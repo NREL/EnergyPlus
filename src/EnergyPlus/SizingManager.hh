@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,32 +52,16 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    class IOFiles;
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SizingManager {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS: none
-
-    // DERIVED TYPE DEFINITIONS: none
-
-    // INTERFACE BLOCK SPECIFICATIONS: none
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumAirLoops;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
-
-    // Types
 
     struct ZoneListData
     {
@@ -92,18 +76,10 @@ namespace SizingManager {
         }
     };
 
-    // Functions
-    void clear_state();
-
     void ManageSizing(EnergyPlusData &state);
 
-    bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
-                                     bool const WarmupFlag,
-                                     int const HourOfDay,
-                                     int const TimeStep,
-                                     int const KindOfSim,
-                                     int const DayOfSim
-                                     );
+    bool CalcdoLoadComponentPulseNow(
+        EnergyPlusData &state, bool isPulseZoneSizing, bool WarmupFlag, int HourOfDay, int TimeStep, DataGlobalConstants::KindOfSim KindOfSim);
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
@@ -111,10 +87,11 @@ namespace SizingManager {
 
     void DetermineSystemPopulationDiversity(EnergyPlusData &state);
 
-    void GetOARequirements();
+    void GetOARequirements(EnergyPlusData &state);
 
-    void ProcessInputOARequirements(std::string const &cCurrentModuleObject,
-                                    int const OAIndex,
+    void ProcessInputOARequirements(EnergyPlusData &state,
+                                    std::string const &cCurrentModuleObject,
+                                    int OAIndex,
                                     Array1D_string const &cAlphaArgs,
                                     int &NumAlphas,
                                     Array1D<Real64> const &rNumericArgs,
@@ -123,46 +100,46 @@ namespace SizingManager {
                                     Array1D_bool const &lAlphaFieldBlanks,
                                     Array1D_string const &cAlphaFieldNames,
                                     Array1D_string const &cNumericFieldNames, // Unused
-                                    bool &ErrorsFound                        // If errors found in input
+                                    bool &ErrorsFound                         // If errors found in input
     );
 
-    void GetZoneAirDistribution();
+    void GetZoneAirDistribution(EnergyPlusData &state);
 
-    void GetZoneHVACSizing();
+    void GetZoneHVACSizing(EnergyPlusData &state);
 
-    void GetAirTerminalSizing();
+    void GetAirTerminalSizing(EnergyPlusData &state);
 
-    void GetSizingParams(IOFiles &ioFiles);
+    void GetSizingParams(EnergyPlusData &state);
 
-    void GetZoneSizingInput();
+    void GetZoneSizingInput(EnergyPlusData &state);
 
-    void
-    GetZoneAndZoneListNames(bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
+    void GetZoneAndZoneListNames(
+        EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
 
-    void GetSystemSizingInput();
+    void GetSystemSizingInput(EnergyPlusData &state);
 
-    void GetPlantSizingInput();
+    void GetPlantSizingInput(EnergyPlusData &state);
 
     void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound);
 
-    void ReportZoneSizing(IOFiles &ioFiles,
+    void ReportZoneSizing(EnergyPlusData &state,
                           std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
-                          Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
-                          Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
-                          Real64 const CalcDesFlow,      // calculated design air flow rate [m3/s]
-                          Real64 const UserDesFlow,      // user input or modified design air flow rate [m3/s]
+                          Real64 CalcDesLoad,            // the value from the sizing calculation [W]
+                          Real64 UserDesLoad,            // the value from the sizing calculation modified by user input [W]
+                          Real64 CalcDesFlow,            // calculated design air flow rate [m3/s]
+                          Real64 UserDesFlow,            // user input or modified design air flow rate [m3/s]
                           std::string const &DesDayName, // the name of the design day that produced the peak
                           std::string const &PeakHrMin,  // time stamp of the peak
-                          Real64 const PeakTemp,         // temperature at peak [C]
-                          Real64 const PeakHumRat,       // humidity ratio at peak [kg water/kg dry air]
-                          Real64 const FloorArea,        // zone floor area [m2]
-                          Real64 const TotOccs,          // design number of occupants for the zone
-                          Real64 const MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
-                          Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
+                          Real64 PeakTemp,               // temperature at peak [C]
+                          Real64 PeakHumRat,             // humidity ratio at peak [kg water/kg dry air]
+                          Real64 FloorArea,              // zone floor area [m2]
+                          Real64 TotOccs,                // design number of occupants for the zone
+                          Real64 MinOAVolFlow,           // zone design minimum outside air flow rate [m3/s]
+                          Real64 DOASHeatAddRate         // zone design heat addition rate from the DOAS [W]
     );
 
-    void ReportSysSizing(IOFiles &ioFiles,
+    void ReportSysSizing(EnergyPlusData &state,
                          std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadType, // either "Sensible" or "Total"
@@ -174,13 +151,31 @@ namespace SizingManager {
                          int const &TimeStepIndex         // time step of the peak
     );
 
-    std::string TimeIndexToHrMinString(int timeIndex);
+    std::string TimeIndexToHrMinString(EnergyPlusData &state, int timeIndex);
 
-    void UpdateFacilitySizing(DataGlobal const &dataGlobals, int const CallIndicator);
+    void UpdateFacilitySizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator CallIndicator);
 
-    void UpdateTermUnitFinalZoneSizing();
+    void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state);
 
 } // namespace SizingManager
+
+struct SizingManagerData : BaseGlobalStruct
+{
+
+    // MODULE VARIABLE DECLARATIONS:
+    int NumAirLoops = 0;
+    bool ReportZoneSizingMyOneTimeFlag = true;
+    bool ReportSysSizingMyOneTimeFlag = true;
+    bool runZeroingOnce = true;
+
+    void clear_state() override
+    {
+        NumAirLoops = 0;
+        ReportZoneSizingMyOneTimeFlag = true;
+        ReportSysSizingMyOneTimeFlag = true;
+        runZeroingOnce = true;
+    }
+};
 
 } // namespace EnergyPlus
 

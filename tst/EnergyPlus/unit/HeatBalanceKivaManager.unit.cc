@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,25 +50,23 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/ConfiguredFunctions.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-
 
 namespace EnergyPlus {
 
@@ -179,86 +177,108 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false); // If errors detected in input
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     int DualZoneNum(1);
 
-    DataEnvironment::DayOfYear_Schedule = 1;    // must initialize this to get schedules initialized
-    DataEnvironment::DayOfWeek = 1;             // must initialize this to get schedules initialized
-    DataGlobals::HourOfDay = 1;                 // must initialize this to get schedules initialized
-    DataGlobals::TimeStep = 1;                  // must initialize this to get schedules initialized
-    DataGlobals::NumOfTimeStepInHour = 1;       // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);    // read schedules
+    state->dataEnvrn->DayOfYear_Schedule = 1;      // must initialize this to get schedules initialized
+    state->dataEnvrn->DayOfWeek = 1;               // must initialize this to get schedules initialized
+    state->dataGlobal->HourOfDay = 1;              // must initialize this to get schedules initialized
+    state->dataGlobal->TimeStep = 1;               // must initialize this to get schedules initialized
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.files);
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
 
-    ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataScheduleMgr->Schedule(state->dataZoneCtrls->TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue =
+        DataHVACGlobals::DualSetPointWithDeadBand;
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 24C/20C
 
     Real64 zoneAssumedTemperature1 = 15.0;
-    HeatBalanceKivaManager::KivaInstanceMap kv1(fnd, 0, {}, 0, zoneAssumedTemperature1, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv1(*state, fnd, 0, {}, 0, zoneAssumedTemperature1, 1.0, 0, &km);
 
     kv1.zoneControlNum = 1;
     kv1.zoneControlType = 1; // Temperature
 
-    kv1.setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
+    kv1.setInitialBoundaryConditions(*state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult1 = kv1.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + DataGlobals::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult1, zoneAssumedTemperature1 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 24C/20C
 
     Real64 coolingSetpoint2 = 24.0;
     Real64 zoneAssumedTemperature2 = -9999;
-    HeatBalanceKivaManager::KivaInstanceMap kv2(fnd, 0, {}, 0, zoneAssumedTemperature2, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv2(*state, fnd, 0, {}, 0, zoneAssumedTemperature2, 1.0, 0, &km);
 
     kv2.zoneControlNum = 1;
     kv2.zoneControlType = 1; // Temperature
 
-    kv2.setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
+    kv2.setInitialBoundaryConditions(*state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult2 = kv2.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + DataGlobals::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult2, coolingSetpoint2 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test using default Initial Indoor Temperature with Cooling/Heating Setpoints of 100C/-100C
 
-    state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
+    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 coolingSetpoint3 = 100.0;
     Real64 zoneAssumedTemperature3 = -9999;
-    HeatBalanceKivaManager::KivaInstanceMap kv3(fnd, 0, {}, 0, zoneAssumedTemperature3, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv3(*state, fnd, 0, {}, 0, zoneAssumedTemperature3, 1.0, 0, &km);
 
     kv3.zoneControlNum = 1;
     kv3.zoneControlType = 1; // Temperature
 
-    kv3.setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
+    kv3.setInitialBoundaryConditions(*state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult3 = kv3.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + DataGlobals::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult3, coolingSetpoint3 + DataGlobalConstants::KelvinConv, 0.001);
 
     // Test Initial Indoor Temperature input of 15C with Cooling/Heating Setpoints of 100C/-100C
 
-    state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
-    state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
+    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).CoolTempSchedIndex = 4;
+    state->dataZoneTempPredictorCorrector->SetPointDualHeatCool(1).HeatTempSchedIndex = 5;
 
     Real64 zoneAssumedTemperature4 = 15.0;
-    HeatBalanceKivaManager::KivaInstanceMap kv4(fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);
+    HeatBalanceKivaManager::KivaInstanceMap kv4(*state, fnd, 0, {}, 0, zoneAssumedTemperature4, 1.0, 0, &km);
 
     kv4.zoneControlNum = 1;
     kv4.zoneControlType = 1; // Temperature
 
-    kv4.setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaweather, 1, 1, 1);
+    kv4.setInitialBoundaryConditions(*state, kivaweather, 1, 1, 1);
 
     Real64 expectedResult4 = kv4.instance.bcs->slabConvectiveTemp;
 
-    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobals::KelvinConv, 0.001);
+    EXPECT_NEAR(expectedResult4, zoneAssumedTemperature4 + DataGlobalConstants::KelvinConv, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)
+{
+
+    // DERIVED TYPE DEFINITIONS:
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/HeatBalanceKivaManagerOSkyTest.epw";
+    state->dataWeatherManager->Missing.OpaqSkyCvr = 5;
+
+    HeatBalanceKivaManager::KivaManager km;
+    km.readWeatherData(*state);
+
+    Real64 TDewK = 264.25;
+    Real64 expected_OSky = 5;
+    Real64 expected_ESky = (0.787 + 0.764 * std::log(TDewK / DataGlobalConstants::KelvinConv)) *
+                           (1.0 + 0.0224 * expected_OSky - 0.0035 * pow_2(expected_OSky) + 0.00028 * pow_3(expected_OSky));
+    ;
+
+    EXPECT_NEAR(expected_ESky, km.kivaWeather.skyEmissivity[0], 0.01);
 }
 
 } // namespace EnergyPlus

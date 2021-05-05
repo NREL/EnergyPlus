@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,6 +49,7 @@
 #define EnergyPlus_SurfaceOctree_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 // ObjexxFCL Headers
@@ -63,6 +64,8 @@
 namespace EnergyPlus {
 
 // Forward
+struct EnergyPlusData;
+
 namespace DataSurfaces {
     struct SurfaceData;
 }
@@ -99,7 +102,7 @@ public: // Creation
     }
 
     // Surfaces Outer Cube Constructor
-    SurfaceOctreeCube(Array1D<Surface> &surfaces) : d_(0u), n_(0u), l_(Vertex(0.0)), u_(Vertex(0.0)), c_(Vertex(0.0)), w_(0.0), r_(0.0)
+    SurfaceOctreeCube(EPVector<Surface> &surfaces) : d_(0u), n_(0u), l_(Vertex(0.0)), u_(Vertex(0.0)), c_(Vertex(0.0)), w_(0.0), r_(0.0)
     {
         for (std::uint8_t i = 0; i < 8; ++i)
             cubes_[i] = nullptr; // VC++ 2013 compatible initialization
@@ -423,7 +426,7 @@ public: // Methods
     }
 
     // Surfaces Outer Cube Initilization
-    void init(Array1D<Surface> &surfaces);
+    void init(EPVector<Surface> &surfaces);
 
     // Surfaces that Line Segment Intersects Cube's Enclosing Sphere
     void surfacesSegmentIntersectsSphere(Vertex const &a, Vertex const &b, Surfaces &surfaces) const
@@ -560,23 +563,26 @@ public: // Methods
 
     // Process Surfaces in Cube that Ray Intersects Stopping if Predicate Satisfied
     template <typename Predicate>
-    bool processSomeSurfaceRayIntersectsCube(Vertex const &a, Vertex const &dir, Vertex const &dir_inv, Predicate const &predicate) const
+    bool processSomeSurfaceRayIntersectsCube(
+        EnergyPlusData &state, Vertex const &a, Vertex const &dir, Vertex const &dir_inv, Predicate const &predicate) const
     {
         if (rayIntersectsCube(a, dir, dir_inv)) {
             for (auto const *surface_p : surfaces_) {   // Process this cube's surfaces
                 if (predicate(*surface_p)) return true; // Don't need to process more surfaces
             }
-            for (std::uint8_t i = 0; i < n_; ++i) {                                                          // Recurse
-                if (cubes_[i]->processSomeSurfaceRayIntersectsCube(a, dir, dir_inv, predicate)) return true; // Don't need to process more surfaces
+            for (std::uint8_t i = 0; i < n_; ++i) { // Recurse
+                if (cubes_[i]->processSomeSurfaceRayIntersectsCube(state, a, dir, dir_inv, predicate))
+                    return true; // Don't need to process more surfaces
             }
         }
         return false;
     }
 
     // Process Surfaces in Cube that Ray Intersects Stopping if Predicate Satisfied
-    template <typename Predicate> bool processSomeSurfaceRayIntersectsCube(Vertex const &a, Vertex const &dir, Predicate const &predicate) const
+    template <typename Predicate>
+    bool processSomeSurfaceRayIntersectsCube(EnergyPlusData &state, Vertex const &a, Vertex const &dir, Predicate const &predicate) const
     {
-        return processSomeSurfaceRayIntersectsCube(a, dir, safe_inverse(dir), predicate); // Inefficient if called in loop with same dir
+        return processSomeSurfaceRayIntersectsCube(state, a, dir, safe_inverse(dir), predicate); // Inefficient if called in loop with same dir
     }
 
 public: // Static Methods
@@ -628,9 +634,6 @@ private:                          // Data
     Surfaces surfaces_;           // Surfaces in this cube
 
 }; // SurfaceOctreeCube
-
-// Globals
-extern SurfaceOctreeCube surfaceOctree;
 
 } // namespace EnergyPlus
 

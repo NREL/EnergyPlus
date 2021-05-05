@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/BArray.hh>
-#include <ObjexxFCL/fmt.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers
@@ -74,14 +73,11 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~MArray()
-	{}
-
-protected: // Assignment
+	~MArray() = default;
 
 	// Copy Assignment
 	MArray &
-	operator =( MArray const & a ); // Disallow
+	operator =( MArray const & a ) = delete;
 
 public: // Predicate
 
@@ -202,41 +198,6 @@ protected: // Methods
 	j1( int const i ) const
 	{
 		return array_.l1() + i - 1;
-	}
-
-	// Array Index of Dimension 2
-	int
-	j2( int const i ) const
-	{
-		return array_.l2() + i - 1;
-	}
-
-	// Array Index of Dimension 3
-	int
-	j3( int const i ) const
-	{
-		return array_.l3() + i - 1;
-	}
-
-	// Array Index of Dimension 4
-	int
-	j4( int const i ) const
-	{
-		return array_.l4() + i - 1;
-	}
-
-	// Array Index of Dimension 5
-	int
-	j5( int const i ) const
-	{
-		return array_.l5() + i - 1;
-	}
-
-	// Array Index of Dimension 6
-	int
-	j6( int const i ) const
-	{
-		return array_.l6() + i - 1;
 	}
 
 protected: // Static Methods

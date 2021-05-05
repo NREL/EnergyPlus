@@ -137,7 +137,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.5;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -174,7 +174,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
@@ -2065,6 +2067,12 @@
   Output:Variable,*,AFN Zone Infiltration Sensible Heat Loss Energy,Timestep;
 
   Output:Variable,*,AFN Zone Infiltration Sensible Heat Gain Energy,Timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Volume,Timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Sensible Heat Loss Energy,Timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Sensible Heat Gain Energy,Timestep;
 
   Output:Variable,*,AFN Zone Mixing Volume,Timestep;
 

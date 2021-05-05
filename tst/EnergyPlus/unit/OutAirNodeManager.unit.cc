@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,56 +52,55 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-
-//#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::OutAirNodeManager;
 
 TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
 {
-    NumOutsideAirNodes = 3;
-    OutsideAirNodeList.allocate(3);
-    DataLoopNode::Node.allocate(3);
-    ScheduleManager::Schedule.allocate(2);
+    state->dataOutAirNodeMgr->NumOutsideAirNodes = 3;
+    state->dataOutAirNodeMgr->OutsideAirNodeList.allocate(3);
+    state->dataLoopNodes->Node.allocate(3);
+    state->dataScheduleMgr->Schedule.allocate(2);
 
-    DataEnvironment::OutDryBulbTemp = 25.0;
-    DataEnvironment::OutWetBulbTemp = 15.0;
-    DataEnvironment::WindSpeed = 2.0;
-    DataEnvironment::WindDir = 0.0;
-    DataEnvironment::OutBaroPress = 101325;
-    DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
+    state->dataEnvrn->OutDryBulbTemp = 25.0;
+    state->dataEnvrn->OutWetBulbTemp = 15.0;
+    state->dataEnvrn->WindSpeed = 2.0;
+    state->dataEnvrn->WindDir = 0.0;
+    state->dataEnvrn->OutBaroPress = 101325;
+    state->dataEnvrn->OutHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
-    ScheduleManager::Schedule(1).CurrentValue = 24.0;
-    OutsideAirNodeList(1) = 1;
-    OutsideAirNodeList(2) = 2;
-    OutsideAirNodeList(3) = 3;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 24.0;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(1) = 1;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(2) = 2;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(3) = 3;
     // Scheduled value
-    DataLoopNode::Node(1).IsLocalNode = true;
-    DataLoopNode::Node(1).OutAirDryBulbSchedNum = 1;
-    DataLoopNode::Node(1).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
-    DataLoopNode::Node(1).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
+    state->dataLoopNodes->Node(1).IsLocalNode = true;
+    state->dataLoopNodes->Node(1).OutAirDryBulbSchedNum = 1;
+    state->dataLoopNodes->Node(1).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(1).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
     // EMS override value
-    DataLoopNode::Node(2).IsLocalNode = true;
-    DataLoopNode::Node(2).EMSOverrideOutAirDryBulb = true;
-    DataLoopNode::Node(2).EMSOverrideOutAirWetBulb = true;
-    DataLoopNode::Node(2).EMSValueForOutAirDryBulb = 26.0;
-    DataLoopNode::Node(2).EMSValueForOutAirWetBulb = 16.0;
-    DataLoopNode::Node(2).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
-    DataLoopNode::Node(2).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
+    state->dataLoopNodes->Node(2).IsLocalNode = true;
+    state->dataLoopNodes->Node(2).EMSOverrideOutAirDryBulb = true;
+    state->dataLoopNodes->Node(2).EMSOverrideOutAirWetBulb = true;
+    state->dataLoopNodes->Node(2).EMSValueForOutAirDryBulb = 26.0;
+    state->dataLoopNodes->Node(2).EMSValueForOutAirWetBulb = 16.0;
+    state->dataLoopNodes->Node(2).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(2).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
     // No changes
-    DataLoopNode::Node(3).OutAirDryBulb = DataEnvironment::OutDryBulbTemp;
-    DataLoopNode::Node(3).OutAirWetBulb = DataEnvironment::OutWetBulbTemp;
+    state->dataLoopNodes->Node(3).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(3).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
 
-    InitOutAirNodes();
+    InitOutAirNodes(*state);
 
-    EXPECT_NEAR(14.6467, DataLoopNode::Node(1).OutAirWetBulb, 0.0001);
-    EXPECT_NEAR(0.007253013, DataLoopNode::Node(2).HumRat, 0.000001);
-    EXPECT_NEAR(0.006543816, DataLoopNode::Node(3).HumRat, 0.000001);
-
+    EXPECT_NEAR(14.6467, state->dataLoopNodes->Node(1).OutAirWetBulb, 0.0001);
+    EXPECT_NEAR(0.007253013, state->dataLoopNodes->Node(2).HumRat, 0.000001);
+    EXPECT_NEAR(0.006543816, state->dataLoopNodes->Node(3).HumRat, 0.000001);
 }

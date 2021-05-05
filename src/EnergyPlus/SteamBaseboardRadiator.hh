@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,52 +52,24 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
 
-    // Forward Declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace SteamBaseboardRadiator {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cCMO_BBRadiator_Steam;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumSteamBaseboards;
-    extern int SteamIndex;
-
-    extern Array1D<Real64> QBBSteamRadSource;    // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> QBBSteamRadSrcAvg;    // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
-    // with no source
-
-    // Record keeping variables used to calculate QBBRadSrcAvg locally
-    extern Array1D<Real64> LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-    extern Array1D_bool SetLoopIndexFlag; // get loop number flag
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
-
-    // Types
 
     struct SteamBaseboardParams
     {
         // Members
         std::string EquipID;
         int EquipType;
+        std::string designObjectName; // Design Object
+        int DesignObjectPtr;
         std::string Schedule;
         Array1D_string SurfaceName;
         Array1D_int SurfacePtr;
@@ -110,7 +82,6 @@ namespace SteamBaseboardRadiator {
         int ControlCompTypeNum;
         int CompErrIndex;
         Real64 DegOfSubcooling;      // Temperature differences due to subcooling of the condensate [C]
-        Real64 Offset;               // Control accuracy
         Real64 SteamMassFlowRate;    // Mass flow rate of steam passing through the heater [kg/s]
         Real64 SteamMassFlowRateMax; // Maximum mass flow rate of steam [kg/s]
         Real64 SteamVolFlowRateMax;  // Maximum volumetric flow rate of steam [m3/s]
@@ -141,20 +112,35 @@ namespace SteamBaseboardRadiator {
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
-        int HeatingCapMethod; // - Method for steam baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity,
-                              // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC
                                       // equipment, {-}, or {W/m2}
 
         // Default Constructor
         SteamBaseboardParams()
-            : EquipType(0), ZonePtr(0), SchedPtr(0), SteamInletNode(0), SteamOutletNode(0), TotSurfToDistrib(0), FluidIndex(0), ControlCompTypeNum(0),
-              CompErrIndex(0), DegOfSubcooling(0.0), Offset(0.0), SteamMassFlowRate(0.0), SteamMassFlowRateMax(0.0), SteamVolFlowRateMax(0.0),
-              SteamOutletTemp(0.0), SteamInletTemp(0.0), SteamInletEnthalpy(0.0), SteamOutletEnthalpy(0.0), SteamInletPress(0.0),
-              SteamOutletPress(0.0), SteamInletQuality(0.0), SteamOutletQuality(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0),
-              TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), LoopNum(0),
-              LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0),
-              HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
+            : EquipType(0), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), SteamInletNode(0), SteamOutletNode(0), TotSurfToDistrib(0), FluidIndex(0),
+              ControlCompTypeNum(0), CompErrIndex(0), DegOfSubcooling(0.0), SteamMassFlowRate(0.0), SteamMassFlowRateMax(0.0),
+              SteamVolFlowRateMax(0.0), SteamOutletTemp(0.0), SteamInletTemp(0.0), SteamInletEnthalpy(0.0), SteamOutletEnthalpy(0.0),
+              SteamInletPress(0.0), SteamOutletPress(0.0), SteamInletQuality(0.0), SteamOutletQuality(0.0), FracRadiant(0.0), FracConvect(0.0),
+              FracDistribPerson(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0),
+              RadEnergy(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0), BBMassFlowReSimIndex(0),
+              BBInletTempFlowReSimIndex(0), ScaledHeatingCapacity(0.0)
+        {
+        }
+    };
+
+    struct SteamBaseboardDesignData : SteamBaseboardParams
+    {
+        // Members
+        std::string designName;
+        int HeatingCapMethod; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+        // FracOfAutosizedHeatingCapacity)
+        Real64 DesignScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 Offset;
+        Real64 FracRadiant;
+        Real64 FracDistribPerson;
+
+        // Default Constructor
+        SteamBaseboardDesignData() : HeatingCapMethod(0), DesignScaledHeatingCapacity(0.0), Offset(0.0), FracRadiant(0.0), FracDistribPerson(0.0)
         {
         }
     };
@@ -170,20 +156,26 @@ namespace SteamBaseboardRadiator {
         }
     };
 
-    // Object Data
-    extern Array1D<SteamBaseboardParams> SteamBaseboard;
-    extern Array1D<SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
+    struct SteamBaseboardDesignNumericFieldData
+    {
+        // Members
+        Array1D_string FieldNames;
 
-    // Functions
+        // Default Constructor
+        SteamBaseboardDesignNumericFieldData()
+        {
+        }
+    };
 
-    void SimSteamBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimSteamBaseboard(EnergyPlusData &state,
+                           std::string const &EquipName,
                            int const ActualZoneNum,
                            int const ControlledZoneNum,
                            bool const FirstHVACIteration,
                            Real64 &PowerMet,
                            int &CompIndex);
 
-    void GetSteamBaseboardInput();
+    void GetSteamBaseboardInput(EnergyPlusData &state);
 
     void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
@@ -191,17 +183,18 @@ namespace SteamBaseboardRadiator {
 
     void CalcSteamBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateSteamBaseboard(int const BaseboardNum);
+    void UpdateSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void UpdateBBSteamRadSourceValAvg(bool &SteamBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateBBSteamRadSourceValAvg(EnergyPlusData &state, bool &SteamBaseboardSysOn); // .TRUE. if the radiant system has run this zone time step
 
-    void DistributeBBSteamRadGains();
+    void DistributeBBSteamRadGains(EnergyPlusData &state);
 
-    void ReportSteamBaseboard(int const BaseboardNum);
+    void ReportSteamBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 
-    void UpdateSteamBaseboardPlantConnection(int const BaseboardTypeNum,       // type index
+    void UpdateSteamBaseboardPlantConnection(EnergyPlusData &state,
+                                             int const BaseboardTypeNum,       // type index
                                              std::string const &BaseboardName, // component name
                                              int const EquipFlowCtrl,          // Flow control mode for the equipment
                                              int const LoopNum,                // Plant loop index for where called from
@@ -213,6 +206,65 @@ namespace SteamBaseboardRadiator {
 
 } // namespace SteamBaseboardRadiator
 
+struct SteamBaseboardRadiatorData : BaseGlobalStruct
+{
+
+    std::string const cCMO_BBRadiator_Steam = "ZoneHVAC:Baseboard:RadiantConvective:Steam";
+    std::string const cCMO_BBRadiator_Steam_Design = "ZoneHVAC:Baseboard:RadiantConvective:Steam:Design";
+    int NumSteamBaseboards = 0;
+    int NumSteamBaseboardsDesign = 0;
+    int SteamIndex = 0;
+
+    Array1D<Real64> QBBSteamRadSource;    // Need to keep the last value in case we are still iterating
+    Array1D<Real64> QBBSteamRadSrcAvg;    // Need to keep the last value in case we are still iterating
+    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone
+                                          // with no source
+
+    // Record keeping variables used to calculate QBBRadSrcAvg locally
+    Array1D<Real64> LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    Array1D_bool MySizeFlag;
+    Array1D_bool CheckEquipName;
+    Array1D_bool CheckDesignObjectName;
+    Array1D_bool SetLoopIndexFlag; // get loop number flag
+
+    bool GetInputFlag = true; // one time get input flag
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false;
+    Array1D_bool MyEnvrnFlag;
+
+    Array1D<SteamBaseboardRadiator::SteamBaseboardParams> SteamBaseboard;
+    Array1D<SteamBaseboardRadiator::SteamBaseboardDesignData> SteamBaseboardDesign;
+    Array1D<SteamBaseboardRadiator::SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
+    Array1D<SteamBaseboardRadiator::SteamBaseboardDesignNumericFieldData> SteamBaseboardDesignNumericFields;
+    Array1D_string SteamBaseboardDesignNames; // Array that contains the names of Design objects
+
+    void clear_state() override
+    {
+        NumSteamBaseboards = 0;
+        SteamIndex = 0;
+        QBBSteamRadSource.clear();
+        QBBSteamRadSrcAvg.clear();
+        ZeroSourceSumHATsurf.clear();
+        LastQBBSteamRadSrc.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        MySizeFlag.clear();
+        MyEnvrnFlag.clear();
+        CheckEquipName.clear();
+        SetLoopIndexFlag.clear();
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
+        SteamBaseboard.clear();
+        SteamBaseboardNumericFields.clear();
+        SteamBaseboardDesignNames.clear();
+    }
+
+    // Default Constructor
+    SteamBaseboardRadiatorData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

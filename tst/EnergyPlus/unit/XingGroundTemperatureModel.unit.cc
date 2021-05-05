@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,9 @@
 
 // EnergyPlus Headers
 #include "EnergyPlus/DataIPShortCuts.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
-#include "EnergyPlus/GroundTemperatureModeling/XingGroundTemperatureModel.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundTemperatureManager;
@@ -77,19 +76,19 @@ TEST_F(EnergyPlusFixture, XingGroundTempsModelTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    std::string const CurrentModuleObject = CurrentModuleObjects(objectType_XingGroundTemp);
+    std::string const CurrentModuleObject = state->dataGrndTempModelMgr->CurrentModuleObjects(objectType_XingGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(*state, CurrentModuleObject, "TEST");
 
-    EXPECT_NEAR(-1.43, thisModel->getGroundTempAtTimeInSeconds(0.0, 0.0), 0.01);
-    EXPECT_NEAR(2.15, thisModel->getGroundTempAtTimeInSeconds(0.0, 6393600), 0.1);   // March 15
-    EXPECT_NEAR(19.74, thisModel->getGroundTempAtTimeInSeconds(0.0, 22291200), 0.1); // Sept 15
-    EXPECT_NEAR(-2.03, thisModel->getGroundTempAtTimeInSeconds(0.0, 35510400), 0.1); // Feb 15 of next year
+    EXPECT_NEAR(-1.43, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 0.0), 0.01);
+    EXPECT_NEAR(2.15, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 6393600), 0.1);   // March 15
+    EXPECT_NEAR(19.74, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 22291200), 0.1); // Sept 15
+    EXPECT_NEAR(-2.03, thisModel->getGroundTempAtTimeInSeconds(*state, 0.0, 35510400), 0.1); // Feb 15 of next year
 
-    EXPECT_NEAR(-2.71, thisModel->getGroundTempAtTimeInMonths(0.0, 1), 0.1);  // January
-    EXPECT_NEAR(23.61, thisModel->getGroundTempAtTimeInMonths(0.0, 7), 0.1);  // July
-    EXPECT_NEAR(1.62, thisModel->getGroundTempAtTimeInMonths(0.0, 12), 0.1);  // December
-    EXPECT_NEAR(-2.12, thisModel->getGroundTempAtTimeInMonths(0.0, 14), 0.1); // Feb of next year
+    EXPECT_NEAR(-2.71, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 1), 0.1);  // January
+    EXPECT_NEAR(23.61, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 7), 0.1);  // July
+    EXPECT_NEAR(1.62, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 12), 0.1);  // December
+    EXPECT_NEAR(-2.12, thisModel->getGroundTempAtTimeInMonths(*state, 0.0, 14), 0.1); // Feb of next year
 
-    EXPECT_NEAR(11.1, thisModel->getGroundTempAtTimeInMonths(100.0, 1), 0.1); // January--deep
+    EXPECT_NEAR(11.1, thisModel->getGroundTempAtTimeInMonths(*state, 100.0, 1), 0.1); // January--deep
 }

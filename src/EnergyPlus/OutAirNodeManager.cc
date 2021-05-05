@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,11 +50,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -90,41 +89,10 @@ namespace OutAirNodeManager {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
-    using namespace DataGlobals;
     using namespace DataEnvironment;
-    using DataContaminantBalance::Contaminant;
-    using DataContaminantBalance::OutdoorCO2;
-    using DataContaminantBalance::OutdoorGC;
-    // USE DataHVACGlobals, ONLY: FirstTimeStepSysFlag
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
-
-    // Type declarations in OutAirNodeManager module
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    Array1D_int OutsideAirNodeList;     // List of all outside air inlet nodes
-    int NumOutsideAirNodes(0);          // Number of single outside air nodes
-    bool GetOutAirNodesInputFlag(true); // Flag set to make sure you get input once
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE OutAirNodeManager
-
-    // Functions
-
-    // Clears the global data in OutAirNodeManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        OutsideAirNodeList.deallocate();
-        NumOutsideAirNodes = 0;
-        GetOutAirNodesInputFlag = true;
-    }
-
-    void SetOutAirNodes()
+    void SetOutAirNodes(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -139,30 +107,14 @@ namespace OutAirNodeManager {
         // METHODOLOGY EMPLOYED:
         // Use appropriate flag to check for needed action
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        if (GetOutAirNodesInputFlag) { // First time subroutine has been entered
-            GetOutAirNodesInput();     // Get OutAir Nodes data
-            GetOutAirNodesInputFlag = false;
+        if (state.dataOutAirNodeMgr->GetOutAirNodesInputFlag) { // First time subroutine has been entered
+            GetOutAirNodesInput(state);                         // Get OutAir Nodes data
+            state.dataOutAirNodeMgr->GetOutAirNodesInputFlag = false;
         }
-        InitOutAirNodes();
+        InitOutAirNodes(state);
     }
 
-    void GetOutAirNodesInput()
+    void GetOutAirNodesInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -213,13 +165,13 @@ namespace OutAirNodeManager {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNums(0);           // Maximum number of numeric input fields
-        static int MaxAlphas(0);         // Maximum number of alpha input fields
-        static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
+        int MaxNums(0);                  // Maximum number of numeric input fields
+        int MaxAlphas(0);                // Maximum number of alpha input fields
+        int TotalArgs(0);                // Total number of alpha and numeric arguments (max) for a
 
-        NumOutAirInletNodeLists = inputProcessor->getNumObjectsFound("OutdoorAir:NodeList");
-        NumOutsideAirNodeSingles = inputProcessor->getNumObjectsFound("OutdoorAir:Node");
-        NumOutsideAirNodes = 0;
+        NumOutAirInletNodeLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "OutdoorAir:NodeList");
+        NumOutsideAirNodeSingles = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "OutdoorAir:Node");
+        state.dataOutAirNodeMgr->NumOutsideAirNodes = 0;
         ErrorsFound = false;
         NextFluidStreamNum = 1;
 
@@ -227,13 +179,13 @@ namespace OutAirNodeManager {
         CurSize = 100;
         TmpNums.dimension(CurSize, 0);
 
-        inputProcessor->getObjectDefMaxArgs("NodeList", NumParams, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
         NodeNums.dimension(NumParams, 0);
 
-        inputProcessor->getObjectDefMaxArgs("OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
-        inputProcessor->getObjectDefMaxArgs("OutdoorAir:Node", TotalArgs, NumAlphas, NumNums);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "OutdoorAir:Node", TotalArgs, NumAlphas, NumNums);
         MaxNums = max(MaxNums, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -248,38 +200,40 @@ namespace OutAirNodeManager {
             // Loop over all outside air inlet nodes in the input and count them
             CurrentModuleObject = "OutdoorAir:NodeList";
             for (OutAirInletNodeListNum = 1; OutAirInletNodeListNum <= NumOutAirInletNodeLists; ++OutAirInletNodeListNum) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              OutAirInletNodeListNum,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNums,
-                                              IOStat,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         OutAirInletNodeListNum,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 for (AlphaNum = 1; AlphaNum <= NumAlphas; ++AlphaNum) {
                     ErrInList = false;
                     //  To support HVAC diagram, every outside inlet node must have a unique fluid stream number
                     //  GetNodeNums will increment the value across a node list, the starting value must be incremented
                     //  here across lists and across objects
-                    GetNodeNums(Alphas(AlphaNum),
+                    GetNodeNums(state,
+                                Alphas(AlphaNum),
                                 NumNodes,
                                 NodeNums,
                                 ErrInList,
-                                NodeType_Air,
+                                DataLoopNode::NodeFluidType::Air,
                                 CurrentModuleObject,
                                 CurrentModuleObject,
-                                NodeConnectionType_OutsideAir,
+                                DataLoopNode::NodeConnectionType::OutsideAir,
                                 NextFluidStreamNum,
                                 ObjectIsNotParent,
                                 IncrementFluidStreamYes,
                                 cAlphaFields(AlphaNum));
                     NextFluidStreamNum += NumNodes;
                     if (ErrInList) {
-                        ShowContinueError("Occurred in " + CurrentModuleObject + ", " + cAlphaFields(AlphaNum) + " = " + Alphas(AlphaNum));
+                        ShowContinueError(state, "Occurred in " + CurrentModuleObject + ", " + cAlphaFields(AlphaNum) + " = " + Alphas(AlphaNum));
                         ErrorsFound = true;
                     }
                     for (NodeNum = 1; NodeNum <= NumNodes; ++NodeNum) {
@@ -296,7 +250,7 @@ namespace OutAirNodeManager {
             }
 
             if (ErrorsFound) {
-                ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
+                ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
             }
         }
 
@@ -304,43 +258,45 @@ namespace OutAirNodeManager {
             // Loop over all single outside air nodes in the input
             CurrentModuleObject = "OutdoorAir:Node";
             for (OutsideAirNodeSingleNum = 1; OutsideAirNodeSingleNum <= NumOutsideAirNodeSingles; ++OutsideAirNodeSingleNum) {
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              OutsideAirNodeSingleNum,
-                                              Alphas,
-                                              NumAlphas,
-                                              Numbers,
-                                              NumNums,
-                                              IOStat,
-                                              lNumericBlanks,
-                                              lAlphaBlanks,
-                                              cAlphaFields,
-                                              cNumericFields);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         OutsideAirNodeSingleNum,
+                                                                         Alphas,
+                                                                         NumAlphas,
+                                                                         Numbers,
+                                                                         NumNums,
+                                                                         IOStat,
+                                                                         lNumericBlanks,
+                                                                         lAlphaBlanks,
+                                                                         cAlphaFields,
+                                                                         cNumericFields);
 
                 ErrInList = false;
                 //  To support HVAC diagram, every outside inlet node must have a unique fluid stream number
                 //  GetNodeNums will increment the value across a node list, the starting value must be incremented
                 //  here across lists and across objects
-                GetNodeNums(Alphas(1),
+                GetNodeNums(state,
+                            Alphas(1),
                             NumNodes,
                             NodeNums,
                             ErrInList,
-                            NodeType_Air,
+                            DataLoopNode::NodeFluidType::Air,
                             CurrentModuleObject,
                             CurrentModuleObject,
-                            NodeConnectionType_OutsideAir,
+                            DataLoopNode::NodeConnectionType::OutsideAir,
                             NextFluidStreamNum,
                             ObjectIsNotParent,
                             IncrementFluidStreamYes,
                             cAlphaFields(1));
                 NextFluidStreamNum += NumNodes;
                 if (ErrInList) {
-                    ShowContinueError("Occurred in " + CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowContinueError(state, "Occurred in " + CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
                     ErrorsFound = true;
                 }
 
                 if (NumNodes > 1) {
-                    ShowSevereError(CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
-                    ShowContinueError("...appears to point to a node list, not a single node.");
+                    ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowContinueError(state, "...appears to point to a node list, not a single node.");
                     ErrorsFound = true;
                     continue;
                 }
@@ -352,77 +308,78 @@ namespace OutAirNodeManager {
                     }
                     TmpNums(ListSize) = NodeNums(1);
                 } else { // Duplicates are a problem
-                    ShowSevereError(CurrentModuleObject + ", duplicate " + cAlphaFields(1) + " = " + Alphas(1));
-                    ShowContinueError("Duplicate " + cAlphaFields(1) + " might be found in an OutdoorAir:NodeList.");
+                    ShowSevereError(state, CurrentModuleObject + ", duplicate " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowContinueError(state, "Duplicate " + cAlphaFields(1) + " might be found in an OutdoorAir:NodeList.");
                     ErrorsFound = true;
                     continue;
                 }
 
                 // Set additional node properties
-                if (NumNums > 0) Node(NodeNums(1)).Height = Numbers(1);
+                if (NumNums > 0) state.dataLoopNodes->Node(NodeNums(1)).Height = Numbers(1);
 
                 if (NumAlphas > 1) {
-                    AnyLocalEnvironmentsInModel = true;
+                    state.dataGlobal->AnyLocalEnvironmentsInModel = true;
                 }
 
                 if (NumAlphas > 1 && !lAlphaBlanks(2)) {
-                    Node(NodeNums(1)).OutAirDryBulbSchedNum = GetScheduleIndex(Alphas(2));
-                    if (Node(NodeNums(1)).OutAirDryBulbSchedNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(2) + "\", invalid schedule.");
-                        ShowContinueError("Dry Bulb Temperature Schedule not found=\"" + Alphas(2) + "\".");
+                    state.dataLoopNodes->Node(NodeNums(1)).OutAirDryBulbSchedNum = GetScheduleIndex(state, Alphas(2));
+                    if (state.dataLoopNodes->Node(NodeNums(1)).OutAirDryBulbSchedNum == 0) {
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(2) + "\", invalid schedule.");
+                        ShowContinueError(state, "Dry Bulb Temperature Schedule not found=\"" + Alphas(2) + "\".");
                         ErrorsFound = true;
                     }
                 }
 
                 if (NumAlphas > 2 && !lAlphaBlanks(3)) {
-                    Node(NodeNums(1)).OutAirWetBulbSchedNum = GetScheduleIndex(Alphas(3));
-                    if (Node(NodeNums(1)).OutAirWetBulbSchedNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(3) + "\", invalid schedule.");
-                        ShowContinueError("Wet Bulb Temperature Schedule not found=\"" + Alphas(3) + "\".");
+                    state.dataLoopNodes->Node(NodeNums(1)).OutAirWetBulbSchedNum = GetScheduleIndex(state, Alphas(3));
+                    if (state.dataLoopNodes->Node(NodeNums(1)).OutAirWetBulbSchedNum == 0) {
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(3) + "\", invalid schedule.");
+                        ShowContinueError(state, "Wet Bulb Temperature Schedule not found=\"" + Alphas(3) + "\".");
                         ErrorsFound = true;
                     }
                 }
 
                 if (NumAlphas > 3 && !lAlphaBlanks(4)) {
-                    Node(NodeNums(1)).OutAirWindSpeedSchedNum = GetScheduleIndex(Alphas(4));
-                    if (Node(NodeNums(1)).OutAirWindSpeedSchedNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(4) + "\", invalid schedule.");
-                        ShowContinueError("Wind Speed Schedule not found=\"" + Alphas(4) + "\".");
+                    state.dataLoopNodes->Node(NodeNums(1)).OutAirWindSpeedSchedNum = GetScheduleIndex(state, Alphas(4));
+                    if (state.dataLoopNodes->Node(NodeNums(1)).OutAirWindSpeedSchedNum == 0) {
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(4) + "\", invalid schedule.");
+                        ShowContinueError(state, "Wind Speed Schedule not found=\"" + Alphas(4) + "\".");
                         ErrorsFound = true;
                     }
                 }
 
                 if (NumAlphas > 4 && !lAlphaBlanks(5)) {
-                    Node(NodeNums(1)).OutAirWindDirSchedNum = GetScheduleIndex(Alphas(5));
-                    if (Node(NodeNums(1)).OutAirWindDirSchedNum == 0) {
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\", invalid schedule.");
-                        ShowContinueError("Wind Direction Schedule not found=\"" + Alphas(5) + "\".");
+                    state.dataLoopNodes->Node(NodeNums(1)).OutAirWindDirSchedNum = GetScheduleIndex(state, Alphas(5));
+                    if (state.dataLoopNodes->Node(NodeNums(1)).OutAirWindDirSchedNum == 0) {
+                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\", invalid schedule.");
+                        ShowContinueError(state, "Wind Direction Schedule not found=\"" + Alphas(5) + "\".");
                         ErrorsFound = true;
                     }
                 }
 
                 if (NumAlphas > 8) {
-                    ShowSevereError(CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
-                    ShowContinueError("Object Definition indicates more than 7 Alpha Objects.");
+                    ShowSevereError(state, CurrentModuleObject + ", " + cAlphaFields(1) + " = " + Alphas(1));
+                    ShowContinueError(state, "Object Definition indicates more than 7 Alpha Objects.");
                     ErrorsFound = true;
                     continue;
                 }
-                if (Node(NodeNums(1)).OutAirDryBulbSchedNum > 0 || Node(NodeNums(1)).OutAirWetBulbSchedNum > 0) {
-                    Node(NodeNums(1)).IsLocalNode = true;
+                if (state.dataLoopNodes->Node(NodeNums(1)).OutAirDryBulbSchedNum > 0 ||
+                    state.dataLoopNodes->Node(NodeNums(1)).OutAirWetBulbSchedNum > 0) {
+                    state.dataLoopNodes->Node(NodeNums(1)).IsLocalNode = true;
                 }
             }
             if (ErrorsFound) {
-                ShowFatalError(RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
+                ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + " input.");
             }
         }
 
         if (ListSize > 0) {
-            NumOutsideAirNodes = ListSize;
-            OutsideAirNodeList = TmpNums({1, ListSize});
+            state.dataOutAirNodeMgr->NumOutsideAirNodes = ListSize;
+            state.dataOutAirNodeMgr->OutsideAirNodeList = TmpNums({1, ListSize});
         }
     }
 
-    void InitOutAirNodes()
+    void InitOutAirNodes(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -440,13 +397,13 @@ namespace OutAirNodeManager {
         int NodeNum;
 
         // Do the begin time step initialization
-        for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= NumOutsideAirNodes; ++OutsideAirNodeNum) {
-            NodeNum = OutsideAirNodeList(OutsideAirNodeNum);
-            SetOANodeValues(NodeNum, true);
+        for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++OutsideAirNodeNum) {
+            NodeNum = state.dataOutAirNodeMgr->OutsideAirNodeList(OutsideAirNodeNum);
+            SetOANodeValues(state, NodeNum, true);
         }
     }
 
-    bool CheckOutAirNodeNumber(int const NodeNumber) // Number of node to check to see if in Outside Air list
+    bool CheckOutAirNodeNumber(EnergyPlusData &state, int const NodeNumber) // Number of node to check to see if in Outside Air list
     {
 
         // FUNCTION INFORMATION:
@@ -485,13 +442,13 @@ namespace OutAirNodeManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (GetOutAirNodesInputFlag) { // First time subroutine has been entered
-            GetOutAirNodesInput();     // Get Out Air Nodes data
-            GetOutAirNodesInputFlag = false;
-            SetOutAirNodes();
+        if (state.dataOutAirNodeMgr->GetOutAirNodesInputFlag) { // First time subroutine has been entered
+            GetOutAirNodesInput(state);                         // Get Out Air Nodes data
+            state.dataOutAirNodeMgr->GetOutAirNodesInputFlag = false;
+            SetOutAirNodes(state);
         }
 
-        if (any_eq(OutsideAirNodeList, NodeNumber)) {
+        if (any_eq(state.dataOutAirNodeMgr->OutsideAirNodeList, NodeNumber)) {
             Okay = true;
         } else {
             Okay = false;
@@ -500,7 +457,8 @@ namespace OutAirNodeManager {
         return Okay;
     }
 
-    void CheckAndAddAirNodeNumber(int const NodeNumber, // Number of node to check to see if in Outside Air list
+    void CheckAndAddAirNodeNumber(EnergyPlusData &state,
+                                  int const NodeNumber, // Number of node to check to see if in Outside Air list
                                   bool &Okay            // True if found, false if not
     )
     {
@@ -540,18 +498,17 @@ namespace OutAirNodeManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_int TmpNums;
         int DummyNumber;
-        static bool errFlag(false);
 
-        if (GetOutAirNodesInputFlag) { // First time subroutine has been entered
-            GetOutAirNodesInput();     // Get Out Air Nodes data
-            GetOutAirNodesInputFlag = false;
-            SetOutAirNodes();
+        if (state.dataOutAirNodeMgr->GetOutAirNodesInputFlag) { // First time subroutine has been entered
+            GetOutAirNodesInput(state);                         // Get Out Air Nodes data
+            state.dataOutAirNodeMgr->GetOutAirNodesInputFlag = false;
+            SetOutAirNodes(state);
         }
 
         Okay = false;
 
-        if (NumOutsideAirNodes > 0) {
-            if (any_eq(OutsideAirNodeList, NodeNumber)) {
+        if (state.dataOutAirNodeMgr->NumOutsideAirNodes > 0) {
+            if (any_eq(state.dataOutAirNodeMgr->OutsideAirNodeList, NodeNumber)) {
                 Okay = true;
             } else {
                 Okay = false;
@@ -562,28 +519,31 @@ namespace OutAirNodeManager {
 
         if (NodeNumber > 0) {
             if (!Okay) { // Add new outside air node to list
-                OutsideAirNodeList.redimension(++NumOutsideAirNodes);
-                OutsideAirNodeList(NumOutsideAirNodes) = NodeNumber;
-                TmpNums = OutsideAirNodeList;
+                state.dataOutAirNodeMgr->OutsideAirNodeList.redimension(++state.dataOutAirNodeMgr->NumOutsideAirNodes);
+                state.dataOutAirNodeMgr->OutsideAirNodeList(state.dataOutAirNodeMgr->NumOutsideAirNodes) = NodeNumber;
+                TmpNums = state.dataOutAirNodeMgr->OutsideAirNodeList;
+                bool errFlag(false);
                 // register new node..
-                GetNodeNums(NodeID(NodeNumber),
+                GetNodeNums(state,
+                            state.dataLoopNodes->NodeID(NodeNumber),
                             DummyNumber,
                             TmpNums,
                             errFlag,
-                            NodeType_Air,
+                            DataLoopNode::NodeFluidType::Air,
                             "OutdoorAir:Node",
                             "OutdoorAir:Node",
-                            NodeConnectionType_OutsideAir,
-                            NumOutsideAirNodes,
+                            DataLoopNode::NodeConnectionType::OutsideAir,
+                            state.dataOutAirNodeMgr->NumOutsideAirNodes,
                             ObjectIsNotParent,
                             IncrementFluidStreamYes);
-                SetOANodeValues(NodeNumber, false);
+                SetOANodeValues(state, NodeNumber, false);
             }
         }
     }
 
-    void SetOANodeValues(int const NodeNum, // Number of node to check to see if in Outside Air list
-                         bool InitCall            // True if Init calls, false if CheckAndAddAirNodeNumber calls
+    void SetOANodeValues(EnergyPlusData &state,
+                         int const NodeNum, // Number of node to check to see if in Outside Air list
+                         bool InitCall      // True if Init calls, false if CheckAndAddAirNodeNumber calls
     )
     {
         // SUBROUTINE INFORMATION:
@@ -591,75 +551,94 @@ namespace OutAirNodeManager {
         //       DATE WRITTEN   July 2018
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Consolidate a block from both CheckAndAddAirNodeNumber and InitOutAirNodes to set 
+        // Consolidate a block from both CheckAndAddAirNodeNumber and InitOutAirNodes to set
         // up outdoor node values
 
         using Psychrometrics::PsyHFnTdbW;
-        using Psychrometrics::PsyWFnTdbTwbPb;
         using Psychrometrics::PsyTwbFnTdbWPb;
+        using Psychrometrics::PsyWFnTdbTwbPb;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Set node data to global values
-        if (Node(NodeNum).Height < 0.0) {
+        if (state.dataLoopNodes->Node(NodeNum).Height < 0.0) {
             // Note -- this setting is different than the DataEnvironment "AT" settings.
-            Node(NodeNum).OutAirDryBulb = OutDryBulbTemp;
-            Node(NodeNum).OutAirWetBulb = OutWetBulbTemp;
-            if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
+            state.dataLoopNodes->Node(NodeNum).OutAirDryBulb = state.dataEnvrn->OutDryBulbTemp;
+            state.dataLoopNodes->Node(NodeNum).OutAirWetBulb = state.dataEnvrn->OutWetBulbTemp;
+            if (InitCall) state.dataLoopNodes->Node(NodeNum).OutAirWindSpeed = state.dataEnvrn->WindSpeed;
         } else {
-            Node(NodeNum).OutAirDryBulb = OutDryBulbTempAt(Node(NodeNum).Height);
-            Node(NodeNum).OutAirWetBulb = OutWetBulbTempAt(Node(NodeNum).Height);
-            if (InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeedAt(Node(NodeNum).Height);
+            state.dataLoopNodes->Node(NodeNum).OutAirDryBulb = OutDryBulbTempAt(state, state.dataLoopNodes->Node(NodeNum).Height);
+            state.dataLoopNodes->Node(NodeNum).OutAirWetBulb = OutWetBulbTempAt(state, state.dataLoopNodes->Node(NodeNum).Height);
+            if (InitCall)
+                state.dataLoopNodes->Node(NodeNum).OutAirWindSpeed = DataEnvironment::WindSpeedAt(state, state.dataLoopNodes->Node(NodeNum).Height);
         }
-        if (!InitCall) Node(NodeNum).OutAirWindSpeed = WindSpeed;
-        Node(NodeNum).OutAirWindDir = WindDir;
+        if (!InitCall) state.dataLoopNodes->Node(NodeNum).OutAirWindSpeed = state.dataEnvrn->WindSpeed;
+        state.dataLoopNodes->Node(NodeNum).OutAirWindDir = state.dataEnvrn->WindDir;
 
         if (InitCall) {
             // Set node data to local air node values if defined
-            if (Node(NodeNum).OutAirDryBulbSchedNum != 0) {
-                Node(NodeNum).OutAirDryBulb = GetCurrentScheduleValue(Node(NodeNum).OutAirDryBulbSchedNum);
+            if (state.dataLoopNodes->Node(NodeNum).OutAirDryBulbSchedNum != 0) {
+                state.dataLoopNodes->Node(NodeNum).OutAirDryBulb =
+                    GetCurrentScheduleValue(state, state.dataLoopNodes->Node(NodeNum).OutAirDryBulbSchedNum);
             }
-            if (Node(NodeNum).OutAirWetBulbSchedNum != 0) {
-                Node(NodeNum).OutAirWetBulb = GetCurrentScheduleValue(Node(NodeNum).OutAirWetBulbSchedNum);
+            if (state.dataLoopNodes->Node(NodeNum).OutAirWetBulbSchedNum != 0) {
+                state.dataLoopNodes->Node(NodeNum).OutAirWetBulb =
+                    GetCurrentScheduleValue(state, state.dataLoopNodes->Node(NodeNum).OutAirWetBulbSchedNum);
             }
-            if (Node(NodeNum).OutAirWindSpeedSchedNum != 0) {
-                Node(NodeNum).OutAirWindSpeed = GetCurrentScheduleValue(Node(NodeNum).OutAirWindSpeedSchedNum);
+            if (state.dataLoopNodes->Node(NodeNum).OutAirWindSpeedSchedNum != 0) {
+                state.dataLoopNodes->Node(NodeNum).OutAirWindSpeed =
+                    GetCurrentScheduleValue(state, state.dataLoopNodes->Node(NodeNum).OutAirWindSpeedSchedNum);
             }
-            if (Node(NodeNum).OutAirWindDirSchedNum != 0) {
-                Node(NodeNum).OutAirWindDir = GetCurrentScheduleValue(Node(NodeNum).OutAirWindDirSchedNum);
+            if (state.dataLoopNodes->Node(NodeNum).OutAirWindDirSchedNum != 0) {
+                state.dataLoopNodes->Node(NodeNum).OutAirWindDir =
+                    GetCurrentScheduleValue(state, state.dataLoopNodes->Node(NodeNum).OutAirWindDirSchedNum);
             }
 
             // Set node data to EMS overwritten values if defined
-            if (Node(NodeNum).EMSOverrideOutAirDryBulb) Node(NodeNum).OutAirDryBulb = Node(NodeNum).EMSValueForOutAirDryBulb;
-            if (Node(NodeNum).EMSOverrideOutAirWetBulb) Node(NodeNum).OutAirWetBulb = Node(NodeNum).EMSValueForOutAirWetBulb;
-            if (Node(NodeNum).EMSOverrideOutAirWindSpeed) Node(NodeNum).OutAirWindSpeed = Node(NodeNum).EMSValueForOutAirWindSpeed;
-            if (Node(NodeNum).EMSOverrideOutAirWindDir) Node(NodeNum).OutAirWindDir = Node(NodeNum).EMSValueForOutAirWindDir;
+            if (state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirDryBulb)
+                state.dataLoopNodes->Node(NodeNum).OutAirDryBulb = state.dataLoopNodes->Node(NodeNum).EMSValueForOutAirDryBulb;
+            if (state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirWetBulb)
+                state.dataLoopNodes->Node(NodeNum).OutAirWetBulb = state.dataLoopNodes->Node(NodeNum).EMSValueForOutAirWetBulb;
+            if (state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirWindSpeed)
+                state.dataLoopNodes->Node(NodeNum).OutAirWindSpeed = state.dataLoopNodes->Node(NodeNum).EMSValueForOutAirWindSpeed;
+            if (state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirWindDir)
+                state.dataLoopNodes->Node(NodeNum).OutAirWindDir = state.dataLoopNodes->Node(NodeNum).EMSValueForOutAirWindDir;
         }
 
-        Node(NodeNum).Temp = Node(NodeNum).OutAirDryBulb;
-        if (Node(NodeNum).IsLocalNode) {
+        state.dataLoopNodes->Node(NodeNum).Temp = state.dataLoopNodes->Node(NodeNum).OutAirDryBulb;
+        if (state.dataLoopNodes->Node(NodeNum).IsLocalNode) {
             if (InitCall) {
-                if (Node(NodeNum).OutAirWetBulb > Node(NodeNum).OutAirDryBulb) {
-                    Node(NodeNum).OutAirWetBulb = Node(NodeNum).OutAirDryBulb;
+                if (state.dataLoopNodes->Node(NodeNum).OutAirWetBulb > state.dataLoopNodes->Node(NodeNum).OutAirDryBulb) {
+                    state.dataLoopNodes->Node(NodeNum).OutAirWetBulb = state.dataLoopNodes->Node(NodeNum).OutAirDryBulb;
                 }
-                if (Node(NodeNum).OutAirWetBulbSchedNum == 0 && !Node(NodeNum).EMSOverrideOutAirWetBulb && (Node(NodeNum).EMSOverrideOutAirDryBulb || Node(NodeNum).OutAirDryBulbSchedNum != 0)) {
-                    Node(NodeNum).HumRat = OutHumRat;
-                    Node(NodeNum).OutAirWetBulb = PsyTwbFnTdbWPb(Node(NodeNum).OutAirDryBulb, OutHumRat, OutBaroPress);
+                if (state.dataLoopNodes->Node(NodeNum).OutAirWetBulbSchedNum == 0 && !state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirWetBulb &&
+                    (state.dataLoopNodes->Node(NodeNum).EMSOverrideOutAirDryBulb || state.dataLoopNodes->Node(NodeNum).OutAirDryBulbSchedNum != 0)) {
+                    state.dataLoopNodes->Node(NodeNum).HumRat = state.dataEnvrn->OutHumRat;
+                    state.dataLoopNodes->Node(NodeNum).OutAirWetBulb = PsyTwbFnTdbWPb(
+                        state, state.dataLoopNodes->Node(NodeNum).OutAirDryBulb, state.dataEnvrn->OutHumRat, state.dataEnvrn->OutBaroPress);
                 } else {
-                    Node(NodeNum).HumRat = PsyWFnTdbTwbPb(Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
+                    state.dataLoopNodes->Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state,
+                                                                               state.dataLoopNodes->Node(NodeNum).OutAirDryBulb,
+                                                                               state.dataLoopNodes->Node(NodeNum).OutAirWetBulb,
+                                                                               state.dataEnvrn->OutBaroPress);
                 }
             } else {
-                Node(NodeNum).HumRat = PsyWFnTdbTwbPb(Node(NodeNum).OutAirDryBulb, Node(NodeNum).OutAirWetBulb, OutBaroPress);
+                state.dataLoopNodes->Node(NodeNum).HumRat = PsyWFnTdbTwbPb(state,
+                                                                           state.dataLoopNodes->Node(NodeNum).OutAirDryBulb,
+                                                                           state.dataLoopNodes->Node(NodeNum).OutAirWetBulb,
+                                                                           state.dataEnvrn->OutBaroPress);
             }
         } else {
-            Node(NodeNum).HumRat = OutHumRat;
+            state.dataLoopNodes->Node(NodeNum).HumRat = state.dataEnvrn->OutHumRat;
         }
-        Node(NodeNum).Enthalpy = PsyHFnTdbW(Node(NodeNum).OutAirDryBulb, Node(NodeNum).HumRat);
-        Node(NodeNum).Press = OutBaroPress;
-        Node(NodeNum).Quality = 0.0;
+        state.dataLoopNodes->Node(NodeNum).Enthalpy =
+            PsyHFnTdbW(state.dataLoopNodes->Node(NodeNum).OutAirDryBulb, state.dataLoopNodes->Node(NodeNum).HumRat);
+        state.dataLoopNodes->Node(NodeNum).Press = state.dataEnvrn->OutBaroPress;
+        state.dataLoopNodes->Node(NodeNum).Quality = 0.0;
         // Add contaminants
-        if (Contaminant.CO2Simulation) Node(NodeNum).CO2 = OutdoorCO2;
-        if (Contaminant.GenericContamSimulation) Node(NodeNum).GenContam = OutdoorGC;
-
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation)
+            state.dataLoopNodes->Node(NodeNum).CO2 = state.dataContaminantBalance->OutdoorCO2;
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
+            state.dataLoopNodes->Node(NodeNum).GenContam = state.dataContaminantBalance->OutdoorGC;
     }
 
 } // namespace OutAirNodeManager

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,12 +60,13 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
 struct EnergyPlusData;
-struct ExteriorEnergyUseData;
 
 namespace ExteriorEnergyUse {
 
-    enum class ExteriorFuelUsage {
+    enum class ExteriorFuelUsage
+    {
         Unknown = 0,
         ElecUse = 1,
         GasUse = 2,
@@ -83,7 +84,8 @@ namespace ExteriorEnergyUse {
         OtherFuel2Use = 14
     };
 
-    enum class LightControlType {
+    enum class LightControlType
+    {
         ScheduleOnly = 1,      // exterior lights only on schedule
         AstroClockOverride = 2 // exterior lights controlled to turn off during day.
     };
@@ -91,23 +93,23 @@ namespace ExteriorEnergyUse {
     struct ExteriorLightUsage
     {
         // Members
-        std::string Name;          // Descriptive name -- will show on reporting
-        int SchedPtr;              // Can be scheduled
-        Real64 DesignLevel;        // Consumption in Watts
-        Real64 Power;              // Power = DesignLevel * ScheduleValue
-        Real64 CurrentUse;         // Use for this time step
-        LightControlType ControlMode;           // Control mode Schedule Only or Astronomical Clock plus schedule
-        bool ManageDemand;         // Flag to indicate whether to use demand limiting
-        Real64 DemandLimit;        // Demand limit set by demand manager [W]
-        bool PowerActuatorOn;      // EMS flag
-        Real64 PowerActuatorValue; // EMS value
-        Real64 SumConsumption;     // sum of electric consumption [J] for reporting
-        Real64 SumTimeNotZeroCons; // sum of time of positive electric consumption [hr]
+        std::string Name;             // Descriptive name -- will show on reporting
+        int SchedPtr;                 // Can be scheduled
+        Real64 DesignLevel;           // Consumption in Watts
+        Real64 Power;                 // Power = DesignLevel * ScheduleValue
+        Real64 CurrentUse;            // Use for this time step
+        LightControlType ControlMode; // Control mode Schedule Only or Astronomical Clock plus schedule
+        bool ManageDemand;            // Flag to indicate whether to use demand limiting
+        Real64 DemandLimit;           // Demand limit set by demand manager [W]
+        bool PowerActuatorOn;         // EMS flag
+        Real64 PowerActuatorValue;    // EMS value
+        Real64 SumConsumption;        // sum of electric consumption [J] for reporting
+        Real64 SumTimeNotZeroCons;    // sum of time of positive electric consumption [hr]
 
         // Default Constructor
         ExteriorLightUsage()
-                : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(LightControlType::ScheduleOnly), ManageDemand(false), DemandLimit(0.0),
-                  PowerActuatorOn(false), PowerActuatorValue(0.0), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
+            : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(LightControlType::ScheduleOnly), ManageDemand(false),
+              DemandLimit(0.0), PowerActuatorOn(false), PowerActuatorValue(0.0), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
         {
         }
     };
@@ -125,47 +127,51 @@ namespace ExteriorEnergyUse {
         Real64 DemandLimit; // Demand limit set by demand manager [W]
 
         // Default Constructor
-        ExteriorEquipmentUsage() : FuelType(ExteriorFuelUsage::Unknown), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
+        ExteriorEquipmentUsage()
+            : FuelType(ExteriorFuelUsage::Unknown), SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ManageDemand(false), DemandLimit(0.0)
         {
         }
     };
 
-    void ManageExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
+    void ManageExteriorEnergyUse(EnergyPlusData &state);
 
-    void GetExteriorEnergyUseInput(ExteriorEnergyUseData &exteriorEnergyUse);
+    void GetExteriorEnergyUseInput(EnergyPlusData &state);
 
-    void ValidateFuelType(ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber,                    // Fuel Type to be set in structure.
-                          std::string const &FuelTypeAlpha,       // Fuel Type String
-                          std::string &FuelTypeString,            // Standardized Fuel Type String (for variable naming)
-                          std::string const &CurrentModuleObject, // object being parsed
-                          std::string const &CurrentField,        // current field being parsed
-                          std::string const &CurrentName          // current object name being parsed
+    void ValidateFuelType(EnergyPlusData &state,
+                          ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber, // Fuel Type to be set in structure.
+                          std::string const &FuelTypeAlpha,                     // Fuel Type String
+                          std::string &FuelTypeString,                          // Standardized Fuel Type String (for variable naming)
+                          std::string const &CurrentModuleObject,               // object being parsed
+                          std::string const &CurrentField,                      // current field being parsed
+                          std::string const &CurrentName                        // current object name being parsed
     );
 
-    void ReportExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
+    void ReportExteriorEnergyUse(EnergyPlusData &state);
 
 } // namespace ExteriorEnergyUse
 
-    struct ExteriorEnergyUseData : BaseGlobalStruct {
+struct ExteriorEnergyUseData : BaseGlobalStruct
+{
 
-        int NumExteriorLights; // Number of Exterior Light Inputs
-        int NumExteriorEqs;    // Number of Exterior Equipment Inputs
-        Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
-        Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
-        std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
-        bool GetExteriorEnergyInputFlag; // First time, input is "gotten"
+    int NumExteriorLights = 0;                                            // Number of Exterior Light Inputs
+    int NumExteriorEqs = 0;                                               // Number of Exterior Equipment Inputs
+    Array1D<ExteriorEnergyUse::ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+    Array1D<ExteriorEnergyUse::ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
+    std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
+    bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
+    Real64 sumDesignLevel = 0.0;            // for predefined report of design level total
 
-        void clear_state() override {
-            NumExteriorLights = 0;
-            NumExteriorEqs = 0;
-            ExteriorLights.deallocate();
-            ExteriorEquipment.deallocate();
-            UniqueExteriorEquipNames.clear();
-            GetExteriorEnergyInputFlag = true;
-        }
-        // Default Constructor
-        ExteriorEnergyUseData() : NumExteriorLights(0), NumExteriorEqs(0), GetExteriorEnergyInputFlag(true){}
-    };
+    void clear_state() override
+    {
+        this->NumExteriorLights = 0;
+        this->NumExteriorEqs = 0;
+        this->ExteriorLights.deallocate();
+        this->ExteriorEquipment.deallocate();
+        this->UniqueExteriorEquipNames.clear();
+        this->GetExteriorEnergyInputFlag = true;
+        this->sumDesignLevel = 0.0;
+    }
+};
 
 } // namespace EnergyPlus
 

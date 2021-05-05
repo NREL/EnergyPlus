@@ -40,13 +40,13 @@ Big Ladder also produces html based documentation [online](http://bigladdersoftw
 
 ## API Documentation
 
-[![Read the Docs](https://img.shields.io/readthedocs/eplus?label=Python%20API%20Latest%20%28beta%29&color=5AC451)](https://eplus.readthedocs.io/en/latest/)
+[![Read the Docs](https://img.shields.io/readthedocs/energyplus?label=docs%20%28latest%29&color=5AC451)](https://energyplus.readthedocs.io/en/latest/)
+[![Read the Docs](https://img.shields.io/readthedocs/energyplus?label=docs%20%28stable%29&color=5AC451)](https://energyplus.readthedocs.io/en/stable/)
 
-An API is being developed to allow access to internal EnergyPlus functionality and open up the possibility for many new workflow opportunities around EnergyPlus.
+An API has been developed to allow access to internal EnergyPlus functionality and open up the possibility for new workflow opportunities around EnergyPlus.
 A C API is developed to expose the C++ functions, then Python bindings are built on top of that to maximize the accessibility.
-Temporary API documentation is available [here](https://nrel.github.io/EnergyPlus/api/index.html), but we are working on moving the API documentation to ReadTheDocs.
-Currently the Python documentation is being built there, for the latest develop snapshot.
-Many improvements to come in this area. 
+Documentation is being built and posted on ReadTheDocs and that documentation will continue to be expanded over time as the API grows.
+The badges above here show the status, and link out to, the `latest` documentation (most recent commit to the `develop` branch) as well as the `stable` documentation (most recent release tag).
 
 ## License & Contributing Development
 

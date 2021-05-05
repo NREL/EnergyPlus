@@ -134,7 +134,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.5;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -171,7 +171,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Sizing:Parameters,
     1.53,                    !- Heating Sizing Factor
@@ -3356,6 +3358,14 @@
   Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Rate,timestep;
 
   Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Energy,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Gain Rate,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Loss Rate,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Loss Energy,timestep;
 
   Output:Variable,*,AFN Zone Mixing Latent Heat Gain Rate,timestep;
 

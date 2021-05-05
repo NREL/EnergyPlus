@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -63,13 +64,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace MicroturbineElectricGenerator {
-
-    using DataGlobalConstants::iGeneratorMicroturbine;
-
-    extern int NumMTGenerators; // number of MT Generators specified in input
-    extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
-
-    void clear_state();
 
     struct MTGeneratorSpecs : PlantComponent
     {
@@ -121,7 +115,7 @@ namespace MicroturbineElectricGenerator {
         Real64 ExhaustAirTemperature;      // Combustion exhaust air temperature (C)
         Real64 ExhaustAirHumRat;           // Combustion exhaust air humidity ratio (kg/kg)
         //      Other required variables/calculated values
-        int CompType_Num;
+        GeneratorType CompType_Num;
         Real64 RefCombustAirInletDensity; // Reference combustion air inlet density (kg/m3)
         Real64 MinPartLoadRat;            // Min allowed operating frac full load
         Real64 MaxPartLoadRat;            // Max allowed operating frac full load
@@ -186,7 +180,7 @@ namespace MicroturbineElectricGenerator {
               HeatRecRateFWaterFlowCurveNum(0), HeatRecMinVolFlowRate(0.0), HeatRecMaxVolFlowRate(0.0), HeatRecMaxWaterTemp(0.0),
               CombustionAirInletNodeNum(0), CombustionAirOutletNodeNum(0), ExhAirCalcsActive(false), RefExhaustAirMassFlowRate(0.0),
               ExhaustAirMassFlowRate(0.0), ExhFlowFTempCurveNum(0), ExhFlowFPLRCurveNum(0), NomExhAirOutletTemp(0.0), ExhAirTempFTempCurveNum(0),
-              ExhAirTempFPLRCurveNum(0), ExhaustAirTemperature(0.0), ExhaustAirHumRat(0.0), CompType_Num(iGeneratorMicroturbine),
+              ExhAirTempFPLRCurveNum(0), ExhaustAirTemperature(0.0), ExhaustAirHumRat(0.0), CompType_Num(GeneratorType::Microturbine),
               RefCombustAirInletDensity(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), FuelEnergyUseRateHHV(0.0), FuelEnergyUseRateLHV(0.0),
               QHeatRecovered(0.0), ExhaustEnergyRec(0.0), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMinMassFlowRate(0.0), HeatRecMaxMassFlowRate(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(0),
@@ -200,12 +194,17 @@ namespace MicroturbineElectricGenerator {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
-                                 Real64 &EP_UNUSED(MaxLoad),
-                                 Real64 &EP_UNUSED(MinLoad),
-                                 Real64 &EP_UNUSED(OptLoad)) override;
+        void getDesignCapacities(EnergyPlusData &state,
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 [[maybe_unused]] Real64 &MaxLoad,
+                                 [[maybe_unused]] Real64 &MinLoad,
+                                 [[maybe_unused]] Real64 &OptLoad) override;
 
         void InitMTGenerators(EnergyPlusData &state,
                               bool RunFlag,
@@ -217,18 +216,31 @@ namespace MicroturbineElectricGenerator {
                                   Real64 MyLoad // Generator demand (W)
         );
 
-        void UpdateMTGeneratorRecords();
+        void UpdateMTGeneratorRecords(EnergyPlusData &state);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
-
     void GetMTGeneratorInput(EnergyPlusData &state);
 
 } // namespace MicroturbineElectricGenerator
+
+struct MicroturbineElectricGeneratorData : BaseGlobalStruct
+{
+
+    int NumMTGenerators = 0;
+    bool GetMTInput = true;
+    EPVector<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
+
+    void clear_state() override
+    {
+        this->NumMTGenerators = 0;
+        this->GetMTInput = true;
+        this->MTGenerator.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

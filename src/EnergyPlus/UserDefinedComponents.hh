@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -64,23 +65,13 @@ struct EnergyPlusData;
 
 namespace UserDefinedComponents {
 
-    extern int NumUserPlantComps;
-    extern int NumUserCoils;
-    extern int NumUserZoneAir;
-    extern int NumUserAirTerminals;
-
-    extern Array1D_bool CheckUserPlantCompName;
-    extern Array1D_bool CheckUserCoilName;
-    extern Array1D_bool CheckUserZoneAirName;
-    extern Array1D_bool CheckUserAirTerminal;
-
     struct PlantConnectionStruct
     {
         // Members
         int ErlInitProgramMngr;      // points to an EMS:ProgramManager to run for setup and sizing
         int ErlSimProgramMngr;       // points to an EMS:ProgramManager to run only when this connection is called
-        int simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
-        int initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
+        int simPluginLocation;       // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int initPluginLocation;      // If Python Plugins are used to init this, this defines the location in the plugin structure
         int LoopNum;                 // plant loop connection index
         int LoopSideNum;             // plant loop side connection index
         int BranchNum;               // plant loop branch connection index
@@ -107,10 +98,11 @@ namespace UserDefinedComponents {
 
         // Default Constructor
         PlantConnectionStruct()
-            : ErlInitProgramMngr(0), ErlSimProgramMngr(0), simPluginLocation(-1), initPluginLocation(-1), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletNodeNum(0), OutletNodeNum(0),
-              FlowPriority(DataPlant::LoopFlowStatus_Unknown), HowLoadServed(DataPlant::HowMet_Unknown), LowOutTempLimit(0.0), HiOutTempLimit(0.0),
-              MassFlowRateRequest(0.0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0), MyLoad(0.0), MinLoad(0.0),
-              MaxLoad(0.0), OptLoad(0.0), InletRho(0.0), InletCp(0.0), InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
+            : ErlInitProgramMngr(0), ErlSimProgramMngr(0), simPluginLocation(-1), initPluginLocation(-1), LoopNum(0), LoopSideNum(0), BranchNum(0),
+              CompNum(0), InletNodeNum(0), OutletNodeNum(0), FlowPriority(DataPlant::LoopFlowStatus_Unknown),
+              HowLoadServed(DataPlant::HowMet_Unknown), LowOutTempLimit(0.0), HiOutTempLimit(0.0), MassFlowRateRequest(0.0), MassFlowRateMin(0.0),
+              MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletRho(0.0), InletCp(0.0),
+              InletTemp(0.0), InletMassFlowRate(0.0), OutletTemp(0.0)
         {
         }
     };
@@ -196,17 +188,19 @@ namespace UserDefinedComponents {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad);
 
-        void report(int LoopNum);
+        void report(EnergyPlusData &state, int LoopNum);
     };
 
     struct UserCoilComponentStruct
@@ -216,7 +210,7 @@ namespace UserDefinedComponents {
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
         int initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
-        int simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int simPluginLocation;  // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         int NumAirConnections;  // count of how many air connections there are
         bool PlantIsConnected;
         Array1D<AirConnectionStruct> Air;
@@ -226,13 +220,15 @@ namespace UserDefinedComponents {
         bool myOneTimeFlag;
 
         // Default Constructor
-        UserCoilComponentStruct() : ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), NumAirConnections(0), PlantIsConnected(false), myOneTimeFlag(true)
+        UserCoilComponentStruct()
+            : ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), NumAirConnections(0),
+              PlantIsConnected(false), myOneTimeFlag(true)
         {
         }
 
         void initialize(EnergyPlusData &state);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
     struct UserZoneHVACForcedAirComponentStruct
@@ -242,7 +238,7 @@ namespace UserDefinedComponents {
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
         int initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
-        int simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int simPluginLocation;  // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         AirConnectionStruct ZoneAir;
         AirConnectionStruct SourceAir;
         int NumPlantConnections;             // count of how many plant loop (demand) connections there are
@@ -257,14 +253,15 @@ namespace UserDefinedComponents {
 
         // Default Constructor
         UserZoneHVACForcedAirComponentStruct()
-            : ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), NumPlantConnections(0), RemainingOutputToHeatingSP(0.0), RemainingOutputToCoolingSP(0.0),
-              RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0), myOneTimeFlag(true)
+            : ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), NumPlantConnections(0),
+              RemainingOutputToHeatingSP(0.0), RemainingOutputToCoolingSP(0.0), RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0),
+              myOneTimeFlag(true)
         {
         }
 
         void initialize(EnergyPlusData &state, int ZoneNum);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
     struct UserAirTerminalComponentStruct
@@ -276,7 +273,7 @@ namespace UserDefinedComponents {
         int ErlSimProgramMngr;  // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr; // EMS:ProgramManager to  run when this model is initialized and setup
         int initPluginLocation; // If Python Plugins are used to init this, this defines the location in the plugin structure
-        int simPluginLocation; // If Python Plugins are used to simulate this, this defines the location in the plugin structure
+        int simPluginLocation;  // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         AirConnectionStruct AirLoop;
         AirConnectionStruct SourceAir;
         int NumPlantConnections;             // count of how many plant loop (demand) connections there are
@@ -291,23 +288,16 @@ namespace UserDefinedComponents {
 
         // Default Constructor
         UserAirTerminalComponentStruct()
-            : ActualCtrlZoneNum(0), ADUNum(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), NumPlantConnections(0), RemainingOutputToHeatingSP(0.0),
-              RemainingOutputToCoolingSP(0.0), RemainingOutputReqToHumidSP(0.0), RemainingOutputReqToDehumidSP(0.0), myOneTimeFlag(true)
+            : ActualCtrlZoneNum(0), ADUNum(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1),
+              NumPlantConnections(0), RemainingOutputToHeatingSP(0.0), RemainingOutputToCoolingSP(0.0), RemainingOutputReqToHumidSP(0.0),
+              RemainingOutputReqToDehumidSP(0.0), myOneTimeFlag(true)
         {
         }
 
         void initialize(EnergyPlusData &state, int ZoneNum);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
-
-    // Object Data
-    extern Array1D<UserPlantComponentStruct> UserPlantComp;
-    extern Array1D<UserCoilComponentStruct> UserCoil;
-    extern Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
-    extern Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
-
-    void clear_state();
 
     void SimCoilUserDefined(EnergyPlusData &state,
                             std::string const &EquipName, // user name for component
@@ -324,23 +314,72 @@ namespace UserDefinedComponents {
                                int &CompIndex                  // index to zone hvac unit
     );
 
-    void SimAirTerminalUserDefined(EnergyPlusData &state,
-                                   std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
+    void SimAirTerminalUserDefined(
+        EnergyPlusData &state, std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
-    void GetUserDefinedPlantComponents();
+    void GetUserDefinedPlantComponents(EnergyPlusData &state);
 
-    void GetUserDefinedComponents();
+    void GetUserDefinedComponents(EnergyPlusData &state);
 
-    void GetUserDefinedCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetUserDefinedCoilIndex(
+        EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void
-    GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetUserDefinedCoilAirInletNode(
+        EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
-    void
-    GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetUserDefinedCoilAirOutletNode(
+        EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
 } // namespace UserDefinedComponents
 
+struct UserDefinedComponentsData : BaseGlobalStruct
+{
+
+    int NumUserPlantComps = 0;
+    int NumUserCoils = 0;
+    int NumUserZoneAir = 0;
+    int NumUserAirTerminals = 0;
+
+    bool GetInput = true;
+    bool GetPlantCompInput = true;
+
+    Array1D_bool CheckUserPlantCompName;
+    Array1D_bool CheckUserCoilName;
+    Array1D_bool CheckUserZoneAirName;
+    Array1D_bool CheckUserAirTerminal;
+
+    // Object Data
+    EPVector<UserDefinedComponents::UserPlantComponentStruct> UserPlantComp;
+    EPVector<UserDefinedComponents::UserCoilComponentStruct> UserCoil;
+    EPVector<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
+    EPVector<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
+
+    bool lDummy_EMSActuatedPlantComp = false;
+    bool lDummy_GetUserDefComp = false;
+
+    void clear_state() override
+    {
+        this->GetInput = true;
+        this->GetPlantCompInput = true;
+        this->NumUserPlantComps = 0;
+        this->NumUserCoils = 0;
+        this->NumUserZoneAir = 0;
+        this->NumUserAirTerminals = 0;
+        this->CheckUserPlantCompName.deallocate();
+        this->CheckUserCoilName.deallocate();
+        this->CheckUserZoneAirName.deallocate();
+        this->CheckUserAirTerminal.deallocate();
+        this->UserPlantComp.deallocate();
+        this->UserCoil.deallocate();
+        this->UserZoneAirHVAC.deallocate();
+        this->UserAirTerminal.deallocate();
+        this->lDummy_EMSActuatedPlantComp = false;
+        this->lDummy_GetUserDefComp = false;
+    }
+
+    // Default Constructor
+    UserDefinedComponentsData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

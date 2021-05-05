@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -79,7 +80,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::BranchNodeConnections;
 using namespace EnergyPlus::DataBranchNodeConnections;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataGlobalConstants;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;
@@ -95,10 +95,10 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 {
     bool errFlag = false;
-    RegisterNodeConnection(1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
     bool ErrorsFound = false;
 
-    CheckNodeConnections(ErrorsFound);
+    CheckNodeConnections(*state, ErrorsFound);
 
     EXPECT_FALSE(errFlag);     // Node should register without error
     EXPECT_FALSE(ErrorsFound); // Node check should not fail on Check 10 -- zone node name must be unique
@@ -107,16 +107,17 @@ TEST_F(EnergyPlusFixture, BranchNodeErrorCheck_SingleNode)
 TEST_F(EnergyPlusFixture, BranchNodeErrorCheck11Test)
 {
     bool errFlag = false;
-    RegisterNodeConnection(1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
-    RegisterNodeConnection(2, "GoodNode", "Type2", "Object2", "Sensor", 1, false, errFlag);
-    RegisterNodeConnection(1, "BadNode", "Type3", "Object3", "ZoneNode", 1, false, errFlag);
-    RegisterNodeConnection(2, "GoodNode", "Type4", "Object4", "Outlet", 1, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    RegisterNodeConnection(*state, 2, "GoodNode", "Type2", "Object2", "Sensor", 1, false, errFlag);
+    RegisterNodeConnection(*state, 1, "BadNode", "Type3", "Object3", "ZoneNode", 1, false, errFlag);
+    RegisterNodeConnection(*state, 2, "GoodNode", "Type4", "Object4", "Outlet", 1, false, errFlag);
     bool ErrorsFound = false;
 
-    CheckNodeConnections(ErrorsFound);
-    std::string const error_string = delimited_string(
-        {"   ** Severe  ** Node Connection Error, Node Name=\"BadNode\", The same zone node appears more than once.",
-         "   **   ~~~   ** Reference Object=TYPE1, Object Name=Object1", "   **   ~~~   ** Reference Object=TYPE3, Object Name=Object3"});
+    CheckNodeConnections(*state, ErrorsFound);
+    std::string const error_string =
+        delimited_string({"   ** Severe  ** Node Connection Error, Node Name=\"BadNode\", The same zone node appears more than once.",
+                          "   **   ~~~   ** Reference Object=TYPE1, Object Name=Object1",
+                          "   **   ~~~   ** Reference Object=TYPE3, Object Name=Object3"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_TRUE(ErrorsFound); // Node check will fail on Check 11 -- zone node name must be unique
@@ -1113,20 +1114,20 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheckFailure)
     ASSERT_TRUE(process_idf(idf_objects));
     compare_err_stream("");
     // OutputProcessor::TimeValue.allocate(2);
-    DataGlobals::DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
-    SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state);
-    BeginSimFlag = true;
-    BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
-    SizingManager::ManageSizing(state);
+    GetProjectData(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
+    SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    createFacilityElectricPowerServiceObject(*state);
+    BranchInputManager::ManageBranchInput(*state);
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->ZoneSizingCalc = true;
+    SizingManager::ManageSizing(*state);
 
     bool ErrorsFound(false);
-    BranchNodeConnections::CheckNodeConnections(ErrorsFound);
+    BranchNodeConnections::CheckNodeConnections(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound); // Node check will fail on Check 11 -- AirLoopHVAC:ReturnPlenum zone node name must be unique
 }
 
@@ -2121,20 +2122,20 @@ TEST_F(EnergyPlusFixture, BranchNodeConnections_ReturnPlenumNodeCheck)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    DataGlobals::DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    GetProjectData(state);
-    OutputReportPredefined::SetPredefinedTables();
-    SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state);
-    BeginSimFlag = true;
-    BeginEnvrnFlag = true;
-    ZoneSizingCalc = true;
-    SizingManager::ManageSizing(state);
+    GetProjectData(*state);
+    OutputReportPredefined::SetPredefinedTables(*state);
+    SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
+    createFacilityElectricPowerServiceObject(*state);
+    BranchInputManager::ManageBranchInput(*state);
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->ZoneSizingCalc = true;
+    SizingManager::ManageSizing(*state);
 
     bool ErrorsFound(false);
-    BranchNodeConnections::CheckNodeConnections(ErrorsFound);
+    BranchNodeConnections::CheckNodeConnections(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 }
 } // namespace EnergyPlus

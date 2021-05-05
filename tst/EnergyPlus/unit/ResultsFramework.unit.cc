@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -78,9 +79,9 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    resultsFramework->setupOutputOptions(state.files);
+    state->dataResultsFramework->resultsFramework->setupOutputOptions(*state);
 
-    EXPECT_TRUE(resultsFramework->timeSeriesAndTabularEnabled());
+    EXPECT_TRUE(state->dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled());
 }
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject2)
@@ -92,25 +93,25 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    resultsFramework->setupOutputOptions(state.files);
+    state->dataResultsFramework->resultsFramework->setupOutputOptions(*state);
 
-    EXPECT_TRUE(resultsFramework->timeSeriesEnabled());
+    EXPECT_TRUE(state->dataResultsFramework->resultsFramework->timeSeriesEnabled());
     compare_json_stream("");
 }
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo)
 {
 
-    resultsFramework->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
-    resultsFramework->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
-    resultsFramework->SimulationInformation.setInputModelURI("");
-    resultsFramework->SimulationInformation.setRunTime("00hr 08min  6.67sec");
-    resultsFramework->SimulationInformation.setNumErrorsSummary("1", "2");
-    resultsFramework->SimulationInformation.setNumErrorsSizing("0", "0");
-    resultsFramework->SimulationInformation.setNumErrorsWarmup("0", "2");
-    resultsFramework->SimulationInformation.setSimulationEnvironment("");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setInputModelURI("");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setRunTime("00hr 08min  6.67sec");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary("1", "2");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing("0", "0");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup("0", "2");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setSimulationEnvironment("");
 
-    json result = resultsFramework->SimulationInformation.getJSON();
+    json result = state->dataResultsFramework->resultsFramework->SimulationInformation.getJSON();
     json expectedResult = R"( {
             "ErrorSummary": {
                 "NumSevere": "2",
@@ -135,16 +136,16 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo)
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_SimInfo_String)
 {
-    resultsFramework->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
-    resultsFramework->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
-    resultsFramework->SimulationInformation.setInputModelURI("");
-    resultsFramework->SimulationInformation.setRunTime("00hr 08min  6.67sec");
-    resultsFramework->SimulationInformation.setNumErrorsSummary("1", "2");
-    resultsFramework->SimulationInformation.setNumErrorsSizing("0", "0");
-    resultsFramework->SimulationInformation.setNumErrorsWarmup("0", "2");
-    resultsFramework->SimulationInformation.setSimulationEnvironment("");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setProgramVersion("EnergyPlus, Version 8.6.0-0f5a10914b");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setStartDateTimeStamp("2017.03.22 11:03");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setInputModelURI("");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setRunTime("00hr 08min  6.67sec");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary("1", "2");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing("0", "0");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup("0", "2");
+    state->dataResultsFramework->resultsFramework->SimulationInformation.setSimulationEnvironment("");
 
-    json result = resultsFramework->SimulationInformation.getJSON();
+    json result = state->dataResultsFramework->resultsFramework->SimulationInformation.getJSON();
 
     std::string expectedResult =
         "{\n    \"ErrorSummary\": {\n        \"NumSevere\": \"2\",\n        \"NumWarnings\": \"1\"\n    },\n    \"ErrorSummarySizing\": {\n        "
@@ -199,10 +200,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo1)
     reportId++;
     Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
 
-    resultsFramework->RITimestepTSData.addVariable(var0);
-    resultsFramework->RITimestepTSData.addVariable(var1);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var1);
 
-    OutputVars["TimeStep"] = resultsFramework->RITimestepTSData.getVariablesJSON();
+    OutputVars["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getVariablesJSON();
 
     json expectedObject = R"( {
             "TimeStep": [
@@ -230,26 +231,26 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
     int reportId = 1;
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-    resultsFramework->RITimestepTSData.addVariable(var0);
-    resultsFramework->RITimestepTSData.newRow(2, 25, 1, 45); // month,day,hour,minute
-    resultsFramework->RITimestepTSData.newRow(2, 25, 1, 60); // month,day,hour,minute
-    resultsFramework->RITimestepTSData.newRow(2, 25, 24, 45); // month,day,hour,minute
-    resultsFramework->RITimestepTSData.newRow(2, 25, 24, 60); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 45);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 60);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 24, 45); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 24, 60); // month,day,hour,minute
 
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 1.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 2.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 3.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 4.0);
 
     reportId++;
     Variable var1("SALESFLOOR INLET NODE:System Node Humidity Ratio", ReportingFrequency::TimeStep, indexType, reportId, Unit::kgWater_kgDryAir);
-    resultsFramework->RITimestepTSData.addVariable(var1);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 5.0);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 6.0);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 7.0);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 8.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var1);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 5.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 6.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 7.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 8.0);
 
-    OutputData["TimeStep"] = resultsFramework->RITimestepTSData.getJSON();
+    OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
 
     json expectedObject = R"( {
             "TimeStep": {
@@ -273,17 +274,17 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
             }
         } )"_json;
 
-    EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+    EXPECT_EQ(expectedObject.dump(), OutputData.dump());
 
     // If add one more, it also should go to the top of json cols array
     reportId++;
     Variable var2("SALESFLOOR OUTLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
-    resultsFramework->RITimestepTSData.addVariable(var2);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 9.0);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 10.0);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 11.0);
-    resultsFramework->RITimestepTSData.pushVariableValue(reportId, 12.0);
-    OutputData["TimeStep"] = resultsFramework->RITimestepTSData.getJSON();
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var2);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 9.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 10.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 11.0);
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.pushVariableValue(reportId, 12.0);
+    OutputData["TimeStep"] = state->dataResultsFramework->resultsFramework->RITimestepTSData.getJSON();
 
     expectedObject = R"( {
             "TimeStep": {
@@ -311,7 +312,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
             }
         } )"_json;
 
-    EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+    EXPECT_EQ(expectedObject.dump(), OutputData.dump());
 }
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_TableInfo)
@@ -331,7 +332,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_TableInfo)
     tableBody(1, 1) = "5.22";
     tableBody(1, 2) = "0.275000";
 
-    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
+    Table tbl(tableBody,
+              rowLabels,
+              columnLabels,
+              "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
     json result = tbl.getJSON();
@@ -370,7 +374,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ReportInfo)
     tableBody(1, 1) = "5.22";
     tableBody(1, 2) = "0.275000";
 
-    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
+    Table tbl(tableBody,
+              rowLabels,
+              columnLabels,
+              "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
     rowLabels.deallocate();
@@ -391,7 +398,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ReportInfo)
     tableBody(2, 1) = "100000.00";
     tableBody(3, 1) = "100000.00";
 
-    Table tbl2(tableBody, rowLabels, columnLabels, "Coil:Cooling:DX:SingleSpeed",
+    Table tbl2(tableBody,
+               rowLabels,
+               columnLabels,
+               "Coil:Cooling:DX:SingleSpeed",
                "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
     Report report;
@@ -446,43 +456,43 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_convertToMonth)
 {
     std::string datetime;
     datetime = "01/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "January");
     datetime = "02/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "February");
     datetime = "03/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "March");
     datetime = "04/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "April");
     datetime = "05/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "May");
     datetime = "06/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "June");
     datetime = "07/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "July");
     datetime = "08/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "August");
     datetime = "09/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "September");
     datetime = "10/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "October");
     datetime = "11/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "November");
     datetime = "12/01 24:00:00";
-    convertToMonth(datetime);
+    convertToMonth(*state, datetime);
     EXPECT_EQ(datetime, "December");
     datetime = "01/01 23:00:00";
-    EXPECT_THROW(convertToMonth(datetime), FatalError);
+    EXPECT_THROW(convertToMonth(*state, datetime), FatalError);
 }
 
 } // namespace EnergyPlus

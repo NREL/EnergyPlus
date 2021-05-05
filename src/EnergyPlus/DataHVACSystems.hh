@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,36 +55,38 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
 
-    // base class for all HVAC systems
-    class HVACSystemData {
+// Forward declarations
+struct EnergyPlusData;
 
-    public:
+// base class for all HVAC systems
+class HVACSystemData
+{
 
-        // Default Constructor
-        HVACSystemData() {
-        }
+public:
+    // Default Constructor
+    HVACSystemData()
+    {
+    }
 
-        virtual void simulate(EnergyPlusData &state, std::string const &Name,
-            bool const firstHVACIteration,
-            int const &AirLoopNum,
-            int &CompIndex,
-            bool &HeatActive,
-            bool &CoolActive,
-            int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-            Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-            bool const ZoneEquipment,    // TRUE if called as zone equipment
-            Real64 &sysOutputProvided,   // sensible output at supply air node
-            Real64 &latOutputProvided    // latent output at supply air node
-        ) = 0;
+    virtual void simulate(EnergyPlusData &state,
+                          std::string const &Name,
+                          bool const firstHVACIteration,
+                          int const &AirLoopNum,
+                          int &CompIndex,
+                          bool &HeatActive,
+                          bool &CoolActive,
+                          int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+                          Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                          bool const ZoneEquipment,    // TRUE if called as zone equipment
+                          Real64 &sysOutputProvided,   // sensible output at supply air node
+                          Real64 &latOutputProvided    // latent output at supply air node
+                          ) = 0;
 
-        virtual void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) = 0;
-        virtual int getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
-        virtual int getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
-
-    };
+    virtual void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) = 0;
+    virtual int getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
+    virtual int getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) = 0;
+};
 
 } // namespace EnergyPlus
 

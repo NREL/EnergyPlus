@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,11 +54,11 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -131,21 +131,22 @@ TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetSetPointManagerInputs(state);
+    GetSetPointManagerInputs(*state);
     // check specified control variable type is "HumidityRatio"
-    ASSERT_EQ(iCtrlVarType_HumRat, AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_EQ(iCtrlVarType::HumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
-    GetControllerInput(state);
+    GetControllerInput(*state);
     // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
-    ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
-    // ControllerProps always expects the control variable type to be "HumididtyRatio"
-    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(state, ControllerProps(1).SensedNode);
-    ASSERT_EQ(iCtrlVarType_HumRat, ControllerProps(1).HumRatCntrlType);
+    // ControllerProps always expects the control variable type to be "HumidityRatio"
+    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType =
+        GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
+    ASSERT_EQ(iCtrlVarType::HumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType);
 
-    ASSERT_EQ(ControllerProps.size(), 1u);
-    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
+    ASSERT_EQ(state->dataHVACControllers->ControllerProps.size(), 1u);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).Offset, DataSizing::AutoSize);
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
@@ -203,76 +204,77 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetSetPointManagerInputs(state);
+    GetSetPointManagerInputs(*state);
     // check specified control variable type is "HumidityRatio"
-    ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
-    GetControllerInput(state);
+    GetControllerInput(*state);
     // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
-    ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
     // ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
-    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(state, ControllerProps(1).SensedNode);
-    ASSERT_EQ(iCtrlVarType_MaxHumRat, ControllerProps(1).HumRatCntrlType);
+    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType =
+        GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType);
 
     // test index for air loop controllers
     // before controllers are simulated, AirLoopControllerIndex = 0
-    ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
+    ASSERT_EQ(0, state->dataHVACControllers->ControllerProps(1).AirLoopControllerIndex);
 
-    OutputReportPredefined::SetPredefinedTables();
-    SimAirServingZones::GetAirLoopInputFlag = false;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    state.dataAirLoop->PriAirSysAvailMgr.allocate(1);
-    state.dataAirLoop->AirLoopControlInfo.allocate(1);
-    state.dataAirLoop->AirToZoneNodeInfo.allocate(1);
-    state.dataAirLoop->AirToZoneNodeInfo(1).NumSupplyNodes = 1;
-    state.dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum.allocate(1);
-    state.dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum(1) = 1;
-    state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
-    state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
-    DataConvergParams::AirLoopConvergence.allocate(1);
-    DataConvergParams::AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).NumControllers = 1;
-    DataAirSystems::PrimaryAirSystem(1).ControllerIndex.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).ControllerIndex(1) = 0;
-    DataAirSystems::PrimaryAirSystem(1).ControllerName.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).ControllerName(1) = "CW COIL CONTROLLER";
-    DataAirSystems::PrimaryAirSystem(1).ControlConverged.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumIn = 4;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumOut = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalNodes = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum(1) = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).CompType_Num = 5; // WaterCoil_Cooling
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    OutputReportPredefined::SetPredefinedTables(*state);
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
+    state->dataAirLoop->AirLoopControlInfo.allocate(1);
+    state->dataAirLoop->AirToZoneNodeInfo.allocate(1);
+    state->dataAirLoop->AirToZoneNodeInfo(1).NumSupplyNodes = 1;
+    state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum.allocate(1);
+    state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum(1) = 1;
+    state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
+    state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
+    state->dataConvergeParams->AirLoopConvergence.allocate(1);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex(1) = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerName.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerName(1) = "CW COIL CONTROLLER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControlConverged.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumIn = 4;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumOut = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalNodes = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNum.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNum(1) = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = 5; // DataPlant::TypeOf_CoilWaterCooling
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
     bool SimZoneEquipment(false);
-    SimAirServingZones::SimAirLoops(state, true, SimZoneEquipment);
+    SimAirServingZones::SimAirLoops(*state, true, SimZoneEquipment);
 
     // after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
-    ASSERT_EQ(1, DataAirSystems::PrimaryAirSystem(1).NumControllers);
-    ASSERT_EQ(1, DataAirSystems::PrimaryAirSystem(1).ControllerIndex(1));
-    ASSERT_EQ(1, ControllerProps(1).AirLoopControllerIndex);
+    ASSERT_EQ(1, state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers);
+    ASSERT_EQ(1, state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex(1));
+    ASSERT_EQ(1, state->dataHVACControllers->ControllerProps(1).AirLoopControllerIndex);
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
@@ -347,18 +349,22 @@ TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetSetPointManagerInputs(state);
+    GetSetPointManagerInputs(*state);
     // There are two setpoint managers and are schedule type
-    ASSERT_EQ(2, NumSchSetPtMgrs); // 2 schedule set point managers
-    ASSERT_EQ(2, NumAllSetPtMgrs); // 2 all set point managers
+    ASSERT_EQ(2, state->dataSetPointManager->NumSchSetPtMgrs); // 2 schedule set point managers
+    ASSERT_EQ(2, state->dataSetPointManager->NumAllSetPtMgrs); // 2 all set point managers
     // check specified control variable types
-    ASSERT_EQ(iTemperature, AllSetPtMgr(1).CtrlTypeMode);           // is "Temperature"
-    ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(2).CtrlTypeMode); // is "MaximumHumidityRatio"
+    // this was a bug waiting to happen, iTemperature is declared as its own int const in HVACControllers.hh
+    // and it just happened to have the same value as the iCtrlVarType_Temperature int const in SetPointManager.hh
+    // changing it to iCtrlVarType::Temp
+    ASSERT_EQ(iCtrlVarType::Temp, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);      // is "Temperature"
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(2).CtrlTypeMode); // is "MaximumHumidityRatio"
 
-    GetControllerInput(state);
+    GetControllerInput(*state);
     // check ControllerProps control variable is set to "MaximumHumidityRatio"
-    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(state, ControllerProps(1).SensedNode);
-    ASSERT_EQ(iCtrlVarType_MaxHumRat, ControllerProps(1).HumRatCntrlType); // MaximumHumidityRatio
+    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType =
+        GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType); // MaximumHumidityRatio
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
@@ -402,56 +408,56 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetControllerInput(state);
+    GetControllerInput(*state);
 
-    ASSERT_EQ(WaterCoil(1).Name, "CHILLED WATER COIL");
-    ASSERT_EQ(WaterCoil(1).WaterCoilType_Num, WaterCoils::WaterCoil_Cooling);
+    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).Name, "CHILLED WATER COIL");
+    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType, DataPlant::TypeOf_CoilWaterCooling);
 
-    OutputReportPredefined::SetPredefinedTables();
-    SimAirServingZones::GetAirLoopInputFlag = false;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).NumControllers = 1;
-    DataAirSystems::PrimaryAirSystem(1).ControllerIndex.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).ControllerIndex(1) = 0;
-    DataAirSystems::PrimaryAirSystem(1).ControllerName.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).ControllerName(1) = "CW COIL CONTROLLER";
-    DataAirSystems::PrimaryAirSystem(1).ControlConverged.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumIn = 4;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumOut = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalNodes = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum(1) = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = WaterCoil(1).Name;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::WaterCoil_Cooling;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex(1) = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerName.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerName(1) = "CW COIL CONTROLLER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControlConverged.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumIn = 4;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumOut = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalNodes = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNum.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNum(1) = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::WaterCoil_Cooling;
 
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater); //"Coil:Cooling:Water";
     std::string CompName = "CHILLED WATER COIL";
     int CoilTypeNum = SimAirServingZones::WaterCoil_Cooling;
 
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(state, CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = true;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(state, CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = true;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilSystemOnAirLoopOrOASystem(state, CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilSystemOnAirLoopOrOASystem(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = true;
-    SimAirServingZones::CheckWaterCoilIsOnAirLoop(state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
+    SimAirServingZones::CheckWaterCoilIsOnAirLoop(*state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     // now test a different water coil type
-    CoilTypeNum = WaterCoils::WaterCoil_DetFlatFinCooling;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(state, CoilTypeNum, CompName);
+    CoilTypeNum = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 }
 
@@ -495,65 +501,65 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetControllerInput(state);
+    GetControllerInput(*state);
 
-    ASSERT_EQ(WaterCoil(1).Name, "OA PREHEAT HW COIL");
-    ASSERT_EQ(WaterCoil(1).WaterCoilType_Num, WaterCoils::WaterCoil_SimpleHeating);
+    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).Name, "OA PREHEAT HW COIL");
+    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType, DataPlant::TypeOf_CoilWaterSimpleHeating);
 
-    OutputReportPredefined::SetPredefinedTables();
-    SimAirServingZones::GetAirLoopInputFlag = false;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
 
-    state.dataAirLoop->NumOASystems = 1;
-    state.dataAirLoop->OutsideAirSys.allocate(1);
-    state.dataAirLoop->OutsideAirSys(1).Name = "AIRLOOP OASYSTEM";
-    state.dataAirLoop->OutsideAirSys(1).NumControllers = 1;
-    state.dataAirLoop->OutsideAirSys(1).ControllerName.allocate(1);
-    state.dataAirLoop->OutsideAirSys(1).ControllerName(1) = "OA CONTROLLER 1";
-    state.dataAirLoop->OutsideAirSys(1).NumComponents = 2;
-    state.dataAirLoop->OutsideAirSys(1).ComponentType.allocate(2);
-    state.dataAirLoop->OutsideAirSys(1).ComponentType(1) = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
-    state.dataAirLoop->OutsideAirSys(1).ComponentType(2) = "OutdoorAir:Mixer";
-    state.dataAirLoop->OutsideAirSys(1).ComponentName.allocate(2);
-    state.dataAirLoop->OutsideAirSys(1).ComponentName(1) = WaterCoil(1).Name;
-    state.dataAirLoop->OutsideAirSys(1).ComponentName(2) = "OAMixer";
-    state.dataAirLoop->OutsideAirSys(1).ComponentType_Num.allocate(2);
-    state.dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_SimpleHeat;
-    state.dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
+    state->dataAirLoop->NumOASystems = 1;
+    state->dataAirLoop->OutsideAirSys.allocate(1);
+    state->dataAirLoop->OutsideAirSys(1).Name = "AIRLOOP OASYSTEM";
+    state->dataAirLoop->OutsideAirSys(1).NumControllers = 1;
+    state->dataAirLoop->OutsideAirSys(1).ControllerName.allocate(1);
+    state->dataAirLoop->OutsideAirSys(1).ControllerName(1) = "OA CONTROLLER 1";
+    state->dataAirLoop->OutsideAirSys(1).NumComponents = 2;
+    state->dataAirLoop->OutsideAirSys(1).ComponentType.allocate(2);
+    state->dataAirLoop->OutsideAirSys(1).ComponentType(1) = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
+    state->dataAirLoop->OutsideAirSys(1).ComponentType(2) = "OutdoorAir:Mixer";
+    state->dataAirLoop->OutsideAirSys(1).ComponentName.allocate(2);
+    state->dataAirLoop->OutsideAirSys(1).ComponentName(1) = state->dataWaterCoils->WaterCoil(1).Name;
+    state->dataAirLoop->OutsideAirSys(1).ComponentName(2) = "OAMixer";
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num.allocate(2);
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_SimpleHeat;
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
 
-    OAMixer.allocate(1);
-    OAMixer(1).Name = "OAMixer";
-    OAMixer(1).InletNode = 2;
+    state->dataMixedAir->OAMixer.allocate(1);
+    state->dataMixedAir->OAMixer(1).Name = "OAMixer";
+    state->dataMixedAir->OAMixer(1).InletNode = 2;
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Name = "PrimaryAirLoop";
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = state.dataAirLoop->OutsideAirSys(1).Name;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Name = "PrimaryAirLoop";
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = state->dataAirLoop->OutsideAirSys(1).Name;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
 
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
-    std::string CompName = WaterCoil(1).Name;
+    std::string CompName = state->dataWaterCoils->WaterCoil(1).Name;
     int CoilTypeNum = SimAirServingZones::WaterCoil_SimpleHeat;
 
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(state, CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = false;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(state, CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(*state, CoilTypeNum, CompName);
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = false;
-    SimAirServingZones::CheckWaterCoilIsOnAirLoop(state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
+    SimAirServingZones::CheckWaterCoilIsOnAirLoop(*state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     // test a different water coil type
     CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
     WaterCoilOnAirLoop = true;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(state, CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 }
 TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSystemCheckTest)
@@ -627,79 +633,79 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetControllerInput(state);
+    GetControllerInput(*state);
 
-    ASSERT_EQ(WaterCoil(1).Name, "DETAILED PRE COOLING COIL");
-    ASSERT_EQ(WaterCoil(1).WaterCoilType_Num, WaterCoils::WaterCoil_DetFlatFinCooling);
+    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).Name, "DETAILED PRE COOLING COIL");
+    ASSERT_EQ(state->dataWaterCoils->WaterCoil(1).WaterCoilType, DataPlant::TypeOf_CoilWaterDetailedFlatCooling);
 
-    OutputReportPredefined::SetPredefinedTables();
-    SimAirServingZones::GetAirLoopInputFlag = false;
+    OutputReportPredefined::SetPredefinedTables(*state);
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
 
-    state.dataAirLoop->NumOASystems = 1;
-    state.dataAirLoop->OutsideAirSys.allocate(1);
-    state.dataAirLoop->OutsideAirSys(1).Name = "AIRLOOP OASYSTEM";
-    state.dataAirLoop->OutsideAirSys(1).NumControllers = 1;
-    state.dataAirLoop->OutsideAirSys(1).ControllerName.allocate(1);
-    state.dataAirLoop->OutsideAirSys(1).ControllerName(1) = "OA CONTROLLER 1";
-    state.dataAirLoop->OutsideAirSys(1).NumComponents = 2;
-    state.dataAirLoop->OutsideAirSys(1).ComponentType.allocate(2);
-    state.dataAirLoop->OutsideAirSys(1).ComponentType(1) = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilWater_CoolingHXAssisted);
-    state.dataAirLoop->OutsideAirSys(1).ComponentType(2) = "OutdoorAir:Mixer";
-    state.dataAirLoop->OutsideAirSys(1).ComponentName.allocate(2);
-    state.dataAirLoop->OutsideAirSys(1).ComponentName(1) = "HXAssisting Cooling Coil";
-    state.dataAirLoop->OutsideAirSys(1).ComponentName(2) = "OAMixer";
-    state.dataAirLoop->OutsideAirSys(1).ComponentType_Num.allocate(2);
-    state.dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_CoolingHXAsst;
-    state.dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
+    state->dataAirLoop->NumOASystems = 1;
+    state->dataAirLoop->OutsideAirSys.allocate(1);
+    state->dataAirLoop->OutsideAirSys(1).Name = "AIRLOOP OASYSTEM";
+    state->dataAirLoop->OutsideAirSys(1).NumControllers = 1;
+    state->dataAirLoop->OutsideAirSys(1).ControllerName.allocate(1);
+    state->dataAirLoop->OutsideAirSys(1).ControllerName(1) = "OA CONTROLLER 1";
+    state->dataAirLoop->OutsideAirSys(1).NumComponents = 2;
+    state->dataAirLoop->OutsideAirSys(1).ComponentType.allocate(2);
+    state->dataAirLoop->OutsideAirSys(1).ComponentType(1) = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilWater_CoolingHXAssisted);
+    state->dataAirLoop->OutsideAirSys(1).ComponentType(2) = "OutdoorAir:Mixer";
+    state->dataAirLoop->OutsideAirSys(1).ComponentName.allocate(2);
+    state->dataAirLoop->OutsideAirSys(1).ComponentName(1) = "HXAssisting Cooling Coil";
+    state->dataAirLoop->OutsideAirSys(1).ComponentName(2) = "OAMixer";
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num.allocate(2);
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_CoolingHXAsst;
+    state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
 
-    OAMixer.allocate(1);
-    OAMixer(1).Name = "OAMixer";
-    OAMixer(1).InletNode = 2;
+    state->dataMixedAir->OAMixer.allocate(1);
+    state->dataMixedAir->OAMixer(1).Name = "OAMixer";
+    state->dataMixedAir->OAMixer(1).InletNode = 2;
 
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Name = "PrimaryAirLoop";
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = state.dataAirLoop->OutsideAirSys(1).Name;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Name = "PrimaryAirLoop";
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = state->dataAirLoop->OutsideAirSys(1).Name;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
 
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
-    std::string CompName = WaterCoil(1).Name;
+    std::string CompName = state->dataWaterCoils->WaterCoil(1).Name;
     int CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
 
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(state, CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = true;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(state, CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = false;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilSystemOnAirLoopOrOASystem(state, CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilSystemOnAirLoopOrOASystem(*state, CoilTypeNum, CompName);
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = false;
-    SimAirServingZones::CheckWaterCoilIsOnAirLoop(state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
+    SimAirServingZones::CheckWaterCoilIsOnAirLoop(*state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
     EXPECT_TRUE(WaterCoilOnAirLoop);
 }
 TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
 {
-    HVACControllers::ControllerProps.allocate(1);
-    HVACControllers::RootFinders.allocate(1);
+    state->dataHVACControllers->ControllerProps.allocate(1);
+    state->dataHVACControllers->RootFinders.allocate(1);
     bool isConverged = true;
     int const controlNum = 1;
-    auto &thisController(ControllerProps(1));
-    thisController.ControlVar = HVACControllers::iTemperatureAndHumidityRatio;
+    auto &thisController(state->dataHVACControllers->ControllerProps(1));
+    thisController.ControlVar = HVACControllers::iCtrl::TemperatureAndHumidityRatio;
     thisController.Offset = 0.0001;
     int sensedNode = 1;
     thisController.SensedNode = sensedNode;
-    DataLoopNode::Node.allocate(2);
-    DataLoopNode::Node(sensedNode).Temp = 21.2;
-    DataLoopNode::Node(sensedNode).HumRatMax = 0.001;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(sensedNode).Temp = 21.2;
+    state->dataLoopNodes->Node(sensedNode).HumRatMax = 0.001;
     thisController.ActuatedNode = 2;
     thisController.ActuatedNodePlantLoopBranchNum = 0;
     thisController.ActuatedNodePlantLoopNum = 0;
@@ -711,9 +717,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.SetPointValue = 21.1;
     thisController.IsSetPointDefinedFlag = true;
     thisController.NumCalcCalls = 5;
-    DataLoopNode::Node(sensedNode).HumRat = 0.0011;
+    state->dataLoopNodes->Node(sensedNode).HumRat = 0.0011;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(*state, controlNum, isConverged);
     EXPECT_FALSE(isConverged);
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -726,9 +732,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.SetPointValue = 21.1;
     thisController.IsSetPointDefinedFlag = true;
     thisController.NumCalcCalls = 5;
-    DataLoopNode::Node(sensedNode).HumRat = 0.0011;
+    state->dataLoopNodes->Node(sensedNode).HumRat = 0.0011;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(*state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);
     EXPECT_TRUE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -741,9 +747,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.SetPointValue = 21.1;
     thisController.IsSetPointDefinedFlag = true;
     thisController.NumCalcCalls = 5;
-    DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax - 0.001;
+    state->dataLoopNodes->Node(sensedNode).HumRat = state->dataLoopNodes->Node(sensedNode).HumRatMax - 0.001;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(*state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -756,9 +762,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.SetPointValue = 21.1;
     thisController.IsSetPointDefinedFlag = true;
     thisController.NumCalcCalls = 5;
-    DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax + 0.002;
+    state->dataLoopNodes->Node(sensedNode).HumRat = state->dataLoopNodes->Node(sensedNode).HumRatMax + 0.002;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(*state, controlNum, isConverged);
     EXPECT_FALSE(isConverged);
     EXPECT_TRUE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 0.0, 0.0001);
@@ -771,10 +777,10 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.SetPointValue = 21.1;
     thisController.IsSetPointDefinedFlag = true;
     thisController.NumCalcCalls = 5;
-    DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax - 0.001;
-    thisController.ControlVar = HVACControllers::iTemperature;
+    state->dataLoopNodes->Node(sensedNode).HumRat = state->dataLoopNodes->Node(sensedNode).HumRatMax - 0.001;
+    thisController.ControlVar = HVACControllers::iCtrl::Temperature;
 
-    HVACControllers::CheckTempAndHumRatCtrl(controlNum, isConverged);
+    HVACControllers::CheckTempAndHumRatCtrl(*state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
@@ -836,14 +842,14 @@ TEST_F(EnergyPlusFixture, HVACControllers_BlankAutosized)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetSetPointManagerInputs(state);
+    GetSetPointManagerInputs(*state);
 
-    GetControllerInput(state);
+    GetControllerInput(*state);
 
-    ASSERT_EQ(ControllerProps.size(), 1u);
-    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).MinVolFlowActuated, 0.0);
+    ASSERT_EQ(state->dataHVACControllers->ControllerProps.size(), 1u);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).Offset, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MinVolFlowActuated, 0.0);
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
@@ -911,110 +917,110 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetSetPointManagerInputs(state);
+    GetSetPointManagerInputs(*state);
 
-    GetControllerInput(state);
+    GetControllerInput(*state);
 
-    ASSERT_EQ(ControllerProps.size(), 1u);
-    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).MinVolFlowActuated, 0.0);
+    ASSERT_EQ(state->dataHVACControllers->ControllerProps.size(), 1u);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).Offset, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MinVolFlowActuated, 0.0);
 
     // test index for air loop controllers
     // before controllers are simulated, AirLoopControllerIndex = 0
-    ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
+    ASSERT_EQ(0, state->dataHVACControllers->ControllerProps(1).AirLoopControllerIndex);
 
-    OutputReportPredefined::SetPredefinedTables();
-    SimAirServingZones::GetAirLoopInputFlag = false;
-    DataHVACGlobals::NumPrimaryAirSys = 1;
-    state.dataAirLoop->PriAirSysAvailMgr.allocate(1);
-    state.dataAirLoop->AirLoopControlInfo.allocate(1);
-    state.dataAirLoop->AirToZoneNodeInfo.allocate(1);
-    state.dataAirLoop->AirToZoneNodeInfo(1).NumSupplyNodes = 1;
-    state.dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum.allocate(1);
-    state.dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum(1) = 1;
-    state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
-    state.dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
-    DataConvergParams::AirLoopConvergence.allocate(1);
-    DataConvergParams::AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
-    DataConvergParams::AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).NumControllers = 1;
-    DataAirSystems::PrimaryAirSystem(1).ControllerIndex.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).ControllerIndex(1) = 0;
-    DataAirSystems::PrimaryAirSystem(1).ControllerName.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).ControllerName(1) = "CW COIL CONTROLLER";
-    DataAirSystems::PrimaryAirSystem(1).ControlConverged.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumIn = 4;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumOut = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalNodes = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNum(1) = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).CompType_Num = 5; // WaterCoil_Cooling
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop(1).Name = "CHW LOOP";
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    OutputReportPredefined::SetPredefinedTables(*state);
+    state->dataSimAirServingZones->GetAirLoopInputFlag = false;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
+    state->dataAirLoop->AirLoopControlInfo.allocate(1);
+    state->dataAirLoop->AirToZoneNodeInfo.allocate(1);
+    state->dataAirLoop->AirToZoneNodeInfo(1).NumSupplyNodes = 1;
+    state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum.allocate(1);
+    state->dataAirLoop->AirToZoneNodeInfo(1).AirLoopSupplyNodeNum(1) = 1;
+    state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum.allocate(1);
+    state->dataAirLoop->AirToZoneNodeInfo(1).ZoneEquipSupplyNodeNum(1) = 4;
+    state->dataConvergeParams->AirLoopConvergence.allocate(1);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACMassFlowNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACHumRatNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACTempNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACEnergyNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACEnthalpyNotConverged.allocate(2);
+    state->dataConvergeParams->AirLoopConvergence(1).HVACPressureNotConverged.allocate(2);
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex(1) = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerName.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControllerName(1) = "CW COIL CONTROLLER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).ControlConverged.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumIn = 4;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumOut = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalNodes = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNum.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNum(1) = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = 5; // WaterCoil_Cooling
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop(1).Name = "CHW LOOP";
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = 39;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
 
-    DataSizing::NumPltSizInput = 1;
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataSizing::PlantSizData(1).ExitTemp = 6.0;
-    DataSizing::PlantSizData(1).PlantLoopName = "CHW LOOP";
-    DataSizing::PlantSizData(1).LoopType = DataSizing::CoolingLoop;
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->NumPltSizInput = 1;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 6.0;
+    state->dataSize->PlantSizData(1).PlantLoopName = "CHW LOOP";
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::CoolingLoop;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
 
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
 
-    DataSizing::UnitarySysEqSizing.allocate(1);
-    DataSizing::UnitarySysEqSizing(1).CoolingCapacity = false;
-    DataSizing::UnitarySysEqSizing(1).HeatingCapacity = false;
-    DataSizing::UnitarySysEqSizing.deallocate();
+    state->dataSize->UnitarySysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing(1).CoolingCapacity = false;
+    state->dataSize->UnitarySysEqSizing(1).HeatingCapacity = false;
+    state->dataSize->UnitarySysEqSizing.deallocate();
 
     bool SimZoneEquipment(false);
     // compare_err_stream("", true); // reset error stream
 
     // This will call ManageController, which calls SizeController which should autosize the controller max actuated flow rate to zero
     // and issue a warning
-    SimAirServingZones::SimAirLoops(state, true, SimZoneEquipment);
+    SimAirServingZones::SimAirLoops(*state, true, SimZoneEquipment);
 
     // after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
-    ASSERT_EQ(1, DataAirSystems::PrimaryAirSystem(1).NumControllers);
-    ASSERT_EQ(1, DataAirSystems::PrimaryAirSystem(1).ControllerIndex(1));
-    ASSERT_EQ(1, ControllerProps(1).AirLoopControllerIndex);
+    ASSERT_EQ(1, state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers);
+    ASSERT_EQ(1, state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex(1));
+    ASSERT_EQ(1, state->dataHVACControllers->ControllerProps(1).AirLoopControllerIndex);
 
     // This should have been autosized to zero
-    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, 0.0);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MaxVolFlowActuated, 0.0);
     // This should have been reset to zero
-    EXPECT_EQ(ControllerProps(1).MinVolFlowActuated, 0.0);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MinVolFlowActuated, 0.0);
 
     Real64 expectedOffset = (0.001 / (2100.0 * DataHVACGlobals::SmallWaterVolFlow)) * (DataConvergParams::HVACEnergyToler / 10.0);
     // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
     expectedOffset = min(0.1 * DataConvergParams::HVACTemperatureToler, expectedOffset);
     EXPECT_EQ(expectedOffset, 0.1 * DataConvergParams::HVACTemperatureToler);
-    EXPECT_EQ(ControllerProps(1).Offset, expectedOffset);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).Offset, expectedOffset);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** InitController: Controller:WaterCoil=\"CW COIL CONTROLLER\", Maximum Actuated Flow is zero.",

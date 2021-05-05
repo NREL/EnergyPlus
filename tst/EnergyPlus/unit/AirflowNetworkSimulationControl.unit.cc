@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,18 +56,15 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -75,7 +72,6 @@ using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 
@@ -84,38 +80,38 @@ namespace EnergyPlus {
 TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 {
 
-    Zone.allocate(1);
-    Zone(1).Name = "SOFF";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SOFF";
 
-    Surface.allocate(2);
-    Surface(1).Name = "WINDOW 1";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "SOFF";
-    Surface(1).Azimuth = 0.0;
-    Surface(1).ExtBoundCond = 0;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(2).Name = "WINDOW 2";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "SOFF";
-    Surface(2).Azimuth = 180.0;
-    Surface(2).ExtBoundCond = 0;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SOFF";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SOFF";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
 
-    TotPeople = 1; // Total number of people statements
-    People.allocate(TotPeople);
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
-    People(1).AdaptiveCEN15251 = true;
+    state->dataHeatBal->TotPeople = 1; // Total number of people statements
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 100.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -166,50 +162,52 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
+    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver);
 
-    Zone.deallocate();
-    Surface.deallocate();
-    People.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSurface->Surface.deallocate();
+    state->dataHeatBal->People.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 {
 
-    Zone.allocate(1);
-    Zone(1).Name = "SOFF";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SOFF";
 
-    Surface.allocate(2);
-    Surface(1).Name = "WINDOW 1";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "SOFF";
-    Surface(1).Azimuth = 0.0;
-    Surface(1).ExtBoundCond = 0;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(2).Name = "WINDOW 2";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "SOFF";
-    Surface(2).Azimuth = 180.0;
-    Surface(2).ExtBoundCond = 0;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SOFF";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SOFF";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
-    NumOfZones = 1;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    ;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    ;
+    state->dataGlobal->NumOfZones = 1;
 
-    TotPeople = 1; // Total number of people statements
-    People.allocate(TotPeople);
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
-    People(1).AdaptiveCEN15251 = true;
+    state->dataHeatBal->TotPeople = 1; // Total number of people statements
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 100.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -262,13 +260,13 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(state);
+    GetAirflowNetworkInput(*state);
 
-    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
+    EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, state->dataAirflowNetwork->AirflowNetworkSimu.solver);
 
-    Zone.deallocate();
-    Surface.deallocate();
-    People.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSurface->Surface.deallocate();
+    state->dataHeatBal->People.deallocate();
 }
 
 } // namespace EnergyPlus

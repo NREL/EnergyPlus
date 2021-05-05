@@ -15,5 +15,6 @@ python3 "$REPO_ROOT"/scripts/dev/check_for_tabs_in_idfs.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/check_for_bom_in_idfs.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/verify_cmake_dirs.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/find_included_cc_files.py || EXIT_STATUS=$?
+python3 "$REPO_ROOT"/scripts/dev/analyze_state.py || EXIT_STATUS=$?
 
 exit $EXIT_STATUS

@@ -1406,6 +1406,209 @@ These outputs are the thermal power or energy losses from both charging and draw
 
 This output reports the fractional battery life used up at a point of time. For example, a value of 0.4 at the end of one year simulation means that the 40\% of the battery life is used up, so the battery needs to be replaced every two and a half years.
 
+\subsection{ElectricLoadCenter:Storage:LiIonNMCBattery}\label{electricloadcenterstorage-liionbattery}
+
+This object usses the Li-ion NMC battery model from the System Advisor Model (SAM) software.
+
+\subsubsection{Inputs}
+
+\paragraph{Field: Name}\label{liion-name}
+
+This alpha field contains the identifying name for the battery.
+
+\paragraph{Field: Availability Schedule Name}\label{liion-avail-sched-name}
+
+This alpha field contains the schedule name (ref. Schedule objects) that describes when the battery is available. A schedule value greater than 0 (usually 1 is used) indicates that electrical energy can be stored or drawn from the battery. A value less than or equal to 0 (usually 0 is used) denotes that the battery is not available. If this field is blank, the schedule has values of 1 for all time periods.
+
+\paragraph{Field: Zone Name}\label{liion-zone-name}
+
+This field contains the name of the thermal zone where the battery is located. Entering a valid name of zone here will direct EnergyPlus to include the energy storage losses as heat gains to the named thermal zone. If the battery is not within a thermal zone, this field can be left blank and the thermal energy associated with storage losses is removed from the building model.
+
+\paragraph{Field: Radiative Fraction}\label{liion-rad-frac}
+
+This field contains the fraction of storage losses that enter the zone as long-wave thermal radiation. This numeric filed should have a value between 0.0 and 1.0. The balance of the losses is convective. This field is not used if the previous field for zone name is left blank.
+
+\paragraph{Field: Lifetime Model}\label{liion-lifetime-model}
+
+Which lifetime model to use for the battery. Available choices are:
+
+\begin{itemize}
+  \item None: The battery doesn't degrade over time
+  \item KandlerSmith: Use the lifetime model developed by Kandler Smith. Details at \url{https://ieeexplore.ieee.org/abstract/document/7963578}
+\end{itemize}
+
+\paragraph{Field: Number of Cells in Series}\label{liion-n-series}
+
+The number of cells in series. Increasing this number increases the voltage output of the battery.
+
+\paragraph{Field: Number of Strings in Parallel}\label{liion-n-parallel}
+
+The number of strings in parallel.
+
+\paragraph{Field: Initial Fractional State of Charge}\label{liion-init-soc}
+
+This field describes the initial state of charge in terms of the fraction of maximum capacity.
+
+\paragraph{Field: DC to DC Charging Efficiency}\label{liion-dc-dc-charg-eff}
+
+The charging loss coefficient.
+
+\paragraph{Field: Battery Mass}\label{liion-mass}
+
+Battery mass (kg) used in thermal calculation.
+
+\paragraph{Field: Battery Surface Area}\label{liion-surf-area}
+
+Battery surface area (m\textsuperscript{2}) used in thermal calculations.
+
+\paragraph{Field: Battery Specific Heat Capacity}\label{liion-cp}
+
+Specific heat of the battery (J/kg-K) used in the thermal calculation.
+
+\paragraph{Field: Heat Transfer Coefficient Between Battery and Ambient}\label{liion-h}
+
+Heat transfer coefficient (W/m\textsuperscript{2}-K)between battery and ambient.
+
+\paragraph{Field: Fully Charged Cell Voltage}\label{liion-vfull}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Cell Voltage at End of Exponential Zone}\label{liion-vexp}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Cell Voltage at End of Nominal Zone}\label{liion-vnom}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Default Nominal Cell Voltage}\label{liion-vnom-default}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Fully Charged Cell Capacity}\label{liion-qfull}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Fraction of Cell Capacity Removed at the End of Exponential Zone}\label{liion-qexp}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Fraction of Cell Capacity Removed at the End of Nominal Zone}\label{liion-qnom}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Charge Rate at Which Voltage vs Capacity Curve Was Generated}\label{liion-crate}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+\paragraph{Field: Battery Cell Internal Electrical Resistance}\label{liion-internal-r}
+
+This field is included for those who want to modify the battery chemistry. Most users should leave this field blank or omit it to use the defaults, which are typical of Lithium-ion batteries.
+
+An example input of the ElectricLoadCenter:Storage:LiIonNMCBattery is:
+
+\begin{lstlisting}
+
+  ElectricLoadCenter:Storage:LiIonNMCBattery,
+    LiIonBattery,            !- Name
+    ALWAYS_ON,               !- Availability Schedule Name
+    ,                        !- Zone Name
+    0,                       !- Radiative Fraction
+    KandlerSmith,            !- Lifetime Model
+    139,                     !- Number of Cells in Series
+    25,                      !- Number of Strings in Parallel
+    0.7,                     !- Initial Fractional State of Charge
+    ,                        !- DC to DC Charging Efficiency
+    342,                     !- Battery Mass
+    4.26,                    !- Battery Surface Area
+    ,                        !- Battery Specific Heat Capacity
+    ;                        !- Heat Transfer Coefficient Between Battery and Ambient
+
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{electricloadcenter-storageliionnmcbatttery-outputs}
+
+\begin{itemize}
+  \item
+    HVAC,Average, Electric Storage Operating Mode Index {[]}
+  \item
+    HVAC,Average,Electric Storage Charge State{[}Ah{]}
+  \item
+    HVAC,Average, Electric Storage Charge Fraction {[]}
+  \item
+    HVAC,Average,Electric Storage Charge Power{[}W{]}
+  \item
+    HVAC,Sum,Electric Storage Charge Energy {[}J{]}
+  \item
+    HVAC,Average,Electric Storage Discharge Power{[}W{]}
+  \item
+    HVAC,Sum,Electric Storage Discharge Energy {[}J{]}
+  \item
+    HVAC,Average,Electric Storage Total Current{[}A{]}
+  \item
+    HVAC,Average, Electric Storage Total Voltage {[}V{]}
+  \item
+    HVAC,Average,Electric Storage Thermal Loss Rate {[}W{]}
+  \item
+    HVAC,Average,Electric Storage Degradation Fraction {[]}
+  \item
+    HVAC,Sum,Electric Storage Production Decrement Energy {[}J{]}
+  \item
+    HVAC,Sum,Electric Storage Thermal Loss Energy {[}J{]}
+  \item
+    HVAC,Average,Electric Storage Battery Temperature {[}C{]}
+\end{itemize}
+
+\paragraph{Electric Storage Operating Mode Index {[]}}\label{liion-operating-mode-index}
+
+This output reports the battery mode of operation: 0 for idle; 1 for discharging; 2 for charging. It is expected that more operation modes would be added when a smart and active power dispatch controller is used in future.
+
+\paragraph{Electric Storage Charge State {[}Ah{]}}\label{liion-charge-state-ah}
+
+The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module
+
+\paragraph{Electric Storage Charge Fraction {[]}}\label{liion-charge-fraction}
+
+This output is the ratio between the electrical storage state of charge and the maximum capacity.
+
+\paragraph{Electric Storage Charge Power {[}W{]}}\label{liion-charge-power-w-1}
+
+\paragraph{Electric Storage Charge Energy {[}J{]}}\label{liion-charge-energy-j-1}
+
+These outputs are total electricity power or energy fed into the battery. This is the rate of amount of charging.
+
+\paragraph{Electric Storage Production Decrement Energy {[}J{]}}\label{liion-production-decrement-energy-j-1}
+
+This output is the total electricity energy decremented from electricity production because it has fed into the battery. This output has the opposite sign of Electric Storage Charge Energy but is otherwise similar. This decrement output variable is also a meter associated with the resource type ElectricityProduced that reduces the metered electricity production to account for power that went into storage after production.
+
+\paragraph{Electric Storage Discharge Power {[}W{]}}\label{liion-discharge-power-w-1}
+
+\paragraph{Electric Storage Discharge Energy {[}J{]}}\label{liion-discharge-energy-j-1}
+
+These outputs are total electricity power or energy drawn from the battery. This is the rate or amount of discharging. The energy from storage output variable is also a meter associated with the resource type ElectricityProduced that increases the metered electricity production to account for power that has come back out of storage.
+
+\paragraph{Electric Storage Total Current {[}A{]}}\label{liion-total-current-a}
+
+This output is the current to or from the battery bank depending on whether the battery is in the state of charging or discharging. The value is positive for discharging and negative for charging.
+
+\paragraph{Electric Storage Total Voltage {[}V{]}}\label{liion-total-voltage-v}
+
+This output is the total terminal voltage of the battery bank.
+
+\paragraph{Electric Storage Thermal Loss Rate {[}W{]}}\label{liion-thermal-loss-rate-w-1}
+
+\paragraph{Electric Storage Thermal Loss Energy {[}J{]}}\label{liion-thermal-loss-energy-j-1}
+
+These outputs are the thermal power or energy losses from both charging and drawing electrical power in or out of the storage device. These losses are due to the battery internal resistance in charging and discharging.
+
+\paragraph{Electric Storage Degradation Fraction {[]}}\label{liion-degradation-fraction}
+
+This output reports the fractional battery life used up at a point of time. For example, a value of 0.4 at the end of one year simulation means that 40\% of the battery life is used up.
+
+\paragraph{HVAC,Average,Electric Storage Battery Temperature {[}C{]}}\label{liion-battery-temperature}
+
+The internal temperature of the battery.
+
 \subsection{Generator:InternalCombustionEngine}\label{generatorinternalcombustionengine}
 
 The Internal Combustion (IC) Engine generator uses a modified Otto cycle. This generator model uses the electrical load and rated engine generator size to compute part-load ratios (PLR). Fuel energy input and recoverable jacket and lube oil heat are then computed. Finally, the recoverable exhaust heat is calculated.
@@ -1840,7 +2043,7 @@ This alpha field contains the identifying name for the combustion turbine genera
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-1}
 
-This alpha field determines the type of fuel that the generator uses. Valid choices are: \textbf{NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1} and \textbf{OtherFuel2}. The default is \textbf{NaturalGas}.
+This choice field specifies the type of fuel used by the generator. The fuel type can be NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, OtherFuel1, or OtherFuel2. If the field is left blank, the fuel type will be assumed to be \textbf{NaturalGas}.
 
 \paragraph{Field: Heat Recovery Maximum Temperature}\label{field-heat-recovery-maximum-temperature-1}
 
@@ -2040,7 +2243,7 @@ This alpha field specifies the name of a quadratic or cubic performance curve (r
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-2}
 
-This choice field specifies the type of fuel used by the generator. Valid field types are Propane and NaturalGas. If the field is left blank, the fuel type will be assumed to be NaturalGas.
+This choice field specifies the type of fuel used by the generator. The fuel type can be NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, OtherFuel1, or OtherFuel2. If the field is left blank, the fuel type will be assumed to be \textbf{NaturalGas}.
 
 \paragraph{Field: Fuel Higher Heating Value}\label{field-fuel-higher-heating-value-2}
 
@@ -3035,6 +3238,10 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
   HVAC,Sum, Generator Fuel Cell Model Iteration Count {[]}
 \item
   HVAC,Sum,Generator Root Solver Iteration Count {[]}
+\item
+  HVAC,Average,Generator Number of Cycles {[]}
+\item
+  HVAC,Average,Generator Power Module Skin Heat Loss Rate {[}W{]}
 \end{itemize}
 
 \paragraph{Generator Air Inlet Temperature {[}C{]}}\label{generator-air-inlet-temperature-c}
@@ -3208,6 +3415,16 @@ This is the water vapor fraction in the exit gas.
 \paragraph{Generator Heat Recovery Water Condensate Molar Flow Rate {[}kmol/s{]}}\label{generator-heat-recovery-water-condensate-molar-flow-rate-kmols}
 
 This is the flow of condensed water in kmol/s.
+
+\paragraph{Generator Number of Cycles {[]}}\label{generator-number-of-cycles}
+
+This is the number of start-stop cycles that the fuel cell power module has experienced so far.
+It is initialized to the value of \hyperref[field-number-of-stops-at-start-of-simulation]{Number of Stops at Start of Simulation} provided in the \hyperref[generatorfuelcellpowermodule]{Generator:FuelCell:PowerModule} object.
+
+\paragraph{Generator Power Module Skin Heat Loss Rate {[}W{]}}\label{generator-power-module-skin-heat-loss-rate-w}
+
+This is the which is the rate of energy lost to the surroundings via the skin of the fuel cell power module.
+
 
 \subsection{Generator:FuelCell:PowerModule}\label{generatorfuelcellpowermodule}
 
@@ -4143,6 +4360,8 @@ This field contains the name of a \hyperref[curvecubic]{Curve:Cubic} input objec
 
 This field describes the portion of the compressor electrical power that is lost to the surroundings. The rest of the energy is added to the fuel stream. A heat loss factor of 1.0 indicates that all the heat is lost to the surroundings and no energy is added to the fuel inlet stream.
 
+Note with \emph{LiquidGeneric} fuel type, currently this value would not taken into effect. In this case a heat loss factor of 1.0 is always used for this fuel type. 
+
 \paragraph{Field: Fuel Type}\label{field-fuel-type-3}
 
 Choose between GaseousConstituents or LiquidGeneric .
@@ -4370,7 +4589,7 @@ The following table shows several sample PV array types with their input values.
 \midrule
 \endhead
 
-Units: & [A] & [V] & [V] & [A] & \{A/K] & [V/K] & [-] & [K] & [m2] \tabularnewline
+Units: & [A] & [V] & [V] & [A] & [A/K] & [V/K] & [-] & [K] & [m2] \tabularnewline
 ASE 300-DFG/50 & 6.2 & 60 & 50.5 & 5.6 & 0.001 & -0.0038 & 216 & 318 & 2.43 \tabularnewline
 BPsolar 275 & 4.75 & 21.4 & 17 & 4.45 & 0.00065 & -0.08 & 36 & 320 & 0.63 \tabularnewline
 BPsolar 3160 & 4.8 & 44.2 & 35.1 & 4.55 & 0.00065 & -0.16 & 72 & 320 & 1.26 \tabularnewline
@@ -4762,7 +4981,7 @@ When using EpMacro with a typical installation of EnergyPlus, the above entry ca
 
 \subsection{Generator:PVWatts}\label{generatorpvwatts}
 
-PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}.
+PVWatts is a web application and module in NREL's System Advisor Model (SAM) software that estimates the electricity production of a grid-connected photovoltaic system based on a few simple inputs. This object brings the same calculations from PVWatts into an EnergyPlus whole building simulation without the need to call the web application API or SAM SDK. It provides a good alternative to the \hyperref[generatorphotovoltaic-000]{Generator:Photovoltaic} object when detailed information about the PV array is not available such as in a first pass analysis or when the desire is to achieve comparable results to PVWatts outside of EnergyPlus. To get comparable results to PVWatts, it should be used with the \hyperref[electricloadcenterinverterpvwatts]{ElectricLoadCenter:Inverter:PVWatts}. The PVWatts:Generator uses SAM 2020.11.29 Revision 0, SSC Revision 250.
 
 \subsubsection{Inputs}\label{input-description}
 
@@ -4908,6 +5127,8 @@ Default: 0.4
   HVAC,Average,Plane of Array Irradiance $\left [\frac{\text{W}}{\text{m}^2} \right ]$
 \item
   HVAC,Average,Generator PV Cell Temperature {[}C{]}
+\item
+  HVAC,Average,Shaded Percent {[}\%{]}
 \end{itemize}
 
 

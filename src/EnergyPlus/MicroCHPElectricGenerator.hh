@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -61,9 +63,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace MicroCHPElectricGenerator {
-
-    extern int NumMicroCHPs;
-    extern int NumMicroCHPParams; // number of parameter sets for micro chp
 
     struct MicroCHPParamsNonNormalized
     {
@@ -100,7 +99,7 @@ namespace MicroCHPElectricGenerator {
         // calculated and from elsewhere
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
         // Saved in order to identify the beginning of a new system time
-        int OpMode;
+        DataGenerators::OperatingMode OpMode;
         Real64 OffModeTime;      // amount of time generator spent in Off mode
         Real64 StandyByModeTime; // amount of time generator spent in standby mode
         Real64 WarmUpModeTime;   // amount of time generator spent in warm up mode
@@ -147,13 +146,13 @@ namespace MicroCHPElectricGenerator {
               InternalFlowControl(false), PlantFlowControl(true), WaterFlowCurveID(0), AirFlowCurveID(0), DeltaPelMax(0.0), DeltaFuelMdotMax(0.0),
               UAhx(0.0), UAskin(0.0), RadiativeFraction(0.0), MCeng(0.0), MCcw(0.0), Pstandby(0.0), WarmUpByTimeDelay(false),
               WarmUpByEngineTemp(true), kf(0.0), TnomEngOp(0.0), kp(0.0), Rfuelwarmup(0.0), WarmUpDelay(0.0), PcoolDown(0.0), CoolDownDelay(0.0),
-              MandatoryFullCoolDown(false), WarmRestartOkay(true), TimeElapsed(0.0), OpMode(0), OffModeTime(0.0), StandyByModeTime(0.0),
-              WarmUpModeTime(0.0), NormalModeTime(0.0), CoolDownModeTime(0.0), TengLast(20.0), TempCWOutLast(20.0), Pnet(0.0), ElecEff(0.0),
-              Qgross(0.0), ThermEff(0.0), Qgenss(0.0), NdotFuel(0.0), MdotFuel(0.0), Teng(20.0), TcwIn(20.0), TcwOut(20.0), MdotAir(0.0),
-              QdotSkin(0.0), QdotConvZone(0.0), QdotRadZone(0.0), ACPowerGen(0.0), ACEnergyGen(0.0), QdotHX(0.0), QdotHR(0.0),
-              TotalHeatEnergyRec(0.0), FuelEnergyLHV(0.0), FuelEnergyUseRateLHV(0.0), FuelEnergyHHV(0.0), FuelEnergyUseRateHHV(0.0),
-              HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), FuelCompressPower(0.0), FuelCompressEnergy(0.0), FuelCompressSkinLoss(0.0),
-              SkinLossPower(0.0), SkinLossEnergy(0.0), SkinLossConvect(0.0), SkinLossRadiat(0.0)
+              MandatoryFullCoolDown(false), WarmRestartOkay(true), TimeElapsed(0.0), OpMode(DataGenerators::OperatingMode::Unassigned),
+              OffModeTime(0.0), StandyByModeTime(0.0), WarmUpModeTime(0.0), NormalModeTime(0.0), CoolDownModeTime(0.0), TengLast(20.0),
+              TempCWOutLast(20.0), Pnet(0.0), ElecEff(0.0), Qgross(0.0), ThermEff(0.0), Qgenss(0.0), NdotFuel(0.0), MdotFuel(0.0), Teng(20.0),
+              TcwIn(20.0), TcwOut(20.0), MdotAir(0.0), QdotSkin(0.0), QdotConvZone(0.0), QdotRadZone(0.0), ACPowerGen(0.0), ACEnergyGen(0.0),
+              QdotHX(0.0), QdotHR(0.0), TotalHeatEnergyRec(0.0), FuelEnergyLHV(0.0), FuelEnergyUseRateLHV(0.0), FuelEnergyHHV(0.0),
+              FuelEnergyUseRateHHV(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), FuelCompressPower(0.0), FuelCompressEnergy(0.0),
+              FuelCompressSkinLoss(0.0), SkinLossPower(0.0), SkinLossEnergy(0.0), SkinLossConvect(0.0), SkinLossRadiat(0.0)
         {
         }
     };
@@ -163,7 +162,6 @@ namespace MicroCHPElectricGenerator {
         std::string Name;                     // name of this Micro CHP Generator
         std::string ParamObjName;             // name of parameter object
         MicroCHPParamsNonNormalized A42Model; // Nested parameter data structure
-        bool ModelTypeAnnex42;                // normalized =  non-normalized?
         Real64 NomEff;                        // nominal efficiency
         std::string ZoneName;
         int ZoneID;
@@ -193,24 +191,32 @@ namespace MicroCHPElectricGenerator {
 
         // Default Constructor
         MicroCHPDataStruct()
-            : ModelTypeAnnex42(true), NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0),
-              PlantMassFlowRateMax(0.0), PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0),
-              DynamicsControlID(0), AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CheckEquipName(true),
-              MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
+            : NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0), PlantMassFlowRateMax(0.0),
+              PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0), DynamicsControlID(0),
+              AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CheckEquipName(true), MySizeFlag(true),
+              MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state,
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 Real64 &MaxLoad,
+                                 Real64 &MinLoad,
+                                 Real64 &OptLoad) override;
 
-        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state);
 
-        void CalcUpdateHeatRecovery();
+        void CalcUpdateHeatRecovery(EnergyPlusData &state) const;
 
         void CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &state,
                                                    bool RunFlagElectCenter, // TRUE when Generator operating
@@ -219,12 +225,12 @@ namespace MicroCHPElectricGenerator {
                                                    Real64 MyThermalLoad,
                                                    bool FirstHVACIteration);
 
-        void UpdateMicroCHPGeneratorRecords();
+        void UpdateMicroCHPGeneratorRecords(EnergyPlusData &state);
 
-        static PlantComponent *factory(EnergyPlusData &state, IOFiles &ioFiles, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetMicroCHPGeneratorInput(EnergyPlusData &state, IOFiles &ioFiles);
+    void GetMicroCHPGeneratorInput(EnergyPlusData &state);
 
     Real64 FuncDetermineEngineTemp(Real64 TcwOut,   // hot water leaving temp
                                    Real64 MCeng,    // Fictitious mass and heat capacity of engine
@@ -258,14 +264,32 @@ namespace MicroCHPElectricGenerator {
                                      Real64 MdotCpcw    // mass flow and specific heat of coolant water
     );
 
-    void FigureMicroCHPZoneGains();
-
-    void clear_state();
-
-    extern Array1D<MicroCHPDataStruct> MicroCHP;
-    extern Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput;
+    void FigureMicroCHPZoneGains(EnergyPlusData &state);
 
 } // namespace MicroCHPElectricGenerator
+
+struct MicroCHPElectricGeneratorData : BaseGlobalStruct
+{
+
+    int NumMicroCHPs = 0;
+    int NumMicroCHPParams = 0;
+    EPVector<MicroCHPElectricGenerator::MicroCHPDataStruct> MicroCHP;
+    EPVector<MicroCHPElectricGenerator::MicroCHPParamsNonNormalized> MicroCHPParamInput;
+    bool getMicroCHPInputFlag = true;
+    bool MyOneTimeFlag = true;
+    bool MyEnvrnFlag = true;
+
+    void clear_state() override
+    {
+        this->NumMicroCHPs = 0;
+        this->NumMicroCHPParams = 0;
+        this->getMicroCHPInputFlag = true;
+        this->MicroCHP.deallocate();
+        this->MicroCHPParamInput.deallocate();
+        this->MyOneTimeFlag = true;
+        this->MyEnvrnFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 

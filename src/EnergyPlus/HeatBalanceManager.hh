@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,69 +53,16 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SurfaceOctree.hh>
 
 namespace EnergyPlus {
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData;
-    struct WindowManagerData;
-    class IOFiles;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatBalanceManager {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    extern Array1D_string const PassFail;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Real Variables for the Heat Balance Simulation
-    // Variables used to determine warmup convergence
-    extern Array1D<Real64> MaxCoolLoadPrevDay; // Max cooling load from the previous day
-    extern Array1D<Real64> MaxCoolLoadZone;    // Maximum zone cooling load from the current day
-    extern Array1D<Real64> MaxHeatLoadPrevDay; // Max heating load from the previous day
-    extern Array1D<Real64> MaxHeatLoadZone;    // Maximum zone heating load from the current day
-    extern Array1D<Real64> MaxTempPrevDay;     // Max temperature from the previous day
-    extern Array1D<Real64> MaxTempZone;        // Maximum zone temperature from the current day
-    extern Array1D<Real64> MinTempPrevDay;     // Min temperature from the previous day
-    extern Array1D<Real64> MinTempZone;        // Minimum zone temperature from the current day
-
-    // Variables used to report difference in temperature and load from the last two warmup days
-    extern Array1D<Real64> WarmupTempDiff;     // Temperature difference between the last two warmup days
-    extern Array1D<Real64> WarmupLoadDiff;     // Zone load differences between the last two warmup days
-    extern Array1D<Real64> TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
-    extern Array1D<Real64> LoadZoneSecPrevDay; // Zone load from the second last warmup day
-    extern Array1D<Real64> TempZonePrevDay;    // Zone air temperature from the previous day
-    extern Array1D<Real64> LoadZonePrevDay;    // Zone load from the previuos day
-    extern Array1D<Real64> TempZone;           // Zone air temperature from the current warmup day
-    extern Array1D<Real64> LoadZone;           // Zone load from the current warmup day
-
-    extern Array2D<Real64> TempZoneRpt;       // Zone air temperature to report (average over all warmup days)
-    extern Array1D<Real64> TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
-    extern Array2D<Real64> LoadZoneRpt;       // Zone load to report (average over all warmup days)
-    extern Array1D<Real64> LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
-    extern Array2D<Real64> MaxLoadZoneRpt;    // Maximum zone load for reporting calcs
-    extern int CountWarmupDayPoints;          // Count of warmup timesteps (to achieve warmup)
-
-    extern std::string CurrentModuleObject; // to assist in getting input
-
-    // Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
-
-    // Input reader routines for the module
-
-    // Initialization routines for module
-
-    // Record Keeping/Utility Routines for Module
-
-    // Reporting routines for module
-
-    // Types
 
     struct WarmupConvergence
     {
@@ -137,50 +84,40 @@ namespace HeatBalanceManager {
         }
     };
 
-    // Object Data
-    extern Array1D<WarmupConvergence> WarmupConvergenceValues;
-
-    // Functions
-
-    // Clears the global data in HeatBalanceManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     void ManageHeatBalance(EnergyPlusData &state);
-
-    // Get Input Section of the Module
-    //******************************************************************************
 
     void GetHeatBalanceInput(EnergyPlusData &state);
 
-    void CheckUsedConstructions(bool &ErrorsFound);
+    void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool CheckValidSimulationObjects();
+    bool CheckValidSimulationObjects(EnergyPlusData &state);
 
-    void SetPreConstructionInputParameters();
+    void SetPreConstructionInputParameters(EnergyPlusData &state);
 
     void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors detected during getting data
 
-    void GetSiteAtmosphereData(EnergyPlus::IOFiles &ioFiles, bool &ErrorsFound);
+    void GetSiteAtmosphereData(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetMaterialData(EnergyPlusData &state, WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound); // set to true if errors found in input
+    void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
-    void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
+    void GetWindowGlassSpectralData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
-    void ValidateMaterialRoughness(int const MaterNum,           // Which Material number being validated.
+    void ValidateMaterialRoughness(EnergyPlusData &state,
+                                   int const MaterNum,           // Which Material number being validated.
                                    std::string const &Roughness, // Roughness String
                                    bool &ErrorsFound             // If errors found
     );
 
-    void GetConstructData(IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
+    void GetConstructData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void GetZoneData(bool &ErrorsFound); // If errors found in input
+    void GetZoneData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void GetZoneLocalEnvData(bool &ErrorsFound); // If errors found in input
+    void GetZoneLocalEnvData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void ProcessZoneData(std::string const &cCurrentModuleObject,
+    void ProcessZoneData(EnergyPlusData &state,
+                         std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
                          int &NumAlphas,
@@ -190,48 +127,28 @@ namespace HeatBalanceManager {
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
                          Array1D_string const &cNumericFieldNames, // Unused
-                         bool &ErrorsFound                        // If errors found in input
+                         bool &ErrorsFound                         // If errors found in input
     );
 
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
+    void InitHeatBalance(EnergyPlusData &state);
 
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
+    void AllocateHeatBalArrays(EnergyPlusData &state);
 
-    void InitHeatBalance(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
+    void RecKeepHeatBalance(EnergyPlusData &state);
 
-    void AllocateHeatBalArrays();
+    void CheckWarmupConvergence(EnergyPlusData &state);
 
-    // End Initialization Section of the Module
-    //******************************************************************************
+    void ReportWarmupConvergence(EnergyPlusData &state);
 
-    // Beginning of Record Keeping subroutines for the HB Module
-    // *****************************************************************************
+    void UpdateWindowFaceTempsNonBSDFWin(EnergyPlusData &state);
 
-    void RecKeepHeatBalance(IOFiles &ioFiles);
+    void ReportHeatBalance(EnergyPlusData &state);
 
-    void CheckWarmupConvergence();
+    void OpenShadingFile(EnergyPlusData &state);
 
-    void ReportWarmupConvergence(IOFiles &ioFiles);
+    void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
 
-    void UpdateWindowFaceTempsNonBSDFWin();
-
-    //        End of Record Keeping subroutines for the HB Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the HB Module
-    // *****************************************************************************
-
-    void ReportHeatBalance(EnergyPlusData &state, IOFiles &ioFiles);
-
-    //        End of Reporting subroutines for the HB Module
-
-    void OpenShadingFile(IOFiles &ioFiles);
-
-    void GetFrameAndDividerData(bool &ErrorsFound); // set to true if errors found in input
-
-    void SearchWindow5DataFile(IOFiles &ioFiles,
+    void SearchWindow5DataFile(EnergyPlusData &state,
                                std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
@@ -239,33 +156,127 @@ namespace HeatBalanceManager {
                                bool &ErrorsFound                           // True if there is a problem with the entry requested from the data file
     );
 
-    void SetStormWindowControl();
+    void SetStormWindowControl(EnergyPlusData &state);
 
-    void CreateFCfactorConstructions(int &ConstrNum,   // Counter for Constructions
+    void CreateFCfactorConstructions(EnergyPlusData &state,
+                                     int &ConstrNum,   // Counter for Constructions
                                      bool &ErrorsFound // If errors found in input
     );
 
-    void CreateAirBoundaryConstructions(int &ConstrNum,   // Counter for Constructions
-        bool &ErrorsFound // If errors found in input
+    void CreateAirBoundaryConstructions(EnergyPlusData &state,
+                                        int &ConstrNum,   // Counter for Constructions
+                                        bool &ErrorsFound // If errors found in input
     );
 
-    void GetScheduledSurfaceGains(bool &ErrorsFound); // If errors found in input
+    void GetScheduledSurfaceGains(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CheckScheduledSurfaceGains(int const ZoneNum); // Zone number for which error check will be performed
+    void CheckScheduledSurfaceGains(EnergyPlusData &state, int const ZoneNum); // Zone number for which error check will be performed
 
-    void CreateTCConstructions(bool &ErrorsFound); // If errors found in input
+    void CreateTCConstructions(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void SetupSimpleWindowGlazingSystem(int &MaterNum);
+    void SetupSimpleWindowGlazingSystem(EnergyPlusData &state, int &MaterNum);
 
-    void SetupComplexFenestrationMaterialInput(int &MaterNum, // num of material items thus far
+    void SetupComplexFenestrationMaterialInput(EnergyPlusData &state,
+                                               int &MaterNum, // num of material items thus far
                                                bool &ErrorsFound);
 
-    void SetupComplexFenestrationStateInput(int &ConstrNum, // num of construction items thus far
+    void SetupComplexFenestrationStateInput(EnergyPlusData &state,
+                                            int &ConstrNum, // num of construction items thus far
                                             bool &ErrorsFound);
 
-    void InitConductionTransferFunctions(IOFiles &ioFiles);
+    void InitConductionTransferFunctions(EnergyPlusData &state);
 
 } // namespace HeatBalanceManager
+
+struct HeatBalanceMgrData : BaseGlobalStruct
+{
+
+    bool ManageHeatBalanceGetInputFlag = true;
+    bool DoReport = false;
+    bool ChangeSet = true; // Toggle for checking storm windows
+    bool FirstWarmupWrite = true;
+    bool WarmupConvergenceWarning = false;
+    bool SizingWarmupConvergenceWarning = false;
+    bool ReportWarmupConvergenceFirstWarmupWrite = true;
+
+    std::string CurrentModuleObject; // to assist in getting input
+    std::unordered_map<std::string, std::string> UniqueMaterialNames;
+    std::unordered_map<std::string, std::string> UniqueConstructNames;
+
+    // Real Variables for the Heat Balance Simulation
+    // Variables used to determine warmup convergence
+    Array1D<Real64> MaxCoolLoadPrevDay; // Max cooling load from the previous day
+    Array1D<Real64> MaxCoolLoadZone;    // Maximum zone cooling load from the current day
+    Array1D<Real64> MaxHeatLoadPrevDay; // Max heating load from the previous day
+    Array1D<Real64> MaxHeatLoadZone;    // Maximum zone heating load from the current day
+    Array1D<Real64> MaxTempPrevDay;     // Max temperature from the previous day
+    Array1D<Real64> MaxTempZone;        // Maximum zone temperature from the current day
+    Array1D<Real64> MinTempPrevDay;     // Min temperature from the previous day
+    Array1D<Real64> MinTempZone;        // Minimum zone temperature from the current day
+
+    // Variables used to report difference in temperature and load from the last two warmup days
+    Array1D<Real64> WarmupTempDiff;     // Temperature difference between the last two warmup days
+    Array1D<Real64> WarmupLoadDiff;     // Zone load differences between the last two warmup days
+    Array1D<Real64> TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
+    Array1D<Real64> LoadZoneSecPrevDay; // Zone load from the second last warmup day
+    Array1D<Real64> TempZonePrevDay;    // Zone air temperature from the previous day
+    Array1D<Real64> LoadZonePrevDay;    // Zone load from the previuos day
+    Array1D<Real64> TempZone;           // Zone air temperature from the current warmup day
+    Array1D<Real64> LoadZone;           // Zone load from the current warmup day
+
+    Array2D<Real64> TempZoneRpt;       // Zone air temperature to report (average over all warmup days)
+    Array1D<Real64> TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
+    Array2D<Real64> LoadZoneRpt;       // Zone load to report (average over all warmup days)
+    Array1D<Real64> LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
+    Array2D<Real64> MaxLoadZoneRpt;    // Maximum zone load for reporting calcs
+
+    int CountWarmupDayPoints; // Count of warmup timesteps (to achieve warmup)
+
+    Array1D<HeatBalanceManager::WarmupConvergence> WarmupConvergenceValues;
+    SurfaceOctreeCube surfaceOctree;
+
+    void clear_state() override
+    {
+
+        ManageHeatBalanceGetInputFlag = true;
+        UniqueMaterialNames.clear();
+        UniqueConstructNames.clear();
+        DoReport = false;
+        ChangeSet = true;
+        FirstWarmupWrite = true;
+        WarmupConvergenceWarning = false;
+        SizingWarmupConvergenceWarning = false;
+        ReportWarmupConvergenceFirstWarmupWrite = true;
+
+        CurrentModuleObject = std::string();
+        MaxCoolLoadPrevDay.clear();
+        MaxCoolLoadZone.clear();
+        MaxHeatLoadPrevDay.clear();
+        MaxHeatLoadZone.clear();
+        MaxTempPrevDay.clear();
+        MaxTempZone.clear();
+        MinTempPrevDay.clear();
+        MinTempZone.clear();
+        WarmupTempDiff.clear();
+        WarmupLoadDiff.clear();
+        TempZoneSecPrevDay.clear();
+        LoadZoneSecPrevDay.clear();
+        TempZonePrevDay.clear();
+        LoadZonePrevDay.clear();
+        TempZone.clear();
+        LoadZone.clear();
+        TempZoneRpt.clear();
+        TempZoneRptStdDev.clear();
+        LoadZoneRpt.clear();
+        LoadZoneRptStdDev.clear();
+        MaxLoadZoneRpt.clear();
+
+        CountWarmupDayPoints = int();
+
+        WarmupConvergenceValues.clear();
+        surfaceOctree = SurfaceOctreeCube();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,36 +51,36 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-
 using namespace EnergyPlus;
 using namespace EnergyPlus::ExteriorEnergyUse;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::ScheduleManager;
 
 TEST_F(EnergyPlusFixture, ExteriorEquipmentTest_Test1)
 {
 
-    state.exteriorEnergyUse.NumExteriorLights = 0;
-    state.exteriorEnergyUse.NumExteriorEqs = 2;
-    TimeStepZone = 0.25;
-    TimeStepZoneSec = TimeStepZone * SecInHour;
-    state.exteriorEnergyUse.ExteriorEquipment.allocate(state.exteriorEnergyUse.NumExteriorEqs);
-    state.exteriorEnergyUse.ExteriorEquipment(1).DesignLevel = 1000.0;
-    state.exteriorEnergyUse.ExteriorEquipment(2).DesignLevel = 0.0;
-    state.exteriorEnergyUse.ExteriorEquipment(1).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-    state.exteriorEnergyUse.ExteriorEquipment(2).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-    ReportExteriorEnergyUse(state.exteriorEnergyUse);
+    state->dataExteriorEnergyUse->NumExteriorLights = 0;
+    state->dataExteriorEnergyUse->NumExteriorEqs = 2;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+    state->dataExteriorEnergyUse->ExteriorEquipment.allocate(state->dataExteriorEnergyUse->NumExteriorEqs);
+    state->dataExteriorEnergyUse->ExteriorEquipment(1).DesignLevel = 1000.0;
+    state->dataExteriorEnergyUse->ExteriorEquipment(2).DesignLevel = 0.0;
+    state->dataExteriorEnergyUse->ExteriorEquipment(1).SchedPtr =
+        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataExteriorEnergyUse->ExteriorEquipment(2).SchedPtr =
+        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    ReportExteriorEnergyUse(*state);
 
-    EXPECT_EQ(1000.0, state.exteriorEnergyUse.ExteriorEquipment(1).Power);
-    EXPECT_EQ(0.0, state.exteriorEnergyUse.ExteriorEquipment(2).Power);
-    EXPECT_EQ(900000.0, state.exteriorEnergyUse.ExteriorEquipment(1).CurrentUse);
-    EXPECT_EQ(0.0, state.exteriorEnergyUse.ExteriorEquipment(2).CurrentUse);
+    EXPECT_EQ(1000.0, state->dataExteriorEnergyUse->ExteriorEquipment(1).Power);
+    EXPECT_EQ(0.0, state->dataExteriorEnergyUse->ExteriorEquipment(2).Power);
+    EXPECT_EQ(900000.0, state->dataExteriorEnergyUse->ExteriorEquipment(1).CurrentUse);
+    EXPECT_EQ(0.0, state->dataExteriorEnergyUse->ExteriorEquipment(2).CurrentUse);
 }

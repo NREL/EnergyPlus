@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,14 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct BaseboardRadiatorData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace BaseboardRadiator {
 
@@ -129,7 +129,8 @@ namespace BaseboardRadiator {
         BaseboardParamsNumericFieldData() = default;
     };
 
-    void SimBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimBaseboard(EnergyPlusData &state,
+                      std::string const &EquipName,
                       int ActualZoneNum,
                       int ControlledZoneNum,
                       bool FirstHVACIteration,
@@ -147,31 +148,30 @@ namespace BaseboardRadiator {
     void UpdateBaseboard(EnergyPlusData &state, int &BaseboardNum);
 
     Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 UA,           // UA of coil
+                                 Real64 UA,                 // UA of coil
                                  Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
 } // namespace BaseboardRadiator
 
-    struct BaseboardRadiatorData : BaseGlobalStruct {
+struct BaseboardRadiatorData : BaseGlobalStruct
+{
 
-        int NumBaseboards;
-        bool getInputFlag;
-        bool ZoneEquipmentListChecked;
-        Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
-        Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
-        void clear_state() override
-        {
-            NumBaseboards = 0;
-            getInputFlag = true;
-            ZoneEquipmentListChecked = false;
-            Baseboard.deallocate();
-            BaseboardParamsNumericFields.deallocate();
-        }
-        // Default Constructor
-        BaseboardRadiatorData()
-            : NumBaseboards(0), getInputFlag(true), ZoneEquipmentListChecked(false) {}
-    };
+    int NumBaseboards = 0;
+    bool getInputFlag = true;
+    bool ZoneEquipmentListChecked = false;
+    Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
+    Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+
+    void clear_state() override
+    {
+        this->NumBaseboards = 0;
+        this->getInputFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->Baseboard.deallocate();
+        this->BaseboardParamsNumericFields.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,17 +55,17 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -87,40 +87,24 @@ namespace ICEngineElectricGenerator {
     // is available to meet an electric load demand, it calls SimICEngineGenerator
     // which in turn calls the ICEngine Generator model.
 
-    Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
-    // value is reported.  This should be subtracted
-    // off of when calculated exhaust energies.
-
-    bool getICEInput(true);       // When TRUE, calls subroutine to read input file.
-    int NumICEngineGenerators(0); // number of IC ENGINE Generators specified in input
-
-    // Object Data
-    Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-
-    void clear_state()
-    {
-        getICEInput = true;
-        NumICEngineGenerators = 0;
-        ICEngineGenerator.deallocate();
-    }
-
     PlantComponent *ICEngineGeneratorSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for ICEGen if it hasn't been done already
-        if (getICEInput) {
+        if (state.dataICEngElectGen->getICEInput) {
             GetICEngineGeneratorInput(state);
-            getICEInput = false;
+            state.dataICEngElectGen->getICEInput = false;
         }
 
         // Now look for this particular generator in the list
-        for (auto &thisICE : ICEngineGenerator) {
+        for (auto &thisICE : state.dataICEngElectGen->ICEngineGenerator) {
             if (thisICE.Name == objectName) {
                 return &thisICE;
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalICEngineGeneratorFactory: Error getting inputs for internal combustion engine generator named: " +
-                       objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state,
+                       "LocalICEngineGeneratorFactory: Error getting inputs for internal combustion engine generator named: " +
+                           objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -135,181 +119,199 @@ namespace ICEngineElectricGenerator {
         // This routine will get the input
         // required by the IC ENGINE Generator models.
 
-        int genNum;                     // Generator counter
-        int NumAlphas;                  // Number of elements in the alpha array
-        int NumNums;                    // Number of elements in the numeric array
-        int IOStat;                     // IO Status when calling get input subroutine
-        Array1D_string AlphArray(10);   // character string data
-        Array1D<Real64> NumArray(11);   // numeric data
-        static bool ErrorsFound(false); // error flag
+        int genNum;                   // Generator counter
+        int NumAlphas;                // Number of elements in the alpha array
+        int NumNums;                  // Number of elements in the numeric array
+        int IOStat;                   // IO Status when calling get input subroutine
+        Array1D_string AlphArray(10); // character string data
+        Array1D<Real64> NumArray(11); // numeric data
+        bool ErrorsFound(false);      // error flag
 
-        // FLOW
-        DataIPShortCuts::cCurrentModuleObject = "Generator:InternalCombustionEngine";
-        NumICEngineGenerators = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        auto &ICEngineGenerator(state.dataICEngElectGen->ICEngineGenerator);
 
-        if (NumICEngineGenerators <= 0) {
-            ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
+        state.dataIPShortCut->cCurrentModuleObject = "Generator:InternalCombustionEngine";
+        state.dataICEngElectGen->NumICEngineGenerators =
+            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataIPShortCut->cCurrentModuleObject);
+
+        if (state.dataICEngElectGen->NumICEngineGenerators <= 0) {
+            ShowSevereError(state, "No " + state.dataIPShortCut->cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        ICEngineGenerator.allocate(NumICEngineGenerators);
+        ICEngineGenerator.allocate(state.dataICEngElectGen->NumICEngineGenerators);
 
         // LOAD ARRAYS WITH IC ENGINE Generator CURVE FIT  DATA
-        for (genNum = 1; genNum <= NumICEngineGenerators; ++genNum) {
-            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
-                                          genNum,
-                                          AlphArray,
-                                          NumAlphas,
-                                          NumArray,
-                                          NumNums,
-                                          IOStat,
-                                          _,
-                                          DataIPShortCuts::lAlphaFieldBlanks,
-                                          DataIPShortCuts::cAlphaFieldNames,
-                                          DataIPShortCuts::cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(AlphArray(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+        for (genNum = 1; genNum <= state.dataICEngElectGen->NumICEngineGenerators; ++genNum) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     state.dataIPShortCut->cCurrentModuleObject,
+                                                                     genNum,
+                                                                     AlphArray,
+                                                                     NumAlphas,
+                                                                     NumArray,
+                                                                     NumNums,
+                                                                     IOStat,
+                                                                     _,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, AlphArray(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
-            ICEngineGenerator(genNum).Name = AlphArray(1);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).Name = AlphArray(1);
 
-            ICEngineGenerator(genNum).RatedPowerOutput = NumArray(1);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).RatedPowerOutput = NumArray(1);
             if (NumArray(1) == 0.0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' + General::RoundSigDigits(NumArray(1), 2));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, format("Invalid {}={:.2R}", state.dataIPShortCut->cNumericFieldNames(1), NumArray(1)));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
             // Not sure what to do with electric nodes, so do not use optional arguments
-            ICEngineGenerator(genNum).ElectricCircuitNode = NodeInputManager::GetOnlySingleNode(AlphArray(2),
-                                                                                                ErrorsFound,
-                                                                                                DataIPShortCuts::cCurrentModuleObject,
-                                                                                                AlphArray(1),
-                                                                                                DataLoopNode::NodeType_Electric,
-                                                                                                DataLoopNode::NodeConnectionType_Electric,
-                                                                                                1,
-                                                                                                DataLoopNode::ObjectIsNotParent);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).ElectricCircuitNode =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    AlphArray(2),
+                                                    ErrorsFound,
+                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    AlphArray(1),
+                                                    DataLoopNode::NodeFluidType::Electric,
+                                                    DataLoopNode::NodeConnectionType::Electric,
+                                                    1,
+                                                    DataLoopNode::ObjectIsNotParent);
 
-            ICEngineGenerator(genNum).MinPartLoadRat = NumArray(2);
-            ICEngineGenerator(genNum).MaxPartLoadRat = NumArray(3);
-            ICEngineGenerator(genNum).OptPartLoadRat = NumArray(4);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).MinPartLoadRat = NumArray(2);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).MaxPartLoadRat = NumArray(3);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).OptPartLoadRat = NumArray(4);
 
             // Load Special IC ENGINE Generator Curve Fit Inputs
-            ICEngineGenerator(genNum).ElecOutputFuelCurve = CurveManager::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
-            if (ICEngineGenerator(genNum).ElecOutputFuelCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + AlphArray(3));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+            state.dataICEngElectGen->ICEngineGenerator(genNum).ElecOutputFuelCurve =
+                CurveManager::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).ElecOutputFuelCurve == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + AlphArray(3));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(genNum).RecJacHeattoFuelCurve = CurveManager::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
-            if (ICEngineGenerator(genNum).RecJacHeattoFuelCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + AlphArray(4));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+            state.dataICEngElectGen->ICEngineGenerator(genNum).RecJacHeattoFuelCurve =
+                CurveManager::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).RecJacHeattoFuelCurve == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + AlphArray(4));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(genNum).RecLubeHeattoFuelCurve = CurveManager::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
-            if (ICEngineGenerator(genNum).RecLubeHeattoFuelCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + AlphArray(5));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+            state.dataICEngElectGen->ICEngineGenerator(genNum).RecLubeHeattoFuelCurve =
+                CurveManager::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).RecLubeHeattoFuelCurve == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(5) + '=' + AlphArray(5));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(genNum).TotExhausttoFuelCurve = CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
-            if (ICEngineGenerator(genNum).TotExhausttoFuelCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + AlphArray(6));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+            state.dataICEngElectGen->ICEngineGenerator(genNum).TotExhausttoFuelCurve =
+                CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).TotExhausttoFuelCurve == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + AlphArray(6));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(genNum).ExhaustTempCurve = CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
-            if (ICEngineGenerator(genNum).ExhaustTempCurve == 0) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + AlphArray(7));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+            state.dataICEngElectGen->ICEngineGenerator(genNum).ExhaustTempCurve =
+                CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).ExhaustTempCurve == 0) {
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + AlphArray(7));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             } else {
-                Real64 xValue = CurveManager::CurveValue(state, ICEngineGenerator(genNum).ExhaustTempCurve, 1.0);
+                Real64 xValue = CurveManager::CurveValue(state, state.dataICEngElectGen->ICEngineGenerator(genNum).ExhaustTempCurve, 1.0);
                 if (xValue < ReferenceTemp) {
-                    ShowSevereError("GetICEngineGeneratorInput: " + DataIPShortCuts::cAlphaFieldNames(7) + " output has very low value.");
-                    ShowContinueError("...curve generates [" + General::RoundSigDigits(xValue, 3) + " C] at PLR=1.0");
-                    ShowContinueError("...this is less than the Reference Temperature [" + General::RoundSigDigits(ReferenceTemp, 2) +
-                                      " C] and may cause errors.");
+                    ShowSevereError(state, "GetICEngineGeneratorInput: " + state.dataIPShortCut->cAlphaFieldNames(7) + " output has very low value.");
+                    ShowContinueError(state, format("...curve generates [{:.3R} C] at PLR=1.0", xValue));
+                    ShowContinueError(state,
+                                      format("...this is less than the Reference Temperature [{:.2R} C] and may cause errors.", ReferenceTemp));
                 }
             }
 
-            ICEngineGenerator(genNum).UACoef(1) = NumArray(5);
-            ICEngineGenerator(genNum).UACoef(2) = NumArray(6);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).UACoef(1) = NumArray(5);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).UACoef(2) = NumArray(6);
 
-            ICEngineGenerator(genNum).MaxExhaustperPowerOutput = NumArray(7);
-            ICEngineGenerator(genNum).DesignMinExitGasTemp = NumArray(8);
-            ICEngineGenerator(genNum).FuelHeatingValue = NumArray(9);
-            ICEngineGenerator(genNum).DesignHeatRecVolFlowRate = NumArray(10);
-            if (ICEngineGenerator(genNum).DesignHeatRecVolFlowRate > 0.0) {
-                ICEngineGenerator(genNum).HeatRecActive = true;
-                ICEngineGenerator(genNum).HeatRecInletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(8),
-                                                                                                    ErrorsFound,
-                                                                                                    DataIPShortCuts::cCurrentModuleObject,
-                                                                                                    AlphArray(1),
-                                                                                                    DataLoopNode::NodeType_Water,
-                                                                                                    DataLoopNode::NodeConnectionType_Inlet,
-                                                                                                    1,
-                                                                                                    DataLoopNode::ObjectIsNotParent);
-                if (ICEngineGenerator(genNum).HeatRecInletNodeNum == 0) {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + '=' + AlphArray(8));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+            state.dataICEngElectGen->ICEngineGenerator(genNum).MaxExhaustperPowerOutput = NumArray(7);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).DesignMinExitGasTemp = NumArray(8);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).FuelHeatingValue = NumArray(9);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).DesignHeatRecVolFlowRate = NumArray(10);
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).DesignHeatRecVolFlowRate > 0.0) {
+                state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecActive = true;
+                state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecInletNodeNum =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        AlphArray(8),
+                                                        ErrorsFound,
+                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        AlphArray(1),
+                                                        DataLoopNode::NodeFluidType::Water,
+                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        1,
+                                                        DataLoopNode::ObjectIsNotParent);
+                if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecInletNodeNum == 0) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
-                ICEngineGenerator(genNum).HeatRecOutletNodeNum = NodeInputManager::GetOnlySingleNode(AlphArray(9),
-                                                                                                     ErrorsFound,
-                                                                                                     DataIPShortCuts::cCurrentModuleObject,
-                                                                                                     AlphArray(1),
-                                                                                                     DataLoopNode::NodeType_Water,
-                                                                                                     DataLoopNode::NodeConnectionType_Outlet,
-                                                                                                     1,
-                                                                                                     DataLoopNode::ObjectIsNotParent);
-                if (ICEngineGenerator(genNum).HeatRecOutletNodeNum == 0) {
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + AlphArray(9));
-                    ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        AlphArray(9),
+                                                        ErrorsFound,
+                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                        AlphArray(1),
+                                                        DataLoopNode::NodeFluidType::Water,
+                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        1,
+                                                        DataLoopNode::ObjectIsNotParent);
+                if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum == 0) {
+                    ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));
+                    ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
                 BranchNodeConnections::TestCompSet(
-                    DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(8), AlphArray(9), "Heat Recovery Nodes");
-                PlantUtilities::RegisterPlantCompDesignFlow(ICEngineGenerator(genNum).HeatRecInletNodeNum,
-                                                            ICEngineGenerator(genNum).DesignHeatRecVolFlowRate);
+                    state, state.dataIPShortCut->cCurrentModuleObject, AlphArray(1), AlphArray(8), AlphArray(9), "Heat Recovery Nodes");
+                PlantUtilities::RegisterPlantCompDesignFlow(state,
+                                                            state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecInletNodeNum,
+                                                            state.dataICEngElectGen->ICEngineGenerator(genNum).DesignHeatRecVolFlowRate);
             } else {
-                ICEngineGenerator(genNum).HeatRecActive = false;
-                ICEngineGenerator(genNum).HeatRecInletNodeNum = 0;
-                ICEngineGenerator(genNum).HeatRecOutletNodeNum = 0;
-                if (!DataIPShortCuts::lAlphaFieldBlanks(8) || !DataIPShortCuts::lAlphaFieldBlanks(9)) {
-                    ShowWarningError("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + DataIPShortCuts::cCurrentModuleObject + '=' +
-                                     AlphArray(1));
-                    ShowContinueError("However, Node names were specified for Heat Recovery inlet or outlet nodes");
+                state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecActive = false;
+                state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecInletNodeNum = 0;
+                state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum = 0;
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(8) || !state.dataIPShortCut->lAlphaFieldBlanks(9)) {
+                    ShowWarningError(state,
+                                     "Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for " + state.dataIPShortCut->cCurrentModuleObject +
+                                         '=' + AlphArray(1));
+                    ShowContinueError(state, "However, Node names were specified for Heat Recovery inlet or outlet nodes");
                 }
             }
 
             // Validate fuel type input
             bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelType(AlphArray(10), ICEngineGenerator(genNum).FuelType, FuelTypeError);
+            UtilityRoutines::ValidateFuelType(state, AlphArray(10), state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType, FuelTypeError);
             if (FuelTypeError) {
-                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + AlphArray(10));
-                ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
+                ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(10) + '=' + AlphArray(10));
+                ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
                 FuelTypeError = false;
             }
 
-            ICEngineGenerator(genNum).HeatRecMaxTemp = NumArray(11);
+            state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecMaxTemp = NumArray(11);
         }
 
         if (ErrorsFound) {
-            ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+            ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
         }
     }
 
-    void ICEngineGeneratorSpecs::setupOutputVars()
+    void ICEngineGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+        SetupOutputVariable(
+            state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced AC Electricity Energy",
+        SetupOutputVariable(state,
+                            "Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ElecEnergyGenerated,
                             "System",
@@ -322,9 +324,10 @@ namespace ICEngineElectricGenerator {
                             "Plant");
 
         SetupOutputVariable(
-            "Generator " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
+            state, "Generator " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator " + this->FuelType + " Energy",
+        SetupOutputVariable(state,
+                            "Generator " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
                             "System",
@@ -337,23 +340,31 @@ namespace ICEngineElectricGenerator {
                             "Plant");
 
         //    general fuel use report to match other generators.
-        SetupOutputVariable("Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
+        SetupOutputVariable(
+            state, "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergy, "System", "Sum", this->Name);
+        SetupOutputVariable(state, "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergy, "System", "Sum", this->Name);
 
         SetupOutputVariable(
-            "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, "System", "Average", this->Name);
+            state, "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
+        SetupOutputVariable(
+            state, "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
 
         if (this->HeatRecActive) {
-            SetupOutputVariable(
-                "Generator Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMdotActual, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Heat Recovery Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                this->HeatRecMdotActual,
+                                "System",
+                                "Average",
+                                this->Name);
 
             SetupOutputVariable(
-                "Generator Jacket Heat Recovery Rate", OutputProcessor::Unit::W, this->QJacketRecovered, "System", "Average", this->Name);
+                state, "Generator Jacket Heat Recovery Rate", OutputProcessor::Unit::W, this->QJacketRecovered, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Jacket Heat Recovery Energy",
+            SetupOutputVariable(state,
+                                "Generator Jacket Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->JacketEnergyRec,
                                 "System",
@@ -366,9 +377,10 @@ namespace ICEngineElectricGenerator {
                                 "Plant");
 
             SetupOutputVariable(
-                "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, this->QLubeOilRecovered, "System", "Average", this->Name);
+                state, "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, this->QLubeOilRecovered, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Lube Heat Recovery Energy",
+            SetupOutputVariable(state,
+                                "Generator Lube Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->LubeOilEnergyRec,
                                 "System",
@@ -381,9 +393,10 @@ namespace ICEngineElectricGenerator {
                                 "Plant");
 
             SetupOutputVariable(
-                "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, this->QExhaustRecovered, "System", "Average", this->Name);
+                state, "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, this->QExhaustRecovered, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Exhaust Heat Recovery Energy",
+            SetupOutputVariable(state,
+                                "Generator Exhaust Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->ExhaustEnergyRec,
                                 "System",
@@ -396,35 +409,49 @@ namespace ICEngineElectricGenerator {
                                 "Plant");
 
             SetupOutputVariable(
-                "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QTotalHeatRecovered, "System", "Average", this->Name);
-
-            SetupOutputVariable("Generator Produced Thermal Energy", OutputProcessor::Unit::J, this->TotalHeatEnergyRec, "System", "Sum", this->Name);
+                state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QTotalHeatRecovered, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Generator Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, "System", "Average", this->Name);
+                state, "Generator Produced Thermal Energy", OutputProcessor::Unit::J, this->TotalHeatEnergyRec, "System", "Sum", this->Name);
 
-            SetupOutputVariable(
-                "Generator Heat Recovery Outlet Temperature", OutputProcessor::Unit::C, this->HeatRecOutletTemp, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Generator Heat Recovery Inlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->HeatRecInletTemp,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable(state,
+                                "Generator Heat Recovery Outlet Temperature",
+                                OutputProcessor::Unit::C,
+                                this->HeatRecOutletTemp,
+                                "System",
+                                "Average",
+                                this->Name);
         }
     }
 
-    void ICEngineGeneratorSpecs::getDesignCapacities(const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
+    void ICEngineGeneratorSpecs::getDesignCapacities(
+        [[maybe_unused]] EnergyPlusData &state, const EnergyPlus::PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
         MaxLoad = 0.0;
         MinLoad = 0.0;
         OptLoad = 0.0;
     }
 
-    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &state,
+                                          [[maybe_unused]] const EnergyPlus::PlantLocation &calledFromLocation,
                                           bool FirstHVACIteration,
-                                          Real64 &EP_UNUSED(CurLoad),
-                                          bool EP_UNUSED(RunFlag))
+                                          [[maybe_unused]] Real64 &CurLoad,
+                                          [[maybe_unused]] bool RunFlag)
     {
         // empty function to emulate current behavior as of conversion to using the PlantComponent calling structure.
         // calls from the plant side only update the plant nodes.
         // calls from the ElectricPowerServiceManger call the init, calc, and update worker functions directly.
 
-        PlantUtilities::UpdateComponentHeatRecoverySide(this->HRLoopNum,
+        PlantUtilities::UpdateComponentHeatRecoverySide(state,
+                                                        this->HRLoopNum,
                                                         this->HRLoopSideNum,
                                                         DataPlant::TypeOf_Generator_ICEngine,
                                                         this->HeatRecInletNodeNum,
@@ -462,8 +489,8 @@ namespace ICEngineElectricGenerator {
 
         if (this->HeatRecActive) {
             int HeatRecInNode = this->HeatRecInletNodeNum;
-            HeatRecInTemp = DataLoopNode::Node(HeatRecInNode).Temp;
-            HeatRecMdot = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
+            HeatRecInTemp = state.dataLoopNodes->Node(HeatRecInNode).Temp;
+            HeatRecMdot = state.dataLoopNodes->Node(HeatRecInNode).MassFlowRate;
 
         } else {
             HeatRecInTemp = 0.0;
@@ -575,13 +602,13 @@ namespace ICEngineElectricGenerator {
                 QExhaustRec = max(ExhaustGasFlow * ExhaustCP * (exhaustTemp - exhaustStackTemp), 0.0);
             } else {
                 if (this->ErrExhaustTempIndex == 0) {
-                    ShowWarningMessage("CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
-                                       "\" low Exhaust Temperature from Curve Value");
-                    ShowContinueError("...curve generated temperature=[" + General::RoundSigDigits(exhaustTemp, 3) + " C], PLR=[" +
-                                      General::RoundSigDigits(PLR, 3) + "].");
-                    ShowContinueError("...simulation will continue with exhaust heat reclaim set to 0.");
+                    ShowWarningMessage(
+                        state, "CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name + "\" low Exhaust Temperature from Curve Value");
+                    ShowContinueError(state, format("...curve generated temperature=[{:.3R} C], PLR=[{:.3R}].", exhaustTemp, PLR));
+                    ShowContinueError(state, "...simulation will continue with exhaust heat reclaim set to 0.");
                 }
-                ShowRecurringWarningErrorAtEnd("CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "CalcICEngineGeneratorModel: " + this->TypeOf + "=\"" + this->Name +
                                                    "\" low Exhaust Temperature continues...",
                                                this->ErrExhaustTempIndex,
                                                exhaustTemp,
@@ -603,7 +630,7 @@ namespace ICEngineElectricGenerator {
         Real64 HRecRatio;
 
         if (this->HeatRecActive) {
-            this->CalcICEngineGenHeatRecovery(qTotalHeatRecovered, HeatRecMdot, HRecRatio);
+            this->CalcICEngineGenHeatRecovery(state, qTotalHeatRecovered, HeatRecMdot, HRecRatio);
             QExhaustRec *= HRecRatio;
             QLubeOilRec *= HRecRatio;
             QJacketRec *= HRecRatio;
@@ -616,19 +643,19 @@ namespace ICEngineElectricGenerator {
 
         // Calculate Energy
         // Generator output (J)
-        Real64 ElectricEnergyGen = elecPowerGenerated * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 ElectricEnergyGen = elecPowerGenerated * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // IC ENGINE fuel use (J)
-        Real64 FuelEnergyUsed = fuelEnergyUseRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 FuelEnergyUsed = fuelEnergyUseRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // water jacket heat recovered (J)
-        Real64 jacketEnergyRec = QJacketRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 jacketEnergyRec = QJacketRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // lube oil cooler heat recovered (J)
-        Real64 lubeOilEnergyRec = QLubeOilRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 lubeOilEnergyRec = QLubeOilRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         // exhaust gas heat recovered (J)
-        Real64 exhaustEnergyRec = QExhaustRec * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 exhaustEnergyRec = QExhaustRec * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->ElecPowerGenerated = elecPowerGenerated;
         this->ElecEnergyGenerated = ElectricEnergyGen;
         this->QJacketRecovered = QJacketRec;
@@ -650,7 +677,10 @@ namespace ICEngineElectricGenerator {
         this->ExhaustStackTemp = exhaustStackTemp;
     }
 
-    void ICEngineGeneratorSpecs::CalcICEngineGenHeatRecovery(Real64 const EnergyRecovered, Real64 const HeatRecMdot, Real64 &HRecRatio)
+    void ICEngineGeneratorSpecs::CalcICEngineGenHeatRecovery(EnergyPlusData &state,
+                                                             Real64 const EnergyRecovered,
+                                                             Real64 const HeatRecMdot,
+                                                             Real64 &HRecRatio)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brandon Anderson
@@ -669,9 +699,12 @@ namespace ICEngineElectricGenerator {
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HRecRatio = 1.0;
 
-        Real64 HeatRecInTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
-        Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, DataPlant::PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
+        Real64 HeatRecInTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
+        Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                  state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                                  HeatRecInTemp,
+                                                                  state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                                  RoutineName);
 
         // Don't divide by zero - Note This also results in no heat recovery when
         //  design Mdot for Heat Recovery - Specified on Chiller Input - is zero
@@ -732,11 +765,11 @@ namespace ICEngineElectricGenerator {
         bool errFlag;
 
         if (this->myFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             this->myFlag = false;
         }
 
-        if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
+        if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
             errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
@@ -752,7 +785,7 @@ namespace ICEngineElectricGenerator {
                                                     _,
                                                     _);
             if (errFlag) {
-                ShowFatalError("InitICEngineGenerators: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "InitICEngineGenerators: Program terminated due to previous condition(s).");
             }
 
             this->MyPlantScanFlag = false;
@@ -761,15 +794,17 @@ namespace ICEngineElectricGenerator {
         if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
 
             // size mass flow rate
-            Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HRLoopNum).FluidName,
-                                                           DataGlobals::InitConvTemp,
-                                                           DataPlant::PlantLoop(this->HRLoopNum).FluidIndex,
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                           DataGlobalConstants::InitConvTemp,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
                                                            RoutineName);
 
             this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
             this->HeatRecMdotDesign = this->DesignHeatRecMassFlowRate;
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->DesignHeatRecMassFlowRate,
                                                this->HeatRecInletNodeNum,
                                                this->HeatRecOutletNodeNum,
@@ -782,14 +817,15 @@ namespace ICEngineElectricGenerator {
         } // end one time inits
 
         // Do the Begin Environment initializations
-        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag && this->HeatRecActive) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && this->HeatRecActive) {
             int HeatRecInletNode = this->HeatRecInletNodeNum;
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
             // set the node Temperature, assuming freeze control
-            DataLoopNode::Node(HeatRecInletNode).Temp = 20.0;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = 20.0;
+            state.dataLoopNodes->Node(HeatRecInletNode).Temp = 20.0;
+            state.dataLoopNodes->Node(HeatRecOutletNode).Temp = 20.0;
             // set the node max and min mass flow rates
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->DesignHeatRecMassFlowRate,
                                                HeatRecInletNode,
                                                HeatRecOutletNode,
@@ -801,7 +837,7 @@ namespace ICEngineElectricGenerator {
             this->MyEnvrnFlag = false;
         } // end environmental inits
 
-        if (!DataGlobals::BeginEnvrnFlag) {
+        if (!state.dataGlobal->BeginEnvrnFlag) {
             this->MyEnvrnFlag = true;
         }
 
@@ -813,7 +849,8 @@ namespace ICEngineElectricGenerator {
                 } else {
                     mdot = 0.0;
                 }
-                PlantUtilities::SetComponentFlowRate(mdot,
+                PlantUtilities::SetComponentFlowRate(state,
+                                                     mdot,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,
@@ -822,7 +859,8 @@ namespace ICEngineElectricGenerator {
                                                      this->HRCompNum);
 
             } else {
-                PlantUtilities::SetComponentFlowRate(this->HeatRecMdotActual,
+                PlantUtilities::SetComponentFlowRate(state,
+                                                     this->HeatRecMdotActual,
                                                      this->HeatRecInletNodeNum,
                                                      this->HeatRecOutletNodeNum,
                                                      this->HRLoopNum,
@@ -833,11 +871,11 @@ namespace ICEngineElectricGenerator {
         }
     }
 
-    void ICEngineGeneratorSpecs::update()
+    void ICEngineGeneratorSpecs::update(EnergyPlusData &state)
     {
         if (this->HeatRecActive) {
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+            state.dataLoopNodes->Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
         }
     }
 

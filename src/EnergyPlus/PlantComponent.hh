@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,9 @@
 
 namespace EnergyPlus {
 
-// Forward Declarations
-struct PlantLocation;
+// Forward declarations
 struct EnergyPlusData;
+struct PlantLocation;
 
 class PlantComponent
 {
@@ -62,24 +62,28 @@ class PlantComponent
 public:
     virtual void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) = 0;
 
-    virtual void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
-                                     Real64 &EP_UNUSED(MaxLoad),
-                                     Real64 &EP_UNUSED(MinLoad),
-                                     Real64 &EP_UNUSED(OptLoad))
+    virtual void getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
+                                     [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                     [[maybe_unused]] Real64 &MaxLoad,
+                                     [[maybe_unused]] Real64 &MinLoad,
+                                     [[maybe_unused]] Real64 &OptLoad)
     {
     }
 
-    virtual void getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut))
+    virtual void getDesignTemperatures([[maybe_unused]] Real64 &TempDesCondIn, [[maybe_unused]] Real64 &TempDesEvapOut)
     {
     }
 
-    virtual void getSizingFactor(Real64 &EP_UNUSED(SizFac))
+    virtual void getSizingFactor([[maybe_unused]] Real64 &SizFac)
     {
     }
 
-    virtual void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation))
+    virtual void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
     {
     }
+
+    // virtual void oneTimeInit(EnergyPlusData &state) = 0;
+    virtual void oneTimeInit([[maybe_unused]] EnergyPlusData &state){};
 
     ~PlantComponent() = default;
 };

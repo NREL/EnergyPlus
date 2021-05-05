@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,18 +51,18 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
@@ -75,12 +75,12 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     // Test base surfaces for rectangular shape in ProcessSurfaceVertices
 
-    TotSurfaces = 5;
-    MaxVerticesPerSurface = 5;
-    Surface.allocate(TotSurfaces);
-    ShadeV.allocate(TotSurfaces);
-    for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-        Surface(SurfNum).Vertex.allocate(MaxVerticesPerSurface);
+    state->dataSurface->TotSurfaces = 5;
+    state->dataSurface->MaxVerticesPerSurface = 5;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->ShadeV.allocate(state->dataSurface->TotSurfaces);
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
+        state->dataSurface->Surface(SurfNum).Vertex.allocate(state->dataSurface->MaxVerticesPerSurface);
     }
 
     bool ErrorsFound(false);
@@ -88,138 +88,138 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
 
     // Surface 1 - Rectangle
     ThisSurf = 1;
-    Surface(ThisSurf).Azimuth = 180.0;
-    Surface(ThisSurf).Tilt = 90.0;
-    Surface(ThisSurf).Sides = 4;
-    Surface(ThisSurf).GrossArea = 10.0;
+    state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
+    state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
+    state->dataSurface->Surface(ThisSurf).Sides = 4;
+    state->dataSurface->Surface(ThisSurf).GrossArea = 10.0;
 
-    Surface(ThisSurf).Vertex(1).x = 0.0;
-    Surface(ThisSurf).Vertex(1).y = 0.0;
-    Surface(ThisSurf).Vertex(1).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).z = 0.0;
 
-    Surface(ThisSurf).Vertex(2).x = 5.0;
-    Surface(ThisSurf).Vertex(2).y = 0.0;
-    Surface(ThisSurf).Vertex(2).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).x = 5.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).z = 0.0;
 
-    Surface(ThisSurf).Vertex(3).x = 5.0;
-    Surface(ThisSurf).Vertex(3).y = 0.0;
-    Surface(ThisSurf).Vertex(3).z = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).x = 5.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).z = 2.0;
 
-    Surface(ThisSurf).Vertex(4).x = 0.0;
-    Surface(ThisSurf).Vertex(4).y = 0.0;
-    Surface(ThisSurf).Vertex(4).z = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).x = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Rectangle, Surface(ThisSurf).Shape);
+    EXPECT_EQ(SurfaceShape::Rectangle, state->dataSurface->Surface(ThisSurf).Shape);
 
     // Surface 2 - Isosceles Trapezoid
     ThisSurf = 2;
-    Surface(ThisSurf).Azimuth = 180.0;
-    Surface(ThisSurf).Tilt = 90.0;
-    Surface(ThisSurf).Sides = 4;
-    Surface(ThisSurf).GrossArea = 8.0;
+    state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
+    state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
+    state->dataSurface->Surface(ThisSurf).Sides = 4;
+    state->dataSurface->Surface(ThisSurf).GrossArea = 8.0;
 
-    Surface(ThisSurf).Vertex(1).x = 0.0;
-    Surface(ThisSurf).Vertex(1).y = 0.0;
-    Surface(ThisSurf).Vertex(1).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).z = 0.0;
 
-    Surface(ThisSurf).Vertex(2).x = 5.0;
-    Surface(ThisSurf).Vertex(2).y = 0.0;
-    Surface(ThisSurf).Vertex(2).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).x = 5.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).z = 0.0;
 
-    Surface(ThisSurf).Vertex(3).x = 4.0;
-    Surface(ThisSurf).Vertex(3).y = 0.0;
-    Surface(ThisSurf).Vertex(3).z = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).x = 4.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).z = 2.0;
 
-    Surface(ThisSurf).Vertex(4).x = 1.0;
-    Surface(ThisSurf).Vertex(4).y = 0.0;
-    Surface(ThisSurf).Vertex(4).z = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).x = 1.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(ThisSurf).Shape);
+    EXPECT_EQ(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape);
 
     // Surface 3 - Parallelogram
     ThisSurf = 3;
-    Surface(ThisSurf).Azimuth = 180.0;
-    Surface(ThisSurf).Tilt = 90.0;
-    Surface(ThisSurf).Sides = 4;
-    Surface(ThisSurf).GrossArea = 10.0;
+    state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
+    state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
+    state->dataSurface->Surface(ThisSurf).Sides = 4;
+    state->dataSurface->Surface(ThisSurf).GrossArea = 10.0;
 
-    Surface(ThisSurf).Vertex(1).x = 0.0;
-    Surface(ThisSurf).Vertex(1).y = 0.0;
-    Surface(ThisSurf).Vertex(1).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).z = 0.0;
 
-    Surface(ThisSurf).Vertex(2).x = 5.0;
-    Surface(ThisSurf).Vertex(2).y = 0.0;
-    Surface(ThisSurf).Vertex(2).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).x = 5.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).z = 0.0;
 
-    Surface(ThisSurf).Vertex(3).x = 7.0;
-    Surface(ThisSurf).Vertex(3).y = 0.0;
-    Surface(ThisSurf).Vertex(3).z = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).x = 7.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).z = 2.0;
 
-    Surface(ThisSurf).Vertex(4).x = 2.0;
-    Surface(ThisSurf).Vertex(4).y = 0.0;
-    Surface(ThisSurf).Vertex(4).z = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).x = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).z = 2.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(ThisSurf).Shape);
+    EXPECT_EQ(SurfaceShape::Quadrilateral, state->dataSurface->Surface(ThisSurf).Shape);
 
     // Surface 4 - Triangle
     ThisSurf = 4;
-    Surface(ThisSurf).Azimuth = 180.0;
-    Surface(ThisSurf).Tilt = 90.0;
-    Surface(ThisSurf).Sides = 3;
-    Surface(ThisSurf).GrossArea = 10.0;
+    state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
+    state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
+    state->dataSurface->Surface(ThisSurf).Sides = 3;
+    state->dataSurface->Surface(ThisSurf).GrossArea = 10.0;
 
-    Surface(ThisSurf).Vertex(1).x = 0.0;
-    Surface(ThisSurf).Vertex(1).y = 0.0;
-    Surface(ThisSurf).Vertex(1).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).z = 0.0;
 
-    Surface(ThisSurf).Vertex(2).x = 5.0;
-    Surface(ThisSurf).Vertex(2).y = 0.0;
-    Surface(ThisSurf).Vertex(2).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).x = 5.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).z = 0.0;
 
-    Surface(ThisSurf).Vertex(3).x = 0.0;
-    Surface(ThisSurf).Vertex(3).y = 0.0;
-    Surface(ThisSurf).Vertex(3).z = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).x = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).z = 2.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Triangle, Surface(ThisSurf).Shape);
+    EXPECT_EQ(SurfaceShape::Triangle, state->dataSurface->Surface(ThisSurf).Shape);
 
     // Surface 5 - Polygon
     ThisSurf = 5;
-    Surface(ThisSurf).Azimuth = 180.0;
-    Surface(ThisSurf).Tilt = 90.0;
-    Surface(ThisSurf).Sides = 5;
-    Surface(ThisSurf).GrossArea = 10.0;
+    state->dataSurface->Surface(ThisSurf).Azimuth = 180.0;
+    state->dataSurface->Surface(ThisSurf).Tilt = 90.0;
+    state->dataSurface->Surface(ThisSurf).Sides = 5;
+    state->dataSurface->Surface(ThisSurf).GrossArea = 10.0;
 
-    Surface(ThisSurf).Vertex(1).x = 0.0;
-    Surface(ThisSurf).Vertex(1).y = 0.0;
-    Surface(ThisSurf).Vertex(1).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).x = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).z = 0.0;
 
-    Surface(ThisSurf).Vertex(2).x = 5.0;
-    Surface(ThisSurf).Vertex(2).y = 0.0;
-    Surface(ThisSurf).Vertex(2).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).x = 5.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).z = 0.0;
 
-    Surface(ThisSurf).Vertex(3).x = 7.0;
-    Surface(ThisSurf).Vertex(3).y = 0.0;
-    Surface(ThisSurf).Vertex(3).z = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).x = 7.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).z = 2.0;
 
-    Surface(ThisSurf).Vertex(4).x = 3.0;
-    Surface(ThisSurf).Vertex(4).y = 0.0;
-    Surface(ThisSurf).Vertex(4).z = 5.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).x = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).z = 5.0;
 
-    Surface(ThisSurf).Vertex(5).x = 1.0;
-    Surface(ThisSurf).Vertex(5).y = 0.0;
-    Surface(ThisSurf).Vertex(5).z = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(5).x = 1.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(5).y = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(5).z = 3.0;
 
-    ProcessSurfaceVertices(state.files, ThisSurf, ErrorsFound);
+    ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Polygonal, Surface(ThisSurf).Shape);
+    EXPECT_EQ(SurfaceShape::Polygonal, state->dataSurface->Surface(ThisSurf).Shape);
 }
 
 TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
@@ -467,95 +467,98 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(state, ErrorsFound); // read project control data
-    EXPECT_FALSE(ErrorsFound);          // expect no errors
+    GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);                  // expect no errors
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
-    CosZoneRelNorth.allocate(1);
-    SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    CosBldgRelNorth = 1.0;
-    SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
-    EXPECT_FALSE(ErrorsFound);   // expect no errors
+    GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     // compare_err_stream( "" ); // just for debugging
 
-    AllocateModuleArrays();
+    SurfaceGeometry::AllocateModuleArrays(*state);
 
     //  Adding additional surfaces will change the index of the following based on where the surfaces are added in the array.
-    //	If adding new tests, break here and look at EnergyPlus::DataSurfaces::Surface to see the order.
+    //	If adding new tests, break here and look at EnergyPlus::state->dataSurface->Surface to see the order.
 
     //	enum surfaceShape:Triangle = 1
     //	"Surface 1 - Triangle"
-    int surfNum = UtilityRoutines::FindItemInList("SURFACE 1 - TRIANGLE", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Triangle, Surface(surfNum).Shape);
+    int surfNum = UtilityRoutines::FindItemInList("SURFACE 1 - TRIANGLE", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::Triangle, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:Quadrilateral = 2
     //	"Surface 2 - Quadrilateral"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 2 - QUADRILATERAL", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Quadrilateral, Surface(surfNum).Shape);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 2 - QUADRILATERAL", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::Quadrilateral, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:Rectangle = 3
     //	"Surface 3 - Rectangle"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 3 - RECTANGLE", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Rectangle, Surface(surfNum).Shape);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 3 - RECTANGLE", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::Rectangle, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularDoorWindow = 4
     //	"Surface 4 - RectangularDoorWindow"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 4 - RECTANGULARDOORWINDOW", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::RectangularDoorWindow, Surface(surfNum).Shape);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 4 - RECTANGULARDOORWINDOW", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::RectangularDoorWindow, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:RectangularOverhang = 5
     //	"Surface 5 - RectangularOverhang"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_NE(SurfaceShape::RectangularOverhang, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_NE(SurfaceShape::RectangularOverhang,
+              state->dataSurface->Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularLeftFin = 6
     //	"Surface 6 - RectangularLeftFin"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_NE(SurfaceShape::RectangularLeftFin, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_NE(SurfaceShape::RectangularLeftFin,
+              state->dataSurface->Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:RectangularRightFin = 7
     //	"Surface 7 - RectangularRightFin"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_NE(SurfaceShape::RectangularRightFin, Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_NE(SurfaceShape::RectangularRightFin,
+              state->dataSurface->Surface(surfNum).Shape); // fins and overhangs will not get set to the proper surface shape.
 
     //	enum surfaceShape:TriangularWindow = 8
     //	"Surface 8 - TriangularWindow"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 8 - TRIANGULARWINDOW", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::TriangularWindow, Surface(surfNum).Shape);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 8 - TRIANGULARWINDOW", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::TriangularWindow, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:TriangularDoor = 9
     //	"Surface 9 - TriangularDoor"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 9 - TRIANGULARDOOR", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::TriangularDoor, Surface(surfNum).Shape);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 9 - TRIANGULARDOOR", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::TriangularDoor, state->dataSurface->Surface(surfNum).Shape);
 
     //	enum surfaceShape:Polygonal = 10
     //	"Surface 10 - Polygonal"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 10 - POLYGONAL", DataSurfaces::Surface);
-    ProcessSurfaceVertices(state.files, surfNum, ErrorsFound);
-    EXPECT_EQ(SurfaceShape::Polygonal, Surface(surfNum).Shape);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE 10 - POLYGONAL", state->dataSurface->Surface);
+    ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
+    EXPECT_EQ(SurfaceShape::Polygonal, state->dataSurface->Surface(surfNum).Shape);
 }
 
 TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
@@ -577,7 +580,7 @@ TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
     SubSurface.NewellSurfaceNormalVector.x = 0.;
     SubSurface.NewellSurfaceNormalVector.y = 0.;
     SubSurface.NewellSurfaceNormalVector.z = 1.;
-    checkSubSurfAzTiltNorm(BaseSurface, SubSurface, surfaceError);
+    checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
     EXPECT_FALSE(surfaceError);
     EXPECT_FALSE(has_err_output());
 
@@ -588,7 +591,7 @@ TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
     SubSurface.NewellSurfaceNormalVector.x = 1.;
     SubSurface.NewellSurfaceNormalVector.y = 0.;
     SubSurface.NewellSurfaceNormalVector.z = 0.;
-    checkSubSurfAzTiltNorm(BaseSurface, SubSurface, surfaceError);
+    checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
     EXPECT_TRUE(surfaceError);
     EXPECT_TRUE(has_err_output());
 
@@ -600,7 +603,7 @@ TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
     SubSurface.NewellSurfaceNormalVector.y =
         1.; // This doesn't match the tilt and azimuth, but want it to be different so tilt and azimuth tests are executed
     SubSurface.NewellSurfaceNormalVector.z = 1.;
-    checkSubSurfAzTiltNorm(BaseSurface, SubSurface, surfaceError);
+    checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
     EXPECT_FALSE(surfaceError);
     EXPECT_FALSE(has_err_output());
 
@@ -618,7 +621,7 @@ TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
     SubSurface.NewellSurfaceNormalVector.x = 1.;
     SubSurface.NewellSurfaceNormalVector.y = 1.;
     SubSurface.NewellSurfaceNormalVector.z = 1.;
-    checkSubSurfAzTiltNorm(BaseSurface, SubSurface, surfaceError);
+    checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
     EXPECT_FALSE(surfaceError);
     EXPECT_TRUE(has_err_output());
 }
@@ -691,93 +694,94 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool FoundError = false;
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, FoundError);
-    GetConstructData(state.files, FoundError);
-    GetZoneData(FoundError); // Read Zone data from input file
-    DataHeatBalance::AnyCTF = true;
-    SetupZoneGeometry(state, FoundError); // this calls GetSurfaceData()
+    GetMaterialData(*state, FoundError);
+    GetConstructData(*state, FoundError);
+    GetZoneData(*state, FoundError); // Read Zone data from input file
+    state->dataHeatBal->AnyCTF = true;
+    SetupZoneGeometry(*state, FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
 
     // test coordinate on existing surface
-    EXPECT_EQ(TotSurfaces, 1);
+    EXPECT_EQ(state->dataSurface->TotSurfaces, 1);
 
-    EXPECT_EQ(Surface(TotSurfaces).Name, "FRONT-1");
+    EXPECT_EQ(state->dataSurface->Surface(state->dataSurface->TotSurfaces).Name, "FRONT-1");
 
     // move surface to SurfaceTmp since MakeMirrorSurface uses that array
-    SurfaceTmp.allocate(10);
-    SurfaceTmp(TotSurfaces) = Surface(TotSurfaces);
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(10);
+    state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces) = state->dataSurface->Surface(state->dataSurface->TotSurfaces);
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Name, "FRONT-1");
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Name, "FRONT-1");
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(1).x, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(1).y, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(1).z, 2.4);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).x, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).z, 2.4);
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(2).x, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(2).y, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(2).z, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).x, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).z, 0.);
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(3).x, 30.5);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(3).y, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(3).z, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).x, 30.5);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).z, 0.);
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(4).x, 30.5);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(4).y, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(4).z, 2.4);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).x, 30.5);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).z, 2.4);
 
-    MakeMirrorSurface(TotSurfaces); // This call increments TotSurfaces so the references after this are for the created mirror surface
+    MakeMirrorSurface(
+        *state, state->dataSurface->TotSurfaces); // This call increments TotSurfaces so the references after this are for the created mirror surface
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Name, "Mir-FRONT-1");
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Name, "Mir-FRONT-1");
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(1).x, 30.5);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(1).y, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(1).z, 2.4);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).x, 30.5);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(1).z, 2.4);
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(2).x, 30.5);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(2).y, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(2).z, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).x, 30.5);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(2).z, 0.);
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(3).x, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(3).y, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(3).z, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).x, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(3).z, 0.);
 
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(4).x, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(4).y, 0.);
-    EXPECT_EQ(SurfaceTmp(TotSurfaces).Vertex(4).z, 2.4);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).x, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).y, 0.);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).z, 2.4);
 }
 
 TEST_F(EnergyPlusFixture, SurfacesGeometry_CalcSurfaceCentroid_NonconvexRealisticZ)
 {
-    TotSurfaces = 10;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 10;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
-    Surface(1).Class = SurfaceClass_Roof;
-    Surface(1).GrossArea = 1000.;
-    Surface(1).Sides = 4;
-    Surface(1).Vertex.allocate(4);
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Roof;
+    state->dataSurface->Surface(1).GrossArea = 1000.;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Vertex.allocate(4);
 
-    Surface(1).Vertex(1).x = 2000.;
-    Surface(1).Vertex(1).y = -1000.;
-    Surface(1).Vertex(1).z = 10.;
+    state->dataSurface->Surface(1).Vertex(1).x = 2000.;
+    state->dataSurface->Surface(1).Vertex(1).y = -1000.;
+    state->dataSurface->Surface(1).Vertex(1).z = 10.;
 
-    Surface(1).Vertex(2).x = 1.;
-    Surface(1).Vertex(2).y = 0.;
-    Surface(1).Vertex(2).z = 10.;
+    state->dataSurface->Surface(1).Vertex(2).x = 1.;
+    state->dataSurface->Surface(1).Vertex(2).y = 0.;
+    state->dataSurface->Surface(1).Vertex(2).z = 10.;
 
-    Surface(1).Vertex(3).x = 2000.;
-    Surface(1).Vertex(3).y = 1000.;
-    Surface(1).Vertex(3).z = 10.;
+    state->dataSurface->Surface(1).Vertex(3).x = 2000.;
+    state->dataSurface->Surface(1).Vertex(3).y = 1000.;
+    state->dataSurface->Surface(1).Vertex(3).z = 10.;
 
-    Surface(1).Vertex(4).x = 0.;
-    Surface(1).Vertex(4).y = 0.;
-    Surface(1).Vertex(4).z = 10.;
+    state->dataSurface->Surface(1).Vertex(4).x = 0.;
+    state->dataSurface->Surface(1).Vertex(4).y = 0.;
+    state->dataSurface->Surface(1).Vertex(4).z = 10.;
 
-    CalcSurfaceCentroid();
+    CalcSurfaceCentroid(*state);
 
-    EXPECT_EQ(Surface(1).Centroid.x, 667.);
-    EXPECT_EQ(Surface(1).Centroid.y, 0.);
-    EXPECT_EQ(Surface(1).Centroid.z, 10.);
+    EXPECT_EQ(state->dataSurface->Surface(1).Centroid.x, 667.);
+    EXPECT_EQ(state->dataSurface->Surface(1).Centroid.y, 0.);
+    EXPECT_EQ(state->dataSurface->Surface(1).Centroid.z, 10.);
 }
 
 TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
@@ -924,42 +928,42 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
 
     // Prepare data for the test
     ASSERT_TRUE(process_idf(idf_objects));
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(*state, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);
-    GetConstructData(state.files, ErrorsFound); // read construction data
+    GetConstructData(*state, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
-    GetZoneData(ErrorsFound); // read zone data
+    GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
-    GetProjectControlData(state, ErrorsFound); // read project control data
+    GetProjectControlData(*state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
-    CosZoneRelNorth.allocate(1);
-    SinZoneRelNorth.allocate(1);
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    CosBldgRelNorth = 1.0;
-    SinBldgRelNorth = 0.0;
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
-    EXPECT_FALSE(ErrorsFound);   // expect no errors
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     // For each surface Run the test then Check the result
     // (1) rectangle window
-    int surfNum = UtilityRoutines::FindItemInList("SURFACE-1-RECTANGLE", DataSurfaces::Surface);
-    MakeEquivalentRectangle(surfNum, ErrorsFound);
+    int surfNum = UtilityRoutines::FindItemInList("SURFACE-1-RECTANGLE", state->dataSurface->Surface);
+    MakeEquivalentRectangle(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
-    EXPECT_NEAR(7.60, Surface(surfNum).Width, 0.01);
-    EXPECT_NEAR(1.20, Surface(surfNum).Height, 0.01);
+    EXPECT_NEAR(7.60, state->dataSurface->Surface(surfNum).Width, 0.01);
+    EXPECT_NEAR(1.20, state->dataSurface->Surface(surfNum).Height, 0.01);
     // (2) trapzoid window
-    surfNum = UtilityRoutines::FindItemInList("SURFACE-2-TRAPZOID", DataSurfaces::Surface);
-    MakeEquivalentRectangle(surfNum, ErrorsFound);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE-2-TRAPZOID", state->dataSurface->Surface);
+    MakeEquivalentRectangle(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
-    EXPECT_NEAR(7.80, Surface(surfNum).Width, 0.01);
-    EXPECT_NEAR(1.17, Surface(surfNum).Height, 0.01);
+    EXPECT_NEAR(7.80, state->dataSurface->Surface(surfNum).Width, 0.01);
+    EXPECT_NEAR(1.17, state->dataSurface->Surface(surfNum).Height, 0.01);
     // (3) parallelogram window
-    surfNum = UtilityRoutines::FindItemInList("SURFACE-3-PARALLELOGRAM", DataSurfaces::Surface);
-    MakeEquivalentRectangle(surfNum, ErrorsFound);
+    surfNum = UtilityRoutines::FindItemInList("SURFACE-3-PARALLELOGRAM", state->dataSurface->Surface);
+    MakeEquivalentRectangle(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
-    EXPECT_NEAR(8.08, Surface(surfNum).Width, 0.01);
-    EXPECT_NEAR(1.13, Surface(surfNum).Height, 0.01);
+    EXPECT_NEAR(8.08, state->dataSurface->Surface(surfNum).Width, 0.01);
+    EXPECT_NEAR(1.13, state->dataSurface->Surface(surfNum).Height, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_distance)
@@ -1202,16 +1206,16 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_listOfFacesFacingAzimuth_test
     DataVectorTypes::Polyhedron zonePoly;
     std::vector<int> results;
 
-    Surface.allocate(9);
-    Surface(1).Azimuth = 0;
-    Surface(2).Azimuth = 30.;
-    Surface(3).Azimuth = 30.;
-    Surface(4).Azimuth = 30.;
-    Surface(5).Azimuth = 45.;
-    Surface(6).Azimuth = 45.;
-    Surface(7).Azimuth = 72.;
-    Surface(8).Azimuth = 72.5;
-    Surface(9).Azimuth = 73.;
+    state->dataSurface->Surface.allocate(9);
+    state->dataSurface->Surface(1).Azimuth = 0;
+    state->dataSurface->Surface(2).Azimuth = 30.;
+    state->dataSurface->Surface(3).Azimuth = 30.;
+    state->dataSurface->Surface(4).Azimuth = 30.;
+    state->dataSurface->Surface(5).Azimuth = 45.;
+    state->dataSurface->Surface(6).Azimuth = 45.;
+    state->dataSurface->Surface(7).Azimuth = 72.;
+    state->dataSurface->Surface(8).Azimuth = 72.5;
+    state->dataSurface->Surface(9).Azimuth = 73.;
 
     zonePoly.NumSurfaceFaces = 9;
     zonePoly.SurfaceFace.allocate(9);
@@ -1225,41 +1229,41 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_listOfFacesFacingAzimuth_test
     zonePoly.SurfaceFace(8).SurfNum = 8;
     zonePoly.SurfaceFace(9).SurfNum = 9;
 
-    results = listOfFacesFacingAzimuth(zonePoly, 90.);
+    results = listOfFacesFacingAzimuth(*state, zonePoly, 90.);
     EXPECT_EQ(size_t(0), results.size());
 
-    results = listOfFacesFacingAzimuth(zonePoly, 0.);
+    results = listOfFacesFacingAzimuth(*state, zonePoly, 0.);
     EXPECT_EQ(size_t(1), results.size());
     EXPECT_EQ(1, results.at(0));
 
-    results = listOfFacesFacingAzimuth(zonePoly, 30.);
+    results = listOfFacesFacingAzimuth(*state, zonePoly, 30.);
     EXPECT_EQ(size_t(3), results.size());
     EXPECT_EQ(2, results.at(0));
     EXPECT_EQ(3, results.at(1));
     EXPECT_EQ(4, results.at(2));
 
-    results = listOfFacesFacingAzimuth(zonePoly, 45.);
+    results = listOfFacesFacingAzimuth(*state, zonePoly, 45.);
     EXPECT_EQ(size_t(2), results.size());
     EXPECT_EQ(5, results.at(0));
     EXPECT_EQ(6, results.at(1));
 
-    results = listOfFacesFacingAzimuth(zonePoly, 71.9);
+    results = listOfFacesFacingAzimuth(*state, zonePoly, 71.9);
     EXPECT_EQ(size_t(2), results.size());
     EXPECT_EQ(7, results.at(0));
     EXPECT_EQ(8, results.at(1));
 
-    results = listOfFacesFacingAzimuth(zonePoly, 72.0);
+    results = listOfFacesFacingAzimuth(*state, zonePoly, 72.0);
     EXPECT_EQ(size_t(2), results.size());
     EXPECT_EQ(7, results.at(0));
     EXPECT_EQ(8, results.at(1));
 
-    results = listOfFacesFacingAzimuth(zonePoly, 72.1);
+    results = listOfFacesFacingAzimuth(*state, zonePoly, 72.1);
     EXPECT_EQ(size_t(3), results.size());
     EXPECT_EQ(7, results.at(0));
     EXPECT_EQ(8, results.at(1));
     EXPECT_EQ(9, results.at(2));
 
-    results = listOfFacesFacingAzimuth(zonePoly, 73.0);
+    results = listOfFacesFacingAzimuth(*state, zonePoly, 73.0);
     EXPECT_EQ(size_t(2), results.size());
     EXPECT_EQ(8, results.at(0));
     EXPECT_EQ(9, results.at(1));
@@ -1269,33 +1273,33 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areSurfaceHorizAndVert_test)
 {
     DataVectorTypes::Polyhedron zonePoly;
 
-    Surface.allocate(9);
-    Surface(1).Class = SurfaceClass_Floor;
-    Surface(1).Tilt = 180.;
+    state->dataSurface->Surface.allocate(9);
+    state->dataSurface->Surface(1).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(1).Tilt = 180.;
 
-    Surface(2).Class = SurfaceClass_Floor;
-    Surface(2).Tilt = 179.5;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(2).Tilt = 179.5;
 
-    Surface(3).Class = SurfaceClass_Wall;
-    Surface(3).Tilt = 89.1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Tilt = 89.1;
 
-    Surface(4).Class = SurfaceClass_Wall;
-    Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(4).Tilt = 90.;
 
-    Surface(5).Class = SurfaceClass_Wall;
-    Surface(5).Tilt = 90.;
+    state->dataSurface->Surface(5).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(5).Tilt = 90.;
 
-    Surface(6).Class = SurfaceClass_Wall;
-    Surface(6).Tilt = 90.9;
+    state->dataSurface->Surface(6).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(6).Tilt = 90.9;
 
-    Surface(7).Class = SurfaceClass_Roof;
-    Surface(7).Tilt = -0.9;
+    state->dataSurface->Surface(7).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(7).Tilt = -0.9;
 
-    Surface(8).Class = SurfaceClass_Roof;
-    Surface(8).Tilt = 0.;
+    state->dataSurface->Surface(8).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(8).Tilt = 0.;
 
-    Surface(9).Class = SurfaceClass_Roof;
-    Surface(9).Tilt = 0.9;
+    state->dataSurface->Surface(9).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(9).Tilt = 0.9;
 
     zonePoly.NumSurfaceFaces = 9;
     zonePoly.SurfaceFace.allocate(9);
@@ -1313,77 +1317,77 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areSurfaceHorizAndVert_test)
     bool isCeilingHorizontal;
     bool areWallsVertical;
 
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_TRUE(isFloorHorizontal);
     EXPECT_TRUE(isCeilingHorizontal);
     EXPECT_TRUE(areWallsVertical);
 
-    Surface(1).Tilt = 170.;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(1).Tilt = 170.;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_FALSE(isFloorHorizontal);
     EXPECT_TRUE(isCeilingHorizontal);
     EXPECT_TRUE(areWallsVertical);
 
-    Surface(1).Tilt = 180.;
-    Surface(2).Tilt = 178.9;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(1).Tilt = 180.;
+    state->dataSurface->Surface(2).Tilt = 178.9;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_FALSE(isFloorHorizontal);
     EXPECT_TRUE(isCeilingHorizontal);
     EXPECT_TRUE(areWallsVertical);
 
-    Surface(2).Tilt = 181.0;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(2).Tilt = 181.0;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_TRUE(isFloorHorizontal);
     EXPECT_TRUE(isCeilingHorizontal);
     EXPECT_TRUE(areWallsVertical);
 
-    Surface(2).Tilt = 181.1;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(2).Tilt = 181.1;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_FALSE(isFloorHorizontal);
     EXPECT_TRUE(isCeilingHorizontal);
     EXPECT_TRUE(areWallsVertical);
 
-    Surface(2).Tilt = 179.5;
-    Surface(8).Tilt = 180.;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(2).Tilt = 179.5;
+    state->dataSurface->Surface(8).Tilt = 180.;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_TRUE(isFloorHorizontal);
     EXPECT_FALSE(isCeilingHorizontal);
     EXPECT_TRUE(areWallsVertical);
 
-    Surface(8).Tilt = 1.1;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(8).Tilt = 1.1;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_TRUE(isFloorHorizontal);
     EXPECT_FALSE(isCeilingHorizontal);
     EXPECT_TRUE(areWallsVertical);
 
-    Surface(8).Tilt = -1.1;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(8).Tilt = -1.1;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_TRUE(isFloorHorizontal);
     EXPECT_FALSE(isCeilingHorizontal);
     EXPECT_TRUE(areWallsVertical);
 
-    Surface(8).Tilt = 0.;
-    Surface(4).Tilt = 270.;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(8).Tilt = 0.;
+    state->dataSurface->Surface(4).Tilt = 270.;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_TRUE(isFloorHorizontal);
     EXPECT_TRUE(isCeilingHorizontal);
     EXPECT_FALSE(areWallsVertical);
 
-    Surface(4).Tilt = 91.1;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(4).Tilt = 91.1;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_TRUE(isFloorHorizontal);
     EXPECT_TRUE(isCeilingHorizontal);
     EXPECT_FALSE(areWallsVertical);
 
-    Surface(4).Tilt = 88.9;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(4).Tilt = 88.9;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_TRUE(isFloorHorizontal);
     EXPECT_TRUE(isCeilingHorizontal);
     EXPECT_FALSE(areWallsVertical);
 
-    Surface(1).Tilt = 170.;
-    Surface(8).Tilt = 1.1;
-    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(zonePoly);
+    state->dataSurface->Surface(1).Tilt = 170.;
+    state->dataSurface->Surface(8).Tilt = 1.1;
+    std::tie(isFloorHorizontal, isCeilingHorizontal, areWallsVertical) = areSurfaceHorizAndVert(*state, zonePoly);
     EXPECT_FALSE(isFloorHorizontal);
     EXPECT_FALSE(isCeilingHorizontal);
     EXPECT_FALSE(areWallsVertical);
@@ -1394,10 +1398,10 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areWallHeightSame_test)
     DataVectorTypes::Polyhedron zonePoly;
     std::vector<int> results;
 
-    Surface.allocate(3);
-    Surface(1).Class = SurfaceClass_Wall;
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(3).Class = SurfaceClass_Wall;
+    state->dataSurface->Surface.allocate(3);
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
 
     zonePoly.NumSurfaceFaces = 3;
     zonePoly.SurfaceFace.allocate(3);
@@ -1425,20 +1429,20 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areWallHeightSame_test)
     zonePoly.SurfaceFace(3).FacePoints(3).z = 10.;
     zonePoly.SurfaceFace(3).FacePoints(4).z = 0.;
 
-    EXPECT_TRUE(areWallHeightSame(zonePoly));
+    EXPECT_TRUE(areWallHeightSame(*state, zonePoly));
 
     zonePoly.SurfaceFace(3).FacePoints(2).z = 9.;
-    EXPECT_TRUE(areWallHeightSame(zonePoly));
+    EXPECT_TRUE(areWallHeightSame(*state, zonePoly));
 
     zonePoly.SurfaceFace(3).FacePoints(2).z = 11.;
-    EXPECT_FALSE(areWallHeightSame(zonePoly));
+    EXPECT_FALSE(areWallHeightSame(*state, zonePoly));
 
     zonePoly.SurfaceFace(3).FacePoints(2).z = 10.;
     zonePoly.SurfaceFace(2).FacePoints(2).z = 10.02;
-    EXPECT_TRUE(areWallHeightSame(zonePoly));
+    EXPECT_TRUE(areWallHeightSame(*state, zonePoly));
 
     zonePoly.SurfaceFace(2).FacePoints(2).z = 10.03;
-    EXPECT_FALSE(areWallHeightSame(zonePoly));
+    EXPECT_FALSE(areWallHeightSame(*state, zonePoly));
 
     zonePoly.SurfaceFace(1).FacePoints(1).z = -10.;
     zonePoly.SurfaceFace(1).FacePoints(2).z = -0.5;
@@ -1455,31 +1459,31 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areWallHeightSame_test)
     zonePoly.SurfaceFace(3).FacePoints(3).z = -10.;
     zonePoly.SurfaceFace(3).FacePoints(4).z = -0.5;
 
-    EXPECT_TRUE(areWallHeightSame(zonePoly));
+    EXPECT_TRUE(areWallHeightSame(*state, zonePoly));
 
     zonePoly.SurfaceFace(3).FacePoints(1).z = -0.6;
-    EXPECT_TRUE(areWallHeightSame(zonePoly));
+    EXPECT_TRUE(areWallHeightSame(*state, zonePoly));
 
     zonePoly.SurfaceFace(3).FacePoints(1).z = -0.4;
-    EXPECT_FALSE(areWallHeightSame(zonePoly));
+    EXPECT_FALSE(areWallHeightSame(*state, zonePoly));
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_findPossibleOppositeFace_test)
 {
     DataVectorTypes::Polyhedron zonePoly;
 
-    Surface.allocate(4);
-    Surface(1).Azimuth = 0.;
-    Surface(1).Area = 10.;
+    state->dataSurface->Surface.allocate(4);
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).Area = 10.;
 
-    Surface(2).Azimuth = 90.;
-    Surface(2).Area = 10.;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).Area = 10.;
 
-    Surface(3).Azimuth = 180.;
-    Surface(3).Area = 10.;
+    state->dataSurface->Surface(3).Azimuth = 180.;
+    state->dataSurface->Surface(3).Area = 10.;
 
-    Surface(4).Azimuth = 270.;
-    Surface(4).Area = 10.;
+    state->dataSurface->Surface(4).Azimuth = 270.;
+    state->dataSurface->Surface(4).Area = 10.;
 
     zonePoly.NumSurfaceFaces = 4;
     zonePoly.SurfaceFace.allocate(4);
@@ -1495,41 +1499,41 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_findPossibleOppositeFace_test
     zonePoly.SurfaceFace(4).SurfNum = 4;
     zonePoly.SurfaceFace(4).NSides = 4;
 
-    EXPECT_EQ(3, findPossibleOppositeFace(zonePoly, 1));
-    EXPECT_EQ(1, findPossibleOppositeFace(zonePoly, 3));
+    EXPECT_EQ(3, findPossibleOppositeFace(*state, zonePoly, 1));
+    EXPECT_EQ(1, findPossibleOppositeFace(*state, zonePoly, 3));
 
-    EXPECT_EQ(4, findPossibleOppositeFace(zonePoly, 2));
-    EXPECT_EQ(2, findPossibleOppositeFace(zonePoly, 4));
+    EXPECT_EQ(4, findPossibleOppositeFace(*state, zonePoly, 2));
+    EXPECT_EQ(2, findPossibleOppositeFace(*state, zonePoly, 4));
 
-    Surface(2).Azimuth = 90.5;
+    state->dataSurface->Surface(2).Azimuth = 90.5;
 
-    EXPECT_EQ(4, findPossibleOppositeFace(zonePoly, 2));
-    EXPECT_EQ(2, findPossibleOppositeFace(zonePoly, 4));
+    EXPECT_EQ(4, findPossibleOppositeFace(*state, zonePoly, 2));
+    EXPECT_EQ(2, findPossibleOppositeFace(*state, zonePoly, 4));
 
-    Surface(2).Azimuth = 89.5;
+    state->dataSurface->Surface(2).Azimuth = 89.5;
 
-    EXPECT_EQ(4, findPossibleOppositeFace(zonePoly, 2));
-    EXPECT_EQ(2, findPossibleOppositeFace(zonePoly, 4));
+    EXPECT_EQ(4, findPossibleOppositeFace(*state, zonePoly, 2));
+    EXPECT_EQ(2, findPossibleOppositeFace(*state, zonePoly, 4));
 
-    Surface(2).Azimuth = 45.;
+    state->dataSurface->Surface(2).Azimuth = 45.;
 
-    EXPECT_EQ(-1, findPossibleOppositeFace(zonePoly, 2)); // not found
-    EXPECT_EQ(-1, findPossibleOppositeFace(zonePoly, 4)); // not found
+    EXPECT_EQ(-1, findPossibleOppositeFace(*state, zonePoly, 2)); // not found
+    EXPECT_EQ(-1, findPossibleOppositeFace(*state, zonePoly, 4)); // not found
 
-    Surface(1).Area = 9.;
+    state->dataSurface->Surface(1).Area = 9.;
 
-    EXPECT_EQ(-1, findPossibleOppositeFace(zonePoly, 1)); // not found
-    EXPECT_EQ(-1, findPossibleOppositeFace(zonePoly, 3)); // not found
+    EXPECT_EQ(-1, findPossibleOppositeFace(*state, zonePoly, 1)); // not found
+    EXPECT_EQ(-1, findPossibleOppositeFace(*state, zonePoly, 3)); // not found
 
-    Surface(1).Area = 10.;
+    state->dataSurface->Surface(1).Area = 10.;
 
-    EXPECT_EQ(3, findPossibleOppositeFace(zonePoly, 1));
-    EXPECT_EQ(1, findPossibleOppositeFace(zonePoly, 3));
+    EXPECT_EQ(3, findPossibleOppositeFace(*state, zonePoly, 1));
+    EXPECT_EQ(1, findPossibleOppositeFace(*state, zonePoly, 3));
 
     zonePoly.SurfaceFace(1).NSides = 3;
 
-    EXPECT_EQ(-1, findPossibleOppositeFace(zonePoly, 1)); // not found
-    EXPECT_EQ(-1, findPossibleOppositeFace(zonePoly, 3)); // not found
+    EXPECT_EQ(-1, findPossibleOppositeFace(*state, zonePoly, 1)); // not found
+    EXPECT_EQ(-1, findPossibleOppositeFace(*state, zonePoly, 3)); // not found
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areCornersEquidistant_test)
@@ -1590,22 +1594,22 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areOppositeWallsSame_test)
 {
     DataVectorTypes::Polyhedron zonePoly;
 
-    Surface.allocate(4);
-    Surface(1).Azimuth = 0.;
-    Surface(1).Class = SurfaceClass_Wall;
-    Surface(1).Area = 30.;
+    state->dataSurface->Surface.allocate(4);
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Area = 30.;
 
-    Surface(2).Azimuth = 90.;
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(2).Area = 24.;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Area = 24.;
 
-    Surface(3).Azimuth = 180.;
-    Surface(3).Class = SurfaceClass_Wall;
-    Surface(3).Area = 30.;
+    state->dataSurface->Surface(3).Azimuth = 180.;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Area = 30.;
 
-    Surface(4).Azimuth = 270.;
-    Surface(4).Class = SurfaceClass_Wall;
-    Surface(4).Area = 24.;
+    state->dataSurface->Surface(4).Azimuth = 270.;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(4).Area = 24.;
 
     zonePoly.NumSurfaceFaces = 4;
     zonePoly.SurfaceFace.allocate(4);
@@ -1692,40 +1696,40 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areOppositeWallsSame_test)
     Real64 area;
     Real64 dist;
 
-    EXPECT_TRUE(areOppositeWallsSame(zonePoly, area, dist));
+    EXPECT_TRUE(areOppositeWallsSame(*state, zonePoly, area, dist));
     EXPECT_EQ(30., area);
     EXPECT_EQ(8., dist);
 
-    Surface(3).Area = 29.; // make surface 1 and 3 no longer match areas - now compare 2 and 4
-    EXPECT_TRUE(areOppositeWallsSame(zonePoly, area, dist));
+    state->dataSurface->Surface(3).Area = 29.; // make surface 1 and 3 no longer match areas - now compare 2 and 4
+    EXPECT_TRUE(areOppositeWallsSame(*state, zonePoly, area, dist));
     EXPECT_EQ(24., area);
     EXPECT_EQ(10., dist);
 
-    Surface(4).Area = 23.; // make surface 2 and 4 no longer match areas
-    EXPECT_FALSE(areOppositeWallsSame(zonePoly, area, dist));
+    state->dataSurface->Surface(4).Area = 23.; // make surface 2 and 4 no longer match areas
+    EXPECT_FALSE(areOppositeWallsSame(*state, zonePoly, area, dist));
 
-    Surface(3).Area = 30.; // make surface 1 and 3 have same areas again
-    Surface(4).Area = 24.; // make surface 2 and 4 have same areas again
+    state->dataSurface->Surface(3).Area = 30.; // make surface 1 and 3 have same areas again
+    state->dataSurface->Surface(4).Area = 24.; // make surface 2 and 4 have same areas again
 
-    EXPECT_TRUE(areOppositeWallsSame(zonePoly, area, dist)); // retest
+    EXPECT_TRUE(areOppositeWallsSame(*state, zonePoly, area, dist)); // retest
 
-    zonePoly.SurfaceFace(3).FacePoints(3).y = 7.;            // move one corner in so distances are not all equal
-    EXPECT_TRUE(areOppositeWallsSame(zonePoly, area, dist)); // should pick other walls
+    zonePoly.SurfaceFace(3).FacePoints(3).y = 7.;                    // move one corner in so distances are not all equal
+    EXPECT_TRUE(areOppositeWallsSame(*state, zonePoly, area, dist)); // should pick other walls
     EXPECT_EQ(24., area);
     EXPECT_EQ(10., dist);
 
-    zonePoly.SurfaceFace(4).FacePoints(3).x = 11.;            // move one corner out so distances are not all equal
-    EXPECT_FALSE(areOppositeWallsSame(zonePoly, area, dist)); // now neither wall matches
+    zonePoly.SurfaceFace(4).FacePoints(3).x = 11.;                    // move one corner out so distances are not all equal
+    EXPECT_FALSE(areOppositeWallsSame(*state, zonePoly, area, dist)); // now neither wall matches
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areFloorAndCeilingSame_test)
 {
     DataVectorTypes::Polyhedron zonePoly;
 
-    Surface.allocate(2);
-    Surface(1).Class = SurfaceClass_Floor;
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Class = SurfaceClass::Floor;
 
-    Surface(2).Class = SurfaceClass_Roof;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Roof;
 
     zonePoly.NumSurfaceFaces = 2;
     zonePoly.SurfaceFace.allocate(2);
@@ -1769,11 +1773,11 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areFloorAndCeilingSame_test)
     zonePoly.SurfaceFace(2).FacePoints(4).y = 8.;
     zonePoly.SurfaceFace(2).FacePoints(4).z = 3.;
 
-    EXPECT_TRUE(areFloorAndCeilingSame(zonePoly));
+    EXPECT_TRUE(areFloorAndCeilingSame(*state, zonePoly));
 
     zonePoly.SurfaceFace(2).FacePoints(4).x = 7.; // move one corner
 
-    EXPECT_FALSE(areFloorAndCeilingSame(zonePoly));
+    EXPECT_FALSE(areFloorAndCeilingSame(*state, zonePoly));
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_makeListOfUniqueVertices_test)
@@ -2491,443 +2495,439 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isEnclosedVolume_BoxWithSplit
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
-    Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 6;
+    state->dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).HasFloor = true;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceLast = 6;
 
-    Surface.dimension(6);
+    state->dataSurface->Surface.allocate(6);
 
-    Surface(1).Sides = 4;
-    Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
-    Surface(1).Tilt = 90.;
-    Surface(1).Vertex(1) = Vector(0., 0., 3.);
-    Surface(1).Vertex(2) = Vector(0., 0., 0.);
-    Surface(1).Vertex(3) = Vector(10., 0., 0.);
-    Surface(1).Vertex(4) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Vertex.dimension(4);
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Vertex(1) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(1).Vertex(2) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(3) = Vector(10., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(4) = Vector(10., 0., 3.);
 
-    Surface(2).Sides = 4;
-    Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(2).Tilt = 90.;
-    Surface(2).Vertex(1) = Vector(0., 8., 3.);
-    Surface(2).Vertex(2) = Vector(0., 8., 0.);
-    Surface(2).Vertex(3) = Vector(0., 0., 0.);
-    Surface(2).Vertex(4) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(2).Sides = 4;
+    state->dataSurface->Surface(2).Vertex.dimension(4);
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Vertex(1) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(2).Vertex(2) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(2).Vertex(3) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(2).Vertex(4) = Vector(0., 0., 3.);
 
-    Surface(3).Sides = 4;
-    Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
-    Surface(3).Tilt = 90.;
-    Surface(3).Vertex(1) = Vector(10., 8., 3.);
-    Surface(3).Vertex(2) = Vector(10., 8., 0.);
-    Surface(3).Vertex(3) = Vector(0., 8., 0.);
-    Surface(3).Vertex(4) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(3).Sides = 4;
+    state->dataSurface->Surface(3).Vertex.dimension(4);
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Vertex(1) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(3).Vertex(2) = Vector(10., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(3) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(4) = Vector(0., 8., 3.);
 
-    Surface(4).Sides = 4;
-    Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Wall;
-    Surface(4).Tilt = 90.;
-    Surface(4).Vertex(1) = Vector(10., 0., 3.);
-    Surface(4).Vertex(2) = Vector(10., 0., 0.);
-    Surface(4).Vertex(3) = Vector(10., 8., 0.);
-    Surface(4).Vertex(4) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(4).Sides = 4;
+    state->dataSurface->Surface(4).Vertex.dimension(4);
+    state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Vertex(1) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(4).Vertex(2) = Vector(10., 0., 0.);
+    state->dataSurface->Surface(4).Vertex(3) = Vector(10., 8., 0.);
+    state->dataSurface->Surface(4).Vertex(4) = Vector(10., 8., 3.);
 
-    Surface(5).Sides = 4;
-    Surface(5).Vertex.dimension(4);
-    Surface(5).Class = SurfaceClass_Floor;
-    Surface(5).Tilt = 180.;
-    Surface(5).Vertex(1) = Vector(0., 0., 0.);
-    Surface(5).Vertex(2) = Vector(0., 8, 0.);
-    Surface(5).Vertex(3) = Vector(10., 8, 0.);
-    Surface(5).Vertex(4) = Vector(10., 0, 0.);
+    state->dataSurface->Surface(5).Sides = 4;
+    state->dataSurface->Surface(5).Vertex.dimension(4);
+    state->dataSurface->Surface(5).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(5).Tilt = 180.;
+    state->dataSurface->Surface(5).Vertex(1) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(5).Vertex(2) = Vector(0., 8, 0.);
+    state->dataSurface->Surface(5).Vertex(3) = Vector(10., 8, 0.);
+    state->dataSurface->Surface(5).Vertex(4) = Vector(10., 0, 0.);
 
-    Surface(6).Sides = 4;
-    Surface(6).Vertex.dimension(4);
-    Surface(6).Class = SurfaceClass_Roof;
-    Surface(6).Tilt = 0.;
-    Surface(6).Vertex(1) = Vector(0., 8., 3.);
-    Surface(6).Vertex(2) = Vector(0., 0., 3.);
-    Surface(6).Vertex(3) = Vector(10., 0., 3.);
-    Surface(6).Vertex(4) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(6).Sides = 4;
+    state->dataSurface->Surface(6).Vertex.dimension(4);
+    state->dataSurface->Surface(6).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(6).Tilt = 0.;
+    state->dataSurface->Surface(6).Vertex(1) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(6).Vertex(2) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(6).Vertex(3) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(6).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    CalculateZoneVolume(*state, enteredCeilingHeight);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
-    Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 5;
+    state->dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).HasFloor = true;
+    //    Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
-    Surface.dimension(5);
+    state->dataSurface->Surface.allocate(5);
 
-    Surface(1).Sides = 4;
-    Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
-    Surface(1).Tilt = 90.;
-    Surface(1).Vertex(1) = Vector(0., 0., 3.);
-    Surface(1).Vertex(2) = Vector(0., 0., 0.);
-    Surface(1).Vertex(3) = Vector(10., 0., 0.);
-    Surface(1).Vertex(4) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Vertex.dimension(4);
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Vertex(1) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(1).Vertex(2) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(3) = Vector(10., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(4) = Vector(10., 0., 3.);
 
-    Surface(2).Sides = 4;
-    Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(2).Tilt = 90.;
-    Surface(2).Vertex(1) = Vector(0., 8., 3.);
-    Surface(2).Vertex(2) = Vector(0., 8., 0.);
-    Surface(2).Vertex(3) = Vector(0., 0., 0.);
-    Surface(2).Vertex(4) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(2).Sides = 4;
+    state->dataSurface->Surface(2).Vertex.dimension(4);
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Vertex(1) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(2).Vertex(2) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(2).Vertex(3) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(2).Vertex(4) = Vector(0., 0., 3.);
 
-    Surface(3).Sides = 4;
-    Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
-    Surface(3).Tilt = 90.;
-    Surface(3).Vertex(1) = Vector(10., 8., 3.);
-    Surface(3).Vertex(2) = Vector(10., 8., 0.);
-    Surface(3).Vertex(3) = Vector(0., 8., 0.);
-    Surface(3).Vertex(4) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(3).Sides = 4;
+    state->dataSurface->Surface(3).Vertex.dimension(4);
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Vertex(1) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(3).Vertex(2) = Vector(10., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(3) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(4) = Vector(0., 8., 3.);
 
-    Surface(4).Sides = 4;
-    Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Floor;
-    Surface(4).Tilt = 180.;
-    Surface(4).Vertex(1) = Vector(0., 0., 0.);
-    Surface(4).Vertex(2) = Vector(0., 8, 0.);
-    Surface(4).Vertex(3) = Vector(10., 8, 0.);
-    Surface(4).Vertex(4) = Vector(10., 0, 0.);
+    state->dataSurface->Surface(4).Sides = 4;
+    state->dataSurface->Surface(4).Vertex.dimension(4);
+    state->dataSurface->Surface(4).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(4).Tilt = 180.;
+    state->dataSurface->Surface(4).Vertex(1) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(4).Vertex(2) = Vector(0., 8, 0.);
+    state->dataSurface->Surface(4).Vertex(3) = Vector(10., 8, 0.);
+    state->dataSurface->Surface(4).Vertex(4) = Vector(10., 0, 0.);
 
-    Surface(5).Sides = 4;
-    Surface(5).Vertex.dimension(4);
-    Surface(5).Class = SurfaceClass_Roof;
-    Surface(5).Tilt = 0.;
-    Surface(5).Vertex(1) = Vector(0., 8., 3.);
-    Surface(5).Vertex(2) = Vector(0., 0., 3.);
-    Surface(5).Vertex(3) = Vector(10., 0., 3.);
-    Surface(5).Vertex(4) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(5).Sides = 4;
+    state->dataSurface->Surface(5).Vertex.dimension(4);
+    state->dataSurface->Surface(5).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(5).Tilt = 0.;
+    state->dataSurface->Surface(5).Vertex(1) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(5).Vertex(2) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(5).Vertex(3) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(5).Vertex(4) = Vector(10., 8., 3.);
 
-    Zone(1).FloorArea = 80.;
-    Zone(1).CeilingHeight = 3.;
+    state->dataHeatBal->Zone(1).FloorArea = 80.;
+    state->dataHeatBal->Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    CalculateZoneVolume(*state, enteredCeilingHeight);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
-    Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 5;
+    state->dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).HasFloor = true;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
-    Surface.dimension(5);
+    state->dataSurface->Surface.allocate(5);
 
-    Surface(1).Sides = 4;
-    Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
-    Surface(1).Tilt = 90.;
-    Surface(1).Vertex(1) = Vector(0., 0., 3.);
-    Surface(1).Vertex(2) = Vector(0., 0., 0.);
-    Surface(1).Vertex(3) = Vector(10., 0., 0.);
-    Surface(1).Vertex(4) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Vertex.dimension(4);
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Vertex(1) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(1).Vertex(2) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(3) = Vector(10., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(4) = Vector(10., 0., 3.);
 
-    Surface(2).Sides = 4;
-    Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(2).Tilt = 90.;
-    Surface(2).Vertex(1) = Vector(0., 8., 3.);
-    Surface(2).Vertex(2) = Vector(0., 8., 0.);
-    Surface(2).Vertex(3) = Vector(0., 0., 0.);
-    Surface(2).Vertex(4) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(2).Sides = 4;
+    state->dataSurface->Surface(2).Vertex.dimension(4);
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Vertex(1) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(2).Vertex(2) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(2).Vertex(3) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(2).Vertex(4) = Vector(0., 0., 3.);
 
-    Surface(3).Sides = 4;
-    Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
-    Surface(3).Tilt = 90.;
-    Surface(3).Vertex(1) = Vector(10., 8., 3.);
-    Surface(3).Vertex(2) = Vector(10., 8., 0.);
-    Surface(3).Vertex(3) = Vector(0., 8., 0.);
-    Surface(3).Vertex(4) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(3).Sides = 4;
+    state->dataSurface->Surface(3).Vertex.dimension(4);
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Vertex(1) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(3).Vertex(2) = Vector(10., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(3) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(4) = Vector(0., 8., 3.);
 
-    Surface(4).Sides = 4;
-    Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Wall;
-    Surface(4).Tilt = 90.;
-    Surface(4).Vertex(1) = Vector(10., 0., 3.);
-    Surface(4).Vertex(2) = Vector(10., 0., 0.);
-    Surface(4).Vertex(3) = Vector(10., 8., 0.);
-    Surface(4).Vertex(4) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(4).Sides = 4;
+    state->dataSurface->Surface(4).Vertex.dimension(4);
+    state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Vertex(1) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(4).Vertex(2) = Vector(10., 0., 0.);
+    state->dataSurface->Surface(4).Vertex(3) = Vector(10., 8., 0.);
+    state->dataSurface->Surface(4).Vertex(4) = Vector(10., 8., 3.);
 
-    Surface(5).Sides = 4;
-    Surface(5).Vertex.dimension(4);
-    Surface(5).Class = SurfaceClass_Floor;
-    Surface(5).Tilt = 180.;
-    Surface(5).Vertex(1) = Vector(0., 0., 0.);
-    Surface(5).Vertex(2) = Vector(0., 8, 0.);
-    Surface(5).Vertex(3) = Vector(10., 8, 0.);
-    Surface(5).Vertex(4) = Vector(10., 0, 0.);
+    state->dataSurface->Surface(5).Sides = 4;
+    state->dataSurface->Surface(5).Vertex.dimension(4);
+    state->dataSurface->Surface(5).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(5).Tilt = 180.;
+    state->dataSurface->Surface(5).Vertex(1) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(5).Vertex(2) = Vector(0., 8, 0.);
+    state->dataSurface->Surface(5).Vertex(3) = Vector(10., 8, 0.);
+    state->dataSurface->Surface(5).Vertex(4) = Vector(10., 0, 0.);
 
-    Zone(1).FloorArea = 80.;
-    Zone(1).CeilingHeight = 3.;
+    state->dataHeatBal->Zone(1).FloorArea = 80.;
+    state->dataHeatBal->Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    CalculateZoneVolume(*state, enteredCeilingHeight);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
-    Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 5;
+    state->dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).HasFloor = true;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
-    Surface.dimension(5);
+    state->dataSurface->Surface.allocate(5);
 
-    Surface(1).Sides = 4;
-    Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
-    Surface(1).Tilt = 90.;
-    Surface(1).Vertex(1) = Vector(0., 0., 3.);
-    Surface(1).Vertex(2) = Vector(0., 0., 0.);
-    Surface(1).Vertex(3) = Vector(10., 0., 0.);
-    Surface(1).Vertex(4) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Vertex.dimension(4);
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Vertex(1) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(1).Vertex(2) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(3) = Vector(10., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(4) = Vector(10., 0., 3.);
 
-    Surface(2).Sides = 4;
-    Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(2).Tilt = 90.;
-    Surface(2).Vertex(1) = Vector(0., 8., 3.);
-    Surface(2).Vertex(2) = Vector(0., 8., 0.);
-    Surface(2).Vertex(3) = Vector(0., 0., 0.);
-    Surface(2).Vertex(4) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(2).Sides = 4;
+    state->dataSurface->Surface(2).Vertex.dimension(4);
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Vertex(1) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(2).Vertex(2) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(2).Vertex(3) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(2).Vertex(4) = Vector(0., 0., 3.);
 
-    Surface(3).Sides = 4;
-    Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
-    Surface(3).Tilt = 90.;
-    Surface(3).Vertex(1) = Vector(10., 8., 3.);
-    Surface(3).Vertex(2) = Vector(10., 8., 0.);
-    Surface(3).Vertex(3) = Vector(0., 8., 0.);
-    Surface(3).Vertex(4) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(3).Sides = 4;
+    state->dataSurface->Surface(3).Vertex.dimension(4);
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Vertex(1) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(3).Vertex(2) = Vector(10., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(3) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(4) = Vector(0., 8., 3.);
 
-    Surface(4).Sides = 4;
-    Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Wall;
-    Surface(4).Tilt = 90.;
-    Surface(4).Vertex(1) = Vector(10., 0., 3.);
-    Surface(4).Vertex(2) = Vector(10., 0., 0.);
-    Surface(4).Vertex(3) = Vector(10., 8., 0.);
-    Surface(4).Vertex(4) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(4).Sides = 4;
+    state->dataSurface->Surface(4).Vertex.dimension(4);
+    state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Vertex(1) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(4).Vertex(2) = Vector(10., 0., 0.);
+    state->dataSurface->Surface(4).Vertex(3) = Vector(10., 8., 0.);
+    state->dataSurface->Surface(4).Vertex(4) = Vector(10., 8., 3.);
 
-    Surface(5).Sides = 4;
-    Surface(5).Vertex.dimension(4);
-    Surface(5).Class = SurfaceClass_Roof;
-    Surface(5).Tilt = 0.;
-    Surface(5).Vertex(1) = Vector(0., 8., 3.);
-    Surface(5).Vertex(2) = Vector(0., 0., 3.);
-    Surface(5).Vertex(3) = Vector(10., 0., 3.);
-    Surface(5).Vertex(4) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(5).Sides = 4;
+    state->dataSurface->Surface(5).Vertex.dimension(4);
+    state->dataSurface->Surface(5).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(5).Tilt = 0.;
+    state->dataSurface->Surface(5).Vertex(1) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(5).Vertex(2) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(5).Vertex(3) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(5).Vertex(4) = Vector(10., 8., 3.);
 
-    Zone(1).CeilingArea = 80.;
-    Zone(1).CeilingHeight = 3.;
+    state->dataHeatBal->Zone(1).CeilingArea = 80.;
+    state->dataHeatBal->Zone(1).CeilingHeight = 3.;
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    CalculateZoneVolume(*state, enteredCeilingHeight);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
 {
-    using DataGlobals::NumOfZones;
-
     Array1D_bool enteredCeilingHeight;
-    NumOfZones = 1;
-    enteredCeilingHeight.dimension(NumOfZones, false);
-    Zone.dimension(NumOfZones);
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 4;
+    state->dataGlobal->NumOfZones = 1;
+    enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceLast = 4;
 
-    Surface.dimension(4);
+    state->dataSurface->Surface.allocate(4);
 
-    Surface(1).Sides = 4;
-    Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
-    Surface(1).Tilt = 90.;
-    Surface(1).Azimuth = 180.;
-    Surface(1).Area = 30.;
-    Surface(1).Vertex(1) = Vector(0., 0., 3.);
-    Surface(1).Vertex(2) = Vector(0., 0., 0.);
-    Surface(1).Vertex(3) = Vector(10., 0., 0.);
-    Surface(1).Vertex(4) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Vertex.dimension(4);
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Azimuth = 180.;
+    state->dataSurface->Surface(1).Area = 30.;
+    state->dataSurface->Surface(1).Vertex(1) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(1).Vertex(2) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(3) = Vector(10., 0., 0.);
+    state->dataSurface->Surface(1).Vertex(4) = Vector(10., 0., 3.);
 
-    Surface(2).Sides = 4;
-    Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(2).Tilt = 90.;
-    Surface(2).Azimuth = 270.;
-    Surface(2).Area = 24.;
-    Surface(2).Vertex(1) = Vector(0., 8., 3.);
-    Surface(2).Vertex(2) = Vector(0., 8., 0.);
-    Surface(2).Vertex(3) = Vector(0., 0., 0.);
-    Surface(2).Vertex(4) = Vector(0., 0., 3.);
+    state->dataSurface->Surface(2).Sides = 4;
+    state->dataSurface->Surface(2).Vertex.dimension(4);
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Azimuth = 270.;
+    state->dataSurface->Surface(2).Area = 24.;
+    state->dataSurface->Surface(2).Vertex(1) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(2).Vertex(2) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(2).Vertex(3) = Vector(0., 0., 0.);
+    state->dataSurface->Surface(2).Vertex(4) = Vector(0., 0., 3.);
 
-    Surface(3).Sides = 4;
-    Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
-    Surface(3).Tilt = 90.;
-    Surface(3).Azimuth = 0.;
-    Surface(3).Area = 30.;
-    Surface(3).Vertex(1) = Vector(10., 8., 3.);
-    Surface(3).Vertex(2) = Vector(10., 8., 0.);
-    Surface(3).Vertex(3) = Vector(0., 8., 0.);
-    Surface(3).Vertex(4) = Vector(0., 8., 3.);
+    state->dataSurface->Surface(3).Sides = 4;
+    state->dataSurface->Surface(3).Vertex.dimension(4);
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).Area = 30.;
+    state->dataSurface->Surface(3).Vertex(1) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(3).Vertex(2) = Vector(10., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(3) = Vector(0., 8., 0.);
+    state->dataSurface->Surface(3).Vertex(4) = Vector(0., 8., 3.);
 
-    Surface(4).Sides = 4;
-    Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Wall;
-    Surface(4).Tilt = 90.;
-    Surface(4).Azimuth = 90.;
-    Surface(4).Area = 24.;
-    Surface(4).Vertex(1) = Vector(10., 0., 3.);
-    Surface(4).Vertex(2) = Vector(10., 0., 0.);
-    Surface(4).Vertex(3) = Vector(10., 8., 0.);
-    Surface(4).Vertex(4) = Vector(10., 8., 3.);
+    state->dataSurface->Surface(4).Sides = 4;
+    state->dataSurface->Surface(4).Vertex.dimension(4);
+    state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).Area = 24.;
+    state->dataSurface->Surface(4).Vertex(1) = Vector(10., 0., 3.);
+    state->dataSurface->Surface(4).Vertex(2) = Vector(10., 0., 0.);
+    state->dataSurface->Surface(4).Vertex(3) = Vector(10., 8., 0.);
+    state->dataSurface->Surface(4).Vertex(4) = Vector(10., 8., 3.);
 
-    CalculateZoneVolume(state.files, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    CalculateZoneVolume(*state, enteredCeilingHeight);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, MakeRectangularVertices)
 {
     int surfNum = 1;
     int zoneNum = 1;
-    SurfaceTmp.allocate(surfNum);
-    SurfaceTmp(surfNum).Class = SurfaceClass_Wall;
-    SurfaceTmp(surfNum).Zone = zoneNum;
-    SurfaceTmp(surfNum).Azimuth = 0.;
-    SurfaceTmp(surfNum).Tilt = 90.;
-    SurfaceTmp(surfNum).Sides = 4;
-    SurfaceTmp(surfNum).Vertex.allocate(4);
 
-    Zone.allocate(zoneNum);
-    Zone(zoneNum).RelNorth = 0.;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(surfNum);
+    state->dataSurfaceGeometry->SurfaceTmp(surfNum).Class = SurfaceClass::Wall;
+    state->dataSurfaceGeometry->SurfaceTmp(surfNum).Zone = zoneNum;
+    state->dataSurfaceGeometry->SurfaceTmp(surfNum).Azimuth = 0.;
+    state->dataSurfaceGeometry->SurfaceTmp(surfNum).Tilt = 90.;
+    state->dataSurfaceGeometry->SurfaceTmp(surfNum).Sides = 4;
+    state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex.allocate(4);
 
-    CosZoneRelNorth.allocate(zoneNum);
-    SinZoneRelNorth.allocate(zoneNum);
-    CosZoneRelNorth(zoneNum) = std::cos(-Zone(zoneNum).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(zoneNum) = std::sin(-Zone(zoneNum).RelNorth * DataGlobals::DegToRadians);
+    state->dataHeatBal->Zone.allocate(zoneNum);
+    state->dataHeatBal->Zone(zoneNum).RelNorth = 0.;
 
-    CosBldgRelNorth = 1.0;
-    SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(zoneNum);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(zoneNum);
+    state->dataSurfaceGeometry->CosZoneRelNorth(zoneNum) = std::cos(-state->dataHeatBal->Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(zoneNum) = std::sin(-state->dataHeatBal->Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
+
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     // facing north
 
-    MakeRectangularVertices(1, 0., 0., 0., 5., 3., false);
+    MakeRectangularVertices(*state, 1, 0., 0., 0., 5., 3., false);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).y, 0.001);
-    EXPECT_NEAR(3., SurfaceTmp(surfNum).Vertex(1).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).y, 0.001);
+    EXPECT_NEAR(3., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).z, 0.001);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).y, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).y, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).z, 0.001);
 
-    EXPECT_NEAR(-5., SurfaceTmp(surfNum).Vertex(3).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(3).y, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(3).z, 0.001);
+    EXPECT_NEAR(-5., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).y, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).z, 0.001);
 
-    EXPECT_NEAR(-5., SurfaceTmp(surfNum).Vertex(4).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(4).y, 0.001);
-    EXPECT_NEAR(3., SurfaceTmp(surfNum).Vertex(4).z, 0.001);
+    EXPECT_NEAR(-5., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).y, 0.001);
+    EXPECT_NEAR(3., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).z, 0.001);
 
     // facing east
 
-    SurfaceTmp(surfNum).Azimuth = 90.;
+    state->dataSurfaceGeometry->SurfaceTmp(surfNum).Azimuth = 90.;
 
-    MakeRectangularVertices(1, 0., 0., 0., 5., 3., false);
+    MakeRectangularVertices(*state, 1, 0., 0., 0., 5., 3., false);
 
-    EXPECT_NEAR(0, SurfaceTmp(surfNum).Vertex(1).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).y, 0.001);
-    EXPECT_NEAR(3., SurfaceTmp(surfNum).Vertex(1).z, 0.001);
+    EXPECT_NEAR(0, state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).y, 0.001);
+    EXPECT_NEAR(3., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).z, 0.001);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).y, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).y, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).z, 0.001);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(3).x, 0.001);
-    EXPECT_NEAR(5., SurfaceTmp(surfNum).Vertex(3).y, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(3).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).x, 0.001);
+    EXPECT_NEAR(5., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).y, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).z, 0.001);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(4).x, 0.001);
-    EXPECT_NEAR(5., SurfaceTmp(surfNum).Vertex(4).y, 0.001);
-    EXPECT_NEAR(3., SurfaceTmp(surfNum).Vertex(4).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).x, 0.001);
+    EXPECT_NEAR(5., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).y, 0.001);
+    EXPECT_NEAR(3., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).z, 0.001);
 
     // facing south
 
-    SurfaceTmp(surfNum).Azimuth = 180.;
+    state->dataSurfaceGeometry->SurfaceTmp(surfNum).Azimuth = 180.;
 
-    MakeRectangularVertices(1, 0., 0., 0., 5., 3., false);
+    MakeRectangularVertices(*state, 1, 0., 0., 0., 5., 3., false);
 
-    EXPECT_NEAR(0, SurfaceTmp(surfNum).Vertex(1).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).y, 0.001);
-    EXPECT_NEAR(3., SurfaceTmp(surfNum).Vertex(1).z, 0.001);
+    EXPECT_NEAR(0, state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).y, 0.001);
+    EXPECT_NEAR(3., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).z, 0.001);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).y, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).y, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).z, 0.001);
 
-    EXPECT_NEAR(5., SurfaceTmp(surfNum).Vertex(3).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(3).y, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(3).z, 0.001);
+    EXPECT_NEAR(5., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).y, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).z, 0.001);
 
-    EXPECT_NEAR(5., SurfaceTmp(surfNum).Vertex(4).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(4).y, 0.001);
-    EXPECT_NEAR(3., SurfaceTmp(surfNum).Vertex(4).z, 0.001);
+    EXPECT_NEAR(5., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).y, 0.001);
+    EXPECT_NEAR(3., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).z, 0.001);
 
     // facing west
 
-    SurfaceTmp(surfNum).Azimuth = 270.;
+    state->dataSurfaceGeometry->SurfaceTmp(surfNum).Azimuth = 270.;
 
-    MakeRectangularVertices(1, 0., 0., 0., 5., 3., false);
+    MakeRectangularVertices(*state, 1, 0., 0., 0., 5., 3., false);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(1).y, 0.001);
-    EXPECT_NEAR(3., SurfaceTmp(surfNum).Vertex(1).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).y, 0.001);
+    EXPECT_NEAR(3., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(1).z, 0.001);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).x, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).y, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(2).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).x, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).y, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(2).z, 0.001);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(3).x, 0.001);
-    EXPECT_NEAR(-5., SurfaceTmp(surfNum).Vertex(3).y, 0.001);
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(3).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).x, 0.001);
+    EXPECT_NEAR(-5., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).y, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(3).z, 0.001);
 
-    EXPECT_NEAR(0., SurfaceTmp(surfNum).Vertex(4).x, 0.001);
-    EXPECT_NEAR(-5., SurfaceTmp(surfNum).Vertex(4).y, 0.001);
-    EXPECT_NEAR(3., SurfaceTmp(surfNum).Vertex(4).z, 0.001);
+    EXPECT_NEAR(0., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).x, 0.001);
+    EXPECT_NEAR(-5., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).y, 0.001);
+    EXPECT_NEAR(3., state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex(4).z, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
@@ -2986,27 +2986,28 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfZones = 2;
-    Zone.allocate(2);
-    Zone(1).Name = "ZONE 1";
-    Zone(2).Name = "ZONE 2";
-    SurfaceTmp.allocate(2);
+    state->dataGlobal->NumOfZones = 2;
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(2).Name = "ZONE 2";
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(2);
     int SurfNum = 0;
     int TotHTSurfs = 2;
     Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
-    Array1D_int const BaseSurfIDs(3, {1, 2, 3});
+    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(
+        3, {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof});
     int NeedToAddSurfaces;
 
-    GetGeometryParameters(state.files, ErrorsFound);
-    CosZoneRelNorth.allocate(2);
-    SinZoneRelNorth.allocate(2);
+    GetGeometryParameters(*state, ErrorsFound);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    CosZoneRelNorth = 1.0;
-    SinZoneRelNorth = 0.0;
-    SinBldgRelNorth = 0.0;
-    CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     EXPECT_EQ(2, SurfNum);
     std::string const error_string =
@@ -3026,343 +3027,660 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest)
 
     // Test a multiple vertex surfaces in ProcessSurfaceVertices and CalcCoordinateTransformation for #6384
 
-    TotSurfaces = 2;
-    MaxVerticesPerSurface = 9;
-    Surface.allocate(TotSurfaces);
-    ShadeV.allocate(TotSurfaces);
-    Surface(1).Vertex.allocate(7);
-    Surface(2).Vertex.allocate(9);
-    SurfaceTmp.allocate(TotSurfaces);
-    SurfaceTmp(1).Vertex.allocate(7);
-    SurfaceTmp(2).Vertex.allocate(9);
+    state->dataSurface->TotSurfaces = 2;
+    state->dataSurface->MaxVerticesPerSurface = 9;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->ShadeV.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface(1).Vertex.allocate(7);
+    state->dataSurface->Surface(2).Vertex.allocate(9);
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurfaceGeometry->SurfaceTmp(1).Vertex.allocate(7);
+    state->dataSurfaceGeometry->SurfaceTmp(2).Vertex.allocate(9);
 
     int ThisSurf(0);
 
     // Surface 1 - Rectangle with 7 points
     ThisSurf = 1;
-    Surface(ThisSurf).Azimuth = 0.0;
-    Surface(ThisSurf).Tilt = 180.0;
-    Surface(ThisSurf).Sides = 7;
-    Surface(ThisSurf).GrossArea = 20.0;
+    state->dataSurface->Surface(ThisSurf).Azimuth = 0.0;
+    state->dataSurface->Surface(ThisSurf).Tilt = 180.0;
+    state->dataSurface->Surface(ThisSurf).Sides = 7;
+    state->dataSurface->Surface(ThisSurf).GrossArea = 20.0;
 
-    Surface(ThisSurf).Vertex(1).x = 10.0;
-    Surface(ThisSurf).Vertex(1).y = 2.0;
-    Surface(ThisSurf).Vertex(1).z = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).y = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).z = 3.0;
 
-    Surface(ThisSurf).Vertex(2).x = 10.0;
-    Surface(ThisSurf).Vertex(2).y = 3.0;
-    Surface(ThisSurf).Vertex(2).z = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).y = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).z = 3.0;
 
-    Surface(ThisSurf).Vertex(3).x = 10.0;
-    Surface(ThisSurf).Vertex(3).y = 4.0;
-    Surface(ThisSurf).Vertex(3).z = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).y = 4.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).z = 3.0;
 
-    Surface(ThisSurf).Vertex(4).x = 10.0;
-    Surface(ThisSurf).Vertex(4).y = 5.0;
-    Surface(ThisSurf).Vertex(4).z = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).y = 5.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).z = 3.0;
 
-    Surface(ThisSurf).Vertex(5).x = 10.0;
-    Surface(ThisSurf).Vertex(5).y = 6.0;
-    Surface(ThisSurf).Vertex(5).z = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(5).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(5).y = 6.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(5).z = 3.0;
 
-    Surface(ThisSurf).Vertex(6).x = 15.0;
-    Surface(ThisSurf).Vertex(6).y = 6.0;
-    Surface(ThisSurf).Vertex(6).z = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(6).x = 15.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(6).y = 6.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(6).z = 3.0;
 
-    Surface(ThisSurf).Vertex(7).x = 15.0;
-    Surface(ThisSurf).Vertex(7).y = 2.0;
-    Surface(ThisSurf).Vertex(7).z = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(7).x = 15.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(7).y = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(7).z = 3.0;
 
-    SurfaceTmp(ThisSurf) = Surface(ThisSurf);
-    CheckConvexity(ThisSurf, SurfaceTmp(ThisSurf).Sides);
-    Surface(ThisSurf) = SurfaceTmp(ThisSurf);
-    EXPECT_EQ(4, Surface(ThisSurf).Sides);
-    EXPECT_EQ(10.0, Surface(ThisSurf).Vertex(2).x);
-    EXPECT_EQ(6.0, Surface(ThisSurf).Vertex(2).y);
-    EXPECT_EQ(15.0, Surface(ThisSurf).Vertex(3).x);
-    EXPECT_EQ(6.0, Surface(ThisSurf).Vertex(3).y);
+    state->dataSurfaceGeometry->SurfaceTmp(ThisSurf) = state->dataSurface->Surface(ThisSurf);
+    CheckConvexity(*state, ThisSurf, state->dataSurfaceGeometry->SurfaceTmp(ThisSurf).Sides);
+    state->dataSurface->Surface(ThisSurf) = state->dataSurfaceGeometry->SurfaceTmp(ThisSurf);
+    EXPECT_EQ(4, state->dataSurface->Surface(ThisSurf).Sides);
+    EXPECT_EQ(10.0, state->dataSurface->Surface(ThisSurf).Vertex(2).x);
+    EXPECT_EQ(6.0, state->dataSurface->Surface(ThisSurf).Vertex(2).y);
+    EXPECT_EQ(15.0, state->dataSurface->Surface(ThisSurf).Vertex(3).x);
+    EXPECT_EQ(6.0, state->dataSurface->Surface(ThisSurf).Vertex(3).y);
 
     // Surface 2 - Rectangle with 9 points
     ThisSurf = 2;
-    Surface(ThisSurf).Azimuth = 0.0;
-    Surface(ThisSurf).Tilt = 0.0;
-    Surface(ThisSurf).Sides = 9;
-    Surface(ThisSurf).GrossArea = 30.0;
+    state->dataSurface->Surface(ThisSurf).Azimuth = 0.0;
+    state->dataSurface->Surface(ThisSurf).Tilt = 0.0;
+    state->dataSurface->Surface(ThisSurf).Sides = 9;
+    state->dataSurface->Surface(ThisSurf).GrossArea = 30.0;
 
-    Surface(ThisSurf).Vertex(1).x = 10.0;
-    Surface(ThisSurf).Vertex(1).y = 2.0;
-    Surface(ThisSurf).Vertex(1).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).y = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(1).z = 0.0;
 
-    Surface(ThisSurf).Vertex(2).x = 10.0;
-    Surface(ThisSurf).Vertex(2).y = 3.0;
-    Surface(ThisSurf).Vertex(2).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).y = 3.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(2).z = 0.0;
 
-    Surface(ThisSurf).Vertex(3).x = 10.0;
-    Surface(ThisSurf).Vertex(3).y = 4.0;
-    Surface(ThisSurf).Vertex(3).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).y = 4.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(3).z = 0.0;
 
-    Surface(ThisSurf).Vertex(4).x = 10.0;
-    Surface(ThisSurf).Vertex(4).y = 5.0;
-    Surface(ThisSurf).Vertex(4).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).y = 5.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(4).z = 0.0;
 
-    Surface(ThisSurf).Vertex(5).x = 10.0;
-    Surface(ThisSurf).Vertex(5).y = 6.0;
-    Surface(ThisSurf).Vertex(5).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(5).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(5).y = 6.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(5).z = 0.0;
 
-    Surface(ThisSurf).Vertex(6).x = 10.0;
-    Surface(ThisSurf).Vertex(6).y = 7.0;
-    Surface(ThisSurf).Vertex(6).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(6).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(6).y = 7.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(6).z = 0.0;
 
-    Surface(ThisSurf).Vertex(7).x = 10.0;
-    Surface(ThisSurf).Vertex(7).y = 8.0;
-    Surface(ThisSurf).Vertex(7).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(7).x = 10.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(7).y = 8.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(7).z = 0.0;
 
-    Surface(ThisSurf).Vertex(8).x = 15.0;
-    Surface(ThisSurf).Vertex(8).y = 8.0;
-    Surface(ThisSurf).Vertex(8).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(8).x = 15.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(8).y = 8.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(8).z = 0.0;
 
-    Surface(ThisSurf).Vertex(9).x = 15.0;
-    Surface(ThisSurf).Vertex(9).y = 2.0;
-    Surface(ThisSurf).Vertex(9).z = 0.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(9).x = 15.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(9).y = 2.0;
+    state->dataSurface->Surface(ThisSurf).Vertex(9).z = 0.0;
 
-    SurfaceTmp(ThisSurf) = Surface(ThisSurf);
-    CheckConvexity(ThisSurf, SurfaceTmp(ThisSurf).Sides);
-    Surface(ThisSurf) = SurfaceTmp(ThisSurf);
-    EXPECT_EQ(4, Surface(ThisSurf).Sides);
-    EXPECT_EQ(10.0, Surface(ThisSurf).Vertex(2).x);
-    EXPECT_EQ(8.0, Surface(ThisSurf).Vertex(2).y);
-    EXPECT_EQ(15.0, Surface(ThisSurf).Vertex(3).x);
-    EXPECT_EQ(8.0, Surface(ThisSurf).Vertex(3).y);
+    state->dataSurfaceGeometry->SurfaceTmp(ThisSurf) = state->dataSurface->Surface(ThisSurf);
+    CheckConvexity(*state, ThisSurf, state->dataSurfaceGeometry->SurfaceTmp(ThisSurf).Sides);
+    state->dataSurface->Surface(ThisSurf) = state->dataSurfaceGeometry->SurfaceTmp(ThisSurf);
+    EXPECT_EQ(4, state->dataSurface->Surface(ThisSurf).Sides);
+    EXPECT_EQ(10.0, state->dataSurface->Surface(ThisSurf).Vertex(2).x);
+    EXPECT_EQ(8.0, state->dataSurface->Surface(ThisSurf).Vertex(2).y);
+    EXPECT_EQ(15.0, state->dataSurface->Surface(ThisSurf).Vertex(3).x);
+    EXPECT_EQ(8.0, state->dataSurface->Surface(ThisSurf).Vertex(3).y);
 }
 
 TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationName.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationName(1) = "Fene-01";
-    WindowShadingControl(1).FenestrationName(2) = "Fene-02";
-    WindowShadingControl(1).FenestrationName(3) = "Fene-03";
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationName(1) = "Fene-01";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(2) = "Fene-02";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(3) = "Fene-03";
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationName.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationName(1) = "Fene-04";
-    WindowShadingControl(2).FenestrationName(2) = "Fene-05";
-    WindowShadingControl(2).FenestrationName(3) = "Fene-06";
-    WindowShadingControl(2).FenestrationName(4) = "Fene-07";
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationName.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationName(1) = "Fene-04";
+    state->dataSurface->WindowShadingControl(2).FenestrationName(2) = "Fene-05";
+    state->dataSurface->WindowShadingControl(2).FenestrationName(3) = "Fene-06";
+    state->dataSurface->WindowShadingControl(2).FenestrationName(4) = "Fene-07";
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationName.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationName(1) = "Fene-08";
-    WindowShadingControl(3).FenestrationName(2) = "Fene-09";
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationName.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationName(1) = "Fene-08";
+    state->dataSurface->WindowShadingControl(3).FenestrationName(2) = "Fene-09";
 
-    dataConstruction.Construct.allocate(1);
-    dataConstruction.Construct(1).WindowTypeEQL = false;
+    state->dataConstruction->Construct.allocate(1);
+    state->dataConstruction->Construct(1).WindowTypeEQL = false;
 
-    SurfaceTmp.allocate(9);
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(9);
 
-    SurfaceTmp(1).Name = "Fene-04";
-    SurfaceTmp(1).Construction = 1;
-    SurfaceTmp(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurfaceGeometry->SurfaceTmp(1).Name = "Fene-04";
+    state->dataSurfaceGeometry->SurfaceTmp(1).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(1).ExtBoundCond = ExternalEnvironment;
 
-    SurfaceTmp(2).Name = "Fene-05";
-    SurfaceTmp(2).Construction = 1;
-    SurfaceTmp(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurfaceGeometry->SurfaceTmp(2).Name = "Fene-05";
+    state->dataSurfaceGeometry->SurfaceTmp(2).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(2).ExtBoundCond = ExternalEnvironment;
 
-    SurfaceTmp(3).Name = "Fene-06";
-    SurfaceTmp(3).Construction = 1;
-    SurfaceTmp(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurfaceGeometry->SurfaceTmp(3).Name = "Fene-06";
+    state->dataSurfaceGeometry->SurfaceTmp(3).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(3).ExtBoundCond = ExternalEnvironment;
 
-    SurfaceTmp(4).Name = "Fene-01";
-    SurfaceTmp(4).Construction = 1;
-    SurfaceTmp(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurfaceGeometry->SurfaceTmp(4).Name = "Fene-01";
+    state->dataSurfaceGeometry->SurfaceTmp(4).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(4).ExtBoundCond = ExternalEnvironment;
 
-    SurfaceTmp(5).Name = "Fene-02";
-    SurfaceTmp(5).Construction = 1;
-    SurfaceTmp(5).ExtBoundCond = ExternalEnvironment;
+    state->dataSurfaceGeometry->SurfaceTmp(5).Name = "Fene-02";
+    state->dataSurfaceGeometry->SurfaceTmp(5).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(5).ExtBoundCond = ExternalEnvironment;
 
-    SurfaceTmp(6).Name = "Fene-03";
-    SurfaceTmp(6).Construction = 1;
-    SurfaceTmp(6).ExtBoundCond = ExternalEnvironment;
+    state->dataSurfaceGeometry->SurfaceTmp(6).Name = "Fene-03";
+    state->dataSurfaceGeometry->SurfaceTmp(6).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(6).ExtBoundCond = ExternalEnvironment;
 
-    SurfaceTmp(7).Name = "Fene-07";
-    SurfaceTmp(7).Construction = 1;
-    SurfaceTmp(7).ExtBoundCond = ExternalEnvironment;
+    state->dataSurfaceGeometry->SurfaceTmp(7).Name = "Fene-07";
+    state->dataSurfaceGeometry->SurfaceTmp(7).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(7).ExtBoundCond = ExternalEnvironment;
 
-    SurfaceTmp(8).Name = "Fene-08";
-    SurfaceTmp(8).Construction = 1;
-    SurfaceTmp(8).ExtBoundCond = ExternalEnvironment;
+    state->dataSurfaceGeometry->SurfaceTmp(8).Name = "Fene-08";
+    state->dataSurfaceGeometry->SurfaceTmp(8).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(8).ExtBoundCond = ExternalEnvironment;
 
-    SurfaceTmp(9).Name = "Fene-09";
-    SurfaceTmp(9).Construction = 1;
-    SurfaceTmp(9).ExtBoundCond = ExternalEnvironment;
+    state->dataSurfaceGeometry->SurfaceTmp(9).Name = "Fene-09";
+    state->dataSurfaceGeometry->SurfaceTmp(9).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(9).ExtBoundCond = ExternalEnvironment;
 
     bool Err = false;
 
     int surfNum = 1;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
-    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 2;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
-    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 3;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
-    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 4;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
-    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).activeWindowShadingControl, 1);
     EXPECT_FALSE(Err);
 
     surfNum = 5;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
-    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).activeWindowShadingControl, 1);
     EXPECT_FALSE(Err);
 
     surfNum = 6;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
-    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 1);
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).activeWindowShadingControl, 1);
     EXPECT_FALSE(Err);
 
     surfNum = 7;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
-    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 2);
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).activeWindowShadingControl, 2);
     EXPECT_FALSE(Err);
 
     surfNum = 8;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
-    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 3);
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).activeWindowShadingControl, 3);
     EXPECT_FALSE(Err);
 
     surfNum = 9;
-    InitialAssociateWindowShadingControlFenestration(Err, surfNum);
-    EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).WindowShadingControlPtr, 3);
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).activeWindowShadingControl, 3);
+    EXPECT_FALSE(Err);
+}
+
+TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi_test)
+{
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
+    int zn = 1;
+
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationName(1) = "Fene-01";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(2) = "Fene-02";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(3) = "Fene-03";
+
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationName.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationName(1) = "Fene-02";
+    state->dataSurface->WindowShadingControl(2).FenestrationName(2) = "Fene-03";
+    state->dataSurface->WindowShadingControl(2).FenestrationName(3) = "Fene-04";
+    state->dataSurface->WindowShadingControl(2).FenestrationName(4) = "Fene-05";
+
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationName.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationName(1) = "Fene-03";
+    state->dataSurface->WindowShadingControl(3).FenestrationName(2) = "Fene-05";
+
+    state->dataConstruction->Construct.allocate(1);
+    state->dataConstruction->Construct(1).WindowTypeEQL = false;
+
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(5);
+
+    state->dataSurfaceGeometry->SurfaceTmp(1).Name = "Fene-01";
+    state->dataSurfaceGeometry->SurfaceTmp(1).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(1).ExtBoundCond = ExternalEnvironment;
+
+    state->dataSurfaceGeometry->SurfaceTmp(2).Name = "Fene-02";
+    state->dataSurfaceGeometry->SurfaceTmp(2).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(2).ExtBoundCond = ExternalEnvironment;
+
+    state->dataSurfaceGeometry->SurfaceTmp(3).Name = "Fene-03";
+    state->dataSurfaceGeometry->SurfaceTmp(3).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(3).ExtBoundCond = ExternalEnvironment;
+
+    state->dataSurfaceGeometry->SurfaceTmp(4).Name = "Fene-04";
+    state->dataSurfaceGeometry->SurfaceTmp(4).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(4).ExtBoundCond = ExternalEnvironment;
+
+    state->dataSurfaceGeometry->SurfaceTmp(5).Name = "Fene-05";
+    state->dataSurfaceGeometry->SurfaceTmp(5).Construction = 1;
+    state->dataSurfaceGeometry->SurfaceTmp(5).ExtBoundCond = ExternalEnvironment;
+
+    bool Err = false;
+
+    int surfNum = 1;
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList.size(), 1u);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList[0], 1);
+    EXPECT_FALSE(Err);
+
+    surfNum = 2;
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList.size(), 2u);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList[0], 1);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList[1], 2);
+    EXPECT_FALSE(Err);
+
+    surfNum = 3;
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList.size(), 3u);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList[0], 1);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList[1], 2);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList[2], 3);
+    EXPECT_FALSE(Err);
+
+    surfNum = 4;
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList.size(), 1u);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList[0], 2);
+    EXPECT_FALSE(Err);
+
+    surfNum = 5;
+    InitialAssociateWindowShadingControlFenestration(*state, Err, surfNum);
+    EXPECT_TRUE(state->dataSurfaceGeometry->SurfaceTmp(surfNum).HasShadeControl);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList.size(), 2u);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList[0], 2);
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(surfNum).windowShadingControlList[1], 3);
     EXPECT_FALSE(Err);
 }
 
 TEST_F(EnergyPlusFixture, FinalAssociateWindowShadingControlFenestration_test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationName.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationName(1) = "Fene-01";
-    WindowShadingControl(1).FenestrationName(2) = "Fene-02";
-    WindowShadingControl(1).FenestrationName(3) = "Fene-03";
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationName(1) = "Fene-01";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(2) = "Fene-02";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(3) = "Fene-03";
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationName.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationName(1) = "Fene-04";
-    WindowShadingControl(2).FenestrationName(2) = "Fene-05";
-    WindowShadingControl(2).FenestrationName(3) = "Fene-06";
-    WindowShadingControl(2).FenestrationName(4) = "Fene-07";
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationName.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationName(1) = "Fene-04";
+    state->dataSurface->WindowShadingControl(2).FenestrationName(2) = "Fene-05";
+    state->dataSurface->WindowShadingControl(2).FenestrationName(3) = "Fene-06";
+    state->dataSurface->WindowShadingControl(2).FenestrationName(4) = "Fene-07";
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationName.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationName(1) = "Fene-08";
-    WindowShadingControl(3).FenestrationName(2) = "Fene-09";
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationName.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationName(1) = "Fene-08";
+    state->dataSurface->WindowShadingControl(3).FenestrationName(2) = "Fene-09";
 
-    TotSurfaces = 12;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 12;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
-    Surface(1).Name = "Fene-07";
-    Surface(1).WindowShadingControlPtr = 2;
+    state->dataSurface->Surface(1).Name = "Fene-07";
+    state->dataSurface->Surface(1).windowShadingControlList.push_back(2);
 
-    Surface(2).Name = "Fene-01";
-    Surface(2).WindowShadingControlPtr = 1;
+    state->dataSurface->Surface(2).Name = "Fene-01";
+    state->dataSurface->Surface(2).windowShadingControlList.push_back(1);
 
-    Surface(3).Name = "Fene-08";
-    Surface(3).WindowShadingControlPtr = 3;
+    state->dataSurface->Surface(3).Name = "Fene-08";
+    state->dataSurface->Surface(3).windowShadingControlList.push_back(3);
 
-    Surface(4).Name = "Fene-02";
-    Surface(4).WindowShadingControlPtr = 1;
+    state->dataSurface->Surface(4).Name = "Fene-02";
+    state->dataSurface->Surface(4).windowShadingControlList.push_back(1);
 
-    Surface(5).Name = "Fene-10";
-    Surface(5).WindowShadingControlPtr = 0;
+    state->dataSurface->Surface(5).Name = "Fene-10";
+    state->dataSurface->Surface(5).windowShadingControlList.push_back(0);
 
-    Surface(6).Name = "Fene-03";
-    Surface(6).WindowShadingControlPtr = 1;
+    state->dataSurface->Surface(6).Name = "Fene-03";
+    state->dataSurface->Surface(6).windowShadingControlList.push_back(1);
 
-    Surface(7).Name = "Fene-09";
-    Surface(7).WindowShadingControlPtr = 3;
+    state->dataSurface->Surface(7).Name = "Fene-09";
+    state->dataSurface->Surface(7).windowShadingControlList.push_back(3);
 
-    Surface(8).Name = "Fene-04";
-    Surface(8).WindowShadingControlPtr = 2;
+    state->dataSurface->Surface(8).Name = "Fene-04";
+    state->dataSurface->Surface(8).windowShadingControlList.push_back(2);
 
-    Surface(9).Name = "Fene-10";
-    Surface(9).WindowShadingControlPtr = 0;
+    state->dataSurface->Surface(9).Name = "Fene-10";
+    state->dataSurface->Surface(9).windowShadingControlList.push_back(0);
 
-    Surface(10).Name = "Fene-05";
-    Surface(10).WindowShadingControlPtr = 2;
+    state->dataSurface->Surface(10).Name = "Fene-05";
+    state->dataSurface->Surface(10).windowShadingControlList.push_back(2);
 
-    Surface(11).Name = "Fene-11";
-    Surface(11).WindowShadingControlPtr = 0;
+    state->dataSurface->Surface(11).Name = "Fene-11";
+    state->dataSurface->Surface(11).windowShadingControlList.push_back(0);
 
-    Surface(12).Name = "Fene-06";
-    Surface(12).WindowShadingControlPtr = 2;
+    state->dataSurface->Surface(12).Name = "Fene-06";
+    state->dataSurface->Surface(12).windowShadingControlList.push_back(2);
 
     bool Err = false;
 
-    FinalAssociateWindowShadingControlFenestration(Err);
+    FinalAssociateWindowShadingControlFenestration(*state, Err);
     EXPECT_FALSE(Err);
 
-    EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(1), 2);
-    EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(2), 4);
-    EXPECT_EQ(WindowShadingControl(1).FenestrationIndex(3), 6);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(1).FenestrationIndex(1), 2);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(1).FenestrationIndex(2), 4);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(1).FenestrationIndex(3), 6);
 
-    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(1), 8);
-    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(2), 10);
-    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(3), 12);
-    EXPECT_EQ(WindowShadingControl(2).FenestrationIndex(4), 1);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(2).FenestrationIndex(1), 8);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(2).FenestrationIndex(2), 10);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(2).FenestrationIndex(3), 12);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(2).FenestrationIndex(4), 1);
 
-    EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(1), 3);
-    EXPECT_EQ(WindowShadingControl(3).FenestrationIndex(2), 7);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(3).FenestrationIndex(1), 3);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(3).FenestrationIndex(2), 7);
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
+{
+    state->dataSurface->WindowShadingControl.allocate(2);
+
+    state->dataSurface->WindowShadingControl(1).Name = "TheShadingControl";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = 57;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
+    state->dataSurface->WindowShadingControl(1).ShadingDevice = 17;
+    state->dataSurface->WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
+    state->dataSurface->WindowShadingControl(1).Schedule = 83;
+    state->dataSurface->WindowShadingControl(1).SetPoint = 200;
+    state->dataSurface->WindowShadingControl(1).SetPoint2 = 170;
+    state->dataSurface->WindowShadingControl(1).ShadingControlIsScheduled = true;
+    state->dataSurface->WindowShadingControl(1).GlareControlIsActive = false;
+    state->dataSurface->WindowShadingControl(1).SlatAngleSchedule = 84;
+    state->dataSurface->WindowShadingControl(1).SlatAngleControlForBlinds = WSC_SAC_BlockBeamSolar;
+    state->dataSurface->WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
+    state->dataSurface->WindowShadingControl(1).DaylightControlIndex = 7;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
+
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationName(1) = "Fene-01";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(2) = "Fene-02";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(3) = "Fene-03";
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 11;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 12;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 13;
+
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    // no changes
+    EXPECT_TRUE(isWindowShadingControlSimilar(*state, 1, 2));
+
+    // changes to portions of struct that are not "similar"
+    // these should not impact similarity so changes are ignored
+
+    state->dataSurface->WindowShadingControl(2).Name = "Different";
+    EXPECT_TRUE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 9;
+    EXPECT_TRUE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).ShadingDevice = 21;
+    EXPECT_TRUE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).Schedule = 91;
+    EXPECT_TRUE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).SlatAngleSchedule = 76;
+    EXPECT_TRUE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    EXPECT_TRUE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).FenestrationName(3) = "Fene-Different";
+    EXPECT_TRUE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(3) = 17;
+    EXPECT_TRUE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    // changes to portions of struct that are "similar"
+    // these are important so they should be shown as false
+
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = 83;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).ShadingType = WinShadingType::BGBlind;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).ShadingControlType = WindowShadingControlType::OffNight_OnDay_HiSolarWindow;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).SetPoint = 140;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).SetPoint2 = 169;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).ShadingControlIsScheduled = false;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).GlareControlIsActive = true;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).SlatAngleControlForBlinds = WSC_SAC_FixedSlatAngle;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).DaylightingControlName = "Different";
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).DaylightControlIndex = 12;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = true;
+    EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWindow_Test)
+{
+    state->dataSurface->Surface.allocate(1);
+
+    state->dataSurface->Surface(1).HasShadeControl = true;
+    state->dataSurface->Surface(1).windowShadingControlList.push_back(1);
+    state->dataSurface->Surface(1).windowShadingControlList.push_back(2);
+    state->dataSurface->Surface(1).windowShadingControlList.push_back(3);
+
+    state->dataSurface->WindowShadingControl.allocate(3);
+
+    state->dataSurface->WindowShadingControl(1).Name = "TheShadingControl";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = 57;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
+    state->dataSurface->WindowShadingControl(1).ShadingDevice = 17;
+    state->dataSurface->WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
+    state->dataSurface->WindowShadingControl(1).Schedule = 83;
+    state->dataSurface->WindowShadingControl(1).SetPoint = 200;
+    state->dataSurface->WindowShadingControl(1).SetPoint2 = 170;
+    state->dataSurface->WindowShadingControl(1).ShadingControlIsScheduled = true;
+    state->dataSurface->WindowShadingControl(1).GlareControlIsActive = false;
+    state->dataSurface->WindowShadingControl(1).SlatAngleSchedule = 84;
+    state->dataSurface->WindowShadingControl(1).SlatAngleControlForBlinds = WSC_SAC_BlockBeamSolar;
+    state->dataSurface->WindowShadingControl(1).DaylightingControlName = "TheDaylightingControl";
+    state->dataSurface->WindowShadingControl(1).DaylightControlIndex = 7;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = false;
+
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationName.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationName(1) = "Fene-01";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(2) = "Fene-02";
+    state->dataSurface->WindowShadingControl(1).FenestrationName(3) = "Fene-03";
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 11;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 12;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 13;
+
+    state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
+    state->dataSurface->WindowShadingControl(3) = state->dataSurface->WindowShadingControl(1);
+
+    bool errorsOccurred = false;
+
+    CheckWindowShadingControlSimilarForWindow(*state, errorsOccurred);
+    EXPECT_FALSE(errorsOccurred);
+
+    state->dataSurface->WindowShadingControl(2).SetPoint = 140;
+    CheckWindowShadingControlSimilarForWindow(*state, errorsOccurred);
+    EXPECT_TRUE(errorsOccurred);
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
+{
+    state->dataHeatBal->TotMaterials = 0;
+    createAirMaterialFromDistance(*state, 0.008, "test_air_");
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 1);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Name, "test_air_8MM");
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Thickness, 0.008);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).GasCon(1, 1), 2.873e-3);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).GasCon(2, 1), 7.760e-5);
+
+    createAirMaterialFromDistance(*state, 0.012, "test_air_");
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 2);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Name, "test_air_12MM");
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Thickness, 0.012);
+
+    createAirMaterialFromDistance(*state, 0.008, "test_air_");
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 2);
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)
+{
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
+
+    state->dataMaterial->Material.allocate(60);
+    state->dataMaterial->Material(47).AbsorpThermalFront = 0.11;
+
+    // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).TotLayers = 3;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1) = 11;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2) = 22;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3) = 33;
+
+    createConstructionWithStorm(*state, 1, "construction_A", 47, 59);
+    EXPECT_EQ(state->dataHeatBal->TotConstructs, 2);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).Name, "construction_A");
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1), 47);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2), 59);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3), 11);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(4), 22);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(5), 33);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).OutsideAbsorpThermal, 0.11);
 }
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
@@ -3553,46 +3871,46 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(state, ErrorsFound); // read project control data
-    EXPECT_FALSE(ErrorsFound);          // expect no errors
+    GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);                  // expect no errors
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
-    CosZoneRelNorth.allocate(2);
-    SinZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
-    CosZoneRelNorth(2) = CosZoneRelNorth(1);
-    SinZoneRelNorth(2) = SinZoneRelNorth(1);
-    CosBldgRelNorth = 1.0;
-    SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = state->dataSurfaceGeometry->CosZoneRelNorth(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = state->dataSurfaceGeometry->SinZoneRelNorth(1);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
-    EXPECT_FALSE(ErrorsFound);   // expect no errors
+    GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
 
-    int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);
-    EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyCondFD);
+    int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", state->dataSurface->Surface);
+    EXPECT_EQ(DataSurfaces::iHeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
 
-    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_10000", DataSurfaces::Surface);
-    EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
+    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_10000", state->dataSurface->Surface);
+    EXPECT_EQ(DataSurfaces::iHeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(state->dataHeatBal->AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
 
-    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_20000", DataSurfaces::Surface);
-    EXPECT_EQ(DataSurfaces::HeatTransferModel_HAMT, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyHAMT);
+    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_20000", state->dataSurface->Surface);
+    EXPECT_EQ(DataSurfaces::iHeatTransferModel::HAMT, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
 
-    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_30000", DataSurfaces::Surface);
-    EXPECT_EQ(DataSurfaces::HeatTransferModel_CTF, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_30000", state->dataSurface->Surface);
+    EXPECT_EQ(DataSurfaces::iHeatTransferModel::CTF, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm);
+    EXPECT_TRUE(state->dataHeatBal->AnyCTF);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from calculated Zone Floor Area(s).",
@@ -3613,16 +3931,16 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 
     // Check heat balance surface lists
     // Remember that ZoneHTSurfaceList includes all HT surfaces in the zone PLUS any adjacent interzone surfaces - same for ZoneIZSurfaceList
-    EXPECT_EQ(DataSurfaces::AllHTSurfaceList.size(), 4u);
-    EXPECT_EQ(DataSurfaces::AllIZSurfaceList.size(), 2u);
+    EXPECT_EQ(state->dataSurface->AllHTSurfaceList.size(), 4u);
+    EXPECT_EQ(state->dataSurface->AllIZSurfaceList.size(), 2u);
 
-    int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", DataHeatBalance::Zone);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 2u);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
+    int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", state->dataHeatBal->Zone);
+    EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneHTSurfaceList.size(), 2u);
+    EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
 
-    zoneNum = UtilityRoutines::FindItemInList("ZONE1", DataHeatBalance::Zone);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
+    zoneNum = UtilityRoutines::FindItemInList("ZONE1", state->dataHeatBal->Zone);
+    EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
+    EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
 }
 
 // Test for #7071: if a Surface references an outside boundary surface that cannot be found, we handle it gracefully with an error message
@@ -3669,32 +3987,33 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Material and Construction, and expect no errors
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    GetConstructData(state.files, ErrorsFound);
+    GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    DataGlobals::NumOfZones = 2;
-    Zone.allocate(2);
-    Zone(1).Name = "ZONE 1";
-    Zone(2).Name = "ZONE 2";
-    SurfaceTmp.allocate(1);
+    state->dataGlobal->NumOfZones = 2;
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(2).Name = "ZONE 2";
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(1);
     int SurfNum = 0;
     int TotHTSurfs = 1;
     Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
-    Array1D_int const BaseSurfIDs(3, {1, 2, 3});
+    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(
+        3, {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof});
     int NeedToAddSurfaces;
 
-    GetGeometryParameters(state.files, ErrorsFound);
-    CosZoneRelNorth.allocate(1);
-    SinZoneRelNorth.allocate(1);
+    GetGeometryParameters(*state, ErrorsFound);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    CosZoneRelNorth = 1.0;
-    SinZoneRelNorth = 0.0;
-    SinBldgRelNorth = 0.0;
-    CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     // We expect one surface, but an error since Surface B cannot be located
     EXPECT_EQ(1, SurfNum);
@@ -4024,22 +4343,22 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
-    GetConstructData(state.files, ErrorsFound);
+    GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Read Zones
-    GetZoneData(ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     // Read InternalMass Object Count
-    int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+    int TotIntMass = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "InternalMass");
     // check the three internal mass objects
     EXPECT_EQ(3, TotIntMass);
 
     // Read InternalMass Surfaces Count
-    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces();
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces(*state);
     // check the 24 internal mass surfaces created from the three zoneLists
     EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
 }
@@ -4362,54 +4681,54 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
-    GetConstructData(state.files, ErrorsFound);
+    GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Read Zones
-    GetZoneData(ErrorsFound);
+    GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     // Read InternalMass Object Count
-    int TotIntMass = inputProcessor->getNumObjectsFound("InternalMass");
+    int TotIntMass = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "InternalMass");
     EXPECT_EQ(3, TotIntMass);
 
     // Read InternalMass Surfaces Count
-    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces();
+    int TotalNumOfInternalMassSurfaces = GetNumIntMassSurfaces(*state);
     EXPECT_EQ(24, TotalNumOfInternalMassSurfaces);
 
-    DataSurfaces::TotSurfaces = TotalNumOfInternalMassSurfaces;
-    SurfaceTmp.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = TotalNumOfInternalMassSurfaces;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
 
     int SurfNum = 0;
-    GetIntMassSurfaceData(ErrorsFound, SurfNum);
+    GetIntMassSurfaceData(*state, ErrorsFound, SurfNum);
     ASSERT_FALSE(ErrorsFound);
 
     // check internal mass surface count and object names
-    EXPECT_EQ(8, DataSurfaces::IntMassObjects(1).NumOfZones);
-    EXPECT_EQ("GFLOORZONESINTMASS", DataSurfaces::IntMassObjects(1).Name);
-    EXPECT_EQ(8, DataSurfaces::IntMassObjects(2).NumOfZones);
-    EXPECT_EQ("MFLOORZONESINTMASS", DataSurfaces::IntMassObjects(2).Name);
-    EXPECT_EQ(8, DataSurfaces::IntMassObjects(3).NumOfZones);
-    EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
+    EXPECT_EQ(8, state->dataSurface->IntMassObjects(1).NumOfZones);
+    EXPECT_EQ("GFLOORZONESINTMASS", state->dataSurface->IntMassObjects(1).Name);
+    EXPECT_EQ(8, state->dataSurface->IntMassObjects(2).NumOfZones);
+    EXPECT_EQ("MFLOORZONESINTMASS", state->dataSurface->IntMassObjects(2).Name);
+    EXPECT_EQ(8, state->dataSurface->IntMassObjects(3).NumOfZones);
+    EXPECT_EQ("TFLOORZONESINTMASS", state->dataSurface->IntMassObjects(3).Name);
     // check total count of internal surfaces created
-    EXPECT_EQ(24, TotSurfaces);
+    EXPECT_EQ(24, state->dataSurface->TotSurfaces);
 
     // check unique internal surface name created created from a combination
     // of zone name and internal mass object name represented in the zone
     // first zone in the ground floor ZoneList
-    EXPECT_EQ("G SW APARTMENT", Zone(1).Name);
-    EXPECT_EQ("GFLOORZONESINTMASS", DataSurfaces::IntMassObjects(1).Name);
-    EXPECT_EQ("G SW APARTMENT GFLOORZONESINTMASS", SurfaceTmp(1).Name);
+    EXPECT_EQ("G SW APARTMENT", state->dataHeatBal->Zone(1).Name);
+    EXPECT_EQ("GFLOORZONESINTMASS", state->dataSurface->IntMassObjects(1).Name);
+    EXPECT_EQ("G SW APARTMENT GFLOORZONESINTMASS", state->dataSurfaceGeometry->SurfaceTmp(1).Name);
     // first zone in the middle floor ZoneList
-    EXPECT_EQ("M SW APARTMENT", Zone(9).Name);
-    EXPECT_EQ("MFLOORZONESINTMASS", DataSurfaces::IntMassObjects(2).Name);
-    EXPECT_EQ("M SW APARTMENT MFLOORZONESINTMASS", SurfaceTmp(9).Name);
+    EXPECT_EQ("M SW APARTMENT", state->dataHeatBal->Zone(9).Name);
+    EXPECT_EQ("MFLOORZONESINTMASS", state->dataSurface->IntMassObjects(2).Name);
+    EXPECT_EQ("M SW APARTMENT MFLOORZONESINTMASS", state->dataSurfaceGeometry->SurfaceTmp(9).Name);
     // first zone in the top floor ZoneList
-    EXPECT_EQ("T SW APARTMENT", Zone(17).Name);
-    EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
-    EXPECT_EQ("T SW APARTMENT TFLOORZONESINTMASS", SurfaceTmp(17).Name);
+    EXPECT_EQ("T SW APARTMENT", state->dataHeatBal->Zone(17).Name);
+    EXPECT_EQ("TFLOORZONESINTMASS", state->dataSurface->IntMassObjects(3).Name);
+    EXPECT_EQ("T SW APARTMENT TFLOORZONESINTMASS", state->dataSurfaceGeometry->SurfaceTmp(17).Name);
 }
 
 TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
@@ -4431,14 +4750,14 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfZones = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
-    Zone(1).OriginX = 0;
-    Zone(1).OriginY = 0;
-    Zone(1).OriginZ = 0;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(1).OriginX = 0;
+    state->dataHeatBal->Zone(1).OriginY = 0;
+    state->dataHeatBal->Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
 }
 
@@ -4461,14 +4780,14 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfZones = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
-    Zone(1).OriginX = 0;
-    Zone(1).OriginY = 0;
-    Zone(1).OriginZ = 0;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(1).OriginX = 0;
+    state->dataHeatBal->Zone(1).OriginY = 0;
+    state->dataHeatBal->Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
 }
 
@@ -4491,18 +4810,19 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfZones = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
-    Zone(1).OriginX = 6;
-    Zone(1).OriginY = 6;
-    Zone(1).OriginZ = 0;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(1).OriginX = 6;
+    state->dataHeatBal->Zone(1).OriginY = 6;
+    state->dataHeatBal->Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(*state, ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
 
     std::string error_string = delimited_string({
-        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on "
+        "the default SurfaceGeometry for 'Relative to zone' coordinate.",
         "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
         "   **   ~~~   ** Rectangular Surface Coordinate System=\"RELATIVE\".",
     });
@@ -4526,18 +4846,19 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfZones = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
-    Zone(1).OriginX = 6;
-    Zone(1).OriginY = 6;
-    Zone(1).OriginZ = 0;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(1).OriginX = 6;
+    state->dataHeatBal->Zone(1).OriginY = 6;
+    state->dataHeatBal->Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(state.files, ErrorsFound);
+    GetGeometryParameters(*state, ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
 
     std::string error_string = delimited_string({
-        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on the default SurfaceGeometry for 'Relative to zone' coordinate.",
+        "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on "
+        "the default SurfaceGeometry for 'Relative to zone' coordinate.",
         "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
         "   **   ~~~   ** Rectangular Surface Coordinate System=\"defaults to RELATIVE\".",
     });
@@ -4547,157 +4868,156 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
 TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckForReversedLayers)
 {
     bool RevLayerDiffs;
-    dataConstruction.Construct.allocate(6);
-    dataMaterial.Material.allocate(7);
+    state->dataConstruction->Construct.allocate(6);
+    state->dataMaterial->Material.allocate(7);
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
-    dataConstruction.Construct(1).TotLayers = 3;
-    dataConstruction.Construct(1).LayerPoint(1) = 1;
-    dataConstruction.Construct(1).LayerPoint(2) = 2;
-    dataConstruction.Construct(1).LayerPoint(3) = 3;
-    dataConstruction.Construct(2).TotLayers = 3;
-    dataConstruction.Construct(2).LayerPoint(1) = 3;
-    dataConstruction.Construct(2).LayerPoint(2) = 2;
-    dataConstruction.Construct(2).LayerPoint(3) = 1;
+    state->dataConstruction->Construct(1).TotLayers = 3;
+    state->dataConstruction->Construct(1).LayerPoint(1) = 1;
+    state->dataConstruction->Construct(1).LayerPoint(2) = 2;
+    state->dataConstruction->Construct(1).LayerPoint(3) = 3;
+    state->dataConstruction->Construct(2).TotLayers = 3;
+    state->dataConstruction->Construct(2).LayerPoint(1) = 3;
+    state->dataConstruction->Construct(2).LayerPoint(2) = 2;
+    state->dataConstruction->Construct(2).LayerPoint(3) = 1;
     RevLayerDiffs = true;
     // ExpectResult = false;
-    CheckForReversedLayers(RevLayerDiffs, 1, 2, 3);
+    CheckForReversedLayers(*state, RevLayerDiffs, 1, 2, 3);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 1a: Constructs with regular materials are not reverse of each other--material layers do not match in reverse (should get a "true" answer)
-    dataConstruction.Construct(2).LayerPoint(1) = 1;
-    dataConstruction.Construct(2).LayerPoint(3) = 3;
-    dataMaterial.Material(1).Group = RegularMaterial;
-    dataMaterial.Material(2).Group = RegularMaterial;
-    dataMaterial.Material(3).Group = RegularMaterial;
+    state->dataConstruction->Construct(2).LayerPoint(1) = 1;
+    state->dataConstruction->Construct(2).LayerPoint(3) = 3;
+    state->dataMaterial->Material(1).Group = RegularMaterial;
+    state->dataMaterial->Material(2).Group = RegularMaterial;
+    state->dataMaterial->Material(3).Group = RegularMaterial;
     RevLayerDiffs = false;
     // ExpectResult = true;
-    CheckForReversedLayers(RevLayerDiffs, 1, 2, 3);
+    CheckForReversedLayers(*state, RevLayerDiffs, 1, 2, 3);
     EXPECT_TRUE(RevLayerDiffs);
 
     // Case 2a: Constructs are reverse of each other using WindowGlass, front/back properties properly switched (should get a "false" answer)
-    dataConstruction.Construct(3).TotLayers = 3;
-    dataConstruction.Construct(3).LayerPoint(1) = 4;
-    dataConstruction.Construct(3).LayerPoint(2) = 2;
-    dataConstruction.Construct(3).LayerPoint(3) = 5;
-    dataConstruction.Construct(4).TotLayers = 3;
-    dataConstruction.Construct(4).LayerPoint(1) = 4;
-    dataConstruction.Construct(4).LayerPoint(2) = 2;
-    dataConstruction.Construct(4).LayerPoint(3) = 5;
-    dataMaterial.Material(4).Group = WindowGlass;
-    dataMaterial.Material(4).Thickness = 0.15;
-    dataMaterial.Material(4).ReflectSolBeamFront = 0.35;
-    dataMaterial.Material(4).ReflectSolBeamBack = 0.25;
-    dataMaterial.Material(4).TransVis = 0.45;
-    dataMaterial.Material(4).ReflectVisBeamFront = 0.34;
-    dataMaterial.Material(4).ReflectVisBeamBack = 0.24;
-    dataMaterial.Material(4).TransThermal = 0.44;
-    dataMaterial.Material(4).AbsorpThermalFront = 0.33;
-    dataMaterial.Material(4).AbsorpThermalBack = 0.23;
-    dataMaterial.Material(4).Conductivity = 0.43;
-    dataMaterial.Material(4).GlassTransDirtFactor = 0.67;
-    dataMaterial.Material(4).SolarDiffusing = true;
-    dataMaterial.Material(4).YoungModulus = 0.89;
-    dataMaterial.Material(4).PoissonsRatio = 1.11;
-    dataMaterial.Material(5).Group = WindowGlass;
-    dataMaterial.Material(5).Thickness = 0.15;
-    dataMaterial.Material(5).ReflectSolBeamFront = 0.25;
-    dataMaterial.Material(5).ReflectSolBeamBack = 0.35;
-    dataMaterial.Material(5).TransVis = 0.45;
-    dataMaterial.Material(5).ReflectVisBeamFront = 0.24;
-    dataMaterial.Material(5).ReflectVisBeamBack = 0.34;
-    dataMaterial.Material(5).TransThermal = 0.44;
-    dataMaterial.Material(5).AbsorpThermalFront = 0.23;
-    dataMaterial.Material(5).AbsorpThermalBack = 0.33;
-    dataMaterial.Material(5).Conductivity = 0.43;
-    dataMaterial.Material(5).GlassTransDirtFactor = 0.67;
-    dataMaterial.Material(5).SolarDiffusing = true;
-    dataMaterial.Material(5).YoungModulus = 0.89;
-    dataMaterial.Material(5).PoissonsRatio = 1.11;
+    state->dataConstruction->Construct(3).TotLayers = 3;
+    state->dataConstruction->Construct(3).LayerPoint(1) = 4;
+    state->dataConstruction->Construct(3).LayerPoint(2) = 2;
+    state->dataConstruction->Construct(3).LayerPoint(3) = 5;
+    state->dataConstruction->Construct(4).TotLayers = 3;
+    state->dataConstruction->Construct(4).LayerPoint(1) = 4;
+    state->dataConstruction->Construct(4).LayerPoint(2) = 2;
+    state->dataConstruction->Construct(4).LayerPoint(3) = 5;
+    state->dataMaterial->Material(4).Group = WindowGlass;
+    state->dataMaterial->Material(4).Thickness = 0.15;
+    state->dataMaterial->Material(4).ReflectSolBeamFront = 0.35;
+    state->dataMaterial->Material(4).ReflectSolBeamBack = 0.25;
+    state->dataMaterial->Material(4).TransVis = 0.45;
+    state->dataMaterial->Material(4).ReflectVisBeamFront = 0.34;
+    state->dataMaterial->Material(4).ReflectVisBeamBack = 0.24;
+    state->dataMaterial->Material(4).TransThermal = 0.44;
+    state->dataMaterial->Material(4).AbsorpThermalFront = 0.33;
+    state->dataMaterial->Material(4).AbsorpThermalBack = 0.23;
+    state->dataMaterial->Material(4).Conductivity = 0.43;
+    state->dataMaterial->Material(4).GlassTransDirtFactor = 0.67;
+    state->dataMaterial->Material(4).SolarDiffusing = true;
+    state->dataMaterial->Material(4).YoungModulus = 0.89;
+    state->dataMaterial->Material(4).PoissonsRatio = 1.11;
+    state->dataMaterial->Material(5).Group = WindowGlass;
+    state->dataMaterial->Material(5).Thickness = 0.15;
+    state->dataMaterial->Material(5).ReflectSolBeamFront = 0.25;
+    state->dataMaterial->Material(5).ReflectSolBeamBack = 0.35;
+    state->dataMaterial->Material(5).TransVis = 0.45;
+    state->dataMaterial->Material(5).ReflectVisBeamFront = 0.24;
+    state->dataMaterial->Material(5).ReflectVisBeamBack = 0.34;
+    state->dataMaterial->Material(5).TransThermal = 0.44;
+    state->dataMaterial->Material(5).AbsorpThermalFront = 0.23;
+    state->dataMaterial->Material(5).AbsorpThermalBack = 0.33;
+    state->dataMaterial->Material(5).Conductivity = 0.43;
+    state->dataMaterial->Material(5).GlassTransDirtFactor = 0.67;
+    state->dataMaterial->Material(5).SolarDiffusing = true;
+    state->dataMaterial->Material(5).YoungModulus = 0.89;
+    state->dataMaterial->Material(5).PoissonsRatio = 1.11;
     RevLayerDiffs = true;
     // ExpectResult = false;
-    CheckForReversedLayers(RevLayerDiffs, 3, 4, 3);
+    CheckForReversedLayers(*state, RevLayerDiffs, 3, 4, 3);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 2b: Constructs are reverse of each other using WindowGlass, front/back properties NOT properly switched (should get a "true" answer)
-    dataMaterial.Material(5).ReflectVisBeamFront = 0.34; // correct would be 0.24
-    dataMaterial.Material(5).ReflectVisBeamBack = 0.24;  // correct would be 0.34
+    state->dataMaterial->Material(5).ReflectVisBeamFront = 0.34; // correct would be 0.24
+    state->dataMaterial->Material(5).ReflectVisBeamBack = 0.24;  // correct would be 0.34
     RevLayerDiffs = false;
     // ExpectResult = true;
-    CheckForReversedLayers(RevLayerDiffs, 3, 4, 3);
+    CheckForReversedLayers(*state, RevLayerDiffs, 3, 4, 3);
     EXPECT_TRUE(RevLayerDiffs);
 
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties properly switched (should get a "false" answer)
-    dataConstruction.Construct(5).TotLayers = 1;
-    dataConstruction.Construct(5).LayerPoint(1) = 6;
-    dataConstruction.Construct(6).TotLayers = 1;
-    dataConstruction.Construct(6).LayerPoint(1) = 7;
-    dataMaterial.Material(6).Group = GlassEquivalentLayer;
-    dataMaterial.Material(6).TausFrontBeamBeam = 0.39;
-    dataMaterial.Material(6).TausBackBeamBeam = 0.29;
-    dataMaterial.Material(6).ReflFrontBeamBeam = 0.38;
-    dataMaterial.Material(6).ReflBackBeamBeam = 0.28;
-    dataMaterial.Material(6).TausFrontBeamBeamVis = 0.37;
-    dataMaterial.Material(6).TausBackBeamBeamVis = 0.27;
-    dataMaterial.Material(6).ReflFrontBeamBeamVis = 0.36;
-    dataMaterial.Material(6).ReflBackBeamBeamVis = 0.26;
-    dataMaterial.Material(6).TausFrontBeamDiff = 0.35;
-    dataMaterial.Material(6).TausBackBeamDiff = 0.25;
-    dataMaterial.Material(6).ReflFrontBeamDiff = 0.34;
-    dataMaterial.Material(6).ReflBackBeamDiff = 0.24;
-    dataMaterial.Material(6).TausFrontBeamDiffVis = 0.33;
-    dataMaterial.Material(6).TausBackBeamDiffVis = 0.23;
-    dataMaterial.Material(6).ReflFrontBeamDiffVis = 0.32;
-    dataMaterial.Material(6).ReflBackBeamDiffVis = 0.22;
-    dataMaterial.Material(6).TausDiffDiff = 0.456;
-    dataMaterial.Material(6).ReflFrontDiffDiff = 0.31;
-    dataMaterial.Material(6).ReflBackDiffDiff = 0.21;
-    dataMaterial.Material(6).TausDiffDiffVis = 0.345;
-    dataMaterial.Material(6).ReflFrontDiffDiffVis = 0.30;
-    dataMaterial.Material(6).ReflBackDiffDiffVis = 0.20;
-    dataMaterial.Material(6).TausThermal = 0.234;
-    dataMaterial.Material(6).EmissThermalFront = 0.888;
-    dataMaterial.Material(6).EmissThermalBack = 0.777;
-    dataMaterial.Material(6).Resistance = 1.234;
-    dataMaterial.Material(7).Group = GlassEquivalentLayer;
-    dataMaterial.Material(7).TausFrontBeamBeam = 0.29;
-    dataMaterial.Material(7).TausBackBeamBeam = 0.39;
-    dataMaterial.Material(7).ReflFrontBeamBeam = 0.28;
-    dataMaterial.Material(7).ReflBackBeamBeam = 0.38;
-    dataMaterial.Material(7).TausFrontBeamBeamVis = 0.27;
-    dataMaterial.Material(7).TausBackBeamBeamVis = 0.37;
-    dataMaterial.Material(7).ReflFrontBeamBeamVis = 0.26;
-    dataMaterial.Material(7).ReflBackBeamBeamVis = 0.36;
-    dataMaterial.Material(7).TausFrontBeamDiff = 0.25;
-    dataMaterial.Material(7).TausBackBeamDiff = 0.35;
-    dataMaterial.Material(7).ReflFrontBeamDiff = 0.24;
-    dataMaterial.Material(7).ReflBackBeamDiff = 0.34;
-    dataMaterial.Material(7).TausFrontBeamDiffVis = 0.23;
-    dataMaterial.Material(7).TausBackBeamDiffVis = 0.33;
-    dataMaterial.Material(7).ReflFrontBeamDiffVis = 0.22;
-    dataMaterial.Material(7).ReflBackBeamDiffVis = 0.32;
-    dataMaterial.Material(7).TausDiffDiff = 0.456;
-    dataMaterial.Material(7).ReflFrontDiffDiff = 0.21;
-    dataMaterial.Material(7).ReflBackDiffDiff = 0.31;
-    dataMaterial.Material(7).TausDiffDiffVis = 0.345;
-    dataMaterial.Material(7).ReflFrontDiffDiffVis = 0.20;
-    dataMaterial.Material(7).ReflBackDiffDiffVis = 0.30;
-    dataMaterial.Material(7).TausThermal = 0.234;
-    dataMaterial.Material(7).EmissThermalFront = 0.777;
-    dataMaterial.Material(7).EmissThermalBack = 0.888;
-    dataMaterial.Material(7).Resistance = 1.234;
+    state->dataConstruction->Construct(5).TotLayers = 1;
+    state->dataConstruction->Construct(5).LayerPoint(1) = 6;
+    state->dataConstruction->Construct(6).TotLayers = 1;
+    state->dataConstruction->Construct(6).LayerPoint(1) = 7;
+    state->dataMaterial->Material(6).Group = GlassEquivalentLayer;
+    state->dataMaterial->Material(6).TausFrontBeamBeam = 0.39;
+    state->dataMaterial->Material(6).TausBackBeamBeam = 0.29;
+    state->dataMaterial->Material(6).ReflFrontBeamBeam = 0.38;
+    state->dataMaterial->Material(6).ReflBackBeamBeam = 0.28;
+    state->dataMaterial->Material(6).TausFrontBeamBeamVis = 0.37;
+    state->dataMaterial->Material(6).TausBackBeamBeamVis = 0.27;
+    state->dataMaterial->Material(6).ReflFrontBeamBeamVis = 0.36;
+    state->dataMaterial->Material(6).ReflBackBeamBeamVis = 0.26;
+    state->dataMaterial->Material(6).TausFrontBeamDiff = 0.35;
+    state->dataMaterial->Material(6).TausBackBeamDiff = 0.25;
+    state->dataMaterial->Material(6).ReflFrontBeamDiff = 0.34;
+    state->dataMaterial->Material(6).ReflBackBeamDiff = 0.24;
+    state->dataMaterial->Material(6).TausFrontBeamDiffVis = 0.33;
+    state->dataMaterial->Material(6).TausBackBeamDiffVis = 0.23;
+    state->dataMaterial->Material(6).ReflFrontBeamDiffVis = 0.32;
+    state->dataMaterial->Material(6).ReflBackBeamDiffVis = 0.22;
+    state->dataMaterial->Material(6).TausDiffDiff = 0.456;
+    state->dataMaterial->Material(6).ReflFrontDiffDiff = 0.31;
+    state->dataMaterial->Material(6).ReflBackDiffDiff = 0.21;
+    state->dataMaterial->Material(6).TausDiffDiffVis = 0.345;
+    state->dataMaterial->Material(6).ReflFrontDiffDiffVis = 0.30;
+    state->dataMaterial->Material(6).ReflBackDiffDiffVis = 0.20;
+    state->dataMaterial->Material(6).TausThermal = 0.234;
+    state->dataMaterial->Material(6).EmissThermalFront = 0.888;
+    state->dataMaterial->Material(6).EmissThermalBack = 0.777;
+    state->dataMaterial->Material(6).Resistance = 1.234;
+    state->dataMaterial->Material(7).Group = GlassEquivalentLayer;
+    state->dataMaterial->Material(7).TausFrontBeamBeam = 0.29;
+    state->dataMaterial->Material(7).TausBackBeamBeam = 0.39;
+    state->dataMaterial->Material(7).ReflFrontBeamBeam = 0.28;
+    state->dataMaterial->Material(7).ReflBackBeamBeam = 0.38;
+    state->dataMaterial->Material(7).TausFrontBeamBeamVis = 0.27;
+    state->dataMaterial->Material(7).TausBackBeamBeamVis = 0.37;
+    state->dataMaterial->Material(7).ReflFrontBeamBeamVis = 0.26;
+    state->dataMaterial->Material(7).ReflBackBeamBeamVis = 0.36;
+    state->dataMaterial->Material(7).TausFrontBeamDiff = 0.25;
+    state->dataMaterial->Material(7).TausBackBeamDiff = 0.35;
+    state->dataMaterial->Material(7).ReflFrontBeamDiff = 0.24;
+    state->dataMaterial->Material(7).ReflBackBeamDiff = 0.34;
+    state->dataMaterial->Material(7).TausFrontBeamDiffVis = 0.23;
+    state->dataMaterial->Material(7).TausBackBeamDiffVis = 0.33;
+    state->dataMaterial->Material(7).ReflFrontBeamDiffVis = 0.22;
+    state->dataMaterial->Material(7).ReflBackBeamDiffVis = 0.32;
+    state->dataMaterial->Material(7).TausDiffDiff = 0.456;
+    state->dataMaterial->Material(7).ReflFrontDiffDiff = 0.21;
+    state->dataMaterial->Material(7).ReflBackDiffDiff = 0.31;
+    state->dataMaterial->Material(7).TausDiffDiffVis = 0.345;
+    state->dataMaterial->Material(7).ReflFrontDiffDiffVis = 0.20;
+    state->dataMaterial->Material(7).ReflBackDiffDiffVis = 0.30;
+    state->dataMaterial->Material(7).TausThermal = 0.234;
+    state->dataMaterial->Material(7).EmissThermalFront = 0.777;
+    state->dataMaterial->Material(7).EmissThermalBack = 0.888;
+    state->dataMaterial->Material(7).Resistance = 1.234;
     RevLayerDiffs = true;
     // ExpectResult = false;
-    CheckForReversedLayers(RevLayerDiffs, 5, 6, 1);
+    CheckForReversedLayers(*state, RevLayerDiffs, 5, 6, 1);
     EXPECT_FALSE(RevLayerDiffs);
 
     // Case 3a: Single layer constructs using Equivalent Glass, front/back properties NOT properly switched (should get a "true" answer)
-    dataMaterial.Material(7).EmissThermalFront = 0.888;
+    state->dataMaterial->Material(7).EmissThermalFront = 0.888;
     RevLayerDiffs = false;
     // ExpectResult = true;
-    CheckForReversedLayers(RevLayerDiffs, 5, 6, 1);
+    CheckForReversedLayers(*state, RevLayerDiffs, 5, 6, 1);
     EXPECT_TRUE(RevLayerDiffs);
-
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundaries)
@@ -4790,47 +5110,46 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
         "    0,1,0,              !- Vertex 1",
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
-        });
+    });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
-    SetupZoneGeometry(state, ErrorsFound);
+    SetupZoneGeometry(*state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(3).Name, "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(3).ZoneNames[0], "Zone 3"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 2);
-    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 3);
+    EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(3).Name, "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(3).ZoneNames[0], "Zone 3"));
+    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 3);
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(3).Name, "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(3).ZoneNames[0], "Zone 3"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
-    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 3);
-
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 3);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(3).Name, "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(3).ZoneNames[0], "Zone 3"));
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 3);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries1)
@@ -4861,8 +5180,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Some Material;        !- Outside Layer",
         "Construction:AirBoundary,",
         "Grouped Air Boundary, !- Name",
-        "GroupedZones,            !- Solar and Daylighting Method",
-        "GroupedZones,            !- Radiant Exchange Method",
         "None;                    !- Air Exchange Method",
 
         "BuildingSurface:Detailed,",
@@ -4928,43 +5245,91 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    0,1,0,              !- Vertex 1",
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
-        });
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+    });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
-    SetupZoneGeometry(state, ErrorsFound);
+    SetupZoneGeometry(*state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[2], "Zone 3"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[2], "Zone 3"));
+    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 3"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
-
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[2], "Zone 3"));
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
@@ -4995,24 +5360,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Some Material;        !- Outside Layer",
 
         "Construction:AirBoundary,",
-        "Grouped Radiant Air Boundary, !- Name",
-        "InteriorWindow,            !- Solar and Daylighting Method",
-        "GroupedZones,            !- Radiant Exchange Method",
-        "None;                    !- Air Exchange Method",
-
-        "Construction:AirBoundary,",
-        "Grouped Solar Air Boundary, !- Name",
-        "GroupedZones,            !- Solar and Daylighting Method",
-        "IRTSurface,            !- Radiant Exchange Method",
+        "Grouped Air Boundary, !- Name",
         "None;                    !- Air Exchange Method",
 
         "BuildingSurface:Detailed,",
         "    Zone1-Surface1,  !- Name",
         "    Wall,                 !- Surface Type",
-        "    Grouped Radiant Air Boundary,  !- Construction Name",
+        "    Some Construction,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
-        "    Surface,                 !- Outside Boundary Condition",
-        "    Zone2-Surface1,  !- Outside Boundary Condition Object",
+        "    Outdoors,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
         "    NoWind,                  !- Wind Exposure",
         "    ,                        !- View Factor to Ground",
@@ -5025,10 +5382,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "BuildingSurface:Detailed,",
         "    Zone2-Surface1,  !- Name",
         "    Wall,                 !- Surface Type",
-        "    Grouped Radiant Air Boundary,  !- Construction Name",
+        "    Some Construction,  !- Construction Name",
         "    Zone 2,       !- Zone Name",
-        "    Surface,                 !- Outside Boundary Condition",
-        "    Zone1-Surface1,  !- Outside Boundary Condition Object",
+        "    Outdoors,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
         "    NoSun,                   !- Sun Exposure",
         "    NoWind,                  !- Wind Exposure",
         "    ,                        !- View Factor to Ground",
@@ -5041,7 +5398,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "BuildingSurface:Detailed,",
         "    Zone1-Surface2,  !- Name",
         "    Wall,                 !- Surface Type",
-        "    Grouped Solar Air Boundary,  !- Construction Name",
+        "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 1,       !- Zone Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone3-Surface1,  !- Outside Boundary Condition Object",
@@ -5057,7 +5414,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "BuildingSurface:Detailed,",
         "    Zone3-Surface1,  !- Name",
         "    Wall,                 !- Surface Type",
-        "    Grouped Solar Air Boundary,  !- Construction Name",
+        "    Grouped Air Boundary,  !- Construction Name",
         "    Zone 3,       !- Zone Name",
         "    Surface,                 !- Outside Boundary Condition",
         "    Zone1-Surface2,  !- Outside Boundary Condition Object",
@@ -5069,20 +5426,69 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    0,1,0,              !- Vertex 1",
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
-        });
+
+        "BuildingSurface:Detailed,",
+        "    Zone1-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+    });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
-    SetupZoneGeometry(state, ErrorsFound);
+    SetupZoneGeometry(*state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -5090,33 +5496,56 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
 
     ErrorsFound = false;
 
-    //std::string const error_string = delimited_string({
-    //"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+    // std::string const error_string = delimited_string({
+    //"   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar
+    // enclosure name."
     //    });
-    //EXPECT_TRUE(compare_err_stream(error_string, true));
+    // EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    // For this test case, Zones 1 and 2 share a radiant enclosure and Zone 1 and 3 share a solar enclosure
+    // For this test case, Zones 1 and 3 share radiant and solar enclosures
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 3"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 2);
+    EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 2);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[1], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
-    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 2);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[1], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
 
+    // Check surface order
+    int Zone1Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface1"), state->dataSurface->Surface);
+    int Zone1Surface2 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface2"), state->dataSurface->Surface);
+    int Zone2Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone2-Surface1"), state->dataSurface->Surface);
+    int Zone3Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone3-Surface1"), state->dataSurface->Surface);
+    int Zone1Floor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Floor"), state->dataSurface->Surface);
+    int Zone2Floor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone2-Floor"), state->dataSurface->Surface);
+    int Zone3Floor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone3-Floor"), state->dataSurface->Surface);
+
+    EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst, Zone1Surface2);     // air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(2).AllSurfaceFirst, Zone2Surface1);     // no air boundary surfaces in Zone 2
+    EXPECT_EQ(state->dataHeatBal->Zone(3).AllSurfaceFirst, Zone3Surface1);     // air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceFirst, Zone1Surface1);      // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceFirst, Zone2Surface1);      // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, Zone3Floor);         // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceLast, Zone1Floor);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).AllSurfaceLast, Zone2Floor);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).AllSurfaceLast, Zone3Floor);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceLast, Zone1Floor);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceLast, Zone2Floor);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, Zone3Floor);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries3)
@@ -5153,8 +5582,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    Some Material;        !- Outside Layer",
         "Construction:AirBoundary,",
         "Grouped Air Boundary, !- Name",
-        "GroupedZones,            !- Solar and Daylighting Method",
-        "GroupedZones,            !- Radiant Exchange Method",
         "None;                    !- Air Exchange Method",
 
         "BuildingSurface:Detailed,",
@@ -5253,7 +5680,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
 
-         "BuildingSurface:Detailed,",
+        "BuildingSurface:Detailed,",
         "    Zone4-Surface2,  !- Name",
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
@@ -5285,7 +5712,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
 
-       "BuildingSurface:Detailed,",
+        "BuildingSurface:Detailed,",
         "    Zone1-Surface3,  !- Name",
         "    Wall,                 !- Surface Type",
         "    Grouped Air Boundary,  !- Construction Name",
@@ -5317,20 +5744,100 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
         "    0,1,1,              !- Vertex 1",
         "    0,0,1;              !- Vertex 1",
 
-        });
+        "BuildingSurface:Detailed,",
+        "    Zone1-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 1,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone2-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 2,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone3-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 3,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone4-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 4,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+        "BuildingSurface:Detailed,",
+        "    Zone5-Floor,  !- Name",
+        "    Floor,                 !- Surface Type",
+        "    Some Construction,  !- Construction Name",
+        "    Zone 5,       !- Zone Name",
+        "    Ground,                 !- Outside Boundary Condition",
+        "    ,  !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    ,                        !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,              !- Vertex 1",
+        "    0,1,0,              !- Vertex 2",
+        "    1,1,0,              !- Vertex 3",
+        "    1,0,0;              !- Vertex 4",
+
+    });
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);    // expect no errors
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
-    EXPECT_FALSE(ErrorsFound); // expect no errors
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
 
-    SetupZoneGeometry(state, ErrorsFound);
+    SetupZoneGeometry(*state, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -5344,32 +5851,31 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // Between Zones 1 and 5
     // This should trigger the enclosure merging and all five zones should share a radiant and solar enclosure
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfRadiantEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[2], "Zone 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[3], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[4], "Zone 4"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(4).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(5).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[2], "Zone 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[3], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneRadiantInfo(1).ZoneNames[4], "Zone 4"));
+    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(4).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(5).RadiantEnclosureNum, 1);
 
-    EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[3], "Zone 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[4], "Zone 4"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(4).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(5).SolarEnclosureNum, 1);
-
+    EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[2], "Zone 5"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[3], "Zone 3"));
+    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->ZoneSolarInfo(1).ZoneNames[4], "Zone 4"));
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(4).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(5).SolarEnclosureNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
@@ -6195,23 +6701,23 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(state, ErrorsFound); // read project control data
-    EXPECT_FALSE(ErrorsFound);                             // expect no errors
+    GetProjectControlData(*state, ErrorsFound); // read project control data
+    EXPECT_FALSE(ErrorsFound);                  // expect no errors
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
-    EXPECT_FALSE(ErrorsFound);                       // expect no errors
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
 
-    GetConstructData(state.files, ErrorsFound); // read construction data
-    EXPECT_FALSE(ErrorsFound);     // expect no errors
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
 
-    GetZoneData(ErrorsFound);  // read zone data
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
+
+    SetupZoneGeometry(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound); // expect no errors
-
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
-    EXPECT_FALSE(ErrorsFound);                                                            // expect no errors
+    GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
+    EXPECT_FALSE(ErrorsFound);           // expect no errors
 
     // compare_err_stream( "" ); // just for debugging
 
@@ -6230,6 +6736,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     //      Internal Mass
     //      Doors
     //      Windows
+    //      TDD_Domes
     //
     // Reporting Order (preserving the old surface order scheme)
     //
@@ -6244,7 +6751,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     //      Internal Mass
     //
     // Special cases:
-    //      TubularDaylightDome is treated as a "non-window" subsurface
+    //      TubularDaylightDome is treated as a separate surface type
     //      TubularDaylightDiffuser is treated as a window subsurface
 
     // For this test, the order should be
@@ -6292,8 +6799,8 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     //      36. NorthRoof4 (roof)
     //      37. EastRoof (roof)
     //      38. WestRoof (roof)
-    //      39. TubularDaylightingDome1 (not a window)
-    //      40. AtticSkylight (window)
+    //      39. AtticSkylight (window)
+    //      40. TubularDaylightingDome1 (not a window)
 
     // For this test, the order should be
     // Reporting (legacy) Order (zero-based):
@@ -6334,29 +6841,30 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     //      29. Attic:LivingFloor (floor)
     //      30. Attic:GarageFloor (floor)
     //      31. NorthRoof1 (roof)
-    //      32.   TubularDaylightingDome1 (not a window)
-    //      33. SouthRoof (roof)
-    //      34. NorthRoof2 (roof)
-    //      35. NorthRoof3 (roof)
-    //      36. NorthRoof4 (roof)
-    //      37. EastRoof (roof)
+
+    //      32. SouthRoof (roof)
+    //      33. NorthRoof2 (roof)
+    //      34. NorthRoof3 (roof)
+    //      35. NorthRoof4 (roof)
+    //      36. EastRoof (roof)
+    //      37. WestRoof (roof)
     //      38.   AtticSkylight (window)
-    //      39. WestRoof (roof)
+    //      39.   TubularDaylightingDome1 (not a window)
 
     // Simulation Order (1-based):
     //  SHADING SURFACES:
     int siteShadeShadeFlatShadeSurface =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SiteShade:FlatShadeSurface"), DataSurfaces::Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
     int mirSiteShadeFlatShadeSurface =
-        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("SiteShade:FlatShadeSurface"), DataSurfaces::Surface);
+        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
     int buildingShadeTiltedShadeSurface =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), DataSurfaces::Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
     int mirBuildingShadeTiltedShadeSurface =
-        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), DataSurfaces::Surface);
+        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
     int zoneShadeLivingSouthShade001 =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("ZoneShade:Living:South:Shade001"), DataSurfaces::Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     int mirZoneShadeLivingSouthShade001 =
-        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("ZoneShade:Living:South:Shade001"), DataSurfaces::Surface);
+        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     EXPECT_EQ(siteShadeShadeFlatShadeSurface, 1);
     EXPECT_EQ(mirSiteShadeFlatShadeSurface, 2);
     EXPECT_EQ(buildingShadeTiltedShadeSurface, 3);
@@ -6365,20 +6873,20 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(mirZoneShadeLivingSouthShade001, 6);
 
     //  LIVING ZONE:
-    int wallLivingNorth = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:North"), DataSurfaces::Surface);
-    int wallLivingEast = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:East"), DataSurfaces::Surface);
-    int wallLivingSouth = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:South"), DataSurfaces::Surface);
-    int wallLivingWest = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:West"), DataSurfaces::Surface);
-    int wallLivingInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Interior"), DataSurfaces::Surface);
-    int floorLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Floor"), DataSurfaces::Surface);
-    int ceilingLivingCeiling = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Ceiling"), DataSurfaces::Surface);
-    int doorWestDoor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestDoor"), DataSurfaces::Surface);
+    int wallLivingNorth = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:North"), state->dataSurface->Surface);
+    int wallLivingEast = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:East"), state->dataSurface->Surface);
+    int wallLivingSouth = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:South"), state->dataSurface->Surface);
+    int wallLivingWest = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:West"), state->dataSurface->Surface);
+    int wallLivingInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Interior"), state->dataSurface->Surface);
+    int floorLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Floor"), state->dataSurface->Surface);
+    int ceilingLivingCeiling = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Ceiling"), state->dataSurface->Surface);
+    int doorWestDoor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestDoor"), state->dataSurface->Surface);
     int windowTubularDaylightingDiffuser1 =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("TubularDaylightingDiffuser1"), DataSurfaces::Surface);
-    int windowNorthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthWindow"), DataSurfaces::Surface);
-    int windowEastWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastWindow"), DataSurfaces::Surface);
-    int windowSouthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SouthWindow"), DataSurfaces::Surface);
-    int windowWestWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestWindow"), DataSurfaces::Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("TubularDaylightingDiffuser1"), state->dataSurface->Surface);
+    int windowNorthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthWindow"), state->dataSurface->Surface);
+    int windowEastWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastWindow"), state->dataSurface->Surface);
+    int windowSouthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SouthWindow"), state->dataSurface->Surface);
+    int windowWestWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestWindow"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallLivingNorth, 7);
     EXPECT_EQ(wallLivingEast, 8);
@@ -6388,26 +6896,26 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(floorLivingFloor, 12);
     EXPECT_EQ(ceilingLivingCeiling, 13);
     EXPECT_EQ(doorWestDoor, 14);
-    EXPECT_EQ(windowTubularDaylightingDiffuser1, 15);
-    EXPECT_EQ(windowNorthWindow, 16);
-    EXPECT_EQ(windowEastWindow, 17);
-    EXPECT_EQ(windowSouthWindow, 18);
-    EXPECT_EQ(windowWestWindow, 19);
-    EXPECT_EQ(Zone(1).SurfaceFirst, 7);
-    EXPECT_EQ(Zone(1).SurfaceLast, 19);
-    EXPECT_EQ(Zone(1).NonWindowSurfaceFirst, 7);
-    EXPECT_EQ(Zone(1).NonWindowSurfaceLast, 14);
-    EXPECT_EQ(Zone(1).WindowSurfaceFirst, 15);
-    EXPECT_EQ(Zone(1).WindowSurfaceLast, 19);
+    EXPECT_EQ(windowTubularDaylightingDiffuser1, 19);
+    EXPECT_EQ(windowNorthWindow, 15);
+    EXPECT_EQ(windowEastWindow, 16);
+    EXPECT_EQ(windowSouthWindow, 17);
+    EXPECT_EQ(windowWestWindow, 18);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceFirst, 7);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).HTSurfaceLast, 19);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst, 7);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast, 14);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).WindowSurfaceFirst, 15);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).WindowSurfaceLast, 19);
 
     //  GARAGE ZONE:
-    int wallGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Interior"), DataSurfaces::Surface);
-    int wallGarageEast = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:EastWall"), DataSurfaces::Surface);
-    int wallGarageWest = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:WestWall"), DataSurfaces::Surface);
-    int wallGarageFrontDoor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:FrontDoor"), DataSurfaces::Surface);
-    int floorGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Floor"), DataSurfaces::Surface);
-    int ceilingGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Ceiling"), DataSurfaces::Surface);
-    int intmassEVChargingStation = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EVChargingStation"), DataSurfaces::Surface);
+    int wallGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Interior"), state->dataSurface->Surface);
+    int wallGarageEast = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:EastWall"), state->dataSurface->Surface);
+    int wallGarageWest = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:WestWall"), state->dataSurface->Surface);
+    int wallGarageFrontDoor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:FrontDoor"), state->dataSurface->Surface);
+    int floorGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Floor"), state->dataSurface->Surface);
+    int ceilingGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Ceiling"), state->dataSurface->Surface);
+    int intmassEVChargingStation = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EVChargingStation"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallGarageInterior, 20);
     EXPECT_EQ(wallGarageEast, 21);
@@ -6416,29 +6924,29 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(floorGarageFloor, 24);
     EXPECT_EQ(ceilingGarageInterior, 25);
     EXPECT_EQ(intmassEVChargingStation, 26);
-    EXPECT_EQ(Zone(2).SurfaceFirst, 20);
-    EXPECT_EQ(Zone(2).SurfaceLast, 26);
-    EXPECT_EQ(Zone(2).NonWindowSurfaceFirst, 20);
-    EXPECT_EQ(Zone(2).NonWindowSurfaceLast, 26);
-    EXPECT_EQ(Zone(2).WindowSurfaceFirst, 0);
-    EXPECT_EQ(Zone(2).WindowSurfaceLast, -1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceFirst, 20);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).HTSurfaceLast, 26);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).OpaqOrIntMassSurfaceFirst, 20);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).OpaqOrIntMassSurfaceLast, 26);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).WindowSurfaceFirst, 0);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).WindowSurfaceLast, -1);
 
     //  ATTIC ZONE:
-    int wallEastGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastGable"), DataSurfaces::Surface);
-    int wallWestGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestGable"), DataSurfaces::Surface);
-    int wallNorthGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthGable"), DataSurfaces::Surface);
-    int floorAtticLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Attic:LivingFloor"), DataSurfaces::Surface);
-    int floorAtticGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Attic:GarageFloor"), DataSurfaces::Surface);
-    int roofNorthRoof1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof1"), DataSurfaces::Surface);
-    int roofSouthRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SouthRoof"), DataSurfaces::Surface);
-    int roofNorthRoof2 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof2"), DataSurfaces::Surface);
-    int roofNorthRoof3 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof3"), DataSurfaces::Surface);
-    int roofNorthRoof4 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof4"), DataSurfaces::Surface);
-    int roofEastRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastRoof"), DataSurfaces::Surface);
-    int roofWestRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestRoof"), DataSurfaces::Surface);
+    int wallEastGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastGable"), state->dataSurface->Surface);
+    int wallWestGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestGable"), state->dataSurface->Surface);
+    int wallNorthGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthGable"), state->dataSurface->Surface);
+    int floorAtticLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Attic:LivingFloor"), state->dataSurface->Surface);
+    int floorAtticGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Attic:GarageFloor"), state->dataSurface->Surface);
+    int roofNorthRoof1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof1"), state->dataSurface->Surface);
+    int roofSouthRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SouthRoof"), state->dataSurface->Surface);
+    int roofNorthRoof2 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof2"), state->dataSurface->Surface);
+    int roofNorthRoof3 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof3"), state->dataSurface->Surface);
+    int roofNorthRoof4 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof4"), state->dataSurface->Surface);
+    int roofEastRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastRoof"), state->dataSurface->Surface);
+    int roofWestRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestRoof"), state->dataSurface->Surface);
     int nonwindowTubularDaylightingDome1 =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("TubularDaylightingDome1"), DataSurfaces::Surface);
-    int windowAtticSkylight = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("AtticSkylight"), DataSurfaces::Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("TubularDaylightingDome1"), state->dataSurface->Surface);
+    int windowAtticSkylight = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("AtticSkylight"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallEastGable, 27);
     EXPECT_EQ(wallWestGable, 28);
@@ -6452,61 +6960,64 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(roofNorthRoof4, 36);
     EXPECT_EQ(roofEastRoof, 37);
     EXPECT_EQ(roofWestRoof, 38);
-    EXPECT_EQ(nonwindowTubularDaylightingDome1, 39);
-    EXPECT_EQ(windowAtticSkylight, 40);
-    EXPECT_EQ(Zone(3).SurfaceFirst, 27);
-    EXPECT_EQ(Zone(3).SurfaceLast, 40);
-    EXPECT_EQ(Zone(3).NonWindowSurfaceFirst, 27);
-    EXPECT_EQ(Zone(3).NonWindowSurfaceLast, 39);
-    EXPECT_EQ(Zone(3).WindowSurfaceFirst, 40);
-    EXPECT_EQ(Zone(3).WindowSurfaceLast, 40);
+    EXPECT_EQ(nonwindowTubularDaylightingDome1, 40);
+    EXPECT_EQ(windowAtticSkylight, 39);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceFirst, 27);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).HTSurfaceLast, 40);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceFirst, 27);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrIntMassSurfaceLast, 38);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceFirst, 39);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceLast, 39);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).OpaqOrWinSurfaceLast, 39);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeFirst, 40);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).TDDDomeLast, 40);
 
     // Reporting (legacy) Order (zero-based)
     //  SHADING SURFACES:
-    EXPECT_EQ(siteShadeShadeFlatShadeSurface, DataSurfaces::AllSurfaceListReportOrder[0]);
-    EXPECT_EQ(mirSiteShadeFlatShadeSurface, DataSurfaces::AllSurfaceListReportOrder[1]);
-    EXPECT_EQ(buildingShadeTiltedShadeSurface, DataSurfaces::AllSurfaceListReportOrder[2]);
-    EXPECT_EQ(mirBuildingShadeTiltedShadeSurface, DataSurfaces::AllSurfaceListReportOrder[3]);
-    EXPECT_EQ(zoneShadeLivingSouthShade001, DataSurfaces::AllSurfaceListReportOrder[4]);
-    EXPECT_EQ(mirZoneShadeLivingSouthShade001, DataSurfaces::AllSurfaceListReportOrder[5]);
+    EXPECT_EQ(siteShadeShadeFlatShadeSurface, state->dataSurface->AllSurfaceListReportOrder[0]);
+    EXPECT_EQ(mirSiteShadeFlatShadeSurface, state->dataSurface->AllSurfaceListReportOrder[1]);
+    EXPECT_EQ(buildingShadeTiltedShadeSurface, state->dataSurface->AllSurfaceListReportOrder[2]);
+    EXPECT_EQ(mirBuildingShadeTiltedShadeSurface, state->dataSurface->AllSurfaceListReportOrder[3]);
+    EXPECT_EQ(zoneShadeLivingSouthShade001, state->dataSurface->AllSurfaceListReportOrder[4]);
+    EXPECT_EQ(mirZoneShadeLivingSouthShade001, state->dataSurface->AllSurfaceListReportOrder[5]);
 
     //  LIVING ZONE:
-    EXPECT_EQ(wallLivingNorth, DataSurfaces::AllSurfaceListReportOrder[6]);
-    EXPECT_EQ(windowNorthWindow, DataSurfaces::AllSurfaceListReportOrder[7]);
-    EXPECT_EQ(wallLivingEast, DataSurfaces::AllSurfaceListReportOrder[8]);
-    EXPECT_EQ(windowEastWindow, DataSurfaces::AllSurfaceListReportOrder[9]);
-    EXPECT_EQ(wallLivingSouth, DataSurfaces::AllSurfaceListReportOrder[10]);
-    EXPECT_EQ(windowSouthWindow, DataSurfaces::AllSurfaceListReportOrder[11]);
-    EXPECT_EQ(wallLivingWest, DataSurfaces::AllSurfaceListReportOrder[12]);
-    EXPECT_EQ(windowWestWindow, DataSurfaces::AllSurfaceListReportOrder[13]);
-    EXPECT_EQ(doorWestDoor, DataSurfaces::AllSurfaceListReportOrder[14]);
-    EXPECT_EQ(wallLivingInterior, DataSurfaces::AllSurfaceListReportOrder[15]);
-    EXPECT_EQ(floorLivingFloor, DataSurfaces::AllSurfaceListReportOrder[16]);
-    EXPECT_EQ(ceilingLivingCeiling, DataSurfaces::AllSurfaceListReportOrder[17]);
-    EXPECT_EQ(windowTubularDaylightingDiffuser1, DataSurfaces::AllSurfaceListReportOrder[18]);
+    EXPECT_EQ(wallLivingNorth, state->dataSurface->AllSurfaceListReportOrder[6]);
+    EXPECT_EQ(windowNorthWindow, state->dataSurface->AllSurfaceListReportOrder[7]);
+    EXPECT_EQ(wallLivingEast, state->dataSurface->AllSurfaceListReportOrder[8]);
+    EXPECT_EQ(windowEastWindow, state->dataSurface->AllSurfaceListReportOrder[9]);
+    EXPECT_EQ(wallLivingSouth, state->dataSurface->AllSurfaceListReportOrder[10]);
+    EXPECT_EQ(windowSouthWindow, state->dataSurface->AllSurfaceListReportOrder[11]);
+    EXPECT_EQ(wallLivingWest, state->dataSurface->AllSurfaceListReportOrder[12]);
+    EXPECT_EQ(windowWestWindow, state->dataSurface->AllSurfaceListReportOrder[13]);
+    EXPECT_EQ(doorWestDoor, state->dataSurface->AllSurfaceListReportOrder[14]);
+    EXPECT_EQ(wallLivingInterior, state->dataSurface->AllSurfaceListReportOrder[15]);
+    EXPECT_EQ(floorLivingFloor, state->dataSurface->AllSurfaceListReportOrder[16]);
+    EXPECT_EQ(ceilingLivingCeiling, state->dataSurface->AllSurfaceListReportOrder[17]);
+    EXPECT_EQ(windowTubularDaylightingDiffuser1, state->dataSurface->AllSurfaceListReportOrder[18]);
 
     //  GARAGE ZONE:
-    EXPECT_EQ(wallGarageInterior, DataSurfaces::AllSurfaceListReportOrder[19]);
-    EXPECT_EQ(wallGarageEast, DataSurfaces::AllSurfaceListReportOrder[20]);
-    EXPECT_EQ(wallGarageWest, DataSurfaces::AllSurfaceListReportOrder[21]);
-    EXPECT_EQ(wallGarageFrontDoor, DataSurfaces::AllSurfaceListReportOrder[22]);
-    EXPECT_EQ(floorGarageFloor, DataSurfaces::AllSurfaceListReportOrder[23]);
-    EXPECT_EQ(ceilingGarageInterior, DataSurfaces::AllSurfaceListReportOrder[24]);
-    EXPECT_EQ(intmassEVChargingStation, DataSurfaces::AllSurfaceListReportOrder[25]);
+    EXPECT_EQ(wallGarageInterior, state->dataSurface->AllSurfaceListReportOrder[19]);
+    EXPECT_EQ(wallGarageEast, state->dataSurface->AllSurfaceListReportOrder[20]);
+    EXPECT_EQ(wallGarageWest, state->dataSurface->AllSurfaceListReportOrder[21]);
+    EXPECT_EQ(wallGarageFrontDoor, state->dataSurface->AllSurfaceListReportOrder[22]);
+    EXPECT_EQ(floorGarageFloor, state->dataSurface->AllSurfaceListReportOrder[23]);
+    EXPECT_EQ(ceilingGarageInterior, state->dataSurface->AllSurfaceListReportOrder[24]);
+    EXPECT_EQ(intmassEVChargingStation, state->dataSurface->AllSurfaceListReportOrder[25]);
 
     //  ATTIC ZONE:
-    EXPECT_EQ(wallEastGable, DataSurfaces::AllSurfaceListReportOrder[26]);
-    EXPECT_EQ(wallWestGable, DataSurfaces::AllSurfaceListReportOrder[27]);
-    EXPECT_EQ(wallNorthGable, DataSurfaces::AllSurfaceListReportOrder[28]);
-    EXPECT_EQ(floorAtticLivingFloor, DataSurfaces::AllSurfaceListReportOrder[29]);
-    EXPECT_EQ(floorAtticGarageFloor, DataSurfaces::AllSurfaceListReportOrder[30]);
-    EXPECT_EQ(roofNorthRoof1, DataSurfaces::AllSurfaceListReportOrder[31]);
-    EXPECT_EQ(nonwindowTubularDaylightingDome1, DataSurfaces::AllSurfaceListReportOrder[32]);
-    EXPECT_EQ(roofSouthRoof, DataSurfaces::AllSurfaceListReportOrder[33]);
-    EXPECT_EQ(roofNorthRoof2, DataSurfaces::AllSurfaceListReportOrder[34]);
-    EXPECT_EQ(roofNorthRoof3, DataSurfaces::AllSurfaceListReportOrder[35]);
-    EXPECT_EQ(roofNorthRoof4, DataSurfaces::AllSurfaceListReportOrder[36]);
-    EXPECT_EQ(roofEastRoof, DataSurfaces::AllSurfaceListReportOrder[37]);
-    EXPECT_EQ(windowAtticSkylight, DataSurfaces::AllSurfaceListReportOrder[38]);
-    EXPECT_EQ(roofWestRoof, DataSurfaces::AllSurfaceListReportOrder[39]);
+    EXPECT_EQ(wallEastGable, state->dataSurface->AllSurfaceListReportOrder[26]);
+    EXPECT_EQ(wallWestGable, state->dataSurface->AllSurfaceListReportOrder[27]);
+    EXPECT_EQ(wallNorthGable, state->dataSurface->AllSurfaceListReportOrder[28]);
+    EXPECT_EQ(floorAtticLivingFloor, state->dataSurface->AllSurfaceListReportOrder[29]);
+    EXPECT_EQ(floorAtticGarageFloor, state->dataSurface->AllSurfaceListReportOrder[30]);
+    EXPECT_EQ(roofNorthRoof1, state->dataSurface->AllSurfaceListReportOrder[31]);
+    EXPECT_EQ(nonwindowTubularDaylightingDome1, state->dataSurface->AllSurfaceListReportOrder[32]);
+    EXPECT_EQ(roofSouthRoof, state->dataSurface->AllSurfaceListReportOrder[33]);
+    EXPECT_EQ(roofNorthRoof2, state->dataSurface->AllSurfaceListReportOrder[34]);
+    EXPECT_EQ(roofNorthRoof3, state->dataSurface->AllSurfaceListReportOrder[35]);
+    EXPECT_EQ(roofNorthRoof4, state->dataSurface->AllSurfaceListReportOrder[36]);
+    EXPECT_EQ(roofEastRoof, state->dataSurface->AllSurfaceListReportOrder[37]);
+    EXPECT_EQ(windowAtticSkylight, state->dataSurface->AllSurfaceListReportOrder[38]);
+    EXPECT_EQ(roofWestRoof, state->dataSurface->AllSurfaceListReportOrder[39]);
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -81,7 +81,6 @@
 using namespace EnergyPlus;
 using namespace DataSurfaces;
 using namespace DataHeatBalance;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 using namespace OutAirNodeManager;
@@ -2952,7 +2951,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    100;                     !- Maximum Value of y",
 
         "  AirLoopHVAC,",
-        "    PSZ-AC:1,                !- Name",
+        "    PSZ-ac:1,                !- Name",
         "    ,                        !- Controller List Name",
         "    PSZ-AC:1 Availability Manager List,  !- Availability Manager List Name",
         "    AUTOSIZE,                !- Design Supply Air Flow Rate {m3/s}",
@@ -3816,7 +3815,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    11.5,                    !- Precool Design Temperature {C}",
         "    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}",
         "    5,                       !- Number of AirLoopHVAC",
-        "    PSZ-AC:1,                !- AirLoopHVAC 1 Name",
+        "    PSZ-ac:1,                !- AirLoopHVAC 1 Name",
         "    PSZ-AC:2,                !- AirLoopHVAC 2 Name",
         "    PSZ-AC:3,                !- AirLoopHVAC 3 Name",
         "    PSZ-AC:4,                !- AirLoopHVAC 4 Name",
@@ -3934,96 +3933,94 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    using namespace EnergyPlus::DataIPShortCuts;
-
-    lNumericFieldBlanks.allocate(1000);
-    lAlphaFieldBlanks.allocate(1000);
-    cAlphaFieldNames.allocate(1000);
-    cNumericFieldNames.allocate(1000);
-    cAlphaArgs.allocate(1000);
-    rNumericArgs.allocate(1000);
-    lNumericFieldBlanks = false;
-    lAlphaFieldBlanks = false;
-    cAlphaFieldNames = " ";
-    cNumericFieldNames = " ";
-    cAlphaArgs = " ";
-    rNumericArgs = 0.0;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(1000);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(1000);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(1000);
+    state->dataIPShortCut->cNumericFieldNames.allocate(1000);
+    state->dataIPShortCut->cAlphaArgs.allocate(1000);
+    state->dataIPShortCut->rNumericArgs.allocate(1000);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
-
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::CosZoneRelNorth.allocate(6);
-    SurfaceGeometry::SinZoneRelNorth.allocate(6);
-    SurfaceGeometry::CosZoneRelNorth = 1.0;
-    SurfaceGeometry::SinZoneRelNorth = 0.0;
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    ZoneEquipmentManager::GetZoneEquipment(state);
-    SimAirServingZones::GetAirPathData(state);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(6);
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    ZoneEquipmentManager::GetZoneEquipment(*state);
+    SimAirServingZones::GetAirPathData(*state);
     // OA inlet node
-    DataLoopNode::Node(2).MassFlowRate = 0.1;
-    DataLoopNode::Node(3).MassFlowRate = 0.1;
-    DataLoopNode::Node(4).MassFlowRate = 0.1;
-    DataLoopNode::Node(5).MassFlowRate = 0.1;
-    DataLoopNode::Node(6).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(5).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(6).MassFlowRate = 0.1;
     // OA relief node
-    DataLoopNode::Node(62).MassFlowRate = 0.1;
-    DataLoopNode::Node(63).MassFlowRate = 0.1;
-    DataLoopNode::Node(64).MassFlowRate = 0.1;
-    DataLoopNode::Node(65).MassFlowRate = 0.1;
-    DataLoopNode::Node(66).MassFlowRate = 0.1;
-    DataLoopNode::Node(62).Temp = 23.0;
-    DataLoopNode::Node(63).Temp = 23.0;
-    DataLoopNode::Node(64).Temp = 23.0;
-    DataLoopNode::Node(65).Temp = 23.0;
-    DataLoopNode::Node(66).Temp = 23.0;
-    DataLoopNode::Node(62).HumRat = 0.001;
-    DataLoopNode::Node(63).HumRat = 0.001;
-    DataLoopNode::Node(64).HumRat = 0.001;
-    DataLoopNode::Node(65).HumRat = 0.001;
-    DataLoopNode::Node(66).HumRat = 0.001;
+    state->dataLoopNodes->Node(62).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(63).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(64).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(65).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(66).MassFlowRate = 0.1;
+    state->dataLoopNodes->Node(62).Temp = 23.0;
+    state->dataLoopNodes->Node(63).Temp = 23.0;
+    state->dataLoopNodes->Node(64).Temp = 23.0;
+    state->dataLoopNodes->Node(65).Temp = 23.0;
+    state->dataLoopNodes->Node(66).Temp = 23.0;
+    state->dataLoopNodes->Node(62).HumRat = 0.001;
+    state->dataLoopNodes->Node(63).HumRat = 0.001;
+    state->dataLoopNodes->Node(64).HumRat = 0.001;
+    state->dataLoopNodes->Node(65).HumRat = 0.001;
+    state->dataLoopNodes->Node(66).HumRat = 0.001;
 
-    auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS->airloopDOAS[0];
+    auto &thisAirLoopDOASObjec = state->dataAirLoopHVACDOAS->airloopDOAS[0];
 
     int index = 0;
     thisAirLoopDOASObjec.SizingOnceFlag = false;
-    DataLoopNode::Node(11).Temp = -10.0;
-    DataLoopNode::Node(11).HumRat = 0.0008;
-    DataLoopNode::Node(70).TempSetPoint = 4.5;
-    Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
-    thisAirLoopDOASObjec.SimAirLoopHVACDOAS(state, true, index);
+    state->dataLoopNodes->Node(11).Temp = -10.0;
+    state->dataLoopNodes->Node(11).HumRat = 0.0008;
+    state->dataLoopNodes->Node(70).TempSetPoint = 4.5;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
+    thisAirLoopDOASObjec.SimAirLoopHVACDOAS(*state, true, index);
 
     // Mixer outlet
-    EXPECT_NEAR(23.0, DataLoopNode::Node(68).Temp, 0.0001);
-    EXPECT_NEAR(0.5, DataLoopNode::Node(68).MassFlowRate, 0.0001);
+    EXPECT_NEAR(23.0, state->dataLoopNodes->Node(68).Temp, 0.0001);
+    EXPECT_NEAR(0.5, state->dataLoopNodes->Node(68).MassFlowRate, 0.0001);
     // Outlet of HX
-    EXPECT_NEAR(-8.0710884, DataLoopNode::Node(67).Temp, 0.0001);
+    EXPECT_NEAR(-8.0710884, state->dataLoopNodes->Node(67).Temp, 0.0001);
     // Outlet of Central DOAS
-    EXPECT_NEAR(4.5, DataLoopNode::Node(70).Temp, 0.0001);
-    EXPECT_NEAR(0.5, DataLoopNode::Node(70).MassFlowRate, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(70).Temp, 0.0001);
+    EXPECT_NEAR(0.5, state->dataLoopNodes->Node(70).MassFlowRate, 0.0001);
     // Outlet of splitter
-    EXPECT_NEAR(4.5, DataLoopNode::Node(2).Temp, 0.0001);
-    EXPECT_NEAR(4.5, DataLoopNode::Node(3).Temp, 0.0001);
-    EXPECT_NEAR(4.5, DataLoopNode::Node(4).Temp, 0.0001);
-    EXPECT_NEAR(4.5, DataLoopNode::Node(5).Temp, 0.0001);
-    EXPECT_NEAR(4.5, DataLoopNode::Node(6).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(2).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(3).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(4).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(5).Temp, 0.0001);
+    EXPECT_NEAR(4.5, state->dataLoopNodes->Node(6).Temp, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
@@ -4184,7 +4181,6 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
         "    ,                        !- Motor Loss Radiative Fraction",
         "    General;                 !- End-Use Subcategory",
 
-
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
 
@@ -4249,22 +4245,22 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    MixedAir::GetOutsideAirSysInputs(state);
-    MixedAir::GetOASysInputFlag = false;
-    MixedAir::GetOAMixerInputs();
+    MixedAir::GetOutsideAirSysInputs(*state);
+    state->dataMixedAir->GetOASysInputFlag = false;
+    MixedAir::GetOAMixerInputs(*state);
 
-    DataAirSystems::PrimaryAirSystem.allocate(5);
-    DataAirSystems::PrimaryAirSystem(1).Name = "PSZ-AC:1";
-    DataAirSystems::PrimaryAirSystem(2).Name = "PSZ-AC:2";
-    DataAirSystems::PrimaryAirSystem(3).Name = "PSZ-AC:3";
-    DataAirSystems::PrimaryAirSystem(4).Name = "PSZ-AC:4";
-    DataAirSystems::PrimaryAirSystem(5).Name = "PSZ-AC:5";
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(5);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Name = "PSZ-AC:1";
+    state->dataAirSystemsData->PrimaryAirSystems(2).Name = "PSZ-AC:2";
+    state->dataAirSystemsData->PrimaryAirSystems(3).Name = "PSZ-AC:3";
+    state->dataAirSystemsData->PrimaryAirSystems(4).Name = "PSZ-AC:4";
+    state->dataAirSystemsData->PrimaryAirSystems(5).Name = "PSZ-AC:5";
 
-    AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(state);
+    AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(*state);
 
-    EXPECT_EQ(state.dataAirLoop->OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
-    EXPECT_EQ(state.dataAirLoop->OutsideAirSys(1).InletNodeNum(2), 2);
-    EXPECT_EQ(state.dataAirLoop->OutsideAirSys(1).OutletNodeNum(2), 23);
+    EXPECT_EQ(state->dataAirLoop->OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
+    EXPECT_EQ(state->dataAirLoop->OutsideAirSys(1).InletNodeNum(2), 2);
+    EXPECT_EQ(state->dataAirLoop->OutsideAirSys(1).OutletNodeNum(2), 23);
 }
 
 } // namespace EnergyPlus

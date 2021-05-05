@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,6 +50,7 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 #include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
@@ -66,28 +67,8 @@ namespace EnergyPlus {
 
 namespace GroundTemperatureManager {
 
-    int const objectType_KusudaGroundTemp(1);
-    int const objectType_FiniteDiffGroundTemp(2);
-    int const objectType_SiteBuildingSurfaceGroundTemp(3);
-    int const objectType_SiteShallowGroundTemp(4);
-    int const objectType_SiteDeepGroundTemp(5);
-    int const objectType_SiteFCFactorMethodGroundTemp(6);
-    int const objectType_XingGroundTemp(7);
-
-    Array1D_string const CurrentModuleObjects(7,
-                                              {"Site:GroundTemperature:Undisturbed:KusudaAchenbach",
-                                               "Site:GroundTemperature:Undisturbed:FiniteDifference",
-                                               "Site:GroundTemperature:BuildingSurface",
-                                               "Site:GroundTemperature:Shallow",
-                                               "Site:GroundTemperature:Deep",
-                                               "Site:GroundTemperature:FCfactorMethod",
-                                               "Site:GroundTemperature:Undisturbed:Xing"});
-
-    std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
-
-    //******************************************************************************
-
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
+    std::shared_ptr<BaseGroundTempsModel>
+    GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
@@ -101,6 +82,8 @@ namespace GroundTemperatureManager {
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int objectType(0);
+
+        auto &CurrentModuleObjects = state.dataGrndTempModelMgr->CurrentModuleObjects;
 
         std::string objectType_str_UPPERCase = UtilityRoutines::MakeUPPERCase(objectType_str);
 
@@ -121,20 +104,19 @@ namespace GroundTemperatureManager {
             objectType = objectType_XingGroundTemp;
         } else {
             // Error out if no ground temperature object types recognized
-            ShowFatalError("GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized.");
+            ShowFatalError(state, "GetGroundTempsModelAndInit: Ground temperature object " + objectType_str + " not recognized.");
         }
 
-        int numGTMs = groundTempModels.size();
+        int numGTMs = state.dataGrndTempModelMgr->groundTempModels.size();
 
         // Check if this instance of this model has already been retrieved
         for (int i = 0; i < numGTMs; ++i) {
-            auto currentModel(groundTempModels[i]);
+            auto currentModel(state.dataGrndTempModelMgr->groundTempModels[i]);
             // Check if the type and name match
             if (objectType == currentModel->objectType && objectName == currentModel->objectName) {
-                return groundTempModels[i];
+                return state.dataGrndTempModelMgr->groundTempModels[i];
             }
         }
-
 
         // If not found, create new instance of the model
         if (objectType == objectType_KusudaGroundTemp) {
@@ -142,29 +124,20 @@ namespace GroundTemperatureManager {
         } else if (objectType == objectType_FiniteDiffGroundTemp) {
             return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteBuildingSurfaceGroundTemp) {
-            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state.files, objectType, objectName);
+            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteShallowGroundTemp) {
-            return SiteShallowGroundTemps::ShallowGTMFactory(state.files, objectType, objectName);
+            return SiteShallowGroundTemps::ShallowGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteDeepGroundTemp) {
-            return SiteDeepGroundTemps::DeepGTMFactory(state.files, objectType, objectName);
+            return SiteDeepGroundTemps::DeepGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteFCFactorMethodGroundTemp) {
-            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state.files, objectType, objectName);
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_XingGroundTemp) {
-            return XingGroundTempsModel::XingGTMFactory(objectType, objectName);
+            return XingGroundTempsModel::XingGTMFactory(state, objectType, objectName);
         } else {
             // Error
             return nullptr;
         }
     }
-
-    //******************************************************************************
-
-    void clear_state()
-    {
-        groundTempModels.clear();
-    }
-
-    //******************************************************************************
 
 } // namespace GroundTemperatureManager
 

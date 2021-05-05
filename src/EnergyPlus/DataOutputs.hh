@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,74 +48,80 @@
 #ifndef DataOutputs_hh_INCLUDED
 #define DataOutputs_hh_INCLUDED
 
+// C++ Headers
+#include <cstddef>
+#include <unordered_map>
+#include <vector>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include "re2/re2.h"
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <cstddef>
-#include <unordered_map>
-#include <vector>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
 namespace DataOutputs {
 
-    // Using/Aliasing
+    int constexpr NumMonthlyReports(63);
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const NumMonthlyReports;
     extern Array1D_string const MonthlyNamedReports;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int MaxConsideredOutputVariables; // Max Array size for OutputVariable pre-scanned
-    extern int NumConsideredOutputVariables; // Number of variables - pre-scanned, allowed for output
-    extern int iNumberOfRecords;             // Number of records in input
-    extern int iNumberOfDefaultedFields;     // number of defaulted fields
-    extern int iTotalFieldsWithDefaults;     // number of fields that can be defaulted
-    extern int iNumberOfAutoSizedFields;     // number of autosized fields
-    extern int iTotalAutoSizableFields;      // number of fields that can be autosized
-    extern int iNumberOfAutoCalcedFields;    // number of autocalculated fields
-    extern int iTotalAutoCalculatableFields; // number of fields that can be autocalculated
-
-    // Types
     struct OutputReportingVariables
     {
-        OutputReportingVariables(std::string const &KeyValue, std::string const &VariableName);
+        OutputReportingVariables(EnergyPlusData &state, std::string const &KeyValue, std::string const &VariableName);
 
         std::string const key;
         std::string const variableName;
         bool is_simple_string = true;
-        std::unique_ptr<RE2> pattern;
-        std::unique_ptr<RE2> case_insensitive_pattern;
+        RE2 *pattern;
+        RE2 *case_insensitive_pattern;
     };
 
-
-
-    // Outer map has a Key of Variable Name, and value is inner map of Key=KeyValue, Value=struct OutputReportingVariables
-    // All of the string are considered as case insenstive (If we search for "ZONE MEAN AIR TEMPERATURE" it would find "Zone Mean Air Temperature")
-    extern std::unordered_map<std::string, std::unordered_map<std::string, OutputReportingVariables,
-                                                              UtilityRoutines::case_insensitive_hasher,
-                                                              UtilityRoutines::case_insensitive_comparator>,
-                               UtilityRoutines::case_insensitive_hasher,
-                               UtilityRoutines::case_insensitive_comparator> OutputVariablesForSimulation;
-
-    // Functions
-
-    // Clears the global data in DataOutputs.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     // Check if a KeyValue/VariableName is inside the map OutputVariablesForSimulation
-    bool FindItemInVariableList(std::string const &KeyedValue, std::string const &VariableName);
+    bool FindItemInVariableList(EnergyPlusData &state, std::string const &KeyedValue, std::string const &VariableName);
 
 } // namespace DataOutputs
+
+struct OutputsData : BaseGlobalStruct
+{
+
+    int MaxConsideredOutputVariables = 0; // Max Array size for OutputVariable pre-scanned
+    int NumConsideredOutputVariables = 0; // Number of variables - pre-scanned, allowed for output
+    int iNumberOfRecords;                 // Number of records in input
+    int iNumberOfDefaultedFields;         // number of defaulted fields
+    int iTotalFieldsWithDefaults;         // number of fields that can be defaulted
+    int iNumberOfAutoSizedFields;         // number of autosized fields
+    int iTotalAutoSizableFields;          // number of fields that can be autosized
+    int iNumberOfAutoCalcedFields;        // number of autocalculated fields
+    int iTotalAutoCalculatableFields;     // number of fields that can be autocalculated
+    std::unordered_map<std::string,
+                       std::unordered_map<std::string,
+                                          DataOutputs::OutputReportingVariables,
+                                          UtilityRoutines::case_insensitive_hasher,
+                                          UtilityRoutines::case_insensitive_comparator>,
+                       UtilityRoutines::case_insensitive_hasher,
+                       UtilityRoutines::case_insensitive_comparator>
+        OutputVariablesForSimulation;
+
+    void clear_state() override
+    {
+        MaxConsideredOutputVariables = 0;
+        NumConsideredOutputVariables = 0;
+        iNumberOfRecords = int();
+        iNumberOfDefaultedFields = int();
+        iTotalFieldsWithDefaults = int();
+        iNumberOfAutoSizedFields = int();
+        iTotalAutoSizableFields = int();
+        iNumberOfAutoCalcedFields = int();
+        iTotalAutoCalculatableFields = int();
+        OutputVariablesForSimulation.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

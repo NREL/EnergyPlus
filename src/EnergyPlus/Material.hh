@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -281,7 +281,7 @@ namespace Material {
         }
     };
 
-}   // namespace Material
+} // namespace Material
 
 struct MaterialData : BaseGlobalStruct
 {
@@ -293,8 +293,6 @@ struct MaterialData : BaseGlobalStruct
     }
 };
 
-extern MaterialData dataMaterial;
-
-}   // namespace EnergyPlus
+} // namespace EnergyPlus
 
 #endif

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,12 +53,12 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DElightManagerF.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -70,7 +70,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -115,26 +114,23 @@ namespace DElightManagerF {
     // USE STATEMENTS:
     using namespace DataDElight;
 
-    void DElightInputGenerator(IOFiles &ioFiles)
+    void DElightInputGenerator(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       February 2004 - Changes to accomodate mods in DElight IDD
+        //       MODIFIED       February 2004 - Changes to accommodate mods in DElight IDD
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine creates a DElight input file from EnergyPlus processed input.
 
         // USE STATEMENTS:
-        using namespace DataGlobals;       // Gives access to too many things to keep track of
-        using namespace DataHeatBalance;   // Gives access to Building, Zone(izone)%var and Lights(ilights) data
+        using namespace DataHeatBalance;   // Gives access to Building, Zone and Lights data
         using namespace DataEnvironment;   // Gives access to Site data
         using namespace DataSurfaces;      // Gives access to Surface data
         using namespace DataStringGlobals; // Gives access to Program Path and Current Time/Date
-        using namespace DataDaylighting;
-        using General::RoundSigDigits;
         using InternalHeatGains::CheckLightsReplaceableMinMaxForZone;
         using InternalHeatGains::GetDesignLightingLevelForZone;
 
@@ -206,9 +202,9 @@ namespace DElightManagerF {
         // Init the ErrorsFound flag
         ErrorsFound = false;
 
-        GetInputDElightComplexFenestration(ErrorsFound);
+        GetInputDElightComplexFenestration(state, ErrorsFound);
 
-        CheckForGeometricTransform(ldoTransform, roldAspectRatio, rnewAspectRatio);
+        CheckForGeometricTransform(state, ldoTransform, roldAspectRatio, rnewAspectRatio);
 
         // Init the counter for Thermal Zones with hosted Daylighting:DElight objects
         iNumDElightZones = 0;
@@ -217,27 +213,34 @@ namespace DElightManagerF {
         int iNumWndoConsts = 0;
 
         // Open a file for writing DElight input from EnergyPlus data
-        auto delightInFile = ioFiles.delightIn.open("DElightInputGenerator", ioFiles.outputControl.delightin);
+        auto delightInFile = state.files.delightIn.open(state, "DElightInputGenerator", state.files.outputControl.delightin);
 
         // Start of DElight input file
-        print(delightInFile, Format_901, CurrentDateTime);
+        print(delightInFile, Format_901, state.dataStrGlobals->CurrentDateTime);
 
         // Building Data Section retrieved from DataHeatBalance and DataEnvironment modules
         // Remove any blanks from the Building Name for ease of input to DElight
-        cNameWOBlanks = ReplaceBlanksWithUnderscores(BuildingName);
-        print(delightInFile, Format_902, cNameWOBlanks, Latitude, Longitude, Elevation * M2FT, BuildingAzimuth, TimeZoneNumber);
+        cNameWOBlanks = ReplaceBlanksWithUnderscores(state.dataHeatBal->BuildingName);
+        print(delightInFile,
+              Format_902,
+              cNameWOBlanks,
+              state.dataEnvrn->Latitude,
+              state.dataEnvrn->Longitude,
+              state.dataEnvrn->Elevation * M2FT,
+              state.dataHeatBal->BuildingAzimuth,
+              state.dataEnvrn->TimeZoneNumber);
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-        CosBldgRelNorth = std::cos(-BuildingAzimuth * DegToRadians);
-        SinBldgRelNorth = std::sin(-BuildingAzimuth * DegToRadians);
+        CosBldgRelNorth = std::cos(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
+        SinBldgRelNorth = std::sin(-state.dataHeatBal->BuildingAzimuth * DataGlobalConstants::DegToRadians);
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
-        for (auto &znDayl : ZoneDaylight) {
-            if (znDayl.DaylightMethod == DElightDaylighting) {
+        for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
+            if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
                 if (znDayl.TotalDaylRefPoints == 0) {
-                    ShowSevereError("No Reference Points input for daylighting zone using DElight =" + znDayl.Name);
+                    ShowSevereError(state, "No Reference Points input for daylighting zone using DElight =" + znDayl.Name);
                     ErrorsFound = true;
                 }
 
@@ -245,8 +248,8 @@ namespace DElightManagerF {
                 if (znDayl.TotalDaylRefPoints > 100) {
                     // Restrict to 100 Ref Pt maximum
                     znDayl.TotalDaylRefPoints = 100;
-                    ShowWarningError("Maximum of 100 Reference Points exceeded for daylighting zone using DElight =" + znDayl.Name);
-                    ShowWarningError("  Only first 100 Reference Points included in DElight analysis");
+                    ShowWarningError(state, "Maximum of 100 Reference Points exceeded for daylighting zone using DElight =" + znDayl.Name);
+                    ShowWarningError(state, "  Only first 100 Reference Points included in DElight analysis");
                 }
                 znDayl.DaylRefPtAbsCoord.allocate(3, znDayl.TotalDaylRefPoints);
                 znDayl.DaylRefPtAbsCoord = 0.0;
@@ -268,14 +271,14 @@ namespace DElightManagerF {
 
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
-        for (auto &znDayl : ZoneDaylight) {
-            if (znDayl.DaylightMethod == DElightDaylighting) {
-                int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, Zone);
+        for (auto &znDayl : state.dataDaylightingData->ZoneDaylight) {
+            if (znDayl.DaylightMethod == DataDaylighting::iDaylightingMethod::DElightDaylighting) {
+                int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
 
-                    rLightLevel = GetDesignLightingLevelForZone(izone);
-                    CheckLightsReplaceableMinMaxForZone(izone);
-                    auto &zn(Zone(izone));
+                    rLightLevel = GetDesignLightingLevelForZone(state, izone);
+                    CheckLightsReplaceableMinMaxForZone(state, izone);
+                    auto &zn(state.dataHeatBal->Zone(izone));
 
                     // Write this Zone to the DElight input file
                     // Remove any blanks from the Zone Name for ease of input to DElight
@@ -298,8 +301,8 @@ namespace DElightManagerF {
                           znDayl.DElightGriddingResolution * M22FT2);
 
                     // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
-                    CosZoneRelNorth = std::cos(-zn.RelNorth * DegToRadians);
-                    SinZoneRelNorth = std::sin(-zn.RelNorth * DegToRadians);
+                    CosZoneRelNorth = std::cos(-zn.RelNorth * DataGlobalConstants::DegToRadians);
+                    SinZoneRelNorth = std::sin(-zn.RelNorth * DataGlobalConstants::DegToRadians);
 
                     // Zone Lighting Schedule Data Section
                     // NOTE: Schedules are not required since hourly values are retrieved from EnergyPlus as needed
@@ -308,14 +311,14 @@ namespace DElightManagerF {
                     // Zone Surface Data Section
                     // Count the number of opaque surfaces bounding the current zone
                     iNumOpaqueSurfs = 0;
-                    iSurfaceFirst = zn.SurfaceFirst;
-                    int const iSurfaceLast = zn.SurfaceLast; // ending loop variable for surfaces
+                    iSurfaceFirst = zn.HTSurfaceFirst;
+                    int const iSurfaceLast = zn.HTSurfaceLast; // ending loop variable for surfaces
 
                     for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
-                        auto &surf(Surface(isurf));
-                        if (surf.Class == SurfaceClass_Wall) ++iNumOpaqueSurfs;
-                        if (surf.Class == SurfaceClass_Roof) ++iNumOpaqueSurfs;
-                        if (surf.Class == SurfaceClass_Floor) ++iNumOpaqueSurfs;
+                        auto &surf(state.dataSurface->Surface(isurf));
+                        if (surf.Class == SurfaceClass::Wall) ++iNumOpaqueSurfs;
+                        if (surf.Class == SurfaceClass::Roof) ++iNumOpaqueSurfs;
+                        if (surf.Class == SurfaceClass::Floor) ++iNumOpaqueSurfs;
                     } // Zone Opaque Surface loop
 
                     print(delightInFile, Format_906, iNumOpaqueSurfs);
@@ -323,10 +326,10 @@ namespace DElightManagerF {
                     // Write each opaque bounding Surface to the DElight input file
                     for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
 
-                        auto &surf(Surface(isurf));
+                        auto &surf(state.dataSurface->Surface(isurf));
 
                         // Only process "opaque bounding" surface types
-                        if ((surf.Class == SurfaceClass_Wall) || (surf.Class == SurfaceClass_Roof) || (surf.Class == SurfaceClass_Floor)) {
+                        if ((surf.Class == SurfaceClass::Wall) || (surf.Class == SurfaceClass::Roof) || (surf.Class == SurfaceClass::Floor)) {
 
                             // Get the Construction index for this Surface
                             iconstruct = surf.Construction;
@@ -334,10 +337,10 @@ namespace DElightManagerF {
                             // Is this Surface exposed to the exterior?
                             if (surf.ExtSolar) {
                                 // Get the index for the outside (i.e., 1st) Material Layer for this Construction
-                                iMatlLayer = dataConstruction.Construct(iconstruct).LayerPoint(1);
+                                iMatlLayer = state.dataConstruction->Construct(iconstruct).LayerPoint(1);
                                 // Get the outside visible reflectance of this material layer
                                 // (since Construct(iconstruct)%ReflectVisDiffFront always appears to == 0.0)
-                                rExtVisRefl = 1.0 - dataMaterial.Material(iMatlLayer).AbsorpVisible;
+                                rExtVisRefl = 1.0 - state.dataMaterial->Material(iMatlLayer).AbsorpVisible;
                             } else {
                                 rExtVisRefl = 0.0;
                             }
@@ -349,7 +352,7 @@ namespace DElightManagerF {
                                   cNameWOBlanks,
                                   surf.Azimuth,
                                   surf.Tilt,
-                                  dataConstruction.Construct(iconstruct).ReflectVisDiffBack,
+                                  state.dataConstruction->Construct(iconstruct).ReflectVisDiffBack,
                                   rExtVisRefl,
                                   surf.Sides);
 
@@ -363,28 +366,30 @@ namespace DElightManagerF {
                             // Count each Window hosted by the current opaque bounding Surface
                             iNumWindows = 0;
                             for (int iwndo = iSurfaceFirst; iwndo <= iSurfaceLast; ++iwndo) {
-                                if (Surface(iwndo).Class == SurfaceClass_Window) {
-                                    auto &wndo(Surface(iwndo));
+                                if (state.dataSurface->Surface(iwndo).Class == SurfaceClass::Window) {
+                                    auto &wndo(state.dataSurface->Surface(iwndo));
                                     if (wndo.BaseSurfName == surf.Name) {
 
                                         // Error if window has multiplier > 1 since this causes incorrect illuminance calc
                                         if (wndo.Multiplier > 1.0) {
-                                            ShowSevereError("Multiplier > 1.0 for window " + wndo.Name +
-                                                            " not allowed since it is in a zone with DElight daylighting.");
+                                            ShowSevereError(state,
+                                                            "Multiplier > 1.0 for window " + wndo.Name +
+                                                                " not allowed since it is in a zone with DElight daylighting.");
                                             ErrorsFound = true;
                                         }
 
                                         // Error if window has a shading device (blind/shade/screen) since
                                         // DElight cannot perform dynamic shading device deployment
                                         if (wndo.HasShadeControl) {
-                                            ShowSevereError("Shading Device on window " + wndo.Name +
-                                                            " dynamic control is not supported in a zone with DElight daylighting.");
+                                            ShowSevereError(state,
+                                                            "Shading Device on window " + wndo.Name +
+                                                                " dynamic control is not supported in a zone with DElight daylighting.");
                                             ErrorsFound = true;
                                         }
 
                                         // Loop through all Doppelganger Surface Names to ignore these Windows
                                         lWndoIsDoppelganger = false;
-                                        for (auto &cfs : DElightComplexFene) {
+                                        for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                             // Is the current Window Surface a Doppelganger?
                                             if (wndo.Name == cfs.wndwName) {
@@ -409,16 +414,16 @@ namespace DElightManagerF {
                             // and track the Window Construction type for later writing
                             if (iNumWindows > 0) {
                                 for (int iwndo2 = iSurfaceFirst; iwndo2 <= iSurfaceLast; ++iwndo2) {
-                                    if (Surface(iwndo2).Class == SurfaceClass_Window) {
+                                    if (state.dataSurface->Surface(iwndo2).Class == SurfaceClass::Window) {
 
-                                        auto &wndo2(Surface(iwndo2));
+                                        auto &wndo2(state.dataSurface->Surface(iwndo2));
 
                                         if (wndo2.BaseSurfName == surf.Name) {
 
                                             // Loop through all Doppelganger Surface Names to ignore these Windows
                                             lWndoIsDoppelganger = false;
 
-                                            for (auto &cfs : DElightComplexFene) {
+                                            for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                                 // Is the current Window Surface a Doppelganger?
                                                 if (wndo2.Name == cfs.wndwName) {
@@ -472,7 +477,7 @@ namespace DElightManagerF {
                             iHostedCFS = 0;
 
                             // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                            for (auto &cfs : DElightComplexFene) {
+                            for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                 // Does the current Opaque Bounding Surface host the current CFS object?
                                 if (surf.Name == cfs.surfName) {
@@ -485,7 +490,7 @@ namespace DElightManagerF {
 
                             // Now write each of the hosted CFS data
                             // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                            for (auto &cfs : DElightComplexFene) {
+                            for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                 // Does the current Opaque Bounding Surface host the current CFS object?
                                 if (surf.Name == cfs.surfName) {
@@ -494,9 +499,9 @@ namespace DElightManagerF {
                                     iDoppelganger = 0;
                                     for (int iwndo3 = iSurfaceFirst; iwndo3 <= iSurfaceLast; ++iwndo3) {
 
-                                        auto &wndo3(Surface(iwndo3));
+                                        auto &wndo3(state.dataSurface->Surface(iwndo3));
 
-                                        if (wndo3.Class == SurfaceClass_Window) {
+                                        if (wndo3.Class == SurfaceClass::Window) {
 
                                             // Is the current Window Surface the Doppelganger for the current CFS?
                                             if (wndo3.Name == cfs.wndwName) {
@@ -510,7 +515,7 @@ namespace DElightManagerF {
                                     if (iDoppelganger > 0) {
 
                                         // Write the data for this hosted CFS
-                                        auto &doppelgangerSurf(Surface(iDoppelganger));
+                                        auto &doppelgangerSurf(state.dataSurface->Surface(iDoppelganger));
 
                                         // Remove any blanks from the CFS Name for ease of input to DElight
                                         cNameWOBlanks = ReplaceBlanksWithUnderscores(cfs.Name);
@@ -528,7 +533,7 @@ namespace DElightManagerF {
                                     }
                                     // Register Error if there is no valid Doppelganger for current Complex Fenestration
                                     if (iDoppelganger == 0) {
-                                        ShowSevereError("No Doppelganger Window Surface found for Complex Fenestration =" + cfs.Name);
+                                        ShowSevereError(state, "No Doppelganger Window Surface found for Complex Fenestration =" + cfs.Name);
                                         ErrorsFound = true;
                                     }
                                 } // The current Opaque Bounding Surface hosts the current CFS object?
@@ -540,16 +545,16 @@ namespace DElightManagerF {
                     print(delightInFile, Format_912, znDayl.TotalDaylRefPoints);
 
                     // Loop through the Daylighting:DElight:Reference Point objects checking for the current DElight Zone host
-                    for (auto &refPt : DaylRefPt) {
+                    for (auto &refPt : state.dataDaylightingData->DaylRefPt) {
 
                         // Is this RefPt hosted by current DElight Zone?
                         if (izone == refPt.ZoneNum) {
-                            auto &zn(Zone(izone));
+                            auto &zn(state.dataHeatBal->Zone(izone));
 
                             // Limit to maximum of 100 RefPts
                             if (znDayl.TotalDaylRefPoints <= 100) {
 
-                                if (DaylRefWorldCoordSystem) {
+                                if (state.dataSurface->DaylRefWorldCoordSystem) {
                                     RefPt_WCS_Coord(1) = refPt.x;
                                     RefPt_WCS_Coord(2) = refPt.y;
                                     RefPt_WCS_Coord(3) = refPt.z;
@@ -580,21 +585,30 @@ namespace DElightManagerF {
 
                                 // Validate that Reference Point coordinates are within the host Zone
                                 if (RefPt_WCS_Coord(1) < zn.MinimumX || RefPt_WCS_Coord(1) > zn.MaximumX) {
-                                    ShowWarningError("DElightInputGenerator:Reference point X Value outside Zone Min/Max X, Zone=" + zn.Name);
-                                    ShowSevereError("...X Reference Point= " + RoundSigDigits(RefPt_WCS_Coord(1), 2) + ", Zone Minimum X= " +
-                                                    RoundSigDigits(zn.MinimumX, 2) + ", Zone Maximum X= " + RoundSigDigits(zn.MaximumX, 2));
+                                    ShowWarningError(state, "DElightInputGenerator:Reference point X Value outside Zone Min/Max X, Zone=" + zn.Name);
+                                    ShowSevereError(state,
+                                                    format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
+                                                           zn.MinimumX,
+                                                           RefPt_WCS_Coord(1),
+                                                           zn.MaximumX));
                                     ErrorsFound = true;
                                 }
                                 if (RefPt_WCS_Coord(2) < zn.MinimumY || RefPt_WCS_Coord(2) > zn.MaximumY) {
-                                    ShowWarningError("DElightInputGenerator:Reference point Y Value outside Zone Min/Max Y, Zone=" + zn.Name);
-                                    ShowSevereError("...Y Reference Point= " + RoundSigDigits(RefPt_WCS_Coord(2), 2) + ", Zone Minimum Y= " +
-                                                    RoundSigDigits(zn.MinimumY, 2) + ", Zone Maximum Y= " + RoundSigDigits(zn.MaximumY, 2));
+                                    ShowWarningError(state, "DElightInputGenerator:Reference point Y Value outside Zone Min/Max Y, Zone=" + zn.Name);
+                                    ShowSevereError(state,
+                                                    format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
+                                                           zn.MinimumY,
+                                                           RefPt_WCS_Coord(2),
+                                                           zn.MaximumY));
                                     ErrorsFound = true;
                                 }
-                                if (RefPt_WCS_Coord(3) < Zone(izone).MinimumZ || RefPt_WCS_Coord(3) > zn.MaximumZ) {
-                                    ShowWarningError("DElightInputGenerator:Reference point Z Value outside Zone Min/Max Z, Zone=" + zn.Name);
-                                    ShowSevereError("...Z Reference Point= " + RoundSigDigits(RefPt_WCS_Coord(3), 2) + ", Zone Minimum Z= " +
-                                                    RoundSigDigits(zn.MinimumZ, 2) + ", Zone Maximum Z= " + RoundSigDigits(zn.MaximumZ, 2));
+                                if (RefPt_WCS_Coord(3) < state.dataHeatBal->Zone(izone).MinimumZ || RefPt_WCS_Coord(3) > zn.MaximumZ) {
+                                    ShowWarningError(state, "DElightInputGenerator:Reference point Z Value outside Zone Min/Max Z, Zone=" + zn.Name);
+                                    ShowSevereError(state,
+                                                    format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
+                                                           zn.MinimumZ,
+                                                           RefPt_WCS_Coord(3),
+                                                           zn.MaximumZ));
                                     ErrorsFound = true;
                                 }
 
@@ -613,7 +627,8 @@ namespace DElightManagerF {
                                           znDayl.IllumSetPoint(refPt.indexToFracAndIllum) * LUX2FC,
                                           znDayl.LightControlType);
                                     // RJH 2008-03-07: Set up DaylIllumAtRefPt for output for this DElight zone RefPt
-                                    SetupOutputVariable("Daylighting Reference Point Illuminance",
+                                    SetupOutputVariable(state,
+                                                        "Daylighting Reference Point Illuminance",
                                                         OutputProcessor::Unit::lux,
                                                         znDayl.DaylIllumAtRefPt(refPt.indexToFracAndIllum),
                                                         "Zone",
@@ -650,18 +665,18 @@ namespace DElightManagerF {
             print(delightInFile,
                   Format_921,
                   iWndoConstIndexes(iconst) + 10000,
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransDiffVis,
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).ReflectVisDiffBack,
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(1),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(2),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(3),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(4),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(5),
-                  dataConstruction.Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(6));
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransDiffVis,
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).ReflectVisDiffBack,
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(1),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(2),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(3),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(4),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(5),
+                  state.dataConstruction->Construct(iWndoConstIndexes(iconst)).TransVisBeamCoef(6));
 
         } // Glass Type loop
 
-        if (ErrorsFound) ShowFatalError("Problems with Daylighting:DElight input, see previous error messages");
+        if (ErrorsFound) ShowFatalError(state, "Problems with Daylighting:DElight input, see previous error messages");
     }
 
     void GenerateDElightDaylightCoefficients(Real64 &dLatitude, int &iErrorFlag)
@@ -679,57 +694,63 @@ namespace DElightManagerF {
         delightdaylightcoefficients(dLatitude, &iErrorFlag);
     }
 
-    void GetInputDElightComplexFenestration(bool &ErrorsFound)
+    void GetInputDElightComplexFenestration(EnergyPlusData &state, bool &ErrorsFound)
     {
         // Perform GetInput function for the Daylighting:DELight:ComplexFenestration object
         // Glazer - July 2016
-
-        using namespace DataIPShortCuts; // Gives access to commonly dimensioned field names, etc for getinput
-        using namespace DataDaylighting;
-        using DataSurfaces::Surface;
 
         int NumAlpha;
         int NumNumber;
         int IOStat;
         int CFSNum = 0;
 
-        static std::string const cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
+        constexpr auto cCurrentModuleObject("Daylighting:DELight:ComplexFenestration");
 
-        TotDElightCFS = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
-        DElightComplexFene.allocate(TotDElightCFS);
-        for (auto &cfs : DElightComplexFene) {
-            inputProcessor->getObjectItem(cCurrentModuleObject,
-                                          ++CFSNum,
-                                          cAlphaArgs,
-                                          NumAlpha,
-                                          rNumericArgs,
-                                          NumNumber,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
-            cfs.Name = cAlphaArgs(1);
-            cfs.ComplexFeneType = cAlphaArgs(2);
-            cfs.surfName = cAlphaArgs(3);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, Surface) == 0) {
-                ShowSevereError(cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames(3) + "=\"" + cfs.surfName + "\".");
+        state.dataDaylightingData->TotDElightCFS = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataDaylightingData->DElightComplexFene.allocate(state.dataDaylightingData->TotDElightCFS);
+        for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     cCurrentModuleObject,
+                                                                     ++CFSNum,
+                                                                     state.dataIPShortCut->cAlphaArgs,
+                                                                     NumAlpha,
+                                                                     state.dataIPShortCut->rNumericArgs,
+                                                                     NumNumber,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            cfs.Name = state.dataIPShortCut->cAlphaArgs(1);
+            cfs.ComplexFeneType = state.dataIPShortCut->cAlphaArgs(2);
+            cfs.surfName = state.dataIPShortCut->cAlphaArgs(3);
+            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
+                ShowSevereError(state,
+                                format("{}{}",
+                                       cCurrentModuleObject,
+                                       ": " + cfs.Name + ", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + cfs.surfName + "\"."));
                 ErrorsFound = true;
             }
-            cfs.wndwName = cAlphaArgs(4);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, Surface) == 0) {
-                ShowSevereError(cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cAlphaFieldNames(4) + "=\"" + cfs.wndwName + "\".");
+            cfs.wndwName = state.dataIPShortCut->cAlphaArgs(4);
+            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
+                ShowSevereError(state,
+                                format("{}{}",
+                                       cCurrentModuleObject,
+                                       ": " + cfs.Name + ", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + cfs.wndwName + "\"."));
                 ErrorsFound = true;
             }
-            cfs.feneRota = rNumericArgs(1);
+            cfs.feneRota = state.dataIPShortCut->rNumericArgs(1);
             if (cfs.feneRota < 0. || cfs.feneRota > 360.) {
-                ShowSevereError(cCurrentModuleObject + ": " + cfs.Name + ", invalid " + cNumericFieldNames(1) + " outside of range 0 to 360.");
+                ShowSevereError(state,
+                                format("{}{}",
+                                       cCurrentModuleObject,
+                                       ": " + cfs.Name + ", invalid " + state.dataIPShortCut->cNumericFieldNames(1) + " outside of range 0 to 360."));
                 ErrorsFound = true;
             }
         }
     }
 
-    void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
+    void CheckForGeometricTransform(EnergyPlusData &state, bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -746,15 +767,8 @@ namespace DElightManagerF {
         //  change them to reflect a different aspect
         // ratio for the entire building based on user input.
 
-        // USE STATEMENTS:
-        // Using/Aliasing
-        using namespace DataIPShortCuts;
-        using DataDaylighting::ZoneDaylight;
-        using DataSurfaces::AspectTransform;
-        using DataSurfaces::WorldCoordSystem;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const CurrentModuleObject("GeometryTransform");
+        constexpr auto CurrentModuleObject("GeometryTransform");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string cAlphas(1);
@@ -769,29 +783,32 @@ namespace DElightManagerF {
         OldAspectRatio = 1.0;
         NewAspectRatio = 1.0;
 
-        if (inputProcessor->getNumObjectsFound(CurrentModuleObject) == 1) {
-            inputProcessor->getObjectItem(CurrentModuleObject,
-                                          1,
-                                          cAlphas,
-                                          NAlphas,
-                                          rNumerics,
-                                          NNum,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+        if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     1,
+                                                                     cAlphas,
+                                                                     NAlphas,
+                                                                     rNumerics,
+                                                                     NNum,
+                                                                     IOStat,
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
             OldAspectRatio = rNumerics(1);
             NewAspectRatio = rNumerics(2);
             if (cAlphas(1) != "XY") {
-                ShowWarningError(CurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored.");
+                ShowWarningError(
+                    state,
+                    format("{}{}", CurrentModuleObject, ": invalid " + state.dataIPShortCut->cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored."));
             }
             doTransform = true;
-            AspectTransform = true;
+            state.dataSurface->AspectTransform = true;
         }
-        if (WorldCoordSystem) {
+        if (state.dataSurface->WorldCoordSystem) {
             doTransform = false;
-            AspectTransform = false;
+            state.dataSurface->AspectTransform = false;
         }
     }
 

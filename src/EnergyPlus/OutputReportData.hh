@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -115,10 +115,14 @@ public:
         std::vector<Real64> m_timeInBin; // amount of time in each bin (usually 10 bins)
     };
 
-    int getVariableKeyCountandTypeFromFldSt(int &typeVar, OutputProcessor::StoreType &avgSumVar,
-                                            OutputProcessor::TimeStepType &stepTypeVar, OutputProcessor::Unit &unitsVar);
+    int getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state,
+                                            int &typeVar,
+                                            OutputProcessor::StoreType &avgSumVar,
+                                            OutputProcessor::TimeStepType &stepTypeVar,
+                                            OutputProcessor::Unit &unitsVar);
 
-    void getVariableKeysFromFldSt(int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar);
+    void getVariableKeysFromFldSt(
+        EnergyPlusData &state, int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar);
 
     std::string m_variMeter;          // the name of the variable or meter
     std::string m_colHead;            // the column header to use instead of the variable name (only for predefined)
@@ -127,13 +131,13 @@ public:
     OutputProcessor::Unit m_varUnits; // Units sting, may be blank
     int m_typeOfVar;                  // 0=not found, 1=integer, 2=real, 3=meter
     int m_keyCount;
-    OutputProcessor::StoreType m_varAvgSum; // Variable  is Averaged=1 or Summed=2
+    OutputProcessor::StoreType m_varAvgSum;      // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType m_varStepType; // Variable time step is Zone=1 or HVAC=2
-    std::vector<std::string> m_namesOfKeys; // stored version of name of keys from getVariableKeys
-    std::vector<int> m_indexesForKeyVar;    // stored version of name of keys from getVariableKeys
-    std::vector<AnnualCell> m_cell;         // for each row contains the results and details for one cell of the table
-    Real64 m_bottomBinValue;                // the bottom of the binning for a column
-    Real64 m_topBinValue;                   // the top of the binning for a column
+    std::vector<std::string> m_namesOfKeys;      // stored version of name of keys from getVariableKeys
+    std::vector<int> m_indexesForKeyVar;         // stored version of name of keys from getVariableKeys
+    std::vector<AnnualCell> m_cell;              // for each row contains the results and details for one cell of the table
+    Real64 m_bottomBinValue;                     // the bottom of the binning for a column
+    Real64 m_topBinValue;                        // the top of the binning for a column
     Real64 m_timeAboveTopBinTotal;
     Real64 m_timeBelowBottomBinTotal;
     std::vector<Real64> m_timeInBinTotal; // amount of time in each bin (usually 10 bins)

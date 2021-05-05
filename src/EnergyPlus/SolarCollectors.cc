@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,20 +54,20 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SolarCollectors.hh>
@@ -94,49 +94,26 @@ namespace SolarCollectors {
 
     static std::string const fluidNameWater("WATER");
 
-    Array1D_bool CheckEquipName;
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumOfCollectors(0);
-    int NumOfParameters(0);
-    bool GetInputFlag(true);
-
-    Array1D<ParametersData> Parameters;
-    Array1D<CollectorData> Collector;
-    std::unordered_map<std::string, std::string> UniqueParametersNames;
-    std::unordered_map<std::string, std::string> UniqueCollectorNames;
-
-    void clear_state()
-    {
-        NumOfCollectors = 0;
-        NumOfParameters = 0;
-        GetInputFlag = true;
-        Parameters.deallocate();
-        Collector.deallocate();
-        UniqueCollectorNames.clear();
-        UniqueParametersNames.clear();
-    }
-
-    PlantComponent *CollectorData::factory(std::string const &objectName)
+    PlantComponent *CollectorData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
-        if (GetInputFlag) {
-            GetSolarCollectorInput();
-            GetInputFlag = false;
+        if (state.dataSolarCollectors->GetInputFlag) {
+            GetSolarCollectorInput(state);
+            state.dataSolarCollectors->GetInputFlag = false;
         }
         // Now look for this particular object
-        for (auto &thisSC : Collector) {
+        for (auto &thisSC : state.dataSolarCollectors->Collector) {
             if (thisSC.Name == objectName) {
                 return &thisSC;
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError("LocalSolarCollectorFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "LocalSolarCollectorFactory: Error getting inputs for object named: " + objectName); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GetSolarCollectorInput()
+    void GetSolarCollectorInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -148,7 +125,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the solar collector input from the input file and sets up the parameters and collector objects.
 
-        bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);              // Set to true if errors in input, fatal at end of routine
         int IOStatus;                         // Used in GetObjectItem
         int NumAlphas;                        // Number of Alphas for each GetObjectItem call
         int NumNumbers;                       // Number of Numbers for each GetObjectItem call
@@ -170,26 +147,26 @@ namespace SolarCollectors {
         MaxAlphas = 0;
 
         CurrentModuleParamObject = "SolarCollectorPerformance:FlatPlate";
-        int NumOfFlatPlateParam = inputProcessor->getNumObjectsFound(CurrentModuleParamObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
+        int NumOfFlatPlateParam = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleParamObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "SolarCollector:FlatPlate:Water";
-        int NumFlatPlateUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        int NumFlatPlateUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleParamObject = "SolarCollectorPerformance:IntegralCollectorStorage";
-        int NumOfICSParam = inputProcessor->getNumObjectsFound(CurrentModuleParamObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
+        int NumOfICSParam = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleParamObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleParamObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
         CurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
-        int NumOfICSUnits = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
+        int NumOfICSUnits = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
         MaxNumbers = max(MaxNumbers, NumNumbers);
         MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -200,102 +177,113 @@ namespace SolarCollectors {
         lAlphaBlanks.dimension(MaxAlphas, true);
         lNumericBlanks.dimension(MaxNumbers, true);
 
-        NumOfCollectors = NumFlatPlateUnits + NumOfICSUnits;
-        NumOfParameters = NumOfFlatPlateParam + NumOfICSParam;
+        state.dataSolarCollectors->NumOfCollectors = NumFlatPlateUnits + NumOfICSUnits;
+        state.dataSolarCollectors->NumOfParameters = NumOfFlatPlateParam + NumOfICSParam;
 
-        if (NumOfParameters > 0) {
-            Parameters.allocate(NumOfParameters);
+        if (state.dataSolarCollectors->NumOfParameters > 0) {
+            state.dataSolarCollectors->Parameters.allocate(state.dataSolarCollectors->NumOfParameters);
 
             CurrentModuleParamObject = "SolarCollectorPerformance:FlatPlate";
 
             for (int FlatPlateParamNum = 1; FlatPlateParamNum <= NumOfFlatPlateParam; ++FlatPlateParamNum) {
 
                 int ParametersNum = FlatPlateParamNum;
-                inputProcessor->getObjectItem(CurrentModuleParamObject,
-                                              ParametersNum,
-                                              DataIPShortCuts::cAlphaArgs,
-                                              NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
-                                              NumNumbers,
-                                              IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              _,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleParamObject,
+                                                                         ParametersNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         _,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 // Collector module parameters name
-                GlobalNames::VerifyUniqueInterObjectName(
-                    UniqueParametersNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
-                Parameters(ParametersNum).Name = DataIPShortCuts::cAlphaArgs(1);
+                GlobalNames::VerifyUniqueInterObjectName(state,
+                                                         state.dataSolarCollectors->UniqueParametersNames,
+                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         CurrentModuleObject,
+                                                         state.dataIPShortCut->cAlphaFieldNames(1),
+                                                         ErrorsFound);
+                state.dataSolarCollectors->Parameters(ParametersNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // NOTE:  This values serves mainly as a reference.  The area of the associated surface object is used in all calculations.
-                Parameters(ParametersNum).Area = DataIPShortCuts::rNumericArgs(1);
+                state.dataSolarCollectors->Parameters(ParametersNum).Area = state.dataIPShortCut->rNumericArgs(1);
 
                 {
-                    auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                     if (SELECT_CASE_var == "WATER") {
-                        Parameters(ParametersNum).TestFluid = FluidEnum::WATER;
+                        state.dataSolarCollectors->Parameters(ParametersNum).TestFluid = FluidEnum::WATER;
                         // CASE('AIR')
                         //  Parameters(ParametersNum)%TestFluid = AIR
                     } else {
-                        ShowSevereError(CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  " + DataIPShortCuts::cAlphaArgs(2) +
-                                        " is an unsupported Test Fluid for " + DataIPShortCuts::cAlphaFieldNames(2));
+                        ShowSevereError(state,
+                                        CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  " +
+                                            state.dataIPShortCut->cAlphaArgs(2) + " is an unsupported Test Fluid for " +
+                                            state.dataIPShortCut->cAlphaFieldNames(2));
                         ErrorsFound = true;
                     }
                 }
 
-                if (DataIPShortCuts::rNumericArgs(2) > 0.0) {
-                    Parameters(ParametersNum).TestMassFlowRate = DataIPShortCuts::rNumericArgs(2) * Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
+                if (state.dataIPShortCut->rNumericArgs(2) > 0.0) {
+                    state.dataSolarCollectors->Parameters(ParametersNum).TestMassFlowRate =
+                        state.dataIPShortCut->rNumericArgs(2) * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
                 } else {
-                    ShowSevereError(CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
-                                    ":  flow rate must be greater than zero for " + DataIPShortCuts::cNumericFieldNames(2));
+                    ShowSevereError(state,
+                                    CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                        ":  flow rate must be greater than zero for " + state.dataIPShortCut->cNumericFieldNames(2));
                     ErrorsFound = true;
                 }
 
                 {
-                    auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(3));
+                    auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
                     if (SELECT_CASE_var == "INLET") {
-                        Parameters(ParametersNum).TestType = TestTypeEnum::INLET;
+                        state.dataSolarCollectors->Parameters(ParametersNum).TestType = TestTypeEnum::INLET;
                     } else if (SELECT_CASE_var == "AVERAGE") {
-                        Parameters(ParametersNum).TestType = TestTypeEnum::AVERAGE;
+                        state.dataSolarCollectors->Parameters(ParametersNum).TestType = TestTypeEnum::AVERAGE;
                     } else if (SELECT_CASE_var == "OUTLET") {
-                        Parameters(ParametersNum).TestType = TestTypeEnum::OUTLET;
+                        state.dataSolarCollectors->Parameters(ParametersNum).TestType = TestTypeEnum::OUTLET;
                     } else {
-                        ShowSevereError(CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  " + DataIPShortCuts::cAlphaArgs(3) +
-                                        " is  not supported for " + DataIPShortCuts::cAlphaFieldNames(3));
+                        ShowSevereError(state,
+                                        CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  " +
+                                            state.dataIPShortCut->cAlphaArgs(3) + " is  not supported for " +
+                                            state.dataIPShortCut->cAlphaFieldNames(3));
                         ErrorsFound = true;
                     }
                 }
 
                 // Efficiency equation coefficients
-                Parameters(ParametersNum).eff0 = DataIPShortCuts::rNumericArgs(3);
-                Parameters(ParametersNum).eff1 = DataIPShortCuts::rNumericArgs(4);
+                state.dataSolarCollectors->Parameters(ParametersNum).eff0 = state.dataIPShortCut->rNumericArgs(3);
+                state.dataSolarCollectors->Parameters(ParametersNum).eff1 = state.dataIPShortCut->rNumericArgs(4);
 
                 if (NumNumbers > 4) {
-                    Parameters(ParametersNum).eff2 = DataIPShortCuts::rNumericArgs(5);
+                    state.dataSolarCollectors->Parameters(ParametersNum).eff2 = state.dataIPShortCut->rNumericArgs(5);
                 } else {
-                    Parameters(ParametersNum).eff2 = 0.0;
+                    state.dataSolarCollectors->Parameters(ParametersNum).eff2 = 0.0;
                 }
 
                 // Incident angle modifier coefficients
                 if (NumNumbers > 5) {
-                    Parameters(ParametersNum).iam1 = DataIPShortCuts::rNumericArgs(6);
+                    state.dataSolarCollectors->Parameters(ParametersNum).iam1 = state.dataIPShortCut->rNumericArgs(6);
                 } else {
-                    Parameters(ParametersNum).iam1 = 0.0;
+                    state.dataSolarCollectors->Parameters(ParametersNum).iam1 = 0.0;
                 }
 
                 if (NumNumbers > 6) {
-                    Parameters(FlatPlateParamNum).iam2 = DataIPShortCuts::rNumericArgs(7);
+                    state.dataSolarCollectors->Parameters(FlatPlateParamNum).iam2 = state.dataIPShortCut->rNumericArgs(7);
                 } else {
-                    Parameters(ParametersNum).iam2 = 0.0;
+                    state.dataSolarCollectors->Parameters(ParametersNum).iam2 = 0.0;
                 }
             } // ParametersNum
 
-            if (ErrorsFound) ShowFatalError("Errors in " + CurrentModuleParamObject + " input.");
+            if (ErrorsFound) ShowFatalError(state, "Errors in " + CurrentModuleParamObject + " input.");
         }
 
-        if (NumOfCollectors > 0) {
-            Collector.allocate(NumOfCollectors);
+        if (state.dataSolarCollectors->NumOfCollectors > 0) {
+            state.dataSolarCollectors->Collector.allocate(state.dataSolarCollectors->NumOfCollectors);
 
             CurrentModuleObject = "SolarCollector:FlatPlate:Water";
 
@@ -303,102 +291,127 @@ namespace SolarCollectors {
 
                 int CollectorNum = FlatPlateUnitsNum;
 
-                inputProcessor->getObjectItem(
-                    CurrentModuleObject, CollectorNum, DataIPShortCuts::cAlphaArgs, NumAlphas, DataIPShortCuts::rNumericArgs, NumNumbers, IOStatus);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         CollectorNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus);
 
                 // Collector name
-                GlobalNames::VerifyUniqueInterObjectName(UniqueCollectorNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
-                Collector(CollectorNum).Name = DataIPShortCuts::cAlphaArgs(1);
-                Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
+                GlobalNames::VerifyUniqueInterObjectName(
+                    state, state.dataSolarCollectors->UniqueCollectorNames, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+                state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+                state.dataSolarCollectors->Collector(CollectorNum).TypeNum =
+                    DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
-                int ParametersNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), Parameters);
+                int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
 
                 if (ParametersNum == 0) {
-                    ShowSevereError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ": " + CurrentModuleParamObject +
-                                    " object called " + DataIPShortCuts::cAlphaArgs(2) + " not found.");
+                    ShowSevereError(state,
+                                    CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": " + CurrentModuleParamObject +
+                                        " object called " + state.dataIPShortCut->cAlphaArgs(2) + " not found.");
                     ErrorsFound = true;
                 } else {
-                    Collector(CollectorNum).Parameters = ParametersNum;
+                    state.dataSolarCollectors->Collector(CollectorNum).Parameters = ParametersNum;
                 }
 
                 // Get surface object
-                int SurfNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), DataSurfaces::Surface);
+                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
-                    ShowSevereError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Surface " + DataIPShortCuts::cAlphaArgs(3) +
-                                    " not found.");
+                    ShowSevereError(state,
+                                    CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Surface " +
+                                        state.dataIPShortCut->cAlphaArgs(3) + " not found.");
                     ErrorsFound = true;
                     continue; // avoid hard crash
                 } else {
 
-                    if (!DataSurfaces::Surface(SurfNum).ExtSolar) {
-                        ShowWarningError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Surface " +
-                                         DataIPShortCuts::cAlphaArgs(3) + " is not exposed to exterior radiation.");
+                    if (!state.dataSurface->Surface(SurfNum).ExtSolar) {
+                        ShowWarningError(state,
+                                         CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Surface " +
+                                             state.dataIPShortCut->cAlphaArgs(3) + " is not exposed to exterior radiation.");
                     }
 
                     // check surface orientation, warn if upside down
-                    if ((DataSurfaces::Surface(SurfNum).Tilt < -95.0) || (DataSurfaces::Surface(SurfNum).Tilt > 95.0)) {
-                        ShowWarningError("Suspected input problem with " + DataIPShortCuts::cAlphaFieldNames(3) + " = " +
-                                         DataIPShortCuts::cAlphaArgs(3));
-                        ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                        ShowContinueError("Surface used for solar collector faces down");
-                        ShowContinueError("Surface tilt angle (degrees from ground outward normal) = " +
-                                          General::RoundSigDigits(DataSurfaces::Surface(SurfNum).Tilt, 2));
+                    if ((state.dataSurface->Surface(SurfNum).Tilt < -95.0) || (state.dataSurface->Surface(SurfNum).Tilt > 95.0)) {
+                        ShowWarningError(state,
+                                         "Suspected input problem with " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " +
+                                             state.dataIPShortCut->cAlphaArgs(3));
+                        ShowContinueError(state,
+                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(state, "Surface used for solar collector faces down");
+                        ShowContinueError(
+                            state,
+                            format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", state.dataSurface->Surface(SurfNum).Tilt));
                     }
 
                     // Check to make sure other solar collectors are not using the same surface
                     // NOTE:  Must search over all solar collector types
                     for (int CollectorNum2 = 1; CollectorNum2 <= NumFlatPlateUnits; ++CollectorNum2) {
-                        if (Collector(CollectorNum2).Surface == SurfNum) {
-                            ShowSevereError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Surface " +
-                                            DataIPShortCuts::cAlphaArgs(3) + " is referenced by more than one " + CurrentModuleObject);
+                        if (state.dataSolarCollectors->Collector(CollectorNum2).Surface == SurfNum) {
+                            ShowSevereError(state,
+                                            CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Surface " +
+                                                state.dataIPShortCut->cAlphaArgs(3) + " is referenced by more than one " + CurrentModuleObject);
                             ErrorsFound = true;
                             break;
                         }
                     } // CollectorNum2
 
-                    Collector(CollectorNum).Surface = SurfNum;
+                    state.dataSolarCollectors->Collector(CollectorNum).Surface = SurfNum;
                 }
 
                 // Give warning if surface area and gross area do not match within tolerance
-                if (SurfNum > 0 && ParametersNum > 0 && Parameters(ParametersNum).Area > 0.0 &&
-                    std::abs(Parameters(ParametersNum).Area - DataSurfaces::Surface(SurfNum).Area) / DataSurfaces::Surface(SurfNum).Area > 0.01) {
+                if (SurfNum > 0 && ParametersNum > 0 && state.dataSolarCollectors->Parameters(ParametersNum).Area > 0.0 &&
+                    std::abs(state.dataSolarCollectors->Parameters(ParametersNum).Area - state.dataSurface->Surface(SurfNum).Area) /
+                            state.dataSurface->Surface(SurfNum).Area >
+                        0.01) {
 
-                    ShowWarningError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
-                                     ":  Gross Area of solar collector parameters and surface object differ by more than 1%.");
-                    ShowContinueError("Area of surface object will be used in all calculations.");
+                    ShowWarningError(state,
+                                     CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
+                                         ":  Gross Area of solar collector parameters and surface object differ by more than 1%.");
+                    ShowContinueError(state, "Area of surface object will be used in all calculations.");
                 }
 
-                Collector(CollectorNum).InletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
-                                                                                        ErrorsFound,
-                                                                                        CurrentModuleObject,
-                                                                                        DataIPShortCuts::cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeType_Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
-                                                                                        1,
-                                                                                        DataLoopNode::ObjectIsNotParent);
-                Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(5),
-                                                                                         ErrorsFound,
-                                                                                         CurrentModuleObject,
-                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
-                                                                                         1,
-                                                                                         DataLoopNode::ObjectIsNotParent);
+                state.dataSolarCollectors->Collector(CollectorNum).InletNode =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        state.dataIPShortCut->cAlphaArgs(4),
+                                                        ErrorsFound,
+                                                        CurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                        DataLoopNode::NodeFluidType::Water,
+                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        1,
+                                                        DataLoopNode::ObjectIsNotParent);
+                state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        state.dataIPShortCut->cAlphaArgs(5),
+                                                        ErrorsFound,
+                                                        CurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                        DataLoopNode::NodeFluidType::Water,
+                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        1,
+                                                        DataLoopNode::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
-                    Collector(CollectorNum).VolFlowRateMax =
-                        DataIPShortCuts::rNumericArgs(1); // Max volumetric flow rate used for plant sizing calculation
+                    state.dataSolarCollectors->Collector(CollectorNum).VolFlowRateMax =
+                        state.dataIPShortCut->rNumericArgs(1); // Max volumetric flow rate used for plant sizing calculation
                 } else {
-                    Collector(CollectorNum).VolFlowRateMax = 0.0;       // Max vol flow rate is not specified; no flow for plant sizing calculation
-                    Collector(CollectorNum).MassFlowRateMax = 999999.9; // But...set a very high value so that it demands as much as possible
+                    state.dataSolarCollectors->Collector(CollectorNum).VolFlowRateMax =
+                        0.0; // Max vol flow rate is not specified; no flow for plant sizing calculation
+                    state.dataSolarCollectors->Collector(CollectorNum).MassFlowRateMax =
+                        999999.9; // But...set a very high value so that it demands as much as possible
                 }
 
-                BranchNodeConnections::TestCompSet(CurrentModuleObject,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaArgs(4),
-                                                   DataIPShortCuts::cAlphaArgs(5),
+                BranchNodeConnections::TestCompSet(state,
+                                                   CurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaArgs(4),
+                                                   state.dataIPShortCut->cAlphaArgs(5),
                                                    "Water Nodes");
 
             } // FlatPlateUnitsNum
@@ -410,96 +423,102 @@ namespace SolarCollectors {
 
                 int ParametersNum = ICSParamNum + NumOfFlatPlateParam;
 
-                inputProcessor->getObjectItem(CurrentModuleParamObject,
-                                              ICSParamNum,
-                                              DataIPShortCuts::cAlphaArgs,
-                                              NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
-                                              NumNumbers,
-                                              IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              _,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleParamObject,
+                                                                         ICSParamNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         _,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 // Collector module parameters name
-                GlobalNames::VerifyUniqueInterObjectName(
-                    UniqueParametersNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
-                Parameters(ParametersNum).Name = DataIPShortCuts::cAlphaArgs(1);
+                GlobalNames::VerifyUniqueInterObjectName(state,
+                                                         state.dataSolarCollectors->UniqueParametersNames,
+                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         CurrentModuleObject,
+                                                         state.dataIPShortCut->cAlphaFieldNames(1),
+                                                         ErrorsFound);
+                state.dataSolarCollectors->Parameters(ParametersNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 // NOTE:  currently the only available choice is RectangularTank.  In the future progressive tube type will be
                 //        added
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(2), "RectangularTank")) {
-                    Parameters(ParametersNum).ICSType_Num = TankTypeEnum::ICSRectangularTank;
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "RectangularTank")) {
+                    state.dataSolarCollectors->Parameters(ParametersNum).ICSType_Num = TankTypeEnum::ICSRectangularTank;
                 } else {
-                    ShowSevereError(DataIPShortCuts::cAlphaFieldNames(2) + " not found=" + DataIPShortCuts::cAlphaArgs(2) + " in " +
-                                    CurrentModuleParamObject + " =" + Parameters(ParametersNum).Name);
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cAlphaFieldNames(2) + " not found=" + state.dataIPShortCut->cAlphaArgs(2) + " in " +
+                                        CurrentModuleParamObject + " =" + state.dataSolarCollectors->Parameters(ParametersNum).Name);
                     ErrorsFound = true;
                 }
                 // NOTE:  This collector gross area is used in all the calculations.
-                Parameters(ParametersNum).Area = DataIPShortCuts::rNumericArgs(1);
-                if (DataIPShortCuts::rNumericArgs(1) <= 0.0) {
-                    ShowSevereError(CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError("Illegal " + DataIPShortCuts::cNumericFieldNames(1) + " = " +
-                                      General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
-                    ShowContinueError(" Collector gross area must be always gretaer than zero.");
+                state.dataSolarCollectors->Parameters(ParametersNum).Area = state.dataIPShortCut->rNumericArgs(1);
+                if (state.dataIPShortCut->rNumericArgs(1) <= 0.0) {
+                    ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(
+                        state, format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(1), state.dataIPShortCut->rNumericArgs(1)));
+                    ShowContinueError(state, " Collector gross area must be always gretaer than zero.");
                     ErrorsFound = true;
                 }
-                Parameters(ParametersNum).Volume = DataIPShortCuts::rNumericArgs(2);
-                if (DataIPShortCuts::rNumericArgs(2) <= 0.0) {
-                    ShowSevereError(CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError("Illegal " + DataIPShortCuts::cNumericFieldNames(2) + " = " +
-                                      General::RoundSigDigits(DataIPShortCuts::rNumericArgs(2), 2));
-                    ShowContinueError(" Collector water volume must be always gretaer than zero.");
+                state.dataSolarCollectors->Parameters(ParametersNum).Volume = state.dataIPShortCut->rNumericArgs(2);
+                if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
+                    ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(
+                        state, format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
+                    ShowContinueError(state, " Collector water volume must be always gretaer than zero.");
                     ErrorsFound = true;
                 }
                 // Note: this value is used to calculate the heat loss through the bottom and side of the collector
-                Parameters(ParametersNum).ULossBottom = DataIPShortCuts::rNumericArgs(3);
-                Parameters(ParametersNum).ULossSide = DataIPShortCuts::rNumericArgs(4);
-                Parameters(ParametersNum).AspectRatio = DataIPShortCuts::rNumericArgs(5);
-                Parameters(ParametersNum).SideHeight = DataIPShortCuts::rNumericArgs(6);
-                Parameters(ParametersNum).ThermalMass = DataIPShortCuts::rNumericArgs(7);
-                Parameters(ParametersNum).NumOfCovers = DataIPShortCuts::rNumericArgs(8);
-                Parameters(ParametersNum).CoverSpacing = DataIPShortCuts::rNumericArgs(9);
+                state.dataSolarCollectors->Parameters(ParametersNum).ULossBottom = state.dataIPShortCut->rNumericArgs(3);
+                state.dataSolarCollectors->Parameters(ParametersNum).ULossSide = state.dataIPShortCut->rNumericArgs(4);
+                state.dataSolarCollectors->Parameters(ParametersNum).AspectRatio = state.dataIPShortCut->rNumericArgs(5);
+                state.dataSolarCollectors->Parameters(ParametersNum).SideHeight = state.dataIPShortCut->rNumericArgs(6);
+                state.dataSolarCollectors->Parameters(ParametersNum).ThermalMass = state.dataIPShortCut->rNumericArgs(7);
+                state.dataSolarCollectors->Parameters(ParametersNum).NumOfCovers = state.dataIPShortCut->rNumericArgs(8);
+                state.dataSolarCollectors->Parameters(ParametersNum).CoverSpacing = state.dataIPShortCut->rNumericArgs(9);
 
-                if (Parameters(ParametersNum).NumOfCovers == 2) {
+                if (state.dataSolarCollectors->Parameters(ParametersNum).NumOfCovers == 2) {
                     // Outer cover refractive index
-                    Parameters(ParametersNum).RefractiveIndex(1) = DataIPShortCuts::rNumericArgs(10);
+                    state.dataSolarCollectors->Parameters(ParametersNum).RefractiveIndex(1) = state.dataIPShortCut->rNumericArgs(10);
                     // Outer cover extinction coefficient times thickness of the cover
-                    Parameters(ParametersNum).ExtCoefTimesThickness(1) = DataIPShortCuts::rNumericArgs(11);
+                    state.dataSolarCollectors->Parameters(ParametersNum).ExtCoefTimesThickness(1) = state.dataIPShortCut->rNumericArgs(11);
                     // Outer cover Emissivity
-                    Parameters(ParametersNum).EmissOfCover(1) = DataIPShortCuts::rNumericArgs(12);
+                    state.dataSolarCollectors->Parameters(ParametersNum).EmissOfCover(1) = state.dataIPShortCut->rNumericArgs(12);
 
-                    if (!DataIPShortCuts::lNumericFieldBlanks(13) || !DataIPShortCuts::lNumericFieldBlanks(14) ||
-                        !DataIPShortCuts::lNumericFieldBlanks(15)) {
-                        Parameters(ParametersNum).RefractiveIndex(2) = DataIPShortCuts::rNumericArgs(13);
-                        Parameters(ParametersNum).ExtCoefTimesThickness(2) = DataIPShortCuts::rNumericArgs(14);
-                        Parameters(ParametersNum).EmissOfCover(2) = DataIPShortCuts::rNumericArgs(15);
+                    if (!state.dataIPShortCut->lNumericFieldBlanks(13) || !state.dataIPShortCut->lNumericFieldBlanks(14) ||
+                        !state.dataIPShortCut->lNumericFieldBlanks(15)) {
+                        state.dataSolarCollectors->Parameters(ParametersNum).RefractiveIndex(2) = state.dataIPShortCut->rNumericArgs(13);
+                        state.dataSolarCollectors->Parameters(ParametersNum).ExtCoefTimesThickness(2) = state.dataIPShortCut->rNumericArgs(14);
+                        state.dataSolarCollectors->Parameters(ParametersNum).EmissOfCover(2) = state.dataIPShortCut->rNumericArgs(15);
                     } else {
-                        ShowSevereError(CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                        ShowContinueError("Illegal input for one of the three inputs of the inner cover optical properties");
+                        ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(state, "Illegal input for one of the three inputs of the inner cover optical properties");
                         ErrorsFound = true;
                     }
-                } else if (Parameters(ParametersNum).NumOfCovers == 1) {
+                } else if (state.dataSolarCollectors->Parameters(ParametersNum).NumOfCovers == 1) {
                     // Outer cover refractive index
-                    Parameters(ParametersNum).RefractiveIndex(1) = DataIPShortCuts::rNumericArgs(10);
+                    state.dataSolarCollectors->Parameters(ParametersNum).RefractiveIndex(1) = state.dataIPShortCut->rNumericArgs(10);
                     // Outer cover extinction coefficient times thickness of the cover
-                    Parameters(ParametersNum).ExtCoefTimesThickness(1) = DataIPShortCuts::rNumericArgs(11);
+                    state.dataSolarCollectors->Parameters(ParametersNum).ExtCoefTimesThickness(1) = state.dataIPShortCut->rNumericArgs(11);
                     // Outer cover emissivity
-                    Parameters(ParametersNum).EmissOfCover(1) = DataIPShortCuts::rNumericArgs(12);
+                    state.dataSolarCollectors->Parameters(ParametersNum).EmissOfCover(1) = state.dataIPShortCut->rNumericArgs(12);
                 } else {
-                    ShowSevereError(CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                    ShowContinueError("Illegal " + DataIPShortCuts::cNumericFieldNames(8) + " = " +
-                                      General::RoundSigDigits(DataIPShortCuts::rNumericArgs(8), 2));
+                    ShowSevereError(state, CurrentModuleParamObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                    ShowContinueError(
+                        state, format("Illegal {} = {:.2R}", state.dataIPShortCut->cNumericFieldNames(8), state.dataIPShortCut->rNumericArgs(8)));
                     ErrorsFound = true;
                 }
                 // Solar absorptance of the absorber plate
-                Parameters(ParametersNum).AbsorOfAbsPlate = DataIPShortCuts::rNumericArgs(16);
+                state.dataSolarCollectors->Parameters(ParametersNum).AbsorOfAbsPlate = state.dataIPShortCut->rNumericArgs(16);
                 // thermal emmissivity of the absorber plate
-                Parameters(ParametersNum).EmissOfAbsPlate = DataIPShortCuts::rNumericArgs(17);
+                state.dataSolarCollectors->Parameters(ParametersNum).EmissOfAbsPlate = state.dataIPShortCut->rNumericArgs(17);
 
             } // end of ParametersNum
 
-            if (ErrorsFound) ShowFatalError("Errors in " + CurrentModuleParamObject + " input.");
+            if (ErrorsFound) ShowFatalError(state, "Errors in " + CurrentModuleParamObject + " input.");
 
             CurrentModuleObject = "SolarCollector:IntegralCollectorStorage";
 
@@ -507,182 +526,217 @@ namespace SolarCollectors {
 
                 int CollectorNum = ICSUnitsNum + NumFlatPlateUnits;
 
-                inputProcessor->getObjectItem(CurrentModuleObject,
-                                              ICSUnitsNum,
-                                              DataIPShortCuts::cAlphaArgs,
-                                              NumAlphas,
-                                              DataIPShortCuts::rNumericArgs,
-                                              NumNumbers,
-                                              IOStatus,
-                                              DataIPShortCuts::lNumericFieldBlanks,
-                                              lAlphaBlanks,
-                                              DataIPShortCuts::cAlphaFieldNames,
-                                              DataIPShortCuts::cNumericFieldNames);
+                state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                         CurrentModuleObject,
+                                                                         ICSUnitsNum,
+                                                                         state.dataIPShortCut->cAlphaArgs,
+                                                                         NumAlphas,
+                                                                         state.dataIPShortCut->rNumericArgs,
+                                                                         NumNumbers,
+                                                                         IOStatus,
+                                                                         state.dataIPShortCut->lNumericFieldBlanks,
+                                                                         lAlphaBlanks,
+                                                                         state.dataIPShortCut->cAlphaFieldNames,
+                                                                         state.dataIPShortCut->cNumericFieldNames);
 
                 // Collector name
-                GlobalNames::VerifyUniqueInterObjectName(
-                    UniqueCollectorNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, DataIPShortCuts::cAlphaFieldNames(1), ErrorsFound);
-                Collector(CollectorNum).Name = DataIPShortCuts::cAlphaArgs(1);
-                Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorICS; // parameter assigned in DataPlant
+                GlobalNames::VerifyUniqueInterObjectName(state,
+                                                         state.dataSolarCollectors->UniqueCollectorNames,
+                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                         CurrentModuleObject,
+                                                         state.dataIPShortCut->cAlphaFieldNames(1),
+                                                         ErrorsFound);
+                state.dataSolarCollectors->Collector(CollectorNum).Name = state.dataIPShortCut->cAlphaArgs(1);
+                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorICS; // parameter assigned in DataPlant
 
-                Collector(CollectorNum).InitICS = true;
+                state.dataSolarCollectors->Collector(CollectorNum).InitICS = true;
 
                 // Get parameters object
-                int ParametersNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), Parameters);
+                int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
 
                 if (ParametersNum == 0) {
-                    ShowSevereError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ": " + CurrentModuleParamObject +
-                                    " object called " + DataIPShortCuts::cAlphaArgs(2) + " not found.");
+                    ShowSevereError(state,
+                                    CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": " + CurrentModuleParamObject +
+                                        " object called " + state.dataIPShortCut->cAlphaArgs(2) + " not found.");
                     ErrorsFound = true;
                 } else {
-                    Collector(CollectorNum).Parameters = ParametersNum;
+                    state.dataSolarCollectors->Collector(CollectorNum).Parameters = ParametersNum;
                 }
 
                 if (ParametersNum > 0) {
                     // Calculate constant collector parameters only once
-                    Real64 Perimeter = 2.0 * std::sqrt(Parameters(ParametersNum).Area) *
-                                       (std::sqrt(Parameters(ParametersNum).AspectRatio) + 1.0 / std::sqrt(Parameters(ParametersNum).AspectRatio));
-                    Collector(CollectorNum).Length = std::sqrt(Parameters(ParametersNum).Area / Parameters(ParametersNum).AspectRatio);
+                    Real64 Perimeter = 2.0 * std::sqrt(state.dataSolarCollectors->Parameters(ParametersNum).Area) *
+                                       (std::sqrt(state.dataSolarCollectors->Parameters(ParametersNum).AspectRatio) +
+                                        1.0 / std::sqrt(state.dataSolarCollectors->Parameters(ParametersNum).AspectRatio));
+                    state.dataSolarCollectors->Collector(CollectorNum).Length = std::sqrt(
+                        state.dataSolarCollectors->Parameters(ParametersNum).Area / state.dataSolarCollectors->Parameters(ParametersNum).AspectRatio);
 
                     // calculate the collector side heat transfer area and loss coefficient
-                    Collector(CollectorNum).ICSType_Num = Parameters(ParametersNum).ICSType_Num;
-                    Collector(CollectorNum).Area = Parameters(ParametersNum).Area;
-                    Collector(CollectorNum).Volume = Parameters(ParametersNum).Volume;
-                    Collector(CollectorNum).SideArea = Perimeter * Parameters(ParametersNum).SideHeight;
-                    Collector(CollectorNum).AreaRatio = Collector(CollectorNum).SideArea / Collector(CollectorNum).Area;
+                    state.dataSolarCollectors->Collector(CollectorNum).ICSType_Num = state.dataSolarCollectors->Parameters(ParametersNum).ICSType_Num;
+                    state.dataSolarCollectors->Collector(CollectorNum).Area = state.dataSolarCollectors->Parameters(ParametersNum).Area;
+                    state.dataSolarCollectors->Collector(CollectorNum).Volume = state.dataSolarCollectors->Parameters(ParametersNum).Volume;
+                    state.dataSolarCollectors->Collector(CollectorNum).SideArea =
+                        Perimeter * state.dataSolarCollectors->Parameters(ParametersNum).SideHeight;
+                    state.dataSolarCollectors->Collector(CollectorNum).AreaRatio =
+                        state.dataSolarCollectors->Collector(CollectorNum).SideArea / state.dataSolarCollectors->Collector(CollectorNum).Area;
                 }
                 // Get surface object
-                int SurfNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), DataSurfaces::Surface);
+                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
-                    ShowSevereError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Surface " + DataIPShortCuts::cAlphaArgs(3) +
-                                    " not found.");
+                    ShowSevereError(state,
+                                    CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Surface " +
+                                        state.dataIPShortCut->cAlphaArgs(3) + " not found.");
                     ErrorsFound = true;
                     continue; // avoid hard crash
                 } else {
 
-                    if (!DataSurfaces::Surface(SurfNum).ExtSolar) {
-                        ShowWarningError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Surface " +
-                                         DataIPShortCuts::cAlphaArgs(3) + " is not exposed to exterior radiation.");
+                    if (!state.dataSurface->Surface(SurfNum).ExtSolar) {
+                        ShowWarningError(state,
+                                         CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Surface " +
+                                             state.dataIPShortCut->cAlphaArgs(3) + " is not exposed to exterior radiation.");
                     }
 
                     // check surface orientation, warn if upside down
-                    if ((DataSurfaces::Surface(SurfNum).Tilt < -95.0) || (DataSurfaces::Surface(SurfNum).Tilt > 95.0)) {
-                        ShowWarningError("Suspected input problem with " + DataIPShortCuts::cAlphaFieldNames(3) + " = " +
-                                         DataIPShortCuts::cAlphaArgs(3));
-                        ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
-                        ShowContinueError("Surface used for solar collector faces down");
-                        ShowContinueError("Surface tilt angle (degrees from ground outward normal) = " +
-                                          General::RoundSigDigits(DataSurfaces::Surface(SurfNum).Tilt, 2));
+                    if ((state.dataSurface->Surface(SurfNum).Tilt < -95.0) || (state.dataSurface->Surface(SurfNum).Tilt > 95.0)) {
+                        ShowWarningError(state,
+                                         "Suspected input problem with " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " +
+                                             state.dataIPShortCut->cAlphaArgs(3));
+                        ShowContinueError(state,
+                                          "Entered in " + state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));
+                        ShowContinueError(state, "Surface used for solar collector faces down");
+                        ShowContinueError(
+                            state,
+                            format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", state.dataSurface->Surface(SurfNum).Tilt));
                     }
 
                     // Check to make sure other solar collectors are not using the same surface
                     // NOTE:  Must search over all solar collector types
-                    for (int CollectorNum2 = 1; CollectorNum2 <= NumOfCollectors; ++CollectorNum2) {
-                        if (Collector(CollectorNum2).Surface == SurfNum) {
-                            ShowSevereError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ":  Surface " +
-                                            DataIPShortCuts::cAlphaArgs(3) + " is referenced by more than one " + CurrentModuleObject);
+                    for (int CollectorNum2 = 1; CollectorNum2 <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum2) {
+                        if (state.dataSolarCollectors->Collector(CollectorNum2).Surface == SurfNum) {
+                            ShowSevereError(state,
+                                            CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ":  Surface " +
+                                                state.dataIPShortCut->cAlphaArgs(3) + " is referenced by more than one " + CurrentModuleObject);
                             ErrorsFound = true;
                             break;
                         }
                     } // ICSNum2
 
-                    Collector(CollectorNum).Surface = SurfNum;
+                    state.dataSolarCollectors->Collector(CollectorNum).Surface = SurfNum;
                 }
 
                 // Give warning if surface area and gross area do not match within tolerance
-                if (SurfNum > 0 && ParametersNum > 0 && Parameters(ParametersNum).Area > 0.0 &&
-                    std::abs(Parameters(ParametersNum).Area - DataSurfaces::Surface(SurfNum).Area) / DataSurfaces::Surface(SurfNum).Area > 0.01) {
+                if (SurfNum > 0 && ParametersNum > 0 && state.dataSolarCollectors->Parameters(ParametersNum).Area > 0.0 &&
+                    std::abs(state.dataSolarCollectors->Parameters(ParametersNum).Area - state.dataSurface->Surface(SurfNum).Area) /
+                            state.dataSurface->Surface(SurfNum).Area >
+                        0.01) {
 
-                    ShowWarningError(CurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) + ": ");
-                    ShowContinueError("Gross area of solar collector parameters and surface object differ by more than 1%.");
-                    ShowContinueError("Gross collector area is always used in the calculation.  Modify the surface ");
-                    ShowContinueError("coordinates to match its area with collector gross area. Otherwise, the underlying ");
-                    ShowContinueError("surface is assumed to be fully shaded when it is not.");
+                    ShowWarningError(state, CurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) + ": ");
+                    ShowContinueError(state, "Gross area of solar collector parameters and surface object differ by more than 1%.");
+                    ShowContinueError(state, "Gross collector area is always used in the calculation.  Modify the surface ");
+                    ShowContinueError(state, "coordinates to match its area with collector gross area. Otherwise, the underlying ");
+                    ShowContinueError(state, "surface is assumed to be fully shaded when it is not.");
                 }
 
-                Collector(CollectorNum).BCType = DataIPShortCuts::cAlphaArgs(4);
-                if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "AmbientAir")) {
-                    Collector(CollectorNum).OSCMName = "";
-                } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "OtherSideConditionsModel")) {
-                    Collector(CollectorNum).OSCMName = DataIPShortCuts::cAlphaArgs(5);
-                    Collector(CollectorNum).OSCM_ON = true;
-                    int Found = UtilityRoutines::FindItemInList(Collector(CollectorNum).OSCMName, DataSurfaces::OSCM);
+                state.dataSolarCollectors->Collector(CollectorNum).BCType = state.dataIPShortCut->cAlphaArgs(4);
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "AmbientAir")) {
+                    state.dataSolarCollectors->Collector(CollectorNum).OSCMName = "";
+                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "OtherSideConditionsModel")) {
+                    state.dataSolarCollectors->Collector(CollectorNum).OSCMName = state.dataIPShortCut->cAlphaArgs(5);
+                    state.dataSolarCollectors->Collector(CollectorNum).OSCM_ON = true;
+                    int Found = UtilityRoutines::FindItemInList(state.dataSolarCollectors->Collector(CollectorNum).OSCMName, state.dataSurface->OSCM);
                     if (Found == 0) {
-                        ShowSevereError(DataIPShortCuts::cAlphaFieldNames(5) + " not found=" + Collector(CollectorNum).OSCMName + " in " +
-                                        CurrentModuleObject + " =" + Collector(CollectorNum).Name);
+                        ShowSevereError(state,
+                                        state.dataIPShortCut->cAlphaFieldNames(5) +
+                                            " not found=" + state.dataSolarCollectors->Collector(CollectorNum).OSCMName + " in " +
+                                            CurrentModuleObject + " =" + state.dataSolarCollectors->Collector(CollectorNum).Name);
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(DataIPShortCuts::cAlphaFieldNames(5) + " not found=" + Collector(CollectorNum).BCType + " in " +
-                                    CurrentModuleObject + " =" + Collector(CollectorNum).Name);
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cAlphaFieldNames(5) +
+                                        " not found=" + state.dataSolarCollectors->Collector(CollectorNum).BCType + " in " + CurrentModuleObject +
+                                        " =" + state.dataSolarCollectors->Collector(CollectorNum).Name);
                     ErrorsFound = true;
                 }
 
-                if (Collector(CollectorNum).OSCM_ON) {
+                if (state.dataSolarCollectors->Collector(CollectorNum).OSCM_ON) {
                     // get index of ventilated cavity object
                     int VentCavIndex = 0;
-                    SolarCollectors::CollectorData::GetExtVentedCavityIndex(SurfNum, VentCavIndex);
-                    Collector(CollectorNum).VentCavIndex = VentCavIndex;
+                    SolarCollectors::CollectorData::GetExtVentedCavityIndex(state, SurfNum, VentCavIndex);
+                    state.dataSolarCollectors->Collector(CollectorNum).VentCavIndex = VentCavIndex;
                 }
 
-                Collector(CollectorNum).InletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(6),
-                                                                                        ErrorsFound,
-                                                                                        CurrentModuleObject,
-                                                                                        DataIPShortCuts::cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeType_Water,
-                                                                                        DataLoopNode::NodeConnectionType_Inlet,
-                                                                                        1,
-                                                                                        DataLoopNode::ObjectIsNotParent);
-                Collector(CollectorNum).OutletNode = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(7),
-                                                                                         ErrorsFound,
-                                                                                         CurrentModuleObject,
-                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Water,
-                                                                                         DataLoopNode::NodeConnectionType_Outlet,
-                                                                                         1,
-                                                                                         DataLoopNode::ObjectIsNotParent);
+                state.dataSolarCollectors->Collector(CollectorNum).InletNode =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        state.dataIPShortCut->cAlphaArgs(6),
+                                                        ErrorsFound,
+                                                        CurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                        DataLoopNode::NodeFluidType::Water,
+                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                        1,
+                                                        DataLoopNode::ObjectIsNotParent);
+                state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
+                    NodeInputManager::GetOnlySingleNode(state,
+                                                        state.dataIPShortCut->cAlphaArgs(7),
+                                                        ErrorsFound,
+                                                        CurrentModuleObject,
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                        DataLoopNode::NodeFluidType::Water,
+                                                        DataLoopNode::NodeConnectionType::Outlet,
+                                                        1,
+                                                        DataLoopNode::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
-                    Collector(CollectorNum).VolFlowRateMax =
-                        DataIPShortCuts::rNumericArgs(1); // Max volumetric flow rate used for plant sizing calculation
+                    state.dataSolarCollectors->Collector(CollectorNum).VolFlowRateMax =
+                        state.dataIPShortCut->rNumericArgs(1); // Max volumetric flow rate used for plant sizing calculation
                 } else {
-                    Collector(CollectorNum).VolFlowRateMax = 0.0;       // Max vol flow rate is not specified; no flow for plant sizing calculation
-                    Collector(CollectorNum).MassFlowRateMax = 999999.9; // But...set a very high value so that it demands as much as possible
+                    state.dataSolarCollectors->Collector(CollectorNum).VolFlowRateMax =
+                        0.0; // Max vol flow rate is not specified; no flow for plant sizing calculation
+                    state.dataSolarCollectors->Collector(CollectorNum).MassFlowRateMax =
+                        999999.9; // But...set a very high value so that it demands as much as possible
                 }
 
-                BranchNodeConnections::TestCompSet(CurrentModuleObject,
-                                                   DataIPShortCuts::cAlphaArgs(1),
-                                                   DataIPShortCuts::cAlphaArgs(6),
-                                                   DataIPShortCuts::cAlphaArgs(7),
+                BranchNodeConnections::TestCompSet(state,
+                                                   CurrentModuleObject,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaArgs(6),
+                                                   state.dataIPShortCut->cAlphaArgs(7),
                                                    "Water Nodes");
 
             } // ICSNum
 
-            if (ErrorsFound) ShowFatalError("Errors in " + CurrentModuleObject + " input.");
+            if (ErrorsFound) ShowFatalError(state, "Errors in " + CurrentModuleObject + " input.");
 
-            if (NumOfCollectors > 0) {
-                CheckEquipName.dimension(NumOfCollectors, true);
+            if (state.dataSolarCollectors->NumOfCollectors > 0) {
+                state.dataSolarCollectors->CheckEquipName.dimension(state.dataSolarCollectors->NumOfCollectors, true);
             }
         }
     }
 
-    void CollectorData::setupOutputVars()
+    void CollectorData::setupOutputVars(EnergyPlusData &state)
     {
         if (this->TypeNum == DataPlant::TypeOf_SolarCollectorFlatPlate) {
             // Setup report variables
-            SetupOutputVariable(
-                "Solar Collector Incident Angle Modifier", OutputProcessor::Unit::None, this->IncidentAngleModifier, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Incident Angle Modifier",
+                                OutputProcessor::Unit::None,
+                                this->IncidentAngleModifier,
+                                "System",
+                                "Average",
+                                this->Name);
 
-            SetupOutputVariable("Solar Collector Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Gain Rate", OutputProcessor::Unit::W, this->HeatGain, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Heat Gain Rate", OutputProcessor::Unit::W, this->HeatGain, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Loss Rate", OutputProcessor::Unit::W, this->HeatLoss, "System", "Average", this->Name);
+            SetupOutputVariable(state, "Solar Collector Heat Loss Rate", OutputProcessor::Unit::W, this->HeatLoss, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Transfer Energy",
+            SetupOutputVariable(state,
+                                "Solar Collector Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->Energy,
                                 "System",
@@ -695,24 +749,36 @@ namespace SolarCollectors {
                                 "Plant");
         } else if (this->TypeNum == DataPlant::TypeOf_SolarCollectorICS) {
 
-            SetupOutputVariable(
-                "Solar Collector Transmittance Absorptance Product", OutputProcessor::Unit::None, this->TauAlpha, "System", "Average", this->Name);
+            SetupOutputVariable(state,
+                                "Solar Collector Transmittance Absorptance Product",
+                                OutputProcessor::Unit::None,
+                                this->TauAlpha,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable(state,
+                                "Solar Collector Overall Top Heat Loss Coefficient",
+                                OutputProcessor::Unit::W_m2C,
+                                this->UTopLoss,
+                                "System",
+                                "Average",
+                                this->Name);
 
             SetupOutputVariable(
-                "Solar Collector Overall Top Heat Loss Coefficient", OutputProcessor::Unit::W_m2C, this->UTopLoss, "System", "Average", this->Name);
+                state, "Solar Collector Absorber Plate Temperature", OutputProcessor::Unit::C, this->TempOfAbsPlate, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Solar Collector Absorber Plate Temperature", OutputProcessor::Unit::C, this->TempOfAbsPlate, "System", "Average", this->Name);
+                state, "Solar Collector Storage Water Temperature", OutputProcessor::Unit::C, this->TempOfWater, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Solar Collector Storage Water Temperature", OutputProcessor::Unit::C, this->TempOfWater, "System", "Average", this->Name);
-
-            SetupOutputVariable("Solar Collector Thermal Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
+                state, "Solar Collector Thermal Efficiency", OutputProcessor::Unit::None, this->Efficiency, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Solar Collector Storage Heat Transfer Rate", OutputProcessor::Unit::W, this->StoredHeatRate, "System", "Average", this->Name);
+                state, "Solar Collector Storage Heat Transfer Rate", OutputProcessor::Unit::W, this->StoredHeatRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Storage Heat Transfer Energy",
+            SetupOutputVariable(state,
+                                "Solar Collector Storage Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->StoredHeatEnergy,
                                 "System",
@@ -725,9 +791,10 @@ namespace SolarCollectors {
                                 "Plant");
 
             SetupOutputVariable(
-                "Solar Collector Skin Heat Transfer Rate", OutputProcessor::Unit::W, this->SkinHeatLossRate, "System", "Average", this->Name);
+                state, "Solar Collector Skin Heat Transfer Rate", OutputProcessor::Unit::W, this->SkinHeatLossRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Skin Heat Transfer Energy",
+            SetupOutputVariable(state,
+                                "Solar Collector Skin Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->CollHeatLossEnergy,
                                 "System",
@@ -739,9 +806,11 @@ namespace SolarCollectors {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable("Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatRate, "System", "Average", this->Name);
+            SetupOutputVariable(
+                state, "Solar Collector Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Solar Collector Heat Transfer Energy",
+            SetupOutputVariable(state,
+                                "Solar Collector Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 this->HeatEnergy,
                                 "System",
@@ -755,10 +824,11 @@ namespace SolarCollectors {
         }
     }
 
-    void CollectorData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
-                                 bool const EP_UNUSED(FirstHVACIteration),
-                                 Real64 &EP_UNUSED(CurLoad),
-                                 bool const EP_UNUSED(RunFlag))
+    void CollectorData::simulate(EnergyPlusData &state,
+                                 [[maybe_unused]] const PlantLocation &calledFromLocation,
+                                 [[maybe_unused]] bool const FirstHVACIteration,
+                                 [[maybe_unused]] Real64 &CurLoad,
+                                 [[maybe_unused]] bool const RunFlag)
     {
         this->initialize(state);
 
@@ -766,17 +836,17 @@ namespace SolarCollectors {
             auto const SELECT_CASE_var(this->TypeNum);
             // Select and CALL models based on collector type
             if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorFlatPlate) {
-                this->CalcSolarCollector();
+                this->CalcSolarCollector(state);
             } else if (SELECT_CASE_var == DataPlant::TypeOf_SolarCollectorICS) {
-                this->CalcICSSolarCollector();
+                this->CalcICSSolarCollector(state);
             } else {
                 assert(false); // LCOV_EXCL_LINE
             }
         }
 
-        this->update();
+        this->update(state);
 
-        this->report();
+        this->report(state);
     }
 
     void CollectorData::initialize(EnergyPlusData &state)
@@ -799,33 +869,45 @@ namespace SolarCollectors {
 
         // Do the one time initializations
         if (this->MyOneTimeFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(state);
             this->MyOneTimeFlag = false;
         }
 
         if (this->SetLoopIndexFlag) {
-            if (allocated(DataPlant::PlantLoop)) {
+            if (allocated(state.dataPlnt->PlantLoop)) {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
-                    this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
+                                                        this->Name,
+                                                        this->TypeNum,
+                                                        this->WLoopNum,
+                                                        this->WLoopSideNum,
+                                                        this->WLoopBranchNum,
+                                                        this->WLoopCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
                 if (errFlag) {
-                    ShowFatalError("InitSolarCollector: Program terminated due to previous condition(s).");
+                    ShowFatalError(state, "InitSolarCollector: Program terminated due to previous condition(s).");
                 }
                 this->SetLoopIndexFlag = false;
             }
         }
 
-        if (!DataGlobals::SysSizingCalc && this->InitSizing) {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->InletNode, this->VolFlowRateMax);
+        if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNode, this->VolFlowRateMax);
             this->InitSizing = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && this->Init) {
+        if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
             // Clear node initial conditions
             if (this->VolFlowRateMax > 0) {
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->WLoopNum).FluidName,
-                                                               DataGlobals::InitConvTemp,
-                                                               DataPlant::PlantLoop(this->WLoopNum).FluidIndex,
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                                               DataGlobalConstants::InitConvTemp,
+                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
                                                                RoutineName);
 
                 this->MassFlowRateMax = this->VolFlowRateMax * rho;
@@ -833,7 +915,8 @@ namespace SolarCollectors {
                 this->MassFlowRateMax = BigNumber;
             }
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->MassFlowRateMax,
                                                this->InletNode,
                                                this->OutletNode,
@@ -857,69 +940,76 @@ namespace SolarCollectors {
             }
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) this->Init = true;
+        if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
         if (this->SetDiffRadFlag && this->InitICS) {
             // calculates the sky and ground reflective diffuse radiation optical properties (only one time)
             int SurfNum = this->Surface;
             int ParamNum = this->Parameters;
 
-            this->Tilt = DataSurfaces::Surface(SurfNum).Tilt;
+            this->Tilt = state.dataSurface->Surface(SurfNum).Tilt;
             this->TiltR2V = std::abs(90.0 - Tilt);
-            this->CosTilt = std::cos(Tilt * DataGlobals::DegToRadians);
-            this->SinTilt = std::sin(1.8 * Tilt * DataGlobals::DegToRadians);
+            this->CosTilt = std::cos(Tilt * DataGlobalConstants::DegToRadians);
+            this->SinTilt = std::sin(1.8 * Tilt * DataGlobalConstants::DegToRadians);
 
             // Diffuse reflectance of the cover for solar radiation diffusely reflected back from the absober
             // plate to the cover.  The diffuse solar radiation reflected back from the absober plate to the
             // cover is represented by the 60 degree equivalent incident angle.  This diffuse reflectance is
             // used to calculate the transmittance - absorptance product (Duffie and Beckman, 1991)
-            Real64 Theta = 60.0 * DataGlobals::DegToRadians;
+            Real64 Theta = 60.0 * DataGlobalConstants::DegToRadians;
             Real64 TransSys = 0.0;
             Real64 RefSys = 0.0;
             Real64 AbsCover1 = 0.0;
             Real64 AbsCover2 = 0.0;
             Real64 RefSysDiffuse = 0.0;
-            this->CalcTransRefAbsOfCover(Theta, TransSys, RefSys, AbsCover1, AbsCover2, true, RefSysDiffuse);
+            this->CalcTransRefAbsOfCover(state, Theta, TransSys, RefSys, AbsCover1, AbsCover2, true, RefSysDiffuse);
             this->RefDiffInnerCover = RefSysDiffuse;
 
             // transmittance-absorptance product normal incident:
             Theta = 0.0;
-            this->CalcTransRefAbsOfCover(Theta, TransSys, RefSys, AbsCover1, AbsCover2);
-            this->TauAlphaNormal = TransSys * SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate /
-                                   (1.0 - (1.0 - SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
+            this->CalcTransRefAbsOfCover(state, Theta, TransSys, RefSys, AbsCover1, AbsCover2);
+            this->TauAlphaNormal = TransSys * state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate /
+                                   (1.0 - (1.0 - state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
 
             // transmittance-absorptance product for sky diffuse radiation.  Uses equivalent incident angle
             // of sky radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-            Theta = (59.68 - 0.1388 * Tilt + 0.001497 * pow_2(Tilt)) * DataGlobals::DegToRadians;
-            this->CalcTransRefAbsOfCover(Theta, TransSys, RefSys, AbsCover1, AbsCover2);
-            this->TauAlphaSkyDiffuse = TransSys * SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate /
-                                       (1.0 - (1.0 - SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
+            Theta = (59.68 - 0.1388 * Tilt + 0.001497 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians;
+            this->CalcTransRefAbsOfCover(state, Theta, TransSys, RefSys, AbsCover1, AbsCover2);
+            this->TauAlphaSkyDiffuse = TransSys * state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate /
+                                       (1.0 - (1.0 - state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
             this->CoversAbsSkyDiffuse(1) = AbsCover1;
             this->CoversAbsSkyDiffuse(2) = AbsCover2;
 
             // transmittance-absorptance product for ground diffuse radiation.  Uses equivalent incident angle
             // of ground radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-            Theta = (90.0 - 0.5788 * Tilt + 0.002693 * pow_2(Tilt)) * DataGlobals::DegToRadians;
-            this->CalcTransRefAbsOfCover(Theta, TransSys, RefSys, AbsCover1, AbsCover2);
-            this->TauAlphaGndDiffuse = TransSys * SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate /
-                                       (1.0 - (1.0 - SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
+            Theta = (90.0 - 0.5788 * Tilt + 0.002693 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians;
+            this->CalcTransRefAbsOfCover(state, Theta, TransSys, RefSys, AbsCover1, AbsCover2);
+            this->TauAlphaGndDiffuse = TransSys * state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate /
+                                       (1.0 - (1.0 - state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
             this->CoversAbsGndDiffuse(1) = AbsCover1;
             this->CoversAbsGndDiffuse(2) = AbsCover2;
 
             this->SetDiffRadFlag = false;
         }
 
-        this->InletTemp = DataLoopNode::Node(this->InletNode).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
 
         this->MassFlowRate = this->MassFlowRateMax;
 
         // Request the mass flow rate from the plant component flow utility routine
-        PlantUtilities::SetComponentFlowRate(
-            this->MassFlowRate, this->InletNode, this->OutletNode, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum);
+        PlantUtilities::SetComponentFlowRate(state,
+                                             this->MassFlowRate,
+                                             this->InletNode,
+                                             this->OutletNode,
+                                             this->WLoopNum,
+                                             this->WLoopSideNum,
+                                             this->WLoopBranchNum,
+                                             this->WLoopCompNum);
 
         if (this->InitICS) {
 
-            Real64 timeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + DataHVACGlobals::SysTimeElapsed;
+            Real64 timeElapsed =
+                state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
 
             if (this->TimeElapsed != timeElapsed) {
                 // The simulation has advanced to the next system timestep.  Save conditions from the end of the previous
@@ -929,14 +1019,14 @@ namespace SolarCollectors {
                 this->SavedTempOfInnerCover = this->TempOfInnerCover;
                 this->SavedTempOfOuterCover = this->TempOfOuterCover;
                 if (this->OSCM_ON) {
-                    this->SavedTempCollectorOSCM = DataSurfaces::ExtVentedCavity(this->VentCavIndex).Tbaffle;
+                    this->SavedTempCollectorOSCM = state.dataSurface->ExtVentedCavity(this->VentCavIndex).Tbaffle;
                 }
                 this->TimeElapsed = timeElapsed;
             }
         }
     }
 
-    void CollectorData::CalcSolarCollector()
+    void CollectorData::CalcSolarCollector(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -979,24 +1069,25 @@ namespace SolarCollectors {
         Real64 incidentAngleModifier; // Net incident angle modifier combining beam, sky, and ground radiation
 
         // Calculate incident angle modifier
-        if (DataHeatBalance::QRadSWOutIncident(SurfNum) > 0.0) {
+        if (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) > 0.0) {
             // Equivalent incident angle of sky radiation (radians)
-            Real64 ThetaBeam = std::acos(DataHeatBalance::CosIncidenceAngle(SurfNum));
+            Real64 ThetaBeam = std::acos(state.dataHeatBal->SurfCosIncidenceAngle(SurfNum));
 
             // Calculate equivalent incident angles for sky and ground radiation according to Brandemuehl and Beckman (1980)
             // Surface tilt angle (degrees)
-            Real64 tilt = DataSurfaces::Surface(SurfNum).Tilt;
+            Real64 tilt = state.dataSurface->Surface(SurfNum).Tilt;
 
             // Equivalent incident angle of sky radiation (radians)
-            Real64 ThetaSky = (59.68 - 0.1388 * tilt + 0.001497 * pow_2(tilt)) * DataGlobals::DegToRadians;
+            Real64 ThetaSky = (59.68 - 0.1388 * tilt + 0.001497 * pow_2(tilt)) * DataGlobalConstants::DegToRadians;
 
             // Equivalent incident angle of ground radiation (radians)
-            Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobals::DegToRadians;
+            Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobalConstants::DegToRadians;
 
-            incidentAngleModifier = (DataHeatBalance::QRadSWOutIncidentBeam(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaBeam) +
-                                     DataHeatBalance::QRadSWOutIncidentSkyDiffuse(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaSky) +
-                                     DataHeatBalance::QRadSWOutIncidentGndDiffuse(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaGnd)) /
-                                    DataHeatBalance::QRadSWOutIncident(SurfNum);
+            incidentAngleModifier =
+                (state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(state, ThetaBeam) +
+                 state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(state, ThetaSky) +
+                 state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(state, ThetaGnd)) /
+                state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
         } else {
             incidentAngleModifier = 0.0;
         }
@@ -1009,16 +1100,17 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // Gross area of collector (m2)
-        Real64 area = DataSurfaces::Surface(SurfNum).Area;
+        Real64 area = state.dataSurface->Surface(SurfNum).Area;
 
         // = MassFlowRate * Cp / Area
         Real64 mCpA = massFlowRate * Cp / area;
 
         // = MassFlowRateTest * Cp / Area (tested area)
-        Real64 mCpATest = SolarCollectors::Parameters(ParamNum).TestMassFlowRate * Cp / SolarCollectors::Parameters(this->Parameters).Area;
+        Real64 mCpATest =
+            state.dataSolarCollectors->Parameters(ParamNum).TestMassFlowRate * Cp / state.dataSolarCollectors->Parameters(this->Parameters).Area;
 
         int Iteration = 1;
 
@@ -1031,7 +1123,7 @@ namespace SolarCollectors {
         // Heat gain or loss to collector fluid (W)
         Real64 Q = 0.0;
 
-        while (std::abs(outletTemp - OutletTempPrev) > DataHeatBalance::TempConvergTol) { // Check for temperature convergence
+        while (std::abs(outletTemp - OutletTempPrev) > state.dataHeatBal->TempConvergTol) { // Check for temperature convergence
 
             OutletTempPrev = outletTemp; // Save previous outlet temperature
 
@@ -1043,33 +1135,35 @@ namespace SolarCollectors {
 
             // Modify coefficients depending on test correlation type
             {
-                auto const SELECT_CASE_var(SolarCollectors::Parameters(ParamNum).TestType);
+                auto const SELECT_CASE_var(state.dataSolarCollectors->Parameters(ParamNum).TestType);
                 if (SELECT_CASE_var == TestTypeEnum::INLET) {
-                    FRULpTest = SolarCollectors::Parameters(ParamNum).eff1 +
-                                SolarCollectors::Parameters(ParamNum).eff2 * (inletTemp - DataSurfaces::Surface(SurfNum).OutDryBulbTemp);
+                    FRULpTest =
+                        state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                        state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->Surface(SurfNum).OutDryBulbTemp);
                     TestTypeMod = 1.0;
 
                 } else if (SELECT_CASE_var == TestTypeEnum::AVERAGE) {
-                    FRULpTest =
-                        SolarCollectors::Parameters(ParamNum).eff1 +
-                        SolarCollectors::Parameters(ParamNum).eff2 * ((inletTemp + outletTemp) * 0.5 - DataSurfaces::Surface(SurfNum).OutDryBulbTemp);
+                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                                state.dataSolarCollectors->Parameters(ParamNum).eff2 *
+                                    ((inletTemp + outletTemp) * 0.5 - state.dataSurface->Surface(SurfNum).OutDryBulbTemp);
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / (2.0 * mCpATest));
 
                 } else if (SELECT_CASE_var == TestTypeEnum::OUTLET) {
-                    FRULpTest = SolarCollectors::Parameters(ParamNum).eff1 +
-                                SolarCollectors::Parameters(ParamNum).eff2 * (outletTemp - DataSurfaces::Surface(SurfNum).OutDryBulbTemp);
+                    FRULpTest =
+                        state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                        state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->Surface(SurfNum).OutDryBulbTemp);
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / mCpATest);
                 }
             }
 
             // FR * tau * alpha at normal incidence = Y-intercept of collector efficiency
-            Real64 FRTAN = SolarCollectors::Parameters(ParamNum).eff0 * TestTypeMod;
+            Real64 FRTAN = state.dataSolarCollectors->Parameters(ParamNum).eff0 * TestTypeMod;
 
             // FR * ULoss = 1st order coefficient of collector efficiency
-            Real64 FRUL = SolarCollectors::Parameters(ParamNum).eff1 * TestTypeMod;
+            Real64 FRUL = state.dataSolarCollectors->Parameters(ParamNum).eff1 * TestTypeMod;
 
             // FR * ULoss / T = 2nd order coefficient of collector efficiency
-            Real64 FRULT = SolarCollectors::Parameters(ParamNum).eff2 * TestTypeMod;
+            Real64 FRULT = state.dataSolarCollectors->Parameters(ParamNum).eff2 * TestTypeMod;
             FRULpTest *= TestTypeMod;
 
             if (massFlowRate > 0.0) { // Calculate efficiency and heat transfer with flow
@@ -1099,8 +1193,8 @@ namespace SolarCollectors {
 
                 // Calculate fluid heat gain (or loss)
                 // Heat loss is possible if there is no incident radiation and fluid is still flowing.
-                Q = (FRTAN * incidentAngleModifier * DataHeatBalance::QRadSWOutIncident(SurfNum) +
-                     FRULpTest * (inletTemp - DataSurfaces::Surface(SurfNum).OutDryBulbTemp)) *
+                Q = (FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
+                     FRULpTest * (inletTemp - state.dataSurface->Surface(SurfNum).OutDryBulbTemp)) *
                     area * FlowMod;
 
                 outletTemp = inletTemp + Q / (massFlowRate * Cp);
@@ -1115,9 +1209,10 @@ namespace SolarCollectors {
                     Q = massFlowRate * Cp * (outletTemp - inletTemp);
                 }
 
-                if (DataHeatBalance::QRadSWOutIncident(SurfNum) > 0.0) { // Calculate thermal efficiency
+                if (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) > 0.0) { // Calculate thermal efficiency
                     // NOTE: Efficiency can be > 1 if Q > QRadSWOutIncident because of favorable delta T, i.e. warm outdoor temperature
-                    efficiency = Q / (DataHeatBalance::QRadSWOutIncident(SurfNum) * area); // Q has units of W; QRadSWOutIncident has units of W/m2
+                    efficiency =
+                        Q / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * area); // Q has units of W; QRadSWOutIncident has units of W/m2
                 } else {
                     efficiency = 0.0;
                 }
@@ -1128,40 +1223,46 @@ namespace SolarCollectors {
 
                 // Calculate temperature of stagnant fluid in collector
                 Real64 A = -FRULT;
-                Real64 B = -FRUL + 2.0 * FRULT * DataSurfaces::Surface(SurfNum).OutDryBulbTemp;
-                Real64 C = -FRULT * pow_2(DataSurfaces::Surface(SurfNum).OutDryBulbTemp) + FRUL * DataSurfaces::Surface(SurfNum).OutDryBulbTemp -
-                           FRTAN * incidentAngleModifier * DataHeatBalance::QRadSWOutIncident(SurfNum);
+                Real64 B = -FRUL + 2.0 * FRULT * state.dataSurface->Surface(SurfNum).OutDryBulbTemp;
+                Real64 C = -FRULT * pow_2(state.dataSurface->Surface(SurfNum).OutDryBulbTemp) +
+                           FRUL * state.dataSurface->Surface(SurfNum).OutDryBulbTemp -
+                           FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
                 Real64 qEquation = (pow_2(B) - 4.0 * A * C);
                 if (qEquation < 0.0) {
                     if (this->ErrIndex == 0) {
-                        ShowSevereMessage("CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                          "\", possible bad input coefficients.");
-                        ShowContinueError("...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid.");
-                        ShowContinueError("...examine input coefficients for accuracy. Calculation will be treated as linear.");
+                        ShowSevereMessage(state,
+                                          "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                                              "\", possible bad input coefficients.");
+                        ShowContinueError(state,
+                                          "...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid.");
+                        ShowContinueError(state, "...examine input coefficients for accuracy. Calculation will be treated as linear.");
                     }
-                    ShowRecurringSevereErrorAtEnd("CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                    ShowRecurringSevereErrorAtEnd(state,
+                                                  "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
                                                       "\", coefficient error continues.",
                                                   this->ErrIndex,
                                                   qEquation,
                                                   qEquation);
                 }
                 if (FRULT == 0.0 || qEquation < 0.0) { // Linear, 1st order solution
-                    outletTemp = DataSurfaces::Surface(SurfNum).OutDryBulbTemp -
-                                 FRTAN * incidentAngleModifier * DataHeatBalance::QRadSWOutIncident(SurfNum) / FRUL;
+                    outletTemp = state.dataSurface->Surface(SurfNum).OutDryBulbTemp -
+                                 FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) / FRUL;
                 } else { // Quadratic, 2nd order solution
                     outletTemp = (-B + std::sqrt(qEquation)) / (2.0 * A);
                 }
             }
 
-            if (SolarCollectors::Parameters(ParamNum).TestType == TestTypeEnum::INLET)
+            if (state.dataSolarCollectors->Parameters(ParamNum).TestType == TestTypeEnum::INLET)
                 break; // Inlet temperature test correlations do not need to iterate
 
             if (Iteration > 100) {
                 if (this->IterErrIndex == 0) {
-                    ShowWarningMessage("CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
-                                       "\":  Solution did not converge.");
+                    ShowWarningMessage(state,
+                                       "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                                           "\":  Solution did not converge.");
                 }
-                ShowRecurringWarningErrorAtEnd("CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "CalcSolarCollector: " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + "=\"" + this->Name +
                                                    "\", solution not converge error continues.",
                                                this->IterErrIndex);
                 break;
@@ -1179,7 +1280,7 @@ namespace SolarCollectors {
         this->Efficiency = efficiency;
     }
 
-    Real64 ParametersData::IAM(Real64 const IncidentAngle)
+    Real64 ParametersData::IAM(EnergyPlusData &state, Real64 const IncidentAngle)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1205,7 +1306,7 @@ namespace SolarCollectors {
         Real64 IAM;
 
         // cut off IAM for angles greater than 60 degrees. (CR 7534)
-        Real64 CutoffAngle = 60.0 * DataGlobals::DegToRadians;
+        Real64 CutoffAngle = 60.0 * DataGlobalConstants::DegToRadians;
         if (std::abs(IncidentAngle) > CutoffAngle) { // cut off, model curves not robust beyond cutoff
             // curves from FSEC/SRCC testing are only certified to 60 degrees, larger angles can cause numerical problems in curves
             IAM = 0.0;
@@ -1217,13 +1318,14 @@ namespace SolarCollectors {
             IAM = max(IAM, 0.0); // Never allow to be less than zero, but greater than one is a possibility
 
             if (IAM > 10.0) { // Greater than 10 is probably not a possibility
-                ShowSevereError("IAM Function: SolarCollectorPerformance:FlatPlate = " + this->Name +
-                                ":  Incident Angle Modifier is out of bounds due to bad coefficients.");
-                ShowContinueError(format("Coefficient 2 of Incident Angle Modifier = {}", this->iam1));
-                ShowContinueError(format("Coefficient 3 of Incident Angle Modifier = {}", this->iam2));
-                ShowContinueError(format("Calculated Incident Angle Modifier = {}", IAM));
-                ShowContinueError("Expected Incident Angle Modifier should be approximately 1.5 or less.");
-                ShowFatalError("Errors in SolarCollectorPerformance:FlatPlate input.");
+                ShowSevereError(state,
+                                "IAM Function: SolarCollectorPerformance:FlatPlate = " + this->Name +
+                                    ":  Incident Angle Modifier is out of bounds due to bad coefficients.");
+                ShowContinueError(state, format("Coefficient 2 of Incident Angle Modifier = {}", this->iam1));
+                ShowContinueError(state, format("Coefficient 3 of Incident Angle Modifier = {}", this->iam2));
+                ShowContinueError(state, format("Calculated Incident Angle Modifier = {}", IAM));
+                ShowContinueError(state, "Expected Incident Angle Modifier should be approximately 1.5 or less.");
+                ShowFatalError(state, "Errors in SolarCollectorPerformance:FlatPlate input.");
             }
 
         } // not greater than cut off angle
@@ -1231,7 +1333,7 @@ namespace SolarCollectors {
         return IAM;
     }
 
-    void CollectorData::CalcICSSolarCollector()
+    void CollectorData::CalcICSSolarCollector(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1258,10 +1360,10 @@ namespace SolarCollectors {
 
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         Real64 TempWater = this->SavedTempOfWater;
         Real64 TempAbsPlate = this->SavedTempOfAbsPlate;
-        Real64 TempOutdoorAir = DataSurfaces::Surface(SurfNum).OutDryBulbTemp;
+        Real64 TempOutdoorAir = state.dataSurface->Surface(SurfNum).OutDryBulbTemp;
 
         Real64 TempOSCM; // Otherside condition model temperature [C]
         if (this->OSCM_ON) {
@@ -1272,8 +1374,8 @@ namespace SolarCollectors {
 
         // Calculate transmittance-absorptance product of the system
         // Incident angle of beam radiation (radians)
-        Real64 ThetaBeam = std::acos(DataHeatBalance::CosIncidenceAngle(SurfNum));
-        this->CalcTransAbsorProduct(ThetaBeam);
+        Real64 ThetaBeam = std::acos(state.dataHeatBal->SurfCosIncidenceAngle(SurfNum));
+        this->CalcTransAbsorProduct(state, ThetaBeam);
 
         Real64 inletTemp = this->InletTemp;
 
@@ -1281,20 +1383,20 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cpw = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // density of collector fluid (kg/m3)
         Real64 Rhow = FluidProperties::GetDensityGlycol(
-            DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // calculate heat transfer coefficients and covers temperature:
-        this->CalcHeatTransCoeffAndCoverTemp();
+        this->CalcHeatTransCoeffAndCoverTemp(state);
 
         // Calc convection heat transfer coefficient between the absorber plate and water:
 
         // convection coeff between absorber plate and water [W/m2K]
         Real64 hConvCoefA2W =
-            EnergyPlus::SolarCollectors::CollectorData::CalcConvCoeffAbsPlateAndWater(TempAbsPlate, TempWater, this->Length, this->TiltR2V);
+            EnergyPlus::SolarCollectors::CollectorData::CalcConvCoeffAbsPlateAndWater(state, TempAbsPlate, TempWater, this->Length, this->TiltR2V);
         Real64 TempWaterOld = TempWater;
         Real64 TempAbsPlateOld = TempAbsPlate;
 
@@ -1306,25 +1408,25 @@ namespace SolarCollectors {
         Real64 a3; // constant term of ODE for absorber temperature
 
         // Gross area of collector (m2)
-        Real64 area = SolarCollectors::Parameters(ParamNum).Area;
+        Real64 area = state.dataSolarCollectors->Parameters(ParamNum).Area;
 
-        if (SolarCollectors::Parameters(ParamNum).ThermalMass > 0.0) {
+        if (state.dataSolarCollectors->Parameters(ParamNum).ThermalMass > 0.0) {
             AbsPlateMassFlag = true;
 
             // thermal mass of the absorber plate [J/K]
-            Real64 ap = SolarCollectors::Parameters(ParamNum).ThermalMass * area;
+            Real64 ap = state.dataSolarCollectors->Parameters(ParamNum).ThermalMass * area;
             a1 = -area * (hConvCoefA2W + this->UTopLoss) / ap;
             a2 = area * hConvCoefA2W / ap;
-            a3 = area * (this->TauAlpha * DataHeatBalance::QRadSWOutIncident(SurfNum) + this->UTopLoss * TempOutdoorAir) / ap;
+            a3 = area * (this->TauAlpha * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + this->UTopLoss * TempOutdoorAir) / ap;
         } else {
             AbsPlateMassFlag = false;
             a1 = -area * (hConvCoefA2W + this->UTopLoss);
             a2 = area * hConvCoefA2W;
-            a3 = area * (this->TauAlpha * DataHeatBalance::QRadSWOutIncident(SurfNum) + this->UTopLoss * TempOutdoorAir);
+            a3 = area * (this->TauAlpha * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + this->UTopLoss * TempOutdoorAir);
         }
 
         // thermal mass of the collector water [J/K]
-        Real64 aw = SolarCollectors::Parameters(ParamNum).Volume * Rhow * Cpw;
+        Real64 aw = state.dataSolarCollectors->Parameters(ParamNum).Volume * Rhow * Cpw;
 
         // coefficient of ODE for water temperature Tp
         Real64 b1 = area * hConvCoefA2W / aw;
@@ -1336,7 +1438,7 @@ namespace SolarCollectors {
         Real64 b3 = (area * (this->UbLoss * TempOSCM + this->UsLoss * TempOutdoorAir) + massFlowRate * Cpw * inletTemp) / aw;
 
         EnergyPlus::SolarCollectors::CollectorData::ICSCollectorAnalyticalSolution(
-            SecInTimeStep, a1, a2, a3, b1, b2, b3, TempAbsPlateOld, TempWaterOld, TempAbsPlate, TempWater, AbsPlateMassFlag);
+            state, SecInTimeStep, a1, a2, a3, b1, b2, b3, TempAbsPlateOld, TempWaterOld, TempAbsPlate, TempWater, AbsPlateMassFlag);
 
         this->SkinHeatLossRate = area * (this->UTopLoss * (TempOutdoorAir - TempAbsPlate) + this->UsLoss * (TempOutdoorAir - TempWater) +
                                          this->UbLoss * (TempOSCM - TempWater));
@@ -1354,14 +1456,15 @@ namespace SolarCollectors {
         this->TempOfAbsPlate = TempAbsPlate;
 
         Real64 efficiency = 0.0; // Thermal efficiency of solar energy conversion
-        if (DataHeatBalance::QRadSWOutIncident(SurfNum) > 0.0) {
-            efficiency = (this->HeatGainRate + this->StoredHeatRate) / (DataHeatBalance::QRadSWOutIncident(SurfNum) * area);
+        if (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) > 0.0) {
+            efficiency = (this->HeatGainRate + this->StoredHeatRate) / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * area);
             if (efficiency < 0.0) efficiency = 0.0;
         }
         this->Efficiency = efficiency;
     }
 
-    void CollectorData::ICSCollectorAnalyticalSolution(Real64 const SecInTimeStep,     // seconds in a time step
+    void CollectorData::ICSCollectorAnalyticalSolution(EnergyPlusData &state,
+                                                       Real64 const SecInTimeStep,     // seconds in a time step
                                                        Real64 const a1,                // coefficient of ODE for Tp
                                                        Real64 const a2,                // coefficient of ODE for Tp
                                                        Real64 const a3,                // coefficient of ODE for Tp
@@ -1424,8 +1527,8 @@ namespace SolarCollectors {
 
             } else { // this should never occur
                 ShowSevereError(
-                    "ICSCollectorAnalyticalSoluton: Unanticipated differential equation coefficient - report to EnergyPlus Development Team");
-                ShowFatalError("Program terminates due to above conditions.");
+                    state, "ICSCollectorAnalyticalSoluton: Unanticipated differential equation coefficient - report to EnergyPlus Development Team");
+                ShowFatalError(state, "Program terminates due to above conditions.");
             }
         } else {
             // In the absence of absorber plate thermal mass, only the collector water heat balance has a
@@ -1438,7 +1541,7 @@ namespace SolarCollectors {
         }
     }
 
-    void CollectorData::CalcTransAbsorProduct(Real64 const IncidAngle)
+    void CollectorData::CalcTransAbsorProduct(EnergyPlusData &state, Real64 const IncidAngle)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1470,13 +1573,13 @@ namespace SolarCollectors {
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
 
-        if (DataHeatBalance::QRadSWOutIncident(SurfNum) > 0.0) {
+        if (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) > 0.0) {
 
             // cover system transmittance and reflectance from outer to inner cover
-            this->CalcTransRefAbsOfCover(IncidAngle, TransSys, ReflSys, AbsCover1, AbsCover2);
+            this->CalcTransRefAbsOfCover(state, IncidAngle, TransSys, ReflSys, AbsCover1, AbsCover2);
 
-            TuaAlphaBeam = TransSys * SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate /
-                           (1.0 - (1.0 - SolarCollectors::Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
+            TuaAlphaBeam = TransSys * state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate /
+                           (1.0 - (1.0 - state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
 
             this->TauAlphaBeam = max(0.0, TuaAlphaBeam);
 
@@ -1485,25 +1588,25 @@ namespace SolarCollectors {
             CoversAbsBeam(2) = AbsCover2;
 
             // calc total solar radiation weighted transmittance-absorptance product
-            TuaAlpha = (DataHeatBalance::QRadSWOutIncidentBeam(SurfNum) * this->TauAlphaBeam +
-                        DataHeatBalance::QRadSWOutIncidentSkyDiffuse(SurfNum) * this->TauAlphaSkyDiffuse +
-                        DataHeatBalance::QRadSWOutIncidentGndDiffuse(SurfNum) * this->TauAlphaGndDiffuse) /
-                       DataHeatBalance::QRadSWOutIncident(SurfNum);
+            TuaAlpha = (state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) * this->TauAlphaBeam +
+                        state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * this->TauAlphaSkyDiffuse +
+                        state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) * this->TauAlphaGndDiffuse) /
+                       state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
 
-            if (SolarCollectors::Parameters(ParamNum).NumOfCovers == 1) {
+            if (state.dataSolarCollectors->Parameters(ParamNum).NumOfCovers == 1) {
                 // calc total solar radiation weighted cover absorptance
-                this->CoverAbs(1) = (DataHeatBalance::QRadSWOutIncidentBeam(SurfNum) * CoversAbsBeam(1) +
-                                     DataHeatBalance::QRadSWOutIncidentSkyDiffuse(SurfNum) * this->CoversAbsSkyDiffuse(1) +
-                                     DataHeatBalance::QRadSWOutIncidentGndDiffuse(SurfNum) * this->CoversAbsGndDiffuse(1)) /
-                                    DataHeatBalance::QRadSWOutIncident(SurfNum);
+                this->CoverAbs(1) = (state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) * CoversAbsBeam(1) +
+                                     state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * this->CoversAbsSkyDiffuse(1) +
+                                     state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) * this->CoversAbsGndDiffuse(1)) /
+                                    state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
 
-            } else if (SolarCollectors::Parameters(ParamNum).NumOfCovers == 2) {
+            } else if (state.dataSolarCollectors->Parameters(ParamNum).NumOfCovers == 2) {
                 // Num = 1 represents outer cover and Num = 2 represents inner cover
-                for (int Num = 1; Num <= SolarCollectors::Parameters(ParamNum).NumOfCovers; ++Num) {
-                    this->CoverAbs(Num) = (DataHeatBalance::QRadSWOutIncidentBeam(SurfNum) * CoversAbsBeam(Num) +
-                                           DataHeatBalance::QRadSWOutIncidentSkyDiffuse(SurfNum) * this->CoversAbsSkyDiffuse(Num) +
-                                           DataHeatBalance::QRadSWOutIncidentGndDiffuse(SurfNum) * this->CoversAbsGndDiffuse(Num)) /
-                                          DataHeatBalance::QRadSWOutIncident(SurfNum);
+                for (int Num = 1; Num <= state.dataSolarCollectors->Parameters(ParamNum).NumOfCovers; ++Num) {
+                    this->CoverAbs(Num) = (state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) * CoversAbsBeam(Num) +
+                                           state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * this->CoversAbsSkyDiffuse(Num) +
+                                           state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) * this->CoversAbsGndDiffuse(Num)) /
+                                          state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
                 }
             }
 
@@ -1513,7 +1616,8 @@ namespace SolarCollectors {
         this->TauAlpha = TuaAlpha;
     }
 
-    void CollectorData::CalcTransRefAbsOfCover(Real64 const IncidentAngle,    // Angle of incidence (radians)
+    void CollectorData::CalcTransRefAbsOfCover(EnergyPlusData &state,
+                                               Real64 const IncidentAngle,    // Angle of incidence (radians)
                                                Real64 &TransSys,              // cover system solar transmittance
                                                Real64 &ReflSys,               // cover system solar reflectance
                                                Real64 &AbsCover1,             // Inner cover solar absorbtance
@@ -1571,16 +1675,16 @@ namespace SolarCollectors {
         int ParamNum = this->Parameters;
         Real64 const sin_IncAngle(std::sin(IncidentAngle));
 
-        for (int nCover = 1; nCover <= SolarCollectors::Parameters(ParamNum).NumOfCovers; ++nCover) {
+        for (int nCover = 1; nCover <= state.dataSolarCollectors->Parameters(ParamNum).NumOfCovers; ++nCover) {
 
             // refractive index of collector cover
-            Real64 CoverRefrIndex = SolarCollectors::Parameters(ParamNum).RefractiveIndex(nCover);
+            Real64 CoverRefrIndex = state.dataSolarCollectors->Parameters(ParamNum).RefractiveIndex(nCover);
 
             // angle of refraction
             Real64 RefrAngle = std::asin(sin_IncAngle * AirRefIndex / CoverRefrIndex);
 
             // transmitted component with absorption only considered:
-            TransAbsOnly(nCover) = std::exp(-SolarCollectors::Parameters(ParamNum).ExtCoefTimesThickness(nCover) / std::cos(RefrAngle));
+            TransAbsOnly(nCover) = std::exp(-state.dataSolarCollectors->Parameters(ParamNum).ExtCoefTimesThickness(nCover) / std::cos(RefrAngle));
 
             // parallel reflected component of unpolarized solar radiation
             Real64 ParaRad;
@@ -1614,7 +1718,7 @@ namespace SolarCollectors {
 
         // solar absorptance of the individual cover
         AbsCover1 = 0.5 * (AbsorPerp(1) + AbsorPara(1));
-        if (SolarCollectors::Parameters(ParamNum).NumOfCovers == 2) AbsCover2 = 0.5 * (AbsorPerp(2) + AbsorPara(2));
+        if (state.dataSolarCollectors->Parameters(ParamNum).NumOfCovers == 2) AbsCover2 = 0.5 * (AbsorPerp(2) + AbsorPara(2));
 
         // calculate from outer to inner cover:
         TransSys =
@@ -1632,7 +1736,7 @@ namespace SolarCollectors {
         }
     }
 
-    void CollectorData::CalcHeatTransCoeffAndCoverTemp() // Collector object number
+    void CollectorData::CalcHeatTransCoeffAndCoverTemp(EnergyPlusData &state) // Collector object number
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Bereket A Nigusse, FSEC/UCF
@@ -1659,25 +1763,26 @@ namespace SolarCollectors {
         Real64 hRadCoefC2O = 0.0;   // radiation coeff. between outer covers and the ambient [W/m2C]
 
         int ParamNum = this->Parameters;
-        int NumCovers = SolarCollectors::Parameters(ParamNum).NumOfCovers;
+        int NumCovers = state.dataSolarCollectors->Parameters(ParamNum).NumOfCovers;
         int SurfNum = this->Surface;
 
-        Real64 TempAbsPlate = this->SavedTempOfAbsPlate;                       // absorber plate average temperature [C]
-        Real64 TempInnerCover = this->SavedTempOfInnerCover;                   // inner cover average temperature [C]
-        Real64 TempOuterCover = this->SavedTempOfOuterCover;                   // outer cover average temperature [C]
-        Real64 TempOutdoorAir = DataSurfaces::Surface(SurfNum).OutDryBulbTemp; // outdoor air temperature [C]
+        Real64 TempAbsPlate = this->SavedTempOfAbsPlate;                            // absorber plate average temperature [C]
+        Real64 TempInnerCover = this->SavedTempOfInnerCover;                        // inner cover average temperature [C]
+        Real64 TempOuterCover = this->SavedTempOfOuterCover;                        // outer cover average temperature [C]
+        Real64 TempOutdoorAir = state.dataSurface->Surface(SurfNum).OutDryBulbTemp; // outdoor air temperature [C]
 
-        Real64 EmissOfAbsPlate = SolarCollectors::Parameters(ParamNum).EmissOfAbsPlate;   // emissivity of absorber plate
-        Real64 EmissOfOuterCover = SolarCollectors::Parameters(ParamNum).EmissOfCover(1); // emissivity of outer cover
-        Real64 EmissOfInnerCover = SolarCollectors::Parameters(ParamNum).EmissOfCover(2); // emissivity of inner cover
-        Real64 AirGapDepth = SolarCollectors::Parameters(ParamNum).CoverSpacing;          // characteristic length [m]
+        Real64 EmissOfAbsPlate = state.dataSolarCollectors->Parameters(ParamNum).EmissOfAbsPlate;   // emissivity of absorber plate
+        Real64 EmissOfOuterCover = state.dataSolarCollectors->Parameters(ParamNum).EmissOfCover(1); // emissivity of outer cover
+        Real64 EmissOfInnerCover = state.dataSolarCollectors->Parameters(ParamNum).EmissOfCover(2); // emissivity of inner cover
+        Real64 AirGapDepth = state.dataSolarCollectors->Parameters(ParamNum).CoverSpacing;          // characteristic length [m]
 
         {
             auto const SELECT_CASE_var(NumCovers);
             if (SELECT_CASE_var == 1) {
                 // calc linearized radiation coefficient
-                tempnom = DataGlobals::StefanBoltzmann * ((TempAbsPlate + DataGlobals::KelvinConv) + (TempOuterCover + DataGlobals::KelvinConv)) *
-                          (pow_2(TempAbsPlate + DataGlobals::KelvinConv) + pow_2(TempOuterCover + DataGlobals::KelvinConv));
+                tempnom = DataGlobalConstants::StefanBoltzmann *
+                          ((TempAbsPlate + DataGlobalConstants::KelvinConv) + (TempOuterCover + DataGlobalConstants::KelvinConv)) *
+                          (pow_2(TempAbsPlate + DataGlobalConstants::KelvinConv) + pow_2(TempOuterCover + DataGlobalConstants::KelvinConv));
                 tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfOuterCover - 1.0;
                 hRadCoefA2C = tempnom / tempdenom;
                 hRadCoefC2C = 0.0;
@@ -1689,9 +1794,9 @@ namespace SolarCollectors {
                 for (int CoverNum = 1; CoverNum <= NumCovers; ++CoverNum) {
                     if (CoverNum == 1) {
                         // calc linearized radiation coefficient
-                        tempnom = DataGlobals::StefanBoltzmann *
-                                  ((TempAbsPlate + DataGlobals::KelvinConv) + (TempInnerCover + DataGlobals::KelvinConv)) *
-                                  (pow_2(TempAbsPlate + DataGlobals::KelvinConv) + pow_2(TempInnerCover + DataGlobals::KelvinConv));
+                        tempnom = DataGlobalConstants::StefanBoltzmann *
+                                  ((TempAbsPlate + DataGlobalConstants::KelvinConv) + (TempInnerCover + DataGlobalConstants::KelvinConv)) *
+                                  (pow_2(TempAbsPlate + DataGlobalConstants::KelvinConv) + pow_2(TempInnerCover + DataGlobalConstants::KelvinConv));
                         tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
                         hRadCoefA2C = tempnom / tempdenom;
                         // Calc convection heat transfer coefficient:
@@ -1699,9 +1804,9 @@ namespace SolarCollectors {
                             TempAbsPlate, TempOuterCover, AirGapDepth, this->CosTilt, this->SinTilt);
                     } else {
                         // calculate the linearized radiation coeff.
-                        tempnom = DataGlobals::StefanBoltzmann *
-                                  ((TempInnerCover + DataGlobals::KelvinConv) + (TempOuterCover + DataGlobals::KelvinConv)) *
-                                  (pow_2(TempInnerCover + DataGlobals::KelvinConv) + pow_2(TempOuterCover + DataGlobals::KelvinConv));
+                        tempnom = DataGlobalConstants::StefanBoltzmann *
+                                  ((TempInnerCover + DataGlobalConstants::KelvinConv) + (TempOuterCover + DataGlobalConstants::KelvinConv)) *
+                                  (pow_2(TempInnerCover + DataGlobalConstants::KelvinConv) + pow_2(TempOuterCover + DataGlobalConstants::KelvinConv));
                         tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
                         hRadCoefC2C = tempnom / tempdenom;
                         // Calc convection heat transfer coefficient:
@@ -1713,13 +1818,13 @@ namespace SolarCollectors {
         }
 
         // Calc collector outside surface convection heat transfer coefficient:
-        hConvCoefC2O = 2.8 + 3.0 * DataSurfaces::Surface(SurfNum).WindSpeed;
+        hConvCoefC2O = 2.8 + 3.0 * state.dataSurface->Surface(SurfNum).WindSpeed;
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
-        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobals::StefanBoltzmann *
-                  ((TempOuterCover + DataGlobals::KelvinConv) + DataEnvironment::SkyTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobals::KelvinConv) + pow_2(DataEnvironment::SkyTempKelvin));
-        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - DataEnvironment::SkyTemp);
+        tempnom = state.dataSurface->Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann *
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv) + state.dataEnvrn->SkyTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv) + pow_2(state.dataEnvrn->SkyTempKelvin));
+        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->SkyTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
             hRadCoefC2Sky = tempnom;
@@ -1730,10 +1835,10 @@ namespace SolarCollectors {
             hRadCoefC2Sky = tempnom / tempdenom;
         }
 
-        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * DataGlobals::StefanBoltzmann *
-                  ((TempOuterCover + DataGlobals::KelvinConv) + DataEnvironment::GroundTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobals::KelvinConv) + pow_2(DataEnvironment::GroundTempKelvin));
-        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - DataEnvironment::GroundTemp);
+        tempnom = state.dataSurface->Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann *
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv) + state.dataEnvrn->GroundTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv) + pow_2(state.dataEnvrn->GroundTempKelvin));
+        tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
             hRadCoefC2Gnd = tempnom;
@@ -1757,34 +1862,35 @@ namespace SolarCollectors {
 
         // calculate the side loss coefficient.  Adds the insulation resistance and the combined
         // convection-radiation coefficients in series.
-        Real64 hRadConvOut = 5.7 + 3.8 * DataSurfaces::Surface(SurfNum).WindSpeed;
-        this->UsLoss = 1.0 / (1.0 / (SolarCollectors::Parameters(ParamNum).ULossSide * this->AreaRatio) + 1.0 / (hRadConvOut * this->AreaRatio));
+        Real64 hRadConvOut = 5.7 + 3.8 * state.dataSurface->Surface(SurfNum).WindSpeed;
+        this->UsLoss =
+            1.0 / (1.0 / (state.dataSolarCollectors->Parameters(ParamNum).ULossSide * this->AreaRatio) + 1.0 / (hRadConvOut * this->AreaRatio));
 
         // the bottom loss coefficient calculation depends on the boundary condition
         if (this->OSCM_ON) { // OtherSideConditionsModel
-            this->UbLoss = SolarCollectors::Parameters(ParamNum).ULossBottom;
+            this->UbLoss = state.dataSolarCollectors->Parameters(ParamNum).ULossBottom;
         } else { // AmbientAir
-            this->UbLoss = 1.0 / (1.0 / SolarCollectors::Parameters(ParamNum).ULossBottom + 1.0 / hRadConvOut);
+            this->UbLoss = 1.0 / (1.0 / state.dataSolarCollectors->Parameters(ParamNum).ULossBottom + 1.0 / hRadConvOut);
         }
 
         // Calculate current timestep covers temperature
         {
             auto const SELECT_CASE_var(NumCovers);
             if (SELECT_CASE_var == 1) {
-                tempnom = this->CoverAbs(1) * DataHeatBalance::QRadSWOutIncident(SurfNum) + TempOutdoorAir * (hConvCoefC2O + hRadCoefC2O) +
+                tempnom = this->CoverAbs(1) * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + TempOutdoorAir * (hConvCoefC2O + hRadCoefC2O) +
                           TempAbsPlate * (hConvCoefA2C + hRadCoefA2C);
                 tempdenom = (hConvCoefC2O + hRadCoefC2O) + (hConvCoefA2C + hRadCoefA2C);
                 TempOuterCover = tempnom / tempdenom;
             } else if (SELECT_CASE_var == 2) {
                 for (int Num = 1; Num <= NumCovers; ++Num) {
                     if (Num == 1) {
-                        tempnom = this->CoverAbs(Num) * DataHeatBalance::QRadSWOutIncident(SurfNum) + TempOutdoorAir * (hConvCoefC2O + hRadCoefC2O) +
-                                  TempInnerCover * (hConvCoefC2C + hRadCoefC2C);
+                        tempnom = this->CoverAbs(Num) * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
+                                  TempOutdoorAir * (hConvCoefC2O + hRadCoefC2O) + TempInnerCover * (hConvCoefC2C + hRadCoefC2C);
                         tempdenom = (hConvCoefC2O + hRadCoefC2O) + (hConvCoefC2C + hRadCoefC2C);
                         TempOuterCover = tempnom / tempdenom;
                     } else if (Num == 2) {
-                        tempnom = this->CoverAbs(Num) * DataHeatBalance::QRadSWOutIncident(SurfNum) + TempAbsPlate * (hConvCoefA2C + hRadCoefA2C) +
-                                  TempOuterCover * (hConvCoefC2C + hRadCoefC2C);
+                        tempnom = this->CoverAbs(Num) * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
+                                  TempAbsPlate * (hConvCoefA2C + hRadCoefA2C) + TempOuterCover * (hConvCoefC2C + hRadCoefC2C);
                         tempdenom = (hConvCoefC2C + hRadCoefC2C + hConvCoefA2C + hRadCoefA2C);
                         TempInnerCover = tempnom / tempdenom;
                     }
@@ -1869,7 +1975,7 @@ namespace SolarCollectors {
             DensOfAir = Density(Index - 1) + InterpFrac * (Density(Index) - Density(Index - 1));
         }
 
-        VolExpAir = 1.0 / (Tref + DataGlobals::KelvinConv);
+        VolExpAir = 1.0 / (Tref + DataGlobalConstants::KelvinConv);
 
         // Rayleigh number
         Real64 RaNum = gravity * pow_2(DensOfAir) * VolExpAir * PrOfAir * DeltaT * pow_3(AirGap) / pow_2(VisDOfAir);
@@ -1896,7 +2002,8 @@ namespace SolarCollectors {
         return hConvCoef;
     }
 
-    Real64 CollectorData::CalcConvCoeffAbsPlateAndWater(Real64 const TAbsorber, // temperature of absorber plate [C]
+    Real64 CollectorData::CalcConvCoeffAbsPlateAndWater(EnergyPlusData &state,
+                                                        Real64 const TAbsorber, // temperature of absorber plate [C]
                                                         Real64 const TWater,    // temperature of water [C]
                                                         Real64 const Lc,        // characteristic length [m]
                                                         Real64 const TiltR2V    // collector tilt angle relative to the vertical [degree]
@@ -1923,22 +2030,22 @@ namespace SolarCollectors {
         Real64 DeltaT = std::abs(TAbsorber - TWater);
         Real64 TReference = TAbsorber - 0.25 * (TAbsorber - TWater);
         // record fluid prop index for water
-        int WaterIndex = FluidProperties::FindGlycol(fluidNameWater);
+        int WaterIndex = FluidProperties::FindGlycol(state, fluidNameWater);
         // find properties of water - always assume water
-        Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
-        Real64 CondOfWater = FluidProperties::GetConductivityGlycol(fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
-        Real64 VisOfWater = FluidProperties::GetViscosityGlycol(fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
-        Real64 DensOfWater = FluidProperties::GetDensityGlycol(fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
+        Real64 WaterSpecHeat = FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
+        Real64 CondOfWater = FluidProperties::GetConductivityGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
+        Real64 VisOfWater = FluidProperties::GetViscosityGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
+        Real64 DensOfWater = FluidProperties::GetDensityGlycol(state, fluidNameWater, max(TReference, 0.0), WaterIndex, CalledFrom);
         Real64 PrOfWater = VisOfWater * WaterSpecHeat / CondOfWater;
         // Requires a different reference temperature for volumetric expansion coefficient
         TReference = TWater - 0.25 * (TWater - TAbsorber);
-        Real64 VolExpWater = -(FluidProperties::GetDensityGlycol(fluidNameWater, max(TReference, 10.0) + 5.0, WaterIndex, CalledFrom) -
-                               FluidProperties::GetDensityGlycol(fluidNameWater, max(TReference, 10.0) - 5.0, WaterIndex, CalledFrom)) /
+        Real64 VolExpWater = -(FluidProperties::GetDensityGlycol(state, fluidNameWater, max(TReference, 10.0) + 5.0, WaterIndex, CalledFrom) -
+                               FluidProperties::GetDensityGlycol(state, fluidNameWater, max(TReference, 10.0) - 5.0, WaterIndex, CalledFrom)) /
                              (10.0 * DensOfWater);
 
         // Grashof number
         Real64 GrNum = gravity * VolExpWater * DensOfWater * DensOfWater * PrOfWater * DeltaT * pow_3(Lc) / pow_2(VisOfWater);
-        Real64 CosTilt = std::cos(TiltR2V * DataGlobals::DegToRadians);
+        Real64 CosTilt = std::cos(TiltR2V * DataGlobalConstants::DegToRadians);
 
         Real64 RaNum; // Raleigh number
         Real64 NuL;   // Nusselt number
@@ -1975,7 +2082,7 @@ namespace SolarCollectors {
         return hConvA2W;
     }
 
-    void CollectorData::update()
+    void CollectorData::update(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1987,15 +2094,18 @@ namespace SolarCollectors {
 
         static std::string const RoutineName("UpdateSolarCollector");
 
-        PlantUtilities::SafeCopyPlantNode(this->InletNode, this->OutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
         // Set outlet node variables that are possibly changed
-        DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
-        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            DataPlant::PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
-        DataLoopNode::Node(this->OutletNode).Enthalpy = Cp * DataLoopNode::Node(this->OutletNode).Temp;
+        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                                           this->OutletTemp,
+                                                           state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
+                                                           RoutineName);
+        state.dataLoopNodes->Node(this->OutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(this->OutletNode).Temp;
     }
 
-    void CollectorData::report()
+    void CollectorData::report(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2005,7 +2115,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
-        Real64 TimeStepInSecond = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        Real64 TimeStepInSecond = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
         this->Energy = this->Power * TimeStepInSecond;
         this->HeatEnergy = this->HeatRate * TimeStepInSecond;
@@ -2015,7 +2125,7 @@ namespace SolarCollectors {
         this->StoredHeatEnergy = this->StoredHeatRate * TimeStepInSecond;
     }
 
-    void CollectorData::GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex)
+    void CollectorData::GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2034,14 +2144,14 @@ namespace SolarCollectors {
 
         if (SurfacePtr == 0) {
             // should be trapped already
-            ShowFatalError("Invalid surface passed to GetExtVentedCavityIndex");
+            ShowFatalError(state, "Invalid surface passed to GetExtVentedCavityIndex");
         }
 
         int CavNum = 0;
         Found = false;
-        for (int thisCav = 1; thisCav <= DataSurfaces::TotExtVentCav; ++thisCav) {
-            for (int ThisSurf = 1; ThisSurf <= DataSurfaces::ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
-                if (SurfacePtr == DataSurfaces::ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
+        for (int thisCav = 1; thisCav <= state.dataSurface->TotExtVentCav; ++thisCav) {
+            for (int ThisSurf = 1; ThisSurf <= state.dataSurface->ExtVentedCavity(thisCav).NumSurfs; ++ThisSurf) {
+                if (SurfacePtr == state.dataSurface->ExtVentedCavity(thisCav).SurfPtrs(ThisSurf)) {
                     Found = true;
                     CavNum = thisCav;
                 }
@@ -2049,8 +2159,9 @@ namespace SolarCollectors {
         }
 
         if (!Found) {
-            ShowFatalError("Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " +
-                           DataSurfaces::Surface(SurfacePtr).Name);
+            ShowFatalError(state,
+                           "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " +
+                               state.dataSurface->Surface(SurfacePtr).Name);
         } else {
 
             VentCavIndex = CavNum;

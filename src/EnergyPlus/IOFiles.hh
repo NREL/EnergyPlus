@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,28 +48,34 @@
 #ifndef IOFiles_hh_INCLUDED
 #define IOFiles_hh_INCLUDED
 
-#include <fstream>
+#include <cassert>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <fstream>
 #include <iostream>
 #include <ostream>
 #include <vector>
-#include <cassert>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 class InputFile
 {
 public:
-    template<typename Type>
-    struct ReadResult {
-        ReadResult(Type data_, bool eof_, bool good_) : data{std::move(data_)}, eof{eof_}, good{good_} {}
+    template <typename Type> struct ReadResult
+    {
+        ReadResult(Type data_, bool eof_, bool good_) : data{std::move(data_)}, eof{eof_}, good{good_}
+        {
+        }
 
         // Update the current eof/good state from the incoming value
         // but only update the `data` member if the state is good
         // The idea is to keep consistency with the operator>> that was used
         // from gio
-        void update(ReadResult &&other) {
+        void update(ReadResult &&other)
+        {
             eof = other.eof;
             good = other.good;
             if (good) {
@@ -87,25 +93,31 @@ public:
 
     bool is_open() const noexcept;
 
-    void backspace () noexcept;
+    void backspace() noexcept;
 
     std::string error_state_to_string() const;
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    InputFile &ensure_open(const std::string &caller, bool output_to_file = true);
+    InputFile &ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true);
     std::istream::iostate rdstate() const noexcept;
 
     std::string fileName;
     void open(bool = false, bool = true);
     std::fstream::pos_type position() const noexcept;
 
-    void rewind() noexcept { if (is) { is->seekg(0); } }
+    void rewind() noexcept
+    {
+        if (is) {
+            is->clear(); // clear eofbit and potentially failbit
+            is->seekg(0, std::ios::beg);
+        }
+    }
 
     ReadResult<std::string> readLine() noexcept;
 
-    template<typename T>
-    ReadResult<T> read() noexcept {
+    template <typename T> ReadResult<T> read() noexcept
+    {
         if (is) {
             T result;
             *is >> result;
@@ -134,7 +146,7 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    InputOutputFile &ensure_open(const std::string &caller, bool output_to_file = true);
+    InputOutputFile &ensure_open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true);
 
     void open(const bool forAppend = false, bool output_to_file = true);
     std::fstream::pos_type position() const noexcept;
@@ -148,7 +160,7 @@ private:
     std::unique_ptr<std::iostream> os;
     bool print_to_dev_null = false;
     template <typename... Args> friend void print(InputOutputFile &of, fmt::string_view format_str, const Args &... args);
-    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char * delim);
+    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char *delim);
     template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile);
     friend class IOFiles;
 };
@@ -156,10 +168,10 @@ private:
 template <typename FileType> struct IOFileName
 {
     std::string fileName;
-    FileType open(const std::string &caller, bool output_to_file = true)
+    FileType open(EnergyPlusData &state, const std::string &caller, bool output_to_file = true)
     {
         FileType file{fileName};
-        file.ensure_open(caller, output_to_file);
+        file.ensure_open(state, caller, output_to_file);
         return file;
     }
     FileType try_open(bool output_to_file = true)
@@ -235,12 +247,11 @@ struct JsonOutputStreams
 class IOFiles
 {
 public:
-
     struct OutputControl
     {
         OutputControl() = default;
 
-        void getInput();
+        void getInput(EnergyPlusData &state);
 
         bool csv = false;
         bool mtr = true;
@@ -341,17 +352,18 @@ public:
     std::string outputErrFileName{"eplusout.err"};
     std::unique_ptr<std::ostream> err_stream;
 
-    static IOFiles &getSingleton();
-    static void setSingleton(IOFiles *newSingleton) noexcept;
-
-    static bool hasSingleton() { return getSingletonInternal() != nullptr; }
+    static bool hasSingleton()
+    {
+        return getSingletonInternal() != nullptr;
+    }
 
     JsonOutputStreams json; // Internal streams used for json outputs
+
+    void flushAll(); // For RunningEnergyPlusViaAPI only
 
 private:
     static IOFiles *&getSingletonInternal();
 };
-
 
 class SharedFileHandle
 {
@@ -424,7 +436,7 @@ template <typename... Args> void print(InputOutputFile &outputFile, fmt::string_
     EnergyPlus::vprint(*outputStream, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
-template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char * delim)
+template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char *delim)
 {
     auto *outputStream = [&]() -> std::ostream * {
         if (outputFile.os) {
@@ -458,9 +470,9 @@ template <class InputIterator> void print(InputIterator first, InputIterator las
     std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<InputIterator>::value_type>(*outputStream));
 }
 
-template <typename... Args> std::string format(fmt::string_view format_str, const Args &... args)
+template <typename... Args> std::string format(::fmt::string_view format_str, const Args &... args)
 {
-    return EnergyPlus::vprint(format_str, fmt::make_format_args(args...), sizeof...(Args));
+    return EnergyPlus::vprint(format_str, ::fmt::make_format_args(args...), sizeof...(Args));
 }
 
 } // namespace EnergyPlus

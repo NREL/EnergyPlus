@@ -1,4 +1,4 @@
-  Version,9.4;
+  Version,9.5;
 
   Building,
     PVWatts Test Case,       !- Name
@@ -17,7 +17,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     All Year,                !- Name
@@ -465,6 +467,10 @@
   Output:Variable,*,Generator Produced DC Electricity Energy,Timestep;
 
   Output:Variable,*,Generator PV Cell Temperature,Timestep;
+
+  Output:Variable,*,Plane of Array Irradiance,Timestep;
+
+  Output:Variable,*,Shaded Percent,Timestep;
 
   Output:Variable,*,Electric Load Center Produced Electricity Rate,Timestep;
 

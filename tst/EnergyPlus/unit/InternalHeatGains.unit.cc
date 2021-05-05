@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -71,8 +72,6 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -116,19 +115,19 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    ASSERT_EQ(DataHeatBalance::ZoneOtherEq.size(), 2u);
+    ASSERT_EQ(state->dataHeatBal->ZoneOtherEq.size(), 2u);
 
-    for (unsigned long i = 1; i <= DataHeatBalance::ZoneOtherEq.size(); ++i) {
-        const DataHeatBalance::ZoneEquipData &equip = DataHeatBalance::ZoneOtherEq(i);
+    for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
+        const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
             ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Unknown);
         } else if (equip.Name == "OTHEREQ2") {
@@ -165,21 +164,22 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state), std::runtime_error);
 
     std::string const error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
          "   ** Severe  ** GetInternalHeatGains: OtherEquipment=\"OTHEREQ1\", Design Level is not allowed to be negative",
          "   **   ~~~   ** ... when a fuel type of FuelOilNo1 is specified.",
          "   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
-         "   ...Summary of Errors that led to program termination:", "   ..... Reference severe error count=1",
+         "   ...Summary of Errors that led to program termination:",
+         "   ..... Reference severe error count=1",
          "   ..... Last severe error=GetInternalHeatGains: OtherEquipment=\"OTHEREQ1\", Design Level is not allowed to be negative"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -211,26 +211,27 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
     ASSERT_FALSE(process_idf(idf_objects, false)); // add false to supress error assertions
     EXPECT_TRUE(has_err_output(false));
 
-    std::string error_string = delimited_string(
-        { "   ** Severe  ** <root>[OtherEquipment][OtherEq1][fuel_type] - \"Water\" - Failed to match against any enum values." });
+    std::string error_string =
+        delimited_string({"   ** Severe  ** <root>[OtherEquipment][OtherEq1][fuel_type] - \"Water\" - Failed to match against any enum values."});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(state), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state), std::runtime_error);
 
     error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
          "   ** Severe  ** GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1",
          "   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
-         "   ...Summary of Errors that led to program termination:", "   ..... Reference severe error count=2",
+         "   ...Summary of Errors that led to program termination:",
+         "   ..... Reference severe error count=2",
          "   ..... Last severe error=GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -287,26 +288,26 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
 
     bool ErrorsFound1(false);
 
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
-    HeatBalanceManager::GetZoneData(ErrorsFound1);
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound1);
     ASSERT_FALSE(ErrorsFound1);
 
-    ScheduleManager::ScheduleInputProcessed = true;
-    ScheduleManager::Schedule(1).Used = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    state->dataScheduleMgr->Schedule(1).Used = true;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    ScheduleManager::Schedule(1).MinValue = 1.0;
-    ScheduleManager::Schedule(1).MaxValue = 1.0;
-    ScheduleManager::Schedule(1).MaxMinSet = true;
-    ScheduleManager::Schedule(2).Used = true;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).MinValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).MaxValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).MaxMinSet = true;
+    state->dataScheduleMgr->Schedule(2).Used = true;
 
-    ScheduleManager::Schedule(2).CurrentValue = 131.8;
-    ScheduleManager::Schedule(2).MinValue = 131.8;
-    ScheduleManager::Schedule(2).MaxValue = 131.8;
-    ScheduleManager::Schedule(2).MaxMinSet = true;
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 131.8;
+    state->dataScheduleMgr->Schedule(2).MinValue = 131.8;
+    state->dataScheduleMgr->Schedule(2).MaxValue = 131.8;
+    state->dataScheduleMgr->Schedule(2).MaxMinSet = true;
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    EXPECT_FALSE(InternalHeatGains::ErrorsFound);
+    EXPECT_FALSE(state->dataInternalHeatGains->ErrorsFound);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentReset)
@@ -468,29 +469,30 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    InternalHeatGains::CalcZoneITEq(state);
-    Real64 InitialPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::CalcZoneITEq(*state);
+    Real64 InitialPower =
+        state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
 
-    DataLoopNode::Node(1).Temp = 45.0;
-    InternalHeatGains::CalcZoneITEq(state);
-    Real64 NewPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
+    state->dataLoopNodes->Node(1).Temp = 45.0;
+    InternalHeatGains::CalcZoneITEq(*state);
+    Real64 NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
     ASSERT_NE(InitialPower, NewPower);
-    HVACManager::ResetNodeData();
+    HVACManager::ResetNodeData(*state);
 
-    InternalHeatGains::CalcZoneITEq(state);
-    NewPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
+    InternalHeatGains::CalcZoneITEq(*state);
+    NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
     ASSERT_EQ(InitialPower, NewPower);
 }
 
@@ -498,164 +500,164 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
 {
 
     std::string const idf_objects = delimited_string({
-         "Zone,Main Zone;",
+        "Zone,Main Zone;",
 
-         "ZoneHVAC:EquipmentConnections,",
-         "  Main Zone,                   !- Zone Name",
-         "  Main Zone Equipment,         !- Zone Conditioning Equipment List Name",
-         "  Main Zone Inlet Node,        !- Zone Air Inlet Node or NodeList Name",
-         "  ,                            !- Zone Air Exhaust Node or NodeList Name",
-         "  Main Zone Node,              !- Zone Air Node Name",
-         "  Main Zone Outlet Node;       !- Zone Return Air Node or NodeList Name",
+        "ZoneHVAC:EquipmentConnections,",
+        "  Main Zone,                   !- Zone Name",
+        "  Main Zone Equipment,         !- Zone Conditioning Equipment List Name",
+        "  Main Zone Inlet Node,        !- Zone Air Inlet Node or NodeList Name",
+        "  ,                            !- Zone Air Exhaust Node or NodeList Name",
+        "  Main Zone Node,              !- Zone Air Node Name",
+        "  Main Zone Outlet Node;       !- Zone Return Air Node or NodeList Name",
 
-         "ZoneHVAC:EquipmentList,",
-         "  Main Zone Equipment,     !- Name",
-         "  SequentialLoad,          !- Load Distribution Scheme",
-         "  ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-         "  Main Zone ATU,           !- Zone Equipment 1 Name",
-         "  1,                       !- Zone Equipment 1 Cooling Sequence",
-         "  2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
-         "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
-         "  ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
-         "  ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
-         "  Main Zone Baseboard,     !- Zone Equipment 2 Name",
-         "  2,                       !- Zone Equipment 2 Cooling Sequence",
-         "  1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
-         "  ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
-         "  ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
+        "ZoneHVAC:EquipmentList,",
+        "  Main Zone Equipment,     !- Name",
+        "  SequentialLoad,          !- Load Distribution Scheme",
+        "  ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "  Main Zone ATU,           !- Zone Equipment 1 Name",
+        "  1,                       !- Zone Equipment 1 Cooling Sequence",
+        "  2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "  ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+        "  ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
+        "  Main Zone Baseboard,     !- Zone Equipment 2 Name",
+        "  2,                       !- Zone Equipment 2 Cooling Sequence",
+        "  1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "  ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
+        "  ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
 
-         "ZoneHVAC:AirDistributionUnit,",
-         "  Main Zone ATU,               !- Name",
-         "  Main Zone Inlet Node,        !- Air Distribution Unit Outlet Node Name",
-         "  AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
-         "  Main Zone VAV Air;           !- Air Terminal Name",
+        "ZoneHVAC:AirDistributionUnit,",
+        "  Main Zone ATU,               !- Name",
+        "  Main Zone Inlet Node,        !- Air Distribution Unit Outlet Node Name",
+        "  AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "  Main Zone VAV Air;           !- Air Terminal Name",
 
-         "AirTerminal:SingleDuct:VAV:NoReheat,",
-         "  Main Zone VAV Air,           !- Name",
-         "  System Availability Schedule,  !- Availability Schedule Name",
-         "  Main Zone Inlet Node,    !- Air Outlet Node Name",
-         "  Main Zone ATU In Node,   !- Air Inlet Node Name",
-         "  8.5,                     !- Maximum Air Flow Rate {m3/s}",
-         "  Constant,                !- Zone Minimum Air Flow Input Method",
-         "  0.05;                    !- Constant Minimum Air Flow Fraction",
+        "AirTerminal:SingleDuct:VAV:NoReheat,",
+        "  Main Zone VAV Air,           !- Name",
+        "  System Availability Schedule,  !- Availability Schedule Name",
+        "  Main Zone Inlet Node,    !- Air Outlet Node Name",
+        "  Main Zone ATU In Node,   !- Air Inlet Node Name",
+        "  8.5,                     !- Maximum Air Flow Rate {m3/s}",
+        "  Constant,                !- Zone Minimum Air Flow Input Method",
+        "  0.05;                    !- Constant Minimum Air Flow Fraction",
 
-         "ZoneHVAC:Baseboard:Convective:Electric,",
-         "  Main Zone Baseboard,     !- Name",
-         "  System Availability Schedule,  !- Availability Schedule Name",
-         "  HeatingDesignCapacity,   !- Heating Design Capacity Method",
-         "  8000,                    !- Heating Design Capacity {W}",
-         "  ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
-         "  ,                        !- Fraction of Autosized Heating Design Capacity",
-         "  0.97;                    !- Efficiency",
+        "ZoneHVAC:Baseboard:Convective:Electric,",
+        "  Main Zone Baseboard,     !- Name",
+        "  System Availability Schedule,  !- Availability Schedule Name",
+        "  HeatingDesignCapacity,   !- Heating Design Capacity Method",
+        "  8000,                    !- Heating Design Capacity {W}",
+        "  ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+        "  ,                        !- Fraction of Autosized Heating Design Capacity",
+        "  0.97;                    !- Efficiency",
 
-         "ElectricEquipment:ITE:AirCooled,",
-         "  Data Center Servers,     !- Name",
-         "  Main Zone,               !- Zone Name",
-         "  ,",
-         "  Watts/Unit,              !- Design Power Input Calculation Method",
-         "  500,                     !- Watts per Unit {W}",
-         "  100,                     !- Number of Units",
-         "  ,                        !- Watts per Zone Floor Area {W/m2}",
-         "  ,  !- Design Power Input Schedule Name",
-         "  ,  !- CPU Loading  Schedule Name",
-         "  Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
-         "  0.4,                     !- Design Fan Power Input Fraction",
-         "  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
-         "  Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
-         "  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
-         "  15,                      !- Design Entering Air Temperature {C}",
-         "  A3,                      !- Environmental Class",
-         "  AdjustedSupply,          !- Air Inlet Connection Type",
-         "  ,                        !- Air Inlet Room Air Model Node Name",
-         "  ,                        !- Air Outlet Room Air Model Node Name",
-         "  Main Zone Inlet Node,    !- Supply Air Node Name",
-         "  0.1,                     !- Design Recirculation Fraction",
-         "  Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
-         "  0.9,                     !- Design Electric Power Supply Efficiency",
-         "  UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
-         "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
-         "  ITE-CPU,                 !- CPU End-Use Subcategory",
-         "  ITE-Fans,                !- Fan End-Use Subcategory",
-         "  ITE-UPS;                 !- Electric Power Supply End-Use Subcategory",
+        "ElectricEquipment:ITE:AirCooled,",
+        "  Data Center Servers,     !- Name",
+        "  Main Zone,               !- Zone Name",
+        "  ,",
+        "  Watts/Unit,              !- Design Power Input Calculation Method",
+        "  500,                     !- Watts per Unit {W}",
+        "  100,                     !- Number of Units",
+        "  ,                        !- Watts per Zone Floor Area {W/m2}",
+        "  ,  !- Design Power Input Schedule Name",
+        "  ,  !- CPU Loading  Schedule Name",
+        "  Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+        "  0.4,                     !- Design Fan Power Input Fraction",
+        "  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+        "  Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+        "  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+        "  15,                      !- Design Entering Air Temperature {C}",
+        "  A3,                      !- Environmental Class",
+        "  AdjustedSupply,          !- Air Inlet Connection Type",
+        "  ,                        !- Air Inlet Room Air Model Node Name",
+        "  ,                        !- Air Outlet Room Air Model Node Name",
+        "  Main Zone Inlet Node,    !- Supply Air Node Name",
+        "  0.1,                     !- Design Recirculation Fraction",
+        "  Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
+        "  0.9,                     !- Design Electric Power Supply Efficiency",
+        "  UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+        "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
+        "  ITE-CPU,                 !- CPU End-Use Subcategory",
+        "  ITE-Fans,                !- Fan End-Use Subcategory",
+        "  ITE-UPS;                 !- Electric Power Supply End-Use Subcategory",
 
-         "Curve:Quadratic,",
-         "  ECM FanPower fFlow,      !- Name",
-         "  0.0,                     !- Coefficient1 Constant",
-         "  1.0,                     !- Coefficient2 x",
-         "  0.0,                     !- Coefficient3 x**2",
-         "  0.0,                     !- Minimum Value of x",
-         "  99.0;                    !- Maximum Value of x",
+        "Curve:Quadratic,",
+        "  ECM FanPower fFlow,      !- Name",
+        "  0.0,                     !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Minimum Value of x",
+        "  99.0;                    !- Maximum Value of x",
 
-         "Curve:Quadratic,",
-         "  UPS Efficiency fPLR,     !- Name",
-         "  1.0,                     !- Coefficient1 Constant",
-         "  0.0,                     !- Coefficient2 x",
-         "  0.0,                     !- Coefficient3 x**2",
-         "  0.0,                     !- Minimum Value of x",
-         "  99.0;                    !- Maximum Value of x",
+        "Curve:Quadratic,",
+        "  UPS Efficiency fPLR,     !- Name",
+        "  1.0,                     !- Coefficient1 Constant",
+        "  0.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Minimum Value of x",
+        "  99.0;                    !- Maximum Value of x",
 
-         "Curve:Biquadratic,",
-         "  Data Center Servers Power fLoadTemp,  !- Name",
-         "  -1.0,                    !- Coefficient1 Constant",
-         "  1.0,                     !- Coefficient2 x",
-         "  0.0,                     !- Coefficient3 x**2",
-         "  0.06667,                 !- Coefficient4 y",
-         "  0.0,                     !- Coefficient5 y**2",
-         "  0.0,                     !- Coefficient6 x*y",
-         "  0.0,                     !- Minimum Value of x",
-         "  1.5,                     !- Maximum Value of x",
-         "  -10,                     !- Minimum Value of y",
-         "  99.0,                    !- Maximum Value of y",
-         "  0.0,                     !- Minimum Curve Output",
-         "  99.0,                    !- Maximum Curve Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Temperature,             !- Input Unit Type for Y",
-         "  Dimensionless;           !- Output Unit Type",
+        "Curve:Biquadratic,",
+        "  Data Center Servers Power fLoadTemp,  !- Name",
+        "  -1.0,                    !- Coefficient1 Constant",
+        "  1.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.06667,                 !- Coefficient4 y",
+        "  0.0,                     !- Coefficient5 y**2",
+        "  0.0,                     !- Coefficient6 x*y",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  99.0,                    !- Maximum Value of y",
+        "  0.0,                     !- Minimum Curve Output",
+        "  99.0,                    !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
 
-         "Curve:Biquadratic,",
-         "  Data Center Servers Airflow fLoadTemp,  !- Name",
-         "  -1.4,                    !- Coefficient1 Constant",
-         "  0.9,                     !- Coefficient2 x",
-         "  0.0,                     !- Coefficient3 x**2",
-         "  0.1,                     !- Coefficient4 y",
-         "  0.0,                     !- Coefficient5 y**2",
-         "  0.0,                     !- Coefficient6 x*y",
-         "  0.0,                     !- Minimum Value of x",
-         "  1.5,                     !- Maximum Value of x",
-         "  -10,                     !- Minimum Value of y",
-         "  99.0,                    !- Maximum Value of y",
-         "  0.0,                     !- Minimum Curve Output",
-         "  99.0,                    !- Maximum Curve Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Temperature,             !- Input Unit Type for Y",
-         "  Dimensionless;           !- Output Unit Type",
+        "Curve:Biquadratic,",
+        "  Data Center Servers Airflow fLoadTemp,  !- Name",
+        "  -1.4,                    !- Coefficient1 Constant",
+        "  0.9,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.1,                     !- Coefficient4 y",
+        "  0.0,                     !- Coefficient5 y**2",
+        "  0.0,                     !- Coefficient6 x*y",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  99.0,                    !- Maximum Value of y",
+        "  0.0,                     !- Minimum Curve Output",
+        "  99.0,                    !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
 
-         "Curve:Biquadratic,",
-         "  Data Center Recirculation fLoadTemp,  !- Name",
-         "  1.0,                     !- Coefficient1 Constant",
-         "  0.0,                     !- Coefficient2 x",
-         "  0.0,                     !- Coefficient3 x**2",
-         "  0.0,                     !- Coefficient4 y",
-         "  0.0,                     !- Coefficient5 y**2",
-         "  0.0,                     !- Coefficient6 x*y",
-         "  0.0,                     !- Minimum Value of x",
-         "  1.5,                     !- Maximum Value of x",
-         "  -10,                     !- Minimum Value of y",
-         "  99.0,                    !- Maximum Value of y",
-         "  0.0,                     !- Minimum Curve Output",
-         "  99.0,                    !- Maximum Curve Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Temperature,             !- Input Unit Type for Y",
-         "  Dimensionless;           !- Output Unit Type",
+        "Curve:Biquadratic,",
+        "  Data Center Recirculation fLoadTemp,  !- Name",
+        "  1.0,                     !- Coefficient1 Constant",
+        "  0.0,                     !- Coefficient2 x",
+        "  0.0,                     !- Coefficient3 x**2",
+        "  0.0,                     !- Coefficient4 y",
+        "  0.0,                     !- Coefficient5 y**2",
+        "  0.0,                     !- Coefficient6 x*y",
+        "  0.0,                     !- Minimum Value of x",
+        "  1.5,                     !- Maximum Value of x",
+        "  -10,                     !- Minimum Value of y",
+        "  99.0,                    !- Maximum Value of y",
+        "  0.0,                     !- Minimum Curve Output",
+        "  99.0,                    !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Temperature,             !- Input Unit Type for Y",
+        "  Dimensionless;           !- Output Unit Type",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
 
     // Set up a simple convective gain for each gain type
     int zoneNum = 1;
@@ -669,35 +671,35 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     for (int gainType = 1; gainType <= numGainTypes; ++gainType) {
         convGains(gainType) = 100 * gainType;
         expectedTotConvGains += convGains(gainType);
-        SetupZoneInternalGain(zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
+        SetupZoneInternalGain(*state, zoneNum, DataHeatBalance::ccZoneIntGainDeviceTypes(gainType), "Gain", gainType, &convGains(gainType));
     }
 
-    InternalHeatGains::UpdateInternalGainValues();
+    InternalHeatGains::UpdateInternalGainValues(*state);
 
     // Check total of all convective gains
-    InternalHeatGains::SumAllInternalConvectionGains(zoneNum, totConvGains);
+    InternalHeatGains::SumAllInternalConvectionGains(*state, zoneNum, totConvGains);
     EXPECT_EQ(totConvGains, expectedTotConvGains);
 
     // Check subtotals used in zone component loads
-    DataEnvironment::TotDesDays = 1;
-    DataEnvironment::TotRunDesPersDays = 0;
-    DataSizing::CurOverallSimDay = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::NumOfTimeStepInHour = 10;
-    DataGlobals::TimeStep = 1;
-    OutputReportTabular::AllocateLoadComponentArrays();
-    int timeStepInDay = (DataGlobals::HourOfDay - 1) * DataGlobals::NumOfTimeStepInHour + DataGlobals::TimeStep;
+    state->dataEnvrn->TotDesDays = 1;
+    state->dataEnvrn->TotRunDesPersDays = 0;
+    state->dataSize->CurOverallSimDay = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 10;
+    state->dataGlobal->TimeStep = 1;
+    OutputReportTabular::AllocateLoadComponentArrays(*state);
+    int timeStepInDay = (state->dataGlobal->HourOfDay - 1) * state->dataGlobal->NumOfTimeStepInHour + state->dataGlobal->TimeStep;
 
-    DataGlobals::CompLoadReportIsReq = true;
-    DataGlobals::isPulseZoneSizing = false;
-    InternalHeatGains::GatherComponentLoadsIntGain();
-    totConvGains = OutputReportTabular::peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::refrigInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::waterUseInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::hvacLossInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   OutputReportTabular::powerGenInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum);
+    state->dataGlobal->CompLoadReportIsReq = true;
+    state->dataGlobal->isPulseZoneSizing = false;
+    InternalHeatGains::GatherComponentLoadsIntGain(*state);
+    totConvGains = state->dataOutRptTab->peopleInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->lightInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->equipInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->refrigInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->waterUseInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->hvacLossInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->powerGenInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum);
 
     // Legitimate gain types excluded from this total
     expectedTotConvGains -= convGains(DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide); // this is only used for CO2
@@ -880,181 +882,180 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataHeatBalance::ZnRpt.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBal->ZnRpt.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    DataLoopNode::Node(1).Temp = 45.0;
-    InternalHeatGains::CalcZoneITEq(state);
-    ASSERT_DOUBLE_EQ(DataHeatBalance::ZoneITEq(1).AirOutletDryBulbT + DataHeatBalance::ZoneITEq(1).ReturnApproachTemp,
-                     DataHeatBalance::Zone(1).AdjustedReturnTempByITE);
-    ASSERT_DOUBLE_EQ(DataLoopNode::Node(1).Temp + DataHeatBalance::ZoneITEq(1).SupplyApproachTemp, DataHeatBalance::ZoneITEq(1).AirInletDryBulbT);
+    state->dataLoopNodes->Node(1).Temp = 45.0;
+    InternalHeatGains::CalcZoneITEq(*state);
+    ASSERT_DOUBLE_EQ(state->dataHeatBal->ZoneITEq(1).AirOutletDryBulbT + state->dataHeatBal->ZoneITEq(1).ReturnApproachTemp,
+                     state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
+    ASSERT_DOUBLE_EQ(state->dataLoopNodes->Node(1).Temp + state->dataHeatBal->ZoneITEq(1).SupplyApproachTemp,
+                     state->dataHeatBal->ZoneITEq(1).AirInletDryBulbT);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 {
 
-    std::string const idf_objects = delimited_string({
-         "Zone,Main Zone;",
+    std::string const idf_objects =
+        delimited_string({"Zone,Main Zone;",
 
-         "ZoneHVAC:EquipmentConnections,",
-         "  Main Zone,                   !- Zone Name",
-         "  Main Zone Equipment,         !- Zone Conditioning Equipment List Name",
-         "  Main Zone Inlet Node,        !- Zone Air Inlet Node or NodeList Name",
-         "  ,                            !- Zone Air Exhaust Node or NodeList Name",
-         "  Main Zone Node,              !- Zone Air Node Name",
-         "  Main Zone Outlet Node;       !- Zone Return Air Node or NodeList Name",
+                          "ZoneHVAC:EquipmentConnections,",
+                          "  Main Zone,                   !- Zone Name",
+                          "  Main Zone Equipment,         !- Zone Conditioning Equipment List Name",
+                          "  Main Zone Inlet Node,        !- Zone Air Inlet Node or NodeList Name",
+                          "  ,                            !- Zone Air Exhaust Node or NodeList Name",
+                          "  Main Zone Node,              !- Zone Air Node Name",
+                          "  Main Zone Outlet Node;       !- Zone Return Air Node or NodeList Name",
 
-         "ZoneHVAC:EquipmentList,",
-         "  Main Zone Equipment,     !- Name",
-         "  SequentialLoad,          !- Load Distribution Scheme",
-         "  ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-         "  Main Zone ATU,           !- Zone Equipment 1 Name",
-         "  1,                       !- Zone Equipment 1 Cooling Sequence",
-         "  2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
-         "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
-         "  ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
-         "  ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
-         "  Main Zone Baseboard,     !- Zone Equipment 2 Name",
-         "  2,                       !- Zone Equipment 2 Cooling Sequence",
-         "  1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
-         "  ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
-         "  ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
+                          "ZoneHVAC:EquipmentList,",
+                          "  Main Zone Equipment,     !- Name",
+                          "  SequentialLoad,          !- Load Distribution Scheme",
+                          "  ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+                          "  Main Zone ATU,           !- Zone Equipment 1 Name",
+                          "  1,                       !- Zone Equipment 1 Cooling Sequence",
+                          "  2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+                          "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+                          "  ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+                          "  ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
+                          "  Main Zone Baseboard,     !- Zone Equipment 2 Name",
+                          "  2,                       !- Zone Equipment 2 Cooling Sequence",
+                          "  1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+                          "  ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
+                          "  ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
 
-         "ZoneHVAC:AirDistributionUnit,",
-         "  Main Zone ATU,               !- Name",
-         "  Main Zone Inlet Node,        !- Air Distribution Unit Outlet Node Name",
-         "  AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
-         "  Main Zone VAV Air;           !- Air Terminal Name",
+                          "ZoneHVAC:AirDistributionUnit,",
+                          "  Main Zone ATU,               !- Name",
+                          "  Main Zone Inlet Node,        !- Air Distribution Unit Outlet Node Name",
+                          "  AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+                          "  Main Zone VAV Air;           !- Air Terminal Name",
 
-         "AirTerminal:SingleDuct:VAV:NoReheat,",
-         "  Main Zone VAV Air,           !- Name",
-         "  System Availability Schedule,  !- Availability Schedule Name",
-         "  Main Zone Inlet Node,    !- Air Outlet Node Name",
-         "  Main Zone ATU In Node,   !- Air Inlet Node Name",
-         "  8.5,                     !- Maximum Air Flow Rate {m3/s}",
-         "  Constant,                !- Zone Minimum Air Flow Input Method",
-         "  0.05;                    !- Constant Minimum Air Flow Fraction",
+                          "AirTerminal:SingleDuct:VAV:NoReheat,",
+                          "  Main Zone VAV Air,           !- Name",
+                          "  System Availability Schedule,  !- Availability Schedule Name",
+                          "  Main Zone Inlet Node,    !- Air Outlet Node Name",
+                          "  Main Zone ATU In Node,   !- Air Inlet Node Name",
+                          "  8.5,                     !- Maximum Air Flow Rate {m3/s}",
+                          "  Constant,                !- Zone Minimum Air Flow Input Method",
+                          "  0.05;                    !- Constant Minimum Air Flow Fraction",
 
-         "ZoneHVAC:Baseboard:Convective:Electric,",
-         "  Main Zone Baseboard,     !- Name",
-         "  System Availability Schedule,  !- Availability Schedule Name",
-         "  HeatingDesignCapacity,   !- Heating Design Capacity Method",
-         "  8000,                    !- Heating Design Capacity {W}",
-         "  ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
-         "  ,                        !- Fraction of Autosized Heating Design Capacity",
-         "  0.97;                    !- Efficiency",
+                          "ZoneHVAC:Baseboard:Convective:Electric,",
+                          "  Main Zone Baseboard,     !- Name",
+                          "  System Availability Schedule,  !- Availability Schedule Name",
+                          "  HeatingDesignCapacity,   !- Heating Design Capacity Method",
+                          "  8000,                    !- Heating Design Capacity {W}",
+                          "  ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+                          "  ,                        !- Fraction of Autosized Heating Design Capacity",
+                          "  0.97;                    !- Efficiency",
 
-        "ElectricEquipment:ITE:AirCooled,",
-        "  Data Center Servers,     !- Name",
-        "  Main Zone,               !- Zone Name",
-        "  ,                        !- Air Flow Calculation Method",
-        "  Watts/Unit,              !- Design Power Input Calculation Method",
-        "  500,                     !- Watts per Unit {W}",
-        "  100,                     !- Number of Units",
-        "  ,                        !- Watts per Zone Floor Area {W/m2}",
-        "  ,                        !- Design Power Input Schedule Name",
-        "  ,                        !- CPU Loading  Schedule Name",
-        "  Data Center Servers Power fLoadTemp,        !- CPU Power Input Function of Loading and Air Temperature Curve Name",
-        "  0.4,                     !- Design Fan Power Input Fraction",
-        "  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
-        "  Data Center Servers Airflow fLoadTemp,      !- Air Flow Function of Loading and Air Temperature Curve Name",
-        "  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
-        "  15,                      !- Design Entering Air Temperature {C}",
-        "  A3,                      !- Environmental Class",
-        "  AdjustedSupply,          !- Air Inlet Connection Type",
-        "  ,                        !- Air Inlet Room Air Model Node Name",
-        "  ,                        !- Air Outlet Room Air Model Node Name",
-        "  Main Zone Inlet Node,    !- Supply Air Node Name",
-        "  0.1,                     !- Design Recirculation Fraction",
-        // This one should be assumed to always 1
-        "  ,                        !- Recirculation Function of Loading and Supply Temperature Curve Name",
-        "  0.9,                     !- Design Electric Power Supply Efficiency",
-        // This one should be assumed to always 1
-        "  ,                        !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
-        "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
-        "  ITE-CPU,                 !- CPU End-Use Subcategory",
-        "  ITE-Fans,                !- Fan End-Use Subcategory",
-        "  ITE-UPS;                 !- Electric Power Supply End-Use Subcategory",
+                          "ElectricEquipment:ITE:AirCooled,",
+                          "  Data Center Servers,     !- Name",
+                          "  Main Zone,               !- Zone Name",
+                          "  ,                        !- Air Flow Calculation Method",
+                          "  Watts/Unit,              !- Design Power Input Calculation Method",
+                          "  500,                     !- Watts per Unit {W}",
+                          "  100,                     !- Number of Units",
+                          "  ,                        !- Watts per Zone Floor Area {W/m2}",
+                          "  ,                        !- Design Power Input Schedule Name",
+                          "  ,                        !- CPU Loading  Schedule Name",
+                          "  Data Center Servers Power fLoadTemp,        !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+                          "  0.4,                     !- Design Fan Power Input Fraction",
+                          "  0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+                          "  Data Center Servers Airflow fLoadTemp,      !- Air Flow Function of Loading and Air Temperature Curve Name",
+                          "  ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+                          "  15,                      !- Design Entering Air Temperature {C}",
+                          "  A3,                      !- Environmental Class",
+                          "  AdjustedSupply,          !- Air Inlet Connection Type",
+                          "  ,                        !- Air Inlet Room Air Model Node Name",
+                          "  ,                        !- Air Outlet Room Air Model Node Name",
+                          "  Main Zone Inlet Node,    !- Supply Air Node Name",
+                          "  0.1,                     !- Design Recirculation Fraction",
+                          // This one should be assumed to always 1
+                          "  ,                        !- Recirculation Function of Loading and Supply Temperature Curve Name",
+                          "  0.9,                     !- Design Electric Power Supply Efficiency",
+                          // This one should be assumed to always 1
+                          "  ,                        !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+                          "  1,                       !- Fraction of Electric Power Supply Losses to Zone",
+                          "  ITE-CPU,                 !- CPU End-Use Subcategory",
+                          "  ITE-Fans,                !- Fan End-Use Subcategory",
+                          "  ITE-UPS;                 !- Electric Power Supply End-Use Subcategory",
 
-        "Curve:Quadratic,",
-        "  ECM FanPower fFlow,      !- Name",
-        "  0.0,                     !- Coefficient1 Constant",
-        "  1.0,                     !- Coefficient2 x",
-        "  0.0,                     !- Coefficient3 x**2",
-        "  0.0,                     !- Minimum Value of x",
-        "  99.0;                    !- Maximum Value of x",
+                          "Curve:Quadratic,",
+                          "  ECM FanPower fFlow,      !- Name",
+                          "  0.0,                     !- Coefficient1 Constant",
+                          "  1.0,                     !- Coefficient2 x",
+                          "  0.0,                     !- Coefficient3 x**2",
+                          "  0.0,                     !- Minimum Value of x",
+                          "  99.0;                    !- Maximum Value of x",
 
-        "Curve:Biquadratic,",
-        "  Data Center Servers Power fLoadTemp,  !- Name",
-        "  -1.0,                    !- Coefficient1 Constant",
-        "  1.0,                     !- Coefficient2 x",
-        "  0.0,                     !- Coefficient3 x**2",
-        "  0.06667,                 !- Coefficient4 y",
-        "  0.0,                     !- Coefficient5 y**2",
-        "  0.0,                     !- Coefficient6 x*y",
-        "  0.0,                     !- Minimum Value of x",
-        "  1.5,                     !- Maximum Value of x",
-        "  -10,                     !- Minimum Value of y",
-        "  99.0,                    !- Maximum Value of y",
-        "  0.0,                     !- Minimum Curve Output",
-        "  99.0,                    !- Maximum Curve Output",
-        "  Dimensionless,           !- Input Unit Type for X",
-        "  Temperature,             !- Input Unit Type for Y",
-        "  Dimensionless;           !- Output Unit Type",
+                          "Curve:Biquadratic,",
+                          "  Data Center Servers Power fLoadTemp,  !- Name",
+                          "  -1.0,                    !- Coefficient1 Constant",
+                          "  1.0,                     !- Coefficient2 x",
+                          "  0.0,                     !- Coefficient3 x**2",
+                          "  0.06667,                 !- Coefficient4 y",
+                          "  0.0,                     !- Coefficient5 y**2",
+                          "  0.0,                     !- Coefficient6 x*y",
+                          "  0.0,                     !- Minimum Value of x",
+                          "  1.5,                     !- Maximum Value of x",
+                          "  -10,                     !- Minimum Value of y",
+                          "  99.0,                    !- Maximum Value of y",
+                          "  0.0,                     !- Minimum Curve Output",
+                          "  99.0,                    !- Maximum Curve Output",
+                          "  Dimensionless,           !- Input Unit Type for X",
+                          "  Temperature,             !- Input Unit Type for Y",
+                          "  Dimensionless;           !- Output Unit Type",
 
-        "Curve:Biquadratic,",
-        "  Data Center Servers Airflow fLoadTemp,  !- Name",
-        "  -1.4,                    !- Coefficient1 Constant",
-        "  0.9,                     !- Coefficient2 x",
-        "  0.0,                     !- Coefficient3 x**2",
-        "  0.1,                     !- Coefficient4 y",
-        "  0.0,                     !- Coefficient5 y**2",
-        "  0.0,                     !- Coefficient6 x*y",
-        "  0.0,                     !- Minimum Value of x",
-        "  1.5,                     !- Maximum Value of x",
-        "  -10,                     !- Minimum Value of y",
-        "  99.0,                    !- Maximum Value of y",
-        "  0.0,                     !- Minimum Curve Output",
-        "  99.0,                    !- Maximum Curve Output",
-        "  Dimensionless,           !- Input Unit Type for X",
-        "  Temperature,             !- Input Unit Type for Y",
-        "  Dimensionless;           !- Output Unit Type"
-    });
+                          "Curve:Biquadratic,",
+                          "  Data Center Servers Airflow fLoadTemp,  !- Name",
+                          "  -1.4,                    !- Coefficient1 Constant",
+                          "  0.9,                     !- Coefficient2 x",
+                          "  0.0,                     !- Coefficient3 x**2",
+                          "  0.1,                     !- Coefficient4 y",
+                          "  0.0,                     !- Coefficient5 y**2",
+                          "  0.0,                     !- Coefficient6 x*y",
+                          "  0.0,                     !- Minimum Value of x",
+                          "  1.5,                     !- Maximum Value of x",
+                          "  -10,                     !- Minimum Value of y",
+                          "  99.0,                    !- Maximum Value of y",
+                          "  0.0,                     !- Minimum Curve Output",
+                          "  99.0,                    !- Maximum Curve Output",
+                          "  Dimensionless,           !- Input Unit Type for X",
+                          "  Temperature,             !- Input Unit Type for Y",
+                          "  Dimensionless;           !- Output Unit Type"});
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
 
     bool ErrorsFound(false);
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    InternalHeatGains::CalcZoneITEq(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    InternalHeatGains::CalcZoneITEq(*state);
 
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
-    Real64 DefaultUPSPower = (DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower) *
-                             max((1.0 - DataHeatBalance::ZoneITEq(1).DesignUPSEfficiency), 0.0);
+    Real64 DefaultUPSPower = (state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower) *
+                             max((1.0 - state->dataHeatBal->ZoneITEq(1).DesignUPSEfficiency), 0.0);
 
-    ASSERT_EQ(DefaultUPSPower, DataHeatBalance::ZoneITEq(1).UPSPower);
-
+    ASSERT_EQ(DefaultUPSPower, state->dataHeatBal->ZoneITEq(1).UPSPower);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
@@ -1066,7 +1067,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
     bool FunctionCallResult;
     bool ExpectedResult;
 
-    //Test 1: everything blank--should result in false result
+    // Test 1: everything blank--should result in false result
     WorkEffSchPresent = true;
     CloInsSchPresent = true;
     AirVelSchPresent = true;
@@ -1074,7 +1075,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
     FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
     EXPECT_EQ(ExpectedResult, FunctionCallResult);
 
-    //Additional Tests: test various combinations where at least one flag is not blank (false)--should result in a true result
+    // Additional Tests: test various combinations where at least one flag is not blank (false)--should result in a true result
     WorkEffSchPresent = false;
     CloInsSchPresent = true;
     AirVelSchPresent = true;
@@ -1123,61 +1124,60 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckThermalComfortSchedules)
     ExpectedResult = true;
     FunctionCallResult = EnergyPlus::InternalHeatGains::CheckThermalComfortSchedules(WorkEffSchPresent, CloInsSchPresent, AirVelSchPresent);
     EXPECT_EQ(ExpectedResult, FunctionCallResult);
-
 }
 TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 {
 
     std::string const idf_objects = delimited_string({
-         "Zone,Main Zone;",
+        "Zone,Main Zone;",
 
-         "ZoneHVAC:EquipmentConnections,",
-         "  Main Zone,                   !- Zone Name",
-         "  Main Zone Equipment,         !- Zone Conditioning Equipment List Name",
-         "  Main Zone Inlet Node,        !- Zone Air Inlet Node or NodeList Name",
-         "  ,                            !- Zone Air Exhaust Node or NodeList Name",
-         "  Main Zone Node,              !- Zone Air Node Name",
-         "  Main Zone Outlet Node;       !- Zone Return Air Node or NodeList Name",
+        "ZoneHVAC:EquipmentConnections,",
+        "  Main Zone,                   !- Zone Name",
+        "  Main Zone Equipment,         !- Zone Conditioning Equipment List Name",
+        "  Main Zone Inlet Node,        !- Zone Air Inlet Node or NodeList Name",
+        "  ,                            !- Zone Air Exhaust Node or NodeList Name",
+        "  Main Zone Node,              !- Zone Air Node Name",
+        "  Main Zone Outlet Node;       !- Zone Return Air Node or NodeList Name",
 
-         "ZoneHVAC:EquipmentList,",
-         "  Main Zone Equipment,     !- Name",
-         "  SequentialLoad,          !- Load Distribution Scheme",
-         "  ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-         "  Main Zone ATU,           !- Zone Equipment 1 Name",
-         "  1,                       !- Zone Equipment 1 Cooling Sequence",
-         "  2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
-         "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
-         "  ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
-         "  ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
-         "  Main Zone Baseboard,     !- Zone Equipment 2 Name",
-         "  2,                       !- Zone Equipment 2 Cooling Sequence",
-         "  1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
-         "  ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
-         "  ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
+        "ZoneHVAC:EquipmentList,",
+        "  Main Zone Equipment,     !- Name",
+        "  SequentialLoad,          !- Load Distribution Scheme",
+        "  ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "  Main Zone ATU,           !- Zone Equipment 1 Name",
+        "  1,                       !- Zone Equipment 1 Cooling Sequence",
+        "  2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "  ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+        "  ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
+        "  Main Zone Baseboard,     !- Zone Equipment 2 Name",
+        "  2,                       !- Zone Equipment 2 Cooling Sequence",
+        "  1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "  ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
+        "  ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
 
-         "ZoneHVAC:AirDistributionUnit,",
-         "  Main Zone ATU,               !- Name",
-         "  Main Zone Inlet Node,        !- Air Distribution Unit Outlet Node Name",
-         "  AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
-         "  Main Zone VAV Air;           !- Air Terminal Name",
+        "ZoneHVAC:AirDistributionUnit,",
+        "  Main Zone ATU,               !- Name",
+        "  Main Zone Inlet Node,        !- Air Distribution Unit Outlet Node Name",
+        "  AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "  Main Zone VAV Air;           !- Air Terminal Name",
 
-         "AirTerminal:SingleDuct:VAV:NoReheat,",
-         "  Main Zone VAV Air,           !- Name",
-         "  System Availability Schedule,  !- Availability Schedule Name",
-         "  Main Zone Inlet Node,    !- Air Outlet Node Name",
-         "  Main Zone ATU In Node,   !- Air Inlet Node Name",
-         "  8.5,                     !- Maximum Air Flow Rate {m3/s}",
-         "  Constant,                !- Zone Minimum Air Flow Input Method",
-         "  0.05;                    !- Constant Minimum Air Flow Fraction",
+        "AirTerminal:SingleDuct:VAV:NoReheat,",
+        "  Main Zone VAV Air,           !- Name",
+        "  System Availability Schedule,  !- Availability Schedule Name",
+        "  Main Zone Inlet Node,    !- Air Outlet Node Name",
+        "  Main Zone ATU In Node,   !- Air Inlet Node Name",
+        "  8.5,                     !- Maximum Air Flow Rate {m3/s}",
+        "  Constant,                !- Zone Minimum Air Flow Input Method",
+        "  0.05;                    !- Constant Minimum Air Flow Fraction",
 
-         "ZoneHVAC:Baseboard:Convective:Electric,",
-         "  Main Zone Baseboard,     !- Name",
-         "  System Availability Schedule,  !- Availability Schedule Name",
-         "  HeatingDesignCapacity,   !- Heating Design Capacity Method",
-         "  8000,                    !- Heating Design Capacity {W}",
-         "  ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
-         "  ,                        !- Fraction of Autosized Heating Design Capacity",
-         "  0.97;                    !- Efficiency",
+        "ZoneHVAC:Baseboard:Convective:Electric,",
+        "  Main Zone Baseboard,     !- Name",
+        "  System Availability Schedule,  !- Availability Schedule Name",
+        "  HeatingDesignCapacity,   !- Heating Design Capacity Method",
+        "  8000,                    !- Heating Design Capacity {W}",
+        "  ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+        "  ,                        !- Fraction of Autosized Heating Design Capacity",
+        "  0.97;                    !- Efficiency",
 
         "ScheduleTypeLimits,SchType1,0.0,1.0,Continuous,Dimensionless;",
 
@@ -1297,56 +1297,56 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     bool ErrorsFound(false);
 
-    DataGlobals::NumOfTimeStepInHour = 1;                 // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;                 // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
-    DataEnvironment::DayOfYear_Schedule = 1;
-    DataEnvironment::DayOfMonth = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::TimeStep = 1;
-    ScheduleManager::UpdateScheduleValues();
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+    ScheduleManager::UpdateScheduleValues(*state);
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    EXPECT_EQ(DataHeatBalance::TotPeople, 1);
-    EXPECT_EQ(DataHeatBalance::TotLights, 1);
-    EXPECT_EQ(DataHeatBalance::TotElecEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotGasEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotHWEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotStmEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotOthEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotBBHeat, 1);
+    EXPECT_EQ(state->dataHeatBal->TotPeople, 1);
+    EXPECT_EQ(state->dataHeatBal->TotLights, 1);
+    EXPECT_EQ(state->dataHeatBal->TotElecEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotGasEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotHWEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotStmEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotOthEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotBBHeat, 1);
 
-    EnergyPlus::createFacilityElectricPowerServiceObject(); // Needs to happen before InitInternalHeatGains
+    EnergyPlus::createFacilityElectricPowerServiceObject(*state); // Needs to happen before InitInternalHeatGains
 
-    // First time should be all good, because ZnRpt values intialize to zero
-    InternalHeatGains::InitInternalHeatGains(state);
+    // First time should be all good, because ZnRpt values initialize to zero
+    InternalHeatGains::InitInternalHeatGains(*state);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).GasPower, 200.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).HWPower, 250.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).SteamPower, 300.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).BaseHeatPower, 1500.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).CO2Rate, 0.0001125);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ITEqSHI, 0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsPower, 100.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).GasPower, 200.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).HWPower, 250.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).SteamPower, 300.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).BaseHeatPower, 1500.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).CO2Rate, 0.0001125);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ITEqSHI, 0);
 
     // Second time should should give the same answers, because everything should reset before accumulating
-    InternalHeatGains::InitInternalHeatGains(state);
+    InternalHeatGains::InitInternalHeatGains(*state);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).GasPower, 200.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).HWPower, 250.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).SteamPower, 300.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).BaseHeatPower, 1500.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).CO2Rate, 0.0001125);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ITEqSHI, 0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsPower, 100.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).GasPower, 200.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).HWPower, 250.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).SteamPower, 300.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).BaseHeatPower, 1500.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).CO2Rate, 0.0001125);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ITEqSHI, 0);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
@@ -1557,694 +1557,694 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
 {
     std::string const idf_objects = delimited_string({
-         "  Zone,",
-         "    Main Zone,               !- Name",
-         "    0,                       !- Direction of Relative North {deg}",
-         "    0,                       !- X Origin {m}",
-         "    0,                       !- Y Origin {m}",
-         "    0,                       !- Z Origin {m}",
-         "    1,                       !- Type",
-         "    1,                       !- Multiplier",
-         "    autocalculate,           !- Ceiling Height {m}",
-         "    autocalculate;           !- Volume {m3}",
+        "  Zone,",
+        "    Main Zone,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
 
-         "  ZoneHVAC:EquipmentConnections,",
-         "    Main Zone,               !- Zone Name",
-         "    Main Zone Equipment,     !- Zone Conditioning Equipment List Name",
-         "    Main Zone Inlet Node,    !- Zone Air Inlet Node or NodeList Name",
-         "    ,                        !- Zone Air Exhaust Node or NodeList Name",
-         "    Main Zone Node,          !- Zone Air Node Name",
-         "    Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name",
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Main Zone,               !- Zone Name",
+        "    Main Zone Equipment,     !- Zone Conditioning Equipment List Name",
+        "    Main Zone Inlet Node,    !- Zone Air Inlet Node or NodeList Name",
+        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "    Main Zone Node,          !- Zone Air Node Name",
+        "    Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name",
 
-         "  ZoneHVAC:EquipmentList,",
-         "    Main Zone Equipment,     !- Name",
-         "    SequentialLoad,          !- Load Distribution Scheme",
-         "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-         "    Main Zone ATU,           !- Zone Equipment 1 Name",
-         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-         "    2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
-         "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
-         "    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
-         "    ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
-         "    Main Zone Baseboard,     !- Zone Equipment 2 Name",
-         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-         "    1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
-         "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
-         "    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
+        "  ZoneHVAC:EquipmentList,",
+        "    Main Zone Equipment,     !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Main Zone ATU,           !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+        "    ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
+        "    Main Zone Baseboard,     !- Zone Equipment 2 Name",
+        "    2,                       !- Zone Equipment 2 Cooling Sequence",
+        "    1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
 
-         "  ZoneHVAC:AirDistributionUnit,",
-         "    Main Zone ATU,           !- Name",
-         "    Main Zone Inlet Node,    !- Air Distribution Unit Outlet Node Name",
-         "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
-         "    Main Zone VAV Air;       !- Air Terminal Name",
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Main Zone ATU,           !- Name",
+        "    Main Zone Inlet Node,    !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    Main Zone VAV Air;       !- Air Terminal Name",
 
-         "  AirTerminal:SingleDuct:VAV:NoReheat,",
-         "    Main Zone VAV Air,       !- Name",
-         "    System Availability Schedule,  !- Availability Schedule Name",
-         "    Main Zone Inlet Node,    !- Air Outlet Node Name",
-         "    Main Zone ATU In Node,   !- Air Inlet Node Name",
-         "    8.5,                     !- Maximum Air Flow Rate {m3/s}",
-         "    Constant,                !- Zone Minimum Air Flow Input Method",
-         "    0.05;                    !- Constant Minimum Air Flow Fraction",
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    Main Zone VAV Air,       !- Name",
+        "    System Availability Schedule,  !- Availability Schedule Name",
+        "    Main Zone Inlet Node,    !- Air Outlet Node Name",
+        "    Main Zone ATU In Node,   !- Air Inlet Node Name",
+        "    8.5,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.05;                    !- Constant Minimum Air Flow Fraction",
 
-         "  ZoneHVAC:Baseboard:Convective:Electric,",
-         "    Main Zone Baseboard,     !- Name",
-         "    System Availability Schedule,  !- Availability Schedule Name",
-         "    HeatingDesignCapacity,   !- Heating Design Capacity Method",
-         "    8000,                    !- Heating Design Capacity {W}",
-         "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
-         "    ,                        !- Fraction of Autosized Heating Design Capacity",
-         "    0.97;                    !- Efficiency",
+        "  ZoneHVAC:Baseboard:Convective:Electric,",
+        "    Main Zone Baseboard,     !- Name",
+        "    System Availability Schedule,  !- Availability Schedule Name",
+        "    HeatingDesignCapacity,   !- Heating Design Capacity Method",
+        "    8000,                    !- Heating Design Capacity {W}",
+        "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+        "    ,                        !- Fraction of Autosized Heating Design Capacity",
+        "    0.97;                    !- Efficiency",
 
-         "  ElectricEquipment:ITE:AirCooled,",
-         "    Data Center Servers,     !- Name",
-         "    Main Zone,               !- Zone Name",
-         "    FlowFromSystem,          !- Air Flow Calculation Method",
-         "    Watts/Unit,              !- Design Power Input Calculation Method",
-         "    500,                     !- Watts per Unit {W}",
-         "    100,                     !- Number of Units",
-         "    ,                        !- Watts per Zone Floor Area {W/m2}",
-         "    Data Center Operation Schedule,  !- Design Power Input Schedule Name",
-         "    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name",
-         "    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
-         "    0.4,                     !- Design Fan Power Input Fraction",
-         "    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
-         "    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
-         "    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
-         "    15,                      !- Design Entering Air Temperature {C}",
-         "    A3,                      !- Environmental Class",
-         "    AdjustedSupply,          !- Air Inlet Connection Type",
-         "    ,                        !- Air Inlet Room Air Model Node Name",
-         "    ,                        !- Air Outlet Room Air Model Node Name",
-         "    Inlet Node Not Found,    !- Supply Air Node Name",
-         "    0.1,                     !- Design Recirculation Fraction",
-         "    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
-         "    0.9,                     !- Design Electric Power Supply Efficiency",
-         "    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
-         "    1,                       !- Fraction of Electric Power Supply Losses to Zone",
-         "    ITE-CPU,                 !- CPU End-Use Subcategory",
-         "    ITE-Fans,                !- Fan End-Use Subcategory",
-         "    ITE-UPS;                 !- Electric Power Supply End-Use Subcategory",
+        "  ElectricEquipment:ITE:AirCooled,",
+        "    Data Center Servers,     !- Name",
+        "    Main Zone,               !- Zone Name",
+        "    FlowFromSystem,          !- Air Flow Calculation Method",
+        "    Watts/Unit,              !- Design Power Input Calculation Method",
+        "    500,                     !- Watts per Unit {W}",
+        "    100,                     !- Number of Units",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    Data Center Operation Schedule,  !- Design Power Input Schedule Name",
+        "    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name",
+        "    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+        "    0.4,                     !- Design Fan Power Input Fraction",
+        "    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+        "    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+        "    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+        "    15,                      !- Design Entering Air Temperature {C}",
+        "    A3,                      !- Environmental Class",
+        "    AdjustedSupply,          !- Air Inlet Connection Type",
+        "    ,                        !- Air Inlet Room Air Model Node Name",
+        "    ,                        !- Air Outlet Room Air Model Node Name",
+        "    Inlet Node Not Found,    !- Supply Air Node Name",
+        "    0.1,                     !- Design Recirculation Fraction",
+        "    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
+        "    0.9,                     !- Design Electric Power Supply Efficiency",
+        "    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+        "    1,                       !- Fraction of Electric Power Supply Losses to Zone",
+        "    ITE-CPU,                 !- CPU End-Use Subcategory",
+        "    ITE-Fans,                !- Fan End-Use Subcategory",
+        "    ITE-UPS;                 !- Electric Power Supply End-Use Subcategory",
 
-         "  Curve:Quadratic,",
-         "    ECM FanPower fFlow,      !- Name",
-         "    0.0,                     !- Coefficient1 Constant",
-         "    1.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.0,                     !- Minimum Value of x",
-         "    99.0;                    !- Maximum Value of x",
+        "  Curve:Quadratic,",
+        "    ECM FanPower fFlow,      !- Name",
+        "    0.0,                     !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    99.0;                    !- Maximum Value of x",
 
-         "  Curve:Quadratic,",
-         "    UPS Efficiency fPLR,     !- Name",
-         "    1.0,                     !- Coefficient1 Constant",
-         "    0.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.0,                     !- Minimum Value of x",
-         "    99.0;                    !- Maximum Value of x",
+        "  Curve:Quadratic,",
+        "    UPS Efficiency fPLR,     !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    99.0;                    !- Maximum Value of x",
 
-         "  Curve:Biquadratic,",
-         "    Data Center Servers Power fLoadTemp,  !- Name",
-         "    -1.0,                    !- Coefficient1 Constant",
-         "    1.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.06667,                 !- Coefficient4 y",
-         "    0.0,                     !- Coefficient5 y**2",
-         "    0.0,                     !- Coefficient6 x*y",
-         "    0.0,                     !- Minimum Value of x",
-         "    1.5,                     !- Maximum Value of x",
-         "    -10,                     !- Minimum Value of y",
-         "    99.0,                    !- Maximum Value of y",
-         "    0.0,                     !- Minimum Curve Output",
-         "    99.0,                    !- Maximum Curve Output",
-         "    Dimensionless,           !- Input Unit Type for X",
-         "    Temperature,             !- Input Unit Type for Y",
-         "    Dimensionless;           !- Output Unit Type",
+        "  Curve:Biquadratic,",
+        "    Data Center Servers Power fLoadTemp,  !- Name",
+        "    -1.0,                    !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.06667,                 !- Coefficient4 y",
+        "    0.0,                     !- Coefficient5 y**2",
+        "    0.0,                     !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    99.0,                    !- Maximum Value of y",
+        "    0.0,                     !- Minimum Curve Output",
+        "    99.0,                    !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
 
-         "  Curve:Biquadratic,",
-         "    Data Center Servers Airflow fLoadTemp,  !- Name",
-         "    -1.4,                    !- Coefficient1 Constant",
-         "    0.9,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.1,                     !- Coefficient4 y",
-         "    0.0,                     !- Coefficient5 y**2",
-         "    0.0,                     !- Coefficient6 x*y",
-         "    0.0,                     !- Minimum Value of x",
-         "    1.5,                     !- Maximum Value of x",
-         "    -10,                     !- Minimum Value of y",
-         "    99.0,                    !- Maximum Value of y",
-         "    0.0,                     !- Minimum Curve Output",
-         "    99.0,                    !- Maximum Curve Output",
-         "    Dimensionless,           !- Input Unit Type for X",
-         "    Temperature,             !- Input Unit Type for Y",
-         "    Dimensionless;           !- Output Unit Type",
+        "  Curve:Biquadratic,",
+        "    Data Center Servers Airflow fLoadTemp,  !- Name",
+        "    -1.4,                    !- Coefficient1 Constant",
+        "    0.9,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.1,                     !- Coefficient4 y",
+        "    0.0,                     !- Coefficient5 y**2",
+        "    0.0,                     !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    99.0,                    !- Maximum Value of y",
+        "    0.0,                     !- Minimum Curve Output",
+        "    99.0,                    !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
 
-         "  Curve:Biquadratic,",
-         "    Data Center Recirculation fLoadTemp,  !- Name",
-         "    1.0,                     !- Coefficient1 Constant",
-         "    0.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.0,                     !- Coefficient4 y",
-         "    0.0,                     !- Coefficient5 y**2",
-         "    0.0,                     !- Coefficient6 x*y",
-         "    0.0,                     !- Minimum Value of x",
-         "    1.5,                     !- Maximum Value of x",
-         "    -10,                     !- Minimum Value of y",
-         "    99.0,                    !- Maximum Value of y",
-         "    0.0,                     !- Minimum Curve Output",
-         "    99.0,                    !- Maximum Curve Output",
-         "    Dimensionless,           !- Input Unit Type for X",
-         "    Temperature,             !- Input Unit Type for Y",
-         "    Dimensionless;           !- Output Unit Type",
+        "  Curve:Biquadratic,",
+        "    Data Center Recirculation fLoadTemp,  !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 y",
+        "    0.0,                     !- Coefficient5 y**2",
+        "    0.0,                     !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    99.0,                    !- Maximum Value of y",
+        "    0.0,                     !- Minimum Curve Output",
+        "    99.0,                    !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
 
-         "  Schedule:Constant,Data Center Operation Schedule,Any Number,1.0;",
+        "  Schedule:Constant,Data Center Operation Schedule,Any Number,1.0;",
 
-         "  Schedule:Compact,",
-         "    Data Center CPU Loading Schedule,  !- Name",
-         "    Any Number,              !- Schedule Type Limits Name",
-         "    Through: 1/31,           !- Field 1",
-         "    For: AllDays,            !- Field 2",
-         "    Until: 24:00,1.0,        !- Field 3",
-         "    Through: 2/29,           !- Field 5",
-         "    For: AllDays,            !- Field 6",
-         "    Until: 24:00,0.50,       !- Field 7",
-         "    Through: 3/31,           !- Field 9",
-         "    For: AllDays,            !- Field 10",
-         "    Until: 24:00,0.75,       !- Field 11",
-         "    Through: 4/30,           !- Field 13",
-         "    For: AllDays,            !- Field 14",
-         "    Until: 24:00,1.0,        !- Field 15",
-         "    Through: 5/31,           !- Field 17",
-         "    For: AllDays,            !- Field 18",
-         "    Until: 24:00,0.25,       !- Field 19",
-         "    Through: 6/30,           !- Field 21",
-         "    For: AllDays,            !- Field 22",
-         "    Until: 24:00,0.50,       !- Field 23",
-         "    Through: 7/31,           !- Field 25",
-         "    For: AllDays,            !- Field 26",
-         "    Until: 24:00,0.1,        !- Field 27",
-         "    Through: 8/31,           !- Field 29",
-         "    For: AllDays,            !- Field 30",
-         "    Until: 24:00,1.0,        !- Field 31",
-         "    Through: 9/30,           !- Field 33",
-         "    For: AllDays,            !- Field 34",
-         "    Until: 24:00,0.25,       !- Field 35",
-         "    Through: 10/31,          !- Field 37",
-         "    For: AllDays,            !- Field 38",
-         "    Until: 24:00,0.50,       !- Field 39",
-         "    Through: 11/30,          !- Field 41",
-         "    For: AllDays,            !- Field 42",
-         "    Until: 24:00,0.75,       !- Field 43",
-         "    Through: 12/31,          !- Field 45",
-         "    For: AllDays,            !- Field 46",
-         "    Until: 24:00,1.00;       !- Field 47",
+        "  Schedule:Compact,",
+        "    Data Center CPU Loading Schedule,  !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 1/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0,        !- Field 3",
+        "    Through: 2/29,           !- Field 5",
+        "    For: AllDays,            !- Field 6",
+        "    Until: 24:00,0.50,       !- Field 7",
+        "    Through: 3/31,           !- Field 9",
+        "    For: AllDays,            !- Field 10",
+        "    Until: 24:00,0.75,       !- Field 11",
+        "    Through: 4/30,           !- Field 13",
+        "    For: AllDays,            !- Field 14",
+        "    Until: 24:00,1.0,        !- Field 15",
+        "    Through: 5/31,           !- Field 17",
+        "    For: AllDays,            !- Field 18",
+        "    Until: 24:00,0.25,       !- Field 19",
+        "    Through: 6/30,           !- Field 21",
+        "    For: AllDays,            !- Field 22",
+        "    Until: 24:00,0.50,       !- Field 23",
+        "    Through: 7/31,           !- Field 25",
+        "    For: AllDays,            !- Field 26",
+        "    Until: 24:00,0.1,        !- Field 27",
+        "    Through: 8/31,           !- Field 29",
+        "    For: AllDays,            !- Field 30",
+        "    Until: 24:00,1.0,        !- Field 31",
+        "    Through: 9/30,           !- Field 33",
+        "    For: AllDays,            !- Field 34",
+        "    Until: 24:00,0.25,       !- Field 35",
+        "    Through: 10/31,          !- Field 37",
+        "    For: AllDays,            !- Field 38",
+        "    Until: 24:00,0.50,       !- Field 39",
+        "    Through: 11/30,          !- Field 41",
+        "    For: AllDays,            !- Field 42",
+        "    Until: 24:00,0.75,       !- Field 43",
+        "    Through: 12/31,          !- Field 45",
+        "    For: AllDays,            !- Field 46",
+        "    Until: 24:00,1.00;       !- Field 47",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
-    EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state));
+    EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state));
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesGoodInletNode)
 {
     std::string const idf_objects = delimited_string({
-         "  Zone,",
-         "    Main Zone,               !- Name",
-         "    0,                       !- Direction of Relative North {deg}",
-         "    0,                       !- X Origin {m}",
-         "    0,                       !- Y Origin {m}",
-         "    0,                       !- Z Origin {m}",
-         "    1,                       !- Type",
-         "    1,                       !- Multiplier",
-         "    autocalculate,           !- Ceiling Height {m}",
-         "    autocalculate;           !- Volume {m3}",
+        "  Zone,",
+        "    Main Zone,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
 
-         "  ZoneHVAC:EquipmentConnections,",
-         "    Main Zone,               !- Zone Name",
-         "    Main Zone Equipment,     !- Zone Conditioning Equipment List Name",
-         "    Main Zone Inlet Node,    !- Zone Air Inlet Node or NodeList Name",
-         "    ,                        !- Zone Air Exhaust Node or NodeList Name",
-         "    Main Zone Node,          !- Zone Air Node Name",
-         "    Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name",
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Main Zone,               !- Zone Name",
+        "    Main Zone Equipment,     !- Zone Conditioning Equipment List Name",
+        "    Main Zone Inlet Node,    !- Zone Air Inlet Node or NodeList Name",
+        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "    Main Zone Node,          !- Zone Air Node Name",
+        "    Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name",
 
-         "  ZoneHVAC:EquipmentList,",
-         "    Main Zone Equipment,     !- Name",
-         "    SequentialLoad,          !- Load Distribution Scheme",
-         "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-         "    Main Zone ATU,           !- Zone Equipment 1 Name",
-         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-         "    2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
-         "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
-         "    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
-         "    ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
-         "    Main Zone Baseboard,     !- Zone Equipment 2 Name",
-         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-         "    1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
-         "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
-         "    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
+        "  ZoneHVAC:EquipmentList,",
+        "    Main Zone Equipment,     !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Main Zone ATU,           !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+        "    ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
+        "    Main Zone Baseboard,     !- Zone Equipment 2 Name",
+        "    2,                       !- Zone Equipment 2 Cooling Sequence",
+        "    1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
 
-         "  ZoneHVAC:AirDistributionUnit,",
-         "    Main Zone ATU,           !- Name",
-         "    Main Zone Inlet Node,    !- Air Distribution Unit Outlet Node Name",
-         "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
-         "    Main Zone VAV Air;       !- Air Terminal Name",
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Main Zone ATU,           !- Name",
+        "    Main Zone Inlet Node,    !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    Main Zone VAV Air;       !- Air Terminal Name",
 
-         "  AirTerminal:SingleDuct:VAV:NoReheat,",
-         "    Main Zone VAV Air,       !- Name",
-         "    System Availability Schedule,  !- Availability Schedule Name",
-         "    Main Zone Inlet Node,    !- Air Outlet Node Name",
-         "    Main Zone ATU In Node,   !- Air Inlet Node Name",
-         "    8.5,                     !- Maximum Air Flow Rate {m3/s}",
-         "    Constant,                !- Zone Minimum Air Flow Input Method",
-         "    0.05;                    !- Constant Minimum Air Flow Fraction",
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    Main Zone VAV Air,       !- Name",
+        "    System Availability Schedule,  !- Availability Schedule Name",
+        "    Main Zone Inlet Node,    !- Air Outlet Node Name",
+        "    Main Zone ATU In Node,   !- Air Inlet Node Name",
+        "    8.5,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.05;                    !- Constant Minimum Air Flow Fraction",
 
-         "  ZoneHVAC:Baseboard:Convective:Electric,",
-         "    Main Zone Baseboard,     !- Name",
-         "    System Availability Schedule,  !- Availability Schedule Name",
-         "    HeatingDesignCapacity,   !- Heating Design Capacity Method",
-         "    8000,                    !- Heating Design Capacity {W}",
-         "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
-         "    ,                        !- Fraction of Autosized Heating Design Capacity",
-         "    0.97;                    !- Efficiency",
+        "  ZoneHVAC:Baseboard:Convective:Electric,",
+        "    Main Zone Baseboard,     !- Name",
+        "    System Availability Schedule,  !- Availability Schedule Name",
+        "    HeatingDesignCapacity,   !- Heating Design Capacity Method",
+        "    8000,                    !- Heating Design Capacity {W}",
+        "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+        "    ,                        !- Fraction of Autosized Heating Design Capacity",
+        "    0.97;                    !- Efficiency",
 
-         "  ElectricEquipment:ITE:AirCooled,",
-         "    Data Center Servers,     !- Name",
-         "    Main Zone,               !- Zone Name",
-         "    FlowControlWithApproachTemperatures,  !- Air Flow Calculation Method",
-         "    Watts/Unit,              !- Design Power Input Calculation Method",
-         "    500,                     !- Watts per Unit {W}",
-         "    100,                     !- Number of Units",
-         "    ,                        !- Watts per Zone Floor Area {W/m2}",
-         "    Data Center Operation Schedule,  !- Design Power Input Schedule Name",
-         "    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name",
-         "    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
-         "    0.4,                     !- Design Fan Power Input Fraction",
-         "    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
-         "    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
-         "    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
-         "    15,                      !- Design Entering Air Temperature {C}",
-         "    A3,                      !- Environmental Class",
-         "    ,                        !- Air Inlet Connection Type",
-         "    ,                        !- Air Inlet Room Air Model Node Name",
-         "    ,                        !- Air Outlet Room Air Model Node Name",
-         "    Main Zone Inlet Node,    !- Supply Air Node Name",
-         "    0.1,                     !- Design Recirculation Fraction",
-         "    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
-         "    0.9,                     !- Design Electric Power Supply Efficiency",
-         "    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
-         "    1,                       !- Fraction of Electric Power Supply Losses to Zone",
-         "    ITE-CPU,                 !- CPU End-Use Subcategory",
-         "    ITE-Fans,                !- Fan End-Use Subcategory",
-         "    ITE-UPS,                 !- Electric Power Supply End-Use Subcategory",
-         "    2,                       !- Supply Temperature Difference {deltaC}",
-         "    ,                        !- Supply Temperature Difference Schedule",
-         "    -1,                      !- Return Temperature Difference {deltaC}",
-         "    ;                        !- Return Temperature Difference Schedule",
+        "  ElectricEquipment:ITE:AirCooled,",
+        "    Data Center Servers,     !- Name",
+        "    Main Zone,               !- Zone Name",
+        "    FlowControlWithApproachTemperatures,  !- Air Flow Calculation Method",
+        "    Watts/Unit,              !- Design Power Input Calculation Method",
+        "    500,                     !- Watts per Unit {W}",
+        "    100,                     !- Number of Units",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    Data Center Operation Schedule,  !- Design Power Input Schedule Name",
+        "    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name",
+        "    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+        "    0.4,                     !- Design Fan Power Input Fraction",
+        "    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+        "    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+        "    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+        "    15,                      !- Design Entering Air Temperature {C}",
+        "    A3,                      !- Environmental Class",
+        "    ,                        !- Air Inlet Connection Type",
+        "    ,                        !- Air Inlet Room Air Model Node Name",
+        "    ,                        !- Air Outlet Room Air Model Node Name",
+        "    Main Zone Inlet Node,    !- Supply Air Node Name",
+        "    0.1,                     !- Design Recirculation Fraction",
+        "    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
+        "    0.9,                     !- Design Electric Power Supply Efficiency",
+        "    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+        "    1,                       !- Fraction of Electric Power Supply Losses to Zone",
+        "    ITE-CPU,                 !- CPU End-Use Subcategory",
+        "    ITE-Fans,                !- Fan End-Use Subcategory",
+        "    ITE-UPS,                 !- Electric Power Supply End-Use Subcategory",
+        "    2,                       !- Supply Temperature Difference {deltaC}",
+        "    ,                        !- Supply Temperature Difference Schedule",
+        "    -1,                      !- Return Temperature Difference {deltaC}",
+        "    ;                        !- Return Temperature Difference Schedule",
 
-         "  Curve:Quadratic,",
-         "    ECM FanPower fFlow,      !- Name",
-         "    0.0,                     !- Coefficient1 Constant",
-         "    1.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.0,                     !- Minimum Value of x",
-         "    99.0;                    !- Maximum Value of x",
+        "  Curve:Quadratic,",
+        "    ECM FanPower fFlow,      !- Name",
+        "    0.0,                     !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    99.0;                    !- Maximum Value of x",
 
-         "  Curve:Quadratic,",
-         "    UPS Efficiency fPLR,     !- Name",
-         "    1.0,                     !- Coefficient1 Constant",
-         "    0.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.0,                     !- Minimum Value of x",
-         "    99.0;                    !- Maximum Value of x",
+        "  Curve:Quadratic,",
+        "    UPS Efficiency fPLR,     !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    99.0;                    !- Maximum Value of x",
 
-         "  Curve:Biquadratic,",
-         "    Data Center Servers Power fLoadTemp,  !- Name",
-         "    -1.0,                    !- Coefficient1 Constant",
-         "    1.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.06667,                 !- Coefficient4 y",
-         "    0.0,                     !- Coefficient5 y**2",
-         "    0.0,                     !- Coefficient6 x*y",
-         "    0.0,                     !- Minimum Value of x",
-         "    1.5,                     !- Maximum Value of x",
-         "    -10,                     !- Minimum Value of y",
-         "    99.0,                    !- Maximum Value of y",
-         "    0.0,                     !- Minimum Curve Output",
-         "    99.0,                    !- Maximum Curve Output",
-         "    Dimensionless,           !- Input Unit Type for X",
-         "    Temperature,             !- Input Unit Type for Y",
-         "    Dimensionless;           !- Output Unit Type",
+        "  Curve:Biquadratic,",
+        "    Data Center Servers Power fLoadTemp,  !- Name",
+        "    -1.0,                    !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.06667,                 !- Coefficient4 y",
+        "    0.0,                     !- Coefficient5 y**2",
+        "    0.0,                     !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    99.0,                    !- Maximum Value of y",
+        "    0.0,                     !- Minimum Curve Output",
+        "    99.0,                    !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
 
-         "  Curve:Biquadratic,",
-         "    Data Center Servers Airflow fLoadTemp,  !- Name",
-         "    -1.4,                    !- Coefficient1 Constant",
-         "    0.9,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.1,                     !- Coefficient4 y",
-         "    0.0,                     !- Coefficient5 y**2",
-         "    0.0,                     !- Coefficient6 x*y",
-         "    0.0,                     !- Minimum Value of x",
-         "    1.5,                     !- Maximum Value of x",
-         "    -10,                     !- Minimum Value of y",
-         "    99.0,                    !- Maximum Value of y",
-         "    0.0,                     !- Minimum Curve Output",
-         "    99.0,                    !- Maximum Curve Output",
-         "    Dimensionless,           !- Input Unit Type for X",
-         "    Temperature,             !- Input Unit Type for Y",
-         "    Dimensionless;           !- Output Unit Type",
+        "  Curve:Biquadratic,",
+        "    Data Center Servers Airflow fLoadTemp,  !- Name",
+        "    -1.4,                    !- Coefficient1 Constant",
+        "    0.9,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.1,                     !- Coefficient4 y",
+        "    0.0,                     !- Coefficient5 y**2",
+        "    0.0,                     !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    99.0,                    !- Maximum Value of y",
+        "    0.0,                     !- Minimum Curve Output",
+        "    99.0,                    !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
 
-         "  Curve:Biquadratic,",
-         "    Data Center Recirculation fLoadTemp,  !- Name",
-         "    1.0,                     !- Coefficient1 Constant",
-         "    0.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.0,                     !- Coefficient4 y",
-         "    0.0,                     !- Coefficient5 y**2",
-         "    0.0,                     !- Coefficient6 x*y",
-         "    0.0,                     !- Minimum Value of x",
-         "    1.5,                     !- Maximum Value of x",
-         "    -10,                     !- Minimum Value of y",
-         "    99.0,                    !- Maximum Value of y",
-         "    0.0,                     !- Minimum Curve Output",
-         "    99.0,                    !- Maximum Curve Output",
-         "    Dimensionless,           !- Input Unit Type for X",
-         "    Temperature,             !- Input Unit Type for Y",
-         "    Dimensionless;           !- Output Unit Type",
+        "  Curve:Biquadratic,",
+        "    Data Center Recirculation fLoadTemp,  !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 y",
+        "    0.0,                     !- Coefficient5 y**2",
+        "    0.0,                     !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    99.0,                    !- Maximum Value of y",
+        "    0.0,                     !- Minimum Curve Output",
+        "    99.0,                    !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
 
-         "  Schedule:Constant,Data Center Operation Schedule,Any Number,1.0;",
+        "  Schedule:Constant,Data Center Operation Schedule,Any Number,1.0;",
 
-         "  Schedule:Compact,",
-         "    Data Center CPU Loading Schedule,  !- Name",
-         "    Any Number,              !- Schedule Type Limits Name",
-         "    Through: 1/31,           !- Field 1",
-         "    For: AllDays,            !- Field 2",
-         "    Until: 24:00,1.0,        !- Field 3",
-         "    Through: 2/29,           !- Field 5",
-         "    For: AllDays,            !- Field 6",
-         "    Until: 24:00,0.50,       !- Field 7",
-         "    Through: 3/31,           !- Field 9",
-         "    For: AllDays,            !- Field 10",
-         "    Until: 24:00,0.75,       !- Field 11",
-         "    Through: 4/30,           !- Field 13",
-         "    For: AllDays,            !- Field 14",
-         "    Until: 24:00,1.0,        !- Field 15",
-         "    Through: 5/31,           !- Field 17",
-         "    For: AllDays,            !- Field 18",
-         "    Until: 24:00,0.25,       !- Field 19",
-         "    Through: 6/30,           !- Field 21",
-         "    For: AllDays,            !- Field 22",
-         "    Until: 24:00,0.50,       !- Field 23",
-         "    Through: 7/31,           !- Field 25",
-         "    For: AllDays,            !- Field 26",
-         "    Until: 24:00,0.1,        !- Field 27",
-         "    Through: 8/31,           !- Field 29",
-         "    For: AllDays,            !- Field 30",
-         "    Until: 24:00,1.0,        !- Field 31",
-         "    Through: 9/30,           !- Field 33",
-         "    For: AllDays,            !- Field 34",
-         "    Until: 24:00,0.25,       !- Field 35",
-         "    Through: 10/31,          !- Field 37",
-         "    For: AllDays,            !- Field 38",
-         "    Until: 24:00,0.50,       !- Field 39",
-         "    Through: 11/30,          !- Field 41",
-         "    For: AllDays,            !- Field 42",
-         "    Until: 24:00,0.75,       !- Field 43",
-         "    Through: 12/31,          !- Field 45",
-         "    For: AllDays,            !- Field 46",
-         "    Until: 24:00,1.00;       !- Field 47",
+        "  Schedule:Compact,",
+        "    Data Center CPU Loading Schedule,  !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 1/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0,        !- Field 3",
+        "    Through: 2/29,           !- Field 5",
+        "    For: AllDays,            !- Field 6",
+        "    Until: 24:00,0.50,       !- Field 7",
+        "    Through: 3/31,           !- Field 9",
+        "    For: AllDays,            !- Field 10",
+        "    Until: 24:00,0.75,       !- Field 11",
+        "    Through: 4/30,           !- Field 13",
+        "    For: AllDays,            !- Field 14",
+        "    Until: 24:00,1.0,        !- Field 15",
+        "    Through: 5/31,           !- Field 17",
+        "    For: AllDays,            !- Field 18",
+        "    Until: 24:00,0.25,       !- Field 19",
+        "    Through: 6/30,           !- Field 21",
+        "    For: AllDays,            !- Field 22",
+        "    Until: 24:00,0.50,       !- Field 23",
+        "    Through: 7/31,           !- Field 25",
+        "    For: AllDays,            !- Field 26",
+        "    Until: 24:00,0.1,        !- Field 27",
+        "    Through: 8/31,           !- Field 29",
+        "    For: AllDays,            !- Field 30",
+        "    Until: 24:00,1.0,        !- Field 31",
+        "    Through: 9/30,           !- Field 33",
+        "    For: AllDays,            !- Field 34",
+        "    Until: 24:00,0.25,       !- Field 35",
+        "    Through: 10/31,          !- Field 37",
+        "    For: AllDays,            !- Field 38",
+        "    Until: 24:00,0.50,       !- Field 39",
+        "    Through: 11/30,          !- Field 41",
+        "    For: AllDays,            !- Field 42",
+        "    Until: 24:00,0.75,       !- Field 43",
+        "    Through: 12/31,          !- Field 45",
+        "    For: AllDays,            !- Field 46",
+        "    Until: 24:00,1.00;       !- Field 47",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesBadInletNode)
 {
     std::string const idf_objects = delimited_string({
-         "  Zone,",
-         "    Main Zone,               !- Name",
-         "    0,                       !- Direction of Relative North {deg}",
-         "    0,                       !- X Origin {m}",
-         "    0,                       !- Y Origin {m}",
-         "    0,                       !- Z Origin {m}",
-         "    1,                       !- Type",
-         "    1,                       !- Multiplier",
-         "    autocalculate,           !- Ceiling Height {m}",
-         "    autocalculate;           !- Volume {m3}",
+        "  Zone,",
+        "    Main Zone,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
 
-         "  ZoneHVAC:EquipmentConnections,",
-         "    Main Zone,               !- Zone Name",
-         "    Main Zone Equipment,     !- Zone Conditioning Equipment List Name",
-         "    Main Zone Inlet Node,    !- Zone Air Inlet Node or NodeList Name",
-         "    ,                        !- Zone Air Exhaust Node or NodeList Name",
-         "    Main Zone Node,          !- Zone Air Node Name",
-         "    Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name",
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Main Zone,               !- Zone Name",
+        "    Main Zone Equipment,     !- Zone Conditioning Equipment List Name",
+        "    Main Zone Inlet Node,    !- Zone Air Inlet Node or NodeList Name",
+        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "    Main Zone Node,          !- Zone Air Node Name",
+        "    Main Zone Outlet Node;   !- Zone Return Air Node or NodeList Name",
 
-         "  ZoneHVAC:EquipmentList,",
-         "    Main Zone Equipment,     !- Name",
-         "    SequentialLoad,          !- Load Distribution Scheme",
-         "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
-         "    Main Zone ATU,           !- Zone Equipment 1 Name",
-         "    1,                       !- Zone Equipment 1 Cooling Sequence",
-         "    2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
-         "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
-         "    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
-         "    ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
-         "    Main Zone Baseboard,     !- Zone Equipment 2 Name",
-         "    2,                       !- Zone Equipment 2 Cooling Sequence",
-         "    1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
-         "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
-         "    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
+        "  ZoneHVAC:EquipmentList,",
+        "    Main Zone Equipment,     !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Main Zone ATU,           !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    2,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+        "    ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type",
+        "    Main Zone Baseboard,     !- Zone Equipment 2 Name",
+        "    2,                       !- Zone Equipment 2 Cooling Sequence",
+        "    1,                       !- Zone Equipment 2 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
+        "    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name",
 
-         "  ZoneHVAC:AirDistributionUnit,",
-         "    Main Zone ATU,           !- Name",
-         "    Main Zone Inlet Node,    !- Air Distribution Unit Outlet Node Name",
-         "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
-         "    Main Zone VAV Air;       !- Air Terminal Name",
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Main Zone ATU,           !- Name",
+        "    Main Zone Inlet Node,    !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    Main Zone VAV Air;       !- Air Terminal Name",
 
-         "  AirTerminal:SingleDuct:VAV:NoReheat,",
-         "    Main Zone VAV Air,       !- Name",
-         "    System Availability Schedule,  !- Availability Schedule Name",
-         "    Main Zone Inlet Node,    !- Air Outlet Node Name",
-         "    Main Zone ATU In Node,   !- Air Inlet Node Name",
-         "    8.5,                     !- Maximum Air Flow Rate {m3/s}",
-         "    Constant,                !- Zone Minimum Air Flow Input Method",
-         "    0.05;                    !- Constant Minimum Air Flow Fraction",
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    Main Zone VAV Air,       !- Name",
+        "    System Availability Schedule,  !- Availability Schedule Name",
+        "    Main Zone Inlet Node,    !- Air Outlet Node Name",
+        "    Main Zone ATU In Node,   !- Air Inlet Node Name",
+        "    8.5,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.05;                    !- Constant Minimum Air Flow Fraction",
 
-         "  ZoneHVAC:Baseboard:Convective:Electric,",
-         "    Main Zone Baseboard,     !- Name",
-         "    System Availability Schedule,  !- Availability Schedule Name",
-         "    HeatingDesignCapacity,   !- Heating Design Capacity Method",
-         "    8000,                    !- Heating Design Capacity {W}",
-         "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
-         "    ,                        !- Fraction of Autosized Heating Design Capacity",
-         "    0.97;                    !- Efficiency",
+        "  ZoneHVAC:Baseboard:Convective:Electric,",
+        "    Main Zone Baseboard,     !- Name",
+        "    System Availability Schedule,  !- Availability Schedule Name",
+        "    HeatingDesignCapacity,   !- Heating Design Capacity Method",
+        "    8000,                    !- Heating Design Capacity {W}",
+        "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+        "    ,                        !- Fraction of Autosized Heating Design Capacity",
+        "    0.97;                    !- Efficiency",
 
-         "  ElectricEquipment:ITE:AirCooled,",
-         "    Data Center Servers,     !- Name",
-         "    Main Zone,               !- Zone Name",
-         "    FlowControlWithApproachTemperatures,  !- Air Flow Calculation Method",
-         "    Watts/Unit,              !- Design Power Input Calculation Method",
-         "    500,                     !- Watts per Unit {W}",
-         "    100,                     !- Number of Units",
-         "    ,                        !- Watts per Zone Floor Area {W/m2}",
-         "    Data Center Operation Schedule,  !- Design Power Input Schedule Name",
-         "    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name",
-         "    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
-         "    0.4,                     !- Design Fan Power Input Fraction",
-         "    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
-         "    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
-         "    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
-         "    15,                      !- Design Entering Air Temperature {C}",
-         "    A3,                      !- Environmental Class",
-         "    RoomAirModel,            !- Air Inlet Connection Type",
-         "    ,                        !- Air Inlet Room Air Model Node Name",
-         "    ,                        !- Air Outlet Room Air Model Node Name",
-         "    Inlet Node Not Found,    !- Supply Air Node Name",
-         "    0.1,                     !- Design Recirculation Fraction",
-         "    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
-         "    0.9,                     !- Design Electric Power Supply Efficiency",
-         "    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
-         "    1,                       !- Fraction of Electric Power Supply Losses to Zone",
-         "    ITE-CPU,                 !- CPU End-Use Subcategory",
-         "    ITE-Fans,                !- Fan End-Use Subcategory",
-         "    ITE-UPS,                 !- Electric Power Supply End-Use Subcategory",
-         "    2,                       !- Supply Temperature Difference {deltaC}",
-         "    ,                        !- Supply Temperature Difference Schedule",
-         "    -1,                      !- Return Temperature Difference {deltaC}",
-         "    ;                        !- Return Temperature Difference Schedule",
+        "  ElectricEquipment:ITE:AirCooled,",
+        "    Data Center Servers,     !- Name",
+        "    Main Zone,               !- Zone Name",
+        "    FlowControlWithApproachTemperatures,  !- Air Flow Calculation Method",
+        "    Watts/Unit,              !- Design Power Input Calculation Method",
+        "    500,                     !- Watts per Unit {W}",
+        "    100,                     !- Number of Units",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    Data Center Operation Schedule,  !- Design Power Input Schedule Name",
+        "    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name",
+        "    Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name",
+        "    0.4,                     !- Design Fan Power Input Fraction",
+        "    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}",
+        "    Data Center Servers Airflow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name",
+        "    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name",
+        "    15,                      !- Design Entering Air Temperature {C}",
+        "    A3,                      !- Environmental Class",
+        "    RoomAirModel,            !- Air Inlet Connection Type",
+        "    ,                        !- Air Inlet Room Air Model Node Name",
+        "    ,                        !- Air Outlet Room Air Model Node Name",
+        "    Inlet Node Not Found,    !- Supply Air Node Name",
+        "    0.1,                     !- Design Recirculation Fraction",
+        "    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name",
+        "    0.9,                     !- Design Electric Power Supply Efficiency",
+        "    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name",
+        "    1,                       !- Fraction of Electric Power Supply Losses to Zone",
+        "    ITE-CPU,                 !- CPU End-Use Subcategory",
+        "    ITE-Fans,                !- Fan End-Use Subcategory",
+        "    ITE-UPS,                 !- Electric Power Supply End-Use Subcategory",
+        "    2,                       !- Supply Temperature Difference {deltaC}",
+        "    ,                        !- Supply Temperature Difference Schedule",
+        "    -1,                      !- Return Temperature Difference {deltaC}",
+        "    ;                        !- Return Temperature Difference Schedule",
 
-         "  Curve:Quadratic,",
-         "    ECM FanPower fFlow,      !- Name",
-         "    0.0,                     !- Coefficient1 Constant",
-         "    1.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.0,                     !- Minimum Value of x",
-         "    99.0;                    !- Maximum Value of x",
+        "  Curve:Quadratic,",
+        "    ECM FanPower fFlow,      !- Name",
+        "    0.0,                     !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    99.0;                    !- Maximum Value of x",
 
-         "  Curve:Quadratic,",
-         "    UPS Efficiency fPLR,     !- Name",
-         "    1.0,                     !- Coefficient1 Constant",
-         "    0.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.0,                     !- Minimum Value of x",
-         "    99.0;                    !- Maximum Value of x",
+        "  Curve:Quadratic,",
+        "    UPS Efficiency fPLR,     !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    99.0;                    !- Maximum Value of x",
 
-         "  Curve:Biquadratic,",
-         "    Data Center Servers Power fLoadTemp,  !- Name",
-         "    -1.0,                    !- Coefficient1 Constant",
-         "    1.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.06667,                 !- Coefficient4 y",
-         "    0.0,                     !- Coefficient5 y**2",
-         "    0.0,                     !- Coefficient6 x*y",
-         "    0.0,                     !- Minimum Value of x",
-         "    1.5,                     !- Maximum Value of x",
-         "    -10,                     !- Minimum Value of y",
-         "    99.0,                    !- Maximum Value of y",
-         "    0.0,                     !- Minimum Curve Output",
-         "    99.0,                    !- Maximum Curve Output",
-         "    Dimensionless,           !- Input Unit Type for X",
-         "    Temperature,             !- Input Unit Type for Y",
-         "    Dimensionless;           !- Output Unit Type",
+        "  Curve:Biquadratic,",
+        "    Data Center Servers Power fLoadTemp,  !- Name",
+        "    -1.0,                    !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.06667,                 !- Coefficient4 y",
+        "    0.0,                     !- Coefficient5 y**2",
+        "    0.0,                     !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    99.0,                    !- Maximum Value of y",
+        "    0.0,                     !- Minimum Curve Output",
+        "    99.0,                    !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
 
-         "  Curve:Biquadratic,",
-         "    Data Center Servers Airflow fLoadTemp,  !- Name",
-         "    -1.4,                    !- Coefficient1 Constant",
-         "    0.9,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.1,                     !- Coefficient4 y",
-         "    0.0,                     !- Coefficient5 y**2",
-         "    0.0,                     !- Coefficient6 x*y",
-         "    0.0,                     !- Minimum Value of x",
-         "    1.5,                     !- Maximum Value of x",
-         "    -10,                     !- Minimum Value of y",
-         "    99.0,                    !- Maximum Value of y",
-         "    0.0,                     !- Minimum Curve Output",
-         "    99.0,                    !- Maximum Curve Output",
-         "    Dimensionless,           !- Input Unit Type for X",
-         "    Temperature,             !- Input Unit Type for Y",
-         "    Dimensionless;           !- Output Unit Type",
+        "  Curve:Biquadratic,",
+        "    Data Center Servers Airflow fLoadTemp,  !- Name",
+        "    -1.4,                    !- Coefficient1 Constant",
+        "    0.9,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.1,                     !- Coefficient4 y",
+        "    0.0,                     !- Coefficient5 y**2",
+        "    0.0,                     !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    99.0,                    !- Maximum Value of y",
+        "    0.0,                     !- Minimum Curve Output",
+        "    99.0,                    !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
 
-         "  Curve:Biquadratic,",
-         "    Data Center Recirculation fLoadTemp,  !- Name",
-         "    1.0,                     !- Coefficient1 Constant",
-         "    0.0,                     !- Coefficient2 x",
-         "    0.0,                     !- Coefficient3 x**2",
-         "    0.0,                     !- Coefficient4 y",
-         "    0.0,                     !- Coefficient5 y**2",
-         "    0.0,                     !- Coefficient6 x*y",
-         "    0.0,                     !- Minimum Value of x",
-         "    1.5,                     !- Maximum Value of x",
-         "    -10,                     !- Minimum Value of y",
-         "    99.0,                    !- Maximum Value of y",
-         "    0.0,                     !- Minimum Curve Output",
-         "    99.0,                    !- Maximum Curve Output",
-         "    Dimensionless,           !- Input Unit Type for X",
-         "    Temperature,             !- Input Unit Type for Y",
-         "    Dimensionless;           !- Output Unit Type",
+        "  Curve:Biquadratic,",
+        "    Data Center Recirculation fLoadTemp,  !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 y",
+        "    0.0,                     !- Coefficient5 y**2",
+        "    0.0,                     !- Coefficient6 x*y",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.5,                     !- Maximum Value of x",
+        "    -10,                     !- Minimum Value of y",
+        "    99.0,                    !- Maximum Value of y",
+        "    0.0,                     !- Minimum Curve Output",
+        "    99.0,                    !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
 
-         "  Schedule:Constant,Data Center Operation Schedule,Any Number,1.0;",
+        "  Schedule:Constant,Data Center Operation Schedule,Any Number,1.0;",
 
-         "  Schedule:Compact,",
-         "    Data Center CPU Loading Schedule,  !- Name",
-         "    Any Number,              !- Schedule Type Limits Name",
-         "    Through: 1/31,           !- Field 1",
-         "    For: AllDays,            !- Field 2",
-         "    Until: 24:00,1.0,        !- Field 3",
-         "    Through: 2/29,           !- Field 5",
-         "    For: AllDays,            !- Field 6",
-         "    Until: 24:00,0.50,       !- Field 7",
-         "    Through: 3/31,           !- Field 9",
-         "    For: AllDays,            !- Field 10",
-         "    Until: 24:00,0.75,       !- Field 11",
-         "    Through: 4/30,           !- Field 13",
-         "    For: AllDays,            !- Field 14",
-         "    Until: 24:00,1.0,        !- Field 15",
-         "    Through: 5/31,           !- Field 17",
-         "    For: AllDays,            !- Field 18",
-         "    Until: 24:00,0.25,       !- Field 19",
-         "    Through: 6/30,           !- Field 21",
-         "    For: AllDays,            !- Field 22",
-         "    Until: 24:00,0.50,       !- Field 23",
-         "    Through: 7/31,           !- Field 25",
-         "    For: AllDays,            !- Field 26",
-         "    Until: 24:00,0.1,        !- Field 27",
-         "    Through: 8/31,           !- Field 29",
-         "    For: AllDays,            !- Field 30",
-         "    Until: 24:00,1.0,        !- Field 31",
-         "    Through: 9/30,           !- Field 33",
-         "    For: AllDays,            !- Field 34",
-         "    Until: 24:00,0.25,       !- Field 35",
-         "    Through: 10/31,          !- Field 37",
-         "    For: AllDays,            !- Field 38",
-         "    Until: 24:00,0.50,       !- Field 39",
-         "    Through: 11/30,          !- Field 41",
-         "    For: AllDays,            !- Field 42",
-         "    Until: 24:00,0.75,       !- Field 43",
-         "    Through: 12/31,          !- Field 45",
-         "    For: AllDays,            !- Field 46",
-         "    Until: 24:00,1.00;       !- Field 47",
+        "  Schedule:Compact,",
+        "    Data Center CPU Loading Schedule,  !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 1/31,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0,        !- Field 3",
+        "    Through: 2/29,           !- Field 5",
+        "    For: AllDays,            !- Field 6",
+        "    Until: 24:00,0.50,       !- Field 7",
+        "    Through: 3/31,           !- Field 9",
+        "    For: AllDays,            !- Field 10",
+        "    Until: 24:00,0.75,       !- Field 11",
+        "    Through: 4/30,           !- Field 13",
+        "    For: AllDays,            !- Field 14",
+        "    Until: 24:00,1.0,        !- Field 15",
+        "    Through: 5/31,           !- Field 17",
+        "    For: AllDays,            !- Field 18",
+        "    Until: 24:00,0.25,       !- Field 19",
+        "    Through: 6/30,           !- Field 21",
+        "    For: AllDays,            !- Field 22",
+        "    Until: 24:00,0.50,       !- Field 23",
+        "    Through: 7/31,           !- Field 25",
+        "    For: AllDays,            !- Field 26",
+        "    Until: 24:00,0.1,        !- Field 27",
+        "    Through: 8/31,           !- Field 29",
+        "    For: AllDays,            !- Field 30",
+        "    Until: 24:00,1.0,        !- Field 31",
+        "    Through: 9/30,           !- Field 33",
+        "    For: AllDays,            !- Field 34",
+        "    Until: 24:00,0.25,       !- Field 35",
+        "    Through: 10/31,          !- Field 37",
+        "    For: AllDays,            !- Field 38",
+        "    Until: 24:00,0.50,       !- Field 39",
+        "    Through: 11/30,          !- Field 41",
+        "    For: AllDays,            !- Field 42",
+        "    Until: 24:00,0.75,       !- Field 43",
+        "    Through: 12/31,          !- Field 45",
+        "    For: AllDays,            !- Field 46",
+        "    Until: 24:00,1.00;       !- Field 47",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
-    ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(state));
+    ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state));
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
@@ -2454,22 +2454,22 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
         "    Through: 12/31,          !- Field 45",
         "    For: AllDays,            !- Field 46",
         "    Until: 24:00,1.00;       !- Field 47",
-                                                     });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
 
-    HeatBalanceManager::GetZoneData(ErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput(state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
 }

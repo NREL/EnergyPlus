@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,14 +51,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/SetPointManager.hh>
-#include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/BranchInputManager.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 
@@ -66,10 +65,10 @@ class DistributePlantLoadTest : public EnergyPlusFixture
 {
 
 public:
-    static void SetUpTestCase()
-    {
-        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
-    }
+    //    static void SetUpTestCase()
+    //    {
+    //        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+    //    }
     static void TearDownTestCase()
     {
     }
@@ -78,22 +77,22 @@ public:
     {
         EnergyPlusFixture::SetUp(); // Sets up individual test cases.
 
-                                    // unit test for plant equipment list load distribution
-                                    // set up one plantloop side with 1 branches, 12 components
-                                    // using 12 components here to test going beyond the old idd limit of 10 pieces of equipment
-        DataPlant::PlantLoop.allocate(1);
-        DataPlant::PlantLoop(1).OpScheme.allocate(1);
-        DataPlant::PlantLoop(1).OpScheme(1).EquipList.allocate(1);
-        auto &thisEquipList(DataPlant::PlantLoop(1).OpScheme(1).EquipList(1));
+        // unit test for plant equipment list load distribution
+        // set up one plantloop side with 1 branches, 12 components
+        // using 12 components here to test going beyond the old idd limit of 10 pieces of equipment
+        state->dataPlnt->PlantLoop.allocate(1);
+        state->dataPlnt->PlantLoop(1).OpScheme.allocate(1);
+        state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList.allocate(1);
+        auto &thisEquipList(state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1));
         thisEquipList.NumComps = 12;
         thisEquipList.Comp.allocate(thisEquipList.NumComps);
 
-        DataPlant::PlantLoop(1).LoopSide.allocate(1);
-        DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-        DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(thisEquipList.NumComps);
-        auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+        state->dataPlnt->PlantLoop(1).LoopSide.allocate(1);
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+        state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(thisEquipList.NumComps);
+        auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-        for (int compNum = 1; compNum <= DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
+        for (int compNum = 1; compNum <= state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
             // set up equipment list data
             thisEquipList.Comp(compNum).CompNumPtr = compNum;
 
@@ -111,30 +110,29 @@ public:
     virtual void ResetLoads()
     {
         // reset loads
-        auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
-        for (int compNum = 1; compNum <= DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
+        auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
+        for (int compNum = 1; compNum <= state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps; ++compNum) {
             thisBranch.Comp(compNum).MyLoad = 0.0;
         }
     }
     virtual void TearDown()
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
-
     }
 };
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::SequentialLoading;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Sequential;
 
     // Loop demand 550W
     DistributePlantLoadTest::ResetLoads();
     Real64 loopDemand = 550.0;
     Real64 remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
@@ -155,7 +153,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     loopDemand = 50.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 50.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 0.0);
@@ -175,7 +173,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     loopDemand = 5000.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
@@ -201,7 +199,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     thisBranch.Comp(10).Available = false;
     thisBranch.Comp(12).Available = false;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
@@ -216,9 +214,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     EXPECT_EQ(thisBranch.Comp(12).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-
-    //Duplicate tests from engineering reference examples for Sequential
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    // Duplicate tests from engineering reference examples for Sequential
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -233,7 +230,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     loopDemand = 5.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 5.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -243,7 +240,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     loopDemand = 25.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 25.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -253,7 +250,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     loopDemand = 50.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 10.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -263,7 +260,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     loopDemand = 100.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 60.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -273,7 +270,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     loopDemand = 150.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 10.0);
@@ -283,7 +280,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
     loopDemand = 200.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 60.0);
@@ -291,19 +288,19 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Sequential)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::UniformLoading;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Uniform;
 
     // Start with 5 components
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
 
     // Loop demand 550W
     DistributePlantLoadTest::ResetLoads();
     Real64 remainingLoopDemand = 0.0;
     Real64 loopDemand = 550.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
@@ -316,7 +313,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     remainingLoopDemand = 0.0;
     loopDemand = 50.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 10.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 10.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 10.0);
@@ -333,7 +330,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     thisBranch.Comp(4).MaxLoad = 50.0;
     thisBranch.Comp(3).Available = false;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 90.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 0.0);
@@ -341,8 +338,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     EXPECT_EQ(thisBranch.Comp(5).MyLoad, 80.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    //Duplicate tests from engineering reference examples
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    // Duplicate tests from engineering reference examples
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -354,7 +351,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 10.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 5.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 5.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -363,7 +360,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 25.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 12.5);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 12.5);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -372,7 +369,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 50.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 25.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 25.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -381,7 +378,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 100.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 60.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -390,7 +387,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 150.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 10.0);
@@ -399,34 +396,32 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Uniform)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 200.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 60.0);
-
 }
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::OptimalLoading;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::Optimal;
 
     // Start with 5 components and smaller component 4
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
     thisBranch.Comp(4).Available = true;
     thisBranch.Comp(4).OptLoad = 45.0;
     thisBranch.Comp(4).MaxLoad = 50.0;
     thisBranch.Comp(4).MinLoad = 0.0;
     thisBranch.Comp(4).MyLoad = 0.0;
 
-
     // Loop demand 550W
     DistributePlantLoadTest::ResetLoads();
     Real64 remainingLoopDemand = 0.0;
     Real64 loopDemand = 550.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
@@ -439,7 +434,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     remainingLoopDemand = 0.0;
     loopDemand = 440.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 99.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 97.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 97.0);
@@ -454,7 +449,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     loopDemand = 340.0;
     thisBranch.Comp(3).Available = false;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 97.5);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 96.25);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 0.0);
@@ -462,8 +457,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     EXPECT_EQ(thisBranch.Comp(5).MyLoad, 96.25);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    //Duplicate tests from engineering reference examples
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    // Duplicate tests from engineering reference examples
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -475,7 +470,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 5.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 5.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -484,7 +479,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 25.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 24.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 1.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -493,7 +488,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 50.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 24.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 26.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -502,7 +497,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 100.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 60.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -511,7 +506,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 150.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 10.0);
@@ -520,7 +515,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 200.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 60.0);
@@ -531,7 +526,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
     loopDemand = 200.0;
     thisBranch.Comp(1).Available = false;
     thisBranch.Comp(2).Available = false;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 0.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 200.0);
@@ -539,12 +534,12 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_Optimal)
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::UniformPLRLoading;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::UniformPLR;
 
     // Start with 5 components and smaller component 4
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
     thisBranch.Comp(4).Available = true;
     thisBranch.Comp(4).OptLoad = 45.0;
     thisBranch.Comp(4).MaxLoad = 50.0;
@@ -556,7 +551,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     Real64 loopDemand = 550.0;
     Real64 remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
@@ -570,7 +565,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     loopDemand = 45.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 10.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 10.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 10.0);
@@ -587,7 +582,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     remainingLoopDemand = 0.0;
     thisBranch.Comp(3).Available = false;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 80.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 80.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 0.0);
@@ -595,8 +590,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     EXPECT_EQ(thisBranch.Comp(5).MyLoad, 80.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    //Duplicate tests from engineering reference examples
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    // Duplicate tests from engineering reference examples
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -608,7 +603,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 5.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 5.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -617,7 +612,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 10.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 10.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -626,48 +621,47 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_UniformPLR)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 25.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 25.0,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 0.0,0.1);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 25.0, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 0.0, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 50W
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 50.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 14.29,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 35.71,0.1);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 14.29, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 35.71, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 100W
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 100.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 28.57,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 71.43,0.1);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 28.57, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 71.43, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 150W
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 150.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 10.0);
-
 }
 
 TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
 {
-    auto &thisBranch(DataPlant::PlantLoop(1).LoopSide(1).Branch(1));
+    auto &thisBranch(state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1));
 
-    DataPlant::PlantLoop(1).LoadDistribution = DataPlant::SequentialUniformPLRLoading;
+    state->dataPlnt->PlantLoop(1).LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
 
     // Start with 5 components and smaller component 4
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 5;
     thisBranch.Comp(4).Available = true;
     thisBranch.Comp(4).OptLoad = 45.0;
     thisBranch.Comp(4).MaxLoad = 50.0;
@@ -679,7 +673,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     Real64 remainingLoopDemand = 0.0;
     Real64 loopDemand = 550.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 100.0);
@@ -693,7 +687,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     loopDemand = 45.0;
     remainingLoopDemand = 0.0;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 45.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 0.0);
@@ -710,7 +704,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     remainingLoopDemand = 0.0;
     thisBranch.Comp(3).Available = false;
 
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 90.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 90.0);
     EXPECT_EQ(thisBranch.Comp(3).MyLoad, 0.0);
@@ -718,8 +712,8 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     EXPECT_EQ(thisBranch.Comp(5).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
-    //Duplicate tests from engineering reference examples
-    DataPlant::PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
+    // Duplicate tests from engineering reference examples
+    state->dataPlnt->PlantLoop(1).OpScheme(1).EquipList(1).NumComps = 2;
     thisBranch.Comp(1).MaxLoad = 40.0;
     thisBranch.Comp(1).MinLoad = 0.2 * 40.0;
     thisBranch.Comp(1).OptLoad = 0.6 * 40.0;
@@ -731,7 +725,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 5.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 5.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -740,7 +734,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 10.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 10.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -749,7 +743,7 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 25.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 25.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 0.0);
     EXPECT_EQ(remainingLoopDemand, 0.0);
@@ -758,104 +752,105 @@ TEST_F(DistributePlantLoadTest, DistributePlantLoad_SequentialUniformPLR)
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 50.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 14.3,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 35.71,0.1);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 14.3, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 35.71, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 100W
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 100.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
-    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 28.6,0.1);
-    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 71.43,0.1);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    EXPECT_NEAR(thisBranch.Comp(1).MyLoad, 28.6, 0.1);
+    EXPECT_NEAR(thisBranch.Comp(2).MyLoad, 71.43, 0.1);
     EXPECT_EQ(remainingLoopDemand, 0.0);
 
     // 150W
     DistributePlantLoadTest::ResetLoads();
     remainingLoopDemand = 0.0;
     loopDemand = 150.0;
-    PlantCondLoopOperation::DistributePlantLoad(1, 1, 1, 1, loopDemand, remainingLoopDemand);
+    PlantCondLoopOperation::DistributePlantLoad(*state, 1, 1, 1, 1, loopDemand, remainingLoopDemand);
     EXPECT_EQ(thisBranch.Comp(1).MyLoad, 40.0);
     EXPECT_EQ(thisBranch.Comp(2).MyLoad, 100.0);
     EXPECT_EQ(remainingLoopDemand, 10.0);
-
 }
 
-TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
+TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
+{
 
     std::string const idf_objects = delimited_string({
-      "PlantEquipmentOperation:ThermalEnergyStorage,",
-      "  TEST PLANTOP SCHEME,          !- Name",
-      "  Ice Thermal Storage On-peak,  !- On-Peak Schedule",
-      "  Ice Thermal Storage Charging,  !- Charging Availability Schedule",
-      "  7.00,                    !- Non-Charging Chilled Water Temperature {C}",
-      "  -5.00,                   !- Charging Chilled Water Temperature {C}",
-      "  Chiller:Electric:EIR,    !- Component 1 Object Type",
-      "  Chiller,                 !- Component 1 Name",
-      "  Primary CHW Loop Pump Water Outlet Node,  !- Component 1 Demand Calculation Node Name",
-      "  Chiller CHW Outlet Node, !- Component 1 Setpoint Node Name",
-      "  0.001351,                !- Component 1 Flow Rate {m3/s}",
-      "  Cooling,                 !- Component 1 Operation Type",
-      "  ThermalStorage:Ice:Detailed,  !- Component 2 Object Type",
-      "  Ice Thermal Storage,     !- Component 2 Name",
-      "  Chiller CHW Outlet Node, !- Component 2 Demand Calculation Node Name",
-      "  Ice Thermal Storage Water Outlet Node,  !- Component 2 Setpoint Node Name",
-      "  autosize,                !- Component 2 Flow Rate {m3/s}",
-      "  Cooling;                 !- Component 2 Operation Type",
-      "",
+        "PlantEquipmentOperation:ThermalEnergyStorage,",
+        "  TEST PLANTOP SCHEME,          !- Name",
+        "  Ice Thermal Storage On-peak,  !- On-Peak Schedule",
+        "  Ice Thermal Storage Charging,  !- Charging Availability Schedule",
+        "  7.00,                    !- Non-Charging Chilled Water Temperature {C}",
+        "  -5.00,                   !- Charging Chilled Water Temperature {C}",
+        "  Chiller:Electric:EIR,    !- Component 1 Object Type",
+        "  Chiller,                 !- Component 1 Name",
+        "  Primary CHW Loop Pump Water Outlet Node,  !- Component 1 Demand Calculation Node Name",
+        "  Chiller CHW Outlet Node, !- Component 1 Setpoint Node Name",
+        "  0.001351,                !- Component 1 Flow Rate {m3/s}",
+        "  Cooling,                 !- Component 1 Operation Type",
+        "  ThermalStorage:Ice:Detailed,  !- Component 2 Object Type",
+        "  Ice Thermal Storage,     !- Component 2 Name",
+        "  Chiller CHW Outlet Node, !- Component 2 Demand Calculation Node Name",
+        "  Ice Thermal Storage Water Outlet Node,  !- Component 2 Setpoint Node Name",
+        "  autosize,                !- Component 2 Flow Rate {m3/s}",
+        "  Cooling;                 !- Component 2 Operation Type",
+        "",
 
-      "Schedule:Compact,",
-      "  Ice Thermal Storage On-peak,  !- Name",
-      "  Fraction,                !- Schedule Type Limits Name",
-      "  Through: 12/31,          !- Field 1",
-      "  For: AllDays,            !- Field 2",
-      "  Until: 08:00,0,          !- Field 3",
-      "  Until: 18:00,1,          !- Field 4",
-      "  Until: 24:00,0;          !- Field 5",
+        "Schedule:Compact,",
+        "  Ice Thermal Storage On-peak,  !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 08:00,0,          !- Field 3",
+        "  Until: 18:00,1,          !- Field 4",
+        "  Until: 24:00,0;          !- Field 5",
 
-      "Schedule:Compact,",
-      "  Ice Thermal Storage Charging,  !- Name",
-      "  Fraction,                !- Schedule Type Limits Name",
-      "  Through: 12/31,          !- Field 1",
-      "  For: AllDays,            !- Field 2",
-      "  Until: 08:00,1,          !- Field 3",
-      "  Until: 18:00,0,          !- Field 4",
-      "  Until: 24:00,1;          !- Field 5",
+        "Schedule:Compact,",
+        "  Ice Thermal Storage Charging,  !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 08:00,1,          !- Field 3",
+        "  Until: 18:00,0,          !- Field 4",
+        "  Until: 24:00,1;          !- Field 5",
 
-      "ScheduleTypeLimits,",
-      "  Fraction,                !- Name",
-      "  0.0,                     !- Lower Limit Value",
-      "  1.0,                     !- Upper Limit Value",
-      "  CONTINUOUS,              !- Numeric Type",
-      "  Dimensionless;           !- Unit Type",
+        "ScheduleTypeLimits,",
+        "  Fraction,                !- Name",
+        "  0.0,                     !- Lower Limit Value",
+        "  1.0,                     !- Upper Limit Value",
+        "  CONTINUOUS,              !- Numeric Type",
+        "  Dimensionless;           !- Unit Type",
 
     });
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
     // Setup the plant itself manually
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
 
-    DataPlant::PlantLoop(1).OpScheme.allocate(1);
-    DataPlant::PlantLoop(1).OpScheme(1).Name = "TEST PLANTOP SCHEME";
+    state->dataPlnt->PlantLoop(1).OpScheme.allocate(1);
+    state->dataPlnt->PlantLoop(1).OpScheme(1).Name = "TEST PLANTOP SCHEME";
 
-    SetPointManager::NumAllSetPtMgrs = 0;
-    SetPointManager::NumSchTESSetPtMgrs = 0;
+    state->dataSetPointManager->NumAllSetPtMgrs = 0;
+    state->dataSetPointManager->NumSchTESSetPtMgrs = 0;
 
     bool ErrorsFound = false;
     int TESSPBO = 1;
     int LoopNum = 1;
     int SchemeNum = 1;
     std::string CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
-    PlantCondLoopOperation::FindCompSPInput(CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound);
+    PlantCondLoopOperation::FindCompSPInput(*state, CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
     std::string const error_string = delimited_string({
-        "   ** Warning ** Equipment Operation Mode was reset to 'DUAL' for Component 'ICE THERMAL STORAGE' in PlantEquipmentOperation:ThermalEnergyStorage='TEST PLANTOP SCHEME'.",
+        "   ** Warning ** Equipment Operation Mode was reset to 'DUAL' for Component 'ICE THERMAL STORAGE' in "
+        "PlantEquipmentOperation:ThermalEnergyStorage='TEST PLANTOP SCHEME'.",
         "   **   ~~~   ** Equipment Operation Mode can only be 'DUAL' for THERMALSTORAGE:ICE:DETAILED objects.",
     });
 
@@ -864,29 +859,29 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
     // Might as well check that the Chiller is also Ok
     {
         int CompNum = 1;
-        std::string compName = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
+        std::string compName = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
         EXPECT_EQ(compName, "CHILLER");
-        int CtrlTypeNum = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
-        EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::CoolingOp);
+        auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+        EXPECT_EQ(CtrlTypeNum, DataPlant::iCtrlType::CoolingOp);
     }
 
     {
         int CompNum = 2;
-        std::string compName = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
+        std::string compName = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
         // Ensure we have the right component (the TES tank)
         EXPECT_EQ(compName, "ICE THERMAL STORAGE");
 
-        int CtrlTypeNum = DataPlant::PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
+        auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlTypeNum;
 
         // Could just test this, but want to improve reporting
         // EXPECT_EQ(CtrlTypeNum, PlantCondLoopOperation::DualOp);
 
         std::string ctrlType = "Unknown";
-        if (CtrlTypeNum == PlantCondLoopOperation::CoolingOp) {
+        if (CtrlTypeNum == DataPlant::iCtrlType::CoolingOp) {
             ctrlType = "CoolingOp";
-        } else if (CtrlTypeNum == PlantCondLoopOperation::HeatingOp) {
+        } else if (CtrlTypeNum == DataPlant::iCtrlType::HeatingOp) {
             ctrlType = "HeatingOp";
-        } else if (CtrlTypeNum == PlantCondLoopOperation::DualOp) {
+        } else if (CtrlTypeNum == DataPlant::iCtrlType::DualOp) {
             ctrlType = "DualOp";
         }
 
@@ -894,7 +889,6 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp) {
     }
 
     // We should now alos have two TES SPMs created, and that's all of them
-    EXPECT_EQ(SetPointManager::NumSchTESSetPtMgrs, 2);
-    EXPECT_EQ(SetPointManager::NumAllSetPtMgrs, 2);
-
+    EXPECT_EQ(state->dataSetPointManager->NumSchTESSetPtMgrs, 2);
+    EXPECT_EQ(state->dataSetPointManager->NumAllSetPtMgrs, 2);
 }

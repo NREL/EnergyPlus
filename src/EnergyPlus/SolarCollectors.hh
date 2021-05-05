@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,11 +64,6 @@ struct EnergyPlusData;
 
 namespace SolarCollectors {
 
-    extern Array1D_bool CheckEquipName;
-
-    extern int NumOfParameters;
-    extern int NumOfCollectors;
-
     enum struct FluidEnum
     {
         WATER,
@@ -124,7 +119,7 @@ namespace SolarCollectors {
         {
         }
 
-        Real64 IAM(Real64 IncidentAngle // Angle of incidence (radians)
+        Real64 IAM(EnergyPlusData &state, Real64 IncidentAngle // Angle of incidence (radians)
         );
     };
 
@@ -136,11 +131,11 @@ namespace SolarCollectors {
         std::string OSCMName;     // OtherSideConditionsModel
         int VentCavIndex;         // index of ventilated cavity object
         TankTypeEnum ICSType_Num; // ICS collector type number
-        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant !DSU
-        int WLoopNum;             // Water plant loop index number                      !DSU
-        int WLoopSideNum;         // Water plant loop side index                        !DSU
-        int WLoopBranchNum;       // Water plant loop branch index                      !DSU
-        int WLoopCompNum;         // Water plant loop component index                   !DSU
+        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant
+        int WLoopNum;             // Water plant loop index number
+        int WLoopSideNum;         // Water plant loop side index
+        int WLoopBranchNum;       // Water plant loop branch index
+        int WLoopCompNum;         // Water plant loop component index
         bool Init;                // Flag for initialization:  TRUE means do the init
         bool InitSizing;          // Flag for initialization of plant sizing
         int Parameters;           // Parameters object number
@@ -229,15 +224,20 @@ namespace SolarCollectors {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
-        void CalcTransRefAbsOfCover(Real64 IncidentAngle,              // Angle of incidence (radians)
+        void CalcTransRefAbsOfCover(EnergyPlusData &state,
+                                    Real64 IncidentAngle,              // Angle of incidence (radians)
                                     Real64 &TransSys,                  // cover system solar transmittance
                                     Real64 &ReflSys,                   // cover system solar reflectance
                                     Real64 &AbsCover1,                 // Inner cover solar absorbtance
@@ -246,15 +246,16 @@ namespace SolarCollectors {
                                     Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
         );
 
-        void CalcSolarCollector();
+        void CalcSolarCollector(EnergyPlusData &state);
 
-        void CalcICSSolarCollector();
+        void CalcICSSolarCollector(EnergyPlusData &state);
 
-        void CalcTransAbsorProduct(Real64 IncidAngle);
+        void CalcTransAbsorProduct(EnergyPlusData &state, Real64 IncidAngle);
 
-        void CalcHeatTransCoeffAndCoverTemp();
+        void CalcHeatTransCoeffAndCoverTemp(EnergyPlusData &state);
 
-        static void ICSCollectorAnalyticalSolution(Real64 SecInTimeStep,     // seconds in a time step
+        static void ICSCollectorAnalyticalSolution(EnergyPlusData &state,
+                                                   Real64 SecInTimeStep,     // seconds in a time step
                                                    Real64 a1,                // coefficient of ODE for Tp
                                                    Real64 a2,                // coefficient of ODE for Tp
                                                    Real64 a3,                // coefficient of ODE for Tp
@@ -275,29 +276,51 @@ namespace SolarCollectors {
                                                  Real64 SinTilt    // sine of surface tilt angle relative to the horizontal
         );
 
-        static Real64 CalcConvCoeffAbsPlateAndWater(Real64 TAbsorber, // temperature of absorber plate [C]
+        static Real64 CalcConvCoeffAbsPlateAndWater(EnergyPlusData &state,
+                                                    Real64 TAbsorber, // temperature of absorber plate [C]
                                                     Real64 TWater,    // temperature of water [C]
                                                     Real64 Lc,        // characteristic length [m]
                                                     Real64 TiltR2V    // collector tilt angle relative to the vertical [degree]
         );
 
-        static void GetExtVentedCavityIndex(int SurfacePtr, int &VentCavIndex);
+        static void GetExtVentedCavityIndex(EnergyPlusData &state, int SurfacePtr, int &VentCavIndex);
 
-        void update();
+        void update(EnergyPlusData &state);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<ParametersData> Parameters;
-    extern Array1D<CollectorData> Collector;
-
-    // Functions
-    void clear_state();
-    void GetSolarCollectorInput();
+    void GetSolarCollectorInput(EnergyPlusData &state);
 
 } // namespace SolarCollectors
 
+struct SolarCollectorsData : BaseGlobalStruct
+{
+
+    Array1D_bool CheckEquipName;
+    int NumOfCollectors = 0;
+    int NumOfParameters = 0;
+    bool GetInputFlag = true;
+
+    Array1D<SolarCollectors::ParametersData> Parameters;
+    Array1D<SolarCollectors::CollectorData> Collector;
+    std::unordered_map<std::string, std::string> UniqueParametersNames;
+    std::unordered_map<std::string, std::string> UniqueCollectorNames;
+
+    void clear_state() override
+    {
+        NumOfCollectors = 0;
+        NumOfParameters = 0;
+        GetInputFlag = true;
+        Parameters.deallocate();
+        Collector.deallocate();
+        UniqueCollectorNames.clear();
+        UniqueParametersNames.clear();
+    }
+
+    // Default Constructor
+    SolarCollectorsData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

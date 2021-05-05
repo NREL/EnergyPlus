@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,18 +52,17 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/CommonIncludes.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
 #include <ostream>
 
 namespace EnergyPlus {
-    class IOFiles;
+
+struct EnergyPlusData;
 
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
 // everything is cleaned up properly
@@ -102,7 +101,7 @@ private:
 class EnergyPlusFixture : public testing::Test
 {
 protected:
-    static void SetUpTestCase();
+    // static void SetUpTestCase();
     static void TearDownTestCase()
     {
     }
@@ -118,13 +117,7 @@ protected:
     // This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
     // Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the
     // unit test names change.
-    inline void show_message()
-    {
-        // Gets information about the currently running test.
-        // Do NOT delete the returned object - it's managed by the UnitTest class.
-        const ::testing::TestInfo *const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
-        ShowMessage("Begin Test: " + std::string(test_info->test_case_name()) + ", " + std::string(test_info->name()));
-    }
+    void show_message();
 
     // This will compare either a STL container or ObjexxFCL container
     // Pass a container you want to compare against an expected container. You can pass in an existing
@@ -246,6 +239,10 @@ protected:
     // Check if DFS stream has any output. Useful to make sure there are or are not outputs to DFS.
     bool has_dfs_output(bool reset_stream = true);
 
+    // Look for a match of an expected string within the ERR stream. The default here does NOT reset the ERR stream after every call.
+    // Will return true if string matches the stream and false if it does not
+    bool match_err_stream(std::string const &expected_match, bool use_regex = false, bool reset_stream = false);
+
     // This function processes an idf snippet and defaults to using the idd cache for the fixture.
     // The cache should be used for nearly all calls to this function.
     // This more or less replicates inputProcessor->processInput() but in a more usable fashion for unit testing
@@ -270,10 +267,10 @@ protected:
                      std::vector<bool> const &numbers_blank);
 
     // Opens output files as stringstreams
-    void openOutputFiles(IOFiles &ioFiles);
+    void openOutputFiles(EnergyPlusData &state);
 
 public:
-    EnergyPlusData state;
+    EnergyPlusData *state;
 
 private:
     friend class InputProcessorFixture;
@@ -286,7 +283,7 @@ private:
     // if it makes sense for the unit test to continue after retrning from function.
     // Will return false if no errors found and true if errors found
 
-    static bool process_idd(std::string const &idd, bool &errors_found);
+    //    static bool process_idd(std::string const &idd, bool &errors_found);
 
     // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
     std::ostringstream *json_stream;

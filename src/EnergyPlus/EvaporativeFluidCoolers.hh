@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -65,8 +66,6 @@ namespace EvaporativeFluidCoolers {
 
     extern std::string const cEvapFluidCooler_SingleSpeed;
     extern std::string const cEvapFluidCooler_TwoSpeed;
-
-    extern int NumSimpleEvapFluidCoolers; // Number of similar evaporative fluid coolers
 
     enum struct EvapLoss
     {
@@ -249,45 +248,63 @@ namespace EvaporativeFluidCoolers {
         {
         }
 
-        static PlantComponent *factory(int objectType, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
         void getSizingFactor(Real64 &_SizFac) override;
 
-        void getDesignCapacities(const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void InitEvapFluidCooler(EnergyPlusData &state);
 
-        void SizeEvapFluidCooler();
+        void SizeEvapFluidCooler(EnergyPlusData &state);
 
-        void CalculateWaterUsage();
+        void CalculateWaterUsage(EnergyPlusData &state);
 
-        void UpdateEvapFluidCooler();
+        void UpdateEvapFluidCooler(EnergyPlusData &state);
 
-        void ReportEvapFluidCooler(bool RunFlag);
+        void ReportEvapFluidCooler(EnergyPlusData &state, bool RunFlag);
 
-        void CalcSingleSpeedEvapFluidCooler();
+        void CalcSingleSpeedEvapFluidCooler(EnergyPlusData &state);
 
-        void CalcTwoSpeedEvapFluidCooler();
+        void CalcTwoSpeedEvapFluidCooler(EnergyPlusData &state);
 
-        Real64 SimpleEvapFluidCoolerUAResidual(Real64 UA, Array1D<Real64> const &Par);
+        Real64 SimpleEvapFluidCoolerUAResidual(EnergyPlusData &state, Real64 UA, Array1D<Real64> const &Par);
 
-        void SimSimpleEvapFluidCooler(Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
+        void SimSimpleEvapFluidCooler(EnergyPlusData &state, Real64 waterMassFlowRate, Real64 AirFlowRate, Real64 UAdesign, Real64 &outletWaterTemp);
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
     };
 
     // Object Data
-    extern Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
 
-    void GetEvapFluidCoolerInput();
-
-    void clear_state();
+    void GetEvapFluidCoolerInput(EnergyPlusData &state);
 
 } // namespace EvaporativeFluidCoolers
+
+struct EvaporativeFluidCoolersData : BaseGlobalStruct
+{
+
+    bool GetEvapFluidCoolerInputFlag = true;
+    int NumSimpleEvapFluidCoolers = 0;                                            // Number of similar evaporative fluid coolers
+    Array1D<EvaporativeFluidCoolers::EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
+    std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
+
+    void clear_state() override
+    {
+        GetEvapFluidCoolerInputFlag = true;
+        NumSimpleEvapFluidCoolers = 0;
+        SimpleEvapFluidCooler.clear();
+        UniqueSimpleEvapFluidCoolerNames.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

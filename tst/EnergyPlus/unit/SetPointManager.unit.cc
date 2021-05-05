@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,7 +56,6 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -64,13 +63,11 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -91,24 +88,24 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager)
 {
 
     // Set up the required plant loop data
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(2).NodeNumIn = 1;  // Supply inlet, return
-    DataPlant::PlantLoop(1).LoopSide(2).NodeNumOut = 2; // Supply outlet, supply
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 2;
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumIn = 1;  // Supply inlet, return
+    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumOut = 2; // Supply outlet, supply
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 2;
 
     // Set up the required node data
-    DataLoopNode::Node.allocate(2);
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
 
     // Set up a cooling setpoint manager
     SetPointManager::DefineReturnWaterChWSetPointManager mySPM;
@@ -120,39 +117,39 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager)
     mySPM.returnTemperatureConstantTarget = 12;
 
     // test 1: normal, in range
-    DataLoopNode::Node(1).Temp = 11;
-    DataLoopNode::Node(2).Temp = 7;
-    mySPM.calculate(DataLoopNode::Node(1), DataLoopNode::Node(2));
+    state->dataLoopNodes->Node(1).Temp = 11;
+    state->dataLoopNodes->Node(2).Temp = 7;
+    mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // on the first pass through it should detect the plant loop it manages
     EXPECT_EQ(1, mySPM.plantLoopIndex);
     // with a delta T of 4, and a target return of 12, it should produce 8
     EXPECT_EQ(8, mySPM.currentSupplySetPt);
 
     // test 2: hit the maximum reset range
-    DataLoopNode::Node(1).Temp = 8;
-    DataLoopNode::Node(2).Temp = 7;
-    mySPM.calculate(DataLoopNode::Node(1), DataLoopNode::Node(2));
+    state->dataLoopNodes->Node(1).Temp = 8;
+    state->dataLoopNodes->Node(2).Temp = 7;
+    mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // with a delta T of 1, and a target return of 12, it should try to produce 11, but be capped at 10
     EXPECT_EQ(10, mySPM.currentSupplySetPt);
 
     // test 3: hit the minimum reset range
-    DataLoopNode::Node(1).Temp = 13;
-    DataLoopNode::Node(2).Temp = 7;
-    mySPM.calculate(DataLoopNode::Node(1), DataLoopNode::Node(2));
+    state->dataLoopNodes->Node(1).Temp = 13;
+    state->dataLoopNodes->Node(2).Temp = 7;
+    mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // with a delta T of 6, and a target return of 12, it should try to produce 6, but be capped at 7
     EXPECT_EQ(7, mySPM.currentSupplySetPt);
 
     // test 4: no flow
-    DataLoopNode::Node(1).Temp = 11;
-    DataLoopNode::Node(2).Temp = 7;
-    DataLoopNode::Node(2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(1).Temp = 11;
+    state->dataLoopNodes->Node(2).Temp = 7;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
     // with Qdemand calculated as zero, it should leave early, but only after setting setpt to design
     EXPECT_EQ(7, mySPM.currentSupplySetPt);
 
     // test 5: backward delta T (something awry...)
-    DataLoopNode::Node(1).Temp = 5;
-    DataLoopNode::Node(2).Temp = 7;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(1).Temp = 5;
+    state->dataLoopNodes->Node(2).Temp = 7;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
     // with Qdemand calculated as negative, it should leave early, but only after setting setpt to design
     EXPECT_EQ(7, mySPM.currentSupplySetPt);
 
@@ -160,45 +157,45 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager)
     // this is actually a passing case, since the plant may not be built when this is first called
     // the PlantManager will do a validation to ensure that a setpoint is found, so we don't have to validate here
     // this code simply defaults to getting a fluid index of 1 (water) if it can't find a matching plant
-    DataLoopNode::Node(1).Temp = 11;
-    DataLoopNode::Node(2).Temp = 7;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
-    DataPlant::PlantLoop(1).LoopSide(2).NodeNumOut = 5; // Supply outlet, supply
+    state->dataLoopNodes->Node(1).Temp = 11;
+    state->dataLoopNodes->Node(2).Temp = 7;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumOut = 5; // Supply outlet, supply
     mySPM.plantLoopIndex = 0;
-    mySPM.calculate(DataLoopNode::Node(1), DataLoopNode::Node(2));
+    mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // this time it shouldn't detect which plant it was found on
     EXPECT_EQ(0, mySPM.plantLoopIndex);
     // with a delta T of 4, and a target return of 12, it should produce 8
     EXPECT_EQ(8, mySPM.currentSupplySetPt);
 
     // tear down
-    DataLoopNode::Node.deallocate();
-    DataPlant::PlantLoop(1).LoopSide.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataLoopNodes->Node.deallocate();
+    state->dataPlnt->PlantLoop(1).LoopSide.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterHWSetPointManager)
 {
 
     // Set up the required plant loop data
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(2).NodeNumIn = 1;  // Supply inlet, return
-    DataPlant::PlantLoop(1).LoopSide(2).NodeNumOut = 2; // Supply outlet, supply
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 2;
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumIn = 1;  // Supply inlet, return
+    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumOut = 2; // Supply outlet, supply
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumOut = 2;
 
     // Set up the required node data
-    DataLoopNode::Node.allocate(2);
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
 
     // Set up a cooling setpoint manager
     SetPointManager::DefineReturnWaterHWSetPointManager mySPM;
@@ -208,37 +205,37 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterHWSetPointManager)
     mySPM.maximumHotWaterSetpoint = 60;
     mySPM.minimumHotWaterSetpoint = 57;
     mySPM.returnTemperatureConstantTarget = 55;
-    DataLoopNode::Node(2).Temp = 60;
+    state->dataLoopNodes->Node(2).Temp = 60;
 
     // test 1: normal, in range
-    DataLoopNode::Node(1).Temp = 56;
-    mySPM.calculate(DataLoopNode::Node(1), DataLoopNode::Node(2));
+    state->dataLoopNodes->Node(1).Temp = 56;
+    mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // on the first pass through it should detect the plant loop it manages
     EXPECT_EQ(1, mySPM.plantLoopIndex);
     // with a delta T of 4, and a target return of 55, it should produce 59
     EXPECT_EQ(59, mySPM.currentSupplySetPt);
 
     // test 2: hit the minimum reset range
-    DataLoopNode::Node(1).Temp = 59;
-    mySPM.calculate(DataLoopNode::Node(1), DataLoopNode::Node(2));
+    state->dataLoopNodes->Node(1).Temp = 59;
+    mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // with a delta T of 1, and a target return of 55, it should try to produce 56, but be capped at 57
     EXPECT_EQ(57, mySPM.currentSupplySetPt);
 
     // test 3: hit the maximum reset range
-    DataLoopNode::Node(1).Temp = 54;
-    mySPM.calculate(DataLoopNode::Node(1), DataLoopNode::Node(2));
+    state->dataLoopNodes->Node(1).Temp = 54;
+    mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // with a delta T of 6, and a target return of 55, it should try to produce 61, but be capped at 60
     EXPECT_EQ(60, mySPM.currentSupplySetPt);
 
     // test 4: no flow
-    DataLoopNode::Node(1).Temp = 56;
-    DataLoopNode::Node(2).MassFlowRate = 0.0;
+    state->dataLoopNodes->Node(1).Temp = 56;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
     // with Qdemand calculated as zero, it should leave early, but only after setting setpt to design
     EXPECT_EQ(60, mySPM.currentSupplySetPt);
 
     // test 5: backward delta T (something awry...)
-    DataLoopNode::Node(1).Temp = 61;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(1).Temp = 61;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
     // with Qdemand calculated as negative, it should leave early, but only after setting setpt to design
     EXPECT_EQ(60, mySPM.currentSupplySetPt);
 
@@ -246,20 +243,20 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterHWSetPointManager)
     // this is actually a passing case, since the plant may not be built when this is first called
     // the PlantManager will do a validation to ensure that a setpoint is found, so we don't have to validate here
     // this code simply defaults to getting a fluid index of 1 (water) if it can't find a matching plant
-    DataLoopNode::Node(1).Temp = 56;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
-    DataPlant::PlantLoop(1).LoopSide(2).NodeNumOut = 5; // Supply outlet, supply
+    state->dataLoopNodes->Node(1).Temp = 56;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).NodeNumOut = 5; // Supply outlet, supply
     mySPM.plantLoopIndex = 0;
-    mySPM.calculate(DataLoopNode::Node(1), DataLoopNode::Node(2));
+    mySPM.calculate(*state, state->dataLoopNodes->Node(1), state->dataLoopNodes->Node(2));
     // this time it shouldn't detect which plant it was found on
     EXPECT_EQ(0, mySPM.plantLoopIndex);
     // with a delta T of 4, and a target return of 55, it should produce 59
     EXPECT_EQ(59, mySPM.currentSupplySetPt);
 
     // tear down
-    DataLoopNode::Node.deallocate();
-    DataPlant::PlantLoop(1).LoopSide.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataLoopNodes->Node.deallocate();
+    state->dataPlnt->PlantLoop(1).LoopSide.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
@@ -309,7 +306,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
                                                       "Dimensionless;           !- Input Unit Type for z",
                                                       "Curve:QuadLinear,",
                                                       "OptCondEntCurveName,     !- Name",
-                                                      "12.2711,                 !- Coefficient1 Constant",
+                                                      "13.2711,                 !- Coefficient1 Constant",
                                                       "0.8,                     !- Coefficient2 w",
                                                       "6.6667,                  !- Coefficient3 x",
                                                       "0.266,                   !- Coefficient4 y",
@@ -335,14 +332,14 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
                                                       "For: AllDays,            !- Field 2",
                                                       "Until: 24:00,30.0;       !- Field 3"});
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    ScheduleManager::ProcessScheduleInput(state.files);
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfYear_Schedule = 1;
-    ScheduleManager::UpdateScheduleValues();
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    ScheduleManager::UpdateScheduleValues(*state);
 
     // a few constants for convenience
     int const evapOutletNodeNum = 1;
@@ -356,34 +353,34 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     int const chillerCompIndex = 1;
 
     // Set up ChW loop manually, way too much input to do that here in idf, all I care about is the
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(2);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
 
-    DataPlant::PlantLoop(chwLoopIndex).LoopSide.allocate(2);
-    DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch.allocate(1);
-    DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp.allocate(1);
-    DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).NodeNumOut = evapOutletNodeNum;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).NodeNumOut = evapOutletNodeNum;
     Real64 const designCondenserEnteringTemp = 20;
-    DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesCondIn =
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesCondIn =
         designCondenserEnteringTemp;
-    DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesEvapOut = 5;
-    DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MaxLoad = 5000;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).TempDesEvapOut = 5;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MaxLoad = 5000;
 
-    DataPlant::PlantLoop(condLoopIndex).LoopSide.allocate(2);
-    DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch.allocate(1);
-    DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp.allocate(1);
-    DataPlant::PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).NodeNumIn = condInletNodeNum;
-    DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 1000;
+    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(demandSide).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(condLoopIndex).LoopSide(demandSide).Branch(chillerBranchCW).Comp(chillerCompIndex).NodeNumIn = condInletNodeNum;
+    state->dataPlnt->PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch(chillerBranchChW).Comp(chillerCompIndex).MyLoad = 1000;
 
-    DataLoopNode::Node.allocate(2);
-    DataLoopNode::Node(evapOutletNodeNum).Temp = 7;
-    DataLoopNode::Node(condInletNodeNum).Temp = 10;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(evapOutletNodeNum).Temp = 7;
+    state->dataLoopNodes->Node(condInletNodeNum).Temp = 10;
 
     SetPointManager::DefineCondEntSetPointManager thisSPM;
-    thisSPM.MinTwrWbCurve = CurveManager::GetCurveIndex(state, "MINDSNWBCURVENAME");
-    thisSPM.MinOaWbCurve = CurveManager::GetCurveIndex(state, "MINACTWBCURVENAME");
-    thisSPM.OptCondEntCurve = CurveManager::GetCurveIndex(state, "OPTCONDENTCURVENAME");
-    thisSPM.CondEntTempSchedPtr = ScheduleManager::GetScheduleIndex("CONDENSER LOOP TEMP SCHEDULE");
+    thisSPM.MinTwrWbCurve = CurveManager::GetCurveIndex(*state, "MINDSNWBCURVENAME");
+    thisSPM.MinOaWbCurve = CurveManager::GetCurveIndex(*state, "MINACTWBCURVENAME");
+    thisSPM.OptCondEntCurve = CurveManager::GetCurveIndex(*state, "OPTCONDENTCURVENAME");
+    thisSPM.CondEntTempSchedPtr = ScheduleManager::GetScheduleIndex(*state, "CONDENSER LOOP TEMP SCHEDULE");
     thisSPM.LoopIndexPlantSide = chwLoopIndex;
     thisSPM.ChillerIndexPlantSide = chillerBranchChW;
     thisSPM.BranchIndexPlantSide = chillerCompIndex;
@@ -393,31 +390,31 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     thisSPM.TypeNum = DataPlant::TypeOf_Chiller_Electric;
 
     // switch: Weighted ratio > 9 && etc...
-    DataPlant::PlantLoop(1).CoolingDemand = 4700;
+    state->dataPlnt->PlantLoop(1).CoolingDemand = 4700;
 
     // Now call and check
-    thisSPM.calculate(state);
+    thisSPM.calculate(*state);
     EXPECT_NEAR(designCondenserEnteringTemp + 1.0, thisSPM.SetPt, 0.001);
 
     // switch: Weighted ratio < 9 || etc...
-    DataPlant::PlantLoop(1).CoolingDemand = 4000;
+    state->dataPlnt->PlantLoop(1).CoolingDemand = 4000;
 
     // switch: OAWB>MinWb && DesignWB>MinDesignWB && CurLift>MinLift
-    DataEnvironment::OutWetBulbTemp = 40;
+    state->dataEnvrn->OutWetBulbTemp = 40;
     thisSPM.TowerDsnInletAirWetBulb = 35;
     thisSPM.MinimumLiftTD = 2;
 
     // Now call and check
-    thisSPM.calculate(state);
+    thisSPM.calculate(*state);
     EXPECT_NEAR(32, thisSPM.SetPt, 0.001);
 
     // switch: ELSE
-    DataEnvironment::OutWetBulbTemp = 30;
+    state->dataEnvrn->OutWetBulbTemp = 30;
     thisSPM.TowerDsnInletAirWetBulb = 20;
     thisSPM.MinimumLiftTD = 5;
 
     // Now call and check
-    thisSPM.calculate(state);
+    thisSPM.calculate(*state);
     EXPECT_NEAR(30, thisSPM.SetPt, 0.001);
 }
 
@@ -528,13 +525,10 @@ TEST_F(EnergyPlusFixture, SetPointManager_setupSetPointAndFlags)
 
 TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
 {
-    int const CoolOpComp(1); // a component that cools only (chillers)
-    int const DualOpComp(2); // a component that heats or cools (ice storage tank)
-
     int schManNum = 1;
-    SetPointManager::SchTESSetPtMgr.allocate(schManNum);
-    SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp = 5;
-    SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp = -5;
+    state->dataSetPointManager->SchTESSetPtMgr.allocate(schManNum);
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp = 5;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).ChargeCHWTemp = -5;
 
     // indexes in Schedule
     int const OnSched = 1;
@@ -544,38 +538,42 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
         "Schedule:Constant,MyScheduleOff,,0;",
     }));
     ASSERT_TRUE(process_idf(idf_contents));
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    ScheduleManager::ProcessScheduleInput(state.files);
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DayOfWeek = 1;
-    DataEnvironment::DayOfYear_Schedule = 1;
-    ScheduleManager::UpdateScheduleValues();
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataGlobal->MinutesPerTimeStep = 60 / state->dataGlobal->NumOfTimeStepInHour;
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DayOfWeek = 1;
+    state->dataEnvrn->DayOfYear_Schedule = 1;
+    ScheduleManager::UpdateScheduleValues(*state);
 
-    SetPointManager::SchTESSetPtMgr(schManNum).CompOpType = CoolOpComp;
+    // CtrlType Bug
+    //    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::HeatingOp;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtr = OnSched;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate();
-    EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(*state);
+    EXPECT_EQ(state->dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp, state->dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OffSched;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtrCharge = OffSched;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate();
-    EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(*state);
+    EXPECT_EQ(state->dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp, state->dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
-    SetPointManager::SchTESSetPtMgr(schManNum).SchedPtrCharge = OnSched;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtr = OffSched;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).SchedPtrCharge = OnSched;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate();
-    EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).ChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(*state);
+    EXPECT_EQ(state->dataSetPointManager->SchTESSetPtMgr(schManNum).ChargeCHWTemp, state->dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 
-    SetPointManager::SchTESSetPtMgr(schManNum).CompOpType = DualOpComp;
+    // CtrlType Bug
+    //    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::DualOp;
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).CompOpType = DataPlant::iCtrlType::CoolingOp;
 
-    SetPointManager::SchTESSetPtMgr(schManNum).calculate();
-    EXPECT_EQ(SetPointManager::SchTESSetPtMgr(schManNum).NonChargeCHWTemp, SetPointManager::SchTESSetPtMgr(schManNum).SetPt);
+    state->dataSetPointManager->SchTESSetPtMgr(schManNum).calculate(*state);
+    EXPECT_EQ(state->dataSetPointManager->SchTESSetPtMgr(schManNum).NonChargeCHWTemp, state->dataSetPointManager->SchTESSetPtMgr(schManNum).SetPt);
 }
 
 TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
@@ -595,151 +593,162 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
 
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
-    DataGlobals::NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
-    DataHeatBalance::Zone(1).Name = "KITCHEN";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "KITCHEN";
 
-    state.dataAirLoop->AirLoopFlow.allocate(1);
+    state->dataAirLoop->AirLoopFlow.allocate(1);
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).OASysOutletNodeNum = NodeInputManager::GetOnlySingleNode("FAN INLET NODE",
-                                                                                                 ErrorsFound,
-                                                                                                 "FAN",
-                                                                                                 "SZRHtest",
-                                                                                                 DataLoopNode::NodeType_Air,
-                                                                                                 DataLoopNode::NodeConnectionType_Internal,
-                                                                                                 1,
-                                                                                                 DataLoopNode::ObjectIsNotParent,
-                                                                                                 "AHU node");
-    DataAirSystems::PrimaryAirSystem(1).OASysInletNodeNum = NodeInputManager::GetOnlySingleNode("RETURN NODE",
-                                                                                                ErrorsFound,
-                                                                                                "OA MIXER",
-                                                                                                "SZRHtest",
-                                                                                                DataLoopNode::NodeType_Air,
-                                                                                                DataLoopNode::NodeConnectionType_Inlet,
-                                                                                                1,
-                                                                                                DataLoopNode::ObjectIsNotParent,
-                                                                                                "AHU node");
-    DataAirSystems::PrimaryAirSystem(1).OAMixOAInNodeNum = NodeInputManager::GetOnlySingleNode("OA INLET TO MIXER",
-                                                                                               ErrorsFound,
-                                                                                               "OA MIXER",
-                                                                                               "SZRHtest",
-                                                                                               DataLoopNode::NodeType_Air,
-                                                                                               DataLoopNode::NodeConnectionType_Internal,
-                                                                                               1,
-                                                                                               DataLoopNode::ObjectIsNotParent,
-                                                                                               "AHU node");
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).InletBranchNum.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).InletBranchNum(1) = 1;
-
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(DataAirSystems::PrimaryAirSystem(1).NumBranches);
-
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).NodeNumIn = NodeInputManager::GetOnlySingleNode("RETURN NODE",
-                                                                                                  ErrorsFound,
-                                                                                                  "OAsysinlet",
-                                                                                                  "SZRHtest",
-                                                                                                  DataLoopNode::NodeType_Air,
-                                                                                                  DataLoopNode::NodeConnectionType_Inlet,
-                                                                                                  1,
-                                                                                                  DataLoopNode::ObjectIsNotParent,
-                                                                                                  "AHU node");
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
-
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).NodeNumIn = NodeInputManager::GetOnlySingleNode("FAN INLET NODE",
-                                                                                                          ErrorsFound,
-                                                                                                          "FAN",
-                                                                                                          "SZRHtest",
-                                                                                                          DataLoopNode::NodeType_Air,
-                                                                                                          DataLoopNode::NodeConnectionType_Internal,
-                                                                                                          1,
-                                                                                                          DataLoopNode::ObjectIsNotParent,
-                                                                                                          "AHU node");
-
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).NodeNumOut = NodeInputManager::GetOnlySingleNode("FAN OUTLET NODE",
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).OASysOutletNodeNum =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            "FAN INLET NODE",
+                                            ErrorsFound,
+                                            "FAN",
+                                            "SZRHtest",
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::NodeConnectionType::Internal,
+                                            1,
+                                            DataLoopNode::ObjectIsNotParent,
+                                            "AHU node");
+    state->dataAirSystemsData->PrimaryAirSystems(1).OASysInletNodeNum = NodeInputManager::GetOnlySingleNode(*state,
+                                                                                                            "RETURN NODE",
+                                                                                                            ErrorsFound,
+                                                                                                            "OA MIXER",
+                                                                                                            "SZRHtest",
+                                                                                                            DataLoopNode::NodeFluidType::Air,
+                                                                                                            DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                            1,
+                                                                                                            DataLoopNode::ObjectIsNotParent,
+                                                                                                            "AHU node");
+    state->dataAirSystemsData->PrimaryAirSystems(1).OAMixOAInNodeNum = NodeInputManager::GetOnlySingleNode(*state,
+                                                                                                           "OA INLET TO MIXER",
                                                                                                            ErrorsFound,
-                                                                                                           "FAN",
+                                                                                                           "OA MIXER",
                                                                                                            "SZRHtest",
-                                                                                                           DataLoopNode::NodeType_Air,
-                                                                                                           DataLoopNode::NodeConnectionType_Internal,
+                                                                                                           DataLoopNode::NodeFluidType::Air,
+                                                                                                           DataLoopNode::NodeConnectionType::Internal,
                                                                                                            1,
                                                                                                            DataLoopNode::ObjectIsNotParent,
                                                                                                            "AHU node");
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).InletBranchNum(1) = 1;
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    int zoneAirNode = NodeInputManager::GetOnlySingleNode("KITCHEN AIR NODE",
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches);
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumIn = NodeInputManager::GetOnlySingleNode(*state,
+                                                                                                              "RETURN NODE",
+                                                                                                              ErrorsFound,
+                                                                                                              "OAsysinlet",
+                                                                                                              "SZRHtest",
+                                                                                                              DataLoopNode::NodeFluidType::Air,
+                                                                                                              DataLoopNode::NodeConnectionType::Inlet,
+                                                                                                              1,
+                                                                                                              DataLoopNode::ObjectIsNotParent,
+                                                                                                              "AHU node");
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumIn =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            "FAN INLET NODE",
+                                            ErrorsFound,
+                                            "FAN",
+                                            "SZRHtest",
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::NodeConnectionType::Internal,
+                                            1,
+                                            DataLoopNode::ObjectIsNotParent,
+                                            "AHU node");
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).NodeNumOut =
+        NodeInputManager::GetOnlySingleNode(*state,
+                                            "FAN OUTLET NODE",
+                                            ErrorsFound,
+                                            "FAN",
+                                            "SZRHtest",
+                                            DataLoopNode::NodeFluidType::Air,
+                                            DataLoopNode::NodeConnectionType::Internal,
+                                            1,
+                                            DataLoopNode::ObjectIsNotParent,
+                                            "AHU node");
+
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    int zoneAirNode = NodeInputManager::GetOnlySingleNode(*state,
+                                                          "KITCHEN AIR NODE",
                                                           ErrorsFound,
                                                           "Zone",
                                                           "SZRHspmTest",
-                                                          DataLoopNode::NodeType_Air,
-                                                          DataLoopNode::NodeConnectionType_ZoneNode,
+                                                          DataLoopNode::NodeFluidType::Air,
+                                                          DataLoopNode::NodeConnectionType::ZoneNode,
                                                           1,
                                                           DataLoopNode::ObjectIsNotParent,
                                                           "Test zone node");
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = zoneAirNode;
-    int zoneInletNode = NodeInputManager::GetOnlySingleNode("KITCHEN DIRECT AIR INLET NODE NAME",
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = zoneAirNode;
+    int zoneInletNode = NodeInputManager::GetOnlySingleNode(*state,
+                                                            "KITCHEN DIRECT AIR INLET NODE NAME",
                                                             ErrorsFound,
                                                             "Zone",
                                                             "SZRHspmTest",
-                                                            DataLoopNode::NodeType_Air,
-                                                            DataLoopNode::NodeConnectionType_ZoneInlet,
+                                                            DataLoopNode::NodeFluidType::Air,
+                                                            DataLoopNode::NodeConnectionType::ZoneInlet,
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent,
                                                             "Test zone inlet node");
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = zoneInletNode;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = zoneInletNode;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-    SetPointManager::GetSetPointManagerInputs(state);
-    EXPECT_EQ(SetPointManager::SingZoneRhSetPtMgr(1).ControlZoneNum, 1);
-    SetPointManager::SingZoneRhSetPtMgr(1).AirLoopNum = 1;
+    SetPointManager::GetSetPointManagerInputs(*state);
+    EXPECT_EQ(state->dataSetPointManager->SingZoneRhSetPtMgr(1).ControlZoneNum, 1);
+    state->dataSetPointManager->SingZoneRhSetPtMgr(1).AirLoopNum = 1;
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
-    state.dataAirLoop->AirLoopInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    state->dataAirLoop->AirLoopInputsFilled = true;
 
-    SetPointManager::InitSetPointManagers(state);
+    SetPointManager::InitSetPointManagers(*state);
 
-    state.dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
-    state.dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.8;
+    state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
+    state->dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.8;
 
-    DataLoopNode::Node(zoneInletNode).MassFlowRate = 1.0; // set zone inlet mass flow
-    DataLoopNode::Node(zoneInletNode).HumRat = 0.0008;
-    DataLoopNode::Node(zoneInletNode).Temp = 20.0;
+    state->dataLoopNodes->Node(zoneInletNode).MassFlowRate = 1.0; // set zone inlet mass flow
+    state->dataLoopNodes->Node(zoneInletNode).HumRat = 0.0008;
+    state->dataLoopNodes->Node(zoneInletNode).Temp = 20.0;
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0;
     // pick these next values so ExtrRateNoHC doesn't exceed loat to sp
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 6000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -4000.0;
-    DataZoneEnergyDemands::DeadBandOrSetback(1) = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 6000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -4000.0;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
 
-    DataLoopNode::Node(zoneAirNode).Temp = 22.0; // zone air node
-    DataLoopNode::Node(zoneAirNode).HumRat = 0.0008;
+    state->dataLoopNodes->Node(zoneAirNode).Temp = 22.0; // zone air node
+    state->dataLoopNodes->Node(zoneAirNode).HumRat = 0.0008;
 
-    DataLoopNode::Node(2).HumRat = 0.0008; // return node
-    DataLoopNode::Node(2).Temp = 22.0;
-    DataLoopNode::Node(2).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(2).Temp, DataLoopNode::Node(2).HumRat);
+    state->dataLoopNodes->Node(2).HumRat = 0.0008; // return node
+    state->dataLoopNodes->Node(2).Temp = 22.0;
+    state->dataLoopNodes->Node(2).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).HumRat);
 
-    DataLoopNode::Node(1).Temp = 16.0;
-    DataLoopNode::Node(4).Temp = 17.0; // fan rise
+    state->dataLoopNodes->Node(1).Temp = 16.0;
+    state->dataLoopNodes->Node(4).Temp = 17.0; // fan rise
 
     // slightly cool OA
-    DataLoopNode::Node(3).HumRat = 0.0006; // OA intake
-    DataLoopNode::Node(3).Temp = 16.0;
-    DataLoopNode::Node(3).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(3).Temp, DataLoopNode::Node(3).HumRat);
+    state->dataLoopNodes->Node(3).HumRat = 0.0006; // OA intake
+    state->dataLoopNodes->Node(3).Temp = 16.0;
+    state->dataLoopNodes->Node(3).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(3).HumRat);
 
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
 
     // node number table
     //  1   Fan Inlet Node   OA system outlet
@@ -750,39 +759,39 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     //  6   Kitchen Direct Air Inlet Node Name
     //  7   PSZ-AC_2:2 Supply Equipment Outlet Node
 
-    EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 18.0251495, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(7).TempSetPoint, 18.0251495, 0.001);
 
-    state.dataAirLoop->AirLoopFlow(1).OAFrac = 0.8;
-    state.dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.8;
+    state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.8;
+    state->dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.8;
 
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
 
-    EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 18.20035, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(7).TempSetPoint, 18.20035, 0.001);
 
     // warmer day outside
-    state.dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
-    state.dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.8;
+    state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
+    state->dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.8;
 
-    DataLoopNode::Node(3).HumRat = 0.0006; // OA intake
-    DataLoopNode::Node(3).Temp = 26.0;
-    DataLoopNode::Node(3).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(3).Temp, DataLoopNode::Node(3).HumRat);
+    state->dataLoopNodes->Node(3).HumRat = 0.0006; // OA intake
+    state->dataLoopNodes->Node(3).Temp = 26.0;
+    state->dataLoopNodes->Node(3).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(3).HumRat);
 
-    DataLoopNode::Node(1).Temp = 26.0;
-    DataLoopNode::Node(4).Temp = 27.0; // fan rise
+    state->dataLoopNodes->Node(1).Temp = 26.0;
+    state->dataLoopNodes->Node(4).Temp = 27.0; // fan rise
 
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
 
-    EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 27.0, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(7).TempSetPoint, 27.0, 0.001);
 
-    state.dataAirLoop->AirLoopFlow(1).OAFrac = 0.8;
-    state.dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.8;
+    state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.8;
+    state->dataAirLoop->AirLoopFlow(1).OAMinFrac = 0.8;
 
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
 
-    EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 26.19976, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(7).TempSetPoint, 26.19976, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, SetPointManager_CalcSetPointTest)
@@ -812,12 +821,12 @@ TEST_F(EnergyPlusFixture, SetPointManager_CalcSetPointTest)
     EXPECT_EQ(54, SetPt8);
 }
 
-TEST(SetPointManager, DefineMixedAirSetPointManager)
+TEST_F(EnergyPlusFixture, DefineMixedAirSetPointManager)
 {
 
     // Set up the required node data
-    DataLoopNode::Node.allocate(5);
-    DataLoopNode::Node(1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node.allocate(5);
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
 
     // Set up a cooling setpoint manager
     SetPointManager::DefineMixedAirSetPointManager mySPM;
@@ -830,10 +839,10 @@ TEST(SetPointManager, DefineMixedAirSetPointManager)
     mySPM.MinCoolCoilOutTemp = 7.2;
 
     // test 1: Original calculation
-    DataLoopNode::Node(5).TempSetPoint = 13;
-    DataLoopNode::Node(2).Temp = 24.2;
-    DataLoopNode::Node(1).Temp = 24.0;
-    mySPM.calculate();
+    state->dataLoopNodes->Node(5).TempSetPoint = 13;
+    state->dataLoopNodes->Node(2).Temp = 24.2;
+    state->dataLoopNodes->Node(1).Temp = 24.0;
+    mySPM.calculate(*state);
 
     EXPECT_EQ(12.8, mySPM.SetPt);
 
@@ -841,27 +850,27 @@ TEST(SetPointManager, DefineMixedAirSetPointManager)
 
     mySPM.CoolCoilInNode = 3;
     mySPM.CoolCoilOutNode = 4;
-    DataLoopNode::Node(5).TempSetPoint = 7.0;
-    DataLoopNode::Node(5).Temp = 7.0;
-    DataLoopNode::Node(3).Temp = 24.2;
-    DataLoopNode::Node(4).Temp = 7.0;
-    mySPM.calculate();
+    state->dataLoopNodes->Node(5).TempSetPoint = 7.0;
+    state->dataLoopNodes->Node(5).Temp = 7.0;
+    state->dataLoopNodes->Node(3).Temp = 24.2;
+    state->dataLoopNodes->Node(4).Temp = 7.0;
+    mySPM.calculate(*state);
 
     EXPECT_EQ(24.2, mySPM.SetPt);
 
     // test 3: Freezing calculation: draw through
-    DataLoopNode::Node(5).TempSetPoint = 7.3;
-    DataLoopNode::Node(3).Temp = 24.2;
-    DataLoopNode::Node(5).Temp = 7.2;
-    DataLoopNode::Node(4).Temp = 7.0;
-    DataLoopNode::Node(2).Temp = 7.2;
-    DataLoopNode::Node(1).Temp = 7.0;
-    mySPM.calculate();
+    state->dataLoopNodes->Node(5).TempSetPoint = 7.3;
+    state->dataLoopNodes->Node(3).Temp = 24.2;
+    state->dataLoopNodes->Node(5).Temp = 7.2;
+    state->dataLoopNodes->Node(4).Temp = 7.0;
+    state->dataLoopNodes->Node(2).Temp = 7.2;
+    state->dataLoopNodes->Node(1).Temp = 7.0;
+    mySPM.calculate(*state);
 
     EXPECT_EQ(24.4, mySPM.SetPt);
 
     // tear down
-    DataLoopNode::Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, MixedAirSetPointManager_SameRefAndSPNodeName)
@@ -881,7 +890,7 @@ TEST_F(EnergyPlusFixture, MixedAirSetPointManager_SameRefAndSPNodeName)
 
     // GetInput should fail since reference and set point node names are the same
     bool ErrorsFound = false;
-    SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
+    SetPointManager::GetSetPointManagerInputData(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -1193,60 +1202,60 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    DataGlobals::NumOfTimeStepInHour = 1;
-    DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput(state.files);
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(*state);
 
-    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
-    EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
-    DataZoneEquipment::GetZoneEquipmentData(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
-    SingleDuct::GetSysInput(state);
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                            // zones are specified in the idf snippet
+    DataZoneEquipment::GetZoneEquipmentData(*state);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    SingleDuct::GetSysInput(*state);
 
-    MixedAir::GetOutsideAirSysInputs(state);
-    SplitterComponent::GetSplitterInput();
-    BranchInputManager::GetMixerInput(state);
-    BranchInputManager::ManageBranchInput(state);
+    MixedAir::GetOutsideAirSysInputs(*state);
+    SplitterComponent::GetSplitterInput(*state);
+    BranchInputManager::GetMixerInput(*state);
+    BranchInputManager::ManageBranchInput(*state);
 
-    DataGlobals::SysSizingCalc = true;
-    SimAirServingZones::GetAirPathData(state);
-    SimAirServingZones::InitAirLoops(state, true);
+    state->dataGlobal->SysSizingCalc = true;
+    SimAirServingZones::GetAirPathData(*state);
+    SimAirServingZones::InitAirLoops(*state, true);
     // check the number of zones served by single duct or dual duct system
-    EXPECT_EQ(1, state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled); // cooled and heated zone (served by single-duct)
-    EXPECT_EQ(0, state.dataAirLoop->AirToZoneNodeInfo(1).NumZonesHeated); // no heated only zone (served by dual-duct)
+    EXPECT_EQ(1, state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled); // cooled and heated zone (served by single-duct)
+    EXPECT_EQ(0, state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesHeated); // no heated only zone (served by dual-duct)
 
-    SetPointManager::GetSetPointManagerInputs(state);
-    SetPointManager::WarmestSetPtMgr(1).AirLoopNum = 1;
-    SetPointManager::ColdestSetPtMgr(1).AirLoopNum = 1;
+    SetPointManager::GetSetPointManagerInputs(*state);
+    state->dataSetPointManager->WarmestSetPtMgr(1).AirLoopNum = 1;
+    state->dataSetPointManager->ColdestSetPtMgr(1).AirLoopNum = 1;
 
-    SetPointManager::InitSetPointManagers(state);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired = 10000.0;
+    SetPointManager::InitSetPointManagers(*state);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 10000.0;
 
-    EXPECT_EQ(DataLoopNode::NodeID(2), "SPACE1-1 IN NODE");
-    EXPECT_EQ(DataLoopNode::NodeID(5), "SPACE1-1 NODE");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(2), "SPACE1-1 IN NODE");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(5), "SPACE1-1 NODE");
 
-    DataLoopNode::Node(2).MassFlowRateMax = 1.0; // zone inlet node air flow rate, kg/s
-    DataLoopNode::Node(2).HumRat = 0.075;        // zone inlet node air hum ratio, kg/kg
-    DataLoopNode::Node(2).Temp = 40.0;           // zone inlet node air temperature, deg C
-    DataLoopNode::Node(5).Temp = 21.0;           // zone air node temperature set to 21.0 deg C
+    state->dataLoopNodes->Node(2).MassFlowRateMax = 1.0; // zone inlet node air flow rate, kg/s
+    state->dataLoopNodes->Node(2).HumRat = 0.075;        // zone inlet node air hum ratio, kg/kg
+    state->dataLoopNodes->Node(2).Temp = 40.0;           // zone inlet node air temperature, deg C
+    state->dataLoopNodes->Node(5).Temp = 21.0;           // zone air node temperature set to 21.0 deg C
 
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
 
-    EXPECT_EQ(DataLoopNode::NodeID(13), "VAV SYS 1 OUTLET NODE");
-    EXPECT_DOUBLE_EQ(16.0, SetPointManager::WarmestSetPtMgr(1).SetPt); // no cooling load, sets to maximum limit value
+    EXPECT_EQ(state->dataLoopNodes->NodeID(13), "VAV SYS 1 OUTLET NODE");
+    EXPECT_DOUBLE_EQ(16.0, state->dataSetPointManager->WarmestSetPtMgr(1).SetPt); // no cooling load, sets to maximum limit value
 
     Real64 CpAir(0.0);
     Real64 ZoneSetPointTemp(0.0);
 
-    CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(2).HumRat);
-    ZoneSetPointTemp = DataLoopNode::Node(5).Temp +
-                       DataZoneEnergyDemands::ZoneSysEnergyDemand(1).TotalOutputRequired / (CpAir * DataLoopNode::Node(2).MassFlowRateMax);
+    CpAir = Psychrometrics::PsyCpAirFnW(state->dataLoopNodes->Node(2).HumRat);
+    ZoneSetPointTemp = state->dataLoopNodes->Node(5).Temp + state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired /
+                                                                (CpAir * state->dataLoopNodes->Node(2).MassFlowRateMax);
     // check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
-    EXPECT_EQ(DataLoopNode::NodeID(12), "HCOIL OUTLET NODE");
-    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, SetPointManager::ColdestSetPtMgr(1).SetPt); // 29.74 deg C
-    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, DataLoopNode::Node(12).TempSetPoint);       // 29.74 deg C
+    EXPECT_EQ(state->dataLoopNodes->NodeID(12), "HCOIL OUTLET NODE");
+    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataSetPointManager->ColdestSetPtMgr(1).SetPt); // 29.74 deg C
+    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataLoopNodes->Node(12).TempSetPoint);          // 29.74 deg C
 }
 
 TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
@@ -1268,41 +1277,41 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(ErrorsFound); // zones are specified in the idf snippet
 
-    SetPointManager::GetSetPointManagerInputs(state);
+    SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
-    EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlVarType, "MAXIMUMTEMPERATURE");
-    EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType_MaxTemp);
-    EXPECT_EQ(SetPointManager::AllSetPtMgr(1).SPMType, SetPointManager::iSPMType_OutsideAir);
-    EXPECT_EQ(80.0, SetPointManager::OutAirSetPtMgr(1).OutLowSetPt1);
-    EXPECT_EQ(-17.778, SetPointManager::OutAirSetPtMgr(1).OutLow1);
-    EXPECT_EQ(40.0, SetPointManager::OutAirSetPtMgr(1).OutHighSetPt1);
-    EXPECT_EQ(21.11, SetPointManager::OutAirSetPtMgr(1).OutHigh1);
+    EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "MAXIMUMTEMPERATURE");
+    EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MaxTemp);
+    EXPECT_EQ(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
+    EXPECT_EQ(80.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
+    EXPECT_EQ(-17.778, state->dataSetPointManager->OutAirSetPtMgr(1).OutLow1);
+    EXPECT_EQ(40.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1);
+    EXPECT_EQ(21.11, state->dataSetPointManager->OutAirSetPtMgr(1).OutHigh1);
     // set out door dry bukb temp
-    DataEnvironment::OutDryBulbTemp = -20.0;
+    state->dataEnvrn->OutDryBulbTemp = -20.0;
     // do init
-    SetPointManager::InitSetPointManagers(state);
+    SetPointManager::InitSetPointManagers(*state);
     // check OA Reset Set Point Manager run
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
     // check OA Reset Set Point Manager sim
-    EXPECT_EQ(80.0, DataLoopNode::Node(1).TempSetPointHi);
+    EXPECT_EQ(80.0, state->dataLoopNodes->Node(1).TempSetPointHi);
     // change the low outdoor air setpoint reset value to 60.0C
-    SetPointManager::OutAirSetPtMgr(1).OutLowSetPt1 = 60.0;
+    state->dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1 = 60.0;
     // re simulate OA Reset Set Point Manager
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
     // check the new reset value is set
-    EXPECT_EQ(60.0, DataLoopNode::Node(1).TempSetPointHi);
+    EXPECT_EQ(60.0, state->dataLoopNodes->Node(1).TempSetPointHi);
 
     // set out door dry bukb temp
-    DataEnvironment::OutDryBulbTemp = 2.0;
+    state->dataEnvrn->OutDryBulbTemp = 2.0;
     // check OA Reset Set Point Manager run
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
     // SetPt = SetTempAtOutLow - ((OutDryBulbTemp - OutLowTemp)/(OutHighTemp - OutLowTemp)) * (SetTempAtOutLow - SetTempAtOutHigh);
     Real64 SetPt = 60.0 - ((2.0 - -17.778) / (21.11 - -17.778)) * (60.0 - 40.0);
     // check OA Reset Set Point Manager sim
-    EXPECT_EQ(SetPt, DataLoopNode::Node(1).TempSetPointHi);
+    EXPECT_EQ(SetPt, state->dataLoopNodes->Node(1).TempSetPointHi);
 }
 
 TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
@@ -1324,41 +1333,41 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(ErrorsFound); // zones are specified in the idf snippet
 
-    SetPointManager::GetSetPointManagerInputs(state);
+    SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
-    EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlVarType, "MINIMUMTEMPERATURE");
-    EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType_MinTemp);
-    EXPECT_EQ(SetPointManager::AllSetPtMgr(1).SPMType, SetPointManager::iSPMType_OutsideAir);
-    EXPECT_EQ(80.0, SetPointManager::OutAirSetPtMgr(1).OutLowSetPt1);
-    EXPECT_EQ(-17.778, SetPointManager::OutAirSetPtMgr(1).OutLow1);
-    EXPECT_EQ(40.0, SetPointManager::OutAirSetPtMgr(1).OutHighSetPt1);
-    EXPECT_EQ(21.11, SetPointManager::OutAirSetPtMgr(1).OutHigh1);
+    EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlVarType, "MINIMUMTEMPERATURE");
+    EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType::MinTemp);
+    EXPECT_EQ(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
+    EXPECT_EQ(80.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
+    EXPECT_EQ(-17.778, state->dataSetPointManager->OutAirSetPtMgr(1).OutLow1);
+    EXPECT_EQ(40.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1);
+    EXPECT_EQ(21.11, state->dataSetPointManager->OutAirSetPtMgr(1).OutHigh1);
     // set out door dry bukb temp
-    DataEnvironment::OutDryBulbTemp = 22.0;
+    state->dataEnvrn->OutDryBulbTemp = 22.0;
     // do init
-    SetPointManager::InitSetPointManagers(state);
+    SetPointManager::InitSetPointManagers(*state);
     // check OA Reset Set Point Manager run
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
     // check OA Reset Set Point Manager sim
-    EXPECT_EQ(40.0, DataLoopNode::Node(1).TempSetPointLo);
+    EXPECT_EQ(40.0, state->dataLoopNodes->Node(1).TempSetPointLo);
     // change the low outdoor air setpoint reset value to 60.0C
-    SetPointManager::OutAirSetPtMgr(1).OutHighSetPt1 = 35.0;
+    state->dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1 = 35.0;
     // re simulate OA Reset Set Point Manager
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
     // check the new reset value is set
-    EXPECT_EQ(35.0, DataLoopNode::Node(1).TempSetPointLo);
+    EXPECT_EQ(35.0, state->dataLoopNodes->Node(1).TempSetPointLo);
 
     // set out door dry bulb temp
-    DataEnvironment::OutDryBulbTemp = 2.0;
+    state->dataEnvrn->OutDryBulbTemp = 2.0;
     // check OA Reset Set Point Manager run
-    SetPointManager::SimSetPointManagers(state);
-    SetPointManager::UpdateSetPointManagers(state);
+    SetPointManager::SimSetPointManagers(*state);
+    SetPointManager::UpdateSetPointManagers(*state);
     // SetPt = SetTempAtOutLow - ((OutDryBulbTemp - OutLowTemp)/(OutHighTemp - OutLowTemp)) * (SetTempAtOutLow - SetTempAtOutHigh);
     Real64 SetPt = 80.0 - ((2.0 - -17.778) / (21.11 - -17.778)) * (80.0 - 35.0);
     // check OA Reset Set Point Manager sim
-    EXPECT_EQ(SetPt, DataLoopNode::Node(1).TempSetPointLo);
+    EXPECT_EQ(SetPt, state->dataLoopNodes->Node(1).TempSetPointLo);
 }
 
 TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
@@ -1377,30 +1386,30 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
-    DataHeatBalance::Zone(1).Name = "KITCHEN";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "KITCHEN";
 
-    DataLoopNode::Node.allocate(3);
+    state->dataLoopNodes->Node.allocate(3);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 4;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-    SetPointManager::GetSetPointManagerInputs(state);
+    SetPointManager::GetSetPointManagerInputs(*state);
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
-    state.dataAirLoop->AirLoopInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    state->dataAirLoop->AirLoopInputsFilled = true;
 
-    ASSERT_THROW(SetPointManager::InitSetPointManagers(state), std::runtime_error);
+    ASSERT_THROW(SetPointManager::InitSetPointManagers(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** SetpointManager:SingleZone:Reheat=\"SUPAIRTEMP MNGRKITCHEN\", The zone inlet node of KITCHEN INLET NODE NAME",
@@ -1415,8 +1424,8 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    DataZoneEquipment::ZoneEquipInputsFilled = false;
-    state.dataAirLoop->AirLoopInputsFilled = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = false;
+    state->dataAirLoop->AirLoopInputsFilled = false;
 }
 TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
 {
@@ -1444,30 +1453,30 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
-    DataHeatBalance::Zone(1).Name = "ZSF1";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "ZSF1";
 
-    DataLoopNode::Node.allocate(3);
+    state->dataLoopNodes->Node.allocate(3);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 4;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-    SetPointManager::GetSetPointManagerInputs(state);
+    SetPointManager::GetSetPointManagerInputs(*state);
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
-    state.dataAirLoop->AirLoopInputsFilled = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    state->dataAirLoop->AirLoopInputsFilled = true;
 
-    ASSERT_THROW(SetPointManager::InitSetPointManagers(state), std::runtime_error);
+    ASSERT_THROW(SetPointManager::InitSetPointManagers(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** SetpointManager:SingleZone:Heating=\"HEATING SUPPLY AIR TEMP MANAGER 1\", The zone inlet node of ZNF1 INLET NODE",
@@ -1482,8 +1491,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    DataZoneEquipment::ZoneEquipInputsFilled = false;
-    state.dataAirLoop->AirLoopInputsFilled = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = false;
+    state->dataAirLoop->AirLoopInputsFilled = false;
 }
 TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
 {
@@ -1511,83 +1520,83 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfZones = 1;
+    state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
-    DataHeatBalance::Zone(1).Name = "ZSF1";
-    SetPointManager::GetSetPointManagerInputs(state);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "ZSF1";
+    SetPointManager::GetSetPointManagerInputs(*state);
 
-    DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;
-    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
-    DataZoneEquipment::ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    int zoneNodeNum = UtilityRoutines::FindItemInList("ZSF1 NODE", DataLoopNode::NodeID);
-    DataZoneEquipment::ZoneEquipConfig(1).ZoneNode = zoneNodeNum;
-    int inletNodeNum = UtilityRoutines::FindItemInList("ZSF1 INLET NODE", DataLoopNode::NodeID);
-    DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = inletNodeNum;
-    DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    int coolSPNodeNum = UtilityRoutines::FindItemInList("ZONE EQUIPMENT 1 INLET NODE", DataLoopNode::NodeID);
-    int heatSPNodeNum = UtilityRoutines::FindItemInList("AIR LOOP 1 OUTLET NODE", DataLoopNode::NodeID);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
+    int zoneNodeNum = UtilityRoutines::FindItemInList("ZSF1 NODE", state->dataLoopNodes->NodeID);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = zoneNodeNum;
+    int inletNodeNum = UtilityRoutines::FindItemInList("ZSF1 INLET NODE", state->dataLoopNodes->NodeID);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = inletNodeNum;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    int coolSPNodeNum = UtilityRoutines::FindItemInList("ZONE EQUIPMENT 1 INLET NODE", state->dataLoopNodes->NodeID);
+    int heatSPNodeNum = UtilityRoutines::FindItemInList("AIR LOOP 1 OUTLET NODE", state->dataLoopNodes->NodeID);
 
-    auto &zoneNode(DataLoopNode::Node(zoneNodeNum));
-    auto &inletNode(DataLoopNode::Node(inletNodeNum));
-    auto &coolSPNode(DataLoopNode::Node(coolSPNodeNum));
-    auto &heatSPNode(DataLoopNode::Node(heatSPNodeNum));
+    auto &zoneNode(state->dataLoopNodes->Node(zoneNodeNum));
+    auto &inletNode(state->dataLoopNodes->Node(inletNodeNum));
+    auto &coolSPNode(state->dataLoopNodes->Node(coolSPNodeNum));
+    auto &heatSPNode(state->dataLoopNodes->Node(heatSPNodeNum));
 
-    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
-    DataZoneEquipment::ZoneEquipInputsFilled = true;
-    state.dataAirLoop->AirLoopInputsFilled = true;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    state->dataAirLoop->AirLoopInputsFilled = true;
 
-    SetPointManager::InitSetPointManagers(state);
+    SetPointManager::InitSetPointManagers(*state);
     EXPECT_FALSE(has_err_output(true));
 
     // Case 1 - No load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
-    SetPointManager::ManageSetPoints(state);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
+    SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, zoneNode.Temp, 0.001);
     EXPECT_NEAR(heatSPNode.TempSetPoint, zoneNode.Temp, 0.001);
 
     // Case 2 - Small heating load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 100.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 50.0;
-    SetPointManager::ManageSetPoints(state);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 100.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 50.0;
+    SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 20.994, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 20.497, 0.01);
 
     // Case 3 - Large heating load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 10000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 5000.0;
-    SetPointManager::ManageSetPoints(state);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 10000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 5000.0;
+    SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 99.0, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 45.0, 0.01);
 
     // Case 4 - Small cooling load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -50.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -100.0;
-    SetPointManager::ManageSetPoints(state);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -50.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -100.0;
+    SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 19.50, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 19.01, 0.01);
 
     // Case 5 - Large cooling load
     inletNode.MassFlowRate = 0.1;
     zoneNode.Temp = 20.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000.0;
-    SetPointManager::ManageSetPoints(state);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000.0;
+    SetPointManager::ManageSetPoints(*state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 14.0, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, -99.0, 0.01);
 }

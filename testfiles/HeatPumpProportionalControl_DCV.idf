@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.5;
 
   Building,
     NONE,                    !- Name
@@ -133,7 +133,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -1389,7 +1391,7 @@
     DCVObject,               !- Name
     VentSchedule,            !- Availability Schedule Name
     Yes,                     !- Demand Controlled Ventilation
-    ProportionalControlBasedonOccupancySchedule,  !- System Outdoor Air Method
+    ProportionalControlBasedOnOccupancySchedule,  !- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
     West Zone,               !- Zone or ZoneList 1 Name
     CM DSOA West Zone,       !- Design Specification Outdoor Air Object Name 1

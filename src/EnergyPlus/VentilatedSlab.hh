@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,85 +52,16 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace VentilatedSlab {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-
-    // Module Object
-    extern std::string const cMO_VentilatedSlab;
-
-    // Parameters for outside air control types:
-    extern int const Heating_ElectricCoilType;
-    extern int const Heating_GasCoilType;
-    extern int const Heating_WaterCoilType;
-    extern int const Heating_SteamCoilType;
-    extern int const Cooling_CoilWaterCooling;
-    extern int const Cooling_CoilDetailedCooling;
-    extern int const Cooling_CoilHXAssisted;
-    extern int const VariablePercent;
-    extern int const FixedTemperature;
-    extern int const FixedOAControl;
-    extern int const NotOperating; // Parameter for use with OperatingMode variable, set for no heating/cooling
-    extern int const HeatingMode;  // Parameter for use with OperatingMode variable, set for heating
-    extern int const CoolingMode;  // Parameter for use with OperatingMode variable, set for cooling
-    // Ventilated Slab Configurations
-    extern int const SlabOnly;    // Air circulate through cores of slab only
-    extern int const SlabAndZone; // Circulated Air is introduced to zone
-    extern int const SeriesSlabs;
-    //  Control Types
-    extern int const MATControl;  // Controls system using mean air temperature
-    extern int const MRTControl;  // Controls system using mean radiant temperature
-    extern int const OPTControl;  // Controls system using operative temperature
-    extern int const ODBControl;  // Controls system using outside air dry-bulb temperature
-    extern int const OWBControl;  // Controls system using outside air wet-bulb temperature
-    extern int const SURControl;  // Controls system using surface temperature !Phase2-A
-    extern int const DPTZControl; // Controls system using dew-point temperature of zone!Phase2-A
-
-    // coil operation
-    extern int const On;  // normal coil operation
-    extern int const Off; // signal coil shouldn't run
-    extern int const NoneOption;
-    extern int const BothOption;
-    extern int const HeatingOption;
-    extern int const CoolingOption;
-    extern int OperatingMode; // Used to keep track of whether system is in heating or cooling mode
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool HCoilOn;                         // TRUE if the heating coil (gas or electric especially) should be running
-    extern int NumOfVentSlabs;                   // Number of ventilated slab in the input file
-    extern Real64 OAMassFlowRate;                // Outside air mass flow rate for the ventilated slab
-    extern Array1D_double QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
-    extern int MaxCloNumOfSurfaces;              // Used to set allocate size in CalcClo routine
-    extern Real64 QZnReq;                        // heating or cooling needed by system [watts]
-
-    // Record keeping variables used to calculate QRadSysSrcAvg locally
-
-    extern Array1D_double LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    extern Array1D_bool CheckEquipName;
-
-    // Autosizing variables
-    extern Array1D_bool MySizeFlag;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
-    // PRIVATE UpdateVentilatedSlabValAvg
-
-    // Types
 
     struct VentilatedSlabData
     {
@@ -337,15 +268,10 @@ namespace VentilatedSlab {
         }
     };
 
-    // Object Data
-    extern Array1D<VentilatedSlabData> VentSlab;
-    extern Array1D<VentSlabNumericFieldData> VentSlabNumericFields;
-
     // Functions
 
-    void clear_state();
-
-    void SimVentilatedSlab(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimVentilatedSlab(EnergyPlusData &state,
+                           std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -354,41 +280,48 @@ namespace VentilatedSlab {
 
     void GetVentilatedSlabInput(EnergyPlusData &state);
 
-    void InitVentilatedSlab(EnergyPlusData &state, int const Item,               // index for the current ventilated slab
+    void InitVentilatedSlab(EnergyPlusData &state,
+                            int const Item,               // index for the current ventilated slab
                             int const VentSlabZoneNum,    // number of zone being served
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
     void SizeVentilatedSlab(EnergyPlusData &state, int const Item);
 
-    void CalcVentilatedSlab(EnergyPlusData &state, int &Item,                     // number of the current ventilated slab being simulated
+    void CalcVentilatedSlab(EnergyPlusData &state,
+                            int &Item,                     // number of the current ventilated slab being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // power supplied (W)
                             Real64 &LatOutputProvided      // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabComps(EnergyPlusData &state, int const Item,                // system index in ventilated slab array
+    void CalcVentilatedSlabComps(EnergyPlusData &state,
+                                 int const Item,                // system index in ventilated slab array
                                  bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                  Real64 &LoadMet                // load met by the system (watts)
     );
 
-    void CalcVentilatedSlabCoilOutput(int const Item,           // system index in ventilated slab array
+    void CalcVentilatedSlabCoilOutput(EnergyPlusData &state,
+                                      int const Item,           // system index in ventilated slab array
                                       Real64 &PowerMet,         // power supplied (W)
                                       Real64 &LatOutputProvided // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabRadComps(EnergyPlusData &state, int const Item,               // System index in ventilated slab array
+    void CalcVentilatedSlabRadComps(EnergyPlusData &state,
+                                    int const Item,               // System index in ventilated slab array
                                     bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
     );
 
-    void SimVentSlabOAMixer(int const Item); // System index in Ventilated Slab array
+    void SimVentSlabOAMixer(EnergyPlusData &state, int const Item); // System index in Ventilated Slab array
 
-    void UpdateVentilatedSlab(int const Item,               // Index for the ventilated slab under consideration within the derived types
+    void UpdateVentilatedSlab(EnergyPlusData &state,
+                              int const Item,               // Index for the ventilated slab under consideration within the derived types
                               bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     );
 
-    Real64 CalcVentSlabHXEffectTerm(int const Item,            // Index number of radiant system under consideration
+    Real64 CalcVentSlabHXEffectTerm(EnergyPlusData &state,
+                                    int const Item,            // Index number of radiant system under consideration
                                     Real64 const Temperature,  // Temperature of air entering the radiant system, in C
                                     Real64 const AirMassFlow,  // Mass flow rate of water in the radiant system, in kg/s
                                     Real64 const FlowFraction, // Mass flow rate fraction for this surface in the radiant system
@@ -396,13 +329,124 @@ namespace VentilatedSlab {
                                     Real64 const CoreDiameter, // Inside diameter of the tubing in the radiant system, in m
                                     Real64 const CoreNumbers);
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 
-    void ReportVentilatedSlab(int const Item); // Index for the ventilated slab under consideration within the derived types
+    void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
 
     //*****************************************************************************************
 
 } // namespace VentilatedSlab
+
+struct VentilatedSlabData : BaseGlobalStruct
+{
+
+    std::string const cMO_VentilatedSlab = "ZoneHVAC:VentilatedSlab";
+
+    // Parameters for outside air control types:
+    int const Heating_ElectricCoilType = 1;
+    int const Heating_GasCoilType = 2;
+    int const Heating_WaterCoilType = 3;
+    int const Heating_SteamCoilType = 4;
+    int const Cooling_CoilWaterCooling = 1;
+    int const Cooling_CoilDetailedCooling = 2;
+    int const Cooling_CoilHXAssisted = 3;
+    int const VariablePercent = 1;
+    int const FixedTemperature = 2;
+    int const FixedOAControl = 3;
+    int const NotOperating = 0; // Parameter for use with OperatingMode variable, set for no heating/cooling
+    int const HeatingMode = 1;  // Parameter for use with OperatingMode variable, set for heating
+    int const CoolingMode = 2;  // Parameter for use with OperatingMode variable, set for cooling
+                                // Ventilated Slab Configurations
+    int const SlabOnly = 1;     // Air circulate through cores of slab only
+    int const SlabAndZone = 2;  // Circulated Air is introduced to zone
+    int const SeriesSlabs = 3;
+    //  Control Types
+    int const MATControl = 1;  // Controls system using mean air temperature
+    int const MRTControl = 2;  // Controls system using mean radiant temperature
+    int const OPTControl = 3;  // Controls system using operative temperature
+    int const ODBControl = 4;  // Controls system using outside air dry-bulb temperature
+    int const OWBControl = 5;  // Controls system using outside air wet-bulb temperature
+    int const SURControl = 6;  // Controls system using surface temperature !Phase2-A
+    int const DPTZControl = 7; // Controls system using dew-point temperature of zone!Phase2-A
+
+    // coil operation
+    int const On = 1;  // normal coil operation
+    int const Off = 0; // signal coil shouldn't run
+    int const NoneOption = 0;
+    int const BothOption = 1;
+    int const HeatingOption = 2;
+    int const CoolingOption = 3;
+    int OperatingMode = 0; // Used to keep track of whether system is in heating or cooling mode
+
+    // MODULE VARIABLE DECLARATIONS:
+    bool HCoilOn = false;                 // TRUE if the heating coil (gas or electric especially) should be running
+    int NumOfVentSlabs = 0;               // Number of ventilated slab in the input file
+    Real64 OAMassFlowRate = 0.0;          // Outside air mass flow rate for the ventilated slab
+    Array1D_double QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
+    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+    int MaxCloNumOfSurfaces = 0;          // Used to set allocate size in CalcClo routine
+    Real64 QZnReq = 0.0;                  // heating or cooling needed by system [watts]
+
+    // Record keeping variables used to calculate QRadSysSrcAvg locally
+
+    Array1D_double LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+    Array1D_bool CheckEquipName;
+
+    // Autosizing variables
+    bool GetInputFlag = true;
+    bool MyOneTimeFlag = true;
+    Array1D_bool MySizeFlag;
+
+    // Object Data
+    EPVector<VentilatedSlab::VentilatedSlabData> VentSlab;
+    EPVector<VentilatedSlab::VentSlabNumericFieldData> VentSlabNumericFields;
+
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+
+    Array1D<Real64> AirTempOut; // Array of outlet air temperatures for each surface in the radiant system
+
+    int CondensationErrorCount = 0;    // Counts for # times the radiant systems are shutdown due to condensation
+    int EnergyImbalanceErrorCount = 0; // Counts for # times a temperature mismatch is found in the energy balance check
+    bool FirstTimeFlag = true;         // for setting size of AirTempOut array
+
+    void clear_state() override
+    {
+        this->MyOneTimeFlag = true;
+        this->GetInputFlag = true;
+        this->HCoilOn = false;
+        this->NumOfVentSlabs = 0;
+        this->OAMassFlowRate = 0.0;
+        this->MaxCloNumOfSurfaces = 0;
+        this->QZnReq = 0.0;
+        this->QRadSysSrcAvg.deallocate();
+        this->ZeroSourceSumHATsurf.deallocate();
+        this->LastQRadSysSrc.deallocate();
+        this->LastSysTimeElapsed.deallocate();
+        this->LastTimeStepSys.deallocate();
+        this->CheckEquipName.deallocate();
+        this->MySizeFlag.deallocate();
+        this->VentSlab.deallocate();
+        this->VentSlabNumericFields.deallocate();
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->MyZoneEqFlag.deallocate();
+        this->AirTempOut.deallocate();
+        this->CondensationErrorCount = 0;
+        this->EnergyImbalanceErrorCount = 0;
+        this->FirstTimeFlag = true;
+    }
+
+    // Default Constructor
+    VentilatedSlabData()
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,16 +53,15 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
 
 using namespace EnergyPlus;
 
@@ -263,42 +262,42 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errorsFound);
+    SurfaceGeometry::GetSurfaceData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
-    ElectricBaseboardRadiator::GetElectricBaseboardInput();
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(2).ZonePtr, 2);
+    ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(1).ZonePtr, 1);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(2).ZonePtr, 2);
 }
 
 TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
@@ -554,109 +553,109 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(3);
-    SurfaceGeometry::SinZoneRelNorth.allocate(3);
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(3) = std::cos(-DataHeatBalance::Zone(3).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(3) = std::sin(-DataHeatBalance::Zone(3).RelNorth * DataGlobals::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(3);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(3);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(3) = std::cos(-state->dataHeatBal->Zone(3).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(3) = std::sin(-state->dataHeatBal->Zone(3).RelNorth * DataGlobalConstants::DegToRadians);
 
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errorsFound);
+    SurfaceGeometry::GetSurfaceData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
     // get electric baseboard inputs
-    ElectricBaseboardRadiator::GetElectricBaseboardInput();
+    ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
 
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(2).ZonePtr, 2);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(3).ZonePtr, 3);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(1).ZonePtr, 1);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(2).ZonePtr, 2);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(3).ZonePtr, 3);
 
-    DataSizing::FinalZoneSizing.allocate(3);
-    DataSizing::ZoneEqSizing.allocate(3);
-    DataSizing::ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing.allocate(3);
+    state->dataSize->ZoneEqSizing.allocate(3);
+    state->dataSize->ZoneSizingRunDone = true;
 
     BaseboardNum = 1;
     CntrlZoneNum = 1;
-    DataSizing::CurZoneEqNum = CntrlZoneNum;
+    state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
-        ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
-    DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+        state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     // do electric baseboard sizing
-    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
+    ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
     // check user specified hardsized nominal capacity
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 1000.0);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 1000.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 1000.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 1000.0);
     // check nominal capacity autosize
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
-    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
+    ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
 
     BaseboardNum = 2;
     CntrlZoneNum = 2;
-    DataSizing::CurZoneEqNum = CntrlZoneNum;
+    state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
-        ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
-    DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
-    DataHeatBalance::Zone(CntrlZoneNum).FloorArea = 100.0;
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+        state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
+    state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do electric baseboard sizing
-    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
+    ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
     // check user specified hardsized nominal capacity
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 30.0);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 30.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
     // check nominal capacity autosize
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
-    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
+    ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 2000.0);
 
     BaseboardNum = 3;
     CntrlZoneNum = 3;
-    DataSizing::CurZoneEqNum = CntrlZoneNum;
+    state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
-        ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
-    DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
-    DataHeatBalance::Zone(CntrlZoneNum).FloorArea = 100.0;
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+        state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
+    state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do electric baseboard sizing
-    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
+    ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
     // check user specified hardsized nominal capacity
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 0.50);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 1500.0);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity, 0.50);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 1500.0);
     // check nominal capacity autosize
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
-    ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
-    ElectricBaseboardRadiator::SizeElectricBaseboard(state, BaseboardNum);
-    EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).ScaledHeatingCapacity = DataSizing::AutoSize;
+    ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
+    EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).NominalCapacity, 3000.0);
 }
 
 TEST_F(EnergyPlusFixture, RadConvElecBaseboard_UpdateElectricBaseboardOff)

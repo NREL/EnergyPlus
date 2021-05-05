@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -64,6 +65,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -72,7 +74,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataHeatBalFanSys;
@@ -1077,76 +1078,75 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    using namespace EnergyPlus::DataIPShortCuts;
-
-    lNumericFieldBlanks.allocate(1000);
-    lAlphaFieldBlanks.allocate(1000);
-    cAlphaFieldNames.allocate(1000);
-    cNumericFieldNames.allocate(1000);
-    cAlphaArgs.allocate(1000);
-    rNumericArgs.allocate(1000);
-    lNumericFieldBlanks = false;
-    lAlphaFieldBlanks = false;
-    cAlphaFieldNames = " ";
-    cNumericFieldNames = " ";
-    cAlphaArgs = " ";
-    rNumericArgs = 0.0;
+    state->dataIPShortCut->lNumericFieldBlanks.allocate(1000);
+    state->dataIPShortCut->lAlphaFieldBlanks.allocate(1000);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(1000);
+    state->dataIPShortCut->cNumericFieldNames.allocate(1000);
+    state->dataIPShortCut->cAlphaArgs.allocate(1000);
+    state->dataIPShortCut->rNumericArgs.allocate(1000);
+    state->dataIPShortCut->lNumericFieldBlanks = false;
+    state->dataIPShortCut->lAlphaFieldBlanks = false;
+    state->dataIPShortCut->cAlphaFieldNames = " ";
+    state->dataIPShortCut->cNumericFieldNames = " ";
+    state->dataIPShortCut->cAlphaArgs = " ";
+    state->dataIPShortCut->rNumericArgs = 0.0;
 
     bool localErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(state, localErrorsFound);
+    HeatBalanceManager::GetProjectControlData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetZoneData(localErrorsFound);
+    HeatBalanceManager::GetZoneData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetWindowGlassSpectralData(localErrorsFound);
+    HeatBalanceManager::GetWindowGlassSpectralData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, localErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    HeatBalanceManager::GetConstructData(state.files, localErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(state.files, localErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
 
-    SurfaceGeometry::CosBldgRotAppGonly = 1.0;
-    SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, localErrorsFound);
+    state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
+    state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ScheduleManager::ProcessScheduleInput(state.files);
-    ScheduleManager::ScheduleInputProcessed = true;
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
-    DataHeatBalance::Zone(2).HasWindow = true;
-    DataHeatBalance::Zone(4).HasWindow = true;
-    EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(TotSurfaces);
-    DataHeatBalance::HConvIn.allocate(TotSurfaces);
-    DataHeatBalance::HConvIn = 0.1;
-    DataHeatBalSurface::TempSurfIn = 25.00;
-    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", DataSurfaces::Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", DataSurfaces::Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", DataSurfaces::Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 26.99;
-    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", DataSurfaces::Surface);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 22.99;
-    DataHeatBalFanSys::MAT.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::MAT = 23.0;
-    DataHeatBalFanSys::ZoneAirHumRat = 0.01;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataHeatBalFanSys::MCPThermChim.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::ThermChimAMFL.allocate(DataGlobals::NumOfZones);
-    DataHeatBalFanSys::MCPTThermChim.allocate(DataGlobals::NumOfZones);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataHeatBalance::ZnAirRpt.allocate(DataGlobals::NumOfZones);
+    state->dataHeatBal->Zone(2).HasWindow = true;
+    state->dataHeatBal->Zone(4).HasWindow = true;
+    state->dataHeatBalSurf->TempSurfIn.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->HConvIn.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->HConvIn = 0.1;
+    state->dataHeatBalSurf->TempSurfIn = 25.00;
+    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", state->dataSurface->Surface);
+    state->dataHeatBalSurf->TempSurfIn(surfNum) = 25.92;
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", state->dataSurface->Surface);
+    state->dataHeatBalSurf->TempSurfIn(surfNum) = 25.92;
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", state->dataSurface->Surface);
+    state->dataHeatBalSurf->TempSurfIn(surfNum) = 26.99;
+    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
+    state->dataHeatBalSurf->TempSurfIn(surfNum) = 22.99;
+    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MAT = 23.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat = 0.01;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
+
+    state->dataHeatBalFanSys->MCPThermChim.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     // No EMS
-    ThermalChimney::GetThermalChimney(localErrorsFound);
+    ThermalChimney::GetThermalChimney(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
-    ThermalChimney::CalcThermalChimney();
-    EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
+    ThermalChimney::CalcThermalChimney(*state);
+    EXPECT_NEAR(state->dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.015668, 0.0001);
     // EMS Override
-    ThermalChimney::ThermalChimneySys(1).EMSOverrideOn = true;
-    ThermalChimney::ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
-    ThermalChimney::CalcThermalChimney();
-    EXPECT_NEAR(ThermalChimney::ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
-
+    state->dataThermalChimneys->ThermalChimneySys(1).EMSOverrideOn = true;
+    state->dataThermalChimneys->ThermalChimneySys(1).EMSAirFlowRateValue = 0.01;
+    ThermalChimney::CalcThermalChimney(*state);
+    EXPECT_NEAR(state->dataThermalChimneys->ThermalChimneyReport(1).OverallTCVolumeFlow, 0.01, 0.0001);
 }

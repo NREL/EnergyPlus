@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -80,15 +80,15 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::NumOfZones = 2;
+    state->dataGlobal->NumOfZones = 2;
 
-    DataHeatBalance::Zone.allocate(2);
-    DataHeatBalance::Zone(1).Name = "SOUTH SKIN";
-    DataHeatBalance::Zone(2).Name = "THERMAL ZONE";
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).Name = "SOUTH SKIN";
+    state->dataHeatBal->Zone(2).Name = "THERMAL ZONE";
 
     bool ErrorsFound(false);
 
-    HeatBalanceAirManager::GetRoomAirModelParameters(state.files, ErrorsFound);
+    HeatBalanceAirManager::GetRoomAirModelParameters(*state, ErrorsFound);
 
     EXPECT_TRUE(ErrorsFound);
 
@@ -106,7 +106,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    DataHeatBalance::Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
 }
 
 } // namespace EnergyPlus

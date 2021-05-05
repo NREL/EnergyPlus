@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,13 +52,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -72,19 +72,19 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::EvaporativeCoolers;
-using EnergyPlus::DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
 
 namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     EvapCond.allocate(1);
     int const EvapCoolNum(1);
     EvapCond(EvapCoolNum).SecInletEnthalpy = 42000.0;
 
     // set up arguments
-    int OperatingMode(EvaporativeCoolers::None);
+    OperatingMode OperatingMode(EvaporativeCoolers::OperatingMode::None);
     Real64 AirMassFlowSec(0.0);
     Real64 const EDBTSec(20.0);
     Real64 const EWBTSec(15.0);
@@ -93,33 +93,33 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
     Real64 QHXLatent(0.0);
 
     // make the call for zero secondary air flow rate
-    CalcSecondaryAirOutletCondition(EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
+    CalcSecondaryAirOutletCondition(*state, EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for evap cooler set off
     EXPECT_DOUBLE_EQ(EvapCond(EvapCoolNum).SecOutletEnthalpy, EvapCond(EvapCoolNum).SecInletEnthalpy);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // dry operating mode and non zero secondary air flow rate
-    OperatingMode = EvaporativeCoolers::DryFull;
+    OperatingMode = EvaporativeCoolers::OperatingMode::DryFull;
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // make the call for dry operating mode
-    CalcSecondaryAirOutletCondition(EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
+    CalcSecondaryAirOutletCondition(*state, EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for dry operating condition
     EXPECT_NEAR(25.0, EvapCond(EvapCoolNum).SecOutletTemp, 0.000001);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate
-    OperatingMode = EvaporativeCoolers::WetFull;
+    OperatingMode = EvaporativeCoolers::OperatingMode::WetFull;
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
     // make the call for wet operating condition
-    CalcSecondaryAirOutletCondition(EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
+    CalcSecondaryAirOutletCondition(*state, EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for wet operating condition
     EXPECT_DOUBLE_EQ(20.0, EvapCond(EvapCoolNum).SecOutletTemp);
@@ -131,33 +131,34 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
 
 TEST_F(EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     int const EvapCoolNum(1);
     EvapCond.allocate(EvapCoolNum);
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     EvapCond(EvapCoolNum).InletMassFlowRate = 1.0;
     EvapCond(EvapCoolNum).InletTemp = 24.0;
     EvapCond(EvapCoolNum).InletHumRat = 0.013;
     EvapCond(EvapCoolNum).DryCoilMaxEfficiency = 0.8;
 
     // set up arguments
-    int DryOrWetOperatingMode(EvaporativeCoolers::DryFull);
+    OperatingMode DryOrWetOperatingMode(EvaporativeCoolers::OperatingMode::DryFull);
     Real64 const AirMassFlowSec(1.0);
     Real64 const EDBTSec(14.0);
     Real64 const EWBTSec(11.0);
     Real64 const EHumRatSec(0.0075);
 
     // testing full capacity in dry operating mode
-    CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
+    CalcIndirectRDDEvapCoolerOutletTemp(*state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
 
     EXPECT_DOUBLE_EQ(16.0, EvapCond(EvapCoolNum).OutletTemp);
 
     // testing full capacity in wet operating mode
-    DryOrWetOperatingMode = EvaporativeCoolers::WetFull;
+    DryOrWetOperatingMode = EvaporativeCoolers::OperatingMode::WetFull;
     EvapCond(EvapCoolNum).WetCoilMaxEfficiency = 0.75;
 
-    CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
+    CalcIndirectRDDEvapCoolerOutletTemp(*state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
 
     EXPECT_DOUBLE_EQ(14.25, EvapCond(EvapCoolNum).OutletTemp);
 
@@ -166,29 +167,30 @@ TEST_F(EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp)
 
 TEST_F(EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     int const EvapCoolNum(1);
     Real64 PrimaryAirDesignFlow(0.0);
     Real64 SecondaryAirDesignFlow(0.0);
 
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
 
     // allocate
-    DataSizing::CurSysNum = 1;
-    FinalSysSizing.allocate(CurSysNum);
-    DataSizing::FinalSysSizing(1).DesMainVolFlow = 1.0;
-    DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.4;
-    PrimaryAirSystem.allocate(CurSysNum);
-    PrimaryAirSystem(CurSysNum).Branch.allocate(1);
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "INDRDD EVAP COOLER";
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.4;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataSize->CurSysNum);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "INDRDD EVAP COOLER";
 
     // Set Primary Air Data
-    PrimaryAirSystem(CurSysNum).NumBranches = 1;
-    PrimaryAirSystem(CurSysNum).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).TotalComponents = 1;
 
     std::string const idf_objects = delimited_string({
         "	EvaporativeCooler:Indirect:ResearchSpecial,",
@@ -221,65 +223,66 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput(state);
+    GetEvapInput(*state);
 
     // Set Parameters for Evap Cooler on Main Air Loop System
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
     EvapCond(EvapCoolNum).DesVolFlowRate = DataSizing::AutoSize;
     EvapCond(EvapCoolNum).IndirectVolFlowRate = DataSizing::AutoSize;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.0;
-    FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
-    PrimaryAirDesignFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.2;
+    PrimaryAirDesignFlow = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow;
     SecondaryAirDesignFlow = PrimaryAirDesignFlow * EvapCond(EvapCoolNum).IndirectVolFlowScalingFactor;
 
     // Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop
-    SizeEvapCooler(EvapCoolNum);
+    SizeEvapCooler(*state, EvapCoolNum);
     EXPECT_EQ(PrimaryAirDesignFlow, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(SecondaryAirDesignFlow, EvapCond(EvapCoolNum).IndirectVolFlowRate);
 
     // Set Parameters for Evap Cooler on OA System
     EvapCond(EvapCoolNum).EvapCoolerName = "EvapCool On OA System", EvapCond(EvapCoolNum).DesVolFlowRate = DataSizing::AutoSize;
     EvapCond(EvapCoolNum).IndirectVolFlowRate = DataSizing::AutoSize;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.0;
-    FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
-    PrimaryAirDesignFlow = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
-    SecondaryAirDesignFlow = max(PrimaryAirDesignFlow, 0.5 * FinalSysSizing(CurSysNum).DesMainVolFlow);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.2;
+    PrimaryAirDesignFlow = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow;
+    SecondaryAirDesignFlow = max(PrimaryAirDesignFlow, 0.5 * state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow);
     SecondaryAirDesignFlow = SecondaryAirDesignFlow * EvapCond(EvapCoolNum).IndirectVolFlowScalingFactor;
 
     // Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on OA System
-    SizeEvapCooler(EvapCoolNum);
+    SizeEvapCooler(*state, EvapCoolNum);
     EXPECT_EQ(0.5, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(SecondaryAirDesignFlow, EvapCond(EvapCoolNum).IndirectVolFlowRate);
 
     EvapCond.deallocate();
-    PrimaryAirSystem.deallocate();
-    FinalSysSizing.deallocate();
+    state->dataAirSystemsData->PrimaryAirSystems.deallocate();
+    state->dataSize->FinalSysSizing.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     int const EvapCoolNum(1);
     Real64 PrimaryAirDesignFlow(0.0);
     Real64 RecirWaterPumpDesignPower(0.0);
 
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
 
-    DataSizing::CurSysNum = 1;
-    FinalSysSizing.allocate(CurSysNum);
-    DataSizing::FinalSysSizing(1).DesMainVolFlow = 1.0;
-    DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.4;
-    PrimaryAirSystem.allocate(CurSysNum);
-    PrimaryAirSystem(CurSysNum).Branch.allocate(1);
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "DIRECTEVAPCOOLER";
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.4;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataSize->CurSysNum);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "DIRECTEVAPCOOLER";
 
     // Set Primary Air Data
-    PrimaryAirSystem(CurSysNum).NumBranches = 1;
-    PrimaryAirSystem(CurSysNum).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).TotalComponents = 1;
 
     std::string const idf_objects = delimited_string({
         "	EvaporativeCooler:Direct:ResearchSpecial,",
@@ -301,36 +304,37 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput(state);
+    GetEvapInput(*state);
     // check autosized input fields from idf snippet read
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).RecircPumpPower);
 
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 0.50;
-    PrimaryAirDesignFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 0.50;
+    PrimaryAirDesignFlow = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow;
     RecirWaterPumpDesignPower = PrimaryAirDesignFlow * EvapCond(EvapCoolNum).RecircPumpSizingFactor;
 
     // Test Direct Evaporative Cooler Primary Air Design Flow Rate sizing
-    SizeEvapCooler(1);
+    SizeEvapCooler(*state, 1);
     EXPECT_EQ(PrimaryAirDesignFlow, EvapCond(EvapCoolNum).DesVolFlowRate);
 
     EXPECT_EQ(RecirWaterPumpDesignPower, EvapCond(EvapCoolNum).RecircPumpPower);
 
     EvapCond.deallocate();
-    PrimaryAirSystem.deallocate();
-    FinalSysSizing.deallocate();
+    state->dataAirSystemsData->PrimaryAirSystems.deallocate();
+    state->dataSize->FinalSysSizing.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
-    EvaporativeCoolers::EvapCond.allocate(1);
+    EvapCond.allocate(1);
     int const EvapCoolNum(1);
-    EvaporativeCoolers::EvapCond(EvapCoolNum).SecInletEnthalpy = 42000.0;
+    EvapCond(EvapCoolNum).SecInletEnthalpy = 42000.0;
 
     // set up arguments
-    int OperatingMode(EvaporativeCoolers::None);
+    OperatingMode OperatingMode(EvaporativeCoolers::OperatingMode::None);
     Real64 AirMassFlowSec(0.0);
     Real64 const EDBTSec(20.0);
     Real64 const EWBTSec(15.0);
@@ -340,160 +344,164 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
 
     // make the call for zero secondary air flow rate
     EvaporativeCoolers::CalcSecondaryAirOutletCondition(
-        EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
+        *state, EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for evap cooler set off
-    EXPECT_DOUBLE_EQ(EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletEnthalpy, EvaporativeCoolers::EvapCond(EvapCoolNum).SecInletEnthalpy);
+    EXPECT_DOUBLE_EQ(EvapCond(EvapCoolNum).SecOutletEnthalpy, EvapCond(EvapCoolNum).SecInletEnthalpy);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // dry operating mode and non zero secondary air flow rate
-    OperatingMode = EvaporativeCoolers::DryFull;
+    OperatingMode = EvaporativeCoolers::OperatingMode::DryFull;
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // make the call for dry operating mode
     EvaporativeCoolers::CalcSecondaryAirOutletCondition(
-        EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
+        *state, EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for dry operating condition
-    EXPECT_NEAR(25.0, EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletTemp, 0.000001);
+    EXPECT_NEAR(25.0, EvapCond(EvapCoolNum).SecOutletTemp, 0.000001);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate
-    OperatingMode = EvaporativeCoolers::WetFull;
+    OperatingMode = EvaporativeCoolers::OperatingMode::WetFull;
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
     // make the call for wet operating condition
     EvaporativeCoolers::CalcSecondaryAirOutletCondition(
-        EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
+        *state, EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for wet operating condition
-    EXPECT_DOUBLE_EQ(20.0, EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletTemp);
-    EXPECT_DOUBLE_EQ(47103.205375000471, EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletEnthalpy);
+    EXPECT_DOUBLE_EQ(20.0, EvapCond(EvapCoolNum).SecOutletTemp);
+    EXPECT_DOUBLE_EQ(47103.205375000471, EvapCond(EvapCoolNum).SecOutletEnthalpy);
     EXPECT_DOUBLE_EQ(QHXTotal, QHXLatent);
 
-    EvaporativeCoolers::EvapCond.deallocate();
+    EvapCond.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
-    OutBaroPress = 101325.0;
-    EvaporativeCoolers::EvapCond.allocate(1);
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    EvapCond.allocate(1);
     int const EvapCoolNum(1);
-    EvaporativeCoolers::EvapCond(EvapCoolNum).InletMassFlowRate = 1.0;
-    EvaporativeCoolers::EvapCond(EvapCoolNum).InletTemp = 24.0;
-    EvaporativeCoolers::EvapCond(EvapCoolNum).InletHumRat = 0.013;
-    EvaporativeCoolers::EvapCond(EvapCoolNum).DryCoilMaxEfficiency = 0.8;
+    EvapCond(EvapCoolNum).InletMassFlowRate = 1.0;
+    EvapCond(EvapCoolNum).InletTemp = 24.0;
+    EvapCond(EvapCoolNum).InletHumRat = 0.013;
+    EvapCond(EvapCoolNum).DryCoilMaxEfficiency = 0.8;
 
     // set up arguments
-    int DryOrWetOperatingMode(EvaporativeCoolers::DryFull);
+    OperatingMode DryOrWetOperatingMode(EvaporativeCoolers::OperatingMode::DryFull);
     Real64 const AirMassFlowSec(1.0);
     Real64 const EDBTSec(14.0);
     Real64 const EWBTSec(11.0);
     Real64 const EHumRatSec(0.0075);
 
     // testing full capacity in dry operating mode
-    EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
+    EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(*state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
 
-    EXPECT_DOUBLE_EQ(16.0, EvaporativeCoolers::EvapCond(EvapCoolNum).OutletTemp);
+    EXPECT_DOUBLE_EQ(16.0, EvapCond(EvapCoolNum).OutletTemp);
 
     // testing full capacity in wet operating mode
-    DryOrWetOperatingMode = EvaporativeCoolers::WetFull;
-    EvaporativeCoolers::EvapCond(EvapCoolNum).WetCoilMaxEfficiency = 0.75;
+    DryOrWetOperatingMode = EvaporativeCoolers::OperatingMode::WetFull;
+    EvapCond(EvapCoolNum).WetCoilMaxEfficiency = 0.75;
 
-    EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
+    EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(*state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
 
-    EXPECT_DOUBLE_EQ(14.25, EvaporativeCoolers::EvapCond(EvapCoolNum).OutletTemp);
+    EXPECT_DOUBLE_EQ(14.25, EvapCond(EvapCoolNum).OutletTemp);
 
-    EvaporativeCoolers::EvapCond.deallocate();
+    EvapCond.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
+
     int CurveNum;
 
-    EvaporativeCoolers::EvapCond.allocate(1);
+    EvapCond.allocate(1);
     int const EvapCoolNum(1);
-    EvaporativeCoolers::EvapCond(EvapCoolNum).IndirectFanPower = 200.0;
-    EvaporativeCoolers::EvapCond(EvapCoolNum).IndirectRecircPumpPower = 100.0;
+    EvapCond(EvapCoolNum).IndirectFanPower = 200.0;
+    EvapCond(EvapCoolNum).IndirectRecircPumpPower = 100.0;
 
     // set up arguments
-    int DryWetMode(EvaporativeCoolers::DryFull);
+    OperatingMode DryWetMode(EvaporativeCoolers::OperatingMode::DryFull);
     Real64 FlowRatio(1.0);
 
     CurveNum = 1;
-    EvaporativeCoolers::EvapCond(EvapCoolNum).FanPowerModifierCurveIndex = CurveNum;
+    EvapCond(EvapCoolNum).FanPowerModifierCurveIndex = CurveNum;
 
-    state.dataCurveManager->NumCurves = 1;
-    state.dataCurveManager->PerfCurve.allocate(1);
-    state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
-    state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = 1.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Var2Min = 0;
-    state.dataCurveManager->PerfCurve(CurveNum).Var2Max = 0;
+    state->dataCurveManager->NumCurves = 1;
+    state->dataCurveManager->PerfCurve.allocate(1);
+    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Min = 0;
+    state->dataCurveManager->PerfCurve(CurveNum).Var2Max = 0;
 
     // make the call for dry full load operating condition
-    EvaporativeCoolers::EvapCond(EvapCoolNum).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(state, EvapCoolNum, DryWetMode, FlowRatio);
+    EvapCond(EvapCoolNum).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(*state, EvapCoolNum, DryWetMode, FlowRatio);
 
     // check outputs for dry full load operating condition
-    EXPECT_EQ(200.0, EvaporativeCoolers::EvapCond(EvapCoolNum).EvapCoolerPower);
+    EXPECT_EQ(200.0, EvapCond(EvapCoolNum).EvapCoolerPower);
 
     // set up arguments for wet modulated operating condition
-    DryWetMode = EvaporativeCoolers::WetModulated;
+    DryWetMode = EvaporativeCoolers::OperatingMode::WetModulated;
     FlowRatio = 0.8;
-    EvaporativeCoolers::EvapCond(EvapCoolNum).PartLoadFract = 0.5;
+    EvapCond(EvapCoolNum).PartLoadFract = 0.5;
 
     // make the call for wet modulated operating condition
-    EvaporativeCoolers::EvapCond(EvapCoolNum).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(state, EvapCoolNum, DryWetMode, FlowRatio);
+    EvapCond(EvapCoolNum).EvapCoolerPower = EvaporativeCoolers::IndEvapCoolerPower(*state, EvapCoolNum, DryWetMode, FlowRatio);
 
     // check outputs for wet modulated operating condition
     // Power expected = curved fan power + linear scaled pump power
-    EXPECT_EQ(200 * 0.8 + 100 * 0.8 * 0.5, EvaporativeCoolers::EvapCond(EvapCoolNum).EvapCoolerPower);
+    EXPECT_EQ(200 * 0.8 + 100 * 0.8 * 0.5, EvapCond(EvapCoolNum).EvapCoolerPower);
 
-    EvaporativeCoolers::EvapCond.deallocate();
-    state.dataCurveManager->PerfCurve.deallocate();
+    EvapCond.deallocate();
+    state->dataCurveManager->PerfCurve.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     // one-time setup of evap cooler instance
     int const EvapCoolNum(1);
-    EvaporativeCoolers::EvapCond.allocate(EvapCoolNum);
-    auto &thisEvapCooler = EvaporativeCoolers::EvapCond(EvapCoolNum);
+    EvapCond.allocate(EvapCoolNum);
+    auto &thisEvapCooler = EvapCond(EvapCoolNum);
 
     // set up sizing stuff
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::ZoneSizingRunDone = false;
-    DataSizing::CurSysNum = 1;
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
-    DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "MyEvapCooler";
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = false;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "MyEvapCooler";
     thisEvapCooler.EvapCoolerName = "MyEvapCooler";
-    DataSizing::FinalSysSizing.allocate(1);
-    DataSizing::FinalSysSizing(1).DesMainVolFlow = 1.0;
-    DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.4;
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.4;
 
     // set up the structure to size the flow rates for an RDDSpecial
-    thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
+    thisEvapCooler.evapCoolerType = EvapCoolerType::IndirectRDDSpecial;
     thisEvapCooler.DesVolFlowRate = DataSizing::AutoSize;
     thisEvapCooler.PadArea = 0.0;
     thisEvapCooler.PadDepth = 0.0;
@@ -503,12 +511,12 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     thisEvapCooler.IndirectVolFlowScalingFactor = 0.3;
 
     // make the call for sizing the flow rates
-    EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
+    EvaporativeCoolers::SizeEvapCooler(*state, EvapCoolNum);
     EXPECT_NEAR(0.3, thisEvapCooler.IndirectVolFlowRate, 0.0001);
     EXPECT_NEAR(1.0, thisEvapCooler.DesVolFlowRate, 0.0001);
 
     // now let's try to size some of the pad properties
-    thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerDirectCELDEKPAD;
+    thisEvapCooler.evapCoolerType = EvapCoolerType::DirectCELDEKPAD;
     thisEvapCooler.DesVolFlowRate = 1.0;
     thisEvapCooler.PadArea = DataSizing::AutoSize;
     thisEvapCooler.PadDepth = DataSizing::AutoSize;
@@ -517,15 +525,15 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     thisEvapCooler.IndirectVolFlowRate = 1.0;
 
     // make the call for sizing the pad properties
-    EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
+    EvaporativeCoolers::SizeEvapCooler(*state, EvapCoolNum);
     EXPECT_NEAR(0.333333, thisEvapCooler.PadArea, 0.0001);
     EXPECT_NEAR(0.17382, thisEvapCooler.PadDepth, 0.0001);
 
     // now let's try 'not' finding it on the air loop; thus it is in the OA path
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "NOT-MyEvapCooler";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "NOT-MyEvapCooler";
 
     // set up the structure to size the flow rates for an indirect celdekpad
-    thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerInDirectCELDEKPAD;
+    thisEvapCooler.evapCoolerType = EvapCoolerType::IndirectCELDEKPAD;
     thisEvapCooler.DesVolFlowRate = DataSizing::AutoSize;
     thisEvapCooler.PadArea = 0.0;
     thisEvapCooler.PadDepth = 0.0;
@@ -535,15 +543,15 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     thisEvapCooler.IndirectVolFlowScalingFactor = 0.3;
 
     // make the call for sizing the flow rates
-    EvaporativeCoolers::SizeEvapCooler(EvapCoolNum);
+    EvaporativeCoolers::SizeEvapCooler(*state, EvapCoolNum);
     EXPECT_NEAR(0.5, thisEvapCooler.IndirectVolFlowRate, 0.0001);
     EXPECT_NEAR(0.5, thisEvapCooler.DesVolFlowRate, 0.0001);
 
     // clean up
-    EvaporativeCoolers::EvapCond.deallocate();
-    DataSizing::FinalSysSizing.deallocate();
-    DataAirSystems::PrimaryAirSystem.deallocate();
-    DataSizing::SysSizInput.deallocate();
+    EvapCond.deallocate();
+    state->dataSize->FinalSysSizing.deallocate();
+    state->dataAirSystemsData->PrimaryAirSystems.deallocate();
+    state->dataSize->SysSizInput.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
@@ -555,24 +563,24 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
     Real64 SecondaryFanPower(0.0);
     Real64 RecirculatingWaterPumpPower(0.0);
 
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
 
     // allocate
-    DataSizing::CurSysNum = 1;
-    FinalSysSizing.allocate(CurSysNum);
-    DataSizing::FinalSysSizing(1).DesMainVolFlow = 1.0;
-    DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.4;
-    PrimaryAirSystem.allocate(CurSysNum);
-    PrimaryAirSystem(CurSysNum).Branch.allocate(1);
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "INDRDD EVAP COOLER";
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.4;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataSize->CurSysNum);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "INDRDD EVAP COOLER";
 
     // Set Primary Air Data
-    PrimaryAirSystem(CurSysNum).NumBranches = 1;
-    PrimaryAirSystem(CurSysNum).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).TotalComponents = 1;
 
     std::string const idf_objects = delimited_string({
         "	EvaporativeCooler:Indirect:ResearchSpecial,",
@@ -610,7 +618,9 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput(state);
+    GetEvapInput(*state);
+
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     // check blank autosizable input fields default to autosize
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
@@ -619,27 +629,27 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).IndirectRecircPumpPower);
 
     // Set Parameters for Evap Cooler on Main Air Loop System
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.0;
-    FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
-    PrimaryAirDesignFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.2;
+    PrimaryAirDesignFlow = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow;
     SecondaryAirDesignFlow = PrimaryAirDesignFlow * EvapCond(EvapCoolNum).IndirectVolFlowScalingFactor;
 
     // Test Indirect Evaporative Cooler Primary/Secondary Air Design Flow Rate on Main Air Loop
-    SizeEvapCooler(EvapCoolNum);
+    SizeEvapCooler(*state, EvapCoolNum);
     EXPECT_EQ(PrimaryAirDesignFlow, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(SecondaryAirDesignFlow, EvapCond(EvapCoolNum).IndirectVolFlowRate);
     // Test Secondary Fan Power and reciculating water pump power
     SecondaryFanPower = SecondaryAirDesignFlow * EvapCond(EvapCoolNum).FanSizingSpecificPower;
     RecirculatingWaterPumpPower = SecondaryAirDesignFlow * EvapCond(EvapCoolNum).RecircPumpSizingFactor;
 
-    // SizeEvapCooler( EvapCoolNum );
+    // SizeEvapCooler(*state,  EvapCoolNum );
     EXPECT_EQ(SecondaryFanPower, EvapCond(EvapCoolNum).IndirectFanPower);
     EXPECT_EQ(RecirculatingWaterPumpPower, EvapCond(EvapCoolNum).IndirectRecircPumpPower);
 
     EvapCond.deallocate();
-    PrimaryAirSystem.deallocate();
-    FinalSysSizing.deallocate();
+    state->dataAirSystemsData->PrimaryAirSystems.deallocate();
+    state->dataSize->FinalSysSizing.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
@@ -649,23 +659,23 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
     Real64 PrimaryAirDesignFlow(0.0);
     Real64 RecirWaterPumpDesignPower(0.0);
 
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
 
-    DataSizing::CurSysNum = 1;
-    FinalSysSizing.allocate(CurSysNum);
-    DataSizing::FinalSysSizing(1).DesMainVolFlow = 1.0;
-    DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.4;
-    PrimaryAirSystem.allocate(CurSysNum);
-    PrimaryAirSystem(CurSysNum).Branch.allocate(1);
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "DIRECTEVAPCOOLER";
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.4;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataSize->CurSysNum);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "DIRECTEVAPCOOLER";
 
     // Set Primary Air Data
-    PrimaryAirSystem(CurSysNum).NumBranches = 1;
-    PrimaryAirSystem(CurSysNum).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).TotalComponents = 1;
 
     std::string const idf_objects = delimited_string({
         "	EvaporativeCooler:Direct:ResearchSpecial,",
@@ -687,86 +697,91 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput(state);
+    GetEvapInput(*state);
+
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
+
     // check blank autosizable input fields default to autosize
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).RecircPumpPower);
 
     // do local sizing calculations
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 0.50;
-    PrimaryAirDesignFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 0.50;
+    PrimaryAirDesignFlow = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow;
     RecirWaterPumpDesignPower = PrimaryAirDesignFlow * EvapCond(EvapCoolNum).RecircPumpSizingFactor;
 
     // Test Direct Evaporative Cooler Primary Air Design Flow Rate sizing
-    SizeEvapCooler(1);
+    SizeEvapCooler(*state, 1);
     EXPECT_EQ(PrimaryAirDesignFlow, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(RecirWaterPumpDesignPower, EvapCond(EvapCoolNum).RecircPumpPower);
 
     EvapCond.deallocate();
-    PrimaryAirSystem.deallocate();
-    FinalSysSizing.deallocate();
+    state->dataAirSystemsData->PrimaryAirSystems.deallocate();
+    state->dataSize->FinalSysSizing.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     // one-time setup of evap cooler instance
     int const EvapCoolNum(1);
-    EvaporativeCoolers::EvapCond.allocate(EvapCoolNum);
-    DataLoopNode::Node.allocate(2);
-    auto &thisEvapCooler = EvaporativeCoolers::EvapCond(EvapCoolNum);
-    DataEnvironment::OutBaroPress = 101325.0;
+    EvapCond.allocate(EvapCoolNum);
+    state->dataLoopNodes->Node.allocate(2);
+    auto &thisEvapCooler = EvapCond(EvapCoolNum);
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     int const CurveNum = 1;
-    state.dataCurveManager->NumCurves = 1;
-    state.dataCurveManager->PerfCurve.allocate(1);
-    state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
-    state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Linear";
-    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = 1.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
-    state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
+    state->dataCurveManager->NumCurves = 1;
+    state->dataCurveManager->PerfCurve.allocate(1);
+    state->dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state->dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Linear";
+    state->dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff1 = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Coeff2 = 1.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
+    state->dataCurveManager->PerfCurve(CurveNum).Var1Max = 1.0;
 
     // set up the flow rates for a direct RDDSpecial
-    thisEvapCooler.EvapCoolerType = DataGlobalConstants::iEvapCoolerDirectResearchSpecial;
+    thisEvapCooler.evapCoolerType = EvapCoolerType::DirectResearchSpecial;
     thisEvapCooler.EvapCoolerName = "MyDirectEvapCoolerRS";
-    thisEvapCooler.SchedPtr = DataGlobals::ScheduleAlwaysOn;
+    thisEvapCooler.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisEvapCooler.PumpPowerModifierCurveIndex = CurveNum;
     thisEvapCooler.DirectEffectiveness = 0.75;
     thisEvapCooler.DesVolFlowRate = 1.0;
     thisEvapCooler.InletNode = 1;
     thisEvapCooler.InletTemp = 25.0;
     thisEvapCooler.InletWetBulbTemp = 21.0;
-    thisEvapCooler.InletHumRat = PsyWFnTdbTwbPb(thisEvapCooler.InletTemp, thisEvapCooler.InletWetBulbTemp, OutBaroPress);
+    thisEvapCooler.InletHumRat = PsyWFnTdbTwbPb(*state, thisEvapCooler.InletTemp, thisEvapCooler.InletWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
     // set full flow rate test condition
-    DataLoopNode::Node(thisEvapCooler.InletNode).MassFlowRateMax = 1.0;
+    state->dataLoopNodes->Node(thisEvapCooler.InletNode).MassFlowRateMax = 1.0;
     thisEvapCooler.InletMassFlowRate = 1.0;
     thisEvapCooler.RecircPumpPower = 200.0;
     thisEvapCooler.PartLoadFract = 1.0;
 
     // check water pump power at full primary air flow
-    EvaporativeCoolers::CalcDirectResearchSpecialEvapCooler(state, EvapCoolNum);
+    EvaporativeCoolers::CalcDirectResearchSpecialEvapCooler(*state, EvapCoolNum);
     EXPECT_DOUBLE_EQ(200.0, thisEvapCooler.RecircPumpPower);
     EXPECT_DOUBLE_EQ(200.0, thisEvapCooler.EvapCoolerPower);
 
     // reduce primary air flow rate by half
     thisEvapCooler.InletMassFlowRate = 0.5;
     // check water pump power at half primary air flow
-    EvaporativeCoolers::CalcDirectResearchSpecialEvapCooler(state, EvapCoolNum);
+    EvaporativeCoolers::CalcDirectResearchSpecialEvapCooler(*state, EvapCoolNum);
     EXPECT_DOUBLE_EQ(200.0, thisEvapCooler.RecircPumpPower);
     EXPECT_DOUBLE_EQ(100.0, thisEvapCooler.EvapCoolerPower);
 }
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     int const EvapCoolNum(1);
-    EvaporativeCoolers::EvapCond.allocate(EvapCoolNum);
-    auto &thisEvapCooler = EvaporativeCoolers::EvapCond(EvapCoolNum);
+    EvapCond.allocate(EvapCoolNum);
+    auto &thisEvapCooler = EvapCond(EvapCoolNum);
     // model inputs
     thisEvapCooler.InletMassFlowRate = 1.0;
     thisEvapCooler.SecInletMassFlowRate = 1.0;
@@ -776,7 +791,8 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
     thisEvapCooler.WetCoilMaxEfficiency = 0.8;
     thisEvapCooler.InletTemp = 25.5;
     thisEvapCooler.InletHumRat = 0.0140;
-    thisEvapCooler.InletWetBulbTemp = PsyTwbFnTdbWPb(EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat, OutBaroPress);
+    thisEvapCooler.InletWetBulbTemp =
+        PsyTwbFnTdbWPb(*state, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat, state->dataEnvrn->OutBaroPress);
     thisEvapCooler.SecInletTemp = thisEvapCooler.InletTemp;
     thisEvapCooler.SecInletHumRat = thisEvapCooler.InletHumRat;
     thisEvapCooler.SecInletWetBulbTemp = thisEvapCooler.InletWetBulbTemp;
@@ -788,12 +804,13 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
     thisEvapCooler.DesiredOutletTemp = 21.0;
 
     // determine operating mode
-    int Result_WetFullOperatingMode = EvaporativeCoolers::IndirectResearchSpecialEvapCoolerOperatingMode(
-        EvapCoolNum, thisEvapCooler.SecInletTemp, thisEvapCooler.SecInletWetBulbTemp, TdbOutSysWetMin, TdbOutSysDryMin);
+    OperatingMode Result_WetFullOperatingMode = EvaporativeCoolers::IndirectResearchSpecialEvapCoolerOperatingMode(
+        *state, EvapCoolNum, thisEvapCooler.SecInletTemp, thisEvapCooler.SecInletWetBulbTemp, TdbOutSysWetMin, TdbOutSysDryMin);
     // check operating mode
-    EXPECT_EQ(Result_WetFullOperatingMode, EvaporativeCoolers::WetFull);
+    EXPECT_EQ(Result_WetFullOperatingMode, EvaporativeCoolers::OperatingMode::WetFull);
     // get outlet temperature in full wet operating mode
-    EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum,
+    EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(*state,
+                                                            EvapCoolNum,
                                                             Result_WetFullOperatingMode,
                                                             thisEvapCooler.SecInletMassFlowRate,
                                                             thisEvapCooler.SecInletTemp,
@@ -807,19 +824,19 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
 {
 
     int const EvapCoolNum(1);
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
 
-    DataSizing::CurSysNum = 1;
-    PrimaryAirSystem.allocate(CurSysNum);
-    PrimaryAirSystem(CurSysNum).Branch.allocate(1);
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp.allocate(1);
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "DIRECTEVAPCOOLER";
+    state->dataSize->CurSysNum = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataSize->CurSysNum);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "DIRECTEVAPCOOLER";
 
     // Set Primary Air Data
-    PrimaryAirSystem(CurSysNum).NumBranches = 1;
-    PrimaryAirSystem(CurSysNum).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).TotalComponents = 1;
 
     std::string const idf_objects = delimited_string({
         "	EvaporativeCooler:Direct:ResearchSpecial,",
@@ -841,16 +858,19 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput(state);
+    GetEvapInput(*state);
+
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
+
     // check blank autosizable input fields default to autosize
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
 
     // set component name on primary air branch
-    PrimaryAirSystem(CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
-    DataSizing::SysSizingRunDone = false;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
+    state->dataSize->SysSizingRunDone = false;
 
     // catch Primary Air Design Flow Rate autosize fatal error message
-    ASSERT_THROW(EvaporativeCoolers::SizeEvapCooler(1), std::runtime_error);
+    ASSERT_THROW(EvaporativeCoolers::SizeEvapCooler(*state, 1), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** For autosizing of EvaporativeCooler:Direct:ResearchSpecial DIRECTEVAPCOOLER, a system sizing run must be done.",
@@ -885,30 +905,32 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EvaporativeCoolers::GetEvapInput(state);
+    EvaporativeCoolers::GetEvapInput(*state);
     ASSERT_FALSE(ErrorsFound);
+
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     int AirLoopNum = 1;
     int EvapCoolNum = 1;
     int Evap_Cooler_CompType = 18;
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     // Air loop fan PLR
-    state.dataAirLoop->AirLoopFlow.allocate(AirLoopNum);
-    state.dataAirLoop->AirLoopControlInfo.allocate(AirLoopNum);
-    state.dataAirLoop->AirLoopFlow(1).FanPLR = 0.8;
+    state->dataAirLoop->AirLoopFlow.allocate(AirLoopNum);
+    state->dataAirLoop->AirLoopControlInfo.allocate(AirLoopNum);
+    state->dataAirLoop->AirLoopFlow(1).FanPLR = 0.8;
 
     // Evap cooler conditions
-    DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).MassFlowRate = 0.5;
-    DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Temp = 28.0;
-    DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).HumRat = 0.001;
-    DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Press = DataEnvironment::OutBaroPress;
+    state->dataLoopNodes->Node(EvapCond(EvapCoolNum).InletNode).MassFlowRate = 0.5;
+    state->dataLoopNodes->Node(EvapCond(EvapCoolNum).InletNode).Temp = 28.0;
+    state->dataLoopNodes->Node(EvapCond(EvapCoolNum).InletNode).HumRat = 0.001;
+    state->dataLoopNodes->Node(EvapCond(EvapCoolNum).InletNode).Press = state->dataEnvrn->OutBaroPress;
 
-    DataGlobals::BeginEnvrnFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
 
     // Simulate air loop component calls SimEvapCooler
     // SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler
-    SimAirServingZones::SimAirLoopComponent(state, EvapCond(EvapCoolNum).EvapCoolerName, Evap_Cooler_CompType, false, AirLoopNum, EvapCoolNum, 0);
+    SimAirServingZones::SimAirLoopComponent(*state, EvapCond(EvapCoolNum).EvapCoolerName, Evap_Cooler_CompType, false, AirLoopNum, EvapCoolNum, 0);
 
     // air loop FanPLR successfully passed for pump power calculation
     EXPECT_EQ(EvapCond(EvapCoolNum).EvapCoolerPower, 60 * 0.8);

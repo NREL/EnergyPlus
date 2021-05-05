@@ -17,15 +17,8 @@ namespace ObjexxFCL {
 namespace internal {
 
 // InitializerSentinel: Array Constructor Initializer Sentinel Class
-class InitializerSentinel
+struct InitializerSentinel
 {
-
-public: // Creation
-
-	// Default Constructor
-	InitializerSentinel()
-	{}
-
 }; // InitializerSentinel
 
 } // internal

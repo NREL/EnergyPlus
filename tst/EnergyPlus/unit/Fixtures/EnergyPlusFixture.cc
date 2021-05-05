@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,65 +48,64 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
 
 // A to Z order
+#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <regex>
 
 using json = nlohmann::json;
 
 namespace EnergyPlus {
 
-void EnergyPlusFixture::SetUpTestCase()
-{
-    EnergyPlus::inputProcessor = InputProcessor::factory();
-}
+// void EnergyPlusFixture::SetUpTestCase()
+//{
+//    state->dataInputProcessing->inputProcessor = InputProcessor::factory();
+//}
 
-void EnergyPlusFixture::openOutputFiles(IOFiles &ioFiles)
+void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
 {
-    ioFiles.eio.open_as_stringstream();
-    ioFiles.mtr.open_as_stringstream();
-    ioFiles.eso.open_as_stringstream();
-    ioFiles.audit.open_as_stringstream();
-    ioFiles.bnd.open_as_stringstream();
-    ioFiles.debug.open_as_stringstream();
-    ioFiles.mtd.open_as_stringstream();
-    ioFiles.edd.open_as_stringstream();
+    state.files.eio.open_as_stringstream();
+    state.files.mtr.open_as_stringstream();
+    state.files.eso.open_as_stringstream();
+    state.files.audit.open_as_stringstream();
+    state.files.bnd.open_as_stringstream();
+    state.files.debug.open_as_stringstream();
+    state.files.mtd.open_as_stringstream();
+    state.files.edd.open_as_stringstream();
 }
 
 void EnergyPlusFixture::SetUp()
 {
-    EnergyPlus::clearAllStates(state);
-    EnergyPlus::inputProcessor->clear_state();
+    //    if (this->state) {
+    //        this->state->clear_state();
+    //    } else {
+    this->state = new EnergyPlusData;
+    //    }
 
     show_message();
 
-    openOutputFiles(state.files);
+    openOutputFiles(*state);
 
     this->err_stream = new std::ostringstream;
     this->json_stream = new std::ostringstream;
 
-    state.files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
-    state.files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
+    state->files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
+    state->files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
@@ -114,32 +113,35 @@ void EnergyPlusFixture::SetUp()
     m_cerr_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cerr = std::unique_ptr<RedirectCerr>(new RedirectCerr(m_cerr_buffer));
 
-    UtilityRoutines::outputErrorHeader = false;
+    state->dataUtilityRoutines->outputErrorHeader = false;
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     FluidProperties::InitializeGlycRoutines();
-    createCoilSelectionReportObj();
+    createCoilSelectionReportObj(*state);
 }
 
 void EnergyPlusFixture::TearDown()
 {
+    state->files.mtd.del();
+    state->files.eso.del();
+    state->files.err_stream.reset();
+    state->files.eio.del();
+    state->files.debug.del();
+    state->files.zsz.del();
+    state->files.ssz.del();
+    state->files.mtr.del();
+    state->files.bnd.del();
+    state->files.shade.del();
+    //    state->clear_state();
+    delete this->state;
+}
 
-    {
-        IOFlags flags;
-        flags.DISPOSE("DELETE");
-        state.files.mtd.del();
-        state.files.eso.del();
-        state.files.err_stream.reset();
-        state.files.eio.del();
-        state.files.debug.del();
-        state.files.zsz.del();
-        state.files.ssz.del();
-        state.files.mtr.del();
-        state.files.bnd.del();
-        state.files.shade.del();
-    }
-
-    clearAllStates(this->state);
+void EnergyPlusFixture::show_message()
+{
+    // Gets information about the currently running test.
+    // Do NOT delete the returned object - it's managed by the UnitTest class.
+    const ::testing::TestInfo *const test_info = ::testing::UnitTest::GetInstance()->current_test_info();
+    ShowMessage(*state, "Begin Test: " + std::string(test_info->test_case_name()) + ", " + std::string(test_info->name()));
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
@@ -173,28 +175,28 @@ bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, 
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = state.files.eso.get_output();
+    auto const stream_str = state->files.eso.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) state.files.eso.open_as_stringstream();
+    if (reset_stream) state->files.eso.open_as_stringstream();
     return are_equal;
 }
 
 bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = state.files.eio.get_output();
+    auto const stream_str = state->files.eio.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) state.files.eio.open_as_stringstream();
+    if (reset_stream) state->files.eio.open_as_stringstream();
     return are_equal;
 }
 
 bool EnergyPlusFixture::compare_mtr_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = state.files.mtr.get_output();
+    auto const stream_str = state->files.mtr.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) state.files.mtr.open_as_stringstream();
+    if (reset_stream) state->files.mtr.open_as_stringstream();
     return are_equal;
 }
 
@@ -227,10 +229,10 @@ bool EnergyPlusFixture::compare_cerr_stream(std::string const &expected_string, 
 
 bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = state.files.dfs.get_output();
+    auto const stream_str = state->files.dfs.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) state.files.dfs.open_as_stringstream();
+    if (reset_stream) state->files.dfs.open_as_stringstream();
     return are_equal;
 }
 
@@ -243,22 +245,22 @@ bool EnergyPlusFixture::has_json_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
-    auto const has_output = !state.files.eso.get_output().empty();
-    if (reset_stream) state.files.eso.open_as_stringstream();
+    auto const has_output = !state->files.eso.get_output().empty();
+    if (reset_stream) state->files.eso.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_eio_output(bool reset_stream)
 {
-    auto const has_output = !state.files.eio.get_output().empty();
-    if (reset_stream) state.files.eio.open_as_stringstream();
+    auto const has_output = !state->files.eio.get_output().empty();
+    if (reset_stream) state->files.eio.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_mtr_output(bool reset_stream)
 {
-    auto const has_output = !state.files.mtr.get_output().empty();
-    if (reset_stream) state.files.mtr.open_as_stringstream();
+    auto const has_output = !state->files.mtr.get_output().empty();
+    if (reset_stream) state->files.mtr.open_as_stringstream();
     return has_output;
 }
 
@@ -285,14 +287,28 @@ bool EnergyPlusFixture::has_cerr_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_dfs_output(bool reset_stream)
 {
-    auto const has_output = !state.files.dfs.get_output().empty();
-    if (reset_stream) state.files.dfs.open_as_stringstream();
+    auto const has_output = !state->files.dfs.get_output().empty();
+    if (reset_stream) state->files.dfs.open_as_stringstream();
     return has_output;
+}
+
+bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool use_regex, bool reset_stream)
+{
+    auto const stream_str = this->err_stream->str();
+    bool match_found;
+    if (use_regex) {
+        match_found = std::regex_match(stream_str, std::regex(expected_match));
+    } else {
+        match_found = stream_str.find(expected_match) != std::string::npos;
+    }
+    if (reset_stream) this->err_stream->str(std::string());
+    return match_found;
 }
 
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
 {
     bool success = true;
+    auto &inputProcessor = state->dataInputProcessing->inputProcessor;
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
     // Add common objects that will trigger a warning if not present
@@ -325,18 +341,18 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     int MaxNumeric = 0;
     inputProcessor->getMaxSchemaArgs(MaxArgs, MaxAlpha, MaxNumeric);
 
-    DataIPShortCuts::cAlphaFieldNames.allocate(MaxAlpha);
-    DataIPShortCuts::cAlphaArgs.allocate(MaxAlpha);
-    DataIPShortCuts::lAlphaFieldBlanks.dimension(MaxAlpha, false);
-    DataIPShortCuts::cNumericFieldNames.allocate(MaxNumeric);
-    DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
-    DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
+    state->dataIPShortCut->cAlphaFieldNames.allocate(MaxAlpha);
+    state->dataIPShortCut->cAlphaArgs.allocate(MaxAlpha);
+    state->dataIPShortCut->lAlphaFieldBlanks.dimension(MaxAlpha, false);
+    state->dataIPShortCut->cNumericFieldNames.allocate(MaxNumeric);
+    state->dataIPShortCut->rNumericArgs.dimension(MaxNumeric, 0.0);
+    state->dataIPShortCut->lNumericFieldBlanks.dimension(MaxNumeric, false);
 
     bool is_valid = inputProcessor->validation->validate(inputProcessor->epJSON);
-    bool hasErrors = inputProcessor->processErrors();
+    bool hasErrors = inputProcessor->processErrors(*state);
 
     inputProcessor->initializeMaps();
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(*state);
     // inputProcessor->state->printErrors();
 
     bool successful_processing = success && is_valid && !hasErrors;
@@ -348,50 +364,50 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
     return successful_processing;
 }
 
-bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
-{
+// bool EnergyPlusFixture::process_idd(std::string const &idd, bool &errors_found)
+//{
+//
+//    std::unique_ptr<std::istream> idd_stream;
+//    if (!idd.empty()) {
+//        idd_stream = std::unique_ptr<std::istringstream>(new std::istringstream(idd));
+//    } else {
+//        static auto const exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
+//        static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
+//        static auto file_exists = FileSystem::fileExists(idd_location);
+//
+//        if (!file_exists) {
+//            // Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
+//            idd_location = FileSystem::getParentDirectoryPath(exeDirectory) + "Energy+.schema.epJSON";
+//            file_exists = FileSystem::fileExists(idd_location);
+//        }
+//
+//        if (!file_exists) {
+//            EXPECT_TRUE(file_exists) << "Energy+.schema.epJSON does not exist at search location." << std::endl
+//                                     << "epJSON Schema search location: \"" << idd_location << "\"";
+//            errors_found = true;
+//            return errors_found;
+//        }
+//
+//        idd_stream = std::unique_ptr<std::ifstream>(new std::ifstream(idd_location, std::ios_base::in | std::ios_base::binary));
+//    }
+//
+//    if (!idd_stream->good()) {
+//        errors_found = true;
+//        return errors_found;
+//    }
+//
+//    state->dataInputProcessing->inputProcessor->schema = json::parse(*idd_stream);
+//
+//    return errors_found;
+//}
 
-    std::unique_ptr<std::istream> idd_stream;
-    if (!idd.empty()) {
-        idd_stream = std::unique_ptr<std::istringstream>(new std::istringstream(idd));
-    } else {
-        static auto const exeDirectory = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
-        static auto idd_location = exeDirectory + "Energy+.schema.epJSON";
-        static auto file_exists = FileSystem::fileExists(idd_location);
-
-        if (!file_exists) {
-            // Energy+.schema.epJSON is in parent Products folder instead of Debug/Release/RelWithDebInfo/MinSizeRel folder of exe
-            idd_location = FileSystem::getParentDirectoryPath(exeDirectory) + "Energy+.schema.epJSON";
-            file_exists = FileSystem::fileExists(idd_location);
-        }
-
-        if (!file_exists) {
-            EXPECT_TRUE(file_exists) << "Energy+.schema.epJSON does not exist at search location." << std::endl
-                                     << "epJSON Schema search location: \"" << idd_location << "\"";
-            errors_found = true;
-            return errors_found;
-        }
-
-        idd_stream = std::unique_ptr<std::ifstream>(new std::ifstream(idd_location, std::ios_base::in | std::ios_base::binary));
-    }
-
-    if (!idd_stream->good()) {
-        errors_found = true;
-        return errors_found;
-    }
-
-    inputProcessor->schema = json::parse(*idd_stream);
-
-    return errors_found;
-}
-
-bool EnergyPlusFixture::compare_idf(std::string const &EP_UNUSED(name),
-                                    int const EP_UNUSED(num_alphas),
-                                    int const EP_UNUSED(num_numbers),
-                                    std::vector<std::string> const &EP_UNUSED(alphas),
-                                    std::vector<bool> const &EP_UNUSED(alphas_blank),
-                                    std::vector<Real64> const &EP_UNUSED(numbers),
-                                    std::vector<bool> const &EP_UNUSED(numbers_blank))
+bool EnergyPlusFixture::compare_idf([[maybe_unused]] std::string const &name,
+                                    [[maybe_unused]] int const num_alphas,
+                                    [[maybe_unused]] int const num_numbers,
+                                    [[maybe_unused]] std::vector<std::string> const &alphas,
+                                    [[maybe_unused]] std::vector<bool> const &alphas_blank,
+                                    [[maybe_unused]] std::vector<Real64> const &numbers,
+                                    [[maybe_unused]] std::vector<bool> const &numbers_blank)
 {
     // using namespace InputProcessor;
 

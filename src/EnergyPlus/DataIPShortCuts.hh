@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,39 +52,30 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-namespace DataIPShortCuts {
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_string cAlphaFieldNames;
-    extern Array1D_string cNumericFieldNames;
-    extern Array1D_bool lNumericFieldBlanks;
-    extern Array1D_bool lAlphaFieldBlanks;
-    extern Array1D_string cAlphaArgs;
-    extern Array1D<Real64> rNumericArgs;
-    extern std::string cCurrentModuleObject;
-
-    // Clears the global data in DataIPShortCuts.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
-} // namespace DataIPShortCuts
+struct IPShortCutsData : BaseGlobalStruct
+{
+    Array1D_string cAlphaFieldNames;
+    Array1D_string cNumericFieldNames;
+    Array1D_bool lNumericFieldBlanks;
+    Array1D_bool lAlphaFieldBlanks;
+    Array1D_string cAlphaArgs;
+    Array1D<Real64> rNumericArgs;
+    std::string cCurrentModuleObject;
+    void clear_state() override
+    {
+        this->cAlphaFieldNames.deallocate();
+        this->cAlphaArgs.deallocate();
+        this->lAlphaFieldBlanks.deallocate();
+        this->cNumericFieldNames.deallocate();
+        this->rNumericArgs.deallocate();
+        this->lNumericFieldBlanks.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

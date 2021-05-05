@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,16 +46,13 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cmath>
-#include <fstream>
-#include <iostream>
-#include <ostream>
-#include <random>
-#include <string>
-#include <vector>
-#include <map>
 #include <algorithm>
 #include <cassert>
+#include <cmath>
+#include <map>
+#include <ostream>
+#include <string>
+#include <vector>
 
 #include <fmt/format.h>
 #include <milo/dtoa.h>
@@ -63,42 +60,24 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/Reference.fwd.hh>
-#include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/ResultsFramework.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
 namespace ResultsFramework {
 
-    using namespace DataHVACGlobals;
-    using namespace DataPrecisionGlobals;
     using namespace OutputProcessor;
-    using DataGlobals::DisplayExtraWarnings;
-    using DataGlobals::InitConvTemp;
-    using DataGlobals::SecInHour;
-    using General::RoundSigDigits;
-    using General::TrimSigDigits;
-    using OutputProcessor::RealVariableType;
     using OutputProcessor::RealVariables;
-
-    std::unique_ptr<ResultsFramework> resultsFramework(new ResultsFramework);
+    using OutputProcessor::RealVariableType;
 
     // trim string
     std::string trim(std::string str)
@@ -187,7 +166,7 @@ namespace ResultsFramework {
                        const int ReportID,
                        const OutputProcessor::Unit &units,
                        const std::string &customUnits)
-            : varName(VarName), m_timeStepType(timeStepType), rptID(ReportID), Units(units), m_customUnits(customUnits)
+        : varName(VarName), m_timeStepType(timeStepType), rptID(ReportID), Units(units), m_customUnits(customUnits)
     {
         setReportFrequency(reportFrequency);
     }
@@ -323,7 +302,7 @@ namespace ResultsFramework {
                                    const int ReportID,
                                    const OutputProcessor::Unit &units,
                                    const std::string &customUnits)
-            : Variable(VarName, reportFrequency, timeStepType, ReportID, units, customUnits)
+        : Variable(VarName, reportFrequency, timeStepType, ReportID, units, customUnits)
     {
     }
 
@@ -366,9 +345,9 @@ namespace ResultsFramework {
         if (acc) {
             root["Cumulative"] = true;
         }
-//        if (meter_only) {
-//            root["MeterOnly"] = true;
-//        }
+        //        if (meter_only) {
+        //            root["MeterOnly"] = true;
+        //        }
         return root;
     }
 
@@ -389,7 +368,7 @@ namespace ResultsFramework {
         return variableMap.at(lastVarID);
     }
 
-    void DataFrame::newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin)
+    void DataFrame::newRow(EnergyPlusData &state, const int month, const int dayOfMonth, int hourOfDay, int curMin)
     {
         char buffer[100];
         if (curMin > 0) {
@@ -399,22 +378,22 @@ namespace ResultsFramework {
             curMin = 0;
             hourOfDay += 1;
         }
-        int cx = snprintf(buffer, 100, "%02d/%02d %02d:%02d:00", month, dayOfMonth, hourOfDay, curMin );
+        int cx = snprintf(buffer, 100, "%02d/%02d %02d:%02d:00", month, dayOfMonth, hourOfDay, curMin);
 
         // future start of ISO 8601 datetime output
         // int cx = snprintf(buffer, 100, "YYYY-%02d/%02dT%02d:%02d:00", month, dayOfMonth, hourOfDay, curMin );
 
-        if (cx < 0 || cx > 100 ) {
-            ShowWarningMessage("Failed to convert datetime when adding new output row. Skipping row.");
+        if (cx < 0 || cx > 100) {
+            ShowWarningMessage(state, "Failed to convert datetime when adding new output row. Skipping row.");
             return;
         }
         TS.emplace_back(buffer);
     }
 
-//    void DataFrame::newRow(const std::string &ts)
-//    {
-//        TS.emplace_back(ts);
-//    }
+    //    void DataFrame::newRow(const std::string &ts)
+    //    {
+    //        TS.emplace_back(ts);
+    //    }
 
     void DataFrame::setRDataFrameEnabled(bool state)
     {
@@ -524,8 +503,7 @@ namespace ResultsFramework {
             }
         }
 
-        if (cols.empty())
-            return root;
+        if (cols.empty()) return root;
 
         json vals = json::array();
 
@@ -773,7 +751,10 @@ namespace ResultsFramework {
         return root;
     }
 
-    void CSVWriter::parseTSOutputs(json const & data, std::vector<std::string> const & outputVariables, OutputProcessor::ReportingFrequency reportingFrequency)
+    void CSVWriter::parseTSOutputs(EnergyPlusData &state,
+                                   json const &data,
+                                   std::vector<std::string> const &outputVariables,
+                                   OutputProcessor::ReportingFrequency reportingFrequency)
     {
         if (data.empty()) return;
         updateReportingFrequency(reportingFrequency);
@@ -785,29 +766,31 @@ namespace ResultsFramework {
         if (reportFrequency == "Detailed-HVAC" || reportFrequency == "Detailed-Zone") {
             reportFrequency = "Each Call";
         }
-        auto const & columns = data.at("Cols");
-        for (auto const & column : columns) {
-            search_string = fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), reportFrequency);
+        auto const &columns = data.at("Cols");
+        for (auto const &column : columns) {
+            search_string =
+                fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), reportFrequency);
             auto found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
             if (found == outputVariables.end()) {
-                search_string = fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), "Each Call");
+                search_string =
+                    fmt::format("{0} [{1}]({2})", column.at("Variable").get<std::string>(), column.at("Units").get<std::string>(), "Each Call");
                 found = std::find(outputVariables.begin(), outputVariables.end(), search_string);
             }
             if (found == outputVariables.end()) {
-                ShowFatalError(fmt::format("Output variable ({0}) not found output variable list", search_string));
+                ShowFatalError(state, fmt::format("Output variable ({0}) not found output variable list", search_string));
             }
             outputVariableIndices[std::distance(outputVariables.begin(), found)] = true;
             indices.emplace_back(std::distance(outputVariables.begin(), found));
         }
 
-        auto const & rows = data.at("Rows");
-        for (auto const & row : rows) {
-            for (auto& el : row.items()) {
+        auto const &rows = data.at("Rows");
+        for (auto const &row : rows) {
+            for (auto &el : row.items()) {
                 auto found_key = outputs.find(el.key());
                 if (found_key == outputs.end()) {
                     std::vector<std::string> output(outputVariables.size());
                     int i = 0;
-                    for (auto const & col : el.value()) {
+                    for (auto const &col : el.value()) {
                         if (col.is_null()) {
                             output[indices[i]] = "";
                         } else {
@@ -819,7 +802,7 @@ namespace ResultsFramework {
                     outputs[el.key()] = output;
                 } else {
                     int i = 0;
-                    for (auto const & col : el.value()) {
+                    for (auto const &col : el.value()) {
                         if (col.is_null()) {
                             found_key->second[indices[i]] = "";
                         } else {
@@ -840,7 +823,8 @@ namespace ResultsFramework {
         }
     }
 
-    std::string & CSVWriter::convertToMonth(std::string & datetime) {
+    std::string &CSVWriter::convertToMonth(EnergyPlusData &state, std::string &datetime)
+    {
         // if running this function, there should only ever be 12 + design days values to change
         static const std::map<std::string, std::string> months({{"01", "January"},
                                                                 {"02", "February"},
@@ -862,15 +846,16 @@ namespace ResultsFramework {
             time = datetime.substr(pos);
         }
         if (time != " 24:00:00") {
-            ShowFatalError("Monthly output variables should occur at the end of the day.");
+            ShowFatalError(state, "Monthly output variables should occur at the end of the day.");
         }
         datetime = months.find(month)->second;
         return datetime;
     }
 
-    void CSVWriter::writeOutput(std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl)
+    void
+    CSVWriter::writeOutput(EnergyPlusData &state, std::vector<std::string> const &outputVariables, InputOutputFile &outputFile, bool outputControl)
     {
-        outputFile.ensure_open("OpenOutputFiles", outputControl);
+        outputFile.ensure_open(state, "OpenOutputFiles", outputControl);
 
         print(outputFile, "{}", "Date/Time,");
         std::string sep;
@@ -879,42 +864,47 @@ namespace ResultsFramework {
             print(outputFile, "{}{}", sep, *it);
             if (sep.empty()) sep = ",";
         }
-        print(outputFile, "{}", DataStringGlobals::NL);
+        print(outputFile, "{}", '\n');
 
-        for (auto & item : outputs) {
+        for (auto &item : outputs) {
             std::string datetime = item.first;
             if (smallestReportingFrequency < OutputProcessor::ReportingFrequency::Monthly) {
                 datetime = datetime.replace(datetime.find(' '), 1, "  ");
             } else {
-                convertToMonth(datetime);
+                convertToMonth(state, datetime);
             }
             print(outputFile, " {},", datetime);
-            item.second.erase(std::remove_if(item.second.begin(), item.second.end(),
-                                             [&](const std::string& d) { auto pos = (&d - &*item.second.begin()); return !outputVariableIndices[pos];}), item.second.end());
-            auto result = std::find_if(item.second.rbegin(), item.second.rend(), [](std::string const & v) { return !v.empty(); } );
+            item.second.erase(std::remove_if(item.second.begin(),
+                                             item.second.end(),
+                                             [&](const std::string &d) {
+                                                 auto pos = (&d - &*item.second.begin());
+                                                 return !outputVariableIndices[pos];
+                                             }),
+                              item.second.end());
+            auto result = std::find_if(item.second.rbegin(), item.second.rend(), [](std::string const &v) { return !v.empty(); });
             auto last = item.second.end() - 1;
             if (result != item.second.rend()) {
                 last = (result + 1).base();
             }
             print(item.second.begin(), last, outputFile, ",");
-            print(outputFile, "{}{}", *last, DataStringGlobals::NL);
+            print(outputFile, "{}{}", *last, '\n');
         }
 
         outputFile.close();
     }
 
-    void ResultsFramework::setupOutputOptions(IOFiles &ioFiles)
+    void ResultsFramework::setupOutputOptions(EnergyPlusData &state)
     {
-        if (ioFiles.outputControl.csv) {
+        if (state.files.outputControl.csv) {
             tsEnabled = true;
             tsAndTabularEnabled = true;
         }
 
-        if (!ioFiles.outputControl.json) {
+        if (!state.files.outputControl.json) {
             return;
         }
 
-        int numberOfOutputSchemaObjects = inputProcessor->getNumObjectsFound("Output:JSON");
+        int numberOfOutputSchemaObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:JSON");
         if (numberOfOutputSchemaObjects == 0) {
             return;
         }
@@ -924,7 +914,7 @@ namespace ResultsFramework {
         Array1D<Real64> numbers(2);
         int numNumbers;
         int status;
-        inputProcessor->getObjectItem("Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
+        state.dataInputProcessing->inputProcessor->getObjectItem(state, "Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
 
         if (numAlphas > 0) {
             std::string option = alphas(1);
@@ -992,18 +982,23 @@ namespace ResultsFramework {
             if (rVar.Report && rVar.frequency == reportFrequency) {
                 Variable var;
                 if (RVariableTypes(Loop).units == OutputProcessor::Unit::customEMS) {
-                    var = Variable(RVariableTypes(Loop).VarName, reportFrequency, RVariableTypes(Loop).timeStepType,
-                                   RVariableTypes(Loop).ReportID, RVariableTypes(Loop).units,
+                    var = Variable(RVariableTypes(Loop).VarName,
+                                   reportFrequency,
+                                   RVariableTypes(Loop).timeStepType,
+                                   RVariableTypes(Loop).ReportID,
+                                   RVariableTypes(Loop).units,
                                    RVariableTypes(Loop).unitNameCustomEMS);
                 } else {
-                    var = Variable(RVariableTypes(Loop).VarName, reportFrequency, RVariableTypes(Loop).timeStepType,
-                                   RVariableTypes(Loop).ReportID, RVariableTypes(Loop).units);
+                    var = Variable(RVariableTypes(Loop).VarName,
+                                   reportFrequency,
+                                   RVariableTypes(Loop).timeStepType,
+                                   RVariableTypes(Loop).ReportID,
+                                   RVariableTypes(Loop).units);
                 }
                 switch (reportFrequency) {
                 case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
                     if ((timeStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
-                         (RVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepZone))
-                    {
+                        (RVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
                         RIDetailedZoneTSData.setRDataFrameEnabled(true);
                         RIDetailedZoneTSData.addVariable(var);
                     } else if ((timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
@@ -1081,13 +1076,15 @@ namespace ResultsFramework {
             IVar >>= IVariableTypes(Loop).VarPtr;
             auto &iVar(IVar());
             if (iVar.Report && iVar.frequency == reportFrequency) {
-                OutputVariable var(IVariableTypes(Loop).VarName, reportFrequency, IVariableTypes(Loop).timeStepType,
-                                   IVariableTypes(Loop).ReportID, IVariableTypes(Loop).units);
+                OutputVariable var(IVariableTypes(Loop).VarName,
+                                   reportFrequency,
+                                   IVariableTypes(Loop).timeStepType,
+                                   IVariableTypes(Loop).ReportID,
+                                   IVariableTypes(Loop).units);
                 switch (reportFrequency) {
                 case OutputProcessor::ReportingFrequency::EachCall: // each time UpdatedataandReport is called
                     if ((timeStepType == OutputProcessor::TimeStepType::TimeStepZone) &&
-                        (IVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepZone))
-                    {
+                        (IVariableTypes(Loop).timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
                         RIDetailedZoneTSData.setIDataFrameEnabled(true);
                         RIDetailedZoneTSData.addVariable(var);
                     } else if ((timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) &&
@@ -1164,12 +1161,17 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::TimeStep: // at 'TimeStep'
             for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
                 if (EnergyMeters(Loop).RptTS || EnergyMeters(Loop).RptTSFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).TSRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptTSFO);
+                    MeterVariable var(
+                        EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).TSRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptTSFO);
                     TSMeters.addVariable(var);
                     TSMeters.setRDataFrameEnabled(true);
                 }
                 if (EnergyMeters(Loop).RptAccTS || EnergyMeters(Loop).RptAccTSFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).TSAccRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptAccTSFO);
+                    MeterVariable var(EnergyMeters(Loop).Name,
+                                      reportFrequency,
+                                      EnergyMeters(Loop).TSAccRptNum,
+                                      EnergyMeters(Loop).Units,
+                                      EnergyMeters(Loop).RptAccTSFO);
                     TSMeters.addVariable(var);
                     TSMeters.setRDataFrameEnabled(true);
                 }
@@ -1178,12 +1180,17 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Hourly: // at 'Hourly'
             for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
                 if (EnergyMeters(Loop).RptHR || EnergyMeters(Loop).RptHRFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).HRRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptHRFO);
+                    MeterVariable var(
+                        EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).HRRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptHRFO);
                     HRMeters.addVariable(var);
                     HRMeters.setRDataFrameEnabled(true);
                 }
                 if (EnergyMeters(Loop).RptAccHR || EnergyMeters(Loop).RptAccHRFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptAccHRFO);
+                    MeterVariable var(EnergyMeters(Loop).Name,
+                                      reportFrequency,
+                                      EnergyMeters(Loop).HRAccRptNum,
+                                      EnergyMeters(Loop).Units,
+                                      EnergyMeters(Loop).RptAccHRFO);
                     HRMeters.addVariable(var);
                     HRMeters.setRDataFrameEnabled(true);
                 }
@@ -1192,12 +1199,17 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Daily: // at 'Daily'
             for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
                 if (EnergyMeters(Loop).RptDY || EnergyMeters(Loop).RptDYFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).DYRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptDYFO);
+                    MeterVariable var(
+                        EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).DYRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptDYFO);
                     DYMeters.addVariable(var);
                     DYMeters.setRDataFrameEnabled(true);
                 }
                 if (EnergyMeters(Loop).RptAccDY || EnergyMeters(Loop).RptAccDYFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptAccDYFO);
+                    MeterVariable var(EnergyMeters(Loop).Name,
+                                      reportFrequency,
+                                      EnergyMeters(Loop).DYAccRptNum,
+                                      EnergyMeters(Loop).Units,
+                                      EnergyMeters(Loop).RptAccDYFO);
                     DYMeters.addVariable(var);
                     DYMeters.setRDataFrameEnabled(true);
                 }
@@ -1206,12 +1218,17 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Monthly: // at 'Monthly'
             for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
                 if (EnergyMeters(Loop).RptMN || EnergyMeters(Loop).RptMNFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).MNRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptMNFO);
+                    MeterVariable var(
+                        EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).MNRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptMNFO);
                     MNMeters.addVariable(var);
                     MNMeters.setRDataFrameEnabled(true);
                 }
                 if (EnergyMeters(Loop).RptAccMN || EnergyMeters(Loop).RptAccMNFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptAccMNFO);
+                    MeterVariable var(EnergyMeters(Loop).Name,
+                                      reportFrequency,
+                                      EnergyMeters(Loop).MNAccRptNum,
+                                      EnergyMeters(Loop).Units,
+                                      EnergyMeters(Loop).RptAccMNFO);
                     MNMeters.addVariable(var);
                     MNMeters.setRDataFrameEnabled(true);
                 }
@@ -1220,12 +1237,17 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Simulation: // at 'RunPeriod'/'SM'
             for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
                 if (EnergyMeters(Loop).RptSM || EnergyMeters(Loop).RptSMFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).SMRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptSMFO);
+                    MeterVariable var(
+                        EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).SMRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptSMFO);
                     SMMeters.addVariable(var);
                     SMMeters.setRDataFrameEnabled(true);
                 }
                 if (EnergyMeters(Loop).RptAccSM || EnergyMeters(Loop).RptAccSMFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptAccSMFO);
+                    MeterVariable var(EnergyMeters(Loop).Name,
+                                      reportFrequency,
+                                      EnergyMeters(Loop).SMAccRptNum,
+                                      EnergyMeters(Loop).Units,
+                                      EnergyMeters(Loop).RptAccSMFO);
                     SMMeters.addVariable(var);
                     SMMeters.setRDataFrameEnabled(true);
                 }
@@ -1234,12 +1256,17 @@ namespace ResultsFramework {
         case OutputProcessor::ReportingFrequency::Yearly: // at 'Yearly'
             for (size_t Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
                 if (EnergyMeters(Loop).RptYR || EnergyMeters(Loop).RptYRFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).YRRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptYRFO);
+                    MeterVariable var(
+                        EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).YRRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptYRFO);
                     YRMeters.addVariable(var);
                     YRMeters.setRDataFrameEnabled(true);
                 }
                 if (EnergyMeters(Loop).RptAccYR || EnergyMeters(Loop).RptAccYRFO) {
-                    MeterVariable var(EnergyMeters(Loop).Name, reportFrequency, EnergyMeters(Loop).YRAccRptNum, EnergyMeters(Loop).Units, EnergyMeters(Loop).RptAccDYFO);
+                    MeterVariable var(EnergyMeters(Loop).Name,
+                                      reportFrequency,
+                                      EnergyMeters(Loop).YRAccRptNum,
+                                      EnergyMeters(Loop).Units,
+                                      EnergyMeters(Loop).RptAccDYFO);
                     YRMeters.addVariable(var);
                     YRMeters.setRDataFrameEnabled(true);
                 }
@@ -1273,22 +1300,22 @@ namespace ResultsFramework {
         }
     }
 
-    void ResultsFramework::writeOutputs(IOFiles & ioFiles)
+    void ResultsFramework::writeOutputs(EnergyPlusData &state)
     {
-        if (ioFiles.outputControl.csv) {
-            writeCSVOutput(ioFiles);
+        if (state.files.outputControl.csv) {
+            writeCSVOutput(state);
         }
 
         if (timeSeriesEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
-            writeTimeSeriesReports(ioFiles.json);
+            writeTimeSeriesReports(state.files.json);
         }
 
         if (timeSeriesAndTabularEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
-            writeReport(ioFiles.json);
+            writeReport(state.files.json);
         }
     }
 
-    void ResultsFramework::writeCSVOutput(IOFiles & ioFiles)
+    void ResultsFramework::writeCSVOutput(EnergyPlusData &state)
     {
         if (!hasOutputData()) {
             return;
@@ -1298,77 +1325,77 @@ namespace ResultsFramework {
 
         // Output yearly time series data
         if (hasRIYearlyTSData()) {
-            csv.parseTSOutputs(RIYearlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
+            csv.parseTSOutputs(state, RIYearlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
         }
 
         if (hasYRMeters()) {
-            csv.parseTSOutputs(YRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
-            mtr_csv.parseTSOutputs(YRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
+            csv.parseTSOutputs(state, YRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
+            mtr_csv.parseTSOutputs(state, YRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Yearly);
         }
 
         // Output run period time series data
         if (hasRIRunPeriodTSData()) {
-            csv.parseTSOutputs(RIRunPeriodTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
+            csv.parseTSOutputs(state, RIRunPeriodTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
         }
 
         if (hasSMMeters()) {
-            csv.parseTSOutputs(SMMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
-            mtr_csv.parseTSOutputs(SMMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
+            csv.parseTSOutputs(state, SMMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
+            mtr_csv.parseTSOutputs(state, SMMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Simulation);
         }
 
         // Output monthly time series data
         if (hasRIMonthlyTSData()) {
-            csv.parseTSOutputs(RIMonthlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
+            csv.parseTSOutputs(state, RIMonthlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
         }
 
         if (hasMNMeters()) {
-            csv.parseTSOutputs(MNMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
-            mtr_csv.parseTSOutputs(MNMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
+            csv.parseTSOutputs(state, MNMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
+            mtr_csv.parseTSOutputs(state, MNMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Monthly);
         }
 
         // Output daily time series data
         if (hasRIDailyTSData()) {
-            csv.parseTSOutputs(RIDailyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
+            csv.parseTSOutputs(state, RIDailyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
         }
 
         if (hasDYMeters()) {
-            csv.parseTSOutputs(DYMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Daily);
-            mtr_csv.parseTSOutputs(DYMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
+            csv.parseTSOutputs(state, DYMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Daily);
+            mtr_csv.parseTSOutputs(state, DYMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Daily);
         }
 
         // Output hourly time series data
         if (hasRIHourlyTSData()) {
-            csv.parseTSOutputs(RIHourlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
+            csv.parseTSOutputs(state, RIHourlyTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
         }
 
         if (hasHRMeters()) {
-            csv.parseTSOutputs(HRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
-            mtr_csv.parseTSOutputs(HRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
+            csv.parseTSOutputs(state, HRMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
+            mtr_csv.parseTSOutputs(state, HRMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::Hourly);
         }
 
         // Output timestep time series data
         if (hasRITimestepTSData()) {
-            csv.parseTSOutputs(RITimestepTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
+            csv.parseTSOutputs(state, RITimestepTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
         }
 
         if (hasTSMeters()) {
-            csv.parseTSOutputs(TSMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
-            mtr_csv.parseTSOutputs(TSMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
+            csv.parseTSOutputs(state, TSMeters.getJSON(true), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
+            mtr_csv.parseTSOutputs(state, TSMeters.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::TimeStep);
         }
 
         // Output detailed HVAC time series data
         if (hasRIDetailedHVACTSData()) {
-            csv.parseTSOutputs(RIDetailedHVACTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
+            csv.parseTSOutputs(state, RIDetailedHVACTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
         }
 
         // Output detailed Zone time series data
         if (hasRIDetailedZoneTSData()) {
-            csv.parseTSOutputs(RIDetailedZoneTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
+            csv.parseTSOutputs(state, RIDetailedZoneTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
         }
 
-        csv.writeOutput(outputVariables, ioFiles.csv, ioFiles.outputControl.csv);
+        csv.writeOutput(state, outputVariables, state.files.csv, state.files.outputControl.csv);
         if (hasMeterData()) {
-            mtr_csv.writeOutput(outputVariables, ioFiles.mtr_csv, ioFiles.outputControl.csv);
+            mtr_csv.writeOutput(state, outputVariables, state.files.mtr_csv, state.files.outputControl.csv);
         }
     }
 
@@ -1534,63 +1561,30 @@ namespace ResultsFramework {
         }
         if (outputCBOR && jsonOutputStreams.cbor_stream) {
             json::to_cbor(root, *jsonOutputStreams.cbor_stream);
-//            std::vector<uint8_t> v_cbor = json::to_cbor(root);
-//            std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*json.cbor_stream));
+            //            std::vector<uint8_t> v_cbor = json::to_cbor(root);
+            //            std::copy(v_cbor.begin(), v_cbor.end(), std::ostream_iterator<uint8_t>(*json.cbor_stream));
         }
         if (outputMsgPack && jsonOutputStreams.msgpack_stream) {
             json::to_msgpack(root, *jsonOutputStreams.msgpack_stream);
-//            std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
-//            std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*json.msgpack_stream));
+            //            std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
+            //            std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*json.msgpack_stream));
         }
     }
 
-    void ResultsFramework::addReportVariable(std::string const & keyedValue,
-                                             std::string const & variableName,
-                                             std::string const & units,
+    void ResultsFramework::addReportVariable(std::string const &keyedValue,
+                                             std::string const &variableName,
+                                             std::string const &units,
                                              OutputProcessor::ReportingFrequency const reportingInterval)
     {
         outputVariables.emplace_back(fmt::format("{0}:{1} [{2}]({3})", keyedValue, variableName, units, reportingFrequency(reportingInterval)));
     }
 
-    void ResultsFramework::addReportMeter(std::string const & meter,
-                                          std::string const & units,
-                                          OutputProcessor::ReportingFrequency const reportingInterval)
+    void
+    ResultsFramework::addReportMeter(std::string const &meter, std::string const &units, OutputProcessor::ReportingFrequency const reportingInterval)
     {
         outputVariables.emplace_back(fmt::format("{0} [{1}]({2})", meter, units, reportingFrequency(reportingInterval)));
     }
 
-    void clear_state()
-    {
-        resultsFramework->DYMeters.setRDataFrameEnabled(false);
-        resultsFramework->DYMeters.setRVariablesScanned(false);
-        resultsFramework->DYMeters.setIVariablesScanned(false);
-        resultsFramework->DYMeters.setIDataFrameEnabled(false);
-
-        resultsFramework->TSMeters.setRVariablesScanned(false);
-        resultsFramework->TSMeters.setRDataFrameEnabled(false);
-        resultsFramework->TSMeters.setIDataFrameEnabled(false);
-        resultsFramework->TSMeters.setIVariablesScanned(false);
-
-        resultsFramework->HRMeters.setRVariablesScanned(false);
-        resultsFramework->HRMeters.setRDataFrameEnabled(false);
-        resultsFramework->HRMeters.setIDataFrameEnabled(false);
-        resultsFramework->HRMeters.setIVariablesScanned(false);
-
-        resultsFramework->MNMeters.setRVariablesScanned(false);
-        resultsFramework->MNMeters.setRDataFrameEnabled(false);
-        resultsFramework->MNMeters.setIDataFrameEnabled(false);
-        resultsFramework->MNMeters.setIVariablesScanned(false);
-
-        resultsFramework->SMMeters.setRVariablesScanned(false);
-        resultsFramework->SMMeters.setRDataFrameEnabled(false);
-        resultsFramework->SMMeters.setIDataFrameEnabled(false);
-        resultsFramework->SMMeters.setIVariablesScanned(false);
-
-        resultsFramework->YRMeters.setRVariablesScanned(false);
-        resultsFramework->YRMeters.setRDataFrameEnabled(false);
-        resultsFramework->YRMeters.setIDataFrameEnabled(false);
-        resultsFramework->YRMeters.setIVariablesScanned(false);
-    }
 } // namespace ResultsFramework
 
 } // namespace EnergyPlus

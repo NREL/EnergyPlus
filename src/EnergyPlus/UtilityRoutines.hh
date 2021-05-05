@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,6 +48,9 @@
 #ifndef UtilityRoutines_hh_INCLUDED
 #define UtilityRoutines_hh_INCLUDED
 
+// C++ Headers
+#include <functional>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.fwd.hh>
@@ -56,24 +59,23 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#include <functional>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    class InputOutputFile;
-    class IOFiles;
+// Forward declarations
+class InputOutputFile;
+struct EnergyPlusData;
 
 int AbortEnergyPlus(EnergyPlusData &state);
 
-void CloseMiscOpenFiles(IOFiles &ioFiles);
+void CloseMiscOpenFiles(EnergyPlusData &state);
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus(IOFiles &ioFiles);
+int EndEnergyPlus(EnergyPlusData &state);
 
 int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
@@ -130,30 +132,40 @@ bool env_var_on(std::string const &env_var_str);
 class FatalError : public std::runtime_error
 {
 public:
-    FatalError(std::string const& msg):
-    runtime_error(msg)
-    {}
+    FatalError(std::string const &msg) : runtime_error(msg)
+    {
+    }
 };
 
 using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
-void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowFatalError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowSevereError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowSevereMessage(EnergyPlusData &state,
+                       std::string const &ErrorMessage,
+                       OptionalOutputFileRef OutUnit1 = _,
+                       OptionalOutputFileRef OutUnit2 = _);
 
-void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowContinueError(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowContinueErrorTimeStamp(EnergyPlusData &state,
+                                std::string const &Message,
+                                OptionalOutputFileRef OutUnit1 = _,
+                                OptionalOutputFileRef OutUnit2 = _);
 
-void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowMessage(EnergyPlusData &state, std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowWarningError(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowWarningMessage(EnergyPlusData &state,
+                        std::string const &ErrorMessage,
+                        OptionalOutputFileRef OutUnit1 = _,
+                        OptionalOutputFileRef OutUnit2 = _);
 
-void ShowRecurringSevereErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
+                                   std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                    int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                    Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
                                    Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -163,7 +175,8 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,             // Me
                                    std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void ShowRecurringWarningErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
+                                    std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                     int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                     Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
                                     Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -173,7 +186,8 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,             // M
                                     std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void ShowRecurringContinueErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
+void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
+                                     std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                      int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                      Optional<Real64 const> ReportMaxOf = _, // Track and report the max of the values passed to this argument
                                      Optional<Real64 const> ReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -183,7 +197,8 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,             // 
                                      std::string const &ReportSumUnits = ""  // optional char string (<=15 length) of units for sum value
 );
 
-void StoreRecurringErrorMessage(std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
+void StoreRecurringErrorMessage(EnergyPlusData &state,
+                                std::string const &ErrorMessage,             // Message automatically written to "error file" at end of simulation
                                 int &ErrorMsgIndex,                          // Recurring message index, if zero, next available index is assigned
                                 Optional<Real64 const> ErrorReportMaxOf = _, // Track and report the max of the values passed to this argument
                                 Optional<Real64 const> ErrorReportMinOf = _, // Track and report the min of the values passed to this argument
@@ -193,16 +208,13 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,             // 
                                 std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
 );
 
-void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void SummarizeErrors();
+void SummarizeErrors(EnergyPlusData &state);
 
-void ShowRecurringErrors();
+void ShowRecurringErrors(EnergyPlusData &state);
 
 namespace UtilityRoutines {
-    extern bool outputErrorHeader;
-
-    void clear_state();
 
     template <class T> struct is_shared_ptr : std::false_type
     {
@@ -213,14 +225,14 @@ namespace UtilityRoutines {
 
     Real64 ProcessNumber(std::string const &String, bool &ErrorFlag);
 
-    int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int const NumItems);
+    int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int NumItems);
 
     inline int FindItemInList(std::string const &String, Array1_string const &ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
-    int FindItemInList(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
+    int FindItemInList(std::string const &String, Array1S_string const ListOfItems, int NumItems);
 
     inline int FindItemInList(std::string const &String, Array1S_string const ListOfItems)
     {
@@ -274,7 +286,7 @@ namespace UtilityRoutines {
         return UtilityRoutines::FindItemInList(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
+    int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems, int NumItems);
 
     inline int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems)
     {
@@ -439,32 +451,39 @@ namespace UtilityRoutines {
     }
 
     template <typename InputIterator>
-    inline void VerifyName(
-        InputIterator first, InputIterator last, std::string const &NameToVerify, bool &ErrorFound, bool &IsBlank, std::string const &StringToDisplay)
+    inline void VerifyName(EnergyPlusData &state,
+                           InputIterator first,
+                           InputIterator last,
+                           std::string const &NameToVerify,
+                           bool &ErrorFound,
+                           bool &IsBlank,
+                           std::string const &StringToDisplay)
     {
         IsBlank = false;
         ErrorFound = false;
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
             return;
         }
         int Found = FindItem(first, last, NameToVerify);
         if (Found != 0) {
-            ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+            ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
             ErrorFound = true;
         }
     }
 
-    void VerifyName(std::string const &NameToVerify,
+    void VerifyName(EnergyPlusData &state,
+                    std::string const &NameToVerify,
                     Array1D_string const &NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
                     bool &IsBlank,
                     std::string const &StringToDisplay);
 
-    void VerifyName(std::string const &NameToVerify,
+    void VerifyName(EnergyPlusData &state,
+                    std::string const &NameToVerify,
                     Array1S_string const NamesList,
                     int const NumOfNames,
                     bool &ErrorFound,
@@ -472,7 +491,8 @@ namespace UtilityRoutines {
                     std::string const &StringToDisplay);
 
     template <typename A>
-    inline void VerifyName(std::string const &NameToVerify,
+    inline void VerifyName(EnergyPlusData &state,
+                           std::string const &NameToVerify,
                            MArray1<A, std::string> const &NamesList,
                            int const NumOfNames,
                            bool &ErrorFound,
@@ -484,13 +504,13 @@ namespace UtilityRoutines {
             int const Found = FindItem(NameToVerify, NamesList,
                                        NumOfNames); // Calls FindItem overload that accepts member arrays
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -500,7 +520,8 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and elements need Name
-    inline void VerifyName(std::string const &NameToVerify,
+    inline void VerifyName(EnergyPlusData &state,
+                           std::string const &NameToVerify,
                            Container const &NamesList,
                            int const NumOfNames,
                            bool &ErrorFound,
@@ -512,13 +533,13 @@ namespace UtilityRoutines {
             int const Found = FindItem(NameToVerify, NamesList,
                                        NumOfNames); // Calls FindItem overload that accepts member arrays
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -528,7 +549,8 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and value_type
-    inline void VerifyName(std::string const &NameToVerify,
+    inline void VerifyName(EnergyPlusData &state,
+                           std::string const &NameToVerify,
                            Container const &NamesList,
                            std::string Container::value_type::*name_p,
                            int const NumOfNames,
@@ -540,13 +562,13 @@ namespace UtilityRoutines {
         if (NumOfNames > 0) {
             int const Found = FindItem(NameToVerify, NamesList, name_p, NumOfNames);
             if (Found != 0) {
-                ShowSevereError(StringToDisplay + ", duplicate name=" + NameToVerify);
+                ShowSevereError(state, StringToDisplay + ", duplicate name=" + NameToVerify);
                 ErrorFound = true;
             }
         }
 
         if (NameToVerify.empty()) {
-            ShowSevereError(StringToDisplay + ", cannot be blank");
+            ShowSevereError(state, StringToDisplay + ", cannot be blank");
             ErrorFound = true;
             IsBlank = true;
         } else {
@@ -554,7 +576,7 @@ namespace UtilityRoutines {
         }
     }
 
-    bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
+    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
 
     // Two structs for case insensitive containers.
     // Eg: for unordered_map, we need to have a case insenstive hasher and a case insensitive comparator
@@ -562,22 +584,48 @@ namespace UtilityRoutines {
     // For map, you'd only need the comparator
     struct case_insensitive_hasher
     {
-        size_t operator()(const std::string& key) const noexcept;
+        size_t operator()(const std::string &key) const noexcept;
     };
 
     struct case_insensitive_comparator
     {
-        bool operator()(const std::string& a, const std::string& b) const noexcept;
+        bool operator()(const std::string &a, const std::string &b) const noexcept;
     };
 
-    void appendPerfLog(IOFiles &ioFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
+    void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
 
-    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound, bool const &AllowSteamAndDistrict = false);
+    bool ValidateFuelType(EnergyPlusData &state,
+                          std::string const &FuelTypeInput,
+                          std::string &FuelTypeOutput,
+                          bool &FuelTypeErrorsFound,
+                          bool const &AllowSteamAndDistrict = false);
 
-    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
+                                                   std::string &FuelTypeOutput,
+                                                   DataGlobalConstants::ResourceType &FuelTypeNum,
+                                                   bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
 
+struct UtilityRoutinesData : BaseGlobalStruct
+{
+
+    bool outputErrorHeader = true;
+    std::string appendPerfLog_headerRow;
+    std::string appendPerfLog_valuesRow;
+    bool GetMatrixInputFlag = true;
+
+    void clear_state() override
+    {
+        outputErrorHeader = true;
+        appendPerfLog_headerRow.clear();
+        appendPerfLog_valuesRow.clear();
+        GetMatrixInputFlag = true;
+    }
+
+    // Default Constructor
+    UtilityRoutinesData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

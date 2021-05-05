@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,7 +58,6 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -70,7 +69,6 @@
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -80,7 +78,6 @@ using namespace ConvectionCoefficients;
 class ConvectionCoefficientsFixture : public EnergyPlus::EnergyPlusFixture
 {
 public:
-
 protected:
     void SetUp() override
     {
@@ -89,7 +86,7 @@ protected:
 
     void TearDown() override
     {
-        EnergyPlus::EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+        EnergyPlus::EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     };
 
     std::string getIDFString()
@@ -436,30 +433,30 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
-    BaseboardElectric::GetBaseboardInput(state);
+    BaseboardElectric::GetBaseboardInput(*state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state->dataGlobal->ZoneSizingCalc = true;
 
     // Surface 1 is a vertical wall
     // Surface 2 is a wall tilted down (interior faces up)
@@ -481,107 +478,107 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     // Surface 15 is a horizontal roof facing down (interior faces up) - this gets automatically flipped over so interior faces down
 
     // Surface temps are 20C
-    for (int surf = 1; surf <= DataSurfaces::TotSurfaces; ++surf) {
-        DataHeatBalSurface::TH(2, 1, surf) = 20.0;
+    for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
+        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
     }
 
     // Case 1 - Zone air warmer than surfaces
-    DataHeatBalFanSys::MAT(1) = 30.0;
+    state->dataHeatBalFanSys->MAT(1) = 30.0;
 
-    DynamicIntConvSurfaceClassification(1);
-    EXPECT_EQ(DataSurfaces::Surface(1).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
+    DynamicIntConvSurfaceClassification(*state, 1);
+    EXPECT_EQ(state->dataSurface->Surface(1).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
-    DynamicIntConvSurfaceClassification(2);
-    EXPECT_EQ(DataSurfaces::Surface(2).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
+    DynamicIntConvSurfaceClassification(*state, 2);
+    EXPECT_EQ(state->dataSurface->Surface(2).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(3);
-    EXPECT_EQ(DataSurfaces::Surface(3).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
+    DynamicIntConvSurfaceClassification(*state, 3);
+    EXPECT_EQ(state->dataSurface->Surface(3).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(4);
-    EXPECT_EQ(DataSurfaces::Surface(4).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
+    DynamicIntConvSurfaceClassification(*state, 4);
+    EXPECT_EQ(state->dataSurface->Surface(4).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(5);
-    EXPECT_EQ(DataSurfaces::Surface(5).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
+    DynamicIntConvSurfaceClassification(*state, 5);
+    EXPECT_EQ(state->dataSurface->Surface(5).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-    DynamicIntConvSurfaceClassification(6);
-    EXPECT_EQ(DataSurfaces::Surface(6).IntConvClassification, 0);
+    DynamicIntConvSurfaceClassification(*state, 6);
+    EXPECT_EQ(state->dataSurface->Surface(6).IntConvClassification, 0);
 
-    DynamicIntConvSurfaceClassification(7);
-    EXPECT_EQ(DataSurfaces::Surface(7).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
+    DynamicIntConvSurfaceClassification(*state, 7);
+    EXPECT_EQ(state->dataSurface->Surface(7).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(8);
-    EXPECT_EQ(DataSurfaces::Surface(8).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
+    DynamicIntConvSurfaceClassification(*state, 8);
+    EXPECT_EQ(state->dataSurface->Surface(8).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(9);
-    EXPECT_EQ(DataSurfaces::Surface(9).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
+    DynamicIntConvSurfaceClassification(*state, 9);
+    EXPECT_EQ(state->dataSurface->Surface(9).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 
-    DynamicIntConvSurfaceClassification(10);
-    EXPECT_EQ(DataSurfaces::Surface(10).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
+    DynamicIntConvSurfaceClassification(*state, 10);
+    EXPECT_EQ(state->dataSurface->Surface(10).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 
-    DynamicIntConvSurfaceClassification(11);
-    EXPECT_EQ(DataSurfaces::Surface(11).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
+    DynamicIntConvSurfaceClassification(*state, 11);
+    EXPECT_EQ(state->dataSurface->Surface(11).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
-    DynamicIntConvSurfaceClassification(12);
-    EXPECT_EQ(DataSurfaces::Surface(12).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
+    DynamicIntConvSurfaceClassification(*state, 12);
+    EXPECT_EQ(state->dataSurface->Surface(12).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(13);
-    EXPECT_EQ(DataSurfaces::Surface(13).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
+    DynamicIntConvSurfaceClassification(*state, 13);
+    EXPECT_EQ(state->dataSurface->Surface(13).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(14);
-    EXPECT_EQ(DataSurfaces::Surface(14).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
+    DynamicIntConvSurfaceClassification(*state, 14);
+    EXPECT_EQ(state->dataSurface->Surface(14).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
 
-    DynamicIntConvSurfaceClassification(15);
-    EXPECT_EQ(DataSurfaces::Surface(15).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
+    DynamicIntConvSurfaceClassification(*state, 15);
+    EXPECT_EQ(state->dataSurface->Surface(15).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
 
     // Case 2 - Zone air colder than surfaces
-    DataHeatBalFanSys::MAT(1) = 10.0;
+    state->dataHeatBalFanSys->MAT(1) = 10.0;
 
-    DynamicIntConvSurfaceClassification(1);
-    EXPECT_EQ(DataSurfaces::Surface(1).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
+    DynamicIntConvSurfaceClassification(*state, 1);
+    EXPECT_EQ(state->dataSurface->Surface(1).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
-    DynamicIntConvSurfaceClassification(2);
-    EXPECT_EQ(DataSurfaces::Surface(2).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
+    DynamicIntConvSurfaceClassification(*state, 2);
+    EXPECT_EQ(state->dataSurface->Surface(2).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(3);
-    EXPECT_EQ(DataSurfaces::Surface(3).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
+    DynamicIntConvSurfaceClassification(*state, 3);
+    EXPECT_EQ(state->dataSurface->Surface(3).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(4);
-    EXPECT_EQ(DataSurfaces::Surface(4).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
+    DynamicIntConvSurfaceClassification(*state, 4);
+    EXPECT_EQ(state->dataSurface->Surface(4).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(5);
-    EXPECT_EQ(DataSurfaces::Surface(5).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
+    DynamicIntConvSurfaceClassification(*state, 5);
+    EXPECT_EQ(state->dataSurface->Surface(5).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
-    DynamicIntConvSurfaceClassification(6);
-    EXPECT_EQ(DataSurfaces::Surface(6).IntConvClassification, 0);
+    DynamicIntConvSurfaceClassification(*state, 6);
+    EXPECT_EQ(state->dataSurface->Surface(6).IntConvClassification, 0);
 
-    DynamicIntConvSurfaceClassification(7);
-    EXPECT_EQ(DataSurfaces::Surface(7).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
+    DynamicIntConvSurfaceClassification(*state, 7);
+    EXPECT_EQ(state->dataSurface->Surface(7).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(8);
-    EXPECT_EQ(DataSurfaces::Surface(8).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
+    DynamicIntConvSurfaceClassification(*state, 8);
+    EXPECT_EQ(state->dataSurface->Surface(8).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableTilted);
 
-    DynamicIntConvSurfaceClassification(9);
-    EXPECT_EQ(DataSurfaces::Surface(9).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
+    DynamicIntConvSurfaceClassification(*state, 9);
+    EXPECT_EQ(state->dataSurface->Surface(9).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
 
-    DynamicIntConvSurfaceClassification(10);
-    EXPECT_EQ(DataSurfaces::Surface(10).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
+    DynamicIntConvSurfaceClassification(*state, 10);
+    EXPECT_EQ(state->dataSurface->Surface(10).IntConvClassification, DataSurfaces::InConvClass_A3_UnstableHoriz);
 
-    DynamicIntConvSurfaceClassification(11);
-    EXPECT_EQ(DataSurfaces::Surface(11).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
+    DynamicIntConvSurfaceClassification(*state, 11);
+    EXPECT_EQ(state->dataSurface->Surface(11).IntConvClassification, DataSurfaces::InConvClass_A3_VertWalls);
 
-    DynamicIntConvSurfaceClassification(12);
-    EXPECT_EQ(DataSurfaces::Surface(12).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
+    DynamicIntConvSurfaceClassification(*state, 12);
+    EXPECT_EQ(state->dataSurface->Surface(12).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(13);
-    EXPECT_EQ(DataSurfaces::Surface(13).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
+    DynamicIntConvSurfaceClassification(*state, 13);
+    EXPECT_EQ(state->dataSurface->Surface(13).IntConvClassification, DataSurfaces::InConvClass_A3_StableTilted);
 
-    DynamicIntConvSurfaceClassification(14);
-    EXPECT_EQ(DataSurfaces::Surface(14).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
+    DynamicIntConvSurfaceClassification(*state, 14);
+    EXPECT_EQ(state->dataSurface->Surface(14).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 
-    DynamicIntConvSurfaceClassification(15);
-    EXPECT_EQ(DataSurfaces::Surface(15).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
+    DynamicIntConvSurfaceClassification(*state, 15);
+    EXPECT_EQ(state->dataSurface->Surface(15).IntConvClassification, DataSurfaces::InConvClass_A3_StableHoriz);
 }
 
 TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
@@ -594,110 +591,110 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     SurfNum = 1;
 
-    DataSurfaces::TotSurfaces = 1;
-    DataGlobals::NumOfZones = 1;
-    DataSurfaces::Surface.allocate( 1 );
-    dataConstruction.Construct.allocate( 1 );
-    DataHeatBalance::Zone.allocate( 1 );
-    DataLoopNode::Node.allocate( 1 );
+    state->dataSurface->TotSurfaces = 1;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataSurface->Surface.allocate(1);
+    state->dataConstruction->Construct.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataLoopNodes->Node.allocate(1);
 
-    DataSurfaces::Surface( SurfNum ).Zone = 1;
-    DataSurfaces::Surface( SurfNum ).Construction = 1;
-    DataSurfaces::Surface(SurfNum).TAirRef = 0;
-    dataConstruction.Construct( 1 ).TypeIsWindow = false;
-    DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 1;
-    DataHeatBalance::Zone( 1 ).Multiplier = 1.0;
-    DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
-    DataEnvironment::OutBaroPress = 101325.0;
-    DataLoopNode::Node( 1 ).Temp = 20.0;
-    HeatBalanceManager::AllocateHeatBalArrays();
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+    state->dataSurface->Surface(SurfNum).Zone = 1;
+    state->dataSurface->Surface(SurfNum).Construction = 1;
+    state->dataSurface->Surface(SurfNum).TAirRef = 0;
+    state->dataConstruction->Construct(1).TypeIsWindow = false;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataLoopNodes->Node(1).Temp = 20.0;
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    for (int surf = 1; surf <= DataSurfaces::TotSurfaces; ++surf) {
-        DataHeatBalSurface::TH(2, 1, surf) = 20.0;
+    for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
+        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
     }
 
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 30.0;
-
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 30.0;
 
     // Case 1 - Low ACH (should default to CalcASHRAETARPNatural)
     Real64 ACH = 0.25;
-    DataHeatBalance::Zone( 1 ).Volume = 125.0;
-    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
-
+    state->dataHeatBal->Zone(1).Volume = 125.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.17653 / 3600.0 * state->dataHeatBal->Zone(1).Volume * ACH;
 
     // Test 1: Floor Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserFloor;
     Hc = 0.0;
-    DataSurfaces::Surface( SurfNum ).CosTilt = -1;
+    state->dataSurface->Surface(SurfNum).CosTilt = -1;
 
-    HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
+    HcExpectedValue =
+        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
-    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
-    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+    EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
+    EXPECT_EQ(state->dataSurface->Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 2: Ceiling Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserCeiling;
     Hc = 0.0;
-    DataSurfaces::Surface( SurfNum ).CosTilt = 1;
+    state->dataSurface->Surface(SurfNum).CosTilt = 1;
 
-    HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
+    HcExpectedValue =
+        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
-    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
-    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+    EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
+    EXPECT_EQ(state->dataSurface->Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 3: Ceiling Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserWalls;
     Hc = 0.0;
-    DataSurfaces::Surface( SurfNum ).CosTilt = 0;
+    state->dataSurface->Surface(SurfNum).CosTilt = 0;
 
-    HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
+    HcExpectedValue =
+        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
-    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
-    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
-
+    EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
+    EXPECT_EQ(state->dataSurface->Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Case 2 - High ACH
     ACH = 3.1;
-    DataHeatBalance::Zone( 1 ).Volume = 125.0;
-    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
+    state->dataHeatBal->Zone(1).Volume = 125.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.17653 / 3600.0 * state->dataHeatBal->Zone(1).Volume * ACH;
 
     // Test 1: Floor Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserFloor;
     Hc = 0.0;
-    DataSurfaces::Surface( SurfNum ).CosTilt = -1;
+    state->dataSurface->Surface(SurfNum).CosTilt = -1;
 
     HcExpectedValue = 4.122;
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
-    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
-    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+    EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
+    EXPECT_EQ(state->dataSurface->Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 2: Ceiling Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserCeiling;
     Hc = 0.0;
-    DataSurfaces::Surface( SurfNum ).CosTilt = 1;
+    state->dataSurface->Surface(SurfNum).CosTilt = 1;
 
     HcExpectedValue = 9.476;
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
-    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
-    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+    EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
+    EXPECT_EQ(state->dataSurface->Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 
     // Test 3: Ceiling Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserWalls;
     Hc = 0.0;
-    DataSurfaces::Surface( SurfNum ).CosTilt = 0;
+    state->dataSurface->Surface(SurfNum).CosTilt = 0;
 
     HcExpectedValue = 3.212;
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
-    EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
-    EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
+    EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
+    EXPECT_EQ(state->dataSurface->Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp);
+    EXPECT_NEAR(Hc, HcExpectedValue, 0.1);
 }
 
 TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
@@ -712,11 +709,11 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     Array1D<Real64> Vhc;
 
     SurfNum = 1;
-    DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).Zone = 1;
-    DataRoomAirModel::AirModel.allocate(1);
-    EnergyPlus::DataHeatBalance::TempEffBulkAir.allocate(1);
-    EnergyPlus::DataHeatBalance::TempEffBulkAir(1) = 1.0;
+    state->dataSurface->Surface.allocate(SurfNum);
+    state->dataSurface->Surface(SurfNum).Zone = 1;
+    state->dataRoomAirMod->AirModel.allocate(1);
+    state->dataHeatBal->TempEffBulkAir.allocate(1);
+    state->dataHeatBal->TempEffBulkAir(1) = 1.0;
     SurfTemp.allocate(1);
     HcIn.allocate(1);
     Vhc.allocate(1);
@@ -728,30 +725,29 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     Hn = CalcWaltonUnstableHorizontalOrTilt(DeltaTemp, CosineTilt);
     EXPECT_NEAR(Hn, 1.520, 0.001);
 
-    //Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
-    DataSurfaces::Surface(SurfNum).HeatTransSurf = true;
-    DataSurfaces::Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
-    DataSurfaces::Surface(SurfNum).IntConvCoeff = 0.0;
-    DataRoomAirModel::AirModel(DataSurfaces::Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel_UCSDDV;
-    DataSurfaces::Surface(SurfNum).CosTilt = 1.0;
+    // Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
+    state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
+    state->dataSurface->Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->Surface(SurfNum).IntConvCoeff = 0.0;
+    state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
+    state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
-    CalcDetailedHcInForDVModel(state, state.dataConvectionCoefficients, SurfNum, SurfTemp, HcIn);
+    CalcDetailedHcInForDVModel(*state, SurfNum, SurfTemp, HcIn);
     Hn = HcIn(1);
     EXPECT_NEAR(Hn, 1.520, 0.001);
 
-    DataSurfaces::Surface(SurfNum).HeatTransSurf = true;
-    DataSurfaces::Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
-    DataSurfaces::Surface(SurfNum).IntConvCoeff = 0.0;
-    DataRoomAirModel::AirModel(DataSurfaces::Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel_UCSDCV;
-    DataSurfaces::Surface(SurfNum).CosTilt = 1.0;
+    state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
+    state->dataSurface->Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
+    state->dataSurface->Surface(SurfNum).IntConvCoeff = 0.0;
+    state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
+    state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
     Vhc(1) = 1.0;
-    CalcDetailedHcInForDVModel(state, state.dataConvectionCoefficients, SurfNum, SurfTemp, HcIn, Vhc);
+    CalcDetailedHcInForDVModel(*state, SurfNum, SurfTemp, HcIn, Vhc);
     Hn = HcIn(1);
     EXPECT_NEAR(Hn, 4.347, 0.001);
-
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
@@ -762,29 +758,28 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     Real64 ACHAnswer;
     Real64 ACHExpected;
 
-    if (!allocated(DataHeatBalance::Zone)) DataHeatBalance::Zone.allocate(TotalNumberofZones);
-    DataHeatBalance::Zone(ZoneNum).Volume = 100.0;
-    DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber = 1;
-    DataGlobals::BeginEnvrnFlag = false;
-    DataHeatBalance::Zone(ZoneNum).Multiplier = 1.0;
-    DataHeatBalance::Zone(ZoneNum).ListMultiplier = 1.0;
-    EnergyPlus::DataEnvironment::OutBaroPress = 101400.0;
-    Real64 ZoneNode = DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber;
+    if (!allocated(state->dataHeatBal->Zone)) state->dataHeatBal->Zone.allocate(TotalNumberofZones);
+    state->dataHeatBal->Zone(ZoneNum).Volume = 100.0;
+    state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber = 1;
+    state->dataGlobal->BeginEnvrnFlag = false;
+    state->dataHeatBal->Zone(ZoneNum).Multiplier = 1.0;
+    state->dataHeatBal->Zone(ZoneNum).ListMultiplier = 1.0;
+    state->dataEnvrn->OutBaroPress = 101400.0;
+    Real64 ZoneNode = state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
 
     // Test 1: Node not allocated, returns a zero ACH
-    if (allocated(EnergyPlus::DataLoopNode::Node)) EnergyPlus::DataLoopNode::Node.deallocate();
+    if (allocated(state->dataLoopNodes->Node)) state->dataLoopNodes->Node.deallocate();
     ACHExpected = 0.0;
-    ACHAnswer = CalcZoneSystemACH(ZoneNum);
+    ACHAnswer = CalcZoneSystemACH(*state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
 
     // Test 2: Node now allocated, needs to return a proper ACH
-    EnergyPlus::DataLoopNode::Node.allocate(DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber);
-    EnergyPlus::DataLoopNode::Node(ZoneNode).Temp = 20.0;
-    EnergyPlus::DataLoopNode::Node(ZoneNode).MassFlowRate = 0.2;
+    state->dataLoopNodes->Node.allocate(state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber);
+    state->dataLoopNodes->Node(ZoneNode).Temp = 20.0;
+    state->dataLoopNodes->Node(ZoneNode).MassFlowRate = 0.2;
     ACHExpected = 6.11506;
-    ACHAnswer = CalcZoneSystemACH(ZoneNum);
+    ACHAnswer = CalcZoneSystemACH(*state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
-
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
@@ -801,7 +796,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     Real64 ExpectedHconv;
     Real64 CalculatedHconv;
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     // Test 1: Non-window, all natural
     Hforced = 10.0;
@@ -813,7 +808,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 1.2994;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(*state, Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 2: Window, all natural
@@ -826,7 +821,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = true;
     ExpectedHconv = 0.8067;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(*state, Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 3: Non-window, all natural
@@ -839,7 +834,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 1.2994;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(*state, Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 4: Non-window, transition
@@ -852,7 +847,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 2.16942;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(*state, Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 5: Non-window, all ceiling diffuser correlation
@@ -865,9 +860,8 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 10.0;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(*state, Hforced, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
-
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelations)
@@ -883,7 +877,7 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelat
     Real64 ExpectedHconv;
     Real64 CalculatedHconv;
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     // Test 1: Forced Convection All Correlations (Floor, Ceiling, Wall)
     ACH = 3.3;
@@ -894,13 +888,13 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelat
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 4.13721502661183;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(*state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
     ExpectedHconv = 9.70692167003631;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(*state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
     ExpectedHconv = 3.28943537910741;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(*state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 2: Natural Convection All Correlations (Floor, Ceiling, Wall)--note, all should give same answer because of how variables are set
@@ -912,13 +906,13 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelat
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 1.2994;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(*state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(*state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(*state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
-    
+
     // Test 3: Mixed Covection All Correlations (Floor, Ceiling, Wall)
     ACH = 1.75;
     Tsurf = 23.0;
@@ -928,15 +922,14 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelat
     height = 1.0;
     isWindow = false;
     ExpectedHconv = 2.70653;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(*state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
     ExpectedHconv = 5.32826;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(*state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
     ExpectedHconv = 2.23620;
-    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(*state, ACH, Tsurf, Tair, cosTilt, humRat, height, isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
-
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestWindward)
@@ -952,23 +945,22 @@ TEST_F(ConvectionCoefficientsFixture, TestWindward)
     CosTilt = 1.0;
     Azimuth = 180.0;
     WindDirection = 180.0;
-    AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
+    AgainstWind = Windward(CosTilt, Azimuth, WindDirection);
     EXPECT_TRUE(AgainstWind);
 
     // Test 2: Vertical surface, Azimuth and WindDiretion within 90 degrees of one another (windward or against wind)
     CosTilt = 0.5;
     Azimuth = 269.0;
     WindDirection = 180.0;
-    AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
+    AgainstWind = Windward(CosTilt, Azimuth, WindDirection);
     EXPECT_TRUE(AgainstWind);
 
     // Test 3: Vertical surface, Azimuth and WindDiretion not within 90 degrees of one another (leeward or not against wind)
     CosTilt = 0.5;
     Azimuth = 271.0;
     WindDirection = 180.0;
-    AgainstWind = Windward(CosTilt,Azimuth,WindDirection);
+    AgainstWind = Windward(CosTilt, Azimuth, WindDirection);
     EXPECT_FALSE(AgainstWind);
-
 }
 
 TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
@@ -977,33 +969,33 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
-    BaseboardElectric::GetBaseboardInput(state);
+    BaseboardElectric::GetBaseboardInput(*state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state->dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1012,18 +1004,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 2.667, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1034,33 +1026,33 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
-    BaseboardElectric::GetBaseboardInput(state);
+    BaseboardElectric::GetBaseboardInput(*state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state->dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1069,18 +1061,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 2.673, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1091,33 +1083,33 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
-    BaseboardElectric::GetBaseboardInput(state);
+    BaseboardElectric::GetBaseboardInput(*state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state->dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1126,18 +1118,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableFloor(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 0.962, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1148,33 +1140,33 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
-    BaseboardElectric::GetBaseboardInput(state);
+    BaseboardElectric::GetBaseboardInput(*state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state->dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1183,18 +1175,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 3.583, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1205,33 +1197,33 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
-    BaseboardElectric::GetBaseboardInput(state);
+    BaseboardElectric::GetBaseboardInput(*state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state->dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1240,18 +1232,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 0.937, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1262,33 +1254,33 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataEnvironment::OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
-    EXPECT_FALSE(errorsFound);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, errorsFound); // read project control data
+    EXPECT_FALSE(errorsFound);                                      // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
-    EXPECT_FALSE(errorsFound);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, errorsFound); // read material data
+    EXPECT_FALSE(errorsFound);                                // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
-    EXPECT_FALSE(errorsFound);                         // expect no errors
+    HeatBalanceManager::GetConstructData(*state, errorsFound); // read construction data
+    EXPECT_FALSE(errorsFound);                                 // expect no errors
 
-    HeatBalanceManager::GetZoneData(errorsFound);
+    HeatBalanceManager::GetZoneData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(state, errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
-    HeatBalanceManager::AllocateHeatBalArrays();
-    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
-    BaseboardElectric::GetBaseboardInput(state);
+    BaseboardElectric::GetBaseboardInput(*state);
 
-    DataGlobals::ZoneSizingCalc = true;
+    state->dataGlobal->ZoneSizingCalc = true;
 
     Real64 tolerance = 1E-3;
 
@@ -1297,21 +1289,20 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 3.581, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(*state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
-
 
 TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpleIntConvCoeff)
 {
@@ -1336,7 +1327,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
-    //Scenario: Vertical Surface, CosTilt not exactly zero
+    // Scenario: Vertical Surface, CosTilt not exactly zero
     // Hcov expected = 3.076
 
     Tsurf = 19.0;
@@ -1347,7 +1338,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
-    //Scenario: Vertical Surface, Zero Delta T
+    // Scenario: Vertical Surface, Zero Delta T
     // Hcov expected = 3.076
 
     Tsurf = 23.0;
@@ -1370,8 +1361,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
-
-    //Scenario: Horizontal surface with enhanced convection:
+    // Scenario: Horizontal surface with enhanced convection:
     // Hcov expected = 4.040
     // A positive Delta_T is required for enhanced convection
 
@@ -1383,7 +1373,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
-    //Scenario: horizontal surface, enhanced convection
+    // Scenario: horizontal surface, enhanced convection
     // 180 degree surface, negative Delta_T
     // Hcov expected = 4.040
 
@@ -1395,7 +1385,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
-    //Scenario: horizontal surface, reduced convection
+    // Scenario: horizontal surface, reduced convection
     // 180 degree surface, positive Delta_T
     // Hcov expected = 0.948
 
@@ -1407,7 +1397,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
-    //Scenario: tilted surface with reduced convection
+    // Scenario: tilted surface with reduced convection
     // Hcov expected = 2.281
     // A negative Delta_T is required for reduced convection
 
@@ -1419,7 +1409,7 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_CalcASHRAESimpl
     ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 
-    //Scenario: tilted surface with enhanced convection
+    // Scenario: tilted surface with enhanced convection
     // Hcov expected = 3.870
 
     Tsurf = 20.0;
@@ -1436,14 +1426,14 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependen
     Real64 ConvectionCoefficient;
     Real64 ExpectedCoefficient = 3.076;
 
-    DataSurfaces::Surface.allocate(1);
-    DataSurfaces::Surface(1).CosTilt = 0;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).CosTilt = 0;
 
-    DataHeatBalance::HConvIn.allocate(1);
+    state->dataHeatBal->HConvIn.allocate(1);
 
-    CalcASHRAESimpleIntConvCoeff(1, 20.0, 30.0);
+    CalcASHRAESimpleIntConvCoeff(*state, 1, 20.0, 30.0);
 
-    ConvectionCoefficient = DataHeatBalance::HConvIn(1);
+    ConvectionCoefficient = state->dataHeatBal->HConvIn(1);
 
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }
@@ -1453,125 +1443,122 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ProperConstruction)
     // This unit test checks to make sure the InsideFaceAdaptiveConvectionAlgo and OutsideFaceAdaptiveConvectionAlgo objects default construct their
     // members to the correct algorithm integer identifiers
 
-    std::string const idf_objects = delimited_string({
-        "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
-        "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
+    std::string const idf_objects = delimited_string({"SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+                                                      "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
 
-        "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
-        "Default Algorithm;       !- Name",
+                                                      "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
+                                                      "Default Algorithm;       !- Name",
 
-        "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
-        "Default algorithms;      !- Name"
-    });
+                                                      "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
+                                                      "Default algorithms;      !- Name"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     int algorithm_identifier;
 
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondUnstableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq4CeilingAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AwbiHattonHeatedFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KaradagChilledCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq6NonHeatedWalls);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AwbiHattonHeatedWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq7Ceiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq5WallNearHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq7Ceiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWalls);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FisherPedersenCeilDiffuserCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq4CeilingAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedAssistingWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedOppossingWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedStableFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedStableCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
 
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_SparrowWindward);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_SparrowLeeward);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_ClearRoof);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalASHRAEVerticalWall);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
-
 }
 
 TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
@@ -1579,139 +1566,138 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
     // This unit test checks to make sure the InsideFaceAdaptiveConvectionAlgo and OutsideFaceAdaptiveConvectionAlgo objects assign their
     // members to the correct algorithm integer identifiers inside the GetUserConvectionCoefficients() function
     std::string const idf_objects = delimited_string({
-                                                         "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
-                                                         "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
+        "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+        "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
 
-                                                         "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
-                                                         "Default Algorithm,       !- Name",
-                                                         "FohannoPolidoriVerticalWall;  !- Simple Buoyancy Vertical Wall Equation Source",
+        "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
+        "Default Algorithm,       !- Name",
+        "FohannoPolidoriVerticalWall;  !- Simple Buoyancy Vertical Wall Equation Source",
 
-                                                         "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
-                                                         "Default algorithms,      !- Name",
-                                                         "TARPWindward;            !- Wind Convection Windward Vertical Wall Equation Source",
+        "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
+        "Default algorithms,      !- Name",
+        "TARPWindward;            !- Wind Convection Windward Vertical Wall Equation Source",
 
-                                                     });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHeatBalSurface::TempSurfInTmp.allocate(6);
-    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
+    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
+    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
+    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
+    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->TempSurfInTmp);
 
     int algorithm_identifier;
 
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondUnstableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq4CeilingAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AwbiHattonHeatedFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KaradagChilledCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq6NonHeatedWalls);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AwbiHattonHeatedWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq7Ceiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq5WallNearHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq7Ceiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWalls);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FisherPedersenCeilDiffuserCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq4CeilingAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedAssistingWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedOppossingWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedStableFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedStableCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
 
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_SparrowWindward);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_SparrowLeeward);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_ClearRoof);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalASHRAEVerticalWall);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
 
-    DataHeatBalSurface::TempSurfInTmp.deallocate();
+    state->dataHeatBalSurf->TempSurfInTmp.deallocate();
 }
-
 
 TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
 {
@@ -1720,235 +1706,302 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
     // are specified in the idf
     std::string const idf_objects = delimited_string({
 
-                                                         "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
-                                                         "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
+        "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+        "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
 
-                                                         "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
-                                                         "Default Algorithm,       !- Name",
-                                                         "ISO15099Windows,         !- Simple Buoyancy Vertical Wall Equation Source",
-                                                         ",                        !- Simple Buoyancy Vertical Wall User Curve Name",
-                                                         "AlamdariHammondStableHorizontal,  !- Simple Buoyancy Stable Horizontal Equation Source",
-                                                         ",                        !- Simple Buoyancy Stable Horizontal Equation User Curve Name",
-                                                         "AlamdariHammondUnstableHorizontal,  !- Simple Buoyancy Unstable Horizontal Equation Source",
-                                                         ",                        !- Simple Buoyancy Unstable Horizontal Equation User Curve Name",
-                                                         "WaltonStableHorizontalOrTilt,  !- Simple Buoyancy Stable Tilted Equation Source",
-                                                         ",                        !- Simple Buoyancy Stable Tilted Equation User Curve Name",
-                                                         "WaltonUnstableHorizontalOrTilt,  !- Simple Buoyancy Unstable Tilted Equation Source",
-                                                         ",                        !- Simple Buoyancy Unstable Tilted Equation User Curve Name",
-                                                         "ISO15099Windows,         !- Simple Buoyancy Windows Equation Source",
-                                                         ",                        !- Simple Buoyancy Windows Equation User Curve Name",
-                                                         "KhalifaEq3WallAwayFromHeat,  !- Floor Heat Ceiling Cool Vertical Wall Equation Source",
-                                                         ",                        !- Floor Heat Ceiling Cool Vertical Wall Equation User Curve Name",
-                                                         "AlamdariHammondStableHorizontal,  !- Floor Heat Ceiling Cool Stable Horizontal Equation Source",
-                                                         ",                        !- Floor Heat Ceiling Cool Stable Horizontal Equation User Curve Name",
-                                                         "KhalifaEq4CeilingAwayFromHeat,  !- Floor Heat Ceiling Cool Unstable Horizontal Equation Source",
-                                                         ",                        !- Floor Heat Ceiling Cool Unstable Horizontal Equation User Curve Name",
-                                                         "AwbiHattonHeatedFloor,   !- Floor Heat Ceiling Cool Heated Floor Equation Source",
-                                                         ",                        !- Floor Heat Ceiling Cool Heated Floor Equation User Curve Name",
-                                                         "KaradagChilledCeiling,   !- Floor Heat Ceiling Cool Chilled Ceiling Equation Source",
-                                                         ",                        !- Floor Heat Ceiling Cool Chilled Ceiling Equation User Curve Name",
-                                                         "WaltonStableHorizontalOrTilt,  !- Floor Heat Ceiling Cool Stable Tilted Equation Source",
-                                                         ",                        !- Floor Heat Ceiling Cool Stable Tilted Equation User Curve Name",
-                                                         "WaltonUnstableHorizontalOrTilt,  !- Floor Heat Ceiling Cool Unstable Tilted Equation Source",
-                                                         ",                        !- Floor Heat Ceiling Cool Unstable Tilted Equation User Curve Name",
-                                                         "ISO15099Windows,         !- Floor Heat Ceiling Cool Window Equation Source",
-                                                         ",                        !- Floor Heat Ceiling Cool Window Equation User Curve Name",
-                                                         "KhalifaEq6NonHeatedWalls,!- Wall Panel Heating Vertical Wall Equation Source",
-                                                         ",                        !- Wall Panel Heating Vertical Wall Equation User Curve Name",
-                                                         "AwbiHattonHeatedWall,    !- Wall Panel Heating Heated Wall Equation Source",
-                                                         ",                        !- Wall Panel Heating Heated Wall Equation User Curve Name",
-                                                         "AlamdariHammondStableHorizontal,  !- Wall Panel Heating Stable Horizontal Equation Source",
-                                                         ",                        !- Wall Panel Heating Stable Horizontal Equation User Curve Name",
-                                                         "KhalifaEq7Ceiling,       !- Wall Panel Heating Unstable Horizontal Equation Source",
-                                                         ",                        !- Wall Panel Heating Unstable Horizontal Equation User Curve Name",
-                                                         "WaltonStableHorizontalOrTilt,  !- Wall Panel Heating Stable Tilted Equation Source",
-                                                         ",                        !- Wall Panel Heating Stable Tilted Equation User Curve Name",
-                                                         "WaltonUnstableHorizontalOrTilt,  !- Wall Panel Heating Unstable Tilted Equation Source",
-                                                         ",                        !- Wall Panel Heating Unstable Tilted Equation User Curve Name",
-                                                         "ISO15099Windows,         !- Wall Panel Heating Window Equation Source",
-                                                         ",                        !- Wall Panel Heating Window Equation User Curve Name",
-                                                         "FohannoPolidoriVerticalWall,  !- Convective Zone Heater Vertical Wall Equation Source",
-                                                         ",                        !- Convective Zone Heater Vertical Wall Equation User Curve Name",
-                                                         "KhalifaEq5WallNearHeat,  !- Convective Zone Heater Vertical Walls Near Heater Equation Source",
-                                                         ",                        !- Convective Zone Heater Vertical Walls Near Heater Equation User Curve Name",
-                                                         "AlamdariHammondStableHorizontal,  !- Convective Zone Heater Stable Horizontal Equation Source",
-                                                         ",                        !- Convective Zone Heater Stable Horizontal Equation User Curve Name",
-                                                         "KhalifaEq7Ceiling,       !- Convective Zone Heater Unstable Horizontal Equation Source",
-                                                         ",                        !- Convective Zone Heater Unstable Horizontal Equation User Curve Name",
-                                                         "WaltonStableHorizontalOrTilt,  !- Convective Zone Heater Stable Tilted Equation Source",
-                                                         ",                        !- Convective Zone Heater Stable Tilted Equation User Curve Name",
-                                                         "WaltonUnstableHorizontalOrTilt,  !- Convective Zone Heater Unstable Tilted Equation Source",
-                                                         ",                        !- Convective Zone Heater Unstable Tilted Equation User Curve Name",
-                                                         "ISO15099Windows,         !- Convective Zone Heater Windows Equation Source",
-                                                         ",                        !- Convective Zone Heater Windows Equation User Curve Name",
-                                                         "GoldsteinNovoselacCeilingDiffuserWalls,  !- Central Air Diffuser Wall Equation Source",
-                                                         ",                        !- Central Air Diffuser Wall Equation User Curve Name",
-                                                         "FisherPedersenCeilingDiffuserCeiling,  !- Central Air Diffuser Ceiling Equation Source",
-                                                         ",                        !- Central Air Diffuser Ceiling Equation User Curve Name",
-                                                         "GoldsteinNovoselacCeilingDiffuserFloor,  !- Central Air Diffuser Floor Equation Source",
-                                                         ",                        !- Central Air Diffuser Floor Equation User Curve Name",
-                                                         "GoldsteinNovoselacCeilingDiffuserWindow,  !- Central Air Diffuser Window Equation Source",
-                                                         ",                        !- Central Air Diffuser Window Equation User Curve Name",
-                                                         "KhalifaEq3WallAwayFromHeat,  !- Mechanical Zone Fan Circulation Vertical Wall Equation Source",
-                                                         ",                        !- Mechanical Zone Fan Circulation Vertical Wall Equation User Curve Name",
-                                                         "AlamdariHammondStableHorizontal,  !- Mechanical Zone Fan Circulation Stable Horizontal Equation Source",
-                                                         ",                        !- Mechanical Zone Fan Circulation Stable Horizontal Equation User Curve Name",
-                                                         "KhalifaEq4CeilingAwayFromHeat,  !- Mechanical Zone Fan Circulation Unstable Horizontal Equation Source",
-                                                         ",                        !- Mechanical Zone Fan Circulation Unstable Horizontal Equation User Curve Name",
-                                                         "WaltonStableHorizontalOrTilt,  !- Mechanical Zone Fan Circulation Stable Tilted Equation Source",
-                                                         ",                        !- Mechanical Zone Fan Circulation Stable Tilted Equation User Curve Name",
-                                                         "WaltonUnstableHorizontalOrTilt,  !- Mechanical Zone Fan Circulation Unstable Tilted Equation Source",
-                                                         ",                        !- Mechanical Zone Fan Circulation Unstable Tilted Equation User Curve Name",
-                                                         "ISO15099Windows,         !- Mechanical Zone Fan Circulation Window Equation Source",
-                                                         ",                        !- Mechanical Zone Fan Circulation Window Equation User Curve Name",
-                                                         ",  !- Mixed Regime Buoyancy Assisting Flow on Walls Equation Source",
-                                                         ",                        !- Mixed Regime Buoyancy Assisting Flow on Walls Equation User Curve Name",
-                                                         ",  !- Mixed Regime Buoyancy Opposing Flow on Walls Equation Source",
-                                                         ",                        !- Mixed Regime Buoyancy Opposing Flow on Walls Equation User Curve Name",
-                                                         ",  !- Mixed Regime Stable Floor Equation Source",
-                                                         ",                        !- Mixed Regime Stable Floor Equation User Curve Name",
-                                                         ",  !- Mixed Regime Unstable Floor Equation Source",
-                                                         ",                        !- Mixed Regime Unstable Floor Equation User Curve Name",
-                                                         ",  !- Mixed Regime Stable Ceiling Equation Source",
-                                                         ",                        !- Mixed Regime Stable Ceiling Equation User Curve Name",
-                                                         ",  !- Mixed Regime Unstable Ceiling Equation Source",
-                                                         ",                        !- Mixed Regime Unstable Ceiling Equation User Curve Name",
-                                                         ",  !- Mixed Regime Window Equation Source",
-                                                         ";                        !- Mixed Regime Window Equation User Curve Name",
+        "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
+        "Default Algorithm,       !- Name",
+        "ISO15099Windows,         !- Simple Buoyancy Vertical Wall Equation Source",
+        ",                        !- Simple Buoyancy Vertical Wall User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Simple Buoyancy Stable Horizontal Equation Source",
+        ",                        !- Simple Buoyancy Stable Horizontal Equation User Curve Name",
+        "AlamdariHammondUnstableHorizontal,  !- Simple Buoyancy Unstable Horizontal Equation Source",
+        ",                        !- Simple Buoyancy Unstable Horizontal Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Simple Buoyancy Stable Tilted Equation Source",
+        ",                        !- Simple Buoyancy Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Simple Buoyancy Unstable Tilted Equation Source",
+        ",                        !- Simple Buoyancy Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Simple Buoyancy Windows Equation Source",
+        ",                        !- Simple Buoyancy Windows Equation User Curve Name",
+        "KhalifaEq3WallAwayFromHeat,  !- Floor Heat Ceiling Cool Vertical Wall Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Vertical Wall Equation User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Floor Heat Ceiling Cool Stable Horizontal Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Stable Horizontal Equation User Curve Name",
+        "KhalifaEq4CeilingAwayFromHeat,  !- Floor Heat Ceiling Cool Unstable Horizontal Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Unstable Horizontal Equation User Curve Name",
+        "AwbiHattonHeatedFloor,   !- Floor Heat Ceiling Cool Heated Floor Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Heated Floor Equation User Curve Name",
+        "KaradagChilledCeiling,   !- Floor Heat Ceiling Cool Chilled Ceiling Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Chilled Ceiling Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Floor Heat Ceiling Cool Stable Tilted Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Floor Heat Ceiling Cool Unstable Tilted Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Floor Heat Ceiling Cool Window Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Window Equation User Curve Name",
+        "KhalifaEq6NonHeatedWalls,!- Wall Panel Heating Vertical Wall Equation Source",
+        ",                        !- Wall Panel Heating Vertical Wall Equation User Curve Name",
+        "AwbiHattonHeatedWall,    !- Wall Panel Heating Heated Wall Equation Source",
+        ",                        !- Wall Panel Heating Heated Wall Equation User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Wall Panel Heating Stable Horizontal Equation Source",
+        ",                        !- Wall Panel Heating Stable Horizontal Equation User Curve Name",
+        "KhalifaEq7Ceiling,       !- Wall Panel Heating Unstable Horizontal Equation Source",
+        ",                        !- Wall Panel Heating Unstable Horizontal Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Wall Panel Heating Stable Tilted Equation Source",
+        ",                        !- Wall Panel Heating Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Wall Panel Heating Unstable Tilted Equation Source",
+        ",                        !- Wall Panel Heating Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Wall Panel Heating Window Equation Source",
+        ",                        !- Wall Panel Heating Window Equation User Curve Name",
+        "FohannoPolidoriVerticalWall,  !- Convective Zone Heater Vertical Wall Equation Source",
+        ",                        !- Convective Zone Heater Vertical Wall Equation User Curve Name",
+        "KhalifaEq5WallNearHeat,  !- Convective Zone Heater Vertical Walls Near Heater Equation Source",
+        ",                        !- Convective Zone Heater Vertical Walls Near Heater Equation User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Convective Zone Heater Stable Horizontal Equation Source",
+        ",                        !- Convective Zone Heater Stable Horizontal Equation User Curve Name",
+        "KhalifaEq7Ceiling,       !- Convective Zone Heater Unstable Horizontal Equation Source",
+        ",                        !- Convective Zone Heater Unstable Horizontal Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Convective Zone Heater Stable Tilted Equation Source",
+        ",                        !- Convective Zone Heater Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Convective Zone Heater Unstable Tilted Equation Source",
+        ",                        !- Convective Zone Heater Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Convective Zone Heater Windows Equation Source",
+        ",                        !- Convective Zone Heater Windows Equation User Curve Name",
+        "GoldsteinNovoselacCeilingDiffuserWalls,  !- Central Air Diffuser Wall Equation Source",
+        ",                        !- Central Air Diffuser Wall Equation User Curve Name",
+        "FisherPedersenCeilingDiffuserCeiling,  !- Central Air Diffuser Ceiling Equation Source",
+        ",                        !- Central Air Diffuser Ceiling Equation User Curve Name",
+        "GoldsteinNovoselacCeilingDiffuserFloor,  !- Central Air Diffuser Floor Equation Source",
+        ",                        !- Central Air Diffuser Floor Equation User Curve Name",
+        "GoldsteinNovoselacCeilingDiffuserWindow,  !- Central Air Diffuser Window Equation Source",
+        ",                        !- Central Air Diffuser Window Equation User Curve Name",
+        "KhalifaEq3WallAwayFromHeat,  !- Mechanical Zone Fan Circulation Vertical Wall Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Vertical Wall Equation User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Mechanical Zone Fan Circulation Stable Horizontal Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Stable Horizontal Equation User Curve Name",
+        "KhalifaEq4CeilingAwayFromHeat,  !- Mechanical Zone Fan Circulation Unstable Horizontal Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Unstable Horizontal Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Mechanical Zone Fan Circulation Stable Tilted Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Mechanical Zone Fan Circulation Unstable Tilted Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Mechanical Zone Fan Circulation Window Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Window Equation User Curve Name",
+        ",  !- Mixed Regime Buoyancy Assisting Flow on Walls Equation Source",
+        ",                        !- Mixed Regime Buoyancy Assisting Flow on Walls Equation User Curve Name",
+        ",  !- Mixed Regime Buoyancy Opposing Flow on Walls Equation Source",
+        ",                        !- Mixed Regime Buoyancy Opposing Flow on Walls Equation User Curve Name",
+        ",  !- Mixed Regime Stable Floor Equation Source",
+        ",                        !- Mixed Regime Stable Floor Equation User Curve Name",
+        ",  !- Mixed Regime Unstable Floor Equation Source",
+        ",                        !- Mixed Regime Unstable Floor Equation User Curve Name",
+        ",  !- Mixed Regime Stable Ceiling Equation Source",
+        ",                        !- Mixed Regime Stable Ceiling Equation User Curve Name",
+        ",  !- Mixed Regime Unstable Ceiling Equation Source",
+        ",                        !- Mixed Regime Unstable Ceiling Equation User Curve Name",
+        ",  !- Mixed Regime Window Equation Source",
+        ";                        !- Mixed Regime Window Equation User Curve Name",
 
-                                                         "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
-                                                         "Default algorithms,      !- Name",
-                                                         "TARPWindward,            !- Wind Convection Windward Vertical Wall Equation Source",
-                                                         ",                        !- Wind Convection Windward Equation Vertical Wall User Curve Name",
-                                                         "TARPLeeward,             !- Wind Convection Leeward Vertical Wall Equation Source",
-                                                         ",                        !- Wind Convection Leeward Vertical Wall Equation User Curve Name",
-                                                         "ClearRoof,               !- Wind Convection Horizontal Roof Equation Source",
-                                                         ",                        !- Wind Convection Horizontal Roof User Curve Name",
-                                                         "ASHRAEVerticalWall,      !- Natural Convection Vertical Wall Equation Source",
-                                                         ",                        !- Natural Convection Vertical Wall Equation User Curve Name",
-                                                         "WaltonStableHorizontalOrTilt,  !- Natural Convection Stable Horizontal Equation Source",
-                                                         ",                        !- Natural Convection Stable Horizontal Equation User Curve Name",
-                                                         "WaltonUnstableHorizontalOrTilt,  !- Natural Convection Unstable Horizontal Equation Source",
-                                                         ";                        !- Natural Convection Unstable Horizontal Equation User Curve Name",
-                                                     });
+        "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
+        "Default algorithms,      !- Name",
+        "TARPWindward,            !- Wind Convection Windward Vertical Wall Equation Source",
+        ",                        !- Wind Convection Windward Equation Vertical Wall User Curve Name",
+        "TARPLeeward,             !- Wind Convection Leeward Vertical Wall Equation Source",
+        ",                        !- Wind Convection Leeward Vertical Wall Equation User Curve Name",
+        "ClearRoof,               !- Wind Convection Horizontal Roof Equation Source",
+        ",                        !- Wind Convection Horizontal Roof User Curve Name",
+        "ASHRAEVerticalWall,      !- Natural Convection Vertical Wall Equation Source",
+        ",                        !- Natural Convection Vertical Wall Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Natural Convection Stable Horizontal Equation Source",
+        ",                        !- Natural Convection Stable Horizontal Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Natural Convection Unstable Horizontal Equation Source",
+        ";                        !- Natural Convection Unstable Horizontal Equation User Curve Name",
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHeatBalSurface::TempSurfInTmp.allocate(6);
-    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
-    DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
-    ConvectionCoefficients::GetUserConvectionCoefficients(state, state.dataConvectionCoefficients, state.files);
+    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
+    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
+    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
+    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
+    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->TempSurfInTmp);
+    ConvectionCoefficients::GetUserConvectionCoefficients(*state);
 
     int algorithm_identifier;
 
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondUnstableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq4CeilingAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AwbiHattonHeatedFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KaradagChilledCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq6NonHeatedWalls);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AwbiHattonHeatedWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq7Ceiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq5WallNearHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq7Ceiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWalls);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FisherPedersenCeilDiffuserCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq4CeilingAwayFromHeat);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedAssistingWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedOppossingWall);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedStableFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableFloor);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedStableCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_BeausoleilMorrisonMixedUnstableCeiling);
-    algorithm_identifier = state.dataConvectionCoefficients.InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_GoldsteinNovoselacCeilingDiffuserWindow);
 
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_SparrowWindward);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_SparrowLeeward);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_ClearRoof);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalASHRAEVerticalWall);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonStableHorizontalOrTilt);
-    algorithm_identifier = state.dataConvectionCoefficients.OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
 
-    DataHeatBalSurface::TempSurfInTmp.deallocate();
+    state->dataHeatBalSurf->TempSurfInTmp.deallocate();
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
+{
+    Real64 Tsurf;
+    Real64 Tair;
+    Real64 AirStreamV;
+    Real64 Tilt;
+    Real64 Hin;
+
+    state->dataSurface->Surface.allocate(3);
+    state->dataHeatBal->Zone.allocate(3);
+
+    // Horizontal Roof, heat flow down
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataHeatBal->Zone(1).Volume = 1000;
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Roof;
+    state->dataSurface->Surface(1).Tilt = 0;
+    state->dataSurface->Surface(1).Area = 100;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).WindSpeed = 1;
+
+    Tsurf = 18.0;
+    Tair = 15.0;
+    AirStreamV = 2.0;
+    Tilt = state->dataSurface->Surface(1).Tilt;
+
+    Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(*state, 1, Tsurf, Tair, AirStreamV, Tilt);
+
+    EXPECT_NEAR(Hin, 1.977, 0.001);
+
+    // Pitched Roof, heat flow up
+    state->dataSurface->Surface(2).Zone = 2;
+    state->dataHeatBal->Zone(2).Volume = 1000;
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Roof;
+    state->dataSurface->Surface(2).Tilt = 20;
+    state->dataSurface->Surface(2).Area = 100;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).WindSpeed = 1;
+    state->dataSurface->Surface(2).Height = 8;
+
+    Tsurf = 15.0;
+    Tair = 18.0;
+    AirStreamV = 2.0;
+    Tilt = state->dataSurface->Surface(2).Tilt;
+
+    Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(*state, 2, Tsurf, Tair, AirStreamV, Tilt);
+
+    EXPECT_NEAR(Hin, 2.666, 0.001);
+
+    // Vertical Wall
+    state->dataSurface->Surface(3).Zone = 3;
+    state->dataHeatBal->Zone(3).Volume = 1000;
+    state->dataSurface->Surface(3).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Tilt = 90;
+    state->dataSurface->Surface(3).Area = 100;
+    state->dataSurface->Surface(3).ExtBoundCond = 1;
+    state->dataSurface->Surface(3).Height = 3;
+
+    Tsurf = 15.0;
+    Tair = 18.0;
+    AirStreamV = 0.0055;
+    Tilt = state->dataSurface->Surface(3).Tilt;
+
+    Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(*state, 3, Tsurf, Tair, AirStreamV, Tilt);
+
+    EXPECT_NEAR(Hin, 1.756, 0.001);
 }

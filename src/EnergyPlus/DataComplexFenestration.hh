@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
@@ -61,40 +62,24 @@ namespace DataComplexFenestration {
     // Using/Aliasing
 
     // Data
-    // Parameters for complex shade
-    extern int const csVenetianHorizontal;
-    extern int const csWoven;
-    extern int const csPerforated;
-    extern int const csOtherShadingType;
-    extern int const csBSDF;
-    extern int const csVenetianVertical;
 
     // Parameters for gas definitions
-    extern int const GasCoeffsCustom;
-    extern int const GasCoeffsAir;
-    extern int const GasCoeffsArgon;
-    extern int const GasCoeffsKrypton;
-    extern int const GasCoeffsXenon;
-
-    // Parameters for Thermal Algorithm
-    // INTEGER, PARAMETER :: taTarcog = 0
-    // INTEGER, PARAMETER :: taWinkelmann = 1
+    constexpr int GasCoeffsCustom(0);
+    constexpr int GasCoeffsAir(1);
+    constexpr int GasCoeffsArgon(2);
+    constexpr int GasCoeffsKrypton(3);
+    constexpr int GasCoeffsXenon(4);
 
     // Parameters for calculation standard
-    extern int const csISO15099;
-    extern int const csEN673Declared;
-    extern int const csEN673Design;
+    constexpr int csISO15099(1);
+    constexpr int csEN673Declared(2);
+    constexpr int csEN673Design(3);
 
     // Parameters for thermal model
-    extern int const tmISO15099;
-    extern int const tmScaledCavityWidth;
-    extern int const tmConvectiveScalarModel_NoSDThickness;
-    extern int const tmConvectiveScalarModel_WithSDThickness;
-
-    // Parameters for deflection model
-    extern int const dmNoDeflection;
-    extern int const dmTemperatureAndPressureInput;
-    extern int const dmMeasuredDeflection;
+    constexpr int tmISO15099(0);
+    constexpr int tmScaledCavityWidth(1);
+    constexpr int tmConvectiveScalarModel_NoSDThickness(2);
+    constexpr int tmConvectiveScalarModel_WithSDThickness(3);
 
     // Types
 
@@ -126,29 +111,29 @@ namespace DataComplexFenestration {
     struct WindowComplexShade
     {
         // Members
-        std::string Name;               // Name for complex shade
-        int LayerType;                  // Layer type (OtherShadingType, Venetian, Woven, Perforated)
-        Real64 Thickness;               // Layer thickness (m)
-        Real64 Conductivity;            // Layer conductivity (W/m2K)
-        Real64 IRTransmittance;         // IR Transmittance
-        Real64 FrontEmissivity;         // Emissivity of front suraface
-        Real64 BackEmissivity;          // Emissivity of back surface
-        Real64 TopOpeningMultiplier;    // Coverage percent for top opening (%)
-        Real64 BottomOpeningMultiplier; // Coverage percent for bottom opening (%)
-        Real64 LeftOpeningMultiplier;   // Coverage percent for left opening (%)
-        Real64 RightOpeningMultiplier;  // Coverage percent for right opening (%)
-        Real64 FrontOpeningMultiplier;  // Coverage percent for front opening (%)
-        Real64 SlatWidth;               // Slat width (m)
-        Real64 SlatSpacing;             // Slat spacing (m)
-        Real64 SlatThickness;           // Slat thickness (m)
-        Real64 SlatAngle;               // Slat angle (deg)
-        Real64 SlatConductivity;        // Slat conductivity (W/m2K)
-        Real64 SlatCurve;               // Curvature radius of slat (if =0 then flat) (m)
+        std::string Name;                        // Name for complex shade
+        TARCOGParams::TARCOGLayerType LayerType; // Layer type (OtherShadingType, Venetian, Woven, Perforated)
+        Real64 Thickness;                        // Layer thickness (m)
+        Real64 Conductivity;                     // Layer conductivity (W/m2K)
+        Real64 IRTransmittance;                  // IR Transmittance
+        Real64 FrontEmissivity;                  // Emissivity of front suraface
+        Real64 BackEmissivity;                   // Emissivity of back surface
+        Real64 TopOpeningMultiplier;             // Coverage percent for top opening (%)
+        Real64 BottomOpeningMultiplier;          // Coverage percent for bottom opening (%)
+        Real64 LeftOpeningMultiplier;            // Coverage percent for left opening (%)
+        Real64 RightOpeningMultiplier;           // Coverage percent for right opening (%)
+        Real64 FrontOpeningMultiplier;           // Coverage percent for front opening (%)
+        Real64 SlatWidth;                        // Slat width (m)
+        Real64 SlatSpacing;                      // Slat spacing (m)
+        Real64 SlatThickness;                    // Slat thickness (m)
+        Real64 SlatAngle;                        // Slat angle (deg)
+        Real64 SlatConductivity;                 // Slat conductivity (W/m2K)
+        Real64 SlatCurve;                        // Curvature radius of slat (if =0 then flat) (m)
 
         // Default Constructor
         WindowComplexShade()
-            : LayerType(-1), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0), BackEmissivity(0.0),
-              TopOpeningMultiplier(0.0), BottomOpeningMultiplier(0.0), LeftOpeningMultiplier(0.0), RightOpeningMultiplier(0.0),
+            : LayerType(TARCOGParams::TARCOGLayerType::UNASSSIGNED), Thickness(0.0), Conductivity(0.0), IRTransmittance(0.0), FrontEmissivity(0.0),
+              BackEmissivity(0.0), TopOpeningMultiplier(0.0), BottomOpeningMultiplier(0.0), LeftOpeningMultiplier(0.0), RightOpeningMultiplier(0.0),
               FrontOpeningMultiplier(0.0), SlatWidth(0.0), SlatSpacing(0.0), SlatThickness(0.0), SlatAngle(0.0), SlatConductivity(0.0), SlatCurve(0.0)
         {
         }
@@ -157,18 +142,19 @@ namespace DataComplexFenestration {
     struct WindowThermalModelParams
     {
         // Members
-        std::string Name;           // Window thermal model name
-        int CalculationStandard;    // Tarcog calculation standard
-        int ThermalModel;           // Tarcog thermal model
-        Real64 SDScalar;            // SDScalar coefficient
-        int DeflectionModel;        // Deflection model
-        Real64 VacuumPressureLimit; // Pressure limit at which it will be considered vacuum gas state
-        Real64 InitialTemperature;  // Window(s) temperature in time of fabrication
-        Real64 InitialPressure;     // Window(s) pressure in time of fabrication
+        std::string Name;                                    // Window thermal model name
+        int CalculationStandard;                             // Tarcog calculation standard
+        TARCOGParams::TARCOGThermalModel ThermalModel;       // Tarcog thermal model
+        Real64 SDScalar;                                     // SDScalar coefficient
+        TARCOGParams::DeflectionCalculation DeflectionModel; // Deflection model
+        Real64 VacuumPressureLimit;                          // Pressure limit at which it will be considered vacuum gas state
+        Real64 InitialTemperature;                           // Window(s) temperature in time of fabrication
+        Real64 InitialPressure;                              // Window(s) pressure in time of fabrication
 
         // Default Constructor
         WindowThermalModelParams()
-            : CalculationStandard(-1), ThermalModel(-1), SDScalar(0.0), DeflectionModel(-1), VacuumPressureLimit(0.0), InitialTemperature(0.0),
+            : CalculationStandard(-1), ThermalModel(TARCOGParams::TARCOGThermalModel::UNASSIGNED), SDScalar(0.0),
+              DeflectionModel(TARCOGParams::DeflectionCalculation::UNASSIGNED), VacuumPressureLimit(0.0), InitialTemperature(0.0),
               InitialPressure(0.0)
         {
         }

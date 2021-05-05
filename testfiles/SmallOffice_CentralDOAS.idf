@@ -36,14 +36,16 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 6
 
-  Version,9.4;
+  Version,9.5;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
     YES,                     !- Do System Sizing Calculation
     YES,                     !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    NO;                      !- Run Simulation for Weather File Run Periods
+    NO,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   Building,
     Ref Bldg Small Office New2004_v1.3_5.0,  !- Name
@@ -4580,7 +4582,7 @@
 
   UtilityCost:Tariff,
     IN_EIAMonthlyRateGas,    !- Name
-    NaturalGas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,     !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -4638,7 +4640,7 @@
     17.5,                    !- Precool Design Temperature {C}
     0.012,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     5,                       !- Number of AirLoopHVAC
-    PSZ-AC:1,                !- AirLoopHVAC 1 Name
+    PSZ-Ac:1,                !- AirLoopHVAC 1 Name
     PSZ-AC:2,                !- AirLoopHVAC 2 Name
     PSZ-AC:3,                !- AirLoopHVAC 3 Name
     PSZ-AC:4,                !- AirLoopHVAC 4 Name

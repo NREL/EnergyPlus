@@ -13,7 +13,7 @@
 ! System:   None.
 ! Plant:    A chain of 5 plant loops that connect LoadProfile:Plant objects to DistrictCooling and DistrictHeating by heat exchangers
 
-  Version,9.4;
+  Version,9.5;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -119,7 +119,9 @@
     NO,                      !- Do System Sizing Calculation
     NO,                      !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    NO;                      !- Run Simulation for Weather File Run Periods
+    NO,                      !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
 !___________________________________________________________________________________
 

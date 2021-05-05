@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,29 +53,16 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace ThermalChimney {
-
-    // Using/Aliasing
-
-    // Data
-    // DERIVED TYPE DEFINITIONS
-
-    extern bool ThermalChimneyGetInputFlag;
-    extern int TotThermalChimney; // Total ThermalChimney Statements in input
-
-    // Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
-    // Get Input routines for module
-    // Algorithms for the module
-    // Reporting routines for module
-    // Utility routines for module
-
-    // Types
 
     struct ThermalChimneyData
     {
@@ -133,22 +120,15 @@ namespace ThermalChimney {
         }
     };
 
-    // Object Data
-    extern Array1D<ThermalChimneyData> ThermalChimneySys;
-    extern Array1D<ThermChimZnReportVars> ZnRptThermChim;
-    extern Array1D<ThermChimReportVars> ThermalChimneyReport;
-
     // Functions
 
-    void clear_state();
+    void ManageThermalChimney(EnergyPlusData &state);
 
-    void ManageThermalChimney();
+    void GetThermalChimney(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void GetThermalChimney(bool &ErrorsFound); // If errors found in input
+    void CalcThermalChimney(EnergyPlusData &state);
 
-    void CalcThermalChimney();
-
-    void ReportThermalChimney();
+    void ReportThermalChimney(EnergyPlusData &state);
 
     void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC);
 
@@ -157,7 +137,27 @@ namespace ThermalChimney {
     //*****************************************************************************************
 
 } // namespace ThermalChimney
+struct ThermalChimneysData : BaseGlobalStruct
+{
 
+    bool ThermalChimneyGetInputFlag = true;
+    int TotThermalChimney = 0; // Total ThermalChimney Statements in input
+
+    EPVector<ThermalChimney::ThermalChimneyData> ThermalChimneySys;
+    EPVector<ThermalChimney::ThermChimZnReportVars> ZnRptThermChim;
+    EPVector<ThermalChimney::ThermChimReportVars> ThermalChimneyReport;
+
+    void clear_state() override
+    {
+        ThermalChimneyGetInputFlag = true;
+        ZnRptThermChim.deallocate();
+        ThermalChimneySys.deallocate();
+        ThermalChimneyReport.deallocate();
+    }
+
+    // Default Constructor
+    ThermalChimneysData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

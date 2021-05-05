@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,11 +50,10 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -64,7 +63,6 @@
 
 using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -74,11 +72,11 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 {
-    SysSizingRunDone = true;
-    CurSysNum = 1;
-    NumElecSteamHums = 0;
-    NumGasSteamHums = 1;
-    NumHumidifiers = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->CurSysNum = 1;
+    state->dataHumidifiers->NumElecSteamHums = 0;
+    state->dataHumidifiers->NumGasSteamHums = 1;
+    state->dataHumidifiers->NumHumidifiers = 1;
 
     HumidifierData thisHum;
 
@@ -88,20 +86,20 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
     thisHum.ThermalEffRated = 1.0;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
-    FinalSysSizing.allocate(CurSysNum);
-    FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 30.0;
-    FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.090;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.60894;
-    FinalSysSizing(CurSysNum).HeatMixHumRat = 0.05;
-    FinalSysSizing(CurSysNum).CoolSupHumRat = 0.07;
-    FinalSysSizing(CurSysNum).HeatSupHumRat = 0.10;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 30.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.090;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
 
     // autosize nominal gas use rate
-    OutBaroPress = 101325.0;
-    thisHum.SizeHumidifier();
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    thisHum.SizeHumidifier(*state);
     EXPECT_DOUBLE_EQ(4.00E-5, thisHum.NomCapVol);
     EXPECT_DOUBLE_EQ(0.040000010708118504, thisHum.NomCap);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.NomPower);
@@ -109,11 +107,11 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
 
 TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
 {
-    SysSizingRunDone = true;
-    CurSysNum = 1;
-    NumElecSteamHums = 0;
-    NumGasSteamHums = 1;
-    NumHumidifiers = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->CurSysNum = 1;
+    state->dataHumidifiers->NumElecSteamHums = 0;
+    state->dataHumidifiers->NumGasSteamHums = 1;
+    state->dataHumidifiers->NumHumidifiers = 1;
 
     HumidifierData thisHum;
 
@@ -123,22 +121,22 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
     thisHum.ThermalEffRated = 0.80;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
-    FinalSysSizing.allocate(CurSysNum);
-    FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 30.0;
-    FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.090;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.60894;
-    FinalSysSizing(CurSysNum).HeatMixHumRat = 0.05;
-    FinalSysSizing(CurSysNum).CoolSupHumRat = 0.07;
-    FinalSysSizing(CurSysNum).HeatSupHumRat = 0.10;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 30.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.090;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
 
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
     // volumetric capacity autosize unit test
     thisHum.NomCapVol = AutoSize;
-    CurZoneEqNum = 0; // size it based on system
-    thisHum.SizeHumidifier();
+    state->dataSize->CurZoneEqNum = 0; // size it based on system
+    thisHum.SizeHumidifier(*state);
     // test autosized nominal capacity
     EXPECT_NEAR(8.185E-05, thisHum.NomCapVol, 1.0E-06); // m3/s
     // test autosized nominal capacity
@@ -151,36 +149,36 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
 {
     HumidifierData thisHum;
 
-    TimeStepSys = 0.25;
-    SysSizingRunDone = true;
-    CurSysNum = 1;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->CurSysNum = 1;
 
-    NumElecSteamHums = 0;
-    NumGasSteamHums = 1;
-    NumHumidifiers = 1;
-    Humidifier.allocate(NumGasSteamHums);
+    state->dataHumidifiers->NumElecSteamHums = 0;
+    state->dataHumidifiers->NumGasSteamHums = 1;
+    state->dataHumidifiers->NumHumidifiers = 1;
+    state->dataHumidifiers->Humidifier.allocate(state->dataHumidifiers->NumGasSteamHums);
     thisHum.HumType_Code = 2;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomPower = 103710.0;
     thisHum.ThermalEffRated = 1.0;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
-    FinalSysSizing.allocate(CurSysNum);
-    FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 20.0;
-    FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.00089;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.60894;
-    FinalSysSizing(CurSysNum).HeatMixHumRat = 0.05;
-    FinalSysSizing(CurSysNum).CoolSupHumRat = 0.07;
-    FinalSysSizing(CurSysNum).HeatSupHumRat = 0.10;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 20.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.00089;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
 
     // resize the humidifier nominal capacity and gas use rate
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomPower = 103710;
-    OutBaroPress = 101325.0;
-    thisHum.SizeHumidifier();
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    thisHum.SizeHumidifier(*state);
     EXPECT_DOUBLE_EQ(0.040000010708118504, thisHum.NomCap);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.NomPower);
 
@@ -190,12 +188,12 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.AirInEnthalpy = 25000.0;
     thisHum.InletWaterTempOption = 1;
     thisHum.CurMakeupWaterTemp = 20.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
-    thisHum.CalcGasSteamHumidifier(state, 0.040000010708118504);
+    thisHum.CalcGasSteamHumidifier(*state, 0.040000010708118504);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.GasUseRate);
 
-    thisHum.ReportHumidifier();
+    thisHum.ReportHumidifier(*state);
     EXPECT_DOUBLE_EQ(93339384.987223208, thisHum.GasUseEnergy);
 }
 
@@ -230,9 +228,9 @@ TEST_F(EnergyPlusFixture, Humidifiers_GetHumidifierInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetHumidifierInput(state);
-    ASSERT_EQ(1, NumHumidifiers);
-    EXPECT_EQ(1, Humidifier(1).EfficiencyCurvePtr);
+    GetHumidifierInput(*state);
+    ASSERT_EQ(1, state->dataHumidifiers->NumHumidifiers);
+    EXPECT_EQ(1, state->dataHumidifiers->Humidifier(1).EfficiencyCurvePtr);
 }
 
 TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
@@ -241,14 +239,14 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
 
     HumidifierData thisHum;
 
-    TimeStepSys = 0.25;
-    SysSizingRunDone = true;
-    CurSysNum = 1;
+    state->dataHVACGlobal->TimeStepSys = 0.25;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->CurSysNum = 1;
 
-    NumElecSteamHums = 0;
-    NumGasSteamHums = 1;
-    NumHumidifiers = 1;
-    Humidifier.allocate(NumGasSteamHums);
+    state->dataHumidifiers->NumElecSteamHums = 0;
+    state->dataHumidifiers->NumGasSteamHums = 1;
+    state->dataHumidifiers->NumHumidifiers = 1;
+    state->dataHumidifiers->Humidifier.allocate(state->dataHumidifiers->NumGasSteamHums);
     thisHum.HumType_Code = 2;
     thisHum.NomCapVol = 4.00E-5;
     thisHum.NomCap = 4.00E-2;
@@ -256,16 +254,16 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     thisHum.ThermalEffRated = 0.80;
     thisHum.FanPower = 0.0;
     thisHum.StandbyPower = 0.0;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
-    thisHum.SchedPtr = ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+    thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
-    FinalSysSizing.allocate(CurSysNum);
-    FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 20.0;
-    FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.00089;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.60894;
-    FinalSysSizing(CurSysNum).HeatMixHumRat = 0.05;
-    FinalSysSizing(CurSysNum).CoolSupHumRat = 0.07;
-    FinalSysSizing(CurSysNum).HeatSupHumRat = 0.10;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 20.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.00089;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
 
     // calculate gas use rate and energy at full load
     thisHum.AirInMassFlowRate = 1.8919;
@@ -273,7 +271,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     thisHum.AirInEnthalpy = 25000.0;
     thisHum.InletWaterTempOption = 1;
     thisHum.CurMakeupWaterTemp = 20.0;
-    OutBaroPress = 101325.0;
+    state->dataEnvrn->OutBaroPress = 101325.0;
 
     std::string const idf_objects = delimited_string({
         "  Curve:Quadratic,",
@@ -287,9 +285,9 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    thisHum.EfficiencyCurvePtr = CurveManager::GetCurveIndex(state, "THERMALEFFICIENCYFPLR");
+    thisHum.EfficiencyCurvePtr = CurveManager::GetCurveIndex(*state, "THERMALEFFICIENCYFPLR");
 
-    thisHum.CalcGasSteamHumidifier(state, 0.030);
+    thisHum.CalcGasSteamHumidifier(*state, 0.030);
     EXPECT_NEAR(0.7875, thisHum.ThermalEff, 0.001);
 }
 

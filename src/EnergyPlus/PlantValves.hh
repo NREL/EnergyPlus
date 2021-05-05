@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -63,21 +64,18 @@ struct EnergyPlusData;
 
 namespace PlantValves {
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumTemperingValves;
-
     struct TemperValveData : PlantComponent
     {
         // Members
         // user input data
-        std::string Name = "";         // User identifier
+        std::string Name;             // User identifier
         int PltInletNodeNum = 0;      // Node number on the inlet side of the plant
         int PltOutletNodeNum = 0;     // Node number on the outlet side of the plant
         int PltStream2NodeNum = 0;    // Node number on the outlet side of the second stream
         int PltSetPointNodeNum = 0;   // Node number for the setpoint node.
         int PltPumpOutletNodeNum = 0; // node number for the pump outlet (for flow rate)
         // Calculated and from elsewhere
-        bool environmentInit = true;                // flag for initializationL true means do the initializations
+        bool environmentInit = true;    // flag for initializationL true means do the initializations
         Real64 FlowDivFract = 0.0;      // Fraction of flow sent down diversion path
         Real64 Stream2SourceTemp = 0.0; // Temperature [C] of stream 2 being mixed
         Real64 InletTemp = 0.0;         // Temperature [C] of inlet to valve
@@ -94,30 +92,42 @@ namespace PlantValves {
 
         virtual ~TemperValveData() = default;
 
-        static PlantComponent *factory(std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation,
-                                 Real64 &MaxLoad,
-                                 Real64 &MinLoad,
-                                 Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void initialize(EnergyPlusData &state);
 
-        void calculate();
-
+        void calculate(EnergyPlusData &state);
     };
 
-    void clear_state();
-
-    void GetPlantValvesInput();
-
-    // Object Data
-    extern Array1D<TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
+    void GetPlantValvesInput(EnergyPlusData &state);
 
 } // namespace PlantValves
+
+struct PlantValvesData : BaseGlobalStruct
+{
+
+    bool GetTemperingValves = true;
+    bool OneTimeInitFlag = true;
+    int NumTemperingValves = 0;
+    EPVector<PlantValves::TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
+
+    void clear_state() override
+    {
+        GetTemperingValves = true;
+        OneTimeInitFlag = true;
+        NumTemperingValves = 0;
+        TemperValve.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

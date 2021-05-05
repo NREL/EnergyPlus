@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,13 +53,18 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/DataRootFinder.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SetPointManager.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HVACControllers {
 
@@ -72,67 +77,15 @@ namespace HVACControllers {
     using DataHVACControllers::iNoAction;
     using DataRootFinder::RootFinderDataType;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // Number of significant digits to display in error messages for floating-point numbers
-    extern Real64 const SomeFloatingPoint;
-    extern int const NumSigDigits;
-
     // Parameters for controls used here
-    extern int const iNoControlVariable;
-    extern int const iTemperature;
-    extern int const iHumidityRatio;
-    extern int const iTemperatureAndHumidityRatio;
-    extern int const iFlow;
-
-    extern int const CoilType_Cooling;
-    extern int const CoilType_Heating;
-
-    extern Array1D_string const ControlVariableTypes;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // Type describing a controller's properties
-
-    // Type describing a controller's runtime statistics over the course of the simulation
-
-    // Type describing an air loop's runtime statistics over the course of the simulation
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumControllers;  // The number of controllers found in the Input
-    extern int NumAirLoopStats; // Same size as NumPrimaryAirSys if controllers
-    // are defined, 0 otherwise.
-    // all controllers per air loop
-    extern Array1D_bool CheckEquipName;
-
-    // Flag set to make sure you get input once
-    extern bool GetControllerInputFlag;
-
-    // SUBROUTINE Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Algorithms for the Simple Controller
-
-    // Statistics routines
-
-    // Trace routines for all controllers on each air loop
-
-    // Trace routines for each individual controller
-
-    // Misc routines
-
-    // Types
-
+    enum class iCtrl
+    {
+        NoControlVariable,
+        Temperature,
+        HumidityRatio,
+        TemperatureAndHumidityRatio,
+        Flow,
+    };
 
     struct SolutionTrackerType
     {
@@ -153,9 +106,9 @@ namespace HVACControllers {
         std::string ControllerName; // Name of the Controller
         std::string ControllerType; // Type of Controller
         int ControllerType_Num;
-        int ControlVar;  // The type of control variable being sensed
-        int ActuatorVar; // The variable that the controller will act on ie. flow
-        int Action;      // Controller Action - Reverse or Normal
+        iCtrl ControlVar;  // The type of control variable being sensed
+        iCtrl ActuatorVar; // The variable that the controller will act on ie. flow
+        int Action;        // Controller Action - Reverse or Normal
         // Controller must be initialized to set MinActuated and MaxActuated
         bool InitFirstPass;
         // --------------------
@@ -200,20 +153,20 @@ namespace HVACControllers {
         int ActuatedNode;                   // The node that is acted upon by the controller
         Real64 ActuatedValue;               // Value of actuated variable before change by the controller
         Real64 NextActuatedValue;           // The new control actuated value
-        int ActuatedNodePlantLoopNum;       // the plant loop index for the actuated node DSU3
-        int ActuatedNodePlantLoopSide;      // the plant loop side for the actuated node DSU3
-        int ActuatedNodePlantLoopBranchNum; // the plant loop branch num for actuated node DSU3
+        int ActuatedNodePlantLoopNum;       // the plant loop index for the actuated node
+        int ActuatedNodePlantLoopSide;      // the plant loop side for the actuated node
+        int ActuatedNodePlantLoopBranchNum; // the plant loop branch num for actuated node
         // --------------------
         // Sensed variable
         // --------------------
         int SensedNode;             // The sensed node number from the grid
         bool IsSetPointDefinedFlag; // If TRUE indicates that the setpoint has been defined and can
         // be used to compute DeltaSensed
-        Real64 SetPointValue; // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
-        Real64 SensedValue;   // The sensed control variable of any type
-        Real64 DeltaSensed;   // Difference of sensed to setpoint value for calculating proportional gain
-        Real64 Offset;        // This is the tolerance or droop from the error
-        int HumRatCntrlType;  // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
+        Real64 SetPointValue;                          // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
+        Real64 SensedValue;                            // The sensed control variable of any type
+        Real64 DeltaSensed;                            // Difference of sensed to setpoint value for calculating proportional gain
+        Real64 Offset;                                 // This is the tolerance or droop from the error
+        SetPointManager::iCtrlVarType HumRatCntrlType; // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
         // --------------------
         // Other controller inputs, not yet used
         // --------------------
@@ -238,14 +191,15 @@ namespace HVACControllers {
 
         // Default Constructor
         ControllerPropsType()
-            : ControllerType_Num(ControllerSimple_Type), ControlVar(iNoControlVariable), ActuatorVar(0), Action(iNoAction), InitFirstPass(true),
-              NumCalcCalls(0), Mode(iModeNone), DoWarmRestartFlag(false), ReuseIntermediateSolutionFlag(false), ReusePreviousSolutionFlag(false),
-              SolutionTrackers(2), MaxAvailActuated(0.0), MaxAvailSensed(0.0), MinAvailActuated(0.0), MinAvailSensed(0.0), MaxVolFlowActuated(0.0),
-              MinVolFlowActuated(0.0), MaxActuated(0.0), MinActuated(0.0), ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0),
-              ActuatedNodePlantLoopNum(0), ActuatedNodePlantLoopSide(0), ActuatedNodePlantLoopBranchNum(0), SensedNode(0),
-              IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0), Offset(0.0), HumRatCntrlType(0), Range(0.0),
-              Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false),
-              FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)
+            : ControllerType_Num(ControllerSimple_Type), ControlVar(iCtrl::NoControlVariable), ActuatorVar(iCtrl::NoControlVariable),
+              Action(iNoAction), InitFirstPass(true), NumCalcCalls(0), Mode(iModeNone), DoWarmRestartFlag(false),
+              ReuseIntermediateSolutionFlag(false), ReusePreviousSolutionFlag(false), SolutionTrackers(2), MaxAvailActuated(0.0), MaxAvailSensed(0.0),
+              MinAvailActuated(0.0), MinAvailSensed(0.0), MaxVolFlowActuated(0.0), MinVolFlowActuated(0.0), MaxActuated(0.0), MinActuated(0.0),
+              ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoopNum(0), ActuatedNodePlantLoopSide(0),
+              ActuatedNodePlantLoopBranchNum(0), SensedNode(0), IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0),
+              Offset(0.0), HumRatCntrlType(SetPointManager::iCtrlVarType::Unknown), Range(0.0), Limit(0.0), FirstTraceFlag(true),
+              BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0),
+              BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)
         {
         }
     };
@@ -291,151 +245,152 @@ namespace HVACControllers {
         }
     };
 
-    // Object Data
-    extern Array1D<ControllerPropsType> ControllerProps;
-    extern Array1D<RootFinderDataType> RootFinders;
-    extern Array1D<AirLoopStatsType> AirLoopStats; // Statistics array to analyze computational profile for
-
-    // Functions
-
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
-    void ManageControllers(EnergyPlusData &state, std::string const &ControllerName,
+    void ManageControllers(EnergyPlusData &state,
+                           std::string const &ControllerName,
                            int &ControllerIndex,
-                           bool const FirstHVACIteration,
-                           int const AirLoopNum, // unused1208
-                           int const Operation,
+                           bool FirstHVACIteration,
+                           int AirLoopNum, // unused1208
+                           int Operation,
                            bool &IsConvergedFlag,
                            bool &IsUpToDateFlag,
                            bool &BypassOAController,
                            Optional_bool AllowWarmRestartFlag = _);
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
     void GetControllerInput(EnergyPlusData &state);
 
-    // End of Get Input subroutines for the Module
-    //******************************************************************************
+    void ResetController(EnergyPlusData &state, int ControlNum, bool DoWarmRestartFlag, bool &IsConvergedFlag);
 
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
+    void InitController(EnergyPlusData &state, int ControlNum, bool &IsConvergedFlag);
 
-    void ResetController(int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag);
+    void SizeController(EnergyPlusData &state, int ControlNum);
 
-    void InitController(EnergyPlusData &state, int const ControlNum,
-                        bool &IsConvergedFlag);
-
-    void SizeController(int const ControlNum);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
-    void CalcSimpleController(int const ControlNum,
-                              bool const FirstHVACIteration,
+    void CalcSimpleController(EnergyPlusData &state,
+                              int ControlNum,
+                              bool FirstHVACIteration,
                               bool &IsConvergedFlag,
                               bool &IsUpToDateFlag,
                               std::string const &ControllerName // used when errors occur
     );
 
-    void FindRootSimpleController(int const ControlNum,
-                                  bool const FirstHVACIteration,
+    void FindRootSimpleController(EnergyPlusData &state,
+                                  int ControlNum,
+                                  bool FirstHVACIteration,
                                   bool &IsConvergedFlag,
                                   bool &IsUpToDateFlag,
                                   std::string const &ControllerName // used when errors occur
     );
 
-    void CheckSimpleController(int const ControlNum, bool &IsConvergedFlag);
+    void CheckSimpleController(EnergyPlusData &state, int ControlNum, bool &IsConvergedFlag);
 
-    bool CheckMinActiveController(int const ControlNum);
+    bool CheckMinActiveController(EnergyPlusData &state, int ControlNum);
 
-    bool CheckMaxActiveController(int const ControlNum);
+    bool CheckMaxActiveController(EnergyPlusData &state, int ControlNum);
 
-    void CheckTempAndHumRatCtrl(int const ControlNum, bool &IsConvergedFlag);
+    void CheckTempAndHumRatCtrl(EnergyPlusData &state, int ControlNum, bool &IsConvergedFlag);
 
-    void SaveSimpleController(int const ControlNum, bool const FirstHVACIteration, bool const IsConvergedFlag);
+    void SaveSimpleController(EnergyPlusData &state, int ControlNum, bool FirstHVACIteration, bool IsConvergedFlag);
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
+    void UpdateController(EnergyPlusData &state, int ControlNum);
 
-    // Beginning of Update subroutines for the Controller Module
-    // *****************************************************************************
-
-    void UpdateController(int const ControlNum);
-
-    //        End of Update subroutines for the Controller Module
-    // *****************************************************************************
-
-    void ExitCalcController(int const ControlNum, Real64 const NextActuatedValue, int const Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
-
-    // Beginning of Statistics subroutines for the Controller Module
-    // *****************************************************************************
+    void ExitCalcController(EnergyPlusData &state, int ControlNum, Real64 NextActuatedValue, int Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
 
     void TrackAirLoopControllers(
-        int const AirLoopNum, int const WarmRestartStatus, int const AirLoopIterMax, int const AirLoopIterTot, int const AirLoopNumCalls);
+        EnergyPlusData &state, int AirLoopNum, int WarmRestartStatus, int AirLoopIterMax, int AirLoopIterTot, int AirLoopNumCalls);
 
-    void TrackAirLoopController(int const AirLoopNum,       // Air loop index
-                                int const AirLoopControlNum // Controller index on this air loop
+    void TrackAirLoopController(EnergyPlusData &state,
+                                int AirLoopNum,       // Air loop index
+                                int AirLoopControlNum // Controller index on this air loop
     );
 
-    void DumpAirLoopStatistics();
+    void DumpAirLoopStatistics(EnergyPlusData &state);
 
-    void WriteAirLoopStatistics(InputOutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
+    void WriteAirLoopStatistics(EnergyPlusData &state,
+                                InputOutputFile &statisticsFile,
+                                DefinePrimaryAirSystem const &ThisPrimaryAirSystem,
+                                AirLoopStatsType const &ThisAirLoopStats);
 
-    // Beginning of Tracing subroutines for the Controller Module
-    // *****************************************************************************
-
-    void SetupAirLoopControllersTracer(int const AirLoopNum);
+    void SetupAirLoopControllersTracer(EnergyPlusData &state, int AirLoopNum);
 
     void TraceAirLoopControllers(
-        bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
+        EnergyPlusData &state, bool FirstHVACIteration, int AirLoopNum, int AirLoopPass, bool AirLoopConverged, int AirLoopNumCalls);
 
     void TraceIterationStamp(
-        InputOutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
+        EnergyPlusData &state, InputOutputFile &TraceFile, bool FirstHVACIteration, int AirLoopPass, bool AirLoopConverged, int AirLoopNumCalls);
 
-    void TraceAirLoopController(InputOutputFile &TraceFile, int const ControlNum);
+    void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int const ControlNum);
 
-    void SetupIndividualControllerTracer(int const ControlNum);
+    void SetupIndividualControllerTracer(EnergyPlusData &state, int ControlNum);
 
-    void TraceIndividualController(int const ControlNum,
-                                   bool const FirstHVACIteration,
-                                   int const AirLoopPass,
-                                   int const Operation, // Operation to execute
-                                   bool const IsConvergedFlag);
+    void TraceIndividualController(EnergyPlusData &state,
+                                   int ControlNum,
+                                   bool FirstHVACIteration,
+                                   int AirLoopPass,
+                                   int Operation, // Operation to execute
+                                   bool IsConvergedFlag);
 
-    std::string CreateHVACTimeString();
+    std::string CreateHVACTimeString(EnergyPlusData &state);
 
-    std::string CreateHVACStepFullString();
+    std::string CreateHVACStepFullString(EnergyPlusData &state);
 
-    std::string MakeHVACTimeIntervalString();
+    std::string MakeHVACTimeIntervalString(EnergyPlusData &state);
 
-    //        End of Tracing subroutines for the Controller Module
+    void CheckControllerListOrder(EnergyPlusData &state);
 
-    void CheckControllerListOrder();
-
-    void CheckCoilWaterInletNode(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
-                                 bool &NodeNotFound           // true if matching actuator node not found, false if found
+    void CheckCoilWaterInletNode(EnergyPlusData &state,
+                                 int WaterInletNodeNum, // input actuator node number
+                                 bool &NodeNotFound     // true if matching actuator node not found, false if found
     );
 
-    void GetControllerNameAndIndex(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
+    void GetControllerNameAndIndex(EnergyPlusData &state,
+                                   int WaterInletNodeNum,       // input actuator node number
                                    std::string &ControllerName, // controller name used by water coil
                                    int &ControllerIndex,        // controller index used by water coil
                                    bool &ErrorsFound            // true if matching actuator node not found
     );
 
-    void GetControllerActuatorNodeNum(EnergyPlusData &state, std::string const &ControllerName, // name of coil controller
+    void GetControllerActuatorNodeNum(EnergyPlusData &state,
+                                      std::string const &ControllerName, // name of coil controller
                                       int &WaterInletNodeNum,            // input actuator node number
                                       bool &NodeNotFound                 // true if matching actuator node not found, false if found
     );
 
-    int GetControllerIndex(EnergyPlusData &state, std::string const &ControllerName // name of coil controller
+    int GetControllerIndex(EnergyPlusData &state,
+                           std::string const &ControllerName // name of coil controller
     );
 
 } // namespace HVACControllers
+
+struct HVACControllersData : BaseGlobalStruct
+{
+    int NumControllers = 0;  // The number of controllers found in the Input
+    int NumAirLoopStats = 0; // Same size as NumPrimaryAirSys if controllers
+    Array1D_bool CheckEquipName;
+    bool GetControllerInputFlag = true;
+    bool InitControllerOneTimeFlag = true;
+    bool InitControllerSetPointCheckFlag = true;
+    Array1D<HVACControllers::ControllerPropsType> ControllerProps;
+    Array1D<HVACControllers::RootFinderDataType> RootFinders;
+    Array1D<HVACControllers::AirLoopStatsType> AirLoopStats; // Statistics array to analyze computational profile for
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MySizeFlag;
+    Array1D_bool MyPlantIndexsFlag;
+
+    void clear_state() override
+    {
+        this->NumControllers = 0;
+        this->NumAirLoopStats = 0;
+        this->CheckEquipName.deallocate();
+        this->GetControllerInputFlag = true;
+        this->InitControllerOneTimeFlag = true;
+        this->InitControllerSetPointCheckFlag = true;
+        this->ControllerProps.deallocate();
+        this->RootFinders.deallocate();
+        this->AirLoopStats.deallocate();
+        this->MyEnvrnFlag.deallocate();
+        this->MySizeFlag.deallocate();
+        this->MyPlantIndexsFlag.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

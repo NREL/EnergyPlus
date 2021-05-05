@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,18 +52,18 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PondGroundHeatExchanger {
-
-    extern int NumOfPondGHEs; // Number of pond ground heat exchangers
 
     struct PondGroundHeatExchangerData : PlantComponent
     {
@@ -119,42 +119,54 @@ namespace PondGroundHeatExchanger {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void InitPondGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void CalcPondGroundHeatExchanger();
+        void CalcPondGroundHeatExchanger(EnergyPlusData &state);
 
-        Real64 CalcTotalFLux(Real64 PondBulkTemp // pond temp for this flux calculation
+        Real64 CalcTotalFLux(EnergyPlusData &state, Real64 PondBulkTemp // pond temp for this flux calculation
         );
 
-        Real64 CalcEffectiveness(Real64 InsideTemperature, // Temperature of fluid in pipe circuit, in C
+        Real64 CalcEffectiveness(EnergyPlusData &state,
+                                 Real64 InsideTemperature, // Temperature of fluid in pipe circuit, in C
                                  Real64 PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
                                  Real64 massFlowRate       // Mass flow rate, in kg/s
         );
 
-        Real64 CalcSolarFlux() const;
+        Real64 CalcSolarFlux(EnergyPlusData &state) const;
 
-        void UpdatePondGroundHeatExchanger();
+        void UpdatePondGroundHeatExchanger(EnergyPlusData &state);
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
-
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
     };
 
-    // Object Data
-    extern Array1D<PondGroundHeatExchangerData> PondGHE;
-
-    void clear_state();
-
-    void GetPondGroundHeatExchanger();
+    void GetPondGroundHeatExchanger(EnergyPlusData &state);
 
 } // namespace PondGroundHeatExchanger
+
+struct PondGroundHeatExchangerData : BaseGlobalStruct
+{
+
+    bool GetInputFlag = true;
+    int NumOfPondGHEs = 0;
+    Array1D<PondGroundHeatExchanger::PondGroundHeatExchangerData> PondGHE;
+
+    void clear_state() override
+    {
+        this->GetInputFlag = true;
+        this->NumOfPondGHEs = 0;
+        this->PondGHE.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

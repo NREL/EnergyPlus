@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,13 +55,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZonePlenumData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ZonePlenum {
 
@@ -159,7 +159,8 @@ namespace ZonePlenum {
 
     // Functions
 
-    void SimAirZonePlenum(EnergyPlusData &state, std::string const &CompName,
+    void SimAirZonePlenum(EnergyPlusData &state,
+                          std::string const &CompName,
                           int const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration = _, // Autodesk:OPTIONAL Used without PRESENT check
@@ -169,17 +170,17 @@ namespace ZonePlenum {
 
     void GetZonePlenumInput(EnergyPlusData &state);
 
-    void InitAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
+    void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void InitAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
+    void InitAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
 
-    void CalcAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
+    void CalcAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void CalcAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool const FirstCall);
+    void CalcAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstCall);
 
-    void UpdateAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
+    void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void UpdateAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
+    void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
 
     int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
 
@@ -189,43 +190,44 @@ namespace ZonePlenum {
 
 } // namespace ZonePlenum
 
-    struct ZonePlenumData : BaseGlobalStruct {
+struct ZonePlenumData : BaseGlobalStruct
+{
 
-        bool GetInputFlag; // Flag set to make sure you get input once
-        bool InitAirZoneReturnPlenumEnvrnFlag;
-        bool InitAirZoneReturnPlenumOneTimeFlag;
+    bool GetInputFlag; // Flag set to make sure you get input once
+    bool InitAirZoneReturnPlenumEnvrnFlag;
+    bool InitAirZoneReturnPlenumOneTimeFlag;
 
-        int NumZonePlenums;       // The Number of ZonePlenums found in the Input
-        int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
-        int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
-        Array1D_bool CheckRetEquipName;
-        Array1D_bool CheckSupEquipName;
+    int NumZonePlenums;       // The Number of ZonePlenums found in the Input
+    int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
+    int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
+    Array1D_bool CheckRetEquipName;
+    Array1D_bool CheckSupEquipName;
 
-        // Object Data
-        Array1D<ZonePlenum::ZoneReturnPlenumConditions> ZoneRetPlenCond;
-        Array1D<ZonePlenum::ZoneSupplyPlenumConditions> ZoneSupPlenCond;
-        bool MyEnvrnFlag = true;
+    // Object Data
+    EPVector<ZonePlenum::ZoneReturnPlenumConditions> ZoneRetPlenCond;
+    EPVector<ZonePlenum::ZoneSupplyPlenumConditions> ZoneSupPlenCond;
+    bool MyEnvrnFlag = true;
 
-        void clear_state() override
-        {
-            GetInputFlag = true;
-            InitAirZoneReturnPlenumEnvrnFlag = true;
-            InitAirZoneReturnPlenumOneTimeFlag = true;
-            NumZonePlenums = 0;
-            NumZoneReturnPlenums = 0;
-            NumZoneSupplyPlenums = 0;
-            ZoneRetPlenCond.deallocate();
-            ZoneSupPlenCond.deallocate();
-            MyEnvrnFlag = true;
-        }
+    void clear_state() override
+    {
+        this->GetInputFlag = true;
+        this->InitAirZoneReturnPlenumEnvrnFlag = true;
+        this->InitAirZoneReturnPlenumOneTimeFlag = true;
+        this->NumZonePlenums = 0;
+        this->NumZoneReturnPlenums = 0;
+        this->NumZoneSupplyPlenums = 0;
+        this->ZoneRetPlenCond.deallocate();
+        this->ZoneSupPlenCond.deallocate();
+        this->MyEnvrnFlag = true;
+    }
 
-        // Default Constructor
-        ZonePlenumData()
-            : GetInputFlag(true), InitAirZoneReturnPlenumEnvrnFlag(true), InitAirZoneReturnPlenumOneTimeFlag(true),
-              NumZonePlenums(0), NumZoneReturnPlenums(0), NumZoneSupplyPlenums(0)
-        {
-        }
-    };
+    // Default Constructor
+    ZonePlenumData()
+        : GetInputFlag(true), InitAirZoneReturnPlenumEnvrnFlag(true), InitAirZoneReturnPlenumOneTimeFlag(true), NumZonePlenums(0),
+          NumZoneReturnPlenums(0), NumZoneSupplyPlenums(0)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

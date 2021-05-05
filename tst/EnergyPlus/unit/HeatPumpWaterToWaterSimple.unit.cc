@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -408,16 +408,44 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                           "    0.0003,                  !- Rated Source Side Flow Rate {m3/s}",
                           "    5490,                    !- Rated Heating Capacity {W}",
                           "    1640,                    !- Rated Heating Power Consumption {W}",
-                          "    -3.01043,                !- Heating Capacity Coefficient 1",
-                          "    -.51452,                 !- Heating Capacity Coefficient 2",
-                          "    4.515927,                !- Heating Capacity Coefficient 3",
-                          "    0.017971,                !- Heating Capacity Coefficient 4",
-                          "    0.155798,                !- Heating Capacity Coefficient 5",
-                          "    -2.65423,                !- Heating Compressor Power Coefficient 1",
-                          "    8.570358,                !- Heating Compressor Power Coefficient 2",
-                          "    1.21629,                 !- Heating Compressor Power Coefficient 3",
-                          "    -.21629,                 !- Heating Compressor Power Coefficient 4",
-                          "    0.033862;                !- Heating Compressor Power Coefficient 5",
+                          "    HtgCapCurve,             !- Heating Capacity Curve Name",
+                          "    HtgPowCurve;             !- Heating Compressor Power Curve Name",
+
+                          "Curve:QuadLinear,",
+                          "    HtgCapCurve,             ! Curve Name",
+                          "    -3.01043,                ! CoefficientC1",
+                          "    -.51452,                 ! CoefficientC2",
+                          "    4.515927,                ! CoefficientC3",
+                          "    0.017971,                ! CoefficientC4",
+                          "    0.155798,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
+
+                          "Curve:QuadLinear,",
+                          "    HtgPowCurve,             ! Curve Name",
+                          "    -2.65423,                ! CoefficientC1",
+                          "    8.570358,                ! CoefficientC2",
+                          "    1.21629,                 ! CoefficientC3",
+                          "    -.21629,                 ! CoefficientC4",
+                          "    0.033862,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
 
                           "PlantLoop,",
                           "    GHEV Loop,               !- Name",
@@ -706,68 +734,69 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(*state);
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state);
+    state->dataGlobal->BeginSimFlag = true;
+    SimulationManager::GetProjectData(*state);
 
-    OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    OutputReportPredefined::SetPredefinedTables(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.files);
-    PlantManager::CheckIfAnyPlant();
+    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
+    OutputProcessor::GetReportVariableInput(*state);
+    PlantManager::CheckIfAnyPlant(*state);
 
-    BranchInputManager::ManageBranchInput(state); // just gets input and
+    BranchInputManager::ManageBranchInput(*state); // just gets input and
 
-    DataGlobals::DoingSizing = false;
-    DataGlobals::KickOffSimulation = true;
+    state->dataGlobal->DoingSizing = false;
+    state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(state, ErrorsFound);
-    DataGlobals::KickOffSimulation = false;
+    WeatherManager::ResetEnvironmentCounter(*state);
+    SimulationManager::SetupSimulation(*state, ErrorsFound);
+    state->dataGlobal->KickOffSimulation = false;
 
     int EnvCount = 0;
-    DataGlobals::WarmupFlag = true;
+    state->dataGlobal->WarmupFlag = true;
     bool Available(true);
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
 
         ++EnvCount;
 
-        DataGlobals::BeginEnvrnFlag = true;
-        DataGlobals::EndEnvrnFlag = false;
-        DataEnvironment::EndMonthFlag = false;
-        DataGlobals::WarmupFlag = true;
-        DataGlobals::DayOfSim = 0;
-        state.dataGlobals.DayOfSimChr = "0";
+        state->dataGlobal->BeginEnvrnFlag = true;
+        state->dataGlobal->EndEnvrnFlag = false;
+        state->dataEnvrn->EndMonthFlag = false;
+        state->dataGlobal->WarmupFlag = true;
+        state->dataGlobal->DayOfSim = 0;
+        state->dataGlobal->DayOfSimChr = "0";
 
-        while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
+        while ((state->dataGlobal->DayOfSim < state->dataGlobal->NumOfDayInEnvrn) || (state->dataGlobal->WarmupFlag)) { // Begin day loop ...
 
-            ++DataGlobals::DayOfSim;
+            ++state->dataGlobal->DayOfSim;
 
-            if (!DataGlobals::WarmupFlag) {
-                ++DataEnvironment::CurrentOverallSimDay;
+            if (!state->dataGlobal->WarmupFlag) {
+                ++state->dataEnvrn->CurrentOverallSimDay;
             }
-            DataGlobals::BeginDayFlag = true;
-            DataGlobals::EndDayFlag = false;
+            state->dataGlobal->BeginDayFlag = true;
+            state->dataGlobal->EndDayFlag = false;
 
-            for (DataGlobals::HourOfDay = 1; DataGlobals::HourOfDay <= 24; ++DataGlobals::HourOfDay) { // Begin hour loop ...
+            for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
 
-                DataGlobals::BeginHourFlag = true;
-                DataGlobals::EndHourFlag = false;
+                state->dataGlobal->BeginHourFlag = true;
+                state->dataGlobal->EndHourFlag = false;
 
-                for (DataGlobals::TimeStep = 1; DataGlobals::TimeStep <= DataGlobals::NumOfTimeStepInHour; ++DataGlobals::TimeStep) {
+                for (state->dataGlobal->TimeStep = 1; state->dataGlobal->TimeStep <= state->dataGlobal->NumOfTimeStepInHour;
+                     ++state->dataGlobal->TimeStep) {
 
-                    DataGlobals::BeginTimeStepFlag = true;
+                    state->dataGlobal->BeginTimeStepFlag = true;
 
                     // Set the End__Flag variables to true if necessary.  Note that
                     // each flag builds on the previous level.  EndDayFlag cannot be
@@ -776,31 +805,31 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                     // Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
                     // SubTimeStepFlags can/will be set/reset in the HVAC Manager.
 
-                    if (DataGlobals::TimeStep == DataGlobals::NumOfTimeStepInHour) {
-                        DataGlobals::EndHourFlag = true;
-                        if (DataGlobals::HourOfDay == 24) {
-                            DataGlobals::EndDayFlag = true;
-                            if ((!DataGlobals::WarmupFlag) && (DataGlobals::DayOfSim == DataGlobals::NumOfDayInEnvrn)) {
-                                DataGlobals::EndEnvrnFlag = true;
+                    if (state->dataGlobal->TimeStep == state->dataGlobal->NumOfTimeStepInHour) {
+                        state->dataGlobal->EndHourFlag = true;
+                        if (state->dataGlobal->HourOfDay == 24) {
+                            state->dataGlobal->EndDayFlag = true;
+                            if ((!state->dataGlobal->WarmupFlag) && (state->dataGlobal->DayOfSim == state->dataGlobal->NumOfDayInEnvrn)) {
+                                state->dataGlobal->EndEnvrnFlag = true;
                             }
                         }
                     }
 
-                    WeatherManager::ManageWeather(state);
+                    WeatherManager::ManageWeather(*state);
 
-                    HeatBalanceManager::ManageHeatBalance(state);
+                    HeatBalanceManager::ManageHeatBalance(*state);
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
-                    DataGlobals::BeginHourFlag = false;
-                    DataGlobals::BeginDayFlag = false;
-                    DataGlobals::BeginEnvrnFlag = false;
-                    DataGlobals::BeginSimFlag = false;
-                    DataGlobals::BeginFullSimFlag = false;
+                    state->dataGlobal->BeginHourFlag = false;
+                    state->dataGlobal->BeginDayFlag = false;
+                    state->dataGlobal->BeginEnvrnFlag = false;
+                    state->dataGlobal->BeginSimFlag = false;
+                    state->dataGlobal->BeginFullSimFlag = false;
 
                 } // TimeStep loop
 
-                DataGlobals::PreviousHour = DataGlobals::HourOfDay;
+                state->dataGlobal->PreviousHour = state->dataGlobal->HourOfDay;
 
             } // ... End hour loop.
 
@@ -808,7 +837,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     } // ... End environment loop.
 
-    EXPECT_NEAR(DataLoopNode::Node(12).MassFlowRate, 0.3, 0.0001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(12).MassFlowRate, 0.3, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
@@ -1150,18 +1179,46 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
                           "    autosize,                  !- Rated Source Side Flow Rate {m3/s}",
                           "    autosize,                    !- Rated Heating Capacity {W}",
                           "    autosize,                    !- Rated Heating Power Consumption {W}",
-                          "    -3.01043,                !- Heating Capacity Coefficient 1",
-                          "    -.51452,                 !- Heating Capacity Coefficient 2",
-                          "    4.515927,                !- Heating Capacity Coefficient 3",
-                          "    0.017971,                !- Heating Capacity Coefficient 4",
-                          "    0.155798,                !- Heating Capacity Coefficient 5",
-                          "    -2.65423,                !- Heating Compressor Power Coefficient 1",
-                          "    8.570358,                !- Heating Compressor Power Coefficient 2",
-                          "    1.21629,                 !- Heating Compressor Power Coefficient 3",
-                          "    -.21629,                 !- Heating Compressor Power Coefficient 4",
-                          "    0.033862,                !- Heating Compressor Power Coefficient 5",
+                          "    HtgCapCurve,                !- Heating Capacity Curve Name",
+                          "    HtgPowCurve,                !- Heating Compressor Power Curve Name",
                           "    3.3475,                  !- Reference Coefficient of Performance",
                           "    1.0;                     !- Sizing Factor",
+
+                          "Curve:QuadLinear,",
+                          "    HtgCapCurve,             ! Curve Name",
+                          "    -3.01043,                ! CoefficientC1",
+                          "    -.51452,                 ! CoefficientC2",
+                          "    4.515927,                ! CoefficientC3",
+                          "    0.017971,                ! CoefficientC4",
+                          "    0.155798,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
+
+                          "Curve:QuadLinear,",
+                          "    HtgPowCurve,             ! Curve Name",
+                          "    -2.65423,                ! CoefficientC1",
+                          "    8.570358,                ! CoefficientC2",
+                          "    1.21629,                 ! CoefficientC3",
+                          "    -.21629,                 ! CoefficientC4",
+                          "    0.033862,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
 
                           "PlantLoop,",
                           "    GHEV Loop,               !- Name",
@@ -1456,53 +1513,53 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    SimulationManager::PostIPProcessing();
+    SimulationManager::PostIPProcessing(*state);
     bool ErrorsFound = false;
 
-    DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state);
+    state->dataGlobal->BeginSimFlag = true;
+    SimulationManager::GetProjectData(*state);
 
-    OutputReportPredefined::SetPredefinedTables();
-    HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
+    OutputReportPredefined::SetPredefinedTables(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
-    createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.files);
-    PlantManager::CheckIfAnyPlant();
+    OutputProcessor::SetupTimePointers(*state, "Zone", state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, "HVAC", state->dataHVACGlobal->TimeStepSys);
+    createFacilityElectricPowerServiceObject(*state);
+    OutputProcessor::GetReportVariableInput(*state);
+    PlantManager::CheckIfAnyPlant(*state);
 
-    BranchInputManager::ManageBranchInput(state); // just gets input and
-    SizingManager::ManageSizing(state);
-    DataGlobals::DoingSizing = false;
-    DataGlobals::KickOffSimulation = true;
+    BranchInputManager::ManageBranchInput(*state); // just gets input and
+    SizingManager::ManageSizing(*state);
+    state->dataGlobal->DoingSizing = false;
+    state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(state, ErrorsFound);
-    DataGlobals::KickOffSimulation = false;
+    WeatherManager::ResetEnvironmentCounter(*state);
+    SimulationManager::SetupSimulation(*state, ErrorsFound);
+    state->dataGlobal->KickOffSimulation = false;
 
     // should be sized now
 
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedLoadVolFlowHeatWasAutoSized);
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedSourceVolFlowHeatWasAutoSized);
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedCapHeatWasAutoSized);
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedPowerHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedLoadVolFlowHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedSourceVolFlowHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedCapHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedPowerHeatWasAutoSized);
 
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedLoadVolFlowHeat, 0.00025, 0.0000001);
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedSourceVolFlowHeat, 0.00025, 0.0000001);
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedCapHeat, 7200.71, 0.1);
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedPowerHeat, 2151.07, 0.1);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedLoadVolFlowHeat, 0.00025, 0.0000001);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedSourceVolFlowHeat, 0.00025, 0.0000001);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedCapHeat, 7200.71, 0.1);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedPowerHeat, 2151.07, 0.1);
 
     // Check that we are outputing the correct values
     EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechType,
-                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechType, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("3.35",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomEff,
-                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechNomEff, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("7200.71",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomCap,
-                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(
+                  *state, state->dataOutRptPredefined->pdchMechNomCap, state->dataHPWaterToWaterSimple->GSHP(1).Name));
 }
 } // namespace EnergyPlus

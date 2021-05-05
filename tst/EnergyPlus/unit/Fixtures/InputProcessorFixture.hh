@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 #include "EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -63,52 +64,53 @@ class InputProcessorFixture : public EnergyPlusFixture
 protected:
     using json = nlohmann::json;
 
-    static void SetUpTestCase()
-    {
-        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
-    }
+    //    static void SetUpTestCase()
+    //    {
+    //        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+    //    }
     static void TearDownTestCase()
     {
     }
 
-    virtual void SetUp()
+    void SetUp() override
     {
         EnergyPlusFixture::SetUp(); // Sets up individual test cases.
     }
 
-    virtual void TearDown()
+    void TearDown() override
     {
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
-    bool process_idd(std::string const &idd, bool &errors_found)
-    {
-        return EnergyPlusFixture::process_idd(idd, errors_found);
-    }
+    //    bool process_idd(std::string const &idd, bool &errors_found)
+    //    {
+    //        return EnergyPlusFixture::process_idd(idd, errors_found);
+    //    }
 
-    bool processErrors()
+    bool processErrors(EnergyPlusData &state)
     {
-        return inputProcessor->processErrors();
+        return state.dataInputProcessing->inputProcessor->processErrors(state);
     }
 
     std::vector<std::string> const &validationErrors()
     {
-        return inputProcessor->validationErrors();
+        return state->dataInputProcessing->inputProcessor->validationErrors();
     }
 
     std::vector<std::string> const &validationWarnings()
     {
-        return inputProcessor->validationWarnings();
+        return state->dataInputProcessing->inputProcessor->validationWarnings();
     }
 
     std::string encodeIDF()
     {
-        return inputProcessor->idf_parser->encode(inputProcessor->epJSON, inputProcessor->schema);
+        return state->dataInputProcessing->inputProcessor->idf_parser->encode(state->dataInputProcessing->inputProcessor->epJSON,
+                                                                              state->dataInputProcessing->inputProcessor->schema);
     }
 
     json &getEpJSON()
     {
-        return inputProcessor->epJSON;
+        return state->dataInputProcessing->inputProcessor->epJSON;
     }
 
     void eat_whitespace(std::string const &idf, size_t &index)
@@ -132,7 +134,7 @@ protected:
     json parse_value(std::string const &idf, size_t &index, bool &success)
     {
         IdfParser idfParser;
-        return idfParser.parse_value(idf, index, success, inputProcessor->schema["properties"]);
+        return idfParser.parse_value(idf, index, success, state->dataInputProcessing->inputProcessor->schema["properties"]);
     }
 
     json parse_value(std::string const &idf, size_t &index, bool &success, json const &field_loc)

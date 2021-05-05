@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,13 +54,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct BaseboardElectricData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace BaseboardElectric {
 
@@ -105,7 +105,8 @@ namespace BaseboardElectric {
         BaseboardNumericFieldData() = default;
     };
 
-    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
+    void SimElectricBaseboard(
+        EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
 
     void GetBaseboardInput(EnergyPlusData &state);
 
@@ -117,27 +118,27 @@ namespace BaseboardElectric {
 
 } // namespace BaseboardElectric
 
-    struct BaseboardElectricData : BaseGlobalStruct {
-        int NumBaseboards;
-        bool getInputFlag;
-        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
-        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
-        bool MyOneTimeFlag = true;
-        bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+struct BaseboardElectricData : BaseGlobalStruct
+{
+    int NumBaseboards = 0;
+    bool getInputFlag = true;
+    EPVector<BaseboardElectric::BaseboardParams> Baseboard;
+    EPVector<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    Array1D_bool MyEnvrnFlag;
 
-        void clear_state() override
-        {
-            NumBaseboards = 0;
-            getInputFlag = true;
-            Baseboard.deallocate();
-            BaseboardNumericFields.deallocate();
-            MyOneTimeFlag = true;
-            ZoneEquipmentListChecked = false;
-        }
-        // Default Constructor
-        BaseboardElectricData()
-            : NumBaseboards(0), getInputFlag(true) {}
-    };
+    void clear_state() override
+    {
+        this->NumBaseboards = 0;
+        this->getInputFlag = true;
+        this->Baseboard.deallocate();
+        this->BaseboardNumericFields.deallocate();
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

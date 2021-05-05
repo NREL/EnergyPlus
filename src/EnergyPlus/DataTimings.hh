@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,9 +53,13 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 #ifdef EP_NO_Timings
 #undef EP_Timings
@@ -68,48 +72,12 @@ namespace DataTimings {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const MaxTimingStringLength; // string length for timing string array
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumTimingElements;
-    extern int MaxTimingElements;
-    extern Real64 dailyWeatherTime;
-    extern Real64 dailyExteriorEnergyUseTime;
-    extern Real64 dailyHeatBalanceTime;
-    extern Real64 hbdailyInit;
-    extern Real64 hbdailyOutSurf;
-    extern Real64 hbdailyInSurf;
-    extern Real64 hbdailyHVAC;
-    extern Real64 hbdailyRep;
-    extern Real64 clockrate;
-    extern bool lprocessingInputTiming;
-    extern bool lmanageSimulationTiming;
-    extern bool lcloseoutReportingTiming;
+    int constexpr MaxTimingStringLength()
+    {
+        return 250;
+    } // string length for timing string array
 
     // Following for calls to routines
-#ifdef EP_Count_Calls
-    extern int NumShadow_Calls;
-    extern int NumShadowAtTS_Calls;
-    extern int NumClipPoly_Calls;
-    extern int NumInitSolar_Calls;
-    extern int NumAnisoSky_Calls;
-    extern int NumDetPolyOverlap_Calls;
-    extern int NumCalcPerSolBeam_Calls;
-    extern int NumDetShadowCombs_Calls;
-    extern int NumIntSolarDist_Calls;
-    extern int NumIntRadExchange_Calls;
-    extern int NumIntRadExchangeZ_Calls;
-    extern int NumIntRadExchangeMain_Calls;
-    extern int NumIntRadExchangeOSurf_Calls;
-    extern int NumIntRadExchangeISurf_Calls;
-    extern int NumMaxInsideSurfIterations;
-    extern int NumCalcScriptF_Calls;
-#endif
 
     // Types
 
@@ -127,9 +95,6 @@ namespace DataTimings {
         }
     };
 
-    // Object Data
-    extern Array1D<timings> Timing;
-
     // Functions
 
     void epStartTime(std::string const &ctimingElementstring);
@@ -141,15 +106,93 @@ namespace DataTimings {
 
     void epSummaryTimes(Real64 &TimeUsed_CPUTime);
 
-    Real64 epGetTimeUsed(std::string const &ctimingElementstring);
+    Real64 epGetTimeUsed(EnergyPlusData &state, std::string const &ctimingElementstring);
 
-    Real64 epGetTimeUsedperCall(std::string const &ctimingElementstring);
+    Real64 epGetTimeUsedperCall(EnergyPlusData &state, std::string const &ctimingElementstring);
 
-    Real64 eptime();
+    Real64 eptime(EnergyPlusData &state);
 
     Real64 epElapsedTime();
 
 } // namespace DataTimings
+
+struct DataTimingsData : BaseGlobalStruct
+{
+
+    int NumTimingElements = 0;
+    int MaxTimingElements = 0;
+    Real64 dailyWeatherTime = 0.0;
+    Real64 dailyExteriorEnergyUseTime = 0.0;
+    Real64 dailyHeatBalanceTime = 0.0;
+    Real64 hbdailyInit = 0.0;
+    Real64 hbdailyOutSurf = 0.0;
+    Real64 hbdailyInSurf = 0.0;
+    Real64 hbdailyHVAC = 0.0;
+    Real64 hbdailyRep = 0.0;
+    Real64 clockrate = 0.0;
+    bool lprocessingInputTiming = false;
+    bool lmanageSimulationTiming = false;
+    bool lcloseoutReportingTiming = false;
+    Array1D<DataTimings::timings> Timing;
+
+    // Following for calls to routines
+#ifdef EP_Count_Calls
+    int NumShadow_Calls = 0;
+    int NumShadowAtTS_Calls = 0;
+    int NumClipPoly_Calls = 0;
+    int NumInitSolar_Calls = 0;
+    int NumAnisoSky_Calls = 0;
+    int NumDetPolyOverlap_Calls = 0;
+    int NumCalcPerSolBeam_Calls = 0;
+    int NumDetShadowCombs_Calls = 0;
+    int NumIntSolarDist_Calls = 0;
+    int NumIntRadExchange_Calls = 0;
+    int NumIntRadExchangeZ_Calls = 0;
+    int NumIntRadExchangeMain_Calls = 0;
+    int NumIntRadExchangeOSurf_Calls = 0;
+    int NumIntRadExchangeISurf_Calls = 0;
+    int NumMaxInsideSurfIterations = 0;
+    int NumCalcScriptF_Calls = 0;
+#endif
+
+    void clear_state() override
+    {
+        this->NumTimingElements = 0;
+        this->MaxTimingElements = 0;
+        this->dailyWeatherTime = 0.0;
+        this->dailyExteriorEnergyUseTime = 0.0;
+        this->dailyHeatBalanceTime = 0.0;
+        this->hbdailyInit = 0.0;
+        this->hbdailyOutSurf = 0.0;
+        this->hbdailyInSurf = 0.0;
+        this->hbdailyHVAC = 0.0;
+        this->hbdailyRep = 0.0;
+        this->clockrate = 0.0;
+        this->lprocessingInputTiming = false;
+        this->lmanageSimulationTiming = false;
+        this->lcloseoutReportingTiming = false;
+        this->Timing.deallocate();
+
+#ifdef EP_Count_Calls
+        this->NumShadow_Calls = 0;
+        this->NumShadowAtTS_Calls = 0;
+        this->NumClipPoly_Calls = 0;
+        this->NumInitSolar_Calls = 0;
+        this->NumAnisoSky_Calls = 0;
+        this->NumDetPolyOverlap_Calls = 0;
+        this->NumCalcPerSolBeam_Calls = 0;
+        this->NumDetShadowCombs_Calls = 0;
+        this->NumIntSolarDist_Calls = 0;
+        this->NumIntRadExchange_Calls = 0;
+        this->NumIntRadExchangeZ_Calls = 0;
+        this->NumIntRadExchangeMain_Calls = 0;
+        this->NumIntRadExchangeOSurf_Calls = 0;
+        this->NumIntRadExchangeISurf_Calls = 0;
+        this->NumMaxInsideSurfIterations = 0;
+        this->NumCalcScriptF_Calls = 0;
+#endif
+    }
+};
 
 } // namespace EnergyPlus
 

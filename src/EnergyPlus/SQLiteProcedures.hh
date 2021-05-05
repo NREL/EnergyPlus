@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,6 +48,13 @@
 #ifndef SQLiteProcedures_hh_INCLUDED
 #define SQLiteProcedures_hh_INCLUDED
 
+// C++ Headers
+#include <fstream>
+#include <iosfwd>
+#include <map>
+#include <memory>
+#include <sqlite3.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
@@ -55,19 +62,16 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Material.hh>
 
-#include <sqlite3.h>
-
-#include <fstream>
-#include <iosfwd>
-#include <map>
-#include <memory>
-
 namespace EnergyPlus {
+
+// Forward
+struct EnergyPlusData;
 
 class SQLiteProcedures
 {
@@ -148,6 +152,9 @@ public:
 
     // Commit a transaction
     void sqliteCommit();
+
+    // Rollback a transaction (cancel)
+    void sqliteRollback();
 
     // Within a current transaction
     bool sqliteWithinTransaction();
@@ -256,7 +263,7 @@ public:
 
     void createSQLiteEnvironmentPeriodRecord(const int curEnvirNum,
                                              const std::string &environmentName,
-                                             const int kindOfSim,
+                                             const DataGlobalConstants::KindOfSim kindOfSim,
                                              const int simulationIndex = 1);
 
     void sqliteWriteMessage(const std::string &message);
@@ -967,8 +974,8 @@ private:
     private:
         int const number;
         std::string const &airModelName;
-        int const &airModelType;
-        int const &tempCoupleScheme;
+        DataRoomAirModel::RoomAirModel const &airModelType;
+        DataRoomAirModel::CouplingScheme const &tempCoupleScheme;
         bool const &simAirModel;
     };
 
@@ -992,11 +999,18 @@ private:
     std::vector<std::unique_ptr<SQLite::RoomAirModel>> roomAirModels;
 };
 
-extern std::unique_ptr<SQLite> sqlite;
+std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase(IOFiles & ioFiles);
+void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
 
-void CreateSQLiteZoneExtendedOutput();
+struct SQLiteProceduresData : BaseGlobalStruct
+{
+    std::unique_ptr<SQLite> sqlite;
+    void clear_state() override
+    {
+        sqlite.reset(); // probably not necessary, as it is recreated in ManageSimulation, but it should be fine to delete it here
+    }
+};
 
 } // namespace EnergyPlus
 

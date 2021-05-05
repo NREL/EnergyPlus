@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,9 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/ICEngineElectricGenerator.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/ICEngineElectricGenerator.hh>
 
 using namespace EnergyPlus::ICEngineElectricGenerator;
 
@@ -127,9 +127,9 @@ TEST_F(EnergyPlusFixture, ICEngineElectricGenerator_Fueltype)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetICEngineGeneratorInput(state);
+    GetICEngineGeneratorInput(*state);
 
-    EXPECT_EQ(ICEngineGenerator(1).FuelType, "Diesel");
+    EXPECT_EQ(state->dataICEngElectGen->ICEngineGenerator(1).FuelType, "Diesel");
 }
 
 } // namespace EnergyPlus

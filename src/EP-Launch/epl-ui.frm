@@ -143,7 +143,7 @@ Begin VB.Form eplUI
          Top             =   480
          Width           =   8175
          Begin VB.Label lblUtilityAbout 
-            Caption         =   $"epl-ui.frx":08CA
+            Caption         =   "lt"
             Height          =   615
             Left            =   120
             TabIndex        =   39
@@ -2743,8 +2743,7 @@ Dim countActive As Long
 Dim countDone As Long
 Dim countCrashes As Long
 Dim firstNotRun As Long
-Dim textFromEnd1 As String
-Dim textFromEnd2 As String
+Dim textFromErr As String
 Dim flNum As Integer
 Dim i As Long
 queueTimer.Enabled = False 'turn off the timer to prevent this routine from being started more than once
@@ -2763,19 +2762,25 @@ For i = 1 To numSimQueue
       'if ok or crashed (if cancelled it would already be classified)
       Err.Clear
       flNum = FreeFile
-      Open simQueue(i).tempFolder & "\eplusout.end" For Input As flNum
+      Open simQueue(i).usedOutFileName & ".err" For Input As flNum
+      'Call MsgBox("opening " & simQueue(i).usedOutFileName & ".err: " & Err.Description, vbInformation)
       If Err.Number <> 0 Then
         curStatus = qStatDoneCrashed
       Else
-        Line Input #flNum, textFromEnd1
+        Do While Not EOF(flNum)
+            Line Input #flNum, textFromErr
+            'Call MsgBox("read " & simQueue(i).usedOutFileName & ".err: " & textFromErr & " error: " & Err.Description, vbInformation)
+        Loop
+        'Call MsgBox(textFromErr, vbInformation)
         If Err.Number <> 0 Then
           curStatus = qStatDoneCrashed
         Else
-          curStatus = qStatDoneOk
-          If Not EOF(flNum) Then
-            Line Input #flNum, textFromEnd2
-          End If
-          simQueue(i).eplusoutEndText = textFromEnd1 & Trim(textFromEnd2)
+            If InStr(textFromErr, "EnergyPlus") = 0 Or InStr(textFromErr, "Elapsed Time") = 0 Then
+              curStatus = qStatDoneCrashed
+            Else
+              curStatus = qStatDoneOk
+              simQueue(i).eplusoutEndText = Mid(textFromErr, 17) 'remove leading asterisks and spaces
+            End If
         End If
         Close flNum
       End If

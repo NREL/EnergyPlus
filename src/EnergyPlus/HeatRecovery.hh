@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,13 +53,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HeatRecovery {
 
@@ -67,41 +68,29 @@ namespace HeatRecovery {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern Real64 const KELVZERO;
-    extern Real64 const SMALL;
+    Real64 constexpr KELVZERO = 273.16;
+    Real64 constexpr SMALL = 1.e-10;
 
     // Heat exchanger performance data type
-    extern int const BALANCEDHX_PERFDATATYPE1;
+    int constexpr BALANCEDHX_PERFDATATYPE1 = 1;
 
     // Heat exchanger configurations
-    extern int const Counter_Flow;
-    extern int const Parallel_Flow;
-    extern int const Cross_Flow_Both_Unmixed;
-    extern int const Cross_Flow_Other;
+    int constexpr Counter_Flow = 1;
+    int constexpr Parallel_Flow = 2;
+    int constexpr Cross_Flow_Both_Unmixed = 3;
+    int constexpr Cross_Flow_Other = 4;
 
     // Heat exchanger configuration types
-    extern int const Plate;
-    extern int const Rotary;
+    int constexpr Plate = 1;
+    int constexpr Rotary = 2;
 
     // Economizer lockout operation
-    extern int const EconoLockOut_No;
-    extern int const EconoLockOut_Yes;
+    int constexpr EconoLockOut_No = 0;
+    int constexpr EconoLockOut_Yes = 1;
 
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumHeatExchangers;           // number of heat exchangers
-    extern int NumAirToAirPlateExchs;       // number of air to air plate heat exchangers
-    extern int NumAirToAirGenericExchs;     // number of air to air generic heat exchangers
-    extern int NumDesiccantBalancedExchs;   // number of desiccant balanced heat exchangers
-    extern int NumDesBalExchsPerfDataType1; // number of desiccant balanced heat exchanger performance data maps
-    extern Real64 FullLoadOutAirTemp;       // Used with desiccant HX empirical model, water coils use inlet node condition
-    // DX coils use DXCoilFullLoadOutAirTemp when coil is ON otherwise inlet node
-    extern Real64 FullLoadOutAirHumRat; // Used with desiccant HX empirical model, water coils use inlet node condition
-    // DX coils use DXCoilFullLoadOutAirHumRat when coil is ON otherwise inlet node
-    extern bool GetInputFlag;           // First time, input is "gotten"
-    extern bool CalledFromParentObject; // Indicates that HX is called from parent object (this object is not on a branch)
-    extern Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -194,32 +183,31 @@ namespace HeatRecovery {
         Real64 SecOutEnth;     // secondary air outlet enthalpy (J/kg)
         Real64 SecOutMassFlow; // secondary air outlet mass flow rate (kg/s)
         // report values
-        Real64 SensHeatingRate;   // rate of sensible heat being added to the supply (primary) air [W]
-        Real64 SensHeatingEnergy; // sensible heat added to the supply (primary) air [J]
-        Real64 LatHeatingRate;    // rate of latent heat being added to the supply (primary) air [W]
-        Real64 LatHeatingEnergy;  // latent heat added to the supply (primary) air [J]
-        Real64 TotHeatingRate;    // rate of total heat being added to the supply (primary) air [W]
-        Real64 TotHeatingEnergy;  // total heat added to the supply (primary) air [J]
-        Real64 SensCoolingRate;   // rate of sensible heat being removed from the supply (primary) air [W]
-        Real64 SensCoolingEnergy; // sensible heat removed from the supply (primary) air [J]
-        Real64 LatCoolingRate;    // rate of latent heat being removed from the supply (primary) air [W]
-        Real64 LatCoolingEnergy;  // latent heat removed from the supply (primary) air [J]
-        Real64 TotCoolingRate;    // rate of total heat being removed from the supply (primary) air [W]
-        Real64 TotCoolingEnergy;  // total heat removed from the supply (primary) air [J]
-        Real64 ElecUseEnergy;     // electricity consumption [J]
-        Real64 ElecUseRate;       // electricity consumption rate [W]
-        Real64 SensEffectiveness; // heat exchanger sensible effectiveness [-]
-        Real64 LatEffectiveness;  // heat exchanger latent effectiveness [-]
-        Real64 SupBypassMassFlow; // supply air mass flow rate bypassing the heat exchanger [kg/s]
-        Real64 SecBypassMassFlow; // secondary air mass flow rate bypassing the heat exchanger [kg/s]
-        int LowFlowErrCount;      // Counter for recurring warning message
-        int LowFlowErrIndex;      // Index to recurring warning message
-        int UnBalancedErrCount;   // Counter for recurring warning message
-        int UnBalancedErrIndex;   // Index to recurring warning message
-        bool myEnvrnFlag;         // one-time-init flag
+        Real64 SensHeatingRate;     // rate of sensible heat being added to the supply (primary) air [W]
+        Real64 SensHeatingEnergy;   // sensible heat added to the supply (primary) air [J]
+        Real64 LatHeatingRate;      // rate of latent heat being added to the supply (primary) air [W]
+        Real64 LatHeatingEnergy;    // latent heat added to the supply (primary) air [J]
+        Real64 TotHeatingRate;      // rate of total heat being added to the supply (primary) air [W]
+        Real64 TotHeatingEnergy;    // total heat added to the supply (primary) air [J]
+        Real64 SensCoolingRate;     // rate of sensible heat being removed from the supply (primary) air [W]
+        Real64 SensCoolingEnergy;   // sensible heat removed from the supply (primary) air [J]
+        Real64 LatCoolingRate;      // rate of latent heat being removed from the supply (primary) air [W]
+        Real64 LatCoolingEnergy;    // latent heat removed from the supply (primary) air [J]
+        Real64 TotCoolingRate;      // rate of total heat being removed from the supply (primary) air [W]
+        Real64 TotCoolingEnergy;    // total heat removed from the supply (primary) air [J]
+        Real64 ElecUseEnergy;       // electricity consumption [J]
+        Real64 ElecUseRate;         // electricity consumption rate [W]
+        Real64 SensEffectiveness;   // heat exchanger sensible effectiveness [-]
+        Real64 LatEffectiveness;    // heat exchanger latent effectiveness [-]
+        Real64 SupBypassMassFlow;   // supply air mass flow rate bypassing the heat exchanger [kg/s]
+        Real64 SecBypassMassFlow;   // secondary air mass flow rate bypassing the heat exchanger [kg/s]
+        int LowFlowErrCount;        // Counter for recurring warning message
+        int LowFlowErrIndex;        // Index to recurring warning message
+        int UnBalancedErrCount;     // Counter for recurring warning message
+        int UnBalancedErrIndex;     // Index to recurring warning message
+        bool myEnvrnFlag;           // one-time-init flag
         bool SensEffectivenessFlag; // flag for error message when sensible effectiveness is negative
-        bool LatEffectivenessFlag; // flag for error message when latent effectiveness is negative
-
+        bool LatEffectivenessFlag;  // flag for error message when latent effectiveness is negative
 
         // Default Constructor
         HeatExchCond()
@@ -516,17 +504,10 @@ namespace HeatRecovery {
         }
     };
 
-    // Object Data
-    extern Array1D<HeatExchCond> ExchCond;
-    extern Array1D<BalancedDesDehumPerfData> BalDesDehumPerfData;
-    extern Array1D<HeatExchCondNumericFieldData> HeatExchCondNumericFields;
-    extern Array1D<HeatExchCondNumericFieldData> BalDesDehumPerfNumericFields;
-
     // Functions
 
-    void clear_state();
-
-    void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,                 // name of the heat exchanger unit
+    void SimHeatRecovery(EnergyPlusData &state,
+                         std::string const &CompName,                 // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                              // Pointer to Component
                          int const FanOpMode,                         // Supply air fan operating mode
@@ -539,21 +520,24 @@ namespace HeatRecovery {
                          Optional_int_const CompanionCoilType_Num = _ // cooling coil type of coil
     );
 
-    void GetHeatRecoveryInput();
+    void GetHeatRecoveryInput(EnergyPlusData &state);
 
-    void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
+    void InitHeatRecovery(EnergyPlusData &state,
+                          int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num);
 
     void SizeHeatRecovery(EnergyPlusData &state, int const ExchNum);
 
-    void CalcAirToAirPlateHeatExch(int const ExNum,                        // number of the current heat exchanger being simulated
+    void CalcAirToAirPlateHeatExch(EnergyPlusData &state,
+                                   int const ExNum,                        // number of the current heat exchanger being simulated
                                    bool const HXUnitOn,                    // flag to simulate heat exchager heat recovery
                                    Optional_bool_const EconomizerFlag = _, // economizer flag pass by air loop or OA sys
                                    Optional_bool_const HighHumCtrlFlag = _ // high humidity control flag passed by airloop or OA sys
     );
 
-    void CalcAirToAirGenericHeatExch(int const ExNum,                           // number of the current heat exchanger being simulated
+    void CalcAirToAirGenericHeatExch(EnergyPlusData &state,
+                                     int const ExNum,                           // number of the current heat exchanger being simulated
                                      bool const HXUnitOn,                       // flag to simulate heat exchanger heat recovery
                                      bool const FirstHVACIteration,             // first HVAC iteration flag
                                      int const FanOpMode,                       // Supply air fan operating mode (1=cycling, 2=constant)
@@ -562,7 +546,8 @@ namespace HeatRecovery {
                                      Optional<Real64 const> HXPartLoadRatio = _ //
     );
 
-    void CalcDesiccantBalancedHeatExch(int const ExNum,               // number of the current heat exchanger being simulated
+    void CalcDesiccantBalancedHeatExch(EnergyPlusData &state,
+                                       int const ExNum,               // number of the current heat exchanger being simulated
                                        bool const HXUnitOn,           // flag to simulate heat exchager heat recovery
                                        bool const FirstHVACIteration, // First HVAC iteration flag
                                        int const FanOpMode,           // Supply air fan operating mode (1=cycling, 2=constant)
@@ -573,28 +558,31 @@ namespace HeatRecovery {
                                        Optional_bool_const HighHumCtrlFlag = _ // high humidity control flag passed by airloop or OA sys
     );
 
-    void FrostControl(int const ExNum); // number of the current heat exchanger being simulated
+    void FrostControl(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
-    void UpdateHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
+    void UpdateHeatRecovery(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
-    void ReportHeatRecovery(int const ExNum); // number of the current heat exchanger being simulated
+    void ReportHeatRecovery(EnergyPlusData &state, int const ExNum); // number of the current heat exchanger being simulated
 
     Real64 SafeDiv(Real64 const a, Real64 const b);
 
-    void CalculateEpsFromNTUandZ(Real64 const NTU,  // number of transfer units
+    void CalculateEpsFromNTUandZ(EnergyPlusData &state,
+                                 Real64 const NTU,  // number of transfer units
                                  Real64 const Z,    // capacity rate ratio
                                  int const FlowArr, // flow arrangement
                                  Real64 &Eps        // heat exchanger effectiveness
     );
 
-    void CalculateNTUfromEpsAndZ(Real64 &NTU,       // number of transfer units
+    void CalculateNTUfromEpsAndZ(EnergyPlusData &state,
+                                 Real64 &NTU,       // number of transfer units
                                  int &Err,          // error indicator
                                  Real64 const Z,    // capacity rate ratio
                                  int const FlowArr, // flow arrangement
                                  Real64 const Eps   // heat exchanger effectiveness
     );
 
-    Real64 GetNTUforCrossFlowBothUnmixed(Real64 const Eps, // heat exchanger effectiveness
+    Real64 GetNTUforCrossFlowBothUnmixed(EnergyPlusData &state,
+                                         Real64 const Eps, // heat exchanger effectiveness
                                          Real64 const Z    // capacity rate ratio
     );
 
@@ -602,7 +590,8 @@ namespace HeatRecovery {
                                         Array1D<Real64> const &Par // par(1) = Eps, par(2) = Z
     );
 
-    void CheckModelBoundsTempEq(int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundsTempEq(EnergyPlusData &state,
+                                int const ExchNum,            // number of the current heat exchanger being simulated
                                 Real64 &T_RegenInTemp,        // current regen inlet temperature (C) for regen outlet temp eqn
                                 Real64 &T_RegenInHumRat,      // current regen inlet hum rat for regen outlet temp eqn
                                 Real64 &T_ProcInTemp,         // current process inlet temperature (C) for regen outlet temp eqn
@@ -611,7 +600,8 @@ namespace HeatRecovery {
                                 bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void CheckModelBoundsHumRatEq(int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundsHumRatEq(EnergyPlusData &state,
+                                  int const ExchNum,            // number of the current heat exchanger being simulated
                                   Real64 &H_RegenInTemp,        // current regen inlet temperature (C) for regen outlet hum rat eqn
                                   Real64 &H_RegenInHumRat,      // current regen inlet hum rat for regen outlet hum rat eqn
                                   Real64 &H_ProcInTemp,         // current process inlet temperature (C) for regen outlet hum rat eqn
@@ -620,19 +610,22 @@ namespace HeatRecovery {
                                   bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void CheckModelBoundOutput_Temp(int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundOutput_Temp(EnergyPlusData &state,
+                                    int const ExchNum,            // number of the current heat exchanger being simulated
                                     Real64 const RegenInTemp,     // current regen inlet temp passed to eqn
                                     Real64 &RegenOutTemp,         // current regen outlet temp from eqn
                                     bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void CheckModelBoundOutput_HumRat(int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundOutput_HumRat(EnergyPlusData &state,
+                                      int const ExchNum,            // number of the current heat exchanger being simulated
                                       Real64 const RegenInHumRat,   // current regen inlet hum rat passed to eqn
                                       Real64 &RegenOutHumRat,       // current regen outlet hum rat from eqn
                                       bool const FirstHVACIteration // First HVAC iteration flag
     );
 
-    void CheckModelBoundsRH_TempEq(int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundsRH_TempEq(EnergyPlusData &state,
+                                   int const ExchNum,            // number of the current heat exchanger being simulated
                                    Real64 const T_RegenInTemp,   // current regen inlet temperature passed to eqn
                                    Real64 const T_RegenInHumRat, // current regen inlet hum rat passed to eqn
                                    Real64 const T_ProcInTemp,    // current process inlet temperature passed to eqn
@@ -640,7 +633,8 @@ namespace HeatRecovery {
                                    bool const FirstHVACIteration // first HVAC iteration flag
     );
 
-    void CheckModelBoundsRH_HumRatEq(int const ExchNum,            // number of the current heat exchanger being simulated
+    void CheckModelBoundsRH_HumRatEq(EnergyPlusData &state,
+                                     int const ExchNum,            // number of the current heat exchanger being simulated
                                      Real64 const H_RegenInTemp,   // current regen inlet temperature passed to eqn
                                      Real64 const H_RegenInHumRat, // current regen inlet hum rat passed to eqn
                                      Real64 const H_ProcInTemp,    // current process inlet temperature passed to eqn
@@ -648,37 +642,45 @@ namespace HeatRecovery {
                                      bool const FirstHVACIteration // first HVAC iteration flag
     );
 
-    void CheckForBalancedFlow(int const ExchNum,              // number of the current heat exchanger being simulated
+    void CheckForBalancedFlow(EnergyPlusData &state,
+                              int const ExchNum,              // number of the current heat exchanger being simulated
                               Real64 const ProcessInMassFlow, // current process inlet air mass flow rate (m3/s)
                               Real64 const RegenInMassFlow,   // current regeneration inlet air mass flow rate (m3/s)
                               bool const FirstHVACIteration   // first HVAC iteration flag
     );
 
-    int GetSupplyInletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSupplyInletNode(EnergyPlusData &state,
+                           std::string const &HXName, // must match HX names for the ExchCond type
                            bool &ErrorsFound          // set to true if problem
     );
 
-    int GetSupplyOutletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSupplyOutletNode(EnergyPlusData &state,
+                            std::string const &HXName, // must match HX names for the ExchCond type
                             bool &ErrorsFound          // set to true if problem
     );
 
-    int GetSecondaryInletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSecondaryInletNode(EnergyPlusData &state,
+                              std::string const &HXName, // must match HX names for the ExchCond type
                               bool &ErrorsFound          // set to true if problem
     );
 
-    int GetSecondaryOutletNode(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetSecondaryOutletNode(EnergyPlusData &state,
+                               std::string const &HXName, // must match HX names for the ExchCond type
                                bool &ErrorsFound          // set to true if problem
     );
 
-    Real64 GetSupplyAirFlowRate(std::string const &HXName, // must match HX names for the ExchCond type
+    Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
+                                std::string const &HXName, // must match HX names for the ExchCond type
                                 bool &ErrorsFound          // set to true if problem
     );
 
-    int GetHeatExchangerObjectTypeNum(std::string const &HXName, // must match HX names for the ExchCond type
+    int GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
+                                      std::string const &HXName, // must match HX names for the ExchCond type
                                       bool &ErrorsFound          // set to true if problem
     );
 
-    void SetHeatExchangerData(int const HXNum,                         // Index of HX
+    void SetHeatExchangerData(EnergyPlusData &state,
+                              int const HXNum,                         // Index of HX
                               bool &ErrorsFound,                       // Set to true if certain errors found
                               std::string const &HXName,               // Name of HX
                               Optional<Real64> SupplyAirVolFlow = _,   // HX supply air flow rate    [m3/s]
@@ -686,6 +688,130 @@ namespace HeatRecovery {
     );
 
 } // namespace HeatRecovery
+
+struct HeatRecoveryData : BaseGlobalStruct
+{
+
+    bool MyOneTimeAllocate = true;
+    // Object Data
+    int NumHeatExchangers = 0;           // number of heat exchangers
+    int NumAirToAirPlateExchs = 0;       // number of air to air plate heat exchangers
+    int NumAirToAirGenericExchs = 0;     // number of air to air generic heat exchangers
+    int NumDesiccantBalancedExchs = 0;   // number of desiccant balanced heat exchangers
+    int NumDesBalExchsPerfDataType1 = 0; // number of desiccant balanced heat exchanger performance data maps
+    Real64 FullLoadOutAirTemp = 0.0;     // Used with desiccant HX empirical model, water coils use inlet node condition
+    // DX coils use DXCoilFullLoadOutAirTemp when coil is ON otherwise inlet node
+    Real64 FullLoadOutAirHumRat = 0.0; // Used with desiccant HX empirical model, water coils use inlet node condition
+    // DX coils use DXCoilFullLoadOutAirHumRat when coil is ON otherwise inlet node
+    bool GetInputFlag = true;           // First time, input is "gotten"
+    bool CalledFromParentObject = true; // Indicates that HX is called from parent object (this object is not on a branch)
+    Array1D_bool CheckEquipName;
+    std::string OutputChar;           // character string for warning messages
+    std::string OutputCharLo;         // character string for warning messages
+    std::string OutputCharHi;         // character string for warning messages
+    std::string CharValue;            // character string for warning messages
+    Real64 TimeStepSysLast = 0.0;     // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime = 0.0;      // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast = 0.0;  // end time of time step for last simulation time step
+    std::string OutputChar2;          // character string for warning messages
+    std::string OutputCharLo2;        // character string for warning messages
+    std::string OutputCharHi2;        // character string for warning messages
+    std::string CharValue2;           // character string for warning messages
+    Real64 TimeStepSysLast2 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime2 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast2 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar3;          // character string for warning messages
+    std::string OutputCharLo3;        // character string for warning messages
+    std::string OutputCharHi3;        // character string for warning messages
+    std::string CharValue3;           // character string for warning messages
+    Real64 TimeStepSysLast3 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime3 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast3 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar4;          // character string for warning messages
+    std::string OutputCharLo4;        // character string for warning messages
+    std::string OutputCharHi4;        // character string for warning messages
+    std::string CharValue4;           // character string for warning messages
+    Real64 TimeStepSysLast4 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime4 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast4 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar5;          // character string for warning messages
+    std::string OutputCharLo5;        // character string for warning messages
+    std::string OutputCharHi5;        // character string for warning messages
+    Real64 TimeStepSysLast5 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime5 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast5 = 0.0; // end time of time step for last simulation time step
+    std::string OutputChar6;          // character string for warning messages
+    std::string OutputCharLo6;        // character string for warning messages
+    std::string OutputCharHi6;        // character string for warning messages
+    Real64 TimeStepSysLast6 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime6 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast6 = 0.0; // end time of time step for last simulation time step
+    std::string OutputCharProc;       // character string for warning messages
+    std::string OutputCharRegen;      // character string for warning messages
+    Real64 TimeStepSysLast7 = 0.0;    // last system time step (used to check for downshifting)
+    Real64 CurrentEndTime7 = 0.0;     // end time of time step for current simulation time step
+    Real64 CurrentEndTimeLast7 = 0.0; // end time of time step for last simulation time step
+    Real64 RegenInletRH = 0.0;        // Regeneration inlet air relative humidity
+    Real64 ProcInletRH = 0.0;         // Process inlet air relative humidity
+    Real64 RegenInletRH2 = 0.0;       // Regeneration inlet air relative humidity
+    Real64 ProcInletRH2 = 0.0;        // Process inlet air relative humidity
+
+    std::unordered_map<std::string, std::string> HeatExchangerUniqueNames;
+
+    // static variables
+    Array1D_bool MySetPointTest;
+    Array1D_bool MySizeFlag;
+
+    Array1D<HeatRecovery::HeatExchCond> ExchCond;
+    Array1D<HeatRecovery::BalancedDesDehumPerfData> BalDesDehumPerfData;
+    Array1D<HeatRecovery::HeatExchCondNumericFieldData> HeatExchCondNumericFields;
+    Array1D<HeatRecovery::HeatExchCondNumericFieldData> BalDesDehumPerfNumericFields;
+
+    void clear_state() override
+    {
+        MyOneTimeAllocate = true;
+        HeatExchangerUniqueNames.clear();
+        NumHeatExchangers = 0;
+        NumAirToAirPlateExchs = 0;
+        NumAirToAirGenericExchs = 0;
+        NumDesiccantBalancedExchs = 0;
+        NumDesBalExchsPerfDataType1 = 0;
+        FullLoadOutAirTemp = 0.0;
+        FullLoadOutAirHumRat = 0.0;
+        GetInputFlag = true;
+        CalledFromParentObject = true;
+        CheckEquipName.clear();
+        ExchCond.clear();
+        BalDesDehumPerfData.clear();
+        HeatExchCondNumericFields.clear();
+        BalDesDehumPerfNumericFields.clear();
+        TimeStepSysLast = 0.0;
+        CurrentEndTime = 0.0;
+        CurrentEndTimeLast = 0.0;
+        TimeStepSysLast2 = 0.0;
+        CurrentEndTime2 = 0.0;
+        CurrentEndTimeLast2 = 0.0;
+        TimeStepSysLast3 = 0.0;
+        CurrentEndTime3 = 0.0;
+        CurrentEndTimeLast3 = 0.0;
+        TimeStepSysLast4 = 0.0;
+        CurrentEndTime4 = 0.0;
+        CurrentEndTimeLast4 = 0.0;
+        TimeStepSysLast5 = 0.0;
+        CurrentEndTime5 = 0.0;
+        CurrentEndTimeLast5 = 0.0;
+        TimeStepSysLast6 = 0.0;
+        CurrentEndTime6 = 0.0;
+        CurrentEndTimeLast6 = 0.0;
+        RegenInletRH = 0.0;
+        ProcInletRH = 0.0;
+        RegenInletRH2 = 0.0;
+        ProcInletRH2 = 0.0;
+        // static variables
+        MySetPointTest.clear();
+        MySizeFlag.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

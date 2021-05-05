@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -128,40 +128,40 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors = false;
-    GetZoneData(foundErrors);
+    GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
-    GetInputDayliteRefPt(foundErrors);
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(1, TotRefPoints);
+    EXPECT_EQ(1, state->dataDaylightingData->TotRefPoints);
 
-    GetDaylightingControls(numObjs, foundErrors);
+    GetDaylightingControls(*state, numObjs, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
     EXPECT_EQ(1, numObjs);
 
-    EXPECT_EQ("WEST ZONE_DAYLCTRL", ZoneDaylight(1).Name);
-    EXPECT_EQ("WEST ZONE", ZoneDaylight(1).ZoneName);
-    EXPECT_EQ(SplitFluxDaylighting, ZoneDaylight(1).DaylightMethod);
-    EXPECT_EQ(Continuous, ZoneDaylight(1).LightControlType);
+    EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->ZoneDaylight(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataDaylightingData->ZoneDaylight(1).ZoneName);
+    EXPECT_EQ(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod);
+    EXPECT_EQ(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType);
 
-    EXPECT_EQ(0.3, ZoneDaylight(1).MinPowerFraction);
-    EXPECT_EQ(0.2, ZoneDaylight(1).MinLightFraction);
-    EXPECT_EQ(1, ZoneDaylight(1).LightControlSteps);
-    EXPECT_EQ(1.0, ZoneDaylight(1).LightControlProbability);
+    EXPECT_EQ(0.3, state->dataDaylightingData->ZoneDaylight(1).MinPowerFraction);
+    EXPECT_EQ(0.2, state->dataDaylightingData->ZoneDaylight(1).MinLightFraction);
+    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).LightControlSteps);
+    EXPECT_EQ(1.0, state->dataDaylightingData->ZoneDaylight(1).LightControlProbability);
 
-    EXPECT_EQ(1, ZoneDaylight(1).glareRefPtNumber);
-    EXPECT_EQ(180., ZoneDaylight(1).ViewAzimuthForGlare);
-    EXPECT_EQ(20., ZoneDaylight(1).MaxGlareallowed);
-    EXPECT_EQ(0, ZoneDaylight(1).DElightGriddingResolution);
+    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).glareRefPtNumber);
+    EXPECT_EQ(180., state->dataDaylightingData->ZoneDaylight(1).ViewAzimuthForGlare);
+    EXPECT_EQ(20., state->dataDaylightingData->ZoneDaylight(1).MaxGlareallowed);
+    EXPECT_EQ(0, state->dataDaylightingData->ZoneDaylight(1).DElightGriddingResolution);
 
-    EXPECT_EQ(1, ZoneDaylight(1).TotalDaylRefPoints);
+    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
 
-    EXPECT_EQ(1, ZoneDaylight(1).DaylRefPtNum(1));
-    EXPECT_EQ(1., ZoneDaylight(1).FracZoneDaylit(1));
-    EXPECT_EQ(500., ZoneDaylight(1).IllumSetPoint(1));
+    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(1));
+    EXPECT_EQ(1., state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(1));
+    EXPECT_EQ(500., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(1));
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_Test)
@@ -230,48 +230,48 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors = false;
-    GetZoneData(foundErrors);
+    GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
-    GetInputDayliteRefPt(foundErrors);
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
+    GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(3, TotRefPoints);
+    EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
 
-    GetDaylightingControls(numObjs, foundErrors);
+    GetDaylightingControls(*state, numObjs, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
     EXPECT_EQ(1, numObjs);
 
-    EXPECT_EQ("WEST ZONE_DAYLCTRL", ZoneDaylight(1).Name);
-    EXPECT_EQ("WEST ZONE", ZoneDaylight(1).ZoneName);
-    EXPECT_EQ(SplitFluxDaylighting, ZoneDaylight(1).DaylightMethod);
-    EXPECT_EQ(Continuous, ZoneDaylight(1).LightControlType);
+    EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->ZoneDaylight(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataDaylightingData->ZoneDaylight(1).ZoneName);
+    EXPECT_EQ(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod);
+    EXPECT_EQ(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType);
 
-    EXPECT_EQ(0.3, ZoneDaylight(1).MinPowerFraction);
-    EXPECT_EQ(0.2, ZoneDaylight(1).MinLightFraction);
-    EXPECT_EQ(1, ZoneDaylight(1).LightControlSteps);
-    EXPECT_EQ(1.0, ZoneDaylight(1).LightControlProbability);
+    EXPECT_EQ(0.3, state->dataDaylightingData->ZoneDaylight(1).MinPowerFraction);
+    EXPECT_EQ(0.2, state->dataDaylightingData->ZoneDaylight(1).MinLightFraction);
+    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).LightControlSteps);
+    EXPECT_EQ(1.0, state->dataDaylightingData->ZoneDaylight(1).LightControlProbability);
 
-    EXPECT_EQ(1, ZoneDaylight(1).glareRefPtNumber);
-    EXPECT_EQ(180., ZoneDaylight(1).ViewAzimuthForGlare);
-    EXPECT_EQ(20., ZoneDaylight(1).MaxGlareallowed);
-    EXPECT_EQ(0, ZoneDaylight(1).DElightGriddingResolution);
+    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).glareRefPtNumber);
+    EXPECT_EQ(180., state->dataDaylightingData->ZoneDaylight(1).ViewAzimuthForGlare);
+    EXPECT_EQ(20., state->dataDaylightingData->ZoneDaylight(1).MaxGlareallowed);
+    EXPECT_EQ(0, state->dataDaylightingData->ZoneDaylight(1).DElightGriddingResolution);
 
-    EXPECT_EQ(3, ZoneDaylight(1).TotalDaylRefPoints);
+    EXPECT_EQ(3, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
 
-    EXPECT_EQ(1, ZoneDaylight(1).DaylRefPtNum(1));
-    EXPECT_EQ(0.35, ZoneDaylight(1).FracZoneDaylit(1));
-    EXPECT_EQ(400., ZoneDaylight(1).IllumSetPoint(1));
+    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(1));
+    EXPECT_EQ(0.35, state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(1));
+    EXPECT_EQ(400., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(1));
 
-    EXPECT_EQ(2, ZoneDaylight(1).DaylRefPtNum(2));
-    EXPECT_EQ(0.4, ZoneDaylight(1).FracZoneDaylit(2));
-    EXPECT_EQ(500., ZoneDaylight(1).IllumSetPoint(2));
+    EXPECT_EQ(2, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(2));
+    EXPECT_EQ(0.4, state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(2));
+    EXPECT_EQ(500., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(2));
 
-    EXPECT_EQ(3, ZoneDaylight(1).DaylRefPtNum(3));
-    EXPECT_EQ(0.25, ZoneDaylight(1).FracZoneDaylit(3));
-    EXPECT_EQ(450., ZoneDaylight(1).IllumSetPoint(3));
+    EXPECT_EQ(3, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(3));
+    EXPECT_EQ(0.25, state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(3));
+    EXPECT_EQ(450., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(3));
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDayliteRefPt_Test)
@@ -316,31 +316,31 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDayliteRefPt_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors = false;
-    GetZoneData(foundErrors);
+    GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    GetInputDayliteRefPt(foundErrors);
+    GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(3, TotRefPoints);
+    EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
 
-    EXPECT_EQ("WEST ZONE_DAYLREFPT1", DaylRefPt(1).Name);
-    EXPECT_EQ(1, DaylRefPt(1).ZoneNum);
-    EXPECT_EQ(3.048, DaylRefPt(1).x);
-    EXPECT_EQ(2.048, DaylRefPt(1).y);
-    EXPECT_EQ(0.7, DaylRefPt(1).z);
+    EXPECT_EQ("WEST ZONE_DAYLREFPT1", state->dataDaylightingData->DaylRefPt(1).Name);
+    EXPECT_EQ(1, state->dataDaylightingData->DaylRefPt(1).ZoneNum);
+    EXPECT_EQ(3.048, state->dataDaylightingData->DaylRefPt(1).x);
+    EXPECT_EQ(2.048, state->dataDaylightingData->DaylRefPt(1).y);
+    EXPECT_EQ(0.7, state->dataDaylightingData->DaylRefPt(1).z);
 
-    EXPECT_EQ("WEST ZONE_DAYLREFPT2", DaylRefPt(2).Name);
-    EXPECT_EQ(1, DaylRefPt(2).ZoneNum);
-    EXPECT_EQ(3.048, DaylRefPt(2).x);
-    EXPECT_EQ(3.048, DaylRefPt(2).y);
-    EXPECT_EQ(0.8, DaylRefPt(2).z);
+    EXPECT_EQ("WEST ZONE_DAYLREFPT2", state->dataDaylightingData->DaylRefPt(2).Name);
+    EXPECT_EQ(1, state->dataDaylightingData->DaylRefPt(2).ZoneNum);
+    EXPECT_EQ(3.048, state->dataDaylightingData->DaylRefPt(2).x);
+    EXPECT_EQ(3.048, state->dataDaylightingData->DaylRefPt(2).y);
+    EXPECT_EQ(0.8, state->dataDaylightingData->DaylRefPt(2).z);
 
-    EXPECT_EQ("WEST ZONE_DAYLREFPT3", DaylRefPt(3).Name);
-    EXPECT_EQ(1, DaylRefPt(3).ZoneNum);
-    EXPECT_EQ(3.048, DaylRefPt(3).x);
-    EXPECT_EQ(4.048, DaylRefPt(3).y);
-    EXPECT_EQ(0.9, DaylRefPt(3).z);
+    EXPECT_EQ("WEST ZONE_DAYLREFPT3", state->dataDaylightingData->DaylRefPt(3).Name);
+    EXPECT_EQ(1, state->dataDaylightingData->DaylRefPt(3).ZoneNum);
+    EXPECT_EQ(3.048, state->dataDaylightingData->DaylRefPt(3).x);
+    EXPECT_EQ(4.048, state->dataDaylightingData->DaylRefPt(3).y);
+    EXPECT_EQ(0.9, state->dataDaylightingData->DaylRefPt(3).z);
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
@@ -378,42 +378,42 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors = false;
-    GetZoneData(foundErrors);
+    GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    GetInputIlluminanceMap(state.files, foundErrors);
+    GetInputIlluminanceMap(*state, foundErrors);
     // compare_err_stream(""); // expecting errors because zone is not really defined
 
-    EXPECT_EQ(1, TotIllumMaps);
+    EXPECT_EQ(1, state->dataDaylightingData->TotIllumMaps);
 
-    EXPECT_EQ("MAP1", IllumMap(1).Name);
-    EXPECT_EQ(1, IllumMap(1).Zone);
-    EXPECT_EQ(0, IllumMap(1).Z);
-    EXPECT_EQ(0.1, IllumMap(1).Xmin);
-    EXPECT_EQ(6.0, IllumMap(1).Xmax);
-    EXPECT_EQ(10, IllumMap(1).Xnum);
-    EXPECT_EQ(0.2, IllumMap(1).Ymin);
-    EXPECT_EQ(5.0, IllumMap(1).Ymax);
-    EXPECT_EQ(11, IllumMap(1).Ynum);
+    EXPECT_EQ("MAP1", state->dataDaylightingData->IllumMap(1).Name);
+    EXPECT_EQ(1, state->dataDaylightingData->IllumMap(1).Zone);
+    EXPECT_EQ(0, state->dataDaylightingData->IllumMap(1).Z);
+    EXPECT_EQ(0.1, state->dataDaylightingData->IllumMap(1).Xmin);
+    EXPECT_EQ(6.0, state->dataDaylightingData->IllumMap(1).Xmax);
+    EXPECT_EQ(10, state->dataDaylightingData->IllumMap(1).Xnum);
+    EXPECT_EQ(0.2, state->dataDaylightingData->IllumMap(1).Ymin);
+    EXPECT_EQ(5.0, state->dataDaylightingData->IllumMap(1).Ymax);
+    EXPECT_EQ(11, state->dataDaylightingData->IllumMap(1).Ynum);
 
     // OutputControl:IlluminanceMap:Style
-    EXPECT_EQ(',', MapColSep);
+    EXPECT_EQ(',', state->dataDaylightingData->MapColSep);
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_doesDayLightingUseDElight_Test)
 {
-    EXPECT_FALSE(doesDayLightingUseDElight());
+    EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
-    ZoneDaylight.allocate(3);
-    ZoneDaylight(1).DaylightMethod = SplitFluxDaylighting;
-    ZoneDaylight(2).DaylightMethod = SplitFluxDaylighting;
-    ZoneDaylight(3).DaylightMethod = SplitFluxDaylighting;
+    state->dataDaylightingData->ZoneDaylight.allocate(3);
+    state->dataDaylightingData->ZoneDaylight(1).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->ZoneDaylight(2).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
+    state->dataDaylightingData->ZoneDaylight(3).DaylightMethod = DataDaylighting::iDaylightingMethod::SplitFluxDaylighting;
 
-    EXPECT_FALSE(doesDayLightingUseDElight());
+    EXPECT_FALSE(doesDayLightingUseDElight(*state));
 
-    ZoneDaylight(2).DaylightMethod = DElightDaylighting;
+    state->dataDaylightingData->ZoneDaylight(2).DaylightMethod = DataDaylighting::iDaylightingMethod::DElightDaylighting;
 
-    EXPECT_TRUE(doesDayLightingUseDElight());
+    EXPECT_TRUE(doesDayLightingUseDElight(*state));
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
@@ -808,97 +808,97 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
-    HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    HeatBalanceManager::GetZoneData(foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
+    SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
+    EXPECT_FALSE(foundErrors);                               // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);
-    ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::PreviousHour = 1;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->PreviousHour = 1;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
 
-    GetDaylightingParametersInput(state.files);
+    GetDaylightingParametersInput(*state);
     compare_err_stream("");
-    EXPECT_EQ(3, TotRefPoints);
+    EXPECT_EQ(3, state->dataDaylightingData->TotRefPoints);
 
-    EXPECT_NEAR(2.048, ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(3.048, ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(2.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataHeatBalance::Zone(1).RelNorth = 45.;
+    state->dataHeatBal->Zone(1).RelNorth = 45.;
 
-    GeometryTransformForDaylighting();
+    GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.603, ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(0.707, ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.603, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(0.707, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataHeatBalance::Zone(1).RelNorth = 90.;
+    state->dataHeatBal->Zone(1).RelNorth = 90.;
 
-    GeometryTransformForDaylighting();
+    GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.048, ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(-2.048, ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(-2.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::WeightNow = 1.0;
-    DataGlobals::WeightPreviousHour = 0.0;
-    CalcDayltgCoefficients(state.files);
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->WeightNow = 1.0;
+    state->dataGlobal->WeightPreviousHour = 0.0;
+    CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
     // zone 1 has only 1 daylighting reference point
-    DayltgInteriorIllum(zoneNum);
+    DayltgInteriorIllum(*state, zoneNum);
     zoneNum += 1;
     // zone 2 has 2 daylighting reference points and will crash if not dimensioned appropriately.
-    DayltgInteriorIllum(zoneNum);
+    DayltgInteriorIllum(*state, zoneNum);
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 {
 
-    Surface.allocate(1);
-    Surface(1).Tilt = 90.0;
-    Surface(1).Azimuth = 180.0;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Azimuth = 180.0;
     int horiz = 1;
     int vert = 2;
     Real64 ProfAng;
@@ -908,190 +908,190 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     CosDirSun(2) = 0.470492;
     CosDirSun(3) = 0.003513;
 
-    ProfileAngle(1, CosDirSun, horiz, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
     EXPECT_NEAR(0.00747, ProfAng, 0.00001);
 
-    ProfileAngle(1, CosDirSun, vert, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
     EXPECT_NEAR(2.06065, ProfAng, 0.00001);
 
     CosDirSun(1) = 0.92318;
     CosDirSun(2) = 0.36483;
     CosDirSun(3) = 0.12094;
 
-    ProfileAngle(1, CosDirSun, horiz, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
     EXPECT_NEAR(0.32010, ProfAng, 0.00001);
 
-    ProfileAngle(1, CosDirSun, vert, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
     EXPECT_NEAR(1.94715, ProfAng, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
 {
-    DataGlobals::NumOfZones = 4;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
-    ZoneDaylight(1).Name = "ZD1";
-    ZoneDaylight(2).Name = "ZD2";
-    ZoneDaylight(3).Name = "ZD3";
-    ZoneDaylight(4).Name = "ZD4";
+    state->dataGlobal->NumOfZones = 4;
+    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
+    state->dataDaylightingData->ZoneDaylight(1).Name = "ZD1";
+    state->dataDaylightingData->ZoneDaylight(2).Name = "ZD2";
+    state->dataDaylightingData->ZoneDaylight(3).Name = "ZD3";
+    state->dataDaylightingData->ZoneDaylight(4).Name = "ZD4";
 
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).DaylightingControlName = "ZD3";
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).DaylightingControlName = "ZD3";
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).DaylightingControlName = "ZD1";
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).DaylightingControlName = "ZD1";
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
 
-    AssociateWindowShadingControlWithDaylighting();
+    AssociateWindowShadingControlWithDaylighting(*state);
 
-    EXPECT_EQ(WindowShadingControl(1).DaylightControlIndex, 3);
-    EXPECT_EQ(WindowShadingControl(2).DaylightControlIndex, 1);
-    EXPECT_EQ(WindowShadingControl(3).DaylightControlIndex, 0);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(1).DaylightControlIndex, 3);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(2).DaylightControlIndex, 1);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(3).DaylightControlIndex, 0);
 }
 
 TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationIndex(1) = 1;
-    WindowShadingControl(1).FenestrationIndex(2) = 2;
-    WindowShadingControl(1).FenestrationIndex(3) = 3;
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 2;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 3;
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationIndex(1) = 4;
-    WindowShadingControl(2).FenestrationIndex(2) = 5;
-    WindowShadingControl(2).FenestrationIndex(3) = 6;
-    WindowShadingControl(2).FenestrationIndex(4) = 7;
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(2) = 5;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(3) = 6;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(4) = 7;
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationIndex(1) = 8;
-    WindowShadingControl(3).FenestrationIndex(2) = 9;
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(2) = 9;
 
-    DataGlobals::NumOfZones = zn;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state->dataGlobal->NumOfZones = zn;
+    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
 
-    CreateShadeDeploymentOrder(zn);
+    CreateShadeDeploymentOrder(*state, zn);
 
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
 
     std::vector<int> compare1;
     compare1.push_back(8);
     compare1.push_back(9);
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[0], compare1);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[0], compare1);
 
     std::vector<int> compare2;
     compare2.push_back(1);
     compare2.push_back(2);
     compare2.push_back(3);
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[1], compare2);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[1], compare2);
 
     std::vector<int> compare3;
     compare3.push_back(4);
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[2], compare3);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[2], compare3);
 
     std::vector<int> compare4;
     compare4.push_back(5);
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[3], compare4);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[3], compare4);
 
     std::vector<int> compare5;
     compare5.push_back(6);
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[4], compare5);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[4], compare5);
 
     std::vector<int> compare6;
     compare6.push_back(7);
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins[5], compare6);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins[5], compare6);
 }
 
 TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationIndex(1) = 1;
-    WindowShadingControl(1).FenestrationIndex(2) = 2;
-    WindowShadingControl(1).FenestrationIndex(3) = 3;
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 2;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 3;
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationIndex(1) = 4;
-    WindowShadingControl(2).FenestrationIndex(2) = 5;
-    WindowShadingControl(2).FenestrationIndex(3) = 6;
-    WindowShadingControl(2).FenestrationIndex(4) = 7;
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(2) = 5;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(3) = 6;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(4) = 7;
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationIndex(1) = 8;
-    WindowShadingControl(3).FenestrationIndex(2) = 9;
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(2) = 9;
 
-    DataGlobals::NumOfZones = zn;
-    ZoneDaylight.allocate(DataGlobals::NumOfZones);
+    state->dataGlobal->NumOfZones = zn;
+    state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
 
-    CreateShadeDeploymentOrder(zn);
+    CreateShadeDeploymentOrder(*state, zn);
 
-    EXPECT_EQ(ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).ShadeDeployOrderExtWins.size(), 6ul);
 
-    ZoneDaylight(zn).TotalDaylRefPoints = 1;
-    ZoneDaylight(zn).NumOfDayltgExtWins = 9;
-    ZoneDaylight(zn).MapShdOrdToLoopNum.allocate(ZoneDaylight(zn).NumOfDayltgExtWins);
-    ZoneDaylight(zn).DayltgExtWinSurfNums.allocate(ZoneDaylight(zn).NumOfDayltgExtWins);
-    ZoneDaylight(zn).DayltgExtWinSurfNums(1) = 1;
-    ZoneDaylight(zn).DayltgExtWinSurfNums(2) = 2;
-    ZoneDaylight(zn).DayltgExtWinSurfNums(3) = 3;
-    ZoneDaylight(zn).DayltgExtWinSurfNums(4) = 4;
-    ZoneDaylight(zn).DayltgExtWinSurfNums(5) = 5;
-    ZoneDaylight(zn).DayltgExtWinSurfNums(6) = 6;
-    ZoneDaylight(zn).DayltgExtWinSurfNums(7) = 7;
-    ZoneDaylight(zn).DayltgExtWinSurfNums(8) = 8;
-    ZoneDaylight(zn).DayltgExtWinSurfNums(9) = 9;
+    state->dataDaylightingData->ZoneDaylight(zn).TotalDaylRefPoints = 1;
+    state->dataDaylightingData->ZoneDaylight(zn).NumOfDayltgExtWins = 9;
+    state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum.allocate(state->dataDaylightingData->ZoneDaylight(zn).NumOfDayltgExtWins);
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums.allocate(state->dataDaylightingData->ZoneDaylight(zn).NumOfDayltgExtWins);
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(1) = 1;
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(2) = 2;
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(3) = 3;
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(4) = 4;
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(5) = 5;
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(6) = 6;
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(7) = 7;
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(8) = 8;
+    state->dataDaylightingData->ZoneDaylight(zn).DayltgExtWinSurfNums(9) = 9;
 
-    MapShadeDeploymentOrderToLoopNumber(zn);
+    MapShadeDeploymentOrderToLoopNumber(*state, zn);
 
-    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(1), 8);
-    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(2), 9);
-    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(3), 1);
-    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(4), 2);
-    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(5), 3);
-    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(6), 4);
-    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(7), 5);
-    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(8), 6);
-    EXPECT_EQ(ZoneDaylight(zn).MapShdOrdToLoopNum(9), 7);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(1), 8);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(2), 9);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(3), 1);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(4), 2);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(5), 3);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(6), 4);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(7), 5);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(8), 6);
+    EXPECT_EQ(state->dataDaylightingData->ZoneDaylight(zn).MapShdOrdToLoopNum(9), 7);
 }
 TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 {
@@ -1308,102 +1308,101 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    DataGlobals::NumOfTimeStepInHour = 1;
-    ScheduleManager::ProcessScheduleInput(state.files);
-    ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 10;
-    DataGlobals::PreviousHour = 10;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 10;
+    state->dataGlobal->PreviousHour = 10;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
 
     bool foundErrors = false;
-    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
-    HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    HeatBalanceManager::GetZoneData(foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
+    SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
+    EXPECT_FALSE(foundErrors);                               // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
-    DaylightingManager::GetInputDayliteRefPt(foundErrors);
-    DaylightingManager::GetDaylightingParametersInput(state.files);
-    DaylightingManager::GILSK = 100.0;
-    DataGlobals::WeightNow = 1.0;
-    DataEnvironment::HISUNF = 100.0;
-    DataEnvironment::HISKF = 100.0;
-    DataEnvironment::SkyClearness = 6.0;
+    int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
+    DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
+    DaylightingManager::GetDaylightingParametersInput(*state);
+    state->dataDaylightingManager->GILSK = 100.0;
+    state->dataGlobal->WeightNow = 1.0;
+    state->dataEnvrn->HISUNF = 100.0;
+    state->dataEnvrn->HISKF = 100.0;
+    state->dataEnvrn->SkyClearness = 6.0;
 
     // Set all daylighting factors to zero
-    ZoneDaylight(ZoneNum).DaylIllFacSky = 0.0;
-    ZoneDaylight(ZoneNum).DaylIllFacSun = 0.0;
-    ZoneDaylight(ZoneNum).DaylIllFacSunDisk = 0.0;
-    ZoneDaylight(ZoneNum).DaylBackFacSky = 0.0;
-    ZoneDaylight(ZoneNum).DaylBackFacSun = 0.0;
-    ZoneDaylight(ZoneNum).DaylBackFacSunDisk = 0.0;
-    ZoneDaylight(ZoneNum).DaylSourceFacSky = 0.0;
-    ZoneDaylight(ZoneNum).DaylSourceFacSun = 0.0;
-    ZoneDaylight(ZoneNum).DaylSourceFacSunDisk = 0.0;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
-    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 0.0, 0.001);
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky = 0.0;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSun = 0.0;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSunDisk = 0.0;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSky = 0.0;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSun = 0.0;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSunDisk = 0.0;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSky = 0.0;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSun = 0.0;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSunDisk = 0.0;
+    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 0.0, 0.001);
 
     int ISky = 1;
     int DayltgExtWin = 1;
     int Shaded = 2;
     int Unshaded = 1;
-    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
+    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
     EXPECT_GT(IWin, 0);
 
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
     // Set shaded surface illuminance factor to 0.5 for RefPt1, 0.05 for RefPt2
     int RefPt = 1;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 1.0;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.5;
     RefPt = 2;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
-    ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Unshaded, ISky, RefPt, DayltgExtWin) = 0.1;
+    state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
-    SurfWinWindowModelType(IWin) = Window5DetailedModel;
-    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
-    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
-    EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
+    state->dataSurface->SurfWinWindowModelType(IWin) = Window5DetailedModel;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
+    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
+    EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
-    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
-    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 50.0, 0.001);
-    EXPECT_NEAR(DaylightingManager::DaylIllum(2), 5.0, 0.001);
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
+    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 50.0, 0.001);
+    EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 5.0, 0.001);
 
     // BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
     // BSDF does shading differently, it's integrated in the base state
-    SurfWinWindowModelType(IWin) = WindowBSDFModel;
-    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
-    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
-    EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
+    state->dataSurface->SurfWinWindowModelType(IWin) = WindowBSDFModel;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
+    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
+    EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
-    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
-    DaylightingManager::DayltgInteriorIllum(ZoneNum);
-    EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
-    EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
+    DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
+    EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
+    EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 }
-
 
 // Test for #7809: Daylighting:Controls has 10 ref points with fraction that do sum exactly to 1,
 // yet with double rounding errors it throws a severe about sum of fraction > 1.0
@@ -1542,51 +1541,51 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors = false;
-    HeatBalanceManager::GetZoneData(foundErrors);
+    HeatBalanceManager::GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
-    DaylightingManager::GetInputDayliteRefPt(foundErrors);
+    DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(10, DataDaylighting::TotRefPoints);
+    EXPECT_EQ(10, state->dataDaylightingData->TotRefPoints);
 
-    DaylightingManager::GetDaylightingControls(numObjs, foundErrors);
+    DaylightingManager::GetDaylightingControls(*state, numObjs, foundErrors);
     // Used to throw
     //    ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.
     //    **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.00 of the zone.\n
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
 
-    EXPECT_EQ("WEST ZONE_DAYLCTRL", DataDaylighting::ZoneDaylight(1).Name);
-    EXPECT_EQ("WEST ZONE", DataDaylighting::ZoneDaylight(1).ZoneName);
-    EXPECT_EQ(DataDaylighting::SplitFluxDaylighting, DataDaylighting::ZoneDaylight(1).DaylightMethod);
-    EXPECT_EQ(DataDaylighting::Continuous, DataDaylighting::ZoneDaylight(1).LightControlType);
+    EXPECT_EQ("WEST ZONE_DAYLCTRL", state->dataDaylightingData->ZoneDaylight(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataDaylightingData->ZoneDaylight(1).ZoneName);
+    EXPECT_EQ(DataDaylighting::iDaylightingMethod::SplitFluxDaylighting, state->dataDaylightingData->ZoneDaylight(1).DaylightMethod);
+    EXPECT_EQ(DataDaylighting::iLtgCtrlType::Continuous, state->dataDaylightingData->ZoneDaylight(1).LightControlType);
 
-    EXPECT_EQ(0.3, DataDaylighting::ZoneDaylight(1).MinPowerFraction);
-    EXPECT_EQ(0.2, DataDaylighting::ZoneDaylight(1).MinLightFraction);
-    EXPECT_EQ(1, DataDaylighting::ZoneDaylight(1).LightControlSteps);
-    EXPECT_EQ(1.0, DataDaylighting::ZoneDaylight(1).LightControlProbability);
+    EXPECT_EQ(0.3, state->dataDaylightingData->ZoneDaylight(1).MinPowerFraction);
+    EXPECT_EQ(0.2, state->dataDaylightingData->ZoneDaylight(1).MinLightFraction);
+    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).LightControlSteps);
+    EXPECT_EQ(1.0, state->dataDaylightingData->ZoneDaylight(1).LightControlProbability);
 
-    EXPECT_EQ(1, DataDaylighting::ZoneDaylight(1).glareRefPtNumber);
-    EXPECT_EQ(180., DataDaylighting::ZoneDaylight(1).ViewAzimuthForGlare);
-    EXPECT_EQ(20., DataDaylighting::ZoneDaylight(1).MaxGlareallowed);
-    EXPECT_EQ(0, DataDaylighting::ZoneDaylight(1).DElightGriddingResolution);
+    EXPECT_EQ(1, state->dataDaylightingData->ZoneDaylight(1).glareRefPtNumber);
+    EXPECT_EQ(180., state->dataDaylightingData->ZoneDaylight(1).ViewAzimuthForGlare);
+    EXPECT_EQ(20., state->dataDaylightingData->ZoneDaylight(1).MaxGlareallowed);
+    EXPECT_EQ(0, state->dataDaylightingData->ZoneDaylight(1).DElightGriddingResolution);
 
-    EXPECT_EQ(10, DataDaylighting::ZoneDaylight(1).TotalDaylRefPoints);
+    EXPECT_EQ(10, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
 
     std::vector<Real64> fractions({0.1053, 0.0936, 0.1213, 0.1018, 0.0893, 0.0842, 0.0882, 0.1026, 0.1134, 0.1003});
     Real64 sum(0.0);
     int i = 1;
-    for (auto frac: fractions) {
+    for (auto frac : fractions) {
         sum += frac;
-        EXPECT_EQ(i, DataDaylighting::ZoneDaylight(1).DaylRefPtNum(i));
-        EXPECT_EQ("WEST ZONE_DAYLREFPT" + std::to_string(i),
-                  DataDaylighting::DaylRefPt(DataDaylighting::ZoneDaylight(1).DaylRefPtNum(i)).Name);
-        EXPECT_EQ(frac, DataDaylighting::ZoneDaylight(1).FracZoneDaylit(i));
-        EXPECT_EQ(200., DataDaylighting::ZoneDaylight(1).IllumSetPoint(i));
+        EXPECT_EQ(i, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(i));
+        EXPECT_EQ(format("WEST ZONE_DAYLREFPT{}", i),
+                  state->dataDaylightingData->DaylRefPt(state->dataDaylightingData->ZoneDaylight(1).DaylRefPtNum(i)).Name);
+        EXPECT_EQ(frac, state->dataDaylightingData->ZoneDaylight(1).FracZoneDaylit(i));
+        EXPECT_EQ(200., state->dataDaylightingData->ZoneDaylight(1).IllumSetPoint(i));
         ++i;
     }
 
@@ -1596,7 +1595,6 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     // Yet, if you are being very litteral, then it's slightly more
     EXPECT_TRUE(sum > 1.0);
     EXPECT_FALSE(sum < 1.0);
-
 }
 
 TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotAroundOne)
@@ -1654,22 +1652,22 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_NotArou
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors = false;
-    HeatBalanceManager::GetZoneData(foundErrors);
+    HeatBalanceManager::GetZoneData(*state, foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    int numObjs = inputProcessor->getNumObjectsFound("Daylighting:Controls");
+    int numObjs = state->dataInputProcessing->inputProcessor->getNumObjectsFound(*state, "Daylighting:Controls");
     EXPECT_EQ(1, numObjs);
 
-    DaylightingManager::GetInputDayliteRefPt(foundErrors);
+    DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     compare_err_stream("");
     EXPECT_FALSE(foundErrors);
-    EXPECT_EQ(2, DataDaylighting::TotRefPoints);
+    EXPECT_EQ(2, state->dataDaylightingData->TotRefPoints);
 
-    DaylightingManager::GetDaylightingControls(numObjs, foundErrors);
+    DaylightingManager::GetDaylightingControls(*state, numObjs, foundErrors);
 
     std::string const error_string = delimited_string({
-      "   ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.",
-      "   **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.001 of the zone.",
+        "   ** Severe  ** GetDaylightingControls: Fraction of Zone controlled by the Daylighting reference points is > 1.0.",
+        "   **   ~~~   ** ..discovered in \"Daylighting:Controls\" for Zone=\"WEST ZONE\", trying to control 1.001 of the zone.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_TRUE(foundErrors);
@@ -2082,230 +2080,235 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
-    HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    HeatBalanceManager::GetZoneData(foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
+    SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
+    EXPECT_FALSE(foundErrors);                               // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
-    DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.files);
-    ScheduleManager::ScheduleInputProcessed = true;
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 1;
-    DataGlobals::PreviousHour = 1;
-    DataEnvironment::Month = 1;
-    DataEnvironment::DayOfMonth = 21;
-    DataGlobals::HourOfDay = 1;
-    DataEnvironment::DSTIndicator = 0;
-    DataEnvironment::DayOfWeek = 2;
-    DataEnvironment::HolidayIndex = 0;
-    DataEnvironment::CurMnDy = "01/21";
-    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
-    ScheduleManager::UpdateScheduleValues();
-    InternalHeatGains::GetInternalHeatGainsInput(state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->PreviousHour = 1;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->CurMnDy = "01/21";
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues(*state);
+    InternalHeatGains::GetInternalHeatGainsInput(*state);
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
 
-    GetDaylightingParametersInput(state.files);
+    GetDaylightingParametersInput(*state);
     compare_err_stream("");
-    EXPECT_EQ(4, TotRefPoints);
+    EXPECT_EQ(4, state->dataDaylightingData->TotRefPoints);
 
-    EXPECT_NEAR(2.048, ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(3.048, ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(2.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataHeatBalance::Zone(1).RelNorth = 45.;
+    state->dataHeatBal->Zone(1).RelNorth = 45.;
 
-    GeometryTransformForDaylighting();
+    GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.603, ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(0.707, ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.603, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(0.707, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
-    DataHeatBalance::Zone(1).RelNorth = 90.;
+    state->dataHeatBal->Zone(1).RelNorth = 90.;
 
-    GeometryTransformForDaylighting();
+    GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.048, ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(-2.048, ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(1, 1), 0.001);
+    EXPECT_NEAR(-2.048, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(2, 1), 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 1), 0.001);
 
     // reset eio stream
     EXPECT_TRUE(has_eio_output(true));
     EXPECT_FALSE(has_dfs_output(true));
 
-    DataGlobals::BeginSimFlag = true;
-    DataGlobals::WeightNow = 1.0;
-    DataGlobals::WeightPreviousHour = 0.0;
-    CalcDayltgCoefficients(state.files);
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->WeightNow = 1.0;
+    state->dataGlobal->WeightPreviousHour = 0.0;
+    CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
     // zone 1 has only 1 daylighting reference point
-    DayltgInteriorIllum(zoneNum);
+    DayltgInteriorIllum(*state, zoneNum);
     zoneNum += 1;
     // zone 2 has 2 daylighting reference points and will crash if not dimensioned appropriately.
-    DayltgInteriorIllum(zoneNum);
+    DayltgInteriorIllum(*state, zoneNum);
 
     // EIO/DFS output uses specifically newline `\n`, so pass that in or on Windows it'll use '\r\n`
     std::string const delim = "\n";
 
-    std::string const eiooutput = delimited_string({
-        "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
-        "Zone/Window Adjacency Daylighting Counts, WEST ZONE,2,-1",
-        "Zone/Window Adjacency Daylighting Counts, EAST ZONE,2,-1",
-        "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
-        "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
-        "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
-        "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor",
-        " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
-        " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
-    }, delim);
+    std::string const eiooutput = delimited_string(
+        {
+            "! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones",
+            "Zone/Window Adjacency Daylighting Counts, WEST ZONE,2,-1",
+            "Zone/Window Adjacency Daylighting Counts, EAST ZONE,2,-1",
+            "! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent Zone Names - 1st 100 (max)",
+            "Zone/Window Adjacency Daylighting Matrix, WEST ZONE,0",
+            "Zone/Window Adjacency Daylighting Matrix, EAST ZONE,0",
+            "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Reference Point, Daylight Factor",
+            " Sky Daylight Factors,Clear Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,WEST ZONE,ZN001:WALL001:WIN001,WEST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Clear Turbid Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Intermediate Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT1,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT2,0.0000",
+            " Sky Daylight Factors,Overcast Sky,01/21,EAST ZONE,ZN002:WALL001:WIN001,EAST ZONE_DAYLREFPT3,0.0000",
+        },
+        delim);
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    std::string const dfsoutput = delimited_string({
+    std::string const dfsoutput = delimited_string(
+        {
 
-        "This file contains daylight factors for all exterior windows of daylight zones.",
-        "MonthAndDay,Zone Name,Window Name,Window State",
-        "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight Factor for Overcast Sky",
-        "01/21,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
-        "1,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "2,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "3,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "4,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "5,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "6,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "7,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "8,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "9,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "10,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "11,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "12,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "13,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "14,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "15,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "16,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "17,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "18,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "19,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "20,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "21,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "22,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "23,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "24,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "01/21,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
-        "1,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "1,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "1,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "2,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "2,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "2,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "3,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "3,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "3,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "4,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "4,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "4,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "5,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "5,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "5,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "6,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "6,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "6,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "7,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "7,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "7,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "8,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "8,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "8,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "9,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "9,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "9,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "10,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "10,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "10,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "11,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "11,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "11,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "12,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "12,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "12,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "13,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "13,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "13,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "14,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "14,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "14,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "15,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "15,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "15,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "16,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "16,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "16,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "17,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "17,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "17,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "18,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "18,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "18,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "19,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "19,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "19,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "20,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "20,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "20,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "21,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "21,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "21,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "22,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "22,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "22,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "23,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "23,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "23,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-        "24,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
-        "24,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
-        "24,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
-    }, delim);
+            "This file contains daylight factors for all exterior windows of daylight zones.",
+            "MonthAndDay,Zone Name,Window Name,Window State",
+            "Hour,Reference Point,Daylight Factor for Clear Sky,Daylight Factor for Clear Turbid Sky,Daylight Factor for Intermediate Sky,Daylight "
+            "Factor for Overcast Sky",
+            "01/21,WEST ZONE,ZN001:WALL001:WIN001,Base Window",
+            "1,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "2,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "3,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "4,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "5,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "6,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "7,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "8,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "9,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "10,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "11,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "12,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "13,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "14,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "15,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "16,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "17,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "18,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "19,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "20,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "21,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "22,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "23,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "24,WEST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "01/21,EAST ZONE,ZN002:WALL001:WIN001,Base Window",
+            "1,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "1,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "1,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "2,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "2,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "2,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "3,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "3,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "3,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "4,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "4,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "4,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "5,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "5,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "5,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "6,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "6,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "6,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "7,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "7,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "7,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "8,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "8,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "8,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "9,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "9,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "9,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "10,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "10,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "10,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "11,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "11,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "11,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "12,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "12,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "12,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "13,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "13,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "13,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "14,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "14,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "14,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "15,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "15,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "15,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "16,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "16,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "16,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "17,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "17,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "17,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "18,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "18,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "18,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "19,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "19,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "19,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "20,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "20,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "20,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "21,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "21,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "21,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "22,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "22,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "22,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "23,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "23,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "23,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+            "24,EAST ZONE_DAYLREFPT1,0.00000,0.00000,0.00000,0.00000",
+            "24,EAST ZONE_DAYLREFPT2,0.00000,0.00000,0.00000,0.00000",
+            "24,EAST ZONE_DAYLREFPT3,0.00000,0.00000,0.00000,0.00000",
+        },
+        delim);
 
     EXPECT_TRUE(compare_dfs_stream(dfsoutput, true));
 }
@@ -2827,43 +2830,45 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     ASSERT_TRUE(process_idf(idf_objects));
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
-    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
-    HeatBalanceManager::GetConstructData(state.files, foundErrors); // read construction data
+    HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
-    HeatBalanceManager::GetZoneData(foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
-    SurfaceGeometry::CosZoneRelNorth.allocate(2);
-    SurfaceGeometry::SinZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    SurfaceGeometry::CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosZoneRelNorth(2) = std::cos(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::SinZoneRelNorth(2) = std::sin(-DataHeatBalance::Zone(2).RelNorth * DataGlobals::DegToRadians);
-    SurfaceGeometry::CosBldgRelNorth = 1.0;
-    SurfaceGeometry::SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(2) = std::cos(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(state, foundErrors); // this calls GetSurfaceData()
-    EXPECT_FALSE(foundErrors);                       // expect no errors
-    HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
+    SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
+    EXPECT_FALSE(foundErrors);                               // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    dataConstruction.Construct(Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
-    DaylightingDevices::GetTDDInput();
-    CalcDayltgCoefficients(state.files);
+    state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
+    DaylightingDevices::GetTDDInput(*state);
+    CalcDayltgCoefficients(*state);
 
     std::string const error_string = delimited_string({
-      "   ** Warning ** DaylightingDevice:Tubular = PIPE1:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.",
-      "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.",
+        "   ** Warning ** DaylightingDevice:Tubular = PIPE1:  is not connected to a Zone that has Daylighting, no visible transmittance will be "
+        "modeled through the daylighting device.",
+        "   ** Warning ** DaylightingDevice:Tubular = PIPE2:  is not connected to a Zone that has Daylighting, no visible transmittance will be "
+        "modeled through the daylighting device.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }

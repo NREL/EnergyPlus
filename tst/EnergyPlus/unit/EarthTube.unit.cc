@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,17 +52,15 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/EarthTube.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EarthTube;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace ObjexxFCL;
-using namespace DataGlobals;
 using namespace EnergyPlus::DataEnvironment;
 
 namespace EnergyPlus {
@@ -78,32 +76,32 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
     int ZNnum = 1;
 
     // Set environmental variables for all cases
-    OutHumRat = 0.009;
-    OutBaroPress = 101400.0;
+    state->dataEnvrn->OutHumRat = 0.009;
+    state->dataEnvrn->OutBaroPress = 101400.0;
 
     // Allocate and set earth tube parameters necessary to run the tests
-    EarthTubeSys.allocate(ETnum);
-    EarthTubeSys(ETnum).InsideAirTemp = 21.0;
-    EarthTubeSys(ETnum).FanType = NaturalEarthTube;
-    EarthTubeSys(ETnum).AirTemp = 20.0;
-    EarthTubeSys(ETnum).FanPower = 0.05;
+    state->dataEarthTube->EarthTubeSys.allocate(ETnum);
+    state->dataEarthTube->EarthTubeSys(ETnum).InsideAirTemp = 21.0;
+    state->dataEarthTube->EarthTubeSys(ETnum).FanType = EarthTubeVentilation::Natural;
+    state->dataEarthTube->EarthTubeSys(ETnum).AirTemp = 20.0;
+    state->dataEarthTube->EarthTubeSys(ETnum).FanPower = 0.05;
 
     // Allocate and set any zone variables necessary to run the tests
-    MCPE.allocate(ZNnum);
-    MCPTE.allocate(ZNnum);
-    EAMFL.allocate(ZNnum);
-    EAMFLxHumRat.allocate(ZNnum);
-    MCPE(ZNnum) = 0.05;
-    EAMFL(ZNnum) = 0.05;
+    state->dataHeatBalFanSys->MCPE.allocate(ZNnum);
+    state->dataHeatBalFanSys->MCPTE.allocate(ZNnum);
+    state->dataHeatBalFanSys->EAMFL.allocate(ZNnum);
+    state->dataHeatBalFanSys->EAMFLxHumRat.allocate(ZNnum);
+    state->dataHeatBalFanSys->MCPE(ZNnum) = 0.05;
+    state->dataHeatBalFanSys->EAMFL(ZNnum) = 0.05;
 
     // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
-    CalcEarthTubeHumRat(ETnum, ZNnum);
-    EXPECT_EQ(EarthTubeSys(ETnum).HumRat, OutHumRat);
+    CalcEarthTubeHumRat(*state, ETnum, ZNnum);
+    EXPECT_EQ(state->dataEarthTube->EarthTubeSys(ETnum).HumRat, state->dataEnvrn->OutHumRat);
 
     // Second case--condensation so inside humidity should be less than outdoor humidity ratio
-    EarthTubeSys(ETnum).InsideAirTemp = 10.0;
-    CalcEarthTubeHumRat(ETnum, ZNnum);
-    EXPECT_GT(OutHumRat, EarthTubeSys(ETnum).HumRat);
+    state->dataEarthTube->EarthTubeSys(ETnum).InsideAirTemp = 10.0;
+    CalcEarthTubeHumRat(*state, ETnum, ZNnum);
+    EXPECT_GT(state->dataEnvrn->OutHumRat, state->dataEarthTube->EarthTubeSys(ETnum).HumRat);
 }
 
 TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
@@ -118,23 +116,23 @@ TEST_F(EnergyPlusFixture, EarthTube_CheckEarthTubesInZonesTest)
     bool ErrorsFound = false;
 
     // Allocate and set earth tube parameters necessary to run the tests
-    TotEarthTube = 3;
-    EarthTubeSys.allocate(TotEarthTube);
-    EarthTubeSys(1).ZonePtr = 1;
-    EarthTubeSys(2).ZonePtr = 2;
-    EarthTubeSys(3).ZonePtr = 3;
+    state->dataEarthTube->TotEarthTube = 3;
+    state->dataEarthTube->EarthTubeSys.allocate(state->dataEarthTube->TotEarthTube);
+    state->dataEarthTube->EarthTubeSys(1).ZonePtr = 1;
+    state->dataEarthTube->EarthTubeSys(2).ZonePtr = 2;
+    state->dataEarthTube->EarthTubeSys(3).ZonePtr = 3;
 
     // First case--no conflicts, only one earth tube per zone (ErrorsFound = false)
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
+    CheckEarthTubesInZones(*state, ZoneName, InputName, ErrorsFound);
     EXPECT_EQ(ErrorsFound, false);
 
     // Second case--conflict with the last earth tube and first (ErrorsFound = true)
-    EarthTubeSys(3).ZonePtr = 1;
-    CheckEarthTubesInZones(ZoneName, InputName, ErrorsFound);
+    state->dataEarthTube->EarthTubeSys(3).ZonePtr = 1;
+    CheckEarthTubesInZones(*state, ZoneName, InputName, ErrorsFound);
     EXPECT_EQ(ErrorsFound, true);
 
-    EarthTubeSys.deallocate();
-    TotEarthTube = 0;
+    state->dataEarthTube->EarthTubeSys.deallocate();
+    state->dataEarthTube->TotEarthTube = 0;
 }
 
 } // namespace EnergyPlus

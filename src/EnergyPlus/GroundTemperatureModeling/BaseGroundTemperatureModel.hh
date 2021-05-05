@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,9 +51,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Base class
 class BaseGroundTempsModel
@@ -76,24 +78,26 @@ public:
     }
 
     // Virtual method for retrieving the ground temp
-    virtual Real64 getGroundTemp() = 0;
+    virtual Real64 getGroundTemp(EnergyPlusData &state) = 0;
 
-    virtual Real64 getGroundTempAtTimeInSeconds(Real64 const, Real64 const) = 0;
+    virtual Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const, Real64 const) = 0;
 
-    virtual Real64 getGroundTempAtTimeInMonths(Real64 const, int const) = 0;
+    virtual Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const, int const) = 0;
 
 protected:
     static void write_ground_temps(InputOutputFile &os, const std::string &name, const Array1D<Real64> &data)
     {
         print(os,
-              "! <Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{C}},Nov{{C}},Dec{{C}}\n", name);
+              "! "
+              "<Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{C}},Nov{{C}},Dec{{C}"
+              "}\n",
+              name);
         print(os, " Site:GroundTemperature:{}", name);
         for (int i = 1; i <= 12; ++i) {
             print(os, ", {:6.2F}", data(i));
         }
         print(os, "\n");
     }
-
 };
 
 } // namespace EnergyPlus

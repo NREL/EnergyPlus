@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,92 +49,93 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
-#include "Fixtures/EnergyPlusFixture.hh"
 using namespace EnergyPlus;
 using namespace EnergyPlus::Psychrometrics;
 
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: TEMP. IS FROM  20 C  TO   40 C
     Real64 H = 7.5223e4 - 1.78637e4;
     Real64 PB = 1.01325e5;
-    Real64 result = PsyTsatFnHPb_raw(H, PB);
+    Real64 result = PsyTsatFnHPb_raw(*state, H, PB);
     Real64 actual_result = 20.0;
     EXPECT_NEAR(actual_result, result, 0.001);
 
     // Test 2: Cache version of the function - first call
-    Real64 cache_miss_result = PsyTsatFnHPb(H, PB);
+    Real64 cache_miss_result = PsyTsatFnHPb(*state, H, PB);
     EXPECT_NEAR(actual_result, cache_miss_result, 0.001);
 
     // Test 3: TEMP. IS FROM   0 C  TO   20 C
     H = 2.7298e4 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = 0.0;
     EXPECT_NEAR(actual_result, result, 0.001);
 
     // Test 4: TEMP. IS FROM   -20 C  TO   0 C
     H = -6.7011e2 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = -20.0;
     EXPECT_NEAR(actual_result, result, 0.001);
 
     // Test 5: TEMP. IS FROM   -40 C  TO   -20 C
     H = -2.21379e4 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = -40.0;
     EXPECT_NEAR(actual_result, result, 0.001);
 
     // Test 6: TEMP. IS FROM   -60 C  TO   -40 C
     H = -4.2399e4 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = -60.0;
     EXPECT_NEAR(actual_result, result, 0.1);
 
     // Test 7: TEMP. IS <  -60 C
     H = -5.2399e4 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = -60.0;
     EXPECT_NEAR(actual_result, result, 0.1);
 
     // Test 8: TEMP. IS FROM   40 C  TO   60 C
     H = 1.8379e5 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = 40.0;
     EXPECT_NEAR(actual_result, result, 0.001);
 
     // Test 9: Label90 - TEMP. IS FROM   60 C  TO   80 C
     H = 4.7577e5 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = 60.0;
     EXPECT_NEAR(actual_result, result, 0.001);
 
     // Test 10: Label100 - TEMP. IS FROM   80 C  TO   90 C
     H = 1.5445e6 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = 80.0;
     EXPECT_NEAR(actual_result, result, 0.001);
 
     // Test 11: Label110 - TEMP. IS FROM   90 C  TO   100 C
     H = 3.8353e6 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = 90.0;
     EXPECT_NEAR(actual_result, result, 0.001);
 
     // Test 12: TEMP > 100 C
     H = 4.5866e7 - 1.78637e4;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = 100.0;
     EXPECT_NEAR(actual_result, result, 1);
 
     // Test 13: PB != 1.0133e5
     H = 7.5223e4 - 1.78637e4;
     PB = 0.91325e5;
-    result = PsyTsatFnHPb_raw(H, PB);
+    result = PsyTsatFnHPb_raw(*state, H, PB);
     actual_result = 18.819;
     EXPECT_NEAR(actual_result, result, 0.001);
 
@@ -142,41 +143,41 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnHPb_Test)
     H = 7.5223e4 - 1.78637e4;
     PB = 1.0133e5;
     actual_result = 20.0;
-    Real64 cache_hit_result = PsyTsatFnHPb(H, PB);
+    Real64 cache_hit_result = PsyTsatFnHPb(*state, H, PB);
     EXPECT_NEAR(actual_result, cache_hit_result, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTsatFnPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: general
     Real64 PB = 101325.0;
-    Real64 result = PsyTsatFnPb_raw(PB);
+    Real64 result = PsyTsatFnPb_raw(*state, PB);
     Real64 actual_result = 99.974;
     EXPECT_NEAR(actual_result, result, 0.001);
 
     // Test 2: Cache version of the function - first call
     PB = 101325.0;
-    Real64 cache_result = PsyTsatFnPb(PB);
+    Real64 cache_result = PsyTsatFnPb(*state, PB);
     EXPECT_NEAR(actual_result, cache_result, 0.001);
 
     // Test 3: upper bound
     PB = 1555000.0;
-    result = PsyTsatFnPb_raw(PB);
+    result = PsyTsatFnPb_raw(*state, PB);
     actual_result = 200.0;
     EXPECT_DOUBLE_EQ(actual_result, result);
 
     // Test 4: lower bound
     PB = 0.0017;
-    result = PsyTsatFnPb_raw(PB);
+    result = PsyTsatFnPb_raw(*state, PB);
     actual_result = -100.0;
     EXPECT_DOUBLE_EQ(actual_result, result);
 
     // Test 5: zero
     PB = 611.1;
-    result = PsyTsatFnPb_raw(PB);
+    result = PsyTsatFnPb_raw(*state, PB);
     actual_result = 0.0;
     EXPECT_DOUBLE_EQ(actual_result, result);
 
@@ -195,7 +196,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     Real64 W;
 
     TDP = 99.0;
-    W = Psychrometrics::PsyWFnTdpPb(TDP, PB);
+    W = Psychrometrics::PsyWFnTdpPb(*state, TDP, PB);
 
     EXPECT_NEAR(17.5250143, W, 0.0001);
 
@@ -208,7 +209,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     });
 
     TDP = 100.0;
-    W = Psychrometrics::PsyWFnTdpPb(TDP, PB);
+    W = Psychrometrics::PsyWFnTdpPb(*state, TDP, PB);
     EXPECT_NEAR(17.5250143, W, 0.0001);
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
@@ -221,8 +222,9 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
         "   **   ~~~   **  Dew-Point= 100.00 Barometric Pressure= 81000.00",
         "   **   ~~~   ** Instead, calculated Humidity Ratio at 93.0 (7 degree less) = 20.0794 will be used. Simulation continues.",
     });
-    Psychrometrics::iPsyErrIndex(5) = 0;
-    W = Psychrometrics::PsyWFnTdpPb(TDP, PB);
+    state->dataPsychrometrics->iPsyErrIndex(5) = 0;
+
+    W = Psychrometrics::PsyWFnTdpPb(*state, TDP, PB);
     EXPECT_NEAR(20.07942181, W, 0.0001);
     EXPECT_TRUE(compare_err_stream(error_string1, true));
 }
@@ -273,7 +275,7 @@ inline Real64 PsyCpAirFnWTdb(Real64 const dw, // humidity ratio {kgWater/kgDryAi
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: analytical PsyCpAirFnW is independent of temperature
     Real64 W = 0.0080;
@@ -344,7 +346,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: dry cooling process test, delta enthalpy vs cpair times delta T
     Real64 W1 = 0.0030;
@@ -389,29 +391,28 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test when wet bulb temperature is below zero
-    Real64 TDB = 1; // C
+    Real64 TDB = 1;   // C
     Real64 W = 0.002; // Kg.water/Kg.dryair
     Real64 Pb = 101325.0;
-    Real64 result = PsyTwbFnTdbWPb(TDB, W, Pb);
+    Real64 result = PsyTwbFnTdbWPb(*state, TDB, W, Pb);
     Real64 expected_result = -2.200; // expected result from psychrometrics chart
     EXPECT_NEAR(result, expected_result, 0.001);
-
 }
 
 TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
 {
 
-    InitializePsychRoutines();
+    InitializePsychRoutines(*state);
 
     // Test 1: heating process, constant humidity ratio
     Real64 W1 = 0.0030;
     Real64 W2 = 0.0030;
-    Real64 CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
-    Real64 CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
-    Real64 CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    Real64 CpAirIn = PsyCpAirFnW(W1);                   // cp of air at state 1
+    Real64 CpAirOut = PsyCpAirFnW(W2);                  // cp of air at state 2
+    Real64 CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2)); // cp of air at average humidity ratio
     Real64 CpAir_average = (CpAirIn + CpAirOut) / 2;
     ;
     // check heating results
@@ -422,9 +423,9 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
     // Test 2: cooling Processes, dehumidified air
     W1 = 0.010;
     W2 = 0.008;
-    CpAirIn = PsyCpAirFnW(W1);           // cp of air at state 1
-    CpAirOut = PsyCpAirFnW(W2);          // cp of air at state 2
-    CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2));  // cp of air at average humidity ratio
+    CpAirIn = PsyCpAirFnW(W1);                   // cp of air at state 1
+    CpAirOut = PsyCpAirFnW(W2);                  // cp of air at state 2
+    CpAir_result = PsyCpAirFnW(0.5 * (W1 + W2)); // cp of air at average humidity ratio
     CpAir_average = (CpAirIn + CpAirOut) / 2;
     ;
     // check cooling results

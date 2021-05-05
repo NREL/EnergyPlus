@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,41 +48,24 @@
 #ifndef GlobalNames_hh_INCLUDED
 #define GlobalNames_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_map>
+#include <unordered_set>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <unordered_map>
-#include <unordered_set>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace GlobalNames {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumChillers;
-    extern int NumBoilers;
-    extern int NumBaseboards;
-    extern int NumCoils;
-    extern int CurMaxChillers;
-    extern int CurMaxBoilers;
-    extern int CurMaxBaseboards;
-    extern int CurMaxCoils;
-    extern int numAirDistUnits; // count of air distribution units
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
-
-    // Types
 
     struct ComponentNameData
     {
@@ -91,78 +74,93 @@ namespace GlobalNames {
         std::string CompName; // Component Name (user supplied)
 
         // Default Constructor
-        ComponentNameData()
-        {
-        }
+        ComponentNameData() = default;
     };
 
-    // Object Data
-    extern std::unordered_map<std::string, std::string> ChillerNames;
-    extern std::unordered_map<std::string, std::string> BoilerNames;
-    extern std::unordered_map<std::string, std::string> BaseboardNames;
-    extern std::unordered_map<std::string, std::string> CoilNames;
-    extern std::unordered_map<std::string, std::string> aDUNames;
-
-    // Functions
-
-    // for unit tests
-    void clear_state();
-
-    void IntraObjUniquenessCheck(std::string &NameToVerify,
+    void IntraObjUniquenessCheck(EnergyPlusData &state,
+                                 std::string &NameToVerify,
                                  std::string const &CurrentModuleObject,
                                  std::string const &FieldName,
                                  std::unordered_set<std::string> &UniqueStrings,
-                                 bool &ErrorsFound
-    );
+                                 bool &ErrorsFound);
 
-    bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
+    bool VerifyUniqueInterObjectName(EnergyPlusData &state,
+                                     std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
                                      std::string const &object_type,
                                      std::string const &field_name,
-                                     bool &ErrorsFound
-    );
+                                     bool &ErrorsFound);
 
-    bool VerifyUniqueInterObjectName(std::unordered_map<std::string, std::string> &names,
+    bool VerifyUniqueInterObjectName(EnergyPlusData &state,
+                                     std::unordered_map<std::string, std::string> &names,
                                      std::string &object_name,
                                      std::string const &object_type,
-                                     bool &ErrorsFound
-    );
+                                     bool &ErrorsFound);
 
-    void
-    VerifyUniqueChillerName(std::string const &TypeToVerify,
-                            std::string const &NameToVerify,
-                            bool &ErrorsFound,                   // returns true if duplicate name found, unchanged otherwise
-                            std::string const &StringToDisplay);
+    void VerifyUniqueChillerName(EnergyPlusData &state,
+                                 std::string const &TypeToVerify,
+                                 std::string const &NameToVerify,
+                                 bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
+                                 std::string const &StringToDisplay);
 
-    void
-    VerifyUniqueBaseboardName(std::string const &TypeToVerify,
-                              std::string const &NameToVerify,
-                              bool &ErrorsFound,                 // returns true if duplicate name found, unchanged otherwise
+    void VerifyUniqueBaseboardName(EnergyPlusData &state,
+                                   std::string const &TypeToVerify,
+                                   std::string const &NameToVerify,
+                                   bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
+                                   std::string const &StringToDisplay);
+
+    void VerifyUniqueBoilerName(EnergyPlusData &state,
+                                std::string const &TypeToVerify,
+                                std::string const &NameToVerify,
+                                bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
+                                std::string const &StringToDisplay);
+
+    void VerifyUniqueCoilName(EnergyPlusData &state,
+                              std::string const &TypeToVerify,
+                              std::string &NameToVerify,
+                              bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
                               std::string const &StringToDisplay);
 
-    void
-    VerifyUniqueBoilerName(std::string const &TypeToVerify,
-                           std::string const &NameToVerify,
-                           bool &ErrorsFound,                    // returns true if duplicate name found, unchanged otherwise
-                           std::string const &StringToDisplay);
-
-    void
-    VerifyUniqueCoilName(std::string const &TypeToVerify,
-                         std::string &NameToVerify,
-                         bool &ErrorsFound,                      // returns true if duplicate name found, unchanged otherwise
-                         std::string const &StringToDisplay);
-
-    void
-    VerifyUniqueADUName(std::string const &TypeToVerify,
-                        std::string const &NameToVerify,
-                        bool &ErrorsFound,                       // returns true if duplicate name found, unchanged otherwise
-                        std::string const &StringToDisplay);
-
-    // Clears the global data in GlobalNames.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
+    void VerifyUniqueADUName(EnergyPlusData &state,
+                             std::string const &TypeToVerify,
+                             std::string const &NameToVerify,
+                             bool &ErrorsFound, // returns true if duplicate name found, unchanged otherwise
+                             std::string const &StringToDisplay);
 
 } // namespace GlobalNames
+
+struct GlobalNamesData : BaseGlobalStruct
+{
+
+    int NumChillers = 0;
+    int NumBoilers = 0;
+    int NumBaseboards = 0;
+    int NumCoils = 0;
+    int CurMaxChillers = 0;
+    int CurMaxCoils = 0;
+    int numAirDistUnits = 0;
+    std::unordered_map<std::string, std::string> ChillerNames;
+    std::unordered_map<std::string, std::string> BoilerNames;
+    std::unordered_map<std::string, std::string> BaseboardNames;
+    std::unordered_map<std::string, std::string> CoilNames;
+    std::unordered_map<std::string, std::string> aDUNames;
+
+    void clear_state() override
+    {
+        this->NumChillers = 0;
+        this->NumBoilers = 0;
+        this->NumBaseboards = 0;
+        this->NumCoils = 0;
+        this->CurMaxChillers = 0;
+        this->CurMaxCoils = 0;
+        this->numAirDistUnits = 0;
+        this->ChillerNames.clear();
+        this->BoilerNames.clear();
+        this->BaseboardNames.clear();
+        this->CoilNames.clear();
+        this->aDUNames.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

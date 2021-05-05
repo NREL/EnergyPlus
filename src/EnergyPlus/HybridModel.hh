@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HybridModel {
 
@@ -65,11 +69,6 @@ namespace HybridModel {
     // MODULE PARAMETER DEFINITIONS
 
     // MODULE VARIABLE TYPE DECLARATIONS:
-    extern bool FlagHybridModel;    // True if hybrid model is activated
-    extern bool FlagHybridModel_TM;   // User input IM option - True if hybrid model (thermal mass) is activated
-    extern bool FlagHybridModel_AI; // User input IM option - True if hybrid model (air infiltration) is activated
-    extern bool FlagHybridModel_PC;   // User input IM option - True if hybrid model (people count) is activated
-    extern int NumOfHybridModelZones; // Number of hybrid model zones in the model
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -124,15 +123,37 @@ namespace HybridModel {
     };
 
     // Object Data
-    extern Array1D<HybridModelProperties> HybridModelZone;
 
     // Functions
 
-    void GetHybridModelZone();
-
-    void clear_state();
+    void GetHybridModelZone(EnergyPlusData &state);
 
 } // namespace HybridModel
+
+struct HybridModelData : BaseGlobalStruct
+{
+
+    bool FlagHybridModel = false;    // True if hybrid model is activated
+    bool FlagHybridModel_TM = false; // User input IM option - True if hybrid model (thermal mass) is activated
+    bool FlagHybridModel_AI = false; // User input IM option - True if hybrid model (air infiltration) is activated
+    bool FlagHybridModel_PC = false; // User input IM option - True if hybrid model (people count) is activated
+
+    int NumOfHybridModelZones = 0;   // Number of hybrid model zones in the model
+    std::string CurrentModuleObject; // to assist in getting input
+
+    Array1D<HybridModel::HybridModelProperties> HybridModelZone;
+
+    void clear_state() override
+    {
+        this->FlagHybridModel = false;
+        this->FlagHybridModel_TM = false;
+        this->FlagHybridModel_AI = false;
+        this->FlagHybridModel_PC = false;
+        this->NumOfHybridModelZones = 0;
+        this->CurrentModuleObject.clear();
+        this->HybridModelZone.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

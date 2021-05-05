@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,28 +56,38 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/PVWattsSSC.hh>
+
+// SAM Headers
+//#include <../third_party/ssc/shared/lib_irradproc.h>
+//#include <../third_party/ssc/shared/lib_pvwatts.h>
+//#include <../third_party/ssc/shared/lib_pvshade.h>
+//#include <../third_party/ssc/shared/lib_pv_incidence_modifier.h>
+#include <../third_party/ssc/ssc/sscapi.h>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PVWatts {
 
     enum class ModuleType
     {
-        STANDARD,
-        PREMIUM,
-        THIN_FILM,
+        STANDARD = 0,
+        PREMIUM = 1,
+        THIN_FILM = 2,
     };
 
     enum class ArrayType
     {
-        FIXED_OPEN_RACK,
-        FIXED_ROOF_MOUNTED,
-        ONE_AXIS,
-        ONE_AXIS_BACKTRACKING,
-        TWO_AXIS,
+        FIXED_OPEN_RACK = 0,
+        FIXED_ROOF_MOUNTED = 1,
+        ONE_AXIS = 2,
+        ONE_AXIS_BACKTRACKING = 3,
+        TWO_AXIS = 4,
     };
 
     enum class GeometryType
@@ -143,29 +153,26 @@ namespace PVWatts {
         Real64 m_azimuth;
         int m_surfaceNum;
         Real64 m_groundCoverageRatio;
-
-        // Internal properties and data structures
-        Real64 m_gamma;
-        bool m_useARGlass;
-        int m_trackMode;
-        Real64 m_inoct;
-        int m_shadeMode1x;
-        std::unique_ptr<pvwatts_celltemp> m_tccalc;
-
-        // State variables
-        Real64 m_lastCellTemperature;        // last cell temperature
-        Real64 m_lastPlaneOfArrayIrradiance; // last cell plane of array irradiance
-        Real64 m_cellTemperature;
-        Real64 m_planeOfArrayIrradiance;
+        Real64 m_DCtoACRatio;
+        Real64 m_inverterEfficiency;
 
         // Output variables
         Real64 m_outputDCPower;
         Real64 m_outputDCEnergy;
+        Real64 m_outputACPower;
+        Real64 m_outputACEnergy;
+        Real64 m_cellTemperature;
+        Real64 m_planeOfArrayIrradiance;
+        Real64 m_shadedPercent;
+
+        ssc_module_t m_pvwattsModule;
+        ssc_data_t m_pvwattsData;
 
     public:
-        static PVWattsGenerator createFromIdfObj(int objNum);
+        static PVWattsGenerator createFromIdfObj(EnergyPlusData &state, int objNum);
 
-        PVWattsGenerator(const std::string &name,
+        PVWattsGenerator(EnergyPlusData &state,
+                         const std::string &name,
                          const Real64 dcSystemCapacity,
                          ModuleType moduleType,
                          ArrayType arrayType,
@@ -176,7 +183,7 @@ namespace PVWatts {
                          size_t surfaceNum = 0,
                          Real64 groundCoverageRatio = 0.4);
 
-        void setupOutputVariables();
+        void setupOutputVariables(EnergyPlusData &state);
 
         Real64 getDCSystemCapacity();
         ModuleType getModuleType();
@@ -185,41 +192,36 @@ namespace PVWatts {
         GeometryType getGeometryType();
         Real64 getTilt();
         Real64 getAzimuth();
-        DataSurfaces::SurfaceData &getSurface();
+        DataSurfaces::SurfaceData &getSurface(EnergyPlusData &state);
         Real64 getGroundCoverageRatio();
 
-        Real64 getCellTempearture();
+        Real64 getCellTemperature();
         Real64 getPlaneOfArrayIrradiance();
         void setCellTemperature(Real64 cellTemp);
         void setPlaneOfArrayIrradiance(Real64 poa);
 
-        void calc();
+        // Setters so we can store properties of the attached inverter.
+        void setDCtoACRatio(Real64 dc2ac);
+        void setInverterEfficiency(Real64 inverterEfficiency);
 
+        void calc(EnergyPlusData &state);
         void getResults(Real64 &GeneratorPower, Real64 &GeneratorEnergy, Real64 &ThermalPower, Real64 &ThermalEnergy);
-
-        IrradianceOutput processIrradiance(int year,
-                                           int month,
-                                           int day,
-                                           int hour,
-                                           Real64 minute,
-                                           Real64 ts_hour,
-                                           Real64 lat,
-                                           Real64 lon,
-                                           Real64 tz,
-                                           Real64 dn,
-                                           Real64 df,
-                                           Real64 alb);
-
-        DCPowerOutput powerout(Real64 &shad_beam, Real64 shad_diff, Real64 dni, Real64 alb, Real64 wspd, Real64 tdry, IrradianceOutput &irr_st);
     };
 
-    extern std::map<int, PVWattsGenerator> PVWattsGenerators;
-
-    PVWattsGenerator &GetOrCreatePVWattsGenerator(std::string const &GeneratorName);
-
-    void clear_state();
+    PVWattsGenerator &GetOrCreatePVWattsGenerator(EnergyPlusData &state, std::string const &GeneratorName);
 
 } // namespace PVWatts
+
+struct PVWattsData : BaseGlobalStruct
+{
+
+    std::map<int, PVWatts::PVWattsGenerator> PVWattsGenerators;
+
+    void clear_state() override
+    {
+        this->PVWattsGenerators.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,11 +51,11 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/PlantChillers.hh>
-
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantChillers.hh>
 
 using namespace EnergyPlus;
 using namespace PlantChillers;
@@ -63,74 +63,74 @@ using namespace PlantChillers;
 TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
 {
     // unit test for autosizing heat recovery in Chiller:CombustionTurbine
-    state.dataPlantChillers.GTChiller.allocate(1);
+    state->dataPlantChillers->GTChiller.allocate(1);
 
-    state.dataPlantChillers.GTChiller(1).SizFac = 1.0;
-    state.dataPlantChillers.GTChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
-    state.dataPlantChillers.GTChiller(1).HeatRecCapacityFraction = 0.5;
-    state.dataPlantChillers.GTChiller(1).HeatRecActive = true;
-    state.dataPlantChillers.GTChiller(1).CondenserType = DataPlant::CondenserType::WATERCOOLED;
-    state.dataPlantChillers.GTChiller(1).CWLoopNum = 1;
-    state.dataPlantChillers.GTChiller(1).CDLoopNum = 2;
-    state.dataPlantChillers.GTChiller(1).EvapVolFlowRate = 1.0;
-    state.dataPlantChillers.GTChiller(1).CondVolFlowRate = 1.0;
-    state.dataPlantChillers.GTChiller(1).NomCap = 10000;
-    state.dataPlantChillers.GTChiller(1).COP = 3.0;
-    state.dataPlantChillers.GTChiller(1).engineCapacityScalar = 1.0;
+    state->dataPlantChillers->GTChiller(1).SizFac = 1.0;
+    state->dataPlantChillers->GTChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
+    state->dataPlantChillers->GTChiller(1).HeatRecCapacityFraction = 0.5;
+    state->dataPlantChillers->GTChiller(1).HeatRecActive = true;
+    state->dataPlantChillers->GTChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
+    state->dataPlantChillers->GTChiller(1).CWLoopNum = 1;
+    state->dataPlantChillers->GTChiller(1).CDLoopNum = 2;
+    state->dataPlantChillers->GTChiller(1).EvapVolFlowRate = 1.0;
+    state->dataPlantChillers->GTChiller(1).CondVolFlowRate = 1.0;
+    state->dataPlantChillers->GTChiller(1).NomCap = 10000;
+    state->dataPlantChillers->GTChiller(1).COP = 3.0;
+    state->dataPlantChillers->GTChiller(1).engineCapacityScalar = 1.0;
 
-    DataPlant::PlantLoop.allocate(2);
-    DataSizing::PlantSizData.allocate(1);
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    state.dataPlantChillers.GTChiller(1).size();
+    state->dataPlantChillers->GTChiller(1).size(*state);
     // see if heat recovery flow rate is as expected
-    EXPECT_NEAR(state.dataPlantChillers.GTChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
+    EXPECT_NEAR(state->dataPlantChillers->GTChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
-    state.dataPlantChillers.GTChiller.deallocate();
-    DataSizing::PlantSizData.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataPlantChillers->GTChiller.deallocate();
+    state->dataSize->PlantSizData.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
 {
     // unit test for autosizing heat recovery in Chiller:EngineDriven
-    state.dataPlantChillers.EngineDrivenChiller.allocate(1);
+    state->dataPlantChillers->EngineDrivenChiller.allocate(1);
 
-    state.dataPlantChillers.EngineDrivenChiller(1).SizFac = 1.0;
-    state.dataPlantChillers.EngineDrivenChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
-    state.dataPlantChillers.EngineDrivenChiller(1).HeatRecCapacityFraction = 0.5;
-    state.dataPlantChillers.EngineDrivenChiller(1).HeatRecActive = true;
-    state.dataPlantChillers.EngineDrivenChiller(1).CondenserType = DataPlant::CondenserType::WATERCOOLED;
-    state.dataPlantChillers.EngineDrivenChiller(1).CWLoopNum = 1;
-    state.dataPlantChillers.EngineDrivenChiller(1).CDLoopNum = 2;
-    state.dataPlantChillers.EngineDrivenChiller(1).EvapVolFlowRate = 1.0;
-    state.dataPlantChillers.EngineDrivenChiller(1).CondVolFlowRate = 1.0;
-    state.dataPlantChillers.EngineDrivenChiller(1).NomCap = 10000;
-    state.dataPlantChillers.EngineDrivenChiller(1).COP = 3.0;
+    state->dataPlantChillers->EngineDrivenChiller(1).SizFac = 1.0;
+    state->dataPlantChillers->EngineDrivenChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
+    state->dataPlantChillers->EngineDrivenChiller(1).HeatRecCapacityFraction = 0.5;
+    state->dataPlantChillers->EngineDrivenChiller(1).HeatRecActive = true;
+    state->dataPlantChillers->EngineDrivenChiller(1).CondenserType = DataPlant::CondenserType::WaterCooled;
+    state->dataPlantChillers->EngineDrivenChiller(1).CWLoopNum = 1;
+    state->dataPlantChillers->EngineDrivenChiller(1).CDLoopNum = 2;
+    state->dataPlantChillers->EngineDrivenChiller(1).EvapVolFlowRate = 1.0;
+    state->dataPlantChillers->EngineDrivenChiller(1).CondVolFlowRate = 1.0;
+    state->dataPlantChillers->EngineDrivenChiller(1).NomCap = 10000;
+    state->dataPlantChillers->EngineDrivenChiller(1).COP = 3.0;
 
-    DataPlant::PlantLoop.allocate(2);
-    DataSizing::PlantSizData.allocate(1);
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(1).FluidIndex = 1;
-    DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    state.dataPlantChillers.EngineDrivenChiller(1).size();
+    state->dataPlantChillers->EngineDrivenChiller(1).size(*state);
     // see if heat recovery flow rate is as expected
-    EXPECT_NEAR(state.dataPlantChillers.EngineDrivenChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
+    EXPECT_NEAR(state->dataPlantChillers->EngineDrivenChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
-    state.dataPlantChillers.EngineDrivenChiller.deallocate();
-    DataSizing::PlantSizData.deallocate();
-    DataPlant::PlantLoop.deallocate();
+    state->dataPlantChillers->EngineDrivenChiller.deallocate();
+    state->dataSize->PlantSizData.deallocate();
+    state->dataPlnt->PlantLoop.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
@@ -223,10 +223,10 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EngineDrivenChillerSpecs::getInput(state, state.dataPlantChillers);
+    EngineDrivenChillerSpecs::getInput(*state);
 
-    EXPECT_EQ(1, state.dataPlantChillers.NumEngineDrivenChillers);
-    EXPECT_EQ(state.dataPlantChillers.EngineDrivenChiller(1).FuelType, "Diesel");
+    EXPECT_EQ(1, state->dataPlantChillers->NumEngineDrivenChillers);
+    EXPECT_EQ(state->dataPlantChillers->EngineDrivenChiller(1).FuelType, "Diesel");
 }
 
 TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
@@ -292,8 +292,8 @@ TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GTChillerSpecs::getInput(state.dataPlantChillers);
+    GTChillerSpecs::getInput(*state);
 
-    EXPECT_EQ(1, state.dataPlantChillers.NumGTChillers);
-    EXPECT_EQ(state.dataPlantChillers.GTChiller(1).FuelType, "NaturalGas");
+    EXPECT_EQ(1, state->dataPlantChillers->NumGTChillers);
+    EXPECT_EQ(state->dataPlantChillers->GTChiller(1).FuelType, "NaturalGas");
 }

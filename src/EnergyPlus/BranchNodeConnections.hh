@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,42 +58,47 @@
 namespace EnergyPlus {
 
 // Forward
+struct EnergyPlusData;
+
 namespace DataBranchNodeConnections {
     struct NodeConnectionDef;
 }
 
 namespace BranchNodeConnections {
 
-    void RegisterNodeConnection(int NodeNumber,                    // Number for this Node
+    void RegisterNodeConnection(EnergyPlusData &state,
+                                int NodeNumber,                          // Number for this Node
                                 std::string const &NodeName,             // Name of this Node
                                 std::string const &ObjectType,           // Type of object this Node is connected to (e.g. Chiller:Electric)
                                 std::string const &ObjectName,           // Name of object this Node is connected to (e.g. MyChiller)
                                 std::string const &ConnectionType,       // Connection Type for this Node (must be valid)
-                                int FluidStream,                   // Count on Fluid Streams
-                                bool IsParent,                     // True when node is a parent node
+                                int FluidStream,                         // Count on Fluid Streams
+                                bool IsParent,                           // True when node is a parent node
                                 bool &errFlag,                           // Will be True if errors already detected or if errors found here
                                 Optional_string_const InputFieldName = _ // Input Field Name
     );
 
-    void OverrideNodeConnectionType(int NodeNumber,              // Number for this Node
+    void OverrideNodeConnectionType(EnergyPlusData &state,
+                                    int NodeNumber,                    // Number for this Node
                                     std::string const &NodeName,       // Name of this Node
                                     std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
                                     std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
                                     std::string const &ConnectionType, // Connection Type for this Node (must be valid)
-                                    int FluidStream,             // Count on Fluid Streams
-                                    bool IsParent,               // True when node is a parent node
+                                    int FluidStream,                   // Count on Fluid Streams
+                                    bool IsParent,                     // True when node is a parent node
                                     bool &errFlag                      // Will be True if errors already detected or if errors found here
     );
 
     bool IsValidConnectionType(std::string const &ConnectionType);
 
-    void CheckNodeConnections(bool &ErrorsFound);
+    void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound);
 
-    bool IsParentObject(std::string const &ComponentType, std::string const &ComponentName);
+    bool IsParentObject(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int WhichParentSet(std::string const &ComponentType, std::string const &ComponentName);
+    int WhichParentSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    void GetParentData(std::string const &ComponentType,
+    void GetParentData(EnergyPlusData &state,
+                       std::string const &ComponentType,
                        std::string const &ComponentName,
                        std::string &InletNodeName,
                        int &InletNodeNum,
@@ -101,15 +106,16 @@ namespace BranchNodeConnections {
                        int &OutletNodeNum,
                        bool &ErrorsFound);
 
-    bool IsParentObjectCompSet(std::string const &ComponentType, std::string const &ComponentName);
+    bool IsParentObjectCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int WhichCompSet(std::string const &ComponentType, std::string const &ComponentName);
+    int WhichCompSet(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    int GetNumChildren(std::string const &ComponentType, std::string const &ComponentName);
+    int GetNumChildren(EnergyPlusData &state, std::string const &ComponentType, std::string const &ComponentName);
 
-    void GetComponentData(std::string const &ComponentType,
+    void GetComponentData(EnergyPlusData &state,
+                          std::string const &ComponentType,
                           std::string const &ComponentName,
-                          bool &IsParent,                    // true or false
+                          bool &IsParent, // true or false
                           int &NumInlets,
                           Array1D_string &InletNodeNames,
                           Array1D_int &InletNodeNums,
@@ -118,10 +124,11 @@ namespace BranchNodeConnections {
                           Array1D_string &OutletNodeNames,
                           Array1D_int &OutletNodeNums,
                           Array1D_int &OutletFluidStreams,
-                          bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
+                          bool &ErrorsFound // set to true if errors found, unchanged otherwise
     );
 
-    void GetChildrenData(std::string const &ComponentType,
+    void GetChildrenData(EnergyPlusData &state,
+                         std::string const &ComponentType,
                          std::string const &ComponentName,
                          int &NumChildren,
                          Array1D_string &ChildrenCType,
@@ -132,7 +139,8 @@ namespace BranchNodeConnections {
                          Array1D_int &OutletNodeNum,
                          bool &ErrorsFound);
 
-    void SetUpCompSets(std::string const &ParentType,        // Parent Object Type
+    void SetUpCompSets(EnergyPlusData &state,
+                       std::string const &ParentType,        // Parent Object Type
                        std::string const &ParentName,        // Parent Object Name
                        std::string const &CompType,          // Component Type
                        std::string const &CompName,          // Component Name
@@ -141,18 +149,19 @@ namespace BranchNodeConnections {
                        Optional_string_const Description = _ // Description
     );
 
-    void TestInletOutletNodes(bool &ErrorsFound);
+    void TestInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
 
-    void TestCompSet(std::string const &CompType,   // Component Type
+    void TestCompSet(EnergyPlusData &state,
+                     std::string const &CompType,   // Component Type
                      std::string const &CompName,   // Component Name
                      std::string const &InletNode,  // Inlet Node Name
                      std::string const &OutletNode, // Outlet Node Name
                      std::string const &Description // Description of Node Pair (for warning message)
     );
 
-    void TestCompSetInletOutletNodes(bool &ErrorsFound);
+    void TestCompSetInletOutletNodes(EnergyPlusData &state, bool &ErrorsFound);
 
-    void GetNodeConnectionType(int NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
+    void GetNodeConnectionType(EnergyPlusData &state, int NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
 
     void FindAllNodeNumbersInList(int WhichNumber,
                                   Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
