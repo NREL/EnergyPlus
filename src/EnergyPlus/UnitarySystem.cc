@@ -519,9 +519,7 @@ namespace UnitarySystems {
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys = true;
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
-                    DXCoils::SetCoilSystemCoolingData(state,
-                                                      this->m_CoolingCoilName,
-                                                      this->Name);
+                    DXCoils::SetCoilSystemCoolingData(state, this->m_CoolingCoilName, this->Name);
                 }
             }
             this->sizeSystem(state, FirstHVACIteration, AirLoopNum);
@@ -6848,7 +6846,7 @@ namespace UnitarySystems {
                 if (!UtilityRoutines::SameString(objectName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
 
                 ++state.dataUnitarySystems->numUnitarySystems;
-                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 // get CoilSystem:Cooling:DX object inputs
                 UnitarySysInputSpec original_input_specs;
