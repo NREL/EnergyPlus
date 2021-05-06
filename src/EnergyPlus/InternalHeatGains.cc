@@ -8039,9 +8039,9 @@ namespace InternalHeatGains {
     }
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                   int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                   int const IntGainTypeOfNum,    // zone internal gain type number
-                                   std::string const IntGainName) // Internal gain name
+                                   int const ZoneNum,                   // zone index pointer for which zone to sum gains for
+                                   int const IntGainTypeOfNum,          // zone internal gain type number
+                                   std::string_view const &IntGainName) // Internal gain name
     {
 
         // SUBROUTINE INFORMATION:
@@ -8062,8 +8062,8 @@ namespace InternalHeatGains {
             return DeviceIndex;
         }
         for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
-            if (UtilityRoutines::SameString(state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectName, IntGainName) &&
-                state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum == IntGainTypeOfNum) {
+            if ((state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectName == IntGainName) &&
+                (state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum == IntGainTypeOfNum)) {
                 DeviceIndex = DeviceNum;
                 break;
             } else {
