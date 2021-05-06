@@ -62,130 +62,13 @@ namespace DataStringGlobals {
     // This data-only module is a repository for string variables used in parsing
     // "pieces" of EnergyPlus.
 
-    // METHODOLOGY EMPLOYED:
-    // na
+    // String that represents version information
+    std::string const VerString("EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}");
 
-    // REFERENCES:
-    // na
+    std::string const MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}");
 
-    // OTHER NOTES:
-    // na
+    std::string const PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}");
 
-    // USE STATEMENTS:
-    // None!--This module is USEd by other modules; it should not USE anything.
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-    std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
-    std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
-    std::string const AccentedUpperCase("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
-    std::string const AccentedLowerCase("àáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
-    std::string const AllCase("àáâãäåæçèéêëìíîïðñòóôõöøùúûüýÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-#ifdef _WIN32
-    std::string const NL("\r\n"); // Platform newline
-#else
-    std::string const NL("\n"); // Platform newline
-#endif
-#ifdef _WIN32
-    char const pathChar('\\');
-    char const altpathChar('/');
-#elif __linux__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#elif __unix__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#elif __posix__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#elif __APPLE__
-    char const pathChar('/');
-    char const altpathChar('\\');
-#else
-#error "Invalid platform detection in DataStringGlobals."
-#endif
-    char const CharComma(',');     // comma
-    char const CharSemicolon(';'); // semicolon
-    char const CharTab('\t');      // tab
-    char const CharSpace(' ');     // space
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    fs::path outputMddFilePath("eplusout.mdd");
-    fs::path outputRddFilePath("eplusout.rdd");
-    fs::path outputShdFilePath("eplusout.shd");
-    fs::path outputTblCsvFilePath("eplustbl.csv");
-    fs::path outputTblHtmFilePath("eplustbl.htm");
-    fs::path outputTblTabFilePath("eplustbl.tab");
-    fs::path outputTblTxtFilePath("eplustbl.txt");
-    fs::path outputTblXmlFilePath("eplustbl.xml");
-    fs::path outputAdsFilePath("eplusADS.out");
-    fs::path outputGLHEFilePath("eplusout.glhe");
-    fs::path outputDelightOutFilePath("eplusout.delightout");
-    fs::path outputIperrFilePath("eplusout.iperr");
-    fs::path outputPerfLogFilePath("eplusout_perflog.csv");
-    fs::path outputSqlFilePath("eplusout.sql");
-    fs::path outputSqliteErrFilePath("eplussqlite.err");
-    fs::path outputCsvFilePath("eplusout.csv");
-    fs::path outputMtrCsvFilePath("eplusmtr.csv");
-    fs::path outputRvauditFilePath("eplusout.rvaudit");
-
-    fs::path eplusADSFilePath;
-    fs::path idfFilePathNameOnly;
-    fs::path idfDirPath;
-    fs::path outDirPath;
-    fs::path inputFilePathNameOnly;
-    fs::path inputDirPath;
-    fs::path outputDirPath;
-    fs::path exeDirectoryPath;
-    fs::path inputFilePath;
-    fs::path inputIddFilePath;
-    fs::path inputEpJSONSchemaFilePath;
-    fs::path FullPath;
-    fs::path weatherFilePathNameOnly;
-    fs::path ProgramPath;          // Path for Program from INI file
-    fs::path CurrentWorkingFolder; // Current working directory for run
-    std::string CurrentDateTime;      // For printing current date and time at start of run
-    std::string IDDVerString;         // Version information from the IDD (line 1)
-
-    std::string
-        VerString("EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}"); // String that
-                                                                                                                                      // represents
-                                                                                                                                      // version
-                                                                                                                                      // information
-    std::string MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"); // String to be matched by Version object
-    std::string PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"); // API version string to be matched when using the Python API
-
-
-    void clear_state()
-    {
-        eplusADSFilePath.clear();
-        idfFilePathNameOnly.clear();
-        idfDirPath.clear();
-        outDirPath.clear();
-        inputFilePathNameOnly.clear();
-        inputDirPath.clear();
-        outputDirPath.clear();
-        exeDirectoryPath.clear();
-        inputFilePath.clear();
-        inputIddFilePath.clear();
-        inputEpJSONSchemaFilePath.clear();
-        FullPath.clear();
-        weatherFilePathNameOnly.clear();
-        ProgramPath.clear();
-        CurrentWorkingFolder.clear();
-        CurrentDateTime.clear();
-        IDDVerString.clear();
-    }
 } // namespace DataStringGlobals
 
 } // namespace EnergyPlus

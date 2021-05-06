@@ -74,7 +74,8 @@ enum class ThermalLossDestination : int
     lostToOutside // device thermal losses have no destination
 };
 
-enum class GeneratorType {
+enum class GeneratorType
+{
     Unassigned,
     ICEngine,
     CombTurbine,
@@ -252,9 +253,9 @@ public: // methods
                   Real64 const controlSOCMaxFracLimit,
                   Real64 const controlSOCMinFracLimit);
 
-    //void calcAndReportSimpleBucketModel();
+    // void calcAndReportSimpleBucketModel();
 
-    //void calcAndReportKineticBatteryModel();
+    // void calcAndReportKineticBatteryModel();
 
     void reinitAtBeginEnvironment();
 
@@ -291,6 +292,7 @@ public: // methods
 
 private:                            // methods
     void simulateSimpleBucketModel( // request charge discharge and
+        EnergyPlusData &state,
         Real64 &powerCharge,
         Real64 &powerDischarge,
         bool &charging,
@@ -307,12 +309,12 @@ private:                            // methods
                                      Real64 const controlSOCMinFracLimit);
 
     void simulateLiIonNmcBatteryModel(EnergyPlusData &state,
-                                     Real64 &powerCharge,
-                                     Real64 &powerDischarge,
-                                     bool &charging,
-                                     bool &discharging,
-                                     Real64 const controlSOCMaxFracLimit,
-                                     Real64 const controlSOCMinFracLimit);
+                                      Real64 &powerCharge,
+                                      Real64 &powerDischarge,
+                                      bool &charging,
+                                      bool &discharging,
+                                      Real64 const controlSOCMaxFracLimit,
+                                      Real64 const controlSOCMinFracLimit);
 
     void rainflow(int const numbin,           // numbin = constant value
                   Real64 const input,         // input = input value from other object (battery model)
@@ -321,11 +323,11 @@ private:                            // methods
                   int &count,                 // calculated here - stored for next timestep in main loop
                   std::vector<Real64> &Nmb,   // calculated here - stored for next timestep in main loop
                   std::vector<Real64> &OneNmb // calculated here - stored for next timestep in main loop
-                                              //	int const dim // end dimension of array
+                                              //    int const dim // end dimension of array
     );
 
     void shift(std::vector<Real64> &A, int const m, int const n, std::vector<Real64> &B
-               //	int const dim // end dimension of arrays
+               //    int const dim // end dimension of arrays
     );
 
 private: // data
@@ -380,7 +382,7 @@ private: // data
     Real64 maxDischargeI_;                         // [A] maximum discharging current
     Real64 cutoffV_;                               // [V] cut-off voltage
     Real64 maxChargeRate_;                         // [1/h] charge rate limit
-    BatteryDegradationModelType lifeCalculation_;   // [ ] battery life calculation: Yes or No
+    BatteryDegradationModelType lifeCalculation_;  // [ ] battery life calculation: Yes or No
     int lifeCurveNum_;                             // [ ] battery life curve name index number
     Real64 liIon_dcToDcChargingEff_;               // [ ] DC to DC Charging Efficiency (Li-ion NMC model)
     Real64 liIon_mass_;                            // [kg] mass of battery (Li-ion NMC model)
@@ -430,7 +432,7 @@ private: // data
     Real64 batteryCurrent_;       // [A] total current
     Real64 batteryVoltage_;       // [V] total voltage
     Real64 batteryDamage_;        // [ ] fractional battery damage
-    Real64 batteryTemperature_;    // [C] battery temperature (only used in Li-ion batteries)
+    Real64 batteryTemperature_;   // [C] battery temperature (only used in Li-ion batteries)
 
 }; // ElectricStorage
 
@@ -533,7 +535,8 @@ public: // Method
                         std::string const &availSchedName,
                         Real64 thermalToElectRatio);
 
-    void simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,             // true if generator is on
+    void simGeneratorGetPowerOutput(EnergyPlusData &state,
+                                    bool const runFlag,             // true if generator is on
                                     Real64 const myElecLoadRequest, // target electric power production request
                                     bool const FirstHVACIteration,  //
                                     Real64 &electricPowerOutput,    // Actual generator electric power output
@@ -542,13 +545,12 @@ public: // Method
 
     void reinitAtBeginEnvironment();
 
-public: // data // might make this class a friend of ElectPowerLoadCenter?
-
-    std::string name;          // user identifier
-    std::string typeOfName;    // equipment type
-    GeneratorType compGenTypeOf_Num;     // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
-    int compPlantTypeOf_Num;   // numeric designator for plant component, in DataPlant
-    std::string compPlantName; // name of plant component if heat recovery
+public:                              // data // might make this class a friend of ElectPowerLoadCenter?
+    std::string name;                // user identifier
+    std::string typeOfName;          // equipment type
+    GeneratorType compGenTypeOf_Num; // Numeric designator for generator CompType (TypeOf), in DataGlobalConstants
+    int compPlantTypeOf_Num;         // numeric designator for plant component, in DataPlant
+    std::string compPlantName;       // name of plant component if heat recovery
     GeneratorType generatorType;
     int generatorIndex;              // index in generator model data struct
     Real64 maxPowerOut;              // Maximum Power Output (W)
@@ -725,11 +727,6 @@ public: // Creation
     }
 
 public: // Methods
-    // Destructor
-    ~ElectricPowerServiceManager()
-    {
-    }
-
     void manageElectricPowerService(EnergyPlusData &state,
                                     bool const FirstHVACIteration,
                                     bool &SimElecCircuits,      // simulation convergence flag
@@ -801,17 +798,16 @@ private:                      // data
 
 }; // class ElectricPowerServiceManager
 
-extern std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
+void createFacilityElectricPowerServiceObject(EnergyPlusData &state);
 
-void createFacilityElectricPowerServiceObject();
+struct ElectPwrSvcMgrData : BaseGlobalStruct
+{
 
-void clearFacilityElectricPowerServiceObject();
-
-struct ElectPwrSvcMgrData : BaseGlobalStruct {
+    std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
 
     void clear_state() override
     {
-
+        this->facilityElectricServiceObj.release();
     }
 };
 

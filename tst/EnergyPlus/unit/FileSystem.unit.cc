@@ -192,7 +192,6 @@ TEST(FileSystem, make_and_remove_Directory)
     fs::remove_all("sandbox");
 }
 
-
 TEST(FileSystem, Elaborate)
 {
     EnergyPlus::FileSystem::makeDirectory("sandbox");

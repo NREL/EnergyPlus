@@ -102,7 +102,7 @@ private:
 class EnergyPlusFixture : public testing::Test
 {
 protected:
-    static void SetUpTestCase();
+    // static void SetUpTestCase();
     static void TearDownTestCase()
     {
     }
@@ -244,7 +244,6 @@ protected:
     // Will return true if string matches the stream and false if it does not
     bool match_err_stream(std::string const &expected_match, bool use_regex = false, bool reset_stream = false);
 
-
     // This function processes an idf snippet and defaults to using the idd cache for the fixture.
     // The cache should be used for nearly all calls to this function.
     // This more or less replicates inputProcessor->processInput() but in a more usable fashion for unit testing
@@ -272,7 +271,7 @@ protected:
     void openOutputFiles(EnergyPlusData &state);
 
 public:
-    EnergyPlusData* state;
+    EnergyPlusData *state;
 
 private:
     friend class InputProcessorFixture;
@@ -285,7 +284,7 @@ private:
     // if it makes sense for the unit test to continue after retrning from function.
     // Will return false if no errors found and true if errors found
 
-    static bool process_idd(std::string const &idd, bool &errors_found);
+    //    static bool process_idd(std::string const &idd, bool &errors_found);
 
     // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
     std::ostringstream *json_stream;

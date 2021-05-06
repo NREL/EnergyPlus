@@ -46,14 +46,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include "AirflowNetwork/Properties.hpp"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 
 namespace EnergyPlus {
 
 namespace AirflowNetwork {
-
-    int lowerLimitErrIdx(0);
-    int upperLimitErrIdx(0);
 
     Real64 airThermConductivity(EnergyPlusData &state, Real64 T // Temperature in Celsius
     )
@@ -70,22 +68,24 @@ namespace AirflowNetwork {
         Real64 const c = -2.40977632412045e-8;
 
         if (T < LowerLimit) {
-            if (lowerLimitErrIdx == 0) {
+            if (state.dataAFNProps->lowerLimitErrIdx == 0) {
                 ShowWarningMessage(state, "Air temperature below lower limit of -20C for conductivity calculation");
             }
-            ShowRecurringWarningErrorAtEnd(state, format("Air temperature below lower limit of -20C for conductivity calculation. Air temperature of {:.1R} "
+            ShowRecurringWarningErrorAtEnd(state,
+                                           format("Air temperature below lower limit of -20C for conductivity calculation. Air temperature of {:.1R} "
                                                   "used for conductivity calculation.",
                                                   LowerLimit),
-                                           lowerLimitErrIdx);
+                                           state.dataAFNProps->lowerLimitErrIdx);
             T = LowerLimit;
         } else if (T > UpperLimit) {
-            if (upperLimitErrIdx == 0) {
+            if (state.dataAFNProps->upperLimitErrIdx == 0) {
                 ShowWarningMessage(state, "Air temperature above upper limit of 70C for conductivity calculation");
             }
-            ShowRecurringWarningErrorAtEnd(state, format("Air temperature above upper limit of 70C for conductivity calculation. Air temperature of {:.1R} "
+            ShowRecurringWarningErrorAtEnd(state,
+                                           format("Air temperature above upper limit of 70C for conductivity calculation. Air temperature of {:.1R} "
                                                   "used for conductivity calculation.",
                                                   UpperLimit),
-                                           upperLimitErrIdx);
+                                           state.dataAFNProps->upperLimitErrIdx);
             T = UpperLimit;
         }
 
@@ -98,7 +98,8 @@ namespace AirflowNetwork {
         return 1.71432e-5 + 4.828e-8 * T;
     }
 
-    Real64 airKinematicVisc(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airKinematicVisc(EnergyPlusData &state,
+                            Real64 T, // Temperature in Celsius
                             Real64 W, // Humidity ratio
                             Real64 P  // Barometric pressure
     )
@@ -119,7 +120,8 @@ namespace AirflowNetwork {
         return airDynamicVisc(T) / AIRDENSITY(state, P, T, W);
     }
 
-    Real64 airThermalDiffusivity(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airThermalDiffusivity(EnergyPlusData &state,
+                                 Real64 T, // Temperature in Celsius
                                  Real64 W, // Humidity ratio
                                  Real64 P  // Barometric pressure
     )
@@ -140,7 +142,8 @@ namespace AirflowNetwork {
         return airThermConductivity(state, T) / (AIRCP(W) * AIRDENSITY(state, P, T, W));
     }
 
-    Real64 airPrandtl(EnergyPlusData &state, Real64 T, // Temperature in Celsius
+    Real64 airPrandtl(EnergyPlusData &state,
+                      Real64 T, // Temperature in Celsius
                       Real64 W, // Humidity ratio
                       Real64 P  // Barometric pressure
     )

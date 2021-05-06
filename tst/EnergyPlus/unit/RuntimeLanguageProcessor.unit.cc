@@ -113,31 +113,27 @@ TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
 
 TEST_F(EnergyPlusFixture, TestOutOfRangeAlphaFields)
 {
-    std::string const idf_objects = delimited_string({
-        "EnergyManagementSystem:Sensor,",
-        "  EMSSensor,",
-        "  *,",
-        "  Electricity:Facility;",
-        "EnergyManagementSystem:Program,",
-        "  DummyProgram,",
-        "  SET N = EMSSensor;",
-        "EnergyManagementSystem:ProgramCallingManager,",
-        "  DummyManager,",
-        "  BeginTimestepBeforePredictor,",
-        "  DummyProgram;",
-        "EnergyManagementSystem:MeteredOutputVariable,",
-        "  MyLongMeteredOutputVariable,",
-        "  EMSSensor,",
-        "  ZoneTimeStep,",
-        "  ,",
-        "  Electricity,",
-        "  Building,",
-        "  ExteriorEquipment,",
-        "  Transformer,",
-        "  J;"
-    });
+    std::string const idf_objects = delimited_string({"EnergyManagementSystem:Sensor,",
+                                                      "  EMSSensor,",
+                                                      "  *,",
+                                                      "  Electricity:Facility;",
+                                                      "EnergyManagementSystem:Program,",
+                                                      "  DummyProgram,",
+                                                      "  SET N = EMSSensor;",
+                                                      "EnergyManagementSystem:ProgramCallingManager,",
+                                                      "  DummyManager,",
+                                                      "  BeginTimestepBeforePredictor,",
+                                                      "  DummyProgram;",
+                                                      "EnergyManagementSystem:MeteredOutputVariable,",
+                                                      "  MyLongMeteredOutputVariable,",
+                                                      "  EMSSensor,",
+                                                      "  ZoneTimeStep,",
+                                                      "  ,",
+                                                      "  Electricity,",
+                                                      "  Building,",
+                                                      "  ExteriorEquipment,",
+                                                      "  Transformer,",
+                                                      "  J;"});
     ASSERT_TRUE(process_idf(idf_objects));
     RuntimeLanguageProcessor::GetRuntimeLanguageUserInput(*state);
-
-
 }

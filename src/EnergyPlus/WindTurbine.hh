@@ -64,19 +64,21 @@ struct EnergyPlusData;
 
 namespace WindTurbine {
 
-    enum class RotorType {
+    enum class RotorType
+    {
         Unassigned = 0,
         HAWT = 1, // 'HorizontalAxisWindTurbine'
         VAWT = 2, // 'VerticalAxisWindTurbine'
     };
 
-    enum class ControlType {
+    enum class ControlType
+    {
         Unassigned = 0,
-        FSFP = 1,  // 'FixedSpeedFixedPitch'
-        FSVP = 2,  // 'FixedSpeedVariablePitch'
-        VSFP = 3,  // 'VariableSpeedFixedPitch'
-        VSVP = 4 // 'VariableSpeedVariablePitch'
-     };
+        FSFP = 1, // 'FixedSpeedFixedPitch'
+        FSVP = 2, // 'FixedSpeedVariablePitch'
+        VSFP = 3, // 'VariableSpeedFixedPitch'
+        VSVP = 4  // 'VariableSpeedVariablePitch'
+    };
 
     struct WindTurbineParams
     {
@@ -131,30 +133,29 @@ namespace WindTurbine {
         // Default Constructor
         WindTurbineParams()
             : rotorType(RotorType::Unassigned), controlType(ControlType::Unassigned), SchedPtr(0), NumOfBlade(0), RatedRotorSpeed(0.0),
-              RotorDiameter(0.0), RotorHeight(0.0), RatedPower(0.0),
-              RatedWindSpeed(0.0), CutInSpeed(0.0), CutOutSpeed(0.0), SysEfficiency(0.0), MaxTipSpeedRatio(0.0), MaxPowerCoeff(0.0),
-              LocalAnnualAvgWS(0.0), AnnualTMYWS(0.0), HeightForLocalWS(0.0), ChordArea(0.0), DragCoeff(0.0), LiftCoeff(0.0), PowerCoeffC1(0.0),
-              PowerCoeffC2(0.0), PowerCoeffC3(0.0), PowerCoeffC4(0.0), PowerCoeffC5(0.0), PowerCoeffC6(0.0), TotPower(0.0), Power(0.0),
-              TotEnergy(0.0), Energy(0.0), LocalWindSpeed(0.0), LocalAirDensity(0.0), PowerCoeff(0.0), ChordalVel(0.0), NormalVel(0.0),
-              RelFlowVel(0.0), TipSpeedRatio(0.0), WSFactor(0.0), AngOfAttack(0.0), IntRelFlowVel(0.0), TanForce(0.0), NorForce(0.0), TotTorque(0.0),
-              AzimuthAng(0.0)
+              RotorDiameter(0.0), RotorHeight(0.0), RatedPower(0.0), RatedWindSpeed(0.0), CutInSpeed(0.0), CutOutSpeed(0.0), SysEfficiency(0.0),
+              MaxTipSpeedRatio(0.0), MaxPowerCoeff(0.0), LocalAnnualAvgWS(0.0), AnnualTMYWS(0.0), HeightForLocalWS(0.0), ChordArea(0.0),
+              DragCoeff(0.0), LiftCoeff(0.0), PowerCoeffC1(0.0), PowerCoeffC2(0.0), PowerCoeffC3(0.0), PowerCoeffC4(0.0), PowerCoeffC5(0.0),
+              PowerCoeffC6(0.0), TotPower(0.0), Power(0.0), TotEnergy(0.0), Energy(0.0), LocalWindSpeed(0.0), LocalAirDensity(0.0), PowerCoeff(0.0),
+              ChordalVel(0.0), NormalVel(0.0), RelFlowVel(0.0), TipSpeedRatio(0.0), WSFactor(0.0), AngOfAttack(0.0), IntRelFlowVel(0.0),
+              TanForce(0.0), NorForce(0.0), TotTorque(0.0), AzimuthAng(0.0)
         {
         }
     };
 
     void SimWindTurbine(EnergyPlusData &state,
-                        GeneratorType GeneratorType,          // Type of Generator
+                        GeneratorType GeneratorType,      // Type of Generator
                         std::string const &GeneratorName, // User specified name of Generator
                         int &GeneratorIndex,              // Generator index
-                        bool RunFlag,               // ON or OFF
-                        Real64 WTLoad               // Electrical load on WT (not used)
+                        bool RunFlag,                     // ON or OFF
+                        Real64 WTLoad                     // Electrical load on WT (not used)
     );
 
     void GetWTGeneratorResults(EnergyPlusData &state,
-                               GeneratorType GeneratorType,  // Type of Generator
-                               int GeneratorIndex, // Generator number
-                               Real64 &GeneratorPower,   // Electrical power
-                               Real64 &GeneratorEnergy,  // Electrical energy
+                               GeneratorType GeneratorType, // Type of Generator
+                               int GeneratorIndex,          // Generator number
+                               Real64 &GeneratorPower,      // Electrical power
+                               Real64 &GeneratorEnergy,     // Electrical energy
                                Real64 &ThermalPower,
                                Real64 &ThermalEnergy);
 
@@ -173,28 +174,29 @@ namespace WindTurbine {
 
 } // namespace WindTurbine
 
-    struct WindTurbineData : BaseGlobalStruct {
+struct WindTurbineData : BaseGlobalStruct
+{
 
-        int NumWindTurbines;        // Total wind turbine statements in inputs
-        bool GetInputFlag;
-        bool MyOneTimeFlag;
-        Real64 AnnualTMYWS = 0.0;   // Annual average wind speed in stat file
-        Array1D<WindTurbine::WindTurbineParams> WindTurbineSys;
+    int NumWindTurbines; // Total wind turbine statements in inputs
+    bool GetInputFlag;
+    bool MyOneTimeFlag;
+    Real64 AnnualTMYWS = 0.0; // Annual average wind speed in stat file
+    EPVector<WindTurbine::WindTurbineParams> WindTurbineSys;
 
-        void clear_state() override
-        {
-            this->NumWindTurbines = 0;
-            this->GetInputFlag = true;
-            this->MyOneTimeFlag = true;
-            this->AnnualTMYWS = 0.0;
-            this->WindTurbineSys.deallocate();
-        }
+    void clear_state() override
+    {
+        this->NumWindTurbines = 0;
+        this->GetInputFlag = true;
+        this->MyOneTimeFlag = true;
+        this->AnnualTMYWS = 0.0;
+        this->WindTurbineSys.deallocate();
+    }
 
-        // Default Constructor
-        WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true), AnnualTMYWS(0.0)
-        {
-        }
-    };
+    // Default Constructor
+    WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true), AnnualTMYWS(0.0)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -50,9 +50,9 @@
 #include "Data/EnergyPlusData.hh"
 #include "DataStringGlobals.hh"
 #include "FileSystem.hh"
-#include "UtilityRoutines.hh"
-#include "InputProcessing/InputProcessor.hh"
 #include "InputProcessing/EmbeddedEpJSONSchema.hh"
+#include "InputProcessing/InputProcessor.hh"
+#include "UtilityRoutines.hh"
 
 #include "nlohmann/json.hpp"
 #include <fmt/format.h>
@@ -287,22 +287,22 @@ std::vector<std::string> InputOutputFile::getLines()
 
 void IOFiles::OutputControl::getInput(EnergyPlusData &state)
 {
-    auto const instances = inputProcessor->epJSON.find("OutputControl:Files");
-    if (instances != inputProcessor->epJSON.end()) {
+    auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find("OutputControl:Files");
+    if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
 
-        auto find_input = [=, &state](nlohmann::json const & fields, std::string const & field_name) -> std::string {
+        auto find_input = [=, &state](nlohmann::json const &fields, std::string const &field_name) -> std::string {
             std::string input;
             auto found = fields.find(field_name);
             if (found != fields.end()) {
                 input = found.value().get<std::string>();
                 input = UtilityRoutines::MakeUPPERCase(input);
             } else {
-                inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
+                state.dataInputProcessing->inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }
             return input;
         };
 
-        auto boolean_choice = [=, &state](std::string const & input) -> bool {
+        auto boolean_choice = [=, &state](std::string const &input) -> bool {
             if (input == "YES") {
                 return true;
             } else if (input == "NO") {
@@ -413,27 +413,8 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
     }
 }
 
-IOFiles &IOFiles::getSingleton()
+void IOFiles::flushAll()
 {
-    assert(getSingletonInternal() != nullptr);
-    if (getSingletonInternal() == nullptr) {
-        throw std::runtime_error("Invalid impossible state of no outputfiles!?!?!");
-    }
-    return *getSingletonInternal();
-}
-
-void IOFiles::setSingleton(IOFiles *newSingleton) noexcept
-{
-    getSingletonInternal() = newSingleton;
-}
-
-IOFiles *&IOFiles::getSingletonInternal()
-{
-    static IOFiles *singleton{nullptr};
-    return singleton;
-}
-
-void IOFiles::flushAll() {
 
     audit.flush();
     eio.flush();
@@ -777,7 +758,7 @@ public:
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
-//    assert(os.good());
+    //    assert(os.good());
     fmt::memory_buffer buffer;
     try {
         // Pass custom argument formatter as a template arg to vformat_to.

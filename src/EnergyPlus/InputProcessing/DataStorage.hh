@@ -113,14 +113,14 @@ public:
     // std::vector< T * >
     // objectsFactory()
     // {
-    // 	auto const it = storage.find( T::objectTypeHash() );
-    // 	if ( it == storage.end() ) return nullptr;
-    // 	std::vector< T * > output;
-    // 	output.reserve( it->second.size() );
-    // 	for ( auto const & obj : it->second ) {
-    // 		output.emplace_back( obj->second.get() );
-    // 	}
-    // 	return output;
+    //     auto const it = storage.find( T::objectTypeHash() );
+    //     if ( it == storage.end() ) return nullptr;
+    //     std::vector< T * > output;
+    //     output.reserve( it->second.size() );
+    //     for ( auto const & obj : it->second ) {
+    //         output.emplace_back( obj->second.get() );
+    //     }
+    //     return output;
     // }
 
 private:
