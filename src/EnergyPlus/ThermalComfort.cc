@@ -2805,7 +2805,7 @@ namespace ThermalComfort {
                 state.dataThermalComforts->DailyAveOutTemp = 0.0;
 
                 auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptiveASH55");
-                for (i = 1; i <= 8; ++i) { // Headers
+                for (i = 1; i <= numHeaderRowsInEpw; ++i) { // Headers
                     epwLine = epwFile.readLine().data;
                 }
                 jStartDay = state.dataEnvrn->DayOfYear - 1;
@@ -3017,8 +3017,15 @@ namespace ThermalComfort {
             const bool epwFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
             readStat = 0;
             if (epwFileExists) {
+                // determine number of days in year
+                int DaysInYear;
+                if (state.dataEnvrn->CurrentYearIsLeapYear) {
+                    DaysInYear = 366;
+                } else {
+                    DaysInYear = 365;
+                }
                 auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptiveCEN15251");
-                for (i = 1; i <= 9; ++i) { // Headers
+                for (i = 1; i <= numHeaderRowsInEpw; ++i) { // Headers
                     epwFile.readLine();
                 }
                 jStartDay = state.dataEnvrn->DayOfYear - 1;
@@ -3094,7 +3101,7 @@ namespace ThermalComfort {
         if (state.dataGlobal->BeginDayFlag && !state.dataThermalComforts->firstDaySet) {
             // Update the running average, reset the daily avg
             state.dataThermalComforts->runningAverageCEN =
-                0.2 * state.dataThermalComforts->runningAverageCEN + 0.8 * state.dataThermalComforts->avgDryBulbCEN;
+                alpha * state.dataThermalComforts->runningAverageCEN + (1.0 - alpha) * state.dataThermalComforts->avgDryBulbCEN;
             state.dataThermalComforts->avgDryBulbCEN = 0.0;
         }
 

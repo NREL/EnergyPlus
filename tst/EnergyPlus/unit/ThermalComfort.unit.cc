@@ -1580,32 +1580,32 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveCEN15251)
 {
-    state.files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
+    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
 
     // test the initialisation
-    DayOfYear = 1;
-    CurrentYearIsLeapYear = false;
-    CalcThermalComfortAdaptiveCEN15251(state.files, true, true, 0.0);
-    EXPECT_NEAR(ThermalComfort::runningAverageCEN, -1.3671408, 0.01);
+    state->dataEnvrn->DayOfYear = 1;
+    state->dataEnvrn->CurrentYearIsLeapYear = false;
+    CalcThermalComfortAdaptiveCEN15251(*state, true, true, 0.0);
+    EXPECT_NEAR(state->dataThermalComforts->runningAverageCEN, -1.3671408, 0.01);
 
     // skip the first day
     Array1D<Real64> HourlyDryBulbTemp = {
         -4.8, -5.4, -5.7, -5.9, -6.1, -6.2, -7.2, -6.7, -6.7, -5.6, -5., -4.4, -5., -3.9, -5., -5., -6.7, -7.8, -9.4, -9.4, -9.4, -9.4, -7.8, -7.2,
     };
-    BeginDayFlag = true;
-    BeginHourFlag = true;
+    state->dataGlobal->BeginDayFlag = true;
+    state->dataGlobal->BeginHourFlag = true;
     for (int i = 1; i <= 24; i++) {
-        OutDryBulbTemp = HourlyDryBulbTemp(i);
-        CalcThermalComfortAdaptiveCEN15251(state.files, false);
+        state->dataEnvrn->OutDryBulbTemp = HourlyDryBulbTemp(i);
+        CalcThermalComfortAdaptiveCEN15251(*state, false);
         if (i == 1) {
-            BeginDayFlag = false;
+            state->dataGlobal->BeginDayFlag = false;
         }
     }
 
     // test the second day
-    DayOfYear += 1;
-    BeginDayFlag = true;
-    CalcThermalComfortAdaptiveCEN15251(state.files, false);
-    EXPECT_NEAR(ThermalComfort::runningAverageCEN, -2.3912126, 0.01);
-    BeginDayFlag = false;
+    state->dataEnvrn->DayOfYear += 1;
+    state->dataGlobal->BeginDayFlag = true;
+    CalcThermalComfortAdaptiveCEN15251(*state, false);
+    EXPECT_NEAR(state->dataThermalComforts->runningAverageCEN, -2.3912126, 0.01);
+    state->dataGlobal->BeginDayFlag = false;
 }
