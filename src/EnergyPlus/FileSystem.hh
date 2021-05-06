@@ -54,22 +54,18 @@
 #if __has_include(<filesystem>)
     #include <filesystem>
     namespace fs = std::filesystem;
-    // Add a custom formatter for fmt, so we don't have to call fs::path::string() everywhere
-    namespace fmt {
-    template <>
-    struct formatter<std::filesystem::path> : formatter<std::string> {};
-    }
 #elif __has_include(<experimental/filesystem>)
     #include <experimental/filesystem>
     namespace fs = std::experimental::filesystem;
-    // Add a custom formatter for fmt
-    namespace fmt {
-    template <>
-    struct formatter<std::experimental::filesystem::path> : formatter<std::string> {};
-    }
 #else
     #error "no filesystem support"
 #endif
+
+// Add a custom formatter for fmt
+namespace fmt {
+    template <>
+    struct formatter<fs::path> : formatter<std::string> {};
+}
 
 // If we want to allow this kind of stuff
 // fs::path p = "folder/eplus";
