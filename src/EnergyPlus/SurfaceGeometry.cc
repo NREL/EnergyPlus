@@ -2719,6 +2719,12 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
             state.dataSurface->Surface(SurfNum).Index = SurfNum;
         }
+        // Initialize surface with movable insulation index list
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            if (state.dataSurface->Surface(SurfNum).MaterialMovInsulExt > 0 || state.dataSurface->Surface(SurfNum).MaterialMovInsulInt > 0) {
+                state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
+            }
+        }
     }
 
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
@@ -11441,6 +11447,7 @@ namespace SurfaceGeometry {
                                 }
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MaterialMovInsulExt = MaterNum;
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMovInsulExt = SchNum;
+                                state.dataSurface->AnyMovableInsulation = true;
                                 if (state.dataMaterial->Material(MaterNum).Resistance <= 0.0) {
                                     if (state.dataMaterial->Material(MaterNum).Conductivity <= 0.0 ||
                                         state.dataMaterial->Material(MaterNum).Thickness <= 0.0) {
@@ -11487,6 +11494,7 @@ namespace SurfaceGeometry {
                                 }
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MaterialMovInsulInt = MaterNum;
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMovInsulInt = SchNum;
+                                state.dataSurface->AnyMovableInsulation = true;
                                 if (state.dataMaterial->Material(MaterNum).Resistance <= 0.0) {
                                     if (state.dataMaterial->Material(MaterNum).Conductivity <= 0.0 ||
                                         state.dataMaterial->Material(MaterNum).Thickness <= 0.0) {

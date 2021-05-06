@@ -2050,7 +2050,6 @@ struct HeatBalanceData : BaseGlobalStruct
     bool NoCfactorConstructionsUsed = true;
     bool NoRegularMaterialsUsed = true;
 
-
     Array1D<Real64> SNLoadHeatEnergy;
     Array1D<Real64> SNLoadCoolEnergy;
     Array1D<Real64> SNLoadHeatRate;
@@ -2070,33 +2069,34 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> GroupSNLoadHeatRate;
     Array1D<Real64> GroupSNLoadCoolRate;
 
-    Array1D<Real64> ZoneMRT;            // MEAN RADIANT TEMPERATURE (C)
-    Array1D<Real64> ZoneTransSolar;     // Exterior beam plus diffuse solar entering zone sum of WinTransSolar for exterior windows in zone (W)
-    Array1D<Real64> ZoneWinHeatGain;    // Heat gain to zone from all exterior windows (includes oneTransSolar); sum of WinHeatGain for exterior windows in zone (W)
-    Array1D<Real64> ZoneWinHeatGainRep;                 // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
-    Array1D<Real64> ZoneWinHeatLossRep;                 // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
-    Array1D<Real64> ZoneBmSolFrExtWinsRep;              // Beam solar into zone from exterior windows [W]
-    Array1D<Real64> ZoneBmSolFrIntWinsRep;              // Beam solar into zone from interior windows [W]
-    Array1D<Real64> ZoneInitialDifSolReflW;             // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
-    Array1D<Real64> ZoneDifSolFrExtWinsRep;             // Diffuse solar into zone from exterior windows [W]
-    Array1D<Real64> ZoneDifSolFrIntWinsRep;             // Diffuse solar into zone from interior windows [W]
-    Array1D<Real64> ZoneOpaqSurfInsFaceCond;            // Zone inside face opaque surface conduction (W)
-    Array1D<Real64> ZoneOpaqSurfInsFaceCondGainRep;     // = Zone inside face opaque surface conduction when >= 0
-    Array1D<Real64> ZoneOpaqSurfInsFaceCondLossRep;     // = -Zone inside face opaque surface conduction when < 0
-    Array1D<Real64> ZoneOpaqSurfExtFaceCond;            // Zone outside face opaque surface conduction (W)
-    Array1D<Real64> ZoneOpaqSurfExtFaceCondGainRep;     // = Zone outside face opaque surface conduction when >= 0
-    Array1D<Real64> ZoneOpaqSurfExtFaceCondLossRep;     // = -Zone outside face opaque surface conduction when < 0
-    Array1D<Real64> ZoneTransSolarEnergy;               // Energy of ZoneTransSolar [J]
-    Array1D<Real64> ZoneWinHeatGainRepEnergy;           // Energy of ZoneWinHeatGainRep [J]
-    Array1D<Real64> ZoneWinHeatLossRepEnergy;           // Energy of ZoneWinHeatLossRep [J]
-    Array1D<Real64> ZoneBmSolFrExtWinsRepEnergy;        // Energy of ZoneBmSolFrExtWinsRep [J]
-    Array1D<Real64> ZoneBmSolFrIntWinsRepEnergy;        // Energy of ZoneBmSolFrIntWinsRep [J]
-    Array1D<Real64> ZoneDifSolFrExtWinsRepEnergy;       // Energy of ZoneDifSolFrExtWinsRep [J]
-    Array1D<Real64> ZoneDifSolFrIntWinsRepEnergy;       // Energy of ZoneDifSolFrIntWinsRep [J]
-    Array1D<Real64> ZnOpqSurfInsFaceCondGnRepEnrg;      // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;      // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-    Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;      // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;      // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
+    Array1D<Real64> ZoneMRT;        // MEAN RADIANT TEMPERATURE (C)
+    Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone sum of WinTransSolar for exterior windows in zone (W)
+    Array1D<Real64>
+        ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes oneTransSolar); sum of WinHeatGain for exterior windows in zone (W)
+    Array1D<Real64> ZoneWinHeatGainRep;             // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
+    Array1D<Real64> ZoneWinHeatLossRep;             // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
+    Array1D<Real64> ZoneBmSolFrExtWinsRep;          // Beam solar into zone from exterior windows [W]
+    Array1D<Real64> ZoneBmSolFrIntWinsRep;          // Beam solar into zone from interior windows [W]
+    Array1D<Real64> ZoneInitialDifSolReflW;         // Initial diffuse solar in zone from ext and int windows reflected from interior surfaces [W]
+    Array1D<Real64> ZoneDifSolFrExtWinsRep;         // Diffuse solar into zone from exterior windows [W]
+    Array1D<Real64> ZoneDifSolFrIntWinsRep;         // Diffuse solar into zone from interior windows [W]
+    Array1D<Real64> ZoneOpaqSurfInsFaceCond;        // Zone inside face opaque surface conduction (W)
+    Array1D<Real64> ZoneOpaqSurfInsFaceCondGainRep; // = Zone inside face opaque surface conduction when >= 0
+    Array1D<Real64> ZoneOpaqSurfInsFaceCondLossRep; // = -Zone inside face opaque surface conduction when < 0
+    Array1D<Real64> ZoneOpaqSurfExtFaceCond;        // Zone outside face opaque surface conduction (W)
+    Array1D<Real64> ZoneOpaqSurfExtFaceCondGainRep; // = Zone outside face opaque surface conduction when >= 0
+    Array1D<Real64> ZoneOpaqSurfExtFaceCondLossRep; // = -Zone outside face opaque surface conduction when < 0
+    Array1D<Real64> ZoneTransSolarEnergy;           // Energy of ZoneTransSolar [J]
+    Array1D<Real64> ZoneWinHeatGainRepEnergy;       // Energy of ZoneWinHeatGainRep [J]
+    Array1D<Real64> ZoneWinHeatLossRepEnergy;       // Energy of ZoneWinHeatLossRep [J]
+    Array1D<Real64> ZoneBmSolFrExtWinsRepEnergy;    // Energy of ZoneBmSolFrExtWinsRep [J]
+    Array1D<Real64> ZoneBmSolFrIntWinsRepEnergy;    // Energy of ZoneBmSolFrIntWinsRep [J]
+    Array1D<Real64> ZoneDifSolFrExtWinsRepEnergy;   // Energy of ZoneDifSolFrExtWinsRep [J]
+    Array1D<Real64> ZoneDifSolFrIntWinsRepEnergy;   // Energy of ZoneDifSolFrIntWinsRep [J]
+    Array1D<Real64> ZnOpqSurfInsFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
+    Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
+    Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
+    Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
 
     Array1D<Real64> SurfQRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
     Array1D<Real64> SurfQRadSWOutIncident;              // Exterior beam plus diffuse solar incident on surface (W/m2)
@@ -2128,12 +2128,12 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> SurfWinSWwinAbsTotalReport;         // Report - Total interior/exterior shortwave absorbed in all glass layers of window (W)
     Array1D<Real64> SurfWinInitialDifSolInTransReport;  // Report - Initial transmitted diffuse solar transmitted out
                                                         // through inside of window surface (W)
-    Array2D<Real64> SurfWinQRadSWwinAbs;            // Short wave radiation absorbed in window glass layers
-    Array2D<Real64> SurfWinInitialDifSolwinAbs;     // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
-    Array1D<Real64> SurfOpaqSWOutAbsTotalReport;    // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
-    Array1D<Real64> SurfOpaqSWOutAbsEnergyReport;   // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
+    Array2D<Real64> SurfWinQRadSWwinAbs;                // Short wave radiation absorbed in window glass layers
+    Array2D<Real64> SurfWinInitialDifSolwinAbs;         // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
+    Array1D<Real64> SurfOpaqSWOutAbsTotalReport;        // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
+    Array1D<Real64> SurfOpaqSWOutAbsEnergyReport;       // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
 
-    //Material
+    // Material
     Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
@@ -2155,7 +2155,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> MultCircumSolar;        // Contribution to eff sky view factor from circumsolar brightening
     Array1D<Real64> MultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
 
-    Array1D<Real64> QS;                      // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
+    Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
     Array1D<Real64> QSLights;                // Like QS, but Lights short-wave only.
     Array1D<Real64> EnclSolQSDifSol;         // Like QS, but diffuse solar short-wave only.
     Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)

@@ -228,8 +228,10 @@ void SurfaceData::SetOutBulbTempAt(EnergyPlusData &state)
             state.dataSurface->SurfOutDryBulbTemp(Index) = BaseDryTemp;
             state.dataSurface->SurfOutWetBulbTemp(Index) = BaseWetTemp;
         } else {
-            state.dataSurface->SurfOutDryBulbTemp(Index) = BaseDryTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
-            state.dataSurface->SurfOutWetBulbTemp(Index) = BaseWetTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+            state.dataSurface->SurfOutDryBulbTemp(Index) =
+                BaseDryTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+            state.dataSurface->SurfOutWetBulbTemp(Index) =
+                BaseWetTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
         }
     }
 }
@@ -400,10 +402,10 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
     } else {
         Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv;
         value = state.dataWindowManager->sigma * pow_4(tout);
-        value =
-            ViewFactorSkyIR * (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
-                               (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
-            ViewFactorGroundIR * value;
+        value = ViewFactorSkyIR *
+                    (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
+                     (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
+                ViewFactorGroundIR * value;
     }
     return value;
 }
@@ -640,7 +642,8 @@ void CheckSurfaceOutBulbTempAt(EnergyPlusData &state)
     Real64 minBulb = 0.0;
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
         minBulb = min(minBulb, state.dataSurface->SurfOutDryBulbTemp(SurfNum), state.dataSurface->SurfOutWetBulbTemp(SurfNum));
-        if (minBulb < -100.0) SetOutBulbTempAt_error(state, "Surface", state.dataSurface->Surface(SurfNum).Centroid.z, state.dataSurface->Surface(SurfNum).Name);
+        if (minBulb < -100.0)
+            SetOutBulbTempAt_error(state, "Surface", state.dataSurface->Surface(SurfNum).Centroid.z, state.dataSurface->Surface(SurfNum).Name);
     }
 }
 
