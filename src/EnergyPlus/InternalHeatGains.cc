@@ -8039,8 +8039,8 @@ namespace InternalHeatGains {
     }
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                   int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                   int const IntGainTypeOfNum,     // zone internal gain type number
+                                   int const ZoneNum,             // zone index pointer for which zone to sum gains for
+                                   int const IntGainTypeOfNum,    // zone internal gain type number
                                    std::string const IntGainName) // Internal gain name
     {
 
