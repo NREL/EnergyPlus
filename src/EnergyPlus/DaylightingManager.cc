@@ -9962,7 +9962,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
 
         FirstTimeMaps(MapNum) = false;
 
-        auto openMapFile = [&](const std::string &filePath) -> InputOutputFile & {
+        auto openMapFile = [&](const fs::path &filePath) -> InputOutputFile & {
             auto &outputFile = *state.dataDaylightingData->IllumMap(MapNum).mapFile;
             outputFile.filePath = fs::path(filePath.string() + fmt::to_string(MapNum));
             outputFile.ensure_open(state, "ReportIllumMap");

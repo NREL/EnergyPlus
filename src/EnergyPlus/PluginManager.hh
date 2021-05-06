@@ -90,15 +90,15 @@ namespace PluginManagement {
     void clear_state();
 
     struct PluginInstance {
-        PluginInstance(const fs::path& _moduleName, const std::string& _className, std::string emsName, bool runPluginDuringWarmup) :
-                moduleName(_moduleName), className(_className),
+        PluginInstance(const fs::path& _modulePath, const std::string& _className, std::string emsName, bool runPluginDuringWarmup) :
+                modulePath(_modulePath), className(_className),
                 emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup),
-                stringIdentifier(_moduleName.string() + "." + _className)
+                stringIdentifier(_modulePath.string() + "." + _className)
         {
         }
 
         // members
-        fs::path moduleName;
+        fs::path modulePath;
         std::string className;
         std::string emsAlias;
         bool runDuringWarmup;

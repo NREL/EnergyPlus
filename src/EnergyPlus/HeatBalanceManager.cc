@@ -4839,7 +4839,7 @@ namespace HeatBalanceManager {
 
             fs::path window5DataFilePath;
             if (ConstructAlphas(1) == "") {
-                window5DataFilePath = state.dataStrGlobals->CurrentWorkingFolder + "Window5DataFile.dat";
+                window5DataFilePath = state.dataStrGlobals->CurrentWorkingFolder / "Window5DataFile.dat";
             } else {
                 window5DataFilePath = ConstructAlphas(1);
             }

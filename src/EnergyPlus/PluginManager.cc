@@ -487,11 +487,9 @@ PluginManager::PluginManager(EnergyPlusData &state)
                 auto const vars = fields.at("py_search_paths");
                 for (const auto &var : vars) {
                     try {
-                        fs::path searchPath = PluginManager::sanitizedPath(var.at("search_path"));
-                        PluginManager::addToPythonPath(state, searchPath, true);
+                        PluginManager::addToPythonPath(state, PluginManager::sanitizedPath(var.at("search_path")), true);
                     } catch (nlohmann::json::out_of_range &e) {
                         // empty entry
-                    }
                     }
                 }
             } catch (nlohmann::json::out_of_range &e) {
@@ -516,7 +514,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
             auto const &fields = instance.value();
             auto const &thisObjectName = instance.key();
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
-            fs::path modulePath(fields.at("python_module_name");
+            fs::path modulePath(fields.at("python_module_name"));
             std::string className = fields.at("plugin_class_name");
             std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
             bool warmup = false;
@@ -715,14 +713,14 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     // this first section is really all about just ultimately getting a full Python class instance
     // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
 
-    PyObject *pModuleName = PyUnicode_DecodeFSDefault(this->moduleName.string().c_str());
+    PyObject *pModuleName = PyUnicode_DecodeFSDefault(this->modulePath.string().c_str());
     this->pModule = PyImport_Import(pModuleName);
     // PyUnicode_DecodeFSDefault documentation does not explicitly say whether it returns a new or borrowed reference,
     // but other functions in that section say they return a new reference, and that makes sense to me, so I think we
     // should decrement it.
     Py_DECREF(pModuleName);
     if (!this->pModule) {
-        EnergyPlus::ShowSevereError(state, "Failed to import module \"" + this->moduleName.string() + "\"");
+        EnergyPlus::ShowSevereError(state, "Failed to import module \"" + this->modulePath.string() + "\"");
         // ONLY call PyErr_Print if PyErr has occurred, otherwise it will cause other problems
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
@@ -733,7 +731,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     }
     PyObject *pModuleDict = PyModule_GetDict(this->pModule);
     if (!pModuleDict) {
-        EnergyPlus::ShowSevereError(state, "Failed to read module dictionary from module \"" + this->moduleName.string() + "\"");
+        EnergyPlus::ShowSevereError(state, "Failed to read module dictionary from module \"" + this->modulePath.string() + "\"");
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         } else {
@@ -757,7 +755,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     PyObject *pClass = PyDict_GetItemString(pModuleDict, className.c_str());
     // Py_DECREF(pModuleDict);  // PyModule_GetDict returns a borrowed reference, DO NOT decrement
     if (!pClass) {
-        EnergyPlus::ShowSevereError(state, "Failed to get class type \"" + className + "\" from module \"" + moduleName + "\"");
+        EnergyPlus::ShowSevereError(state, "Failed to get class type \"" + className + "\" from module \"" + modulePath.string() + "\"");
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         } else {
@@ -795,7 +793,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
     if (!detectFunction || !PyCallable_Check(detectFunction)) {
         EnergyPlus::ShowSevereError(state, "Could not find or call function \"" + detectOverriddenFunctionName
-                + "\" on class \"" + this->moduleName.string() + "." + this->className + "\"");
+                + "\" on class \"" + this->modulePath.string() + "." + this->className + "\"");
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         } else {

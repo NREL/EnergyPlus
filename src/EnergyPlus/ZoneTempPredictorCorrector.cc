@@ -2735,12 +2735,10 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
                 }
                 runningAverageCEN(dayOfYear) /= 7;
             }
-        } else {
-            ShowFatalError(state, "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFilePath.filePath + " for input (read). (File does not exist)");
         }
     } else {
         ShowFatalError(state,
-                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFilePath.filePath +
+                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
                            " for input (read). (File does not exist)");
     }
 }

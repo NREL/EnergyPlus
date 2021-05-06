@@ -1034,9 +1034,6 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     Array1D_string NameListInstances(5);
     fs::path tempFullFilePath;
 
-    std::vector<fs::path> fullFilePaths;
-    std::vector<std::string> strippedFileNames;
-
     Array1D_string strippedFileName; // remove path from entered file name
     Array1D_string fullFileName;     // entered file name/found
 
@@ -1057,10 +1054,6 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         state.dataExternalInterface->FMURootWorkingFolder = fs::path("tmp-fmus");  // getStringFromCharArray( FMUWorkingFolderCharArr );
 
         // Get and store the names of all FMUs in EnergyPlus data structure
-        // I doubt we'll have more than a handful of objects, so reserve is probably overkill
-        fullFilePaths.reserve(static_cast<unsigned>(NumFMUObjects));
-        strippedFileNames.reserve(static_cast<unsigned>(NumFMUObjects));
-
         strippedFileName.allocate(state.dataExternalInterface->NumFMUObjects);
         fullFileName.allocate(state.dataExternalInterface->NumFMUObjects);
 
@@ -1082,14 +1075,12 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
             // Get the FMU name
             state.dataExternalInterface->FMU(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
-            fs::path inputPath = FileSystem::makeNativePath(FMU(Loop).Name);
+            fs::path inputPath = FileSystem::makeNativePath(state.dataExternalInterface->FMU(Loop).Name);
 
             std::string contextString = cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(1) + ": ";
 
             tempFullFilePath = CheckForActualFilePath(state, inputPath, contextString);
             if (!tempFullFilePath.empty()) {
-                fullFilePaths.push_back(tempFullFilePath);
-                strippedFileNames.push_back(inputPath.filename().string());
 
                 // TODO: eliminate this old block once confident
                 pos = index(state.dataExternalInterface->FMU(Loop).Name, pathChar, true); // look backwards
@@ -1103,10 +1094,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                         strippedFileName(Loop) = state.dataExternalInterface->FMU(Loop).Name;
                     }
                 }
-                fullFileName(Loop) = tempFullFilePath.strng();
+                fullFileName(Loop) = tempFullFilePath.string();
             } else {
-                fullFilePaths.push_back(fs::path{});
-                strippedFileNames.push_back(std::string(""));
                 state.dataExternalInterface->ErrorsFound = true;
             }
             // Get fmu time out
@@ -1117,8 +1106,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
 
         // check for dups that aren't the same file
         // this is windows code...
-        // // So this check that if I entered two different things and get the same end filename, then it's wrong?
-        // TODO: delete once confident
+        // So this check that if I entered two different things and get the same end filename, then it's wrong?
         for (j = 1; j <= state.dataExternalInterface->NumFMUObjects; ++j) {
             for (k = 2; k <= state.dataExternalInterface->NumFMUObjects; ++k) {
                 if (!UtilityRoutines::SameString(strippedFileName(j), strippedFileName(k))) continue;
@@ -1132,22 +1120,6 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                 ShowContinueError(state, "...   full file name=\"" + fullFileName(k) + "\"");
                 ShowContinueError(state, "...name collision but not same file name.");
                 state.dataExternalInterface->ErrorsFound = true;
-            }
-        }
-
-        for (j = 0; j <= state.dataExternalInterface->NumFMUObjects; ++j) {
-            for (k = 1; k <= state.dataExternalInterface->NumFMUObjects; ++k) {
-                if (UtilityRoutines::SameString(strippedFileNames[j], strippedFileNames[k]) &&
-                        (fullFilePaths[j] != fullFilePaths[j])) {
-                    ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport:");
-                    ShowContinueError(state, "duplicate file names (but not same file) entered.");
-                    ShowContinueError(state, "...entered file name=\"" + FMU(j).Name + "\"");
-                    ShowContinueError(state, "...   full file name=\"" + fullFileName(j) + "\"");
-                    ShowContinueError(state, "...entered file name=\"" + FMU(k).Name + "\"");
-                    ShowContinueError(state, "...   full file name=\"" + fullFileName(k) + "\"");
-                    ShowContinueError(state, "...name collision but not same file name.");
-                    state.dataExternalInterface->ErrorsFound = true;
-                }
             }
         }
 
@@ -1284,7 +1256,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                     // Reserve some space in the string, becasue addLibPathCurrentWorkflowFolder doesn't allocate memory for the workingFolderWithLibArr
                     // Note: you can't call str.resize(str.length() + 91) because the conversion to std::vector<char> will find the null
                     // terminator and so it will have no effect
-                    std::string reservedString = FMU(i).Instance(j).WorkingFolder.string() +
+                    std::string reservedString = state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string() +
                         "                                                                                           ";
                     auto workingFolderWithLibArr(getCharArrayFromString(reservedString));
 

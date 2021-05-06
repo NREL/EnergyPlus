@@ -464,10 +464,10 @@ namespace ScheduleManager {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            std::string ShadingSunlitFracFilePath = Alphas(1);
+            std::string ShadingSunlitFracFileName = Alphas(1);
 
             std::string contextString = CurrentModuleObject + ", " + cAlphaFields(1) + ": ";
-            state.files.TempFullFilePath.filePath = CheckForActualFilePath(state, ShadingSunlitFracFilePath, contextString);
+            state.files.TempFullFilePath.filePath = CheckForActualFilePath(state, ShadingSunlitFracFileName, contextString);
 
             if (state.files.TempFullFilePath.filePath.empty()) {
                 ShowFatalError(state, "Program terminates due to previous condition.");
@@ -475,7 +475,7 @@ namespace ScheduleManager {
 
             auto SchdFile = state.files.TempFullFilePath.try_open();
             if (!SchdFile.good()) {
-                ShowSevereError(state, format("{}:\"{}\" cannot be opened.", RoutineName, ShadingSunlitFracFilePath.string()));
+                ShowSevereError(state, format("{}:\"{}\" cannot be opened.", RoutineName, ShadingSunlitFracFileName));
                 ShowContinueError(state, "... It may be open in another program (such as Excel).  Please close and try again.");
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
@@ -485,7 +485,7 @@ namespace ScheduleManager {
             if (endLine > 0) {
                 if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
                     SchdFile.close();
-                    ShowSevereError(state, format("{}:\"{}\" appears to be a Unicode or binary file.", RoutineName, ShadingSunlitFracFilePath.string()));
+                    ShowSevereError(state, format("{}:\"{}\" appears to be a Unicode or binary file.", RoutineName, ShadingSunlitFracFileName));
                     ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                     ShowFatalError(state, "Program terminates due to previous condition.");
                 }
@@ -534,7 +534,7 @@ namespace ScheduleManager {
                             ShowWarningError(state,
                                              format("{}:\"{}\"  first line does not contain the indicated column separator=comma.",
                                                     RoutineName,
-                                                    ShadingSunlitFracFilePath.string()));
+                                                    ShadingSunlitFracFileName));
                             ShowContinueError(state, "...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
                             firstLine = false;
                         }
@@ -544,11 +544,11 @@ namespace ScheduleManager {
                     if (colCnt > 1) {
                         if (rowCnt == 1) {
                             if (subString == BlankString) {
-                                ShowWarningError(state, format("{}:\"{}\": invalid blank column header.", RoutineName, ShadingSunlitFracFilePath.string()));
+                                ShowWarningError(state, format("{}:\"{}\": invalid blank column header.", RoutineName, ShadingSunlitFracFileName));
                                 errFlag = true;
                             } else if (CSVAllColumnNames.count(subString)) {
                                 ShowWarningError(
-                                    state, format("{}:\"{}\": duplicated column header: \"{}\".", RoutineName, ShadingSunlitFracFilePath.string(), subString));
+                                    state, format("{}:\"{}\": duplicated column header: \"{}\".", RoutineName, ShadingSunlitFracFileName, subString));
                                 ShowContinueError(state, "The first occurrence of the same surface name would be used.");
                                 errFlag = true;
                             }
@@ -569,10 +569,10 @@ namespace ScheduleManager {
                                 ShowWarningError(state,
                                                  format("{}:\"{}\": found error processing column: {}, row:{} in {}.",
                                                         RoutineName,
-                                                        ShadingSunlitFracFilePath,
+                                                        ShadingSunlitFracFileName,
                                                         colCnt,
                                                         rowCnt,
-                                                        ShadingSunlitFracFilePath));
+                                                        ShadingSunlitFracFileName));
                                 ShowContinueError(state, "This value is set to 0.");
                             }
                             CSVAllColumnNameAndValues[colCnt - 1](rowCnt - 1) = columnValue;

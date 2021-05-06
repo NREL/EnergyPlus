@@ -203,19 +203,6 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
         ShowFatalError(state, "Invalid reporting requested -- UpdateTabularReports");
     }
 
-<<<<<<< HEAD
-    std::ofstream & open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const & filePath, bool output_to_file)
-    {
-        std::ofstream &tbl_stream(*state.dataOutRptTab->TabularOutputFile(iStyle));
-        if (output_to_file) {
-            tbl_stream.open(filePath);
-            if (!tbl_stream) {
-                ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filePath.string() +
-                               "\" for output (write).");
-            }
-        } else {
-            tbl_stream.setstate(std::ios_base::badbit);
-=======
     if (ort->UpdateTabularReportsGetInput) {
         GetInputTabularMonthly(state);
         OutputReportTabularAnnual::GetInputTabularAnnual(state);
@@ -248,7 +235,6 @@ void UpdateTabularReports(EnergyPlusData &state, OutputProcessor::TimeStepType t
             GatherPeakDemandForTimestep(state, t_timeStepType);
             GatherHeatGainReport(state, t_timeStepType);
             GatherHeatEmissionReport(state, t_timeStepType);
->>>>>>> develop
         }
     }
 }
@@ -3005,104 +2991,6 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
 //======================================================================================================================
 //======================================================================================================================
 
-<<<<<<< HEAD
-        GetEnvironmentalImpactFactorInfo(state, ort->efficiencyDistrictHeating, ort->efficiencyDistrictCooling, ort->sourceFactorSteam);
-    }
-
-    //======================================================================================================================
-    //======================================================================================================================
-
-    //    OTHER INITIALIZATION ROUTINES
-
-    //======================================================================================================================
-    //======================================================================================================================
-
-    void OpenOutputTabularFile(EnergyPlusData &state)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   July 2003
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   Create a file that holds the output from the tabular reports
-        //   the output is in a CSV file if it is comma delimited otherwise
-        //   it is in a TXT file.
-
-        // METHODOLOGY EMPLOYED:
-        //   Uses get input structure similar to other objects
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataHeatBalance::BuildingName;
-        using DataStringGlobals::VerString;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int iStyle;
-        std::string curDel;
-        auto &ort(state.dataOutRptTab);
-
-        // get a new file unit number
-        // create a file to hold the results
-        // Use a CSV file if comma separated but otherwise use TXT file
-        // extension.
-        if (ort->WriteTabularFiles && state.files.outputControl.tabular) {
-            for (iStyle = 1; iStyle <= ort->numStyles; ++iStyle) {
-                curDel = ort->del(iStyle);
-                if (ort->TableStyle(iStyle) == iTableStyle::Comma) {
-                    DisplayString(state, "Writing tabular output file results using comma format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFilePath, state.files.outputControl.tabular);
-                    tbl_stream << "Program Version:" << curDel << VerString << '\n';
-                    tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
-                    tbl_stream << '\n';
-                    tbl_stream << "Building:" << curDel << BuildingName << '\n';
-                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
-                    } else {
-                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
-                    }
-                    tbl_stream << '\n';
-                } else if (ort->TableStyle(iStyle) == iTableStyle::Tab) {
-                    DisplayString(state, "Writing tabular output file results using tab format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFilePath, state.files.outputControl.tabular);
-                    tbl_stream << "Program Version" << curDel << VerString << '\n';
-                    tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
-                    tbl_stream << '\n';
-                    tbl_stream << "Building:" << curDel << BuildingName << '\n';
-                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
-                    } else {
-                        tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
-                    }
-                    tbl_stream << '\n';
-                } else if (ort->TableStyle(iStyle) == iTableStyle::HTML) {
-                    DisplayString(state, "Writing tabular output file results using HTML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFilePath, state.files.outputControl.tabular);
-                    tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
-                    tbl_stream << "<html>\n";
-                    tbl_stream << "<head>\n";
-                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << '\n';
-                    } else {
-                        tbl_stream << "<title> " << BuildingName << ' ' << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
-                    }
-                    tbl_stream << "  " << std::setw(4) << ort->td(1) << '-' << std::setfill('0') << std::setw(2) << ort->td(2) << '-' << std::setw(2) << ort->td(3)
-=======
 void OpenOutputTabularFile(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -3140,7 +3028,6 @@ void OpenOutputTabularFile(EnergyPlusData &state)
                     tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << '\n';
                 } else {
                     tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle
->>>>>>> develop
                                << '\n';
                 }
                 tbl_stream << '\n';
@@ -3157,59 +3044,6 @@ void OpenOutputTabularFile(EnergyPlusData &state)
                 } else {
                     tbl_stream << "Environment:" << curDel << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle
                                << '\n';
-<<<<<<< HEAD
-                    tbl_stream << " - EnergyPlus</title>\n";
-                    tbl_stream << "</head>\n";
-                    tbl_stream << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n";
-                    tbl_stream << "<body>\n";
-                    tbl_stream << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>\n";
-                    tbl_stream << "<a name=top></a>\n";
-                    tbl_stream << "<p>Program Version:<b>" << VerString << "</b></p>\n";
-                    tbl_stream << "<p>Tabular Output Report in Format: <b>HTML</b></p>\n";
-                    tbl_stream << "<p>Building: <b>" << BuildingName << "</b></p>\n";
-                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << "</b></p>\n";
-                    } else {
-                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << "</b></p>\n";
-                    }
-                    tbl_stream << "<p>Simulation Timestamp: <b>" << std::setw(4) << ort->td(1) << '-' << std::setfill('0') << std::setw(2) << ort->td(2) << '-'
-                               << std::setw(2) << ort->td(3) << '\n';
-                    tbl_stream << "  " << std::setw(2) << ort->td(5) << ':' << std::setw(2) << ort->td(6) << ':' << std::setw(2) << ort->td(7) << std::setfill(' ')
-                               << "</b></p>\n";
-                } else if (ort->TableStyle(iStyle) == iTableStyle::XML) {
-                    DisplayString(state, "Writing tabular output file results using XML format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFilePath, state.files.outputControl.tabular);
-                    tbl_stream << "<?xml version=\"1.0\"?>\n";
-                    tbl_stream << "<EnergyPlusTabularReports>\n";
-                    tbl_stream << "  <BuildingName>" << BuildingName << "</BuildingName>\n";
-                    tbl_stream << "  <EnvironmentName>" << state.dataEnvrn->EnvironmentName << "</EnvironmentName>\n";
-                    tbl_stream << "  <WeatherFileLocationTitle>" << state.dataEnvrn->WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
-                    tbl_stream << "  <ProgramVersion>" << VerString << "</ProgramVersion>\n";
-                    tbl_stream << "  <SimulationTimestamp>\n";
-                    tbl_stream << "    <Date>\n";
-                    tbl_stream << "      " << std::setw(4) << ort->td(1) << '-' << std::setfill('0') << std::setw(2) << ort->td(2) << '-' << std::setw(2)
-                               << ort->td(3) << '\n';
-                    tbl_stream << "    </Date>\n";
-                    tbl_stream << "    <Time>\n";
-                    tbl_stream << "      " << std::setw(2) << ort->td(5) << ':' << std::setw(2) << ort->td(6) << ':' << std::setw(2) << ort->td(7)
-                               << std::setfill(' ') << '\n';
-                    tbl_stream << "    </Time>\n";
-                    tbl_stream << "  </SimulationTimestamp>\n";
-                    tbl_stream << '\n';
-                } else {
-                    DisplayString(state, "Writing tabular output file results using text format.");
-                    std::ofstream & tbl_stream = open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFilePath, state.files.outputControl.tabular);
-                    tbl_stream << "Program Version: " << VerString << '\n';
-                    tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
-                    tbl_stream << '\n';
-                    tbl_stream << "Building:        " << BuildingName << '\n';
-                    if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-                        tbl_stream << "Environment:     " << state.dataEnvrn->EnvironmentName << '\n';
-                    } else {
-                        tbl_stream << "Environment:     " << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << '\n';
-                    }
-                    tbl_stream << '\n';
-=======
                 }
                 tbl_stream << '\n';
             } else if (ort->TableStyle(iStyle) == iTableStyle::HTML) {
@@ -3282,7 +3116,6 @@ void OpenOutputTabularFile(EnergyPlusData &state)
                 } else {
                     tbl_stream << "Environment:     " << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle
                                << '\n';
->>>>>>> develop
                 }
                 tbl_stream << '\n';
             }
@@ -5483,88 +5316,7 @@ bool produceDualUnitsFlags(const int &iUnit_Sys,
             brkflag = true;
             produce_Sql = false;
         }
-<<<<<<< HEAD
-        // these not part of big if/else because sequential
-        if (lineType == StatLineType::KoppenDes1Line && isKoppen) lineType = StatLineType::KoppenDes2Line;
-        if (lineType == StatLineType::KoppenLine && isKoppen) lineType = StatLineType::KoppenDes1Line;
-        if (has(lineIn, "ppen classification)")) lineType = StatLineType::KoppenLine;
-        if (lineType == StatLineType::AshStdDes2Line) lineType = StatLineType::AshStdDes3Line;
-        if (lineType == StatLineType::AshStdDes1Line) lineType = StatLineType::AshStdDes2Line;
-        if (lineType == StatLineType::AshStdLine) lineType = StatLineType::AshStdDes1Line;
-        if (has(lineIn, "ASHRAE Standard")) lineType = StatLineType::AshStdLine;
     }
-
-    void FillWeatherPredefinedEntries(EnergyPlusData &state)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   Feb 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        //   Read the STAT file for the active weather file and summarize in a predefined report.
-        //   The stat file that is attached may have several formats -- from evolution of the
-        //   stat file from the weather converter (or others that produce a similar stat file).
-
-        // Using/Aliasing
-        using namespace OutputReportPredefined;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const degChar("°");
-
-        auto &ort(state.dataOutRptTab);
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        StatLineType lineType = StatLineType::Initialized;
-        StatLineType lineTypeinterim = StatLineType::Initialized;
-        bool isASHRAE;
-        bool iscalc;
-        bool isKoppen;
-        std::string::size_type ashPtr;
-        std::string::size_type lnPtr;
-        int col1;
-        int col2;
-        int col3;
-        std::string::size_type sposlt;
-        std::string::size_type eposlt;
-        std::string::size_type sposlg;
-        std::string::size_type eposlg;
-        std::string::size_type spostz;
-        std::string::size_type epostz;
-        std::string ashDesYear;
-        std::string ashZone; // ashrae climate zone
-        std::string curNameWithSIUnits;
-        std::string curNameAndUnits;
-        int indexUnitConv;
-        std::string storeASHRAEHDD;
-        std::string storeASHRAECDD;
-        bool heatingDesignlinepassed;
-        bool coolingDesignlinepassed;
-        bool desConditionlinepassed;
-
-        isASHRAE = false;
-        iscalc = false;
-        isKoppen = false;
-        heatingDesignlinepassed = false;
-        coolingDesignlinepassed = false;
-        desConditionlinepassed = false;
-        storeASHRAEHDD = "";
-        storeASHRAECDD = "";
-        lineTypeinterim = StatLineType::Initialized;
-        if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
-            auto statFile = state.files.inStatFilePath.open(state, "FillWeatherPredefinedEntries");
-            while (statFile.good()) { // end of file, or error
-                lineType = lineTypeinterim;
-                auto lineIn = statFile.readLine().data;
-                // reconcile line with different versions of stat file
-                // v7.1 added version as first line.
-                strip(lineIn);
-                parseStatLine(lineIn, lineType, desConditionlinepassed, heatingDesignlinepassed, coolingDesignlinepassed, isKoppen);
-=======
-    }
->>>>>>> develop
 
     // False if a separate sqlite round is needed;
     // true if not

@@ -245,7 +245,6 @@ namespace CurveManager {
         fs::path filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
-        bool load(EnergyPlusData &state, fs::path const &path);
         bool load(EnergyPlusData &state, fs::path const &path);        // Note: this returns 'True' if ErrorsFound
         std::vector<double> &getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow);
 
@@ -274,8 +273,6 @@ namespace CurveManager {
         int getNumGridDims(int gridIndex);
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
-        std::map<std::string, const json&> independentVarRefs;
-        std::map<fs::path, TableFile> tableFiles;
         std::map<std::string, const json &> independentVarRefs;
         std::map<fs::path, TableFile> tableFiles;
         void clear();

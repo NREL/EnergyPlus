@@ -9345,7 +9345,7 @@ namespace WeatherManager {
                 auto statFile = state.files.inputWeatherFilePath.try_open();
                 if (!statFile.good()) {
                     ShowSevereError(state,
-                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFilePath.filePath +
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
                                         " for input (read).");
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
                     return;

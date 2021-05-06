@@ -1252,8 +1252,8 @@ void PrepDebugFilesAndVariables(EnergyPlusData &state,
 
     // setup file names if file name is provided, otherwise keep default
     if (!Debug_file.empty()) {
-        files.WINCogFilePath = fs::path(Debug_file + ".w7");
-        files.DebugOutputFilePath = fs::path(Debug_file + ".dbg");
+        files.WINCogFilePath = fs::path(Debug_file.string() + ".w7");
+        files.DebugOutputFilePath = fs::path(Debug_file.string() + ".dbg");
     }
 
     files.WriteDebugOutput = false;
