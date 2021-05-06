@@ -579,10 +579,10 @@ namespace AirflowNetwork {
         std::string name;     // Name of standard conditions component
         Real64 temperature;   // Standard temperature for crack data
         Real64 pressure;      // Standard barometric pressure for crack data
-        Real64 humidityRatio; // Standard humidity ratio for crack data
+        Real64 humidity_ratio; // Standard humidity ratio for crack data
 
-        ReferenceConditions(const std::string &name, Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidityRatio = 0.0)
-            : name(name), temperature(temperature), pressure(pressure), humidityRatio(humidityRatio)
+        ReferenceConditions(const std::string &name, Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidity_ratio = 0.0)
+            : name(name), temperature(temperature), pressure(pressure), humidity_ratio(humidity_ratio)
         {
         }
 
@@ -597,31 +597,28 @@ namespace AirflowNetwork {
         // Members
         Real64 coefficient;         // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 exponent;            // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
-        Real64 StandardT; // Standard temperature for crack data
-        Real64 StandardP; // Standard barometric pressure for crack data
-        Real64 StandardW; // Standard humidity ratio for crack data
         Real64 reference_density;   // Reference density for crack data
         Real64 reference_viscosity; // Reference viscosity for crack data
 
         // Default Constructor
-        SurfaceCrack() : coefficient(0.0), exponent(0.0), StandardT(0.0), StandardP(0.0), StandardW(0.0), reference_density(0.0), reference_viscosity(0.0)
+        SurfaceCrack() : coefficient(0.0), exponent(0.0), reference_density(0.0), reference_viscosity(0.0)
         {
         }
 
-        int calculate(EnergyPlusData &state,
-                      bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                              // Linkage number
-                      [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                      [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirProperties &propN,               // Node 1 properties
-                      const AirProperties &propM,               // Node 2 properties
-                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
-                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+        int calculate([[maybe_unused]] EnergyPlusData &state,
+                      bool const linear,            // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,           // Total pressure drop across a component (P1 - P2) [Pa]
+                      [[maybe_unused]] int const i, // Linkage number
+                      const Real64 multiplier,      // Element multiplier
+                      const Real64 control,         // Element control signal
+                      const AirProperties &propN,   // Node 1 properties
+                      const AirProperties &propM,   // Node 2 properties
+                      std::array<Real64, 2> &F,     // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF     // Partial derivative:  DF/DP
         );
 
         virtual int calculate(EnergyPlusData &state,
-                              const Real64 PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                              const Real64 pdrop,         // Total pressure drop across a component (P1 - P2) [Pa]
                               const Real64 multiplier,    // Element multiplier
                               const Real64 control,       // Element control signal
                               const AirProperties &propN, // Node 1 properties

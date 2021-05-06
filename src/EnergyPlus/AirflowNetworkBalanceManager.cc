@@ -403,7 +403,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 Real64 refT = defaultReferenceConditions.temperature;
                 Real64 refP = defaultReferenceConditions.pressure;
-                Real64 refW = defaultReferenceConditions.humidityRatio;
+                Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
@@ -416,7 +416,7 @@ namespace AirflowNetworkBalanceManager {
                         } else {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
-                            refW = result->second.humidityRatio;
+                            refW = result->second.humidity_ratio;
                             state.dataInputProcessing->inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
                                                                                         result->second.name);
                         }
@@ -428,9 +428,6 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).exponent = expnt;      // Air Mass Flow exponent
                 state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).reference_density = AIRDENSITY(state, refP, refT, refW);
                 state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).reference_viscosity = AIRDYNAMICVISCOSITY(refT);
-                state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).StandardT = refT;
-                state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).StandardP = refP;
-                state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).StandardW = refW;
 
                 // This is the first element that is being added to the lookup table, so no check of naming overlaps
                 solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneSurfaceCrackData(i); // Yet another workaround
@@ -492,7 +489,7 @@ namespace AirflowNetworkBalanceManager {
 
                 Real64 refT = defaultReferenceConditions.temperature;
                 Real64 refP = defaultReferenceConditions.pressure;
-                Real64 refW = defaultReferenceConditions.humidityRatio;
+                Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
@@ -505,7 +502,7 @@ namespace AirflowNetworkBalanceManager {
                         } else {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
-                            refW = result->second.humidityRatio;
+                            refW = result->second.humidity_ratio;
                             state.dataInputProcessing->inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
                                                                                         result->second.name);
                         }
@@ -568,7 +565,7 @@ namespace AirflowNetworkBalanceManager {
 
                 Real64 refT = defaultReferenceConditions.temperature;
                 Real64 refP = defaultReferenceConditions.pressure;
-                Real64 refW = defaultReferenceConditions.humidityRatio;
+                Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
@@ -581,7 +578,7 @@ namespace AirflowNetworkBalanceManager {
                         } else {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
-                            refW = result->second.humidityRatio;
+                            refW = result->second.humidity_ratio;
                             state.dataInputProcessing->inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
                                                                                         result->second.name);
                         }
@@ -643,7 +640,7 @@ namespace AirflowNetworkBalanceManager {
 
                 Real64 refT = defaultReferenceConditions.temperature;
                 Real64 refP = defaultReferenceConditions.pressure;
-                Real64 refW = defaultReferenceConditions.humidityRatio;
+                Real64 refW = defaultReferenceConditions.humidity_ratio;
                 if (!conditionsAreDefaulted) {
                     if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
                         auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
@@ -656,7 +653,7 @@ namespace AirflowNetworkBalanceManager {
                         } else {
                             refT = result->second.temperature;
                             refP = result->second.pressure;
-                            refW = result->second.humidityRatio;
+                            refW = result->second.humidity_ratio;
                             state.dataInputProcessing->inputProcessor->markObjectAsUsed("AirflowNetwork:MultiZone:ReferenceCrackConditions",
                                                                                         result->second.name);
                         }
