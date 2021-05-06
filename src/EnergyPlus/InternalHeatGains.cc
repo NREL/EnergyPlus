@@ -8062,7 +8062,7 @@ namespace InternalHeatGains {
             return DeviceIndex;
         }
         for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
-            if ((state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectName == IntGainName) &&
+            if ((UtilityRoutines::SameString(state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectName, IntGainName.data())) &&
                 (state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum == IntGainTypeOfNum)) {
                 DeviceIndex = DeviceNum;
                 break;
