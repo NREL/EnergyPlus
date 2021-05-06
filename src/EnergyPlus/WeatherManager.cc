@@ -9347,7 +9347,7 @@ namespace WeatherManager {
                     ShowSevereError(state,
                                     "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
                                         " for input (read).");
-                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
 
@@ -9379,7 +9379,7 @@ namespace WeatherManager {
                 bool epwHasLeapYear(false);
                 if (!epwFile.good()) {
                     ShowSevereError(state, "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + epwFile.filePath.string() + " for input (read).");
-                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
                 for (int i = 1; i <= 8; ++i) { // Headers
