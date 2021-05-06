@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
     state->dataStrGlobals->outputPerfLogFilePath = "eplusout_perflog.csv";
 
     // start with no file
-    fs:remove(state->dataStrGlobals->outputPerfLogFilePath);
+    fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
 
     // make sure the static variables are cleared
     UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");

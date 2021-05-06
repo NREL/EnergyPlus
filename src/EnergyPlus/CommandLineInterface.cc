@@ -284,23 +284,23 @@ namespace CommandLineInterface {
             auto inputFileExt = state.dataStrGlobals->inputFilePath.extension().string();
             std::transform(inputFileExt.begin(), inputFileExt.end(), inputFileExt.begin(), ::toupper);
 
-            if (inputFileExt == "EPJSON" || inputFileExt == "JSON") {
+            if (inputFileExt == ".EPJSON" || inputFileExt == ".JSON") {
                 state.dataGlobal->isEpJSON = true;
-            } else if (inputFileExt == "IDF" || inputFileExt == "IMF") {
+            } else if (inputFileExt == ".IDF" || inputFileExt == ".IMF") {
                 state.dataGlobal->isEpJSON = false;
-            } else if (inputFileExt == "CBOR") {
+            } else if (inputFileExt == ".CBOR") {
                 state.dataGlobal->isEpJSON = true;
                 state.dataGlobal->isCBOR = true;
                 DisplayString(state, "CBOR input format is experimental and unsupported.");
-            } else if (inputFileExt == "MSGPACK") {
+            } else if (inputFileExt == ".MSGPACK") {
                 state.dataGlobal->isEpJSON = true;
                 state.dataGlobal->isMsgPack = true;
                 DisplayString(state, "MsgPack input format is experimental and unsupported.");
-            } else if (inputFileExt == "UBJSON") {
+            } else if (inputFileExt == ".UBJSON") {
                 state.dataGlobal->isEpJSON = true;
                 state.dataGlobal->isUBJSON = true;
                 DisplayString(state, "UBJSON input format is experimental and unsupported.");
-            } else if (inputFileExt == "BSON") {
+            } else if (inputFileExt == ".BSON") {
                 state.dataGlobal->isEpJSON = true;
                 state.dataGlobal->isBSON = true;
                 DisplayString(state, "BSON input format is experimental and unsupported.");
