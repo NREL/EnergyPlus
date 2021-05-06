@@ -90,14 +90,14 @@ void jsonToArray(EnergyPlusData &state, Array1D<Real64> &arr, nlohmann::json &j,
     // 0-based array to JSON list
 
     try {
-        int size = static_cast<int>(j[key].size());
+        int size = static_cast<int>(j.at(key).size());
         arr.dimension({0, size - 1}, 0.0);
         int idx = 0;
-        for (auto &v : j[key]) {
+        for (auto &v : j.at(key)) {
             arr[idx] = v;
             ++idx;
         }
-    } catch (nlohmann::json::out_of_range &e) {
+    } catch (const nlohmann::json::out_of_range &e) {
         ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
     }
 }
@@ -107,14 +107,14 @@ void jsonToArray1(EnergyPlusData &state, Array1D<Real64> &arr, nlohmann::json &j
     // 1-based array to JSON list
 
     try {
-        int size = static_cast<int>(j[key].size());
+        int size = static_cast<int>(j.at(key).size());
         arr.dimension(size, 0.0);
         int idx = 0;
-        for (auto &v : j[key]) {
+        for (auto &v : j.at(key)) {
             arr[idx] = v;
             ++idx;
         }
-    } catch (nlohmann::json::out_of_range &e) {
+    } catch (const nlohmann::json::out_of_range &e) {
         ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
     }
 }

@@ -78,8 +78,8 @@ namespace Cache {
     template <typename T> void jsonToData(EnergyPlusData &state, T &data, nlohmann::json &j, std::string const &key)
     {
         try {
-            data = j[key];
-        } catch (nlohmann::json::out_of_range &e) {
+            data = j.at(key);
+        } catch (const nlohmann::json::out_of_range &e) {
             ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
         }
     }

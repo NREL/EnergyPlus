@@ -2080,22 +2080,23 @@ void ConstructionProps::loadFromCache(EnergyPlusData &state)
     try {
         // load cached data
         std::string key = this->getCacheKey(state);
-        nlohmann::json jCTFData = state.dataCache->cache[Cache::CTFKey][key];
+        nlohmann::json allCTFs = state.dataCache->cache.at(Cache::CTFKey);
+        nlohmann::json thisConstrData = allCTFs.at(key);
 
         // CTF arrays
-        Cache::jsonToArray(state, this->CTFCross, jCTFData, "ctf_cross");
-        Cache::jsonToArray1(state, this->CTFFlux, jCTFData, "ctf_flux");
-        Cache::jsonToArray(state, this->CTFInside, jCTFData, "ctf_inside");
-        Cache::jsonToArray(state, this->CTFOutside, jCTFData, "ctf_outside");
+        Cache::jsonToArray(state, this->CTFCross, thisConstrData, "ctf_cross");
+        Cache::jsonToArray1(state, this->CTFFlux, thisConstrData, "ctf_flux");
+        Cache::jsonToArray(state, this->CTFInside, thisConstrData, "ctf_inside");
+        Cache::jsonToArray(state, this->CTFOutside, thisConstrData, "ctf_outside");
 
         // other necessary data
-        Cache::jsonToData(state, this->NumHistories, jCTFData, "num_histories");
-        Cache::jsonToData(state, this->NumCTFTerms, jCTFData, "num_ctf_terms");
-        Cache::jsonToData(state, this->CTFTimeStep, jCTFData, "ctf_timestep");
-        Cache::jsonToData(state, this->UValue, jCTFData, "u_value");
+        Cache::jsonToData(state, this->NumHistories, thisConstrData, "num_histories");
+        Cache::jsonToData(state, this->NumCTFTerms, thisConstrData, "num_ctf_terms");
+        Cache::jsonToData(state, this->CTFTimeStep, thisConstrData, "ctf_timestep");
+        Cache::jsonToData(state, this->UValue, thisConstrData, "u_value");
 
         this->CTFLoadedFromCache = true;
-    } catch (nlohmann::json::out_of_range &e) {
+    } catch (const nlohmann::json::out_of_range &e) {
         // should already be defaulted to false, but this makes sure
         // we might need other error handling if we get to this point
         this->CTFLoadedFromCache = false;
