@@ -563,7 +563,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             } else { // RJH 2008-03-07: No errors
                 // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
                 // Open DElight Electric Lighting Dump File for reading
-                auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delighteldmp);
+                auto iDElightErrorFile = state.files.outputDelightEldmpFilePath.try_open(state.files.outputControl.delighteldmp);
                 if (iDElightErrorFile.is_open()) {
                     elOpened = true;
                 } else {
