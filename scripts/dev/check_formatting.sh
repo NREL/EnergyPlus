@@ -10,10 +10,15 @@
 
 # Run this script from the root of the repo and it will check the files in src/EnergyPlus and tst/EnergyPlus/unit
 
+exit_code=0
 for dir in "src/EnergyPlus" "tst/EnergyPlus/unit"; do
   echo "***Processing files in directory: ${dir}"
   files=$(find "${dir}" | grep -E '\.((c|C)c?(pp|xx|\+\+)*$|(h|H)h?(pp|xx|\+\+)*$)')
   for file in $files; do
-    /usr/bin/clang-format-10 --dry-run --Werror --style=file "${file}"
+    if ! /usr/bin/clang-format-10 --dry-run --Werror --style=file "${file}";
+    then
+		  exit_code=1
+		fi
   done
 done
+exit "$exit_code"
