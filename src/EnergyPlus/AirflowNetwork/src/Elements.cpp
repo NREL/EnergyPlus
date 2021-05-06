@@ -449,9 +449,9 @@ namespace AirflowNetwork {
         VisAve = (propN.viscosity + propM.viscosity) / 2.0;
         Tave = (propN.temperature + propM.temperature) / 2.0;
         if (PDROP >= 0.0) {
-            coef = FlowCoef / propN.sqrtDensity * Corr;
+            coef = FlowCoef / propN.sqrt_density * Corr;
         } else {
-            coef = FlowCoef / propM.sqrtDensity * Corr;
+            coef = FlowCoef / propM.sqrt_density * Corr;
         }
 
         if (LFLAG) {
@@ -477,9 +477,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (expn == 0.5) {
-                    FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                    FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
                 } else {
-                    FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                    FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
                 }
             } else {
                 // Flow in negative direction.
@@ -490,9 +490,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (expn == 0.5) {
-                    FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                    FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
                 } else {
-                    FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                    FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
                 }
             }
             // Select laminar or turbulent flow.
@@ -566,9 +566,9 @@ namespace AirflowNetwork {
         VisAve = (propN.viscosity + propM.viscosity) / 2.0;
         Tave = (propN.temperature + propM.temperature) / 2.0;
         if (PDROP >= 0.0) {
-            coef = multiplier * control * FlowCoef / propN.sqrtDensity;
+            coef = multiplier * control * FlowCoef / propN.sqrt_density;
         } else {
-            coef = multiplier * control * FlowCoef / propM.sqrtDensity;
+            coef = multiplier * control * FlowCoef / propM.sqrt_density;
         }
 
         // Standard calculation.
@@ -581,9 +581,9 @@ namespace AirflowNetwork {
             FL = CDM * PDROP;
             // Turbulent flow.
             if (expn == 0.5) {
-                FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
             } else {
-                FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
             }
         } else {
             // Flow in negative direction.
@@ -594,9 +594,9 @@ namespace AirflowNetwork {
             FL = CDM * PDROP;
             // Turbulent flow.
             if (expn == 0.5) {
-                FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
             } else {
-                FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
             }
         }
         // Select laminar or turbulent flow.
@@ -655,9 +655,9 @@ namespace AirflowNetwork {
         Real64 coef = FlowCoef;
 
         if (PDROP >= 0.0) {
-            coef /= propN.sqrtDensity;
+            coef /= propN.sqrt_density;
         } else {
-            coef /= propM.sqrtDensity;
+            coef /= propM.sqrt_density;
         }
 
         if (LFLAG) {
@@ -679,9 +679,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Flow in positive direction for turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = coef * propN.sqrtDensity * std::sqrt(PDROP);
+                    FT = coef * propN.sqrt_density * std::sqrt(PDROP);
                 } else {
-                    FT = coef * propN.sqrtDensity * std::pow(PDROP, FlowExpo);
+                    FT = coef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
                 }
             } else {
                 // Flow in negative direction for laminar flow
@@ -689,9 +689,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Flow in negative direction for turbulent flow
                 if (FlowExpo == 0.5) {
-                    FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP);
+                    FT = -coef * propM.sqrt_density * std::sqrt(-PDROP);
                 } else {
-                    FT = -coef * propM.sqrtDensity * std::pow(-PDROP, FlowExpo);
+                    FT = -coef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
                 }
             }
             // Select laminar or turbulent flow.
@@ -749,9 +749,9 @@ namespace AirflowNetwork {
         Real64 coef = FlowCoef;
 
         if (PDROP >= 0.0) {
-            coef /= propN.sqrtDensity;
+            coef /= propN.sqrt_density;
         } else {
-            coef /= propM.sqrtDensity;
+            coef /= propM.sqrt_density;
         }
 
         // Standard calculation.
@@ -762,9 +762,9 @@ namespace AirflowNetwork {
             FL = CDM * PDROP;
             // Flow in positive direction for turbulent flow.
             if (FlowExpo == 0.5) {
-                FT = coef * propN.sqrtDensity * std::sqrt(PDROP);
+                FT = coef * propN.sqrt_density * std::sqrt(PDROP);
             } else {
-                FT = coef * propN.sqrtDensity * std::pow(PDROP, FlowExpo);
+                FT = coef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
             }
         } else {
             // Flow in negative direction for laminar flow
@@ -772,9 +772,9 @@ namespace AirflowNetwork {
             FL = CDM * PDROP;
             // Flow in negative direction for turbulent flow
             if (FlowExpo == 0.5) {
-                FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP);
+                FT = -coef * propM.sqrt_density * std::sqrt(-PDROP);
             } else {
-                FT = -coef * propM.sqrtDensity * std::pow(-PDROP, FlowExpo);
+                FT = -coef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
             }
         }
         // Select laminar or turbulent flow.
@@ -1223,9 +1223,9 @@ namespace AirflowNetwork {
         } else {
             //                              Turbulent flow.
             if (PDROP >= 0.0) {
-                F[0] = C * TurFlow * propN.sqrtDensity * std::pow(PDROP, FlowExpo);
+                F[0] = C * TurFlow * propN.sqrt_density * std::pow(PDROP, FlowExpo);
             } else {
-                F[0] = -C * TurFlow * propM.sqrtDensity * std::pow(-PDROP, FlowExpo);
+                F[0] = -C * TurFlow * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
             }
             DF[0] = F[0] * FlowExpo / PDROP;
         }
@@ -1284,9 +1284,9 @@ namespace AirflowNetwork {
         } else {
             //                              Turbulent flow.
             if (PDROP >= 0.0) {
-                F[0] = C * TurFlow * propN.sqrtDensity * std::pow(PDROP, FlowExpo);
+                F[0] = C * TurFlow * propN.sqrt_density * std::pow(PDROP, FlowExpo);
             } else {
-                F[0] = -C * TurFlow * propM.sqrtDensity * std::pow(-PDROP, FlowExpo);
+                F[0] = -C * TurFlow * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
             }
             DF[0] = F[0] * FlowExpo / PDROP;
         }
@@ -1352,9 +1352,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = FlowCoef * propN.sqrtDensity * std::sqrt(PDROP);
+                    FT = FlowCoef * propN.sqrt_density * std::sqrt(PDROP);
                 } else {
-                    FT = FlowCoef * propN.sqrtDensity * std::pow(PDROP, FlowExpo);
+                    FT = FlowCoef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
                 }
             } else {
                 // Flow in negative direction.
@@ -1363,9 +1363,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = -FlowCoef * propM.sqrtDensity * std::sqrt(-PDROP);
+                    FT = -FlowCoef * propM.sqrt_density * std::sqrt(-PDROP);
                 } else {
-                    FT = -FlowCoef * propM.sqrtDensity * std::pow(-PDROP, FlowExpo);
+                    FT = -FlowCoef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
                 }
             }
             // Select laminar or turbulent flow.
@@ -1429,9 +1429,9 @@ namespace AirflowNetwork {
             FL = CDM * PDROP;
             // Turbulent flow.
             if (FlowExpo == 0.5) {
-                FT = FlowCoef * propN.sqrtDensity * std::sqrt(PDROP);
+                FT = FlowCoef * propN.sqrt_density * std::sqrt(PDROP);
             } else {
-                FT = FlowCoef * propN.sqrtDensity * std::pow(PDROP, FlowExpo);
+                FT = FlowCoef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
             }
         } else {
             // Flow in negative direction.
@@ -1440,9 +1440,9 @@ namespace AirflowNetwork {
             FL = CDM * PDROP;
             // Turbulent flow.
             if (FlowExpo == 0.5) {
-                FT = -FlowCoef * propM.sqrtDensity * std::sqrt(-PDROP);
+                FT = -FlowCoef * propM.sqrt_density * std::sqrt(-PDROP);
             } else {
-                FT = -FlowCoef * propM.sqrtDensity * std::pow(-PDROP, FlowExpo);
+                FT = -FlowCoef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
             }
         }
         // Select laminar or turbulent flow.
@@ -1992,9 +1992,9 @@ namespace AirflowNetwork {
         }
 
         if (PDROP >= 0.0) {
-            coeff /= propN.sqrtDensity;
+            coeff /= propN.sqrt_density;
         } else {
-            coeff /= propM.sqrtDensity;
+            coeff /= propM.sqrt_density;
         }
 
         // Add window multiplier with window close
@@ -2032,36 +2032,36 @@ namespace AirflowNetwork {
             if (Y <= 0.0) {
                 // One-way flow (negative).
                 if (DRHO >= 0.0) {
-                    F[0] = -propM.sqrtDensity * std::abs(FH - F0);
-                    DF[0] = propM.sqrtDensity * std::abs(DFH - DF0);
+                    F[0] = -propM.sqrt_density * std::abs(FH - F0);
+                    DF[0] = propM.sqrt_density * std::abs(DFH - DF0);
                 } else {
-                    F[0] = propN.sqrtDensity * std::abs(FH - F0);
-                    DF[0] = propN.sqrtDensity * std::abs(DFH - DF0);
+                    F[0] = propN.sqrt_density * std::abs(FH - F0);
+                    DF[0] = propN.sqrt_density * std::abs(DFH - DF0);
                 }
                 // if (LIST >= 4) gio::write(Unit21, Format_900) << " Dr1:" << C << F[0] << DF[0];
             } else if (Y >= Height) {
                 // One-way flow (positive).
                 if (DRHO >= 0.0) {
-                    F[0] = propN.sqrtDensity * std::abs(FH - F0);
-                    DF[0] = propN.sqrtDensity * std::abs(DFH - DF0);
+                    F[0] = propN.sqrt_density * std::abs(FH - F0);
+                    DF[0] = propN.sqrt_density * std::abs(DFH - DF0);
                 } else {
-                    F[0] = -propM.sqrtDensity * std::abs(FH - F0);
-                    DF[0] = propM.sqrtDensity * std::abs(DFH - DF0);
+                    F[0] = -propM.sqrt_density * std::abs(FH - F0);
+                    DF[0] = propM.sqrt_density * std::abs(DFH - DF0);
                 }
                 // if (LIST >= 4) gio::write(Unit21, Format_900) << " Dr2:" << C << F[0] << DF[0];
             } else {
                 // Two-way flow.
                 NF = 2;
                 if (DRHO >= 0.0) {
-                    F[0] = -propM.sqrtDensity * FH;
-                    DF[0] = propM.sqrtDensity * DFH;
-                    F[1] = propN.sqrtDensity * F0;
-                    DF[1] = propN.sqrtDensity * DF0;
+                    F[0] = -propM.sqrt_density * FH;
+                    DF[0] = propM.sqrt_density * DFH;
+                    F[1] = propN.sqrt_density * F0;
+                    DF[1] = propN.sqrt_density * DF0;
                 } else {
-                    F[0] = propN.sqrtDensity * FH;
-                    DF[0] = propN.sqrtDensity * DFH;
-                    F[1] = -propM.sqrtDensity * F0;
-                    DF[1] = propM.sqrtDensity * DF0;
+                    F[0] = propN.sqrt_density * FH;
+                    DF[0] = propN.sqrt_density * DFH;
+                    F[1] = -propM.sqrt_density * F0;
+                    DF[1] = propM.sqrt_density * DF0;
                 }
                 // if (LIST >= 4) gio::write(Unit21, Format_900) << " Dr3:" << C << F[0] << DF[0];
                 // if (LIST >= 4) gio::write(Unit21, Format_900) << " Dr4:" << C << F[1] << DF[1];
@@ -2191,9 +2191,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = FlowCoef * propN.sqrtDensity * std::sqrt(PDROP);
+                    FT = FlowCoef * propN.sqrt_density * std::sqrt(PDROP);
                 } else {
-                    FT = FlowCoef * propN.sqrtDensity * std::pow(PDROP, FlowExpo);
+                    FT = FlowCoef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
                 }
             } else {
                 // Flow in negative direction.
@@ -2202,9 +2202,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (FlowExpo == 0.5) {
-                    FT = -FlowCoef * propM.sqrtDensity * std::sqrt(-PDROP);
+                    FT = -FlowCoef * propM.sqrt_density * std::sqrt(-PDROP);
                 } else {
-                    FT = -FlowCoef * propM.sqrtDensity * std::pow(-PDROP, FlowExpo);
+                    FT = -FlowCoef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
                 }
             }
             // Select laminar or turbulent flow.
@@ -2271,9 +2271,9 @@ namespace AirflowNetwork {
             FL = CDM * PDROP;
             // Turbulent flow.
             if (FlowExpo == 0.5) {
-                FT = FlowCoef * propN.sqrtDensity * std::sqrt(PDROP);
+                FT = FlowCoef * propN.sqrt_density * std::sqrt(PDROP);
             } else {
-                FT = FlowCoef * propN.sqrtDensity * std::pow(PDROP, FlowExpo);
+                FT = FlowCoef * propN.sqrt_density * std::pow(PDROP, FlowExpo);
             }
         } else {
             // Flow in negative direction.
@@ -2282,9 +2282,9 @@ namespace AirflowNetwork {
             FL = CDM * PDROP;
             // Turbulent flow.
             if (FlowExpo == 0.5) {
-                FT = -FlowCoef * propM.sqrtDensity * std::sqrt(-PDROP);
+                FT = -FlowCoef * propM.sqrt_density * std::sqrt(-PDROP);
             } else {
-                FT = -FlowCoef * propM.sqrtDensity * std::pow(-PDROP, FlowExpo);
+                FT = -FlowCoef * propM.sqrt_density * std::pow(-PDROP, FlowExpo);
             }
         }
         // Select laminar or turbulent flow.
@@ -3123,9 +3123,9 @@ namespace AirflowNetwork {
             VisAve = (propN.viscosity + propM.viscosity) / 2.0;
             Tave = (propN.temperature + propM.temperature) / 2.0;
             if (PDROP >= 0.0) {
-                coef = FlowCoef / propN.sqrtDensity * Corr;
+                coef = FlowCoef / propN.sqrt_density * Corr;
             } else {
-                coef = FlowCoef / propM.sqrtDensity * Corr;
+                coef = FlowCoef / propM.sqrt_density * Corr;
             }
 
             if (LFLAG) {
@@ -3151,9 +3151,9 @@ namespace AirflowNetwork {
                     FL = CDM * PDROP;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                        FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
                     } else {
-                        FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                        FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
                     }
                 } else {
                     // Flow in negative direction.
@@ -3164,9 +3164,9 @@ namespace AirflowNetwork {
                     FL = CDM * PDROP;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
                     } else {
-                        FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
                     }
                 }
                 // Select laminar or turbulent flow.
@@ -3248,9 +3248,9 @@ namespace AirflowNetwork {
             VisAve = (propN.viscosity + propM.viscosity) / 2.0;
             Tave = (propN.temperature + propM.temperature) / 2.0;
             if (PDROP >= 0.0) {
-                coef = control * FlowCoef / propN.sqrtDensity;
+                coef = control * FlowCoef / propN.sqrt_density;
             } else {
-                coef = control * FlowCoef / propM.sqrtDensity;
+                coef = control * FlowCoef / propM.sqrt_density;
             }
 
             // Standard calculation.
@@ -3263,9 +3263,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (expn == 0.5) {
-                    FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                    FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
                 } else {
-                    FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                    FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
                 }
             } else {
                 // Flow in negative direction.
@@ -3276,9 +3276,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (expn == 0.5) {
-                    FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                    FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
                 } else {
-                    FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                    FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
                 }
             }
             // Select laminar or turbulent flow.
@@ -3487,9 +3487,9 @@ namespace AirflowNetwork {
             VisAve = (propN.viscosity + propM.viscosity) / 2.0;
             Tave = (propN.temperature + propM.temperature) / 2.0;
             if (PDROP >= 0.0) {
-                coef = FlowCoef / propN.sqrtDensity * Corr;
+                coef = FlowCoef / propN.sqrt_density * Corr;
             } else {
-                coef = FlowCoef / propM.sqrtDensity * Corr;
+                coef = FlowCoef / propM.sqrt_density * Corr;
             }
 
             if (LFLAG) {
@@ -3515,9 +3515,9 @@ namespace AirflowNetwork {
                     FL = CDM * PDROP;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                        FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
                     } else {
-                        FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                        FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
                     }
                 } else {
                     // Flow in negative direction.
@@ -3528,9 +3528,9 @@ namespace AirflowNetwork {
                     FL = CDM * PDROP;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
                     } else {
-                        FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
                     }
                 }
                 // Select laminar or turbulent flow.
@@ -3608,9 +3608,9 @@ namespace AirflowNetwork {
             VisAve = (propN.viscosity + propM.viscosity) / 2.0;
             Tave = (propN.temperature + propM.temperature) / 2.0;
             if (PDROP >= 0.0) {
-                coef = FlowCoef / propN.sqrtDensity * Corr;
+                coef = FlowCoef / propN.sqrt_density * Corr;
             } else {
-                coef = FlowCoef / propM.sqrtDensity * Corr;
+                coef = FlowCoef / propM.sqrt_density * Corr;
             }
 
             if (LFLAG) {
@@ -3636,9 +3636,9 @@ namespace AirflowNetwork {
                     FL = CDM * PDROP;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                        FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
                     } else {
-                        FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                        FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
                     }
                 } else {
                     // Flow in negative direction.
@@ -3649,9 +3649,9 @@ namespace AirflowNetwork {
                     FL = CDM * PDROP;
                     // Turbulent flow.
                     if (expn == 0.5) {
-                        FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
                     } else {
-                        FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                        FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
                     }
                 }
                 // Select laminar or turbulent flow.

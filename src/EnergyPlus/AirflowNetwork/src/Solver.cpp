@@ -88,10 +88,10 @@ namespace AirflowNetwork {
 
     // Functions
 
-    AirProperties::AirProperties(double const airDensity)
+    AirProperties::AirProperties(double const density)
     {
-        this->density = airDensity;
-        this->sqrtDensity = sqrt(airDensity);
+        this->density = density;
+        this->sqrt_density = sqrt(density);
     }
 
     void Solver::allocate(EnergyPlusData &state)
@@ -205,7 +205,7 @@ namespace AirflowNetwork {
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
             PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
             properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
+            properties[i].humidity_ratio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
 
@@ -334,7 +334,7 @@ namespace AirflowNetwork {
             // WZ(i) = AirflowNetworkNodeSimu(i).WZ;
             PZ(i) = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).PZ;
             properties[i].temperature = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).TZ;
-            properties[i].humidityRatio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
+            properties[i].humidity_ratio = state.dataAirflowNetwork->AirflowNetworkNodeSimu(i).WZ;
             // properties[i].pressure = AirflowNetworkNodeSimu(i).PZ;
         }
     }
@@ -470,15 +470,15 @@ namespace AirflowNetwork {
         }
         // Compute zone air properties.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
-            properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidityRatio);
+            properties[n].density = AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), properties[n].temperature, properties[n].humidity_ratio);
             // RHOZ(n) = PsyRhoAirFnPbTdbW(StdBaroPress + PZ(n), TZ(n), WZ(n));
             if (state.dataAirflowNetwork->AirflowNetworkNodeData(n).ExtNodeNum > 0) {
                 properties[n].density =
                     AIRDENSITY(state, state.dataEnvrn->StdBaroPress + PZ(n), state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
                 properties[n].temperature = state.dataEnvrn->OutDryBulbTemp;
-                properties[n].humidityRatio = state.dataEnvrn->OutHumRat;
+                properties[n].humidity_ratio = state.dataEnvrn->OutHumRat;
             }
-            properties[n].sqrtDensity = std::sqrt(properties[n].density);
+            properties[n].sqrt_density = std::sqrt(properties[n].density);
             properties[n].viscosity = 1.71432e-5 + 4.828e-8 * properties[n].temperature;
             // if (LIST >= 2) ObjexxFCL::gio::write(outputFile, Format_903) << "D,V:" << n << properties[n].density << properties[n].viscosity;
         }
@@ -1073,9 +1073,9 @@ namespace AirflowNetwork {
         VisAve = (propN.viscosity + propM.viscosity) / 2.0;
         Tave = (propN.temperature + propM.temperature) / 2.0;
         if (PDROP >= 0.0) {
-            coef /= propN.sqrtDensity;
+            coef /= propN.sqrt_density;
         } else {
-            coef /= propM.sqrtDensity;
+            coef /= propM.sqrt_density;
         }
 
         if (LFLAG) {
@@ -1101,9 +1101,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (expn == 0.5) {
-                    FT = coef * propN.sqrtDensity * std::sqrt(PDROP) * Ctl;
+                    FT = coef * propN.sqrt_density * std::sqrt(PDROP) * Ctl;
                 } else {
-                    FT = coef * propN.sqrtDensity * std::pow(PDROP, expn) * Ctl;
+                    FT = coef * propN.sqrt_density * std::pow(PDROP, expn) * Ctl;
                 }
             } else {
                 // Flow in negative direction.
@@ -1114,9 +1114,9 @@ namespace AirflowNetwork {
                 FL = CDM * PDROP;
                 // Turbulent flow.
                 if (expn == 0.5) {
-                    FT = -coef * propM.sqrtDensity * std::sqrt(-PDROP) * Ctl;
+                    FT = -coef * propM.sqrt_density * std::sqrt(-PDROP) * Ctl;
                 } else {
-                    FT = -coef * propM.sqrtDensity * std::pow(-PDROP, expn) * Ctl;
+                    FT = -coef * propM.sqrt_density * std::pow(-PDROP, expn) * Ctl;
                 }
             }
             // Select laminar or turbulent flow.
@@ -2065,9 +2065,9 @@ namespace AirflowNetwork {
             auto &solver = state.dataAFNSolver->solver;
 
             TempL1 = solver.properties[From].temperature;
-            Xhl1 = solver.properties[From].humidityRatio;
+            Xhl1 = solver.properties[From].humidity_ratio;
             TzFrom = solver.properties[From].temperature;
-            XhzFrom = solver.properties[From].humidityRatio;
+            XhzFrom = solver.properties[From].humidity_ratio;
             RhoL1 = solver.properties[From].density;
             if (ll == 0 || ll == 3) {
                 PzFrom = solver.PZ(From);
@@ -2085,9 +2085,9 @@ namespace AirflowNetwork {
             }
 
             TempL2 = solver.properties[To].temperature;
-            Xhl2 = solver.properties[To].humidityRatio;
+            Xhl2 = solver.properties[To].humidity_ratio;
             TzTo = solver.properties[To].temperature;
-            XhzTo = solver.properties[To].humidityRatio;
+            XhzTo = solver.properties[To].humidity_ratio;
             RhoL2 = solver.properties[To].density;
 
             if (ll < 3) {
