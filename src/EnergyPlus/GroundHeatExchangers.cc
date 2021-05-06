@@ -1408,14 +1408,14 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
     // For convenience
     using json = nlohmann::json;
 
-    if (!FileSystem::fileExists(state.dataStrGlobals->outputGLHEFileName)) {
+    if (!FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
         // if the file doesn't exist, there are no data to read
         return;
     } else {
         // file exists -- read data and load if possible
 
         // open file
-        std::ifstream ifs(state.dataStrGlobals->outputGLHEFileName);
+        std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
 
         // create empty json object
         json json_in;
@@ -1427,7 +1427,7 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
         } catch (...) {
             if (!json_in.empty()) {
                 // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, state.dataStrGlobals->outputGLHEFileName + " contains invalid file format");
+                ShowWarningError(state, state.dataStrGlobals->outputGLHEFilePath.string() + " contains invalid file format");
             }
             ifs.close();
             return;
@@ -1482,49 +1482,14 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
 void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
 {
 
-<<<<<<< HEAD
-        if (!FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
-            // if the file doesn't exist, there are no data to read
-            return;
-        } else {
-            // file exists -- read data and load if possible
-
-            // open file
-            std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
-
-            // create empty json object
-            json json_in;
-
-            // read json_in data
-            try {
-                ifs >> json_in;
-                ifs.close();
-            } catch (...) {
-                if (!json_in.empty()) {
-                    // file exists, is not empty, but failed for some other reason
-                    ShowWarningError(state, state.dataStrGlobals->outputGLHEFilePath.string() + " contains invalid file format");
-                }
-                ifs.close();
-                return;
-            }
-
-            for (auto &existing_data : json_in) {
-                if (myCacheData["Phys Data"] == existing_data["Phys Data"]) {
-                    myCacheData["Response Factors"] = existing_data["Response Factors"];
-                    gFunctionsExist = true;
-                    break;
-                }
-            }
-=======
     // For convenience
     using json = nlohmann::json;
->>>>>>> develop
 
-    if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFileName)) {
+    if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
         // file exists -- add data
 
         // open file
-        std::ifstream ifs(state.dataStrGlobals->outputGLHEFileName);
+        std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
 
         // create empty json object
         json json_in;
@@ -1536,8 +1501,8 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
         } catch (...) {
             if (!json_in.empty()) {
                 // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, "Error reading from " + state.dataStrGlobals->outputGLHEFileName);
-                ShowWarningError(state, "Data from previous " + state.dataStrGlobals->outputGLHEFileName + " not saved");
+                ShowWarningError(state, "Error reading from " + state.dataStrGlobals->outputGLHEFilePath.string());
+                ShowWarningError(state, "Data from previous " + state.dataStrGlobals->outputGLHEFilePath.string() + " not saved");
             }
             ifs.close();
         }
@@ -1545,19 +1510,6 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
         // empty json object for output writing
         json json_out;
 
-<<<<<<< HEAD
-    void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
-    {
-
-        // For convenience
-        using json = nlohmann::json;
-
-        if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
-            // file exists -- add data
-
-            // open file
-            std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
-=======
         // add existing data to json_out
         int i = 0;
         for (auto &existing_data : json_in) {
@@ -1565,36 +1517,20 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
             std::string case_name = format("GHLE {}", i);
             json_out[case_name] = existing_data;
         }
->>>>>>> develop
 
         // add current data
         std::string case_name = format("GHLE {}", i + 1);
         json_out[case_name] = myCacheData;
 
-<<<<<<< HEAD
-            // read json_in data
-            try {
-                ifs >> json_in;
-                ifs.close();
-            } catch (...) {
-                if (!json_in.empty()) {
-                    // file exists, is not empty, but failed for some other reason
-                    ShowWarningError(state, "Error reading from " + state.dataStrGlobals->outputGLHEFilePath.string());
-                    ShowWarningError(state, "Data from previous " + state.dataStrGlobals->outputGLHEFilePath.string() + " not saved");
-                }
-                ifs.close();
-            }
-=======
         if (state.files.outputControl.glhe) {
             // open output file
             std::ofstream ofs;
-            ofs.open(state.dataStrGlobals->outputGLHEFileName);
+            ofs.open(state.dataStrGlobals->outputGLHEFilePath);
             // write data to file, set spacing at 2
             ofs << std::setw(2) << json_out;
             // don't forget to close
             ofs.close();
         }
->>>>>>> develop
 
     } else {
         // file doesn't exist -- add data
@@ -1602,41 +1538,6 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
         // empty json object for output writing
         json json_out;
 
-<<<<<<< HEAD
-            // add current data
-            std::string case_name = format("GHLE {}", i + 1);
-            json_out[case_name] = myCacheData;
-
-            if (state.files.outputControl.glhe) {
-                // open output file
-                std::ofstream ofs;
-                ofs.open(state.dataStrGlobals->outputGLHEFilePath);
-                // write data to file, set spacing at 2
-                ofs << std::setw(2) << json_out;
-                // don't forget to close
-                ofs.close();
-            }
-
-        } else {
-            // file doesn't exist -- add data
-
-            // empty json object for output writing
-            json json_out;
-
-            // add current data
-            std::string case_name = "GHLE 1";
-            json_out[case_name] = myCacheData;
-
-            if (state.files.outputControl.glhe) {
-                // open output file
-                std::ofstream ofs;
-                ofs.open(state.dataStrGlobals->outputGLHEFilePath);
-                // write data to file, set spacing at 2
-                ofs << std::setw(2) << json_out;
-                // don't forget to close
-                ofs.close();
-            }
-=======
         // add current data
         std::string case_name = "GHLE 1";
         json_out[case_name] = myCacheData;
@@ -1644,12 +1545,11 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
         if (state.files.outputControl.glhe) {
             // open output file
             std::ofstream ofs;
-            ofs.open(state.dataStrGlobals->outputGLHEFileName);
+            ofs.open(state.dataStrGlobals->outputGLHEFilePath);
             // write data to file, set spacing at 2
             ofs << std::setw(2) << json_out;
             // don't forget to close
             ofs.close();
->>>>>>> develop
         }
     }
 }

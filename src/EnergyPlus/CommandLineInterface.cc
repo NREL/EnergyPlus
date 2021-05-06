@@ -658,7 +658,6 @@ namespace CommandLineInterface {
             state.dataStrGlobals->inputFilePath = outputEpmidfFilePath;
         }
 
-<<<<<<< HEAD
         if (runExpandObjects) {
             fs::path expandObjectsPath = (state.dataStrGlobals->exeDirectoryPath / fs::path("ExpandObjects")).replace_extension(FileSystem::exeExtension);
             if (!FileSystem::fileExists(expandObjectsPath)) {
