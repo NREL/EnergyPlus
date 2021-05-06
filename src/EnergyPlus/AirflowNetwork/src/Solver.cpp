@@ -886,7 +886,7 @@ namespace AirflowNetwork {
                 DP = PZ(n) - PZ(m) + DpL(i, 1) + PW(i);
             }
             Real64 multiplier = 1.0;
-            Real64 control = 1.0;
+            Real64 control = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).control;
             // if (LIST >= 4) ObjexxFCL::gio::write(outputFile, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
             j = state.dataAirflowNetwork->AirflowNetworkLinkageData(i).CompNum;
 

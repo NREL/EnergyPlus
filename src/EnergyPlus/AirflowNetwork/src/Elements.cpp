@@ -445,13 +445,13 @@ namespace AirflowNetwork {
         RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
-        expn = FlowExpo;
+        expn = exponent;
         VisAve = (propN.viscosity + propM.viscosity) / 2.0;
         Tave = (propN.temperature + propM.temperature) / 2.0;
         if (PDROP >= 0.0) {
-            coef = FlowCoef / propN.sqrt_density * Corr;
+            coef = coefficient / propN.sqrt_density * Corr;
         } else {
-            coef = FlowCoef / propM.sqrt_density * Corr;
+            coef = coefficient / propM.sqrt_density * Corr;
         }
 
         if (LFLAG) {
@@ -562,13 +562,13 @@ namespace AirflowNetwork {
         RhozNorm = AIRDENSITY(state, StandardP, StandardT, StandardW);
         VisczNorm = 1.71432e-5 + 4.828e-8 * StandardT;
 
-        expn = FlowExpo;
+        expn = exponent;
         VisAve = (propN.viscosity + propM.viscosity) / 2.0;
         Tave = (propN.temperature + propM.temperature) / 2.0;
         if (PDROP >= 0.0) {
-            coef = multiplier * control * FlowCoef / propN.sqrt_density;
+            coef = multiplier * control * coefficient / propN.sqrt_density;
         } else {
-            coef = multiplier * control * FlowCoef / propM.sqrt_density;
+            coef = multiplier * control * coefficient / propM.sqrt_density;
         }
 
         // Standard calculation.

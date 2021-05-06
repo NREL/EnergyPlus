@@ -424,8 +424,10 @@ namespace AirflowNetworkBalanceManager {
                 }
                 // globalSolverObject.cracks[thisObjectName] = SurfaceCrack(coeff, expnt, refT, refP, refW);
                 state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).name = thisObjectName; // Name of surface crack component
-                state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).FlowCoef = coeff;      // Air Mass Flow Coefficient
-                state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).FlowExpo = expnt;      // Air Mass Flow exponent
+                state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).coefficient = coeff;   // Air Mass Flow Coefficient
+                state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).exponent = expnt;      // Air Mass Flow exponent
+                state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).reference_density = AIRDENSITY(state, refP, refT, refW);
+                state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).reference_viscosity = AIRDYNAMICVISCOSITY(refT);
                 state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).StandardT = refT;
                 state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).StandardP = refP;
                 state.dataAirflowNetwork->MultizoneSurfaceCrackData(i).StandardW = refW;
@@ -6742,6 +6744,10 @@ namespace AirflowNetworkBalanceManager {
                                                        state.dataAirflowNetwork->MultizoneSurfaceData(i).OpenFactor,
                                                        state.dataAirflowNetwork->MultizoneSurfaceData(i).OpenFactor);
                     }
+                }
+            } else {
+                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).element->type() == ComponentType::SCR) {
+                    state.dataAirflowNetwork->AirflowNetworkLinkageData(i).control = state.dataAirflowNetwork->MultizoneSurfaceData(i).Factor;
                 }
             }
         }
