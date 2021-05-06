@@ -2080,8 +2080,10 @@ void GetPTUnit(EnergyPlusData &state)
                 // Varify zone number and return air node
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
-                        if (UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).Name, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
-                            UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
+                        if (UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).Name,
+                                                        state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
+                            UtilityRoutines::SameString(state.dataPTHP->PTUnit(PTUnitNum).UnitType,
+                                                        state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
                             state.dataPTHP->PTUnit(PTUnitNum).ZonePtr = CtrlZone;
                             break;
                         }
@@ -2090,7 +2092,8 @@ void GetPTUnit(EnergyPlusData &state)
                 }
                 bool InletNodeFound = false;
                 if (state.dataPTHP->PTUnit(PTUnitNum).ZonePtr > 0) {
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).NumReturnNodes; ++NodeNum) {
+                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataPTHP->PTUnit(PTUnitNum).ZonePtr).NumReturnNodes;
+                         ++NodeNum) {
                         InletNodeFound = ZonePlenum::ValidateInducedNode(
                             state, state.dataPTHP->PTUnit(PTUnitNum).AirInNode, state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode(NodeNum));
                         if (InletNodeFound && state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists) {
@@ -2105,7 +2108,8 @@ void GetPTUnit(EnergyPlusData &state)
                                       "air node in ZonePlenum.");
                     ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
                     ShowContinueError(state, "..Induced Air Outlet Node name is specified in AirLoopHVAC:ReturnPlenum object.");
-                    ShowContinueError(state, "..Air-conditioners inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
+                    ShowContinueError(
+                        state, "..Air-conditioners inlet node name = " + state.dataLoopNodes->NodeID(state.dataPTHP->PTUnit(PTUnitNum).AirInNode));
                     ErrorsFound = true;
                 }
             }
