@@ -6368,7 +6368,7 @@ namespace CondenserLoopTowers {
 
         // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
         Real64 const LoopMinTemp = state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-        if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
+        if (this->OutletWaterTemp<LoopMinTemp &&this->WaterMassFlowRate> 0.0) {
             ++this->OutletWaterTempErrorCount;
             strip(CharErrOut);
             if (this->OutletWaterTempErrorCount < 2) {
