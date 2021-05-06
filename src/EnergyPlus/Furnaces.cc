@@ -72,6 +72,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACControllers.hh>
@@ -86,7 +87,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
@@ -7328,7 +7328,7 @@ namespace Furnaces {
         Real64 TempHeatOutput;      // Temporary Sensible output of heating coil while iterating on PLR (W)
         Real64 TempLatentOutput;    // Temporary Latent output of AC at increasing PLR (W)
         //                                           ! (Temp variables are used to find min PLR for positive latent removal)
-        std::array<Real64, 10> Par;       // parameters passed to RegulaFalsi function
+        std::array<Real64, 10> Par;    // parameters passed to RegulaFalsi function
         int SolFlag;                   // return flag from RegulaFalsi
         Real64 TempMinPLR;             // Temporary min latent PLR when hum control is required and iter is exceeded
         Real64 TempMinPLR2;            // Temporary min latent PLR when cyc fan hum control is required and iter is exceeded
@@ -7564,7 +7564,7 @@ namespace Furnaces {
                             Par[6] = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
                             Par[7] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
                             Par[8] = 0.0;               // HXUnitOn is always false for HX
-                            Par[9]= 0.0;
+                            Par[9] = 0.0;
                             //         HeatErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
                             General::SolveRoot<10>(state, HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
                             //         OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
@@ -8283,8 +8283,7 @@ namespace Furnaces {
                                 Par[9] = 0.0;
                             }
                             //           CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                            General::SolveRoot<10>(
-                                state, CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
+                            General::SolveRoot<10>(state, CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
                             //           OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
                             OnOffAirFlowRatio = state.dataFurnaces->OnOffAirFlowRatioSave;
                             if (SolFlag == -1) {
@@ -8699,15 +8698,15 @@ namespace Furnaces {
         int FurnaceInletNode;      // heat pump Inlet node
         int FurnaceOutletNode;     // heat pump Outlet node
 
-        int OASysInletNode;      // node number of return air inlet to OA sys
-        int OASysOutletNode;     // node number of mixed air outlet of OA sys
-        int OpMode;              // Mode of Operation (fan cycling = 1 or fan continuous = 2)
-        bool HumControl;         // Logical flag signaling when dehumidification is required
-        Real64 SuppHeatCoilLoad; // Load passed to supplemental heater (W)
-        Real64 CoolErrorToler;   // convergence tolerance used in cooling mode
-        Real64 HeatErrorToler;   // convergence tolerance used in heating mode
-        int SolFlag;             // flag returned from iteration routine to denote problems
-        std::array<Real64, 9> Par;  // parameters passed to iteration routine
+        int OASysInletNode;        // node number of return air inlet to OA sys
+        int OASysOutletNode;       // node number of mixed air outlet of OA sys
+        int OpMode;                // Mode of Operation (fan cycling = 1 or fan continuous = 2)
+        bool HumControl;           // Logical flag signaling when dehumidification is required
+        Real64 SuppHeatCoilLoad;   // Load passed to supplemental heater (W)
+        Real64 CoolErrorToler;     // convergence tolerance used in cooling mode
+        Real64 HeatErrorToler;     // convergence tolerance used in heating mode
+        int SolFlag;               // flag returned from iteration routine to denote problems
+        std::array<Real64, 9> Par; // parameters passed to iteration routine
 
         auto &TotalZoneLatentLoad = state.dataFurnaces->TotalZoneLatentLoad;
         auto &TotalZoneSensLoad = state.dataFurnaces->TotalZoneSensLoad;
@@ -9874,8 +9873,8 @@ namespace Furnaces {
     }
 
     Real64 CalcWaterToAirResidual(EnergyPlusData &state,
-                                  Real64 const PartLoadRatio, // DX cooling coil part load ratio
-                                  std::array<Real64, 9> const &Par  // Function parameters
+                                  Real64 const PartLoadRatio,      // DX cooling coil part load ratio
+                                  std::array<Real64, 9> const &Par // Function parameters
     )
     {
 
@@ -10488,7 +10487,7 @@ namespace Furnaces {
     }
 
     Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 const HWFlow,       // hot water flow rate in kg/s
+                                Real64 const HWFlow,             // hot water flow rate in kg/s
                                 std::array<Real64, 4> const &Par // Par(5) is the requested coil load
     )
     {
@@ -10948,18 +10947,18 @@ namespace Furnaces {
         int const MaxIte(500); // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 FullOutput;       // unit full output when compressor is operating [W]
-        Real64 LowOutput;        // unit full output at low speed [W]
-        Real64 TempOutput;       // unit output when iteration limit exceeded [W]
-        Real64 NoCompOutput;     // output when no active compressor [W]
-        Real64 LatOutput;        // latent capacity output
-        Real64 ErrorToler;       // error tolerance
-        int SolFla;              // Flag of RegulaFalsi solver
+        Real64 FullOutput;          // unit full output when compressor is operating [W]
+        Real64 LowOutput;           // unit full output at low speed [W]
+        Real64 TempOutput;          // unit output when iteration limit exceeded [W]
+        Real64 NoCompOutput;        // output when no active compressor [W]
+        Real64 LatOutput;           // latent capacity output
+        Real64 ErrorToler;          // error tolerance
+        int SolFla;                 // Flag of RegulaFalsi solver
         std::array<Real64, 10> Par; // Parameters passed to RegulaFalsi
-        Real64 QCoilActual;      // coil load actually delivered returned to calling component
-        int i;                   // Speed index
-        int ErrCountCyc(0);      // Counter used to minimize the occurrence of output warnings
-        int ErrCountVar(0);      // Counter used to minimize the occurrence of output warnings
+        Real64 QCoilActual;         // coil load actually delivered returned to calling component
+        int i;                      // Speed index
+        int ErrCountCyc(0);         // Counter used to minimize the occurrence of output warnings
+        int ErrCountVar(0);         // Counter used to minimize the occurrence of output warnings
         IHPOperationMode IHPMode(IHPOperationMode::IdleMode);
 
         SupHeaterLoad = 0.0;
@@ -12015,7 +12014,7 @@ namespace Furnaces {
     //******************************************************************************
 
     Real64 VSHPCyclingResidual(EnergyPlusData &state,
-                               Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                               Real64 const PartLoadFrac,        // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                std::array<Real64, 10> const &Par // par(1) = FurnaceNum
     )
     {
@@ -12133,7 +12132,7 @@ namespace Furnaces {
     //******************************************************************************
 
     Real64 VSHPSpeedResidual(EnergyPlusData &state,
-                             Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                             Real64 const SpeedRatio,          // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                              std::array<Real64, 10> const &Par // par(1) = MSHPNum
     )
     {
