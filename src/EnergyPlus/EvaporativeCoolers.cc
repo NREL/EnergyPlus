@@ -2559,7 +2559,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
     Real64 EvapCoolerTotalElectricPowerDry; // evaporative cooler current total electric power drawn
     Real64 EvapCoolerTotalElectricPowerWet; // evaporative cooler current total electric power drawn
     int SolFla;                             // Flag of solver
-    std::array<Real64, 6> Par;                 // Parameter array passed to solver
+    std::array<Real64, 6> Par;              // Parameter array passed to solver
     Real64 QHXLatent;                       // evaporative cooler latent heat transfer rate
     Real64 hfg;                             // latent heat of vaporization of water at the secondary air inlet condition
 
@@ -2668,7 +2668,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             Par[4] = InletWetBulbTempSec;
             Par[5] = InletHumRatioSec;
             // get dry operation performance first
-            Par[1]= double(OperatingMode::DryModulated);
+            Par[1] = double(OperatingMode::DryModulated);
             General::SolveRoot<6>(
                 state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
             // if the numerical inversion failed, issue error messages.
@@ -3000,8 +3000,8 @@ OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(EnergyPlusData &sta
 }
 
 Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state,
-                                      Real64 const AirMassFlowSec, // secondary air mass flow rate in kg/s
-                                      std::array<Real64, 6> const &Par   // Par(2) is desired outlet temperature of Evap Cooler
+                                      Real64 const AirMassFlowSec,     // secondary air mass flow rate in kg/s
+                                      std::array<Real64, 6> const &Par // Par(2) is desired outlet temperature of Evap Cooler
 )
 {
     // SUBROUTINE INFORMATION:
@@ -4655,7 +4655,7 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
 
     // calculate part load ratio
     if (FullFlowSensibleOutput < ZoneCoolingLoad) {
-        std::array<Real64, 2> Par = {Real64(UnitNum), ZoneCoolingLoad};        // Parameters passed to root solver
+        std::array<Real64, 2> Par = {Real64(UnitNum), ZoneCoolingLoad}; // Parameters passed to root solver
 
         General::SolveRoot<2>(state, Tol, MaxIte, SolFla, PartLoadRatio, ZoneEvapUnitLoadResidual, 0.0, 1.0, Par);
         if (SolFla == -1) {
@@ -4694,9 +4694,7 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
     ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
 }
 
-Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state,
-                                Real64 const PartLoadRatio,
-                                std::array<Real64, 2> const &Par // parameters
+Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio, std::array<Real64, 2> const &Par // parameters
 )
 {
     // calculates cooling load residual by varying part load ratio
@@ -4795,7 +4793,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                                                                       PsyHFnTdbW(Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp, MinHumRat));
 
     if (FullFlowSensibleOutputProvided < ZoneCoolingLoad) { // find speed ratio by regula falsi numerical method
-        std::array<Real64, 5> Par; // Parameters passed to RegulaFalsi
+        std::array<Real64, 5> Par;                          // Parameters passed to RegulaFalsi
         Par[0] = UnitNum;
         Par[1] = ZoneNum;
         Par[2] = ZoneEvapUnit(UnitNum).ZoneNodeNum;
@@ -4836,9 +4834,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
     }
 }
 
-Real64 VSEvapUnitLoadResidual(EnergyPlusData &state,
-                              Real64 const FanSpeedRatio,
-                              std::array<Real64, 5> const &Par // parameters
+Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 const FanSpeedRatio, std::array<Real64, 5> const &Par // parameters
 )
 {
 

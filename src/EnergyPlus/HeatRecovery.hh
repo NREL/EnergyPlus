@@ -587,7 +587,7 @@ namespace HeatRecovery {
     );
 
     Real64 GetResidCrossFlowBothUnmixed(EnergyPlusData &state,
-                                        Real64 const NTU,          // number of transfer units
+                                        Real64 const NTU,                // number of transfer units
                                         std::array<Real64, 2> const &Par // par(1) = Eps, par(2) = Z
     );
 

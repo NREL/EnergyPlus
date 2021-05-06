@@ -402,9 +402,8 @@ namespace EvaporativeCoolers {
                                              Real64 EWBTSec,
                                              Real64 EHumRatSec);
 
-    Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state,
-                                          Real64 AirMassFlowSec,
-                                          std::array<Real64, 6> const &Par // Par( 6 ) is desired temperature C
+    Real64
+    CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state, Real64 AirMassFlowSec, std::array<Real64, 6> const &Par // Par( 6 ) is desired temperature C
     );
 
     Real64 IndEvapCoolerPower(EnergyPlusData &state,
@@ -475,7 +474,7 @@ namespace EvaporativeCoolers {
     );
 
     Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state,
-                                    Real64 PartLoadRatio,      // zone evap unit part load ratiod
+                                    Real64 PartLoadRatio,            // zone evap unit part load ratiod
                                     std::array<Real64, 2> const &Par // parameters
     );
 
@@ -485,9 +484,7 @@ namespace EvaporativeCoolers {
                                      Real64 ZoneCoolingLoad // target cooling load
     );
 
-    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state,
-                                  Real64 FanSpeedRatio,
-                                  std::array<Real64, 5> const &Par // parameters
+    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 FanSpeedRatio, std::array<Real64, 5> const &Par // parameters
     );
 
     void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum); // unit number

@@ -7449,7 +7449,7 @@ namespace FluidProperties {
 
         // Perform iterations to obtain the temperature level
         {
-            std::array<Real64, 3> Par;       // Parameters passed to RegulaFalsi
+            std::array<Real64, 3> Par;    // Parameters passed to RegulaFalsi
             Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
             int const MaxIte(500);        // maximum number of iterations
             int SolFla;                   // Flag of RegulaFalsi solver

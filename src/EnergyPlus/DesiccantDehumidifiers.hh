@@ -242,8 +242,8 @@ namespace DesiccantDehumidifiers {
     // Functions
 
     void SimDesiccantDehumidifier(EnergyPlusData &state,
-                                  std::string const &CompName,   // name of the dehumidifier unit
-                                  bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+                                  std::string const &CompName, // name of the dehumidifier unit
+                                  bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep
                                   int &CompIndex);
 
     void GetDesiccantDehumidifierInput(EnergyPlusData &state);
@@ -255,7 +255,7 @@ namespace DesiccantDehumidifiers {
 
     void ControlDesiccantDehumidifier(EnergyPlusData &state,
                                       int DesicDehumNum,      // number of the current dehumidifier being simulated
-                                      Real64 &HumRatNeeded,         // process air leaving humidity ratio set by controller [kg water/kg air]
+                                      Real64 &HumRatNeeded,   // process air leaving humidity ratio set by controller [kg water/kg air]
                                       bool FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     );
 
@@ -276,14 +276,14 @@ namespace DesiccantDehumidifiers {
     void ReportDesiccantDehumidifier(EnergyPlusData &state, int DesicDehumNum); // number of the current dehumidifier being simulated
 
     void CalcNonDXHeatingCoils(EnergyPlusData &state,
-                               int DesicDehumNum,              // Desiccant dehumidifier unit index
-                               bool FirstHVACIteration,        // flag for first HVAC iteration in the time step
-                               Real64 RegenCoilLoad,           // heating coil load to be met (Watts)
+                               int DesicDehumNum,                    // Desiccant dehumidifier unit index
+                               bool FirstHVACIteration,              // flag for first HVAC iteration in the time step
+                               Real64 RegenCoilLoad,                 // heating coil load to be met (Watts)
                                Optional<Real64> RegenCoilLoadmet = _ // heating load met
     );
 
     Real64 HotWaterCoilResidual(EnergyPlusData &state,
-                                Real64 HWFlow,       // hot water flow rate in kg/s
+                                Real64 HWFlow,                   // hot water flow rate in kg/s
                                 std::array<Real64, 3> const &Par // Par(5) is the requested coil load
     );
 

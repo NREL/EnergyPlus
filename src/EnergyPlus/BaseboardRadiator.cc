@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -75,10 +76,10 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus::BaseboardRadiator {
+namespace EnergyPlus {
+namespace BaseboardRadiator {
 
     // Module containing the routines dealing with the BASEBOARD HEATER
     // component(s).
@@ -1229,7 +1230,7 @@ namespace EnergyPlus::BaseboardRadiator {
     }
 
     Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 const UA,           // UA of coil
+                                 Real64 const UA,                 // UA of coil
                                  std::array<Real64, 2> const &Par // par(1) = design coil load [W]
     )
     {
@@ -1262,5 +1263,7 @@ namespace EnergyPlus::BaseboardRadiator {
 
         return Residuum;
     }
+
+} // namespace BaseboardRadiator
 
 } // namespace EnergyPlus

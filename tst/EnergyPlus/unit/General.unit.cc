@@ -265,7 +265,7 @@ Real64 ResidualTest([[maybe_unused]] EnergyPlusData &state, Real64 const Frac, [
     Actual = 1.0 + 2.0 * Frac + 10.0 * Frac * Frac;
 
     ResidualTest = (Actual - Request) / Request;
-    //Request = Par[0] + 1.0e-12;
+    // Request = Par[0] + 1.0e-12;
     return ResidualTest;
 }
 
@@ -311,7 +311,6 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
     std::array<Real64, 2> Par = {1.0, 1.0}; // Function parameters
     General::SolveRoot<2>(*state, ErrorToler, 40, SolFla, Frac, ResidualTest, 0.0, small, Par);
     EXPECT_EQ(-1, SolFla);
-
 }
 
 TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)

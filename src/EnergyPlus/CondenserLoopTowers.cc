@@ -2479,7 +2479,7 @@ namespace CondenserLoopTowers {
         Real64 UA0;                       // Lower bound for UA [W/C]
         Real64 UA1;                       // Upper bound for UA [W/C]
         Real64 UA;                        // Calculated UA value
-        std::array<Real64, 6> Par;           // Parameter array need for RegulaFalsi routine
+        std::array<Real64, 6> Par;        // Parameter array need for RegulaFalsi routine
         std::string OutputChar;           // report variable for warning messages
         std::string OutputChar2;          // report variable for warning messages
         std::string OutputCharLo;         // report variable for warning messages
@@ -3436,7 +3436,7 @@ namespace CondenserLoopTowers {
         int SolFla; // Flag of solver
         Real64 tmpHighSpeedFanPower;
 
-        std::array<Real64, 6> Par;           // Parameter array need for RegulaFalsi routine
+        std::array<Real64, 6> Par;        // Parameter array need for RegulaFalsi routine
         Real64 UA0;                       // Lower bound for UA [W/C]
         Real64 UA1;                       // Upper bound for UA [W/C]
         Real64 DesTowerLoad;              // Design tower load [W]
@@ -4930,13 +4930,13 @@ namespace CondenserLoopTowers {
         static std::string const RoutineName("calculateVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SolFla(0);           // Flag of solver
-        std::array<Real64, 6> Par;  // Parameter array for regula falsi solver
-        std::string OutputChar;  // character string used for warning messages
-        std::string OutputChar2; // character string used for warning messages
-        std::string OutputChar3; // character string used for warning messages
-        std::string OutputChar4; // character string used for warning messages
-        std::string OutputChar5; // character string used for warning messages
+        int SolFla(0);             // Flag of solver
+        std::array<Real64, 6> Par; // Parameter array for regula falsi solver
+        std::string OutputChar;    // character string used for warning messages
+        std::string OutputChar2;   // character string used for warning messages
+        std::string OutputChar3;   // character string used for warning messages
+        std::string OutputChar4;   // character string used for warning messages
+        std::string OutputChar5;   // character string used for warning messages
 
         // Added for multi-cell. Determine the number of cells operating
         Real64 WaterMassFlowRatePerCellMin = 0.0;
@@ -5248,7 +5248,7 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::array<Real64, 8> Par; // Parameter array passed to solver
-        int SolFla(0);          // Flag of solver
+        int SolFla(0);             // Flag of solver
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
@@ -5492,8 +5492,8 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::residualMerkelLoad(EnergyPlusData &state,
-                                            Real64 airFlowRateRatioLocal, // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                            std::array<Real64, 8> const &Par    // par(1) = Tower number
+                                            Real64 airFlowRateRatioLocal,    // fan speed ratio (1.0 is continuous, 0.0 is off)
+                                            std::array<Real64, 8> const &Par // par(1) = Tower number
     )
     {
 
@@ -5689,7 +5689,7 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;                                // Flag of solver
-        std::array<Real64, 6> Par;                    // Parameter array for regula falsi solver
+        std::array<Real64, 6> Par;                 // Parameter array for regula falsi solver
         Real64 const VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
 
         //   determine tower outlet water temperature
@@ -6078,7 +6078,7 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::residualUA(EnergyPlusData &state,
-                                    Real64 UA,                 // UA of cooling tower
+                                    Real64 UA,                       // UA of cooling tower
                                     std::array<Real64, 6> const &Par // par(1) = design tower load [W]
     )
     {
@@ -6108,7 +6108,7 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::residualTr(EnergyPlusData &state,
-                                    Real64 Trange,             // cooling tower range temperature [C]
+                                    Real64 Trange,                   // cooling tower range temperature [C]
                                     std::array<Real64, 6> const &Par // par(1) = tower number
     )
     {
@@ -6142,7 +6142,7 @@ namespace CondenserLoopTowers {
     }
 
     Real64 CoolingTower::residualTa(EnergyPlusData &state,
-                                    Real64 FlowRatio,          // water or air flow ratio of cooling tower
+                                    Real64 FlowRatio,                // water or air flow ratio of cooling tower
                                     std::array<Real64, 6> const &Par // par(1) = tower number
     )
     {
@@ -6368,7 +6368,7 @@ namespace CondenserLoopTowers {
 
         // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
         Real64 const LoopMinTemp = state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-        if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
+        if (this->OutletWaterTemp<LoopMinTemp &&this->WaterMassFlowRate> 0.0) {
             ++this->OutletWaterTempErrorCount;
             strip(CharErrOut);
             if (this->OutletWaterTempErrorCount < 2) {

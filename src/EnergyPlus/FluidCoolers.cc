@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -73,7 +74,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::FluidCoolers {
@@ -863,7 +863,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     Real64 UA;                      // Calculated UA value
     Real64 OutWaterTempAtUA0;       // Water outlet temperature at UA0
     Real64 OutWaterTempAtUA1;       // Water outlet temperature at UA1
-    std::array<Real64, 5> Par;         // Parameter array need for RegulaFalsi routine
+    std::array<Real64, 5> Par;      // Parameter array need for RegulaFalsi routine
     std::string equipName;
     Real64 Cp;                            // local specific heat for fluid
     Real64 rho;                           // local density for fluid
@@ -1787,7 +1787,7 @@ void CalcFluidCoolerOutlet(
 }
 
 Real64 SimpleFluidCoolerUAResidual(EnergyPlusData &state,
-                                   Real64 const UA,           // UA of fluid cooler
+                                   Real64 const UA,                 // UA of fluid cooler
                                    std::array<Real64, 5> const &Par // par(1) = design fluid cooler load [W]
 )
 {
@@ -1869,7 +1869,7 @@ void FluidCoolerspecs::update(EnergyPlusData &state)
 
     // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
     LoopMinTemp = state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-    if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
+    if (this->OutletWaterTemp<LoopMinTemp &&this->WaterMassFlowRate> 0.0) {
         ++this->OutletWaterTempErrorCount;
 
         if (this->OutletWaterTempErrorCount < 2) {

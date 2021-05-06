@@ -12842,7 +12842,7 @@ namespace UnitarySystems {
                                 double(this->m_CoolingSpeedNum),
                                 1.0, //  this->m_CoolingSpeedRatio;
                                 1.0, // run on latent, check coil outlet node HumRat
-                                0.0 // dummy because genericDXCoilResidual takes 8 parameters
+                                0.0  // dummy because genericDXCoilResidual takes 8 parameters
                             };
 
                             General::SolveRoot<8>(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
@@ -14993,7 +14993,7 @@ namespace UnitarySystems {
     }
 
     Real64 UnitarySys::genericDXCoilResidual(EnergyPlusData &state,
-                                             Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                             Real64 const PartLoadRatio,      // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                              std::array<Real64, 8> const &Par // par(1) = DX coil number
     )
     {

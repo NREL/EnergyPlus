@@ -2852,13 +2852,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualCool)
     TairInlet = 25.55534;
     Garate = 0.20664;
     BF = 0.0592;
-    std::array<Real64, 5> Par = {
-        ZnSenLoad,
-        Th2,
-        TairInlet,
-        Garate,
-        BF
-    };
+    std::array<Real64, 5> Par = {ZnSenLoad, Th2, TairInlet, Garate, BF};
     // Run and Check
     double FanSpdResidual = FanSpdResidualCool(*state, FanSpdRto, Par);
     EXPECT_NEAR(-0.707, FanSpdResidual, 0.0005);
@@ -2885,13 +2879,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_FanSpdResidualHeat)
     TairInlet = 20.236;
     Garate = 0.21136;
     BF = 0.1360;
-    std::array<Real64, 5> Par = {
-        ZnSenLoad,
-        Th2,
-        TairInlet,
-        Garate,
-        BF
-    };
+    std::array<Real64, 5> Par = {ZnSenLoad, Th2, TairInlet, Garate, BF};
 
     // Run and Check
     double FanSpdResidual = FanSpdResidualHeat(*state, FanSpdRto, Par);

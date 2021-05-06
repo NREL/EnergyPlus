@@ -1989,9 +1989,9 @@ namespace FuelCellElectricGenerator {
 
             // solve for a new TprodGasLeavingFCPM using regula falsi method
 
-            Real64 Acc = 0.01;      // guessing need to refine
-            int MaxIter = 150;      // guessing need to refine
-            SolverFlag = 0;         // init
+            Real64 Acc = 0.01;         // guessing need to refine
+            int MaxIter = 150;         // guessing need to refine
+            SolverFlag = 0;            // init
             std::array<Real64, 2> Par; // parameters passed in to SolveRoot
             Par[0] = tmpTotProdGasEnthalpy;
             Par[1] = this->FCPM.NdotProdGas;
@@ -2236,7 +2236,7 @@ namespace FuelCellElectricGenerator {
     }
 
     Real64 FCDataStruct::FuelCellProductGasEnthResidual(EnergyPlusData &state,
-                                                        Real64 const TprodGas,     // temperature, this is "x" being searched
+                                                        Real64 const TprodGas,           // temperature, this is "x" being searched
                                                         std::array<Real64, 2> const &Par // par(1) = Generator Number
     )
     {
