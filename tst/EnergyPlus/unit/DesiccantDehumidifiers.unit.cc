@@ -2821,6 +2821,9 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->ZoneSizingCalc = true;
     state->dataGlobal->SysSizingCalc = true;
+    for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
+        state->dataSurface->SurfActiveConstruction(SurfNum) = state->dataSurface->Surface(SurfNum).Construction;
+    }
     SizingManager::ManageSizing(*state);
 
     state->dataSize->CurSysNum = 1;
