@@ -168,9 +168,29 @@ namespace General {
                                    int MaxIte,   // maximum number of allowed iterations
                                    int &Flag,    // integer storing exit status
                                    Real64 &XRes, // value of x that solves f(x,Par) = 0
-                                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::array<Real64, 12> const &)> &f,
+                                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::array<Real64, 9> const &)> &f,
                                    Real64 X_0,                      // 1st bound of interval that contains the solution
                                    Real64 X_1,                      // 2nd bound of interval that contains the solution
+                                   std::array<Real64, 9> const &Par // array with additional parameters used for function evaluation
+    );
+    extern template void SolveRoot(EnergyPlusData &state,
+                                   Real64 Eps,   // required absolute accuracy
+                                   int MaxIte,   // maximum number of allowed iterations
+                                   int &Flag,    // integer storing exit status
+                                   Real64 &XRes, // value of x that solves f(x,Par) = 0
+                                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::array<Real64, 10> const &)> &f,
+                                   Real64 X_0,                      // 1st bound of interval that contains the solution
+                                   Real64 X_1,                      // 2nd bound of interval that contains the solution
+                                   std::array<Real64, 10> const &Par // array with additional parameters used for function evaluation
+    );
+    extern template void SolveRoot(EnergyPlusData &state,
+                                   Real64 Eps,   // required absolute accuracy
+                                   int MaxIte,   // maximum number of allowed iterations
+                                   int &Flag,    // integer storing exit status
+                                   Real64 &XRes, // value of x that solves f(x,Par) = 0
+                                   const std::function<Real64(EnergyPlusData &state, Real64 const, std::array<Real64, 12> const &)> &f,
+                                   Real64 X_0,                       // 1st bound of interval that contains the solution
+                                   Real64 X_1,                       // 2nd bound of interval that contains the solution
                                    std::array<Real64, 12> const &Par // array with additional parameters used for function evaluation
     );
 
