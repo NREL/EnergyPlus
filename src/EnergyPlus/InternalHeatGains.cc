@@ -8039,10 +8039,9 @@ namespace InternalHeatGains {
     }
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                   int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                   int const IntGainTypeOfNum,    // zone internal gain type number
-                                   std::string const IntGainName, // Internal gain name
-                                   int &DeviceIndex)              // Device Index
+                                   int const ZoneNum,              // zone index pointer for which zone to sum gains for
+                                   int const IntGainTypeOfNum,     // zone internal gain type number
+                                   std::string const IntGainName) // Internal gain name
     {
 
         // SUBROUTINE INFORMATION:
@@ -8057,6 +8056,7 @@ namespace InternalHeatGains {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DeviceNum;
+        int DeviceIndex;
         if (state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
             DeviceIndex = -1;
             return DeviceIndex;
