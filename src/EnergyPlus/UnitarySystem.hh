@@ -407,7 +407,6 @@ namespace UnitarySystems {
         bool m_SuppCompNotSetYet;
         bool m_OKToPrintSizing;
         Real64 m_SmallLoadTolerance;
-        bool m_setupOutputVars;
 
     public:
         // SZVAV variables
@@ -890,6 +889,7 @@ namespace UnitarySystems {
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
     // void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
     bool searchTotalComponents(EnergyPlusData &state, std::string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
+    void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct

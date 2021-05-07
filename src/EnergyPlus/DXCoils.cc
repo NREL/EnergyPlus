@@ -14994,9 +14994,7 @@ void GetFanIndexForTwoSpeedCoil(
                         SupplyFan_TypeNum = DataHVACGlobals::FanType_SystemModelObject;
 
                     } else if (state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
-                                   SimAirServingZones::UnitarySystemModel ||
-                               state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num ==
-                                   SimAirServingZones::DXSystem) {
+                               SimAirServingZones::UnitarySystemModel) {
                         // fan may not be specified in a unitary system object, keep looking
                         // Unitary System will "set" the fan index to the DX coil if contained within the HVAC system
                         if (state.dataDXCoils->DXCoil(CoolingCoilIndex).SupplyFanIndex > -1) break;

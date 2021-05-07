@@ -4081,7 +4081,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
 
     mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
 
-    EXPECT_EQ(1.005, thisSys.m_DesignFanVolFlowRate);
+    EXPECT_NEAR(1.005, thisSys.m_DesignFanVolFlowRate, 0.00001);
     EXPECT_EQ(0.0, thisSys.m_MaxCoolAirVolFlow);
     EXPECT_EQ(1.005, thisSys.m_MaxHeatAirVolFlow);
     EXPECT_EQ(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow);
@@ -4119,6 +4119,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
         thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
         thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity = false;
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingCapacity = false;
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad = 0.0;
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad = 0.0;
 
         // for FractionOfAutosizedCoolingAirflow, set sizing data to 1.005 and UnitarySystem MaxCoolAirVolFlow to 1, they will multiply and
         // yield 1.005
@@ -4141,8 +4145,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
         EXPECT_NEAR(1.005, thisSys.m_MaxCoolAirVolFlow, 0.0000000001);
         EXPECT_NEAR(1.005, thisSys.m_MaxHeatAirVolFlow, 0.0000000001);
         EXPECT_NEAR(1.005, thisSys.m_MaxNoCoolHeatAirVolFlow, 0.0000000001);
-        EXPECT_EQ(18827.616766698276, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad);
-        EXPECT_NEAR(1431.9234900374995, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad, 0.0000000001);
+        EXPECT_NEAR(18827.616766698, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad, 0.000000001);
+        EXPECT_NEAR(1431.923490037, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad, 0.000000001);
     }
 }
 

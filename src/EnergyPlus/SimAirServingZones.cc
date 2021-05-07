@@ -3443,7 +3443,10 @@ void SimAirLoopComponents(EnergyPlusData &state,
                                 FirstHVACIteration,
                                 AirLoopNum,
                                 PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompIndex,
-                                PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).compPointer);
+                                PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).compPointer,
+                                AirLoopNum,
+                                BranchNum,
+                                CompNum);
         } // End of component loop
 
         // Enforce continuity through the splitter
@@ -3461,7 +3464,10 @@ void SimAirLoopComponent(EnergyPlusData &state,
                          bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                          int const AirLoopNum,          // Primary air loop number
                          int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
-                         HVACSystemData *CompPointer    // equipment actual pointer
+                         HVACSystemData *CompPointer,   // equipment actual pointer
+                         int const &airLoopNum,         // index to AirloopHVAC
+                         int const &branchNum,          // index to AirloopHVAC branch
+                         int const &compNum             // index to AirloopHVAC branch component
 )
 {
 
@@ -3575,6 +3581,8 @@ void SimAirLoopComponent(EnergyPlusData &state,
             if (CompPointer == nullptr) {
                 UnitarySystems::UnitarySys thisSys;
                 CompPointer = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                // temporary fix for saving pointer, eventually apply to UnitarySystem 25 lines down
+                state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Branch(branchNum).Comp(compNum).compPointer = CompPointer;
             }
             Real64 sensOut = 0.0;
             Real64 latOut = 0.0;
