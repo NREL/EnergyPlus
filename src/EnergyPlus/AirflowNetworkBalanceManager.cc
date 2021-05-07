@@ -6663,7 +6663,12 @@ namespace AirflowNetworkBalanceManager {
         }
 
         for (i = 1; i <= state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces; ++i) {
-            if (i > state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces - state.dataAirflowNetwork->NumOfLinksIntraZone) continue;
+            if (i > state.dataAirflowNetwork->AirflowNetworkNumOfSurfaces - state.dataAirflowNetwork->NumOfLinksIntraZone) {
+                continue;
+            }
+            if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).element->type() == ComponentType::SCR) {
+                state.dataAirflowNetwork->AirflowNetworkLinkageData(i).control = state.dataAirflowNetwork->MultizoneSurfaceData(i).Factor;
+            }
             if (state.dataAirflowNetwork->MultizoneSurfaceData(i).OccupantVentilationControlNum == 0)
                 state.dataAirflowNetwork->MultizoneSurfaceData(i).OpenFactor = 0.0;
             j = state.dataAirflowNetwork->MultizoneSurfaceData(i).SurfNum;
@@ -6741,10 +6746,6 @@ namespace AirflowNetworkBalanceManager {
                                                        state.dataAirflowNetwork->MultizoneSurfaceData(i).OpenFactor,
                                                        state.dataAirflowNetwork->MultizoneSurfaceData(i).OpenFactor);
                     }
-                }
-            } else {
-                if (state.dataAirflowNetwork->AirflowNetworkLinkageData(i).element->type() == ComponentType::SCR) {
-                    state.dataAirflowNetwork->AirflowNetworkLinkageData(i).control = state.dataAirflowNetwork->MultizoneSurfaceData(i).Factor;
                 }
             }
         }
