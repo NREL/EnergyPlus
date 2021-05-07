@@ -576,9 +576,9 @@ namespace AirflowNetwork {
     struct ReferenceConditions // Surface crack standard conditions
     {
         // Members
-        std::string name;     // Name of standard conditions component
-        Real64 temperature;   // Standard temperature for crack data
-        Real64 pressure;      // Standard barometric pressure for crack data
+        std::string name;      // Name of standard conditions component
+        Real64 temperature;    // Standard temperature for crack data
+        Real64 pressure;       // Standard barometric pressure for crack data
         Real64 humidity_ratio; // Standard humidity ratio for crack data
 
         ReferenceConditions(const std::string &name, Real64 temperature = 20.0, Real64 pressure = 101325.0, Real64 humidity_ratio = 0.0)

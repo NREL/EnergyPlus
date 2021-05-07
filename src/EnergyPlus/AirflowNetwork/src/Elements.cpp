@@ -902,7 +902,8 @@ namespace AirflowNetwork {
         auto &solver = state.dataAFNSolver->solver;
         if (solver.AFECTL(i) <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            return GenericCrack(state, FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            generic_crack(FlowCoef, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            return 1;
         }
         // Pressure rise at reference fan speed.
         if (solver.AFECTL(i) >= TranRat) {
@@ -1030,7 +1031,8 @@ namespace AirflowNetwork {
 
         if (control <= 0.0) {
             // Speed = 0; treat fan as resistance.
-            return GenericCrack(state, FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
+            generic_crack(FlowCoef, FlowExpo, false, PDROP, propN, propM, F, DF);
+            return 1;
         }
         // Pressure rise at reference fan speed.
         if (control >= TranRat) {
@@ -1947,12 +1949,14 @@ namespace AirflowNetwork {
         GDRHO = 9.8 * DRHO;
         // if (LIST >= 4) gio::write(Unit21, Format_903) << " DOR:" << i << n << m << PDROP << std::abs(DRHO) << MinRhoDiff;
         if (OpenFactor == 0.0) {
-            return GenericCrack(state, coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            generic_crack(coeff, FlowExpo, LFLAG, PDROP, propN, propM, F, DF);
+            return 1;
         }
         if (std::abs(DRHO) < MinRhoDiff || LFLAG) {
             DPMID = PDROP - 0.5 * Height * GDRHO;
             // Initialization or identical temps: treat as one-way flow.
-            NF = GenericCrack(state, coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
+            NF = 1;
+            generic_crack(coeff, FlowExpo, LFLAG, DPMID, propN, propM, F, DF);
             // if (LIST >= 4) gio::write(Unit21, Format_900) << " Drs:" << DPMID << F[0] << DF[0];
         } else {
             // Possible two-way flow:
@@ -3300,7 +3304,8 @@ namespace AirflowNetwork {
 
         // Check which zone is higher
         if (Fact == 0.0) {
-            return GenericCrack(state, coef, expn, LFLAG, PDROP, propN, propM, F, DF);
+            generic_crack(coef, expn, LFLAG, PDROP, propN, propM, F, DF);
+            return 1;
         }
 
         fma12 = 0.0;
