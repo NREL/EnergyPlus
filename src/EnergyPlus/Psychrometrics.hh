@@ -189,10 +189,9 @@ namespace Psychrometrics {
         return rhoair;
     }
 
-    constexpr Real64
-    PsyRhoAirFnPbTdbW(Real64 const pb,  // barometric pressure (Pascals)
-                      Real64 const tdb, // dry bulb temperature (Celsius)
-                      Real64 const dw   // humidity ratio (kgWater/kgDryAir)
+    constexpr Real64 PsyRhoAirFnPbTdbW(Real64 const pb,  // barometric pressure (Pascals)
+                                       Real64 const tdb, // dry bulb temperature (Celsius)
+                                       Real64 const dw   // humidity ratio (kgWater/kgDryAir)
     )
     {
         // FUNCTION INFORMATION:

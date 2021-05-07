@@ -601,7 +601,9 @@ namespace AirflowNetwork {
         Real64 reference_viscosity; // Reference viscosity for crack data
 
         // Default Constructor
-        SurfaceCrack() : coefficient(0.0), exponent(0.0), reference_density(0.0), reference_viscosity(0.0)
+        SurfaceCrack()
+            : coefficient(0.0), exponent(0.0), reference_density(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0)),
+              reference_viscosity(AIRDYNAMICVISCOSITY(20.0))
         {
         }
 

@@ -79,6 +79,7 @@ namespace AirflowNetwork {
         Real64 sqrt_density{0.0};
         Real64 viscosity{AIRDYNAMICVISCOSITY(20.0)};
 
+        AirProperties();
         explicit AirProperties(double const airDensity);
     };
 
