@@ -203,7 +203,7 @@ void ManageControllers(EnergyPlusData &state,
                        int &ControllerIndex,
                        bool const FirstHVACIteration,
                        int const AirLoopNum,
-                       int const Operation,
+                       ControllerOperation const Operation,
                        bool &IsConvergedFlag,
                        bool &IsUpToDateFlag,
                        bool &BypassOAController,
@@ -334,7 +334,7 @@ void ManageControllers(EnergyPlusData &state,
     // Plant upgrades for V7 added init to these cases because MassFlowRateMaxAvail is better controlled
     {
         auto const SELECT_CASE_var(Operation);
-        if (SELECT_CASE_var == iControllerOpColdStart) {
+        if (SELECT_CASE_var == ControllerOperation::ColdStart) {
             // For temperature and humidity control reset humidity control override if it was set
             if (ControllerProps(ControlNum).HumRatCtrlOverride) {
                 ControllerProps(ControlNum).HumRatCtrlOverride = false;
@@ -353,13 +353,13 @@ void ManageControllers(EnergyPlusData &state,
             // Update the current Controller to the outlet nodes
             UpdateController(state, ControlNum);
 
-        } else if (SELECT_CASE_var == iControllerOpWarmRestart) {
+        } else if (SELECT_CASE_var == ControllerOperation::WarmRestart) {
             // If a iControllerOpWarmRestart call, set the actuator inlet flows to previous solution
             ResetController(state, ControlNum, true, IsConvergedFlag);
             // Update the current Controller to the outlet nodes
             UpdateController(state, ControlNum);
 
-        } else if (SELECT_CASE_var == iControllerOpIterate) {
+        } else if (SELECT_CASE_var == ControllerOperation::Iterate) {
             // With the correct ControlNum Initialize all Controller related parameters
             InitController(state, ControlNum, IsConvergedFlag);
 
@@ -381,7 +381,7 @@ void ManageControllers(EnergyPlusData &state,
 
             CheckTempAndHumRatCtrl(state, ControlNum, IsConvergedFlag);
 
-        } else if (SELECT_CASE_var == iControllerOpEnd) {
+        } else if (SELECT_CASE_var == ControllerOperation::End) {
             // With the correct ControlNum Initialize all Controller related parameters
             InitController(state, ControlNum, IsConvergedFlag);
 
@@ -587,11 +587,11 @@ void GetControllerInput(EnergyPlusData &state)
                 }
             }
             if (UtilityRoutines::SameString(AlphArray(3), "Normal")) {
-                ControllerProps(Num).Action = iNormalAction;
+                ControllerProps(Num).Action = ControllerAction::NormalAction;
             } else if (UtilityRoutines::SameString(AlphArray(3), "Reverse")) {
-                ControllerProps(Num).Action = iReverseAction;
+                ControllerProps(Num).Action = ControllerAction::ReverseAction;
             } else if (lAlphaBlanks(3)) {
-                ControllerProps(Num).Action = 0;
+                ControllerProps(Num).Action = ControllerAction::NoAction;
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                 ShowSevereError(state, "...Invalid " + cAlphaFields(3) + "=\"" + AlphArray(3) + R"(", must be "Normal", "Reverse" or blank.)");
@@ -715,22 +715,22 @@ void GetControllerInput(EnergyPlusData &state)
             ShowContinueError(state, "...the actuator node must also be a water inlet node of a water coil");
         } else { // Node found, check type and action
             if (iNodeType == DataPlant::TypeOf_CoilWaterCooling) {
-                if (ControllerProps(Num).Action == 0) {
-                    ControllerProps(Num).Action = iReverseAction;
-                } else if (ControllerProps(Num).Action == iNormalAction) {
+                if (ControllerProps(Num).Action == ControllerAction::NoAction) {
+                    ControllerProps(Num).Action = ControllerAction::ReverseAction;
+                } else if (ControllerProps(Num).Action == ControllerAction::NormalAction) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
                     ShowContinueError(state, "...Normal action has been specified for a cooling coil - should be Reverse.");
                     ShowContinueError(state, "...overriding user input action with Reverse Action.");
-                    ControllerProps(Num).Action = iReverseAction;
+                    ControllerProps(Num).Action = ControllerAction::ReverseAction;
                 }
             } else if (iNodeType == DataPlant::TypeOf_CoilWaterSimpleHeating) {
-                if (ControllerProps(Num).Action == 0) {
-                    ControllerProps(Num).Action = iNormalAction;
-                } else if (ControllerProps(Num).Action == iReverseAction) {
+                if (ControllerProps(Num).Action == ControllerAction::NoAction) {
+                    ControllerProps(Num).Action = ControllerAction::NormalAction;
+                } else if (ControllerProps(Num).Action == ControllerAction::ReverseAction) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
                     ShowContinueError(state, "...Reverse action has been specified for a heating coil - should be Normal.");
                     ShowContinueError(state, "...overriding user input action with Normal Action.");
-                    ControllerProps(Num).Action = iNormalAction;
+                    ControllerProps(Num).Action = ControllerAction::NormalAction;
                 }
             }
         }
@@ -822,7 +822,7 @@ void ResetController(EnergyPlusData &state, int const ControlNum, bool const DoW
     } else {
         ControllerProps(ControlNum).DoWarmRestartFlag = false;
         // If no speculative warm restart then reset stored mode and actucated value
-        ControllerProps(ControlNum).Mode = iModeNone;
+        ControllerProps(ControlNum).Mode = ControllerMode::None;
         ControllerProps(ControlNum).NextActuatedValue = 0.0;
     }
 
@@ -940,7 +940,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                     } else {
                         //           Warn if humidity setpoint is detected (only for cooling coils) and control varible is TEMP.
                         if (state.dataLoopNodes->Node(SensedNode).HumRatMax != SensedNodeFlagValue &&
-                            ControllerProps(ControllerIndex).Action == iReverseAction) {
+                            ControllerProps(ControllerIndex).Action == ControllerAction::ReverseAction) {
                             ShowWarningError(state,
                                              "HVACControllers: controller type=" + ControllerProps(ControllerIndex).ControllerType + " Name=\"" +
                                                  ControllerProps(ControllerIndex).ControllerName +
@@ -1115,7 +1115,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         // Setup root finder after sizing calculation
         {
             auto const SELECT_CASE_var(ControllerProps(ControlNum).Action);
-            if (SELECT_CASE_var == iNormalAction) {
+            if (SELECT_CASE_var == ControllerAction::NormalAction) {
                 SetupRootFinder(state,
                                 RootFinders(ControlNum),
                                 iSlopeIncreasing,
@@ -1126,7 +1126,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                                                                      // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
                                                                      // Y variables
 
-            } else if (SELECT_CASE_var == iReverseAction) {
+            } else if (SELECT_CASE_var == ControllerAction::ReverseAction) {
                 SetupRootFinder(state,
                                 RootFinders(ControlNum),
                                 iSlopeDecreasing,
@@ -1165,7 +1165,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         // Reset solution trackers
         for (auto &e : ControllerProps(ControlNum).SolutionTrackers) {
             e.DefinedFlag = false;
-            e.Mode = iModeNone;
+            e.Mode = ControllerMode::None;
             e.ActuatedValue = 0.0;
         }
 
@@ -1422,7 +1422,7 @@ void CalcSimpleController(EnergyPlusData &state,
     // Check to see if the component is running; if not converged and return.  This check will be done
     // by looking at the component mass flow rate at the sensed node.
     if (state.dataLoopNodes->Node(SensedNode).MassFlowRate == 0.0) {
-        ExitCalcController(state, ControlNum, DataPrecisionGlobals::constant_zero, iModeOff, IsConvergedFlag, IsUpToDateFlag);
+        ExitCalcController(state, ControlNum, DataPrecisionGlobals::constant_zero, ControllerMode::Off, IsConvergedFlag, IsUpToDateFlag);
         return;
     }
 
@@ -1525,7 +1525,7 @@ void FindRootSimpleController(EnergyPlusData &state,
     bool ReusePreviousSolutionFlag;
     int PreviousSolutionIndex;
     bool PreviousSolutionDefinedFlag;
-    int PreviousSolutionMode;
+    ControllerMode PreviousSolutionMode;
     Real64 PreviousSolutionValue;
 
     auto &ControllerProps(state.dataHVACControllers->ControllerProps);
@@ -1572,7 +1572,7 @@ void FindRootSimpleController(EnergyPlusData &state,
             // Make sure that proposed candidate does not conflict with current min/max range and lower/upper brackets
             ReusePreviousSolutionFlag = ControllerProps(ControlNum).ReusePreviousSolutionFlag &&
                                         (RootFinders(ControlNum).CurrentMethodType == DataRootFinder::iMethod::Bracket) &&
-                                        PreviousSolutionDefinedFlag && (PreviousSolutionMode == iModeActive) &&
+                                        PreviousSolutionDefinedFlag && (PreviousSolutionMode == ControllerMode::Active) &&
                                         CheckRootFinderCandidate(RootFinders(ControlNum), PreviousSolutionValue);
 
             if (ReusePreviousSolutionFlag) {
@@ -1589,17 +1589,17 @@ void FindRootSimpleController(EnergyPlusData &state,
 
         } else if ((SELECT_CASE_var == iStatus::OK) || (SELECT_CASE_var == iStatus::OKRoundOff)) {
             // Indicate convergence with base value (used to obtain DeltaSensed!)
-            ExitCalcController(state, ControlNum, RootFinders(ControlNum).XCandidate, iModeActive, IsConvergedFlag, IsUpToDateFlag);
+            ExitCalcController(state, ControlNum, RootFinders(ControlNum).XCandidate, ControllerMode::Active, IsConvergedFlag, IsUpToDateFlag);
 
         } else if (SELECT_CASE_var == iStatus::OKMin) {
             // Indicate convergence with min value
             // Should be the same as ControllerProps(ControlNum)%MinAvailActuated
-            ExitCalcController(state, ControlNum, RootFinders(ControlNum).MinPoint.X, iModeMinActive, IsConvergedFlag, IsUpToDateFlag);
+            ExitCalcController(state, ControlNum, RootFinders(ControlNum).MinPoint.X, ControllerMode::MinActive, IsConvergedFlag, IsUpToDateFlag);
 
         } else if (SELECT_CASE_var == iStatus::OKMax) {
             // Indicate convergence with max value
             // Should be the same as ControllerProps(ControlNum)%MaxAvailActuated
-            ExitCalcController(state, ControlNum, RootFinders(ControlNum).MaxPoint.X, iModeMaxActive, IsConvergedFlag, IsUpToDateFlag);
+            ExitCalcController(state, ControlNum, RootFinders(ControlNum).MaxPoint.X, ControllerMode::MaxActive, IsConvergedFlag, IsUpToDateFlag);
 
         } else if (SELECT_CASE_var == iStatus::ErrorSingular) {
             // Indicate inactive mode with min actuated value
@@ -1609,7 +1609,7 @@ void FindRootSimpleController(EnergyPlusData &state,
             //       with       RootFinders(ControlNum)%MinPoint%X
             //       which is the same as (see SUBROUTINE InitController)
             //                  ControllerProps(ControlNum)%MinAvailActuated
-            ExitCalcController(state, ControlNum, RootFinders(ControlNum).MinPoint.X, iModeInactive, IsConvergedFlag, IsUpToDateFlag);
+            ExitCalcController(state, ControlNum, RootFinders(ControlNum).MinPoint.X, ControllerMode::Inactive, IsConvergedFlag, IsUpToDateFlag);
 
             // Abnormal case: should never happen
         } else if (SELECT_CASE_var == iStatus::ErrorRange) {
@@ -1626,7 +1626,7 @@ void FindRootSimpleController(EnergyPlusData &state,
         } else if (SELECT_CASE_var == iStatus::ErrorBracket) {
             ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
             ShowContinueError(state, " Controller name=" + ControllerProps(ControlNum).ControllerName);
-            ShowContinueError(state, " Controller action=" + state.dataHVACCtrl->ActionTypes(ControllerProps(ControlNum).Action));
+            ShowContinueError(state, " Controller action=" + state.dataHVACCtrl->ActionTypes(static_cast<int>(ControllerProps(ControlNum).Action)));
             ShowContinueError(state,
                               format(" Root candidate x={:.{}T} does not lie within the lower/upper brackets.",
                                      ControllerProps(ControlNum).ActuatedValue,
@@ -1657,7 +1657,7 @@ void FindRootSimpleController(EnergyPlusData &state,
                 ShowContinueErrorTimeStamp(state, "");
                 ShowContinueError(state,
                                   "  Controller function is inconsistent with user specified controller action = " +
-                                      state.dataHVACCtrl->ActionTypes(ControllerProps(ControlNum).Action));
+                                      state.dataHVACCtrl->ActionTypes(static_cast<int>(ControllerProps(ControlNum).Action)));
                 ShowContinueError(state, "  Actuator will be set to maximum action");
                 ShowContinueError(state, "Controller control type=" + ControlVariableTypes(ControllerProps(ControlNum).ControlVar));
                 if (ControllerProps(ControlNum).ControlVar == iCtrl::Temperature) {
@@ -1711,7 +1711,7 @@ void FindRootSimpleController(EnergyPlusData &state,
             }
             // Indicate convergence with min value
             // Should be the same as ControllerProps(ControlNum)%MaxAvailActuated
-            ExitCalcController(state, ControlNum, RootFinders(ControlNum).MaxPoint.X, iModeMaxActive, IsConvergedFlag, IsUpToDateFlag);
+            ExitCalcController(state, ControlNum, RootFinders(ControlNum).MaxPoint.X, ControllerMode::MaxActive, IsConvergedFlag, IsUpToDateFlag);
 
         } else {
             // Should never happen
@@ -1759,7 +1759,7 @@ void CheckSimpleController(EnergyPlusData &state, int const ControlNum, bool &Is
 
     {
         auto const SELECT_CASE_var(ControllerProps(ControlNum).Mode);
-        if (SELECT_CASE_var == iModeOff) {
+        if (SELECT_CASE_var == ControllerMode::Off) {
             // Check whether the component is running
             // This check is performed by looking at the component mass flow rate at the sensed node.
             // Since the components have been simulated before getting here, if they are zero they should be OFF.
@@ -1770,7 +1770,7 @@ void CheckSimpleController(EnergyPlusData &state, int const ControlNum, bool &Is
                 }
             }
 
-        } else if (SELECT_CASE_var == iModeInactive) {
+        } else if (SELECT_CASE_var == ControllerMode::Inactive) {
             // Controller component NOT available (ie, inactive)
             // Make sure that the actuated variable is still equal to the node min avail
             // NOTE: Replaced Node(ActuatedNode)%MassFlowRateMinAvail         in release 1.3
@@ -1780,7 +1780,7 @@ void CheckSimpleController(EnergyPlusData &state, int const ControlNum, bool &Is
                 return;
             }
 
-        } else if (SELECT_CASE_var == iModeMinActive) {
+        } else if (SELECT_CASE_var == ControllerMode::MinActive) {
             // Check for min constrained convergence
             if (CheckMinActiveController(state, ControlNum)) {
                 IsConvergedFlag = true;
@@ -1795,7 +1795,7 @@ void CheckSimpleController(EnergyPlusData &state, int const ControlNum, bool &Is
                 return;
             }
 
-        } else if (SELECT_CASE_var == iModeMaxActive) {
+        } else if (SELECT_CASE_var == ControllerMode::MaxActive) {
             // Check for max constrained convergence
             if (CheckMaxActiveController(state, ControlNum)) {
                 IsConvergedFlag = true;
@@ -1810,7 +1810,7 @@ void CheckSimpleController(EnergyPlusData &state, int const ControlNum, bool &Is
                 return;
             }
 
-        } else if (SELECT_CASE_var == iModeActive) {
+        } else if (SELECT_CASE_var == ControllerMode::Active) {
             // Check min constraint on actuated variable
             if (ControllerProps(ControlNum).ActuatedValue < ControllerProps(ControlNum).MinAvailActuated) {
                 IsConvergedFlag = false;
@@ -1876,14 +1876,14 @@ bool CheckMinActiveController(EnergyPlusData &state, int const ControlNum)
 
     {
         auto const SELECT_CASE_var(ControllerProps(ControlNum).Action);
-        if (SELECT_CASE_var == iNormalAction) { // "NORMAL"
+        if (SELECT_CASE_var == ControllerAction::NormalAction) { // "NORMAL"
             // Check for min constrained convergence
             if (ControllerProps(ControlNum).SetPointValue <= ControllerProps(ControlNum).SensedValue) {
                 CheckMinActiveController = true;
                 return CheckMinActiveController;
             }
 
-        } else if (SELECT_CASE_var == iReverseAction) { // "REVERSE"
+        } else if (SELECT_CASE_var == ControllerAction::ReverseAction) { // "REVERSE"
             // Check for min constrained convergence
             if (ControllerProps(ControlNum).SetPointValue >= ControllerProps(ControlNum).SensedValue) {
                 CheckMinActiveController = true;
@@ -1928,14 +1928,14 @@ bool CheckMaxActiveController(EnergyPlusData &state, int const ControlNum)
 
     {
         auto const SELECT_CASE_var(ControllerProps(ControlNum).Action);
-        if (SELECT_CASE_var == iNormalAction) { // "NORMAL"
+        if (SELECT_CASE_var == ControllerAction::NormalAction) { // "NORMAL"
             // Check for max constrained convergence
             if (ControllerProps(ControlNum).SetPointValue >= ControllerProps(ControlNum).SensedValue) {
                 CheckMaxActiveController = true;
                 return CheckMaxActiveController;
             }
 
-        } else if (SELECT_CASE_var == iReverseAction) { // "REVERSE"
+        } else if (SELECT_CASE_var == ControllerAction::ReverseAction) { // "REVERSE"
             // Check for max constrained convergence
             if (ControllerProps(ControlNum).SetPointValue <= ControllerProps(ControlNum).SensedValue) {
                 CheckMaxActiveController = true;
@@ -1979,7 +1979,7 @@ void SaveSimpleController(EnergyPlusData &state, int const ControlNum, bool cons
             PreviousSolutionIndex = 2;
         }
 
-        if (ControllerProps(ControlNum).Mode == iModeActive) {
+        if (ControllerProps(ControlNum).Mode == ControllerMode::Active) {
             ControllerProps(ControlNum).SolutionTrackers(PreviousSolutionIndex).DefinedFlag = true;
             ControllerProps(ControlNum).SolutionTrackers(PreviousSolutionIndex).Mode = ControllerProps(ControlNum).Mode;
             ControllerProps(ControlNum).SolutionTrackers(PreviousSolutionIndex).ActuatedValue = ControllerProps(ControlNum).NextActuatedValue;
@@ -2051,7 +2051,7 @@ void CheckTempAndHumRatCtrl(EnergyPlusData &state, int const ControlNum, bool &I
                         // Turn on humdity control and restart controller
                         IsConvergedFlag = false;
                         thisController.HumRatCtrlOverride = true;
-                        if (thisController.Action == iReverseAction) {
+                        if (thisController.Action == ControllerAction::ReverseAction) {
                             // Cooling coil controller should always be ReverseAction, but skip this if not
                             RootFinder::SetupRootFinder(state,
                                                         state.dataHVACControllers->RootFinders(ControlNum),
@@ -2070,8 +2070,12 @@ void CheckTempAndHumRatCtrl(EnergyPlusData &state, int const ControlNum, bool &I
     }
 }
 
-void ExitCalcController(
-    EnergyPlusData &state, int const ControlNum, Real64 const NextActuatedValue, int const Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag)
+void ExitCalcController(EnergyPlusData &state,
+                        int const ControlNum,
+                        Real64 const NextActuatedValue,
+                        ControllerMode const Mode,
+                        bool &IsConvergedFlag,
+                        bool &IsUpToDateFlag)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2108,7 +2112,7 @@ void ExitCalcController(
 
 void TrackAirLoopControllers(EnergyPlusData &state,
                              int const AirLoopNum,
-                             int const WarmRestartStatus,
+                             ControllerWarmRestart const WarmRestartStatus,
                              int const AirLoopIterMax,
                              int const AirLoopIterTot,
                              int const AirLoopNumCalls)
@@ -2149,9 +2153,9 @@ void TrackAirLoopControllers(EnergyPlusData &state,
 
     {
         auto const SELECT_CASE_var(WarmRestartStatus);
-        if (SELECT_CASE_var == iControllerWarmRestartSuccess) {
+        if (SELECT_CASE_var == ControllerWarmRestart::Success) {
             ++AirLoopStats(AirLoopNum).NumSuccessfulWarmRestarts;
-        } else if (SELECT_CASE_var == iControllerWarmRestartFail) {
+        } else if (SELECT_CASE_var == ControllerWarmRestart::Fail) {
             ++AirLoopStats(AirLoopNum).NumFailedWarmRestarts;
         } else {
             // Nothing to do if no speculative warm restart used
@@ -2194,7 +2198,7 @@ void TrackAirLoopController(EnergyPlusData &state,
     // Number of iterations needed to solve this controller
     int IterationCount;
     // Current operating mode
-    int Mode;
+    ControllerMode Mode;
 
     auto &AirLoopStats(state.dataHVACControllers->AirLoopStats);
     auto &ControllerProps(state.dataHVACControllers->ControllerProps);
@@ -2208,14 +2212,14 @@ void TrackAirLoopController(EnergyPlusData &state,
     IterationCount = ControllerProps(ControlIndex).NumCalcCalls;
     Mode = ControllerProps(ControlIndex).Mode;
 
-    if (Mode != iModeNone) {
+    if (Mode != ControllerMode::None) {
 
-        ++AirLoopStats(AirLoopNum).ControllerStats(AirLoopControlNum).NumCalls(Mode);
+        ++AirLoopStats(AirLoopNum).ControllerStats(AirLoopControlNum).NumCalls(static_cast<int>(Mode));
 
-        AirLoopStats(AirLoopNum).ControllerStats(AirLoopControlNum).TotIterations(Mode) += IterationCount;
+        AirLoopStats(AirLoopNum).ControllerStats(AirLoopControlNum).TotIterations(static_cast<int>(Mode)) += IterationCount;
 
-        AirLoopStats(AirLoopNum).ControllerStats(AirLoopControlNum).MaxIterations(Mode) =
-            max(AirLoopStats(AirLoopNum).ControllerStats(AirLoopControlNum).MaxIterations(Mode), IterationCount);
+        AirLoopStats(AirLoopNum).ControllerStats(AirLoopControlNum).MaxIterations(static_cast<int>(Mode)) =
+            max(AirLoopStats(AirLoopNum).ControllerStats(AirLoopControlNum).MaxIterations(static_cast<int>(Mode)), IterationCount);
     }
 }
 
@@ -2605,7 +2609,7 @@ void TraceIndividualController(EnergyPlusData &state,
                                int const ControlNum,
                                bool const FirstHVACIteration,
                                int const AirLoopPass,
-                               int const Operation, // Operation to execute
+                               ControllerOperation const Operation, // Operation to execute
                                bool const IsConvergedFlag)
 {
 
@@ -2668,7 +2672,7 @@ void TraceIndividualController(EnergyPlusData &state,
     // Write detailed diagnostic
     {
         auto const SELECT_CASE_var(Operation);
-        if ((SELECT_CASE_var == iControllerOpColdStart) || (SELECT_CASE_var == iControllerOpWarmRestart)) {
+        if ((SELECT_CASE_var == ControllerOperation::ColdStart) || (SELECT_CASE_var == ControllerOperation::WarmRestart)) {
             print(TraceFile,
                   "{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{:.10T},{},{},{},{},{:.10T},",
                   state.dataLoopNodes->Node(SensedNode).MassFlowRate,
@@ -2690,7 +2694,7 @@ void TraceIndividualController(EnergyPlusData &state,
             // Finally skip line
             print(TraceFile, "\n");
 
-        } else if (SELECT_CASE_var == iControllerOpIterate) {
+        } else if (SELECT_CASE_var == ControllerOperation::Iterate) {
             // Masss flow rate
             // Convergence analysis
 
@@ -2716,7 +2720,7 @@ void TraceIndividualController(EnergyPlusData &state,
             // Finally skip line
             print(TraceFile, "\n");
 
-        } else if (SELECT_CASE_var == iControllerOpEnd) {
+        } else if (SELECT_CASE_var == ControllerOperation::End) {
             // Masss flow rate
             // Convergence analysis
             print(TraceFile,
