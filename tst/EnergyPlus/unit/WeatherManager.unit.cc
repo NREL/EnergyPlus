@@ -1178,17 +1178,12 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
         "  Yes;                     !- Use Weather File Snow Indicators",
 
         "Site:Location,",
-        "  CHICAGO_IL_USA TMY2-94846,  !- Name",
-        "  41.78,                   !- Latitude {deg}",
-        "  -87.75,                  !- Longitude {deg}",
-        "  -6.00,                   !- Time Zone {hr}",
-        "  190.00;                  !- Elevation {m}",
+        "  Univ_Of_Illinois_725315,  !- Name",
+        "  40.06,                   !- Latitude {deg}",
+        "  -88.37,                  !- Longitude {deg}",
+        "  -6.0,                   !- Time Zone {hr}",
+        "  213.0;                  !- Elevation {m}",
 
-        //"Output:Variable,",
-        //"*,",
-        //"Site Outdoor Air Drybulb Temperature,",
-        //"Timestep;",
-        //"Output:Variable,*,Site Wind Speed,Timestep;",
         "Output:Variable,*,Site Total Sky Cover,Timestep;",
         "Output:Variable,*,Site Opaque Sky Cover,Timestep;",
     });
@@ -1212,10 +1207,6 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
     WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
 
     // Test get output variables for Total Sky Cover and Opaque Sky Cover
-    //EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->RVariableTypes(1).VarNameOnly);
-    //EXPECT_EQ("Environment:Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->RVariableTypes(1).VarName);
-    //EXPECT_EQ("Site Wind Speed", state->dataOutputProcessor->RVariableTypes(2).VarNameOnly);
-    //EXPECT_EQ("Environment:Site Wind Speed", state->dataOutputProcessor->RVariableTypes(2).VarName);
     EXPECT_EQ("Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(1).VarNameOnly);
     EXPECT_EQ("Environment:Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(1).VarName);
     EXPECT_EQ("Site Opaque Sky Cover", state->dataOutputProcessor->RVariableTypes(2).VarNameOnly);
@@ -1223,8 +1214,6 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
 
     EXPECT_EQ(7, state->dataOutputProcessor->RVariableTypes(1).ReportID);
     EXPECT_EQ(8, state->dataOutputProcessor->RVariableTypes(2).ReportID);
-    //EXPECT_EQ(9, state->dataOutputProcessor->RVariableTypes(3).ReportID);
-    //EXPECT_EQ(110, state->dataOutputProcessor->RVariableTypes(4).ReportID);
 
     state->dataWeatherManager->Envrn = 1;
 
@@ -1240,10 +1229,11 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
     OpenWeatherFile(*state, ErrorsFound);
     ReadWeatherForDay(*state, 1, 1, true);
 
-    // Test the feature of interpolating some weather inputs to calc sky temp
+    // Test additional set of weather data on sky temp calc
     Real64 expected_SkyTemp = -1.7901122977770569;
     EXPECT_NEAR(state->dataWeatherManager->TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
 
+    // Test Total Sky Cover and Opaque Sky Cover
     Real64 expected_TSC = 9;
     Real64 expected_OSC = 8;
 
