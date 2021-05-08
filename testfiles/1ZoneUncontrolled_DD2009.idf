@@ -799,6 +799,10 @@
 
   Output:Variable,*,Site Outdoor Air Barometric Pressure,Timestep;
 
+  Output:Variable,*,Site Total Sky Cover,Timestep;
+
+  Output:Variable,*,Site Opaque Sky Cover,Timestep;
+
   Output:Variable,*,Site Sky Temperature,Timestep;
 
   Output:Variable,*,Site Diffuse Solar Radiation Rate per Area,Timestep;
