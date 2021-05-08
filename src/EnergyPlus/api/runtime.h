@@ -141,7 +141,8 @@ ENERGYPLUSLIB_API void stopSimulation(EnergyPlusState state);
 ///          when calling EnergyPlus as a library.  This function mutes the standard output messages.  Note that these
 ///          can still be retrieved using callback functionality.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
-ENERGYPLUSLIB_API void muteConsoleOutput(EnergyPlusState state);
+/// \param[in] muteOutput An integer describing whether the console output should be muted or not: nonzero integer for yes, 0 for no.
+ENERGYPLUSLIB_API void setConsoleOutputMuteState(EnergyPlusState state, int muteOutput);
 
 /// \brief Asks EnergyPlus to issue a warning message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to alert the user using

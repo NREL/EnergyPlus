@@ -93,8 +93,8 @@ class Runtime:
         self.api.issueText.restype = c_void_p
         self.api.stopSimulation.argtypes = [c_void_p]
         self.api.stopSimulation.restype = c_void_p
-        self.api.muteConsoleOutput.argtypes = [c_void_p]
-        self.api.muteConsoleOutput.restype = c_void_p
+        self.api.setConsoleOutputMuteState.argtypes = [c_void_p, c_int]
+        self.api.setConsoleOutputMuteState.restype = c_void_p
         self.py_progress_callback_type = CFUNCTYPE(c_void_p, c_int)
         self.api.registerProgressCallback.argtypes = [c_void_p, self.py_progress_callback_type]
         self.api.registerProgressCallback.restype = c_void_p
@@ -191,13 +191,17 @@ class Runtime:
     # def stop_simulation(self, state: c_void_p) -> None:
     #     pass
 
-    def mute_console_output(self, state) -> None:
+    def set_console_output_mute_state(self, state, mute_output: bool) -> None:
         """
         Mutes all console output (stdout and stderr) when calling EnergyPlus as a library.
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param mute_output: A boolean flag for whether we should mute console output
         :return: Nothing
         """
-        self.api.muteConsoleOutput(state)
+        if mute_output:
+            self.api.setConsoleOutputMuteState(state, 1)
+        else:
+            self.api.setConsoleOutputMuteState(state, 0)
 
     def issue_warning(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """
