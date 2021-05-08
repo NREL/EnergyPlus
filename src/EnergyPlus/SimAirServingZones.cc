@@ -2775,7 +2775,7 @@ void SimAirLoop(EnergyPlusData &state,
                                 state.dataSimAirServingZones->NumCallsSAL2);
 
         // Update air loop trackers
-        state.dataSimAirServingZones->WarmRestartStatusSAL = iControllerWarmRestartNone;
+        state.dataSimAirServingZones->WarmRestartStatusSAL = ControllerWarmRestart::None;
         AirLoopNumCalls += state.dataSimAirServingZones->NumCallsSAL2;
         AirLoopIterMax = max(AirLoopIterMax, state.dataSimAirServingZones->IterMaxSAL2);
         AirLoopIterTot += state.dataSimAirServingZones->IterTotSAL2;
@@ -2790,7 +2790,7 @@ void SimAirLoop(EnergyPlusData &state,
                                   state.dataSimAirServingZones->NumCallsSAL2);
 
         // Update air loop trackers
-        state.dataSimAirServingZones->WarmRestartStatusSAL = iControllerWarmRestartSuccess;
+        state.dataSimAirServingZones->WarmRestartStatusSAL = ControllerWarmRestart::Success;
         AirLoopNumCalls += state.dataSimAirServingZones->NumCallsSAL2;
         AirLoopIterMax = max(AirLoopIterMax, state.dataSimAirServingZones->IterMaxSAL2);
         AirLoopIterTot += state.dataSimAirServingZones->IterTotSAL2;
@@ -2806,7 +2806,7 @@ void SimAirLoop(EnergyPlusData &state,
                                     state.dataSimAirServingZones->NumCallsSAL2);
 
             // Update air loop trackers
-            state.dataSimAirServingZones->WarmRestartStatusSAL = iControllerWarmRestartFail;
+            state.dataSimAirServingZones->WarmRestartStatusSAL = DataHVACControllers::ControllerWarmRestart::Fail;
             AirLoopNumCalls += state.dataSimAirServingZones->NumCallsSAL2;
             AirLoopIterMax = max(AirLoopIterMax, state.dataSimAirServingZones->IterMaxSAL2);
             AirLoopIterTot += state.dataSimAirServingZones->IterTotSAL2;
@@ -2936,7 +2936,7 @@ void SolveAirLoopControllers(
                           PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum),
                           FirstHVACIteration,
                           AirLoopNum,
-                          iControllerOpColdStart,
+                          ControllerOperation::ColdStart,
                           ControllerConvergedFlag,
                           IsUpToDateFlag,
                           state.dataSimAirServingZones->BypassOAControllerSALC,
@@ -2975,7 +2975,7 @@ void SolveAirLoopControllers(
                               PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum),
                               FirstHVACIteration,
                               AirLoopNum,
-                              iControllerOpIterate,
+                              ControllerOperation::Iterate,
                               ControllerConvergedFlag,
                               IsUpToDateFlag,
                               state.dataSimAirServingZones->BypassOAControllerSALC);
@@ -3061,7 +3061,7 @@ void SolveAirLoopControllers(
                           PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum),
                           FirstHVACIteration,
                           AirLoopNum,
-                          iControllerOpEnd,
+                          ControllerOperation::End,
                           ControllerConvergedFlag,
                           IsUpToDateFlag,
                           state.dataSimAirServingZones->BypassOAControllerSALC);
@@ -3158,7 +3158,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
                       ControllerIndex,
                       FirstHVACIteration,
                       AirLoopNum,
-                      iControllerOpColdStart,
+                      ControllerOperation::ColdStart,
                       ControllerConvergedFlag,
                       IsUpToDateFlag,
                       state.dataSimAirServingZones->BypassOAControllerSWCC,
@@ -3200,7 +3200,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
                           ControllerIndex,
                           FirstHVACIteration,
                           AirLoopNum,
-                          iControllerOpIterate,
+                          ControllerOperation::Iterate,
                           ControllerConvergedFlag,
                           IsUpToDateFlag,
                           state.dataSimAirServingZones->BypassOAControllerSWCC);
@@ -3265,7 +3265,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
                       ControllerIndex,
                       FirstHVACIteration,
                       AirLoopNum,
-                      iControllerOpEnd,
+                      ControllerOperation::End,
                       ControllerConvergedFlag,
                       IsUpToDateFlag,
                       state.dataSimAirServingZones->BypassOAControllerSWCC);
@@ -3350,7 +3350,7 @@ void ReSolveAirLoopControllers(
                           PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum),
                           FirstHVACIteration,
                           AirLoopNum,
-                          iControllerOpWarmRestart,
+                          ControllerOperation::WarmRestart,
                           ControllerConvergedFlag,
                           IsUpToDateFlag,
                           state.dataSimAirServingZones->BypassOAControllerRSALC);
@@ -3372,7 +3372,7 @@ void ReSolveAirLoopControllers(
                           PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum),
                           FirstHVACIteration,
                           AirLoopNum,
-                          iControllerOpEnd,
+                          ControllerOperation::End,
                           ControllerConvergedFlag,
                           IsUpToDateFlag,
                           state.dataSimAirServingZones->BypassOAControllerRSALC);

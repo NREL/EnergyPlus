@@ -259,7 +259,7 @@ struct SimAirServingZonesData : BaseGlobalStruct
     // If Status<0, no speculative warm restart attempted.
     // If Status==0, warm restart failed.
     // If Status>0, warm restart succeeded.
-    int WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+    DataHVACControllers::ControllerWarmRestart WarmRestartStatusSAL = DataHVACControllers::ControllerWarmRestart::None;
     int IterSALC = 0;        // Iteration counter
     int ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
     int MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded
@@ -332,7 +332,7 @@ struct SimAirServingZonesData : BaseGlobalStruct
         this->NumCallsSAL2 = 0;     // Number of times SimAirLoopComponents() has been invoked per air loop for either Solve or ReSolve operations
         this->AirLoopConvergedFlagSAL = false;
         this->DoWarmRestartFlagSAL = false;
-        this->WarmRestartStatusSAL = DataHVACControllers::iControllerWarmRestartNone;
+        this->WarmRestartStatusSAL = DataHVACControllers::ControllerWarmRestart::None;
         this->IterSALC = 0;        // Iteration counter
         this->ErrCountSALC = 0;    // Number of times that the maximum iterations was exceeded
         this->MaxErrCountSALC = 0; // Number of times that the maximum iterations was exceeded

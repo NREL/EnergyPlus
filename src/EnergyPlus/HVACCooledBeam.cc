@@ -274,13 +274,13 @@ namespace HVACCooledBeam {
             CoolBeam(CBNum).Name = Alphas(1);
             CoolBeam(CBNum).UnitType = CurrentModuleObject;
             CoolBeam(CBNum).UnitType_Num = 1;
-            CoolBeam(CBNum).CBType = Alphas(3);
-            if (UtilityRoutines::SameString(CoolBeam(CBNum).CBType, "Passive")) {
-                CoolBeam(CBNum).CBType_Num = Passive_Cooled_Beam;
-            } else if (UtilityRoutines::SameString(CoolBeam(CBNum).CBType, "Active")) {
-                CoolBeam(CBNum).CBType_Num = Active_Cooled_Beam;
+            CoolBeam(CBNum).CBTypeString = Alphas(3);
+            if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Passive")) {
+                CoolBeam(CBNum).CBType = CooledBeamType::Passive;
+            } else if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Active")) {
+                CoolBeam(CBNum).CBType = CooledBeamType::Active;
             } else {
-                ShowSevereError(state, "Illegal " + cAlphaFields(3) + " = " + CoolBeam(CBNum).CBType + '.');
+                ShowSevereError(state, "Illegal " + cAlphaFields(3) + " = " + CoolBeam(CBNum).CBTypeString + '.');
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + CoolBeam(CBNum).Name);
                 ErrorsFound = true;
             }
@@ -727,7 +727,7 @@ namespace HVACCooledBeam {
         }
 
         if (CoolBeam(CBNum).Kin == DataGlobalConstants::AutoCalculate) {
-            if (CoolBeam(CBNum).CBType_Num == Passive_Cooled_Beam) {
+            if (CoolBeam(CBNum).CBType == CooledBeamType::Passive) {
                 CoolBeam(CBNum).Kin = 0.0;
             } else {
                 CoolBeam(CBNum).Kin = 2.0;
