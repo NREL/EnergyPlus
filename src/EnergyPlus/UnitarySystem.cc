@@ -1507,7 +1507,7 @@ namespace UnitarySystems {
         } else if (state.dataSize->CurSysNum > 0) {
             select_EqSizing = &state.dataSize->UnitarySysEqSizing(state.dataSize->CurSysNum);
             // this was reseting data set by OutdoorAirUnit when UnitarySystem is child
-            // question is then who resets these?
+            // question is then who resets these (#8751 temporary fix)?
             // move here for now and only reset UnitarySystem flags, then find better way to do this
             select_EqSizing->AirFlow = false;
             select_EqSizing->CoolingAirFlow = false;
@@ -1529,6 +1529,13 @@ namespace UnitarySystems {
         }
         // Object Data, points to specific array
         DataSizing::ZoneEqSizingData &EqSizing(*select_EqSizing);
+
+        // coil sizing requires this information to check proper flow/capacity limits (#8761)
+        if (this->m_ISHundredPercentDOASDXCoil) {
+            state.dataHVACGlobal->DXCT = 2; // uses 100% DX coil flow limits
+        } else {
+            state.dataHVACGlobal->DXCT = 1; // uses normal DX coil flow limits
+        }
 
         bool anyEMSRan;
         EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UnitarySystemSizing, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
@@ -1605,7 +1612,10 @@ namespace UnitarySystems {
             if (!this->m_HeatCoilExists) state.dataSize->ZoneCoolingOnlyFan = true;
             TempSize = this->m_MaxCoolAirVolFlow;
             SaveCurDuctType = state.dataSize->CurDuctType;
-            state.dataSize->CurDuctType = DataHVACGlobals::Cooling;
+            // might want to rethink this method. Tries to find the larger of cooling or heating capcity
+            // however, if there is no heating coil the cooling air flow rate is used, not the main flow rate
+            // this is fine if there are no other systems on the branch. CoilSystem does not do this (#8761).
+            if (this->UnitType == "AirLoopHVAC:UnitarySystem") state.dataSize->CurDuctType = DataHVACGlobals::Cooling;
             bool errorsFound = false;
             if ((CoolingSAFlowMethod == state.dataUnitarySystems->SupplyAirFlowRate) || (CoolingSAFlowMethod == state.dataUnitarySystems->None)) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -1695,11 +1705,15 @@ namespace UnitarySystems {
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 state.dataSize->DXCoolCap = CoolCapAtPeak;
-                EqSizing.CoolingCapacity = true;
-                EqSizing.DesCoolingLoad = CoolCapAtPeak;
+                // CoilSystem does not size the cooling coil (#8761)
+                if (this->UnitType == "AirLoopHVAC:UnitarySystem") {
+                    EqSizing.CoolingCapacity = true;
+                    EqSizing.DesCoolingLoad = CoolCapAtPeak;
+                }
             } else {
                 if (!HardSizeNoDesRun &&
                     (CoolingSAFlowMethod != state.dataUnitarySystems->FlowPerCoolingCapacity && this->m_DesignCoolingCapacity > 0.0)) {
+                    // corrected code for #8756
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                         this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
                         this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
@@ -16676,8 +16690,10 @@ namespace UnitarySystems {
 
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes)
     {
+        // setup reports only once
+        if (state.dataUnitarySystems->reportVariablesAreSetup) return;
         // all report variable are set up here after all UnitarySystem controlled types are read in.
-        // UnitarySystem now models CoilSystem, any new reports must be set up last.
+        // UnitarySystem now models CoilSystem, any new reports may be setup in the order of call in SimAirServingZones.
         // if (UnitarySystem), else (CoilSystem), else (otherSystems), etc., else FATAL.
         if (numAllSystemTypes == state.dataUnitarySystems->numUnitarySystems) {
             for (int sysNum = 0; sysNum < state.dataUnitarySystems->numUnitarySystems; ++sysNum) {
@@ -17119,6 +17135,7 @@ namespace UnitarySystems {
                 }
             }
         }
+        state.dataUnitarySystems->reportVariablesAreSetup = true;
     }
 
 } // namespace UnitarySystems
