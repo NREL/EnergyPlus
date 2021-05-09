@@ -4443,7 +4443,6 @@ namespace UnitarySystems {
                         //                        SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound,
                         //                        HeatingCoilPLFCurveIndex );
                         //                    }
-
                     }
 
                     if (state.dataGlobal->DoCoilDirectSolutions && this->m_NumOfSpeedCooling > 1) {
@@ -4554,7 +4553,7 @@ namespace UnitarySystems {
                         this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
                         this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
                         this->m_HeatPump = true;
-                    } 
+                    }
                 }
 
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
@@ -7217,9 +7216,9 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
                 }
             }
-            if (numAllSystemTypes == state.dataUnitarySystems->numUnitarySystems && state.dataZoneEquip->ZoneEquipInputsFilled)
-                setupAllOutputVars(state, numAllSystemTypes);
         }
+        if (numAllSystemTypes == state.dataUnitarySystems->numUnitarySystems && state.dataZoneEquip->ZoneEquipInputsFilled)
+            setupAllOutputVars(state, numAllSystemTypes);
     }
 
     void UnitarySys::calcUnitarySuppSystemToSP(EnergyPlusData &state, bool const FirstHVACIteration // True when first HVAC iteration
