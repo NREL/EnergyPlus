@@ -376,11 +376,11 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfAirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + state.dataSurface->Surface(SurfNum).CosTilt));
 
             // Set flag that determines whether a surface is a shadowing surface
-            state.dataSurface->Surface(SurfNum).ShadowingSurf = false;
+            state.dataSurface->SurfIsShadowing(SurfNum) = false;
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Shading ||
                 state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_F ||
                 state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_B) {
-                state.dataSurface->Surface(SurfNum).ShadowingSurf = true;
+                state.dataSurface->SurfIsShadowing(SurfNum) = true;
                 if (state.dataSurface->ShadingSurfaceFirst == -1) state.dataSurface->ShadingSurfaceFirst = SurfNum;
                 state.dataSurface->ShadingSurfaceLast = SurfNum;
             }
@@ -949,6 +949,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfICSPtr.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIsShadowing.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = false;
             state.dataSurface->SurfShadowSurfRecSurfNum(SurfNum) = 0;
@@ -967,6 +968,7 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfICSPtr(SurfNum) = 0;
             state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfNum) = false;
             state.dataSurface->SurfDaylightingShelfInd(SurfNum) = 0;
+            state.dataSurface->SurfIsShadowing(SurfNum) = false;
         }
         state.dataSurface->SurfLowTempErrCount.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHighTempErrCount.allocate(state.dataSurface->TotSurfaces);
@@ -3232,7 +3234,6 @@ namespace SurfaceGeometry {
                         ShowContinueError(state, "...Schedule values > 1 have no meaning for shading elements.");
                     }
                     if (std::abs(SchedMinValue - SchedMaxValue) > 1.0e-6) {
-                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfSchedVaries = true;
                         state.dataSurface->ShadingTransmittanceVaries = true;
                     }
                 }
@@ -6249,7 +6250,6 @@ namespace SurfaceGeometry {
                     ShowContinueError(state, "...Schedule values > 1 have no meaning for shading elements.");
                 }
                 if (std::abs(SchedMinValue - SchedMaxValue) > 1.0e-6) {
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfSchedVaries = true;
                     state.dataSurface->ShadingTransmittanceVaries = true;
                 }
             }
@@ -9089,11 +9089,8 @@ namespace SurfaceGeometry {
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ViewFactorGroundIR = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGroundIR;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ViewFactorSkyIR = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSkyIR;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).SchedShadowSurfIndex = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ShadowSurfSchedVaries =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfSchedVaries;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).SchedMinValue = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMinValue;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).IsTransparent = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).IsTransparent;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ShadowingSurf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowingSurf;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).MaterialMovInsulExt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MaterialMovInsulExt;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).MaterialMovInsulInt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MaterialMovInsulInt;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).SchedMovInsulExt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMovInsulExt;
@@ -12442,7 +12439,7 @@ namespace SurfaceGeometry {
         HeatTransSurf = state.dataSurface->Surface(ThisSurf).HeatTransSurf;
 
         // Kludge for daylighting shelves
-        if (state.dataSurface->Surface(ThisSurf).ShadowingSurf) {
+        if (state.dataSurface->SurfIsShadowing(ThisSurf)) {
             ThisBaseSurface = ThisSurf;
             HeatTransSurf = true;
         }
@@ -13694,8 +13691,6 @@ namespace SurfaceGeometry {
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).OSCPtr = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OSCPtr;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).SchedShadowSurfIndex =
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ShadowSurfSchedVaries =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfSchedVaries;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).MaterialMovInsulExt =
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MaterialMovInsulExt;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).MaterialMovInsulInt =

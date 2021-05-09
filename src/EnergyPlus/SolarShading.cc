@@ -4960,7 +4960,7 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
                 state.dataSolarShading->SUNCOS(2) = state.dataSolarShading->cos_Phi[IPhi] * state.dataSolarShading->sin_Theta[ITheta];
 
                 for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                    if (!state.dataSurface->Surface(SurfNum).ShadowingSurf && !state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+                    if (!state.dataSurface->SurfIsShadowing(SurfNum) && !state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
                     state.dataSolarShading->CTHETA(SurfNum) = state.dataSolarShading->SUNCOS(1) * state.dataSurface->Surface(SurfNum).OutNormVec(1) +
                                                               state.dataSolarShading->SUNCOS(2) * state.dataSurface->Surface(SurfNum).OutNormVec(2) +
                                                               state.dataSolarShading->SUNCOS(3) * state.dataSurface->Surface(SurfNum).OutNormVec(3);
@@ -4970,7 +4970,7 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
 
                 for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
-                    if (!state.dataSurface->Surface(SurfNum).ShadowingSurf &&
+                    if (!state.dataSurface->SurfIsShadowing(SurfNum) &&
                         (!state.dataSurface->Surface(SurfNum).HeatTransSurf || !state.dataSurface->Surface(SurfNum).ExtSolar))
                         continue;
 
@@ -4998,7 +4998,7 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
 
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
-            if (!state.dataSurface->Surface(SurfNum).ShadowingSurf &&
+            if (!state.dataSurface->SurfIsShadowing(SurfNum) &&
                 (!state.dataSurface->Surface(SurfNum).HeatTransSurf || !state.dataSurface->Surface(SurfNum).ExtSolar))
                 continue;
 
@@ -5124,7 +5124,7 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
 
     for (GRSNR = 1; GRSNR <= state.dataSurface->TotSurfaces; ++GRSNR) { // Loop through all surfaces (looking for potential receiving surfaces)...
 
-        ShadowingSurf = state.dataSurface->Surface(GRSNR).ShadowingSurf;
+        ShadowingSurf = state.dataSurface->SurfIsShadowing(GRSNR);
         NGSS = 0;
         NSBS = 0;
         NBKS = 0;
@@ -5614,7 +5614,7 @@ void SHADOW(EnergyPlusData &state,
             {
 #endif
                 NGRS = state.dataSurface->Surface(GRSNR).BaseSurf;
-                if (state.dataSurface->Surface(GRSNR).ShadowingSurf) NGRS = GRSNR;
+                if (state.dataSurface->SurfIsShadowing(GRSNR)) NGRS = GRSNR;
 
                 // Compute the X and Y displacements of a shadow.
                 XS = state.dataSurface->Surface(NGRS).lcsx.x * state.dataSolarShading->SUNCOS(1) +
@@ -10314,7 +10314,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
 
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) { // Cosine of angle of incidence on surface of solar
                 // radiation from patch
-                ShadowingSurf = state.dataSurface->Surface(SurfNum).ShadowingSurf;
+                ShadowingSurf = state.dataSurface->SurfIsShadowing(SurfNum);
 
                 if (!ShadowingSurf && !state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
 
@@ -10326,7 +10326,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
             SHADOW(state, 24, 0);
 
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                ShadowingSurf = state.dataSurface->Surface(SurfNum).ShadowingSurf;
+                ShadowingSurf = state.dataSurface->SurfIsShadowing(SurfNum);
 
                 if (!ShadowingSurf && (!state.dataSurface->Surface(SurfNum).HeatTransSurf || !state.dataSurface->Surface(SurfNum).ExtSolar)) continue;
 
@@ -10353,7 +10353,7 @@ void SkyDifSolarShading(EnergyPlusData &state)
     }         // End of Phi loop
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        ShadowingSurf = state.dataSurface->Surface(SurfNum).ShadowingSurf;
+        ShadowingSurf = state.dataSurface->SurfIsShadowing(SurfNum);
 
         if (!ShadowingSurf && (!state.dataSurface->Surface(SurfNum).HeatTransSurf || !state.dataSurface->Surface(SurfNum).ExtSolar)) continue;
 

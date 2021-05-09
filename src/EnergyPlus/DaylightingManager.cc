@@ -3145,8 +3145,7 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
 
                 // Lambda function for the octree to test for surface hit
                 auto surfaceHit = [&state, &GroundHitPt, &hitObs, &URay, &ObsHitPt](SurfaceData const &surface) -> bool {
-                    // todo - how to find index of object objArr
-                    int ObsSurfNum = surface.Index;
+                    int const ObsSurfNum = surface.Index;
                     if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) {
                         PierceSurface(surface, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
                         return hitObs;                                               // Ray pierces surface
@@ -3406,7 +3405,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             NearestHitSurfNumX = NearestHitSurfNum;
             // Each shadowing surface has a "mirror" duplicate surface facing in the opposite direction.
             // The following gets the correct side of a shadowing surface for reflection.
-            if (state.dataSurface->Surface(NearestHitSurfNum).ShadowingSurf) {
+            if (state.dataSurface->SurfIsShadowing(NearestHitSurfNum)) {
                 if (dot(Ray, state.dataSurface->Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
             }
             if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
@@ -3719,7 +3718,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         ReflSurfNumX = ReflSurfNum;
                         // Each shadowing surface has a "mirror" duplicate surface facing in the opposite direction.
                         // The following gets the correct side of a shadowing surface for reflection.
-                        if (state.dataSurface->Surface(ReflSurfNum).ShadowingSurf) {
+                        if (state.dataSurface->SurfIsShadowing(ReflSurfNum)) {
                             if (dot(RAYCOS, state.dataSurface->Surface(ReflSurfNum).OutNormVec) < 0.0) ReflSurfNumX = ReflSurfNum + 1;
                         }
                         // Require that the surface can have specular reflection
@@ -3801,7 +3800,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 SpecReflectance =
                                     POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                             }
-                            if (state.dataSurface->Surface(ReflSurfNum).ShadowingSurf &&
+                            if (state.dataSurface->SurfIsShadowing(ReflSurfNum) &&
                                 state.dataSurface->Surface(ReflSurfNum).ShadowSurfGlazingConstruct > 0)
                                 SpecReflectance =
                                     state.dataSurface->Surface(ReflSurfNum).ShadowSurfGlazingFrac *
@@ -5884,7 +5883,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
                     ObTrans = 0.0;
                     break;
                 }
-            } else if (surface.ShadowingSurf) {
+            } else if (state.dataSurface->SurfIsShadowing(ISurf)) {
                 PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
                 if (hit) { // Shading surface is hit
                     // Get solar transmittance of the shading surface
@@ -5906,7 +5905,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit and update transmittance if hit
         auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
-            int ObsSurfNum = surface.Index;
+            int const ObsSurfNum = surface.Index;
             if (!state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) return false; // Do Consider separate octree without filtered surfaces
             auto const sClass(surface.Class);
             if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
@@ -5915,7 +5914,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
                     ObTrans = 0.0;
                     return true;
                 }
-            } else if (surface.ShadowingSurf) {
+            } else if (state.dataSurface->SurfIsShadowing(ObsSurfNum)) {
                 PierceSurface(surface, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);
                 if (hit) { // Shading surface is hit
                     // Get solar transmittance of the shading surface
@@ -5980,7 +5979,7 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
         for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
             auto const &surface(state.dataSurface->Surface(ISurf));
             IType = surface.Class;
-            if ((surface.ShadowingSurf) ||                       // Shadowing surface
+            if ((state.dataSurface->SurfIsShadowing(ISurf)) ||                       // Shadowing surface
                 ((surface.SolarEnclIndex == window_Enclosure) && // Wall/ceiling/floor is in same zone as window
                  (IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf) &&
                  (ISurf != window_base_iExtBoundCond))) // Exclude window's base or base-adjacent surfaces
@@ -5999,7 +5998,8 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
             auto const sClass(surface.Class);
-            if ((surface.ShadowingSurf) ||                       // Shadowing surface
+            int const ISurf = surface.Index;
+            if ((state.dataSurface->SurfIsShadowing(ISurf)) ||                       // Shadowing surface
                 ((surface.SolarEnclIndex == window_Enclosure) && // Surface is in same zone as window
                  (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
                  (&surface != window_base_p) && (&surface != window_base_adjacent_p))) // Exclude window's base or base-adjacent surfaces
@@ -6073,7 +6073,7 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
         for (int ISurf = 1; ISurf <= state.dataSurface->TotSurfaces; ++ISurf) {
             auto const &surface(state.dataSurface->Surface(ISurf));
             IType = surface.Class;
-            if ((surface.ShadowingSurf) ||                        // Shadowing surface
+            if ((state.dataSurface->SurfIsShadowing(ISurf)) ||                        // Shadowing surface
                 ((surface.SolarEnclIndex == window2_Enclosure) && // Wall/ceiling/floor is in same zone as windows
                  (IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
                  (ISurf != window1_iBaseSurf) && (ISurf != window2_iBaseSurf) &&                                 // Exclude windows' base surfaces
@@ -6098,7 +6098,8 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &R1, &hit, &state](SurfaceData const &surface) -> bool {
             auto const sClass(surface.Class);
-            if ((surface.ShadowingSurf) ||                        // Shadowing surface
+            int const ISurf = surface.Index;
+            if ((state.dataSurface->SurfIsShadowing(ISurf)) ||                        // Shadowing surface
                 ((surface.SolarEnclIndex == window2_Enclosure) && // Surface is in same zone as window
                  (sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && // Wall, ceiling/roof, or floor
                  (&surface != window1_base_p) && (&surface != window2_base_p) &&                                    // Exclude windows' base surfaces
@@ -7909,7 +7910,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     NearestHitSurfNumX = NearestHitSurfNum;
                     // Each shadowing surface has a "mirror" duplicate surface facing in the opposite direction.
                     // The following gets the correct side of a shadowing surface for reflection.
-                    if (state.dataSurface->Surface(NearestHitSurfNum).ShadowingSurf) {
+                    if (state.dataSurface->SurfIsShadowing(NearestHitSurfNum)) {
                         if (dot(U, state.dataSurface->Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                     }
                     if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
@@ -9257,7 +9258,7 @@ void DayltgClosestObstruction(EnergyPlusData &state,
 
         // Lambda function for the octree to test for surface hit
         auto surfaceHit = [=, &state, &RecPt, &RayVec, &hit, &NearestHitDistance_sq, &nearestHitSurface, &NearestHitPt](SurfaceData const &surface) {
-            int ObsSurfNum = surface.Index;
+            int const ObsSurfNum = surface.Index;
             if (state.dataSurface->SurfShadowSurfPossibleObstruction(ObsSurfNum)) {
                 // Determine if this ray hits the surface and, if so, get the distance from the receiving point to the hit
                 PierceSurface(surface, RecPt, RayVec, state.dataDaylightingManager->HitPt, hit); // Check if ray pierces surface
@@ -9331,7 +9332,7 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
     if (state.dataSurface->SurfDaylightingShelfInd(ReflSurfNum) > 0) return;
     // Normal to reflecting surface in hemisphere containing window element
     DayltgSurfaceLumFromSunReflNorm = state.dataSurface->Surface(ReflSurfNum).OutNormVec;
-    if (state.dataSurface->Surface(ReflSurfNum).ShadowingSurf) {
+    if (state.dataSurface->SurfIsShadowing(ReflSurfNum)) {
         if (dot(DayltgSurfaceLumFromSunReflNorm, Ray) > 0.0) {
             DayltgSurfaceLumFromSunReflNorm *= -1.0;
         }
@@ -9353,7 +9354,7 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
     if (hitObs) return; // Obstruction was hit, blocking sun
     // Obstruction was not hit; sun reaches ReflHitPt.
     // Calculate luminance at ReflHitPt due to beam solar reflection (for unit beam normal illuminance)
-    if (state.dataSurface->Surface(ReflSurfNum).ShadowingSurf) {
+    if (state.dataSurface->SurfIsShadowing(ReflSurfNum)) {
         DiffVisRefl = state.dataSurface->Surface(ReflSurfNum).ShadowSurfDiffuseVisRefl;
         // Note that if the shadowing surface has a non-zero glazing fraction (e.g., neighboring bldg) that the above is
         // (1 - glazing fraction) * (vis refl of opaque part of shadowing surface); specular reflection is
