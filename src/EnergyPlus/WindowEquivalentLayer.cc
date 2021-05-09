@@ -230,9 +230,9 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
         if (state.dataMaterial->Material(MaterNum).Group == BlindEquivalentLayer) {
             CFS(EQLNum).VBLayerPtr = sLayer;
             if (state.dataMaterial->Material(MaterNum).SlatOrientation == Horizontal) {
-                CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyVBHOR;
+                CFS(EQLNum).L(sLayer).LTYPE = LayerType::VBHOR;
             } else if (state.dataMaterial->Material(MaterNum).SlatOrientation == Vertical) {
-                CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyVBVER;
+                CFS(EQLNum).L(sLayer).LTYPE = LayerType::VBVER;
             }
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBD = state.dataMaterial->Material(MaterNum).ReflBackBeamDiff;
@@ -249,7 +249,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).C = state.dataMaterial->Material(MaterNum).SlatCrown;
         } else if (state.dataMaterial->Material(MaterNum).Group == GlassEquivalentLayer) {
             // glazing
-            CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyGLAZE;
+            CFS(EQLNum).L(sLayer).LTYPE = LayerType::GLAZE;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = state.dataMaterial->Material(MaterNum).ReflFrontBeamBeam;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBBB = state.dataMaterial->Material(MaterNum).ReflBackBeamBeam;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
@@ -264,7 +264,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = state.dataMaterial->Material(MaterNum).TausDiffDiff;
         } else if (state.dataMaterial->Material(MaterNum).Group == ShadeEquivalentLayer) {
             // roller blind
-            CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyROLLB;
+            CFS(EQLNum).L(sLayer).LTYPE = LayerType::ROLLB;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
@@ -274,7 +274,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
         } else if (state.dataMaterial->Material(MaterNum).Group == DrapeEquivalentLayer) {
             // drapery fabric
-            CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyDRAPE;
+            CFS(EQLNum).L(sLayer).LTYPE = LayerType::DRAPE;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
@@ -290,7 +290,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = -1.0;
         } else if (state.dataMaterial->Material(MaterNum).Group == ScreenEquivalentLayer) {
             // insect screen
-            CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyINSCRN;
+            CFS(EQLNum).L(sLayer).LTYPE = LayerType::INSCRN;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = state.dataMaterial->Material(MaterNum).TausBackBeamBeam;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
@@ -320,7 +320,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             // fills gas density and effective gap thickness
             BuildGap(state, CFS(EQLNum).G(gLayer), CFS(EQLNum).G(gLayer).GTYPE, CFS(EQLNum).G(gLayer).TAS);
         } else {
-            CFS(EQLNum).L(sLayer).LTYPE = LayerType::ltyNONE;
+            CFS(EQLNum).L(sLayer).LTYPE = LayerType::NONE;
         }
         // beam beam transmittance is the same for front and back side
         CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBB = CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB;
@@ -341,7 +341,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
     state.dataConstruction->Construct(ConstrNum).TotSolidLayers = CFS(EQLNum).NL;
 
     // Calculate layers diffuse absorptance and system diffuse transmittance
-    CalcEQLWindowOpticalProperty(state, CFS(EQLNum), isDIFF, SysAbs1, 0.0, 0.0, 0.0);
+    CalcEQLWindowOpticalProperty(state, CFS(EQLNum), SolarArrays::DIFF, SysAbs1, 0.0, 0.0, 0.0);
     state.dataConstruction->Construct(ConstrNum).TransDiffFrontEQL = SysAbs1(1, CFS(EQLNum).NL + 1);
     state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, _, EQLNum) = SysAbs1;
     state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL({1, CFSMAXNL}) = SysAbs1(1, {1, CFSMAXNL});
@@ -515,10 +515,9 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
     Abs1 = 0.0;
     HCIN = 3.0; // Initial guess
     HCOUT = 15.0;
-    if (FS.L(1).LTYPE == LayerType::ltyROLLB || FS.L(1).LTYPE == LayerType::ltyDRAPE || FS.L(1).LTYPE == LayerType::ltyINSCRN ||
-        FS.L(1).LTYPE == LayerType::ltyVBHOR ||
-        FS.L(1).LTYPE == LayerType::ltyVBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior Insect Screen Present | Exterior
-                                                // Venetian Blind Present
+    if (FS.L(1).LTYPE == LayerType::ROLLB || FS.L(1).LTYPE == LayerType::DRAPE || FS.L(1).LTYPE == LayerType::INSCRN ||
+        FS.L(1).LTYPE == LayerType::VBHOR || FS.L(1).LTYPE == LayerType::VBVER) { // Exterior Roller Blind Present | Exterior Drape Fabric | Exterior
+                                                                                  // Insect Screen Present | Exterior Venetian Blind Present
         // Reduced convection coefficient due to external attachment
         HCOUT = 12.25;
     }
@@ -568,8 +567,8 @@ void CalcEQLWindowSHGCAndTransNormal(EnergyPlusData &state,
 }
 
 void CalcEQLWindowOpticalProperty(EnergyPlusData &state,
-                                  CFSTY &FS,              // fenestration system
-                                  int const DiffBeamFlag, // isDIFF: calc diffuse properties
+                                  CFSTY &FS,                      // fenestration system
+                                  SolarArrays const DiffBeamFlag, // isDIFF: calc diffuse properties
                                   Array2A<Real64> Abs1,
                                   Real64 const IncA,   // angle of incidence, radians
                                   Real64 const VProfA, // inc solar vertical profile angle, radians
@@ -625,7 +624,7 @@ void CalcEQLWindowOpticalProperty(EnergyPlusData &state,
         }
     }
 
-    if (DiffBeamFlag != isDIFF) {
+    if (DiffBeamFlag != SolarArrays::DIFF) {
         //  Beam: Convert direct-normal solar properties to off-normal properties
         for (I = 1; I <= NL; ++I) {
             ASHWAT_OffNormalProperties(state, FS.L(I), IncA, VProfA, HProfA, SWP_ON(I));
@@ -915,7 +914,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     SurfOutsideTemp = T(1) - DataGlobalConstants::KelvinConv;
     // Various reporting calculations
     InSideLayerType = state.dataWindowEquivLayer->CFS(EQLNum).L(NL).LTYPE;
-    if (InSideLayerType == LayerType::ltyGLAZE) {
+    if (InSideLayerType == LayerType::GLAZE) {
         ConvHeatFlowNatural = 0.0;
     } else {
         ConvHeatFlowNatural = state.dataSurface->Surface(SurfNum).Area * QOCFRoom;
@@ -934,7 +933,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
     state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
     state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
-    if (InSideLayerType == LayerType::ltyGLAZE) {
+    if (InSideLayerType == LayerType::GLAZE) {
         // no interior sade
         state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
     } else {
@@ -6406,7 +6405,7 @@ Real64 ConvectionFactor(CFSLAYER const &L) // window layer
 
     Real64 SlatADeg;
 
-    if (L.LTYPE == LayerType::ltyVBHOR) {
+    if (L.LTYPE == LayerType::VBHOR) {
         // horiz VB: enhanced convection at +/- 45 due to "pumping"
         SlatADeg = min(90.0, std::abs(L.PHI_DEG));
         ConvectionFactor = 1.0 + 0.2 * std::sin(2.0 * SlatADeg);
@@ -6829,17 +6828,17 @@ void ASHWAT_OffNormalProperties(EnergyPlusData &state,
         // specular glazing
         // HBX note: ltyGZS here iff modelOption F=x; spectral cases elsewhere
         Specular_SWP(LSWP_ON, THETA);
-    } else if (L.LTYPE == LayerType::ltyVBHOR) {
+    } else if (L.LTYPE == LayerType::VBHOR) {
         OKAY = VB_SWP(state, L, LSWP_ON, OMEGA_V);
-    } else if (L.LTYPE == LayerType::ltyVBVER) {
+    } else if (L.LTYPE == LayerType::VBVER) {
         OKAY = VB_SWP(state, L, LSWP_ON, OMEGA_H);
-    } else if (L.LTYPE == LayerType::ltyDRAPE) {
+    } else if (L.LTYPE == LayerType::DRAPE) {
         OKAY = PD_SWP(state, L, LSWP_ON, OMEGA_V, OMEGA_H);
-    } else if (L.LTYPE == LayerType::ltyROLLB) {
+    } else if (L.LTYPE == LayerType::ROLLB) {
         OKAY = RB_SWP(state, L, LSWP_ON, THETA);
-    } else if (L.LTYPE == LayerType::ltyINSCRN) {
+    } else if (L.LTYPE == LayerType::INSCRN) {
         OKAY = IS_SWP(state, L, LSWP_ON, THETA);
-    } else if (L.LTYPE == LayerType::ltyNONE || L.LTYPE == LayerType::ltyROOM) {
+    } else if (L.LTYPE == LayerType::NONE || L.LTYPE == LayerType::ROOM) {
         // none or room: do nothing
     } else {
         // placeholder for add'l non-specular layers
@@ -7080,7 +7079,7 @@ bool RB_LWP(CFSLAYER const &L, // RB layer
     Real64 OPENNESS;
 
     RB_LWP = false;
-    if (L.LTYPE != LayerType::ltyROLLB) return RB_LWP;
+    if (L.LTYPE != LayerType::ROLLB) return RB_LWP;
 
     OPENNESS = L.SWP_MAT.TAUSFBB;
 
@@ -7123,7 +7122,7 @@ bool RB_SWP(EnergyPlusData &state,
     Real64 TAUX;
 
     RB_SWP = false;
-    if (L.LTYPE != LayerType::ltyROLLB) return RB_SWP;
+    if (L.LTYPE != LayerType::ROLLB) return RB_SWP;
 
     DODIFFUSE = !present(THETA);
 
@@ -7169,7 +7168,7 @@ bool IS_LWP(CFSLAYER const &L, // IS layer
     Real64 TAULX;
 
     IS_LWP = false;
-    if (L.LTYPE != LayerType::ltyINSCRN) return IS_LWP;
+    if (L.LTYPE != LayerType::INSCRN) return IS_LWP;
 
     OPENNESS = L.SWP_MAT.TAUSFBB;
 
@@ -7211,7 +7210,7 @@ bool IS_SWP(EnergyPlusData &state,
     Real64 TAUX;
 
     IS_SWP = false;
-    if (L.LTYPE != LayerType::ltyINSCRN) return IS_SWP;
+    if (L.LTYPE != LayerType::INSCRN) return IS_SWP;
 
     DODIFFUSE = !present(THETA);
 
@@ -7288,7 +7287,7 @@ bool PD_LWP(EnergyPlusData &state,
     Real64 OPENNESS_FABRIC;
 
     PD_LWP = false;
-    if (L.LTYPE != LayerType::ltyDRAPE) return PD_LWP;
+    if (L.LTYPE != LayerType::DRAPE) return PD_LWP;
 
     OPENNESS_FABRIC = L.SWP_MAT.TAUSFBB;
 
@@ -7326,7 +7325,7 @@ bool PD_SWP(EnergyPlusData &state,
     Real64 TAUX;
 
     PD_SWP = false;
-    if (!(L.LTYPE == LayerType::ltyDRAPE)) return PD_SWP;
+    if (!(L.LTYPE == LayerType::DRAPE)) return PD_SWP;
 
     DODIFFUSE = !(present(OHM_V_RAD) && present(OHM_H_RAD));
 
@@ -7618,7 +7617,7 @@ bool DoShadeControl(EnergyPlusData &state,
     if (IsVBLayer(L) && L.CNTRL != state.dataWindowEquivalentLayer->lscNONE) {
         if (THETA < 0.0 || THETA >= DataGlobalConstants::PiOvr2) {
             OMEGA_DEG = -1.0; // diffuse only
-        } else if (L.LTYPE == LayerType::ltyVBHOR) {
+        } else if (L.LTYPE == LayerType::VBHOR) {
             // horiz VB
             OMEGA_DEG = state.dataWindowEquivalentLayer->RadiansToDeg * OMEGA_V;
         } else {
@@ -7665,18 +7664,18 @@ void FinalizeCFSLAYER(EnergyPlusData &state, CFSLAYER &L) // layer, input: LTYPE
         L.PHI_DEG = 0.0; // phi, C, CNTRL are VB only
         L.C = 0.0;
         L.CNTRL = state.dataWindowEquivalentLayer->lscNONE;
-        if (L.LTYPE == LayerType::ltyDRAPE) {
+        if (L.LTYPE == LayerType::DRAPE) {
             LOK = PD_LWP(state, L, L.LWP_EL);
             DOK = PD_SWP(state, L, L.SWP_EL);           // SW diffuse
             BOK = PD_SWP(state, L, L.SWP_EL, 0.0, 0.0); // SW properties w/ profile angs = 0
-        } else if (L.LTYPE == LayerType::ltyINSCRN) {
+        } else if (L.LTYPE == LayerType::INSCRN) {
             LOK = IS_LWP(L, L.LWP_EL);             // LW
             DOK = IS_SWP(state, L, L.SWP_EL);      // SW diffuse
             BOK = IS_SWP(state, L, L.SWP_EL, 0.0); // SW beam w/ theta = 0
         } else {
             L.S = 0.0; // geometry mbrs unused
             L.W = 0.0;
-            if (L.LTYPE == LayerType::ltyROLLB) {
+            if (L.LTYPE == LayerType::ROLLB) {
                 LOK = RB_LWP(L, L.LWP_EL);             // LW
                 DOK = RB_SWP(state, L, L.SWP_EL);      // SW diffuse
                 BOK = RB_SWP(state, L, L.SWP_EL, 0.0); // SW beam w/ theta = 0
@@ -7715,7 +7714,7 @@ bool IsGZSLayer(CFSLAYER const &L)
     // Return value
     bool IsGZSLayer;
 
-    IsGZSLayer = L.LTYPE == LayerType::ltyGZS;
+    IsGZSLayer = L.LTYPE == LayerType::GZS;
     return IsGZSLayer;
 }
 
@@ -7734,7 +7733,7 @@ bool IsGlazeLayerX(CFSLAYER const &L)
     // Return value
     bool IsGlazeLayerX;
 
-    IsGlazeLayerX = L.LTYPE == LayerType::ltyGLAZE || IsGZSLayer(L);
+    IsGlazeLayerX = L.LTYPE == LayerType::GLAZE || IsGZSLayer(L);
     return IsGlazeLayerX;
 }
 
@@ -7772,7 +7771,7 @@ bool IsVBLayer(CFSLAYER const &L)
     // Return value
     bool IsVBLayer;
 
-    IsVBLayer = L.LTYPE == LayerType::ltyVBHOR || L.LTYPE == LayerType::ltyVBVER;
+    IsVBLayer = L.LTYPE == LayerType::VBHOR || L.LTYPE == LayerType::VBVER;
     return IsVBLayer;
 }
 
@@ -7965,24 +7964,24 @@ void FillDefaultsSWP(EnergyPlusData &state,
     if (SWP.TAUSBBB < 0.0) SWP.TAUSBBB = SWP.TAUSFBB;
     if (SWP.TAUSBBD < 0.0) SWP.TAUSBBD = SWP.TAUSFBD;
 
-    if (L.LTYPE == LayerType::ltyGLAZE) {
+    if (L.LTYPE == LayerType::GLAZE) {
         // estimate diffuse properties if any < 0 or autocalculate
         if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
             Specular_EstimateDiffuseProps(state, SWP);
         }
-    } else if (L.LTYPE == LayerType::ltyVBHOR || L.LTYPE == LayerType::ltyVBVER) {
+    } else if (L.LTYPE == LayerType::VBHOR || L.LTYPE == LayerType::VBVER) {
 
-    } else if (L.LTYPE == LayerType::ltyDRAPE) {
+    } else if (L.LTYPE == LayerType::DRAPE) {
         // estimate diffuse properties if any < 0
         if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
             Fabric_EstimateDiffuseProps(state, SWP);
         }
-    } else if (L.LTYPE == LayerType::ltyROLLB) {
+    } else if (L.LTYPE == LayerType::ROLLB) {
         // estimate diffuse properties if any < 0
         if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
             OK = RB_SWP(state, L, SWP); // TODO RB
         }
-    } else if (L.LTYPE == LayerType::ltyINSCRN) {
+    } else if (L.LTYPE == LayerType::INSCRN) {
         if (SWP.TAUSFBB < 0.0) {
             SWP.TAUSFBB = IS_OPENNESS(L.S, L.W);
             if (SWP.TAUSBBB < 0.0) SWP.TAUSBBB = SWP.TAUSFBB;
@@ -7990,7 +7989,7 @@ void FillDefaultsSWP(EnergyPlusData &state,
         if (min(SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD) < 0.0) {
             OK = IS_SWP(state, L, SWP); // TODO IS
         }
-    } else if (L.LTYPE == LayerType::ltyNONE || L.LTYPE == LayerType::ltyROOM) {
+    } else if (L.LTYPE == LayerType::NONE || L.LTYPE == LayerType::ROOM) {
         // none or room: do nothing
     } else {
         ShowSevereError(state, RoutineName + L.Name + '.');
@@ -8172,8 +8171,8 @@ Real64 TRadC(Real64 const J,    // radiosity, W/m2
 
 void CalcEQLOpticalProperty(EnergyPlusData &state,
                             int const SurfNum,
-                            int const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
-                            Array2A<Real64> CFSAbs  // absorbed beam solar radiation by layers fraction
+                            SolarArrays const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
+                            Array2A<Real64> CFSAbs          // absorbed beam solar radiation by layers fraction
 )
 {
 
@@ -8213,14 +8212,14 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
     ProfAngVer = 0.0;
     ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
     EQLNum = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr;
-    if (BeamDIffFlag != isDIFF) {
+    if (BeamDIffFlag != SolarArrays::DIFF) {
         if (state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) return;
 
         for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
             if (IsVBLayer(CFS(EQLNum).L(Lay))) {
-                if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyVBHOR) {
+                if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBHOR) {
                     ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
-                } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyVBVER) {
+                } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBVER) {
                     ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                 }
             }
@@ -8234,9 +8233,9 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
         if (state.dataWindowEquivalentLayer->EQLDiffPropFlag(EQLNum)) {
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
-                    if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyVBHOR) {
+                    if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBHOR) {
                         ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
-                    } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyVBVER) {
+                    } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBVER) {
                         ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                     }
                 }

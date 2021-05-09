@@ -64,16 +64,9 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+class BaseGroundTempsModel;
 
 namespace GroundTemperatureManager {
-
-    int constexpr objectType_KusudaGroundTemp = 1;
-    int constexpr objectType_FiniteDiffGroundTemp = 2;
-    int constexpr objectType_SiteBuildingSurfaceGroundTemp = 3;
-    int constexpr objectType_SiteShallowGroundTemp = 4;
-    int constexpr objectType_SiteDeepGroundTemp = 5;
-    int constexpr objectType_SiteFCFactorMethodGroundTemp = 6;
-    int constexpr objectType_XingGroundTemp = 7;
 
     std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &type, std::string const &name);
 
@@ -81,7 +74,7 @@ namespace GroundTemperatureManager {
 
 struct GroundTemperatureManagerData : BaseGlobalStruct
 {
-    Array1D_string const CurrentModuleObjects = Array1D_string(7,
+    Array1D_string const CurrentModuleObjects = Array1D_string({0, 6},
                                                                {"Site:GroundTemperature:Undisturbed:KusudaAchenbach",
                                                                 "Site:GroundTemperature:Undisturbed:FiniteDifference",
                                                                 "Site:GroundTemperature:BuildingSurface",
