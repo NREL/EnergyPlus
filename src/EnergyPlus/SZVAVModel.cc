@@ -58,10 +58,10 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SZVAVModel.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -378,14 +378,14 @@ namespace SZVAVModel {
                             Par(9) = 0.0;
                         }
                         General::SolveRoot(state,
-                                                 0.001,
-                                                 MaxIter,
-                                                 SolFlag,
-                                                 PartLoadRatio,
-                                                 PackagedTerminalHeatPump::CalcPTUnitAirAndWaterFlowResidual,
-                                                 0.0,
-                                                 1.0,
-                                                 Par);
+                                           0.001,
+                                           MaxIter,
+                                           SolFlag,
+                                           PartLoadRatio,
+                                           PackagedTerminalHeatPump::CalcPTUnitAirAndWaterFlowResidual,
+                                           0.0,
+                                           1.0,
+                                           Par);
                         if (SolFlag < 0) {
                             MessagePrefix = "Step 2b: ";
                         }
@@ -794,8 +794,7 @@ namespace SZVAVModel {
                             General::SolveRoot(
                                 state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                         } else {
-                            General::SolveRoot(
-                                state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                            General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
                         }
                         outletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                         if ((CoolingLoad && outletTemp < maxOutletTemp) || (HeatingLoad && outletTemp > maxOutletTemp)) {
@@ -822,8 +821,7 @@ namespace SZVAVModel {
                                 MessagePrefix = "Step 2b: ";
                             }
                         } else {
-                            General::SolveRoot(
-                                state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
+                            General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
                             if (SolFlag < 0) {
                                 MessagePrefix = "Step 2: ";
                             }
@@ -896,8 +894,7 @@ namespace SZVAVModel {
                     Par(12) = maxAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
                     Par(13) = 0.0;            // SA Temp target, 0 means iterate on load and not SA temperature
                     if (SZVAVModel.HCoilType_Num == FanCoilUnits::HCoil::Water || !HeatingLoad) {
-                        General::SolveRoot(
-                            state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
+                        General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilWaterFlowResidual, 0.0, 1.0, Par);
                     } else {
                         General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadRatio, FanCoilUnits::CalcFanCoilLoadResidual, 0.0, 1.0, Par);
                     }

@@ -1576,14 +1576,14 @@ namespace WaterToAirHeatPump {
                     Par(3) = SuperHeatEnth;
 
                     General::SolveRoot(state,
-                                             ERR,
-                                             STOP1,
-                                             SolFlag,
-                                             state.dataWaterToAirHeatPump->CompSuctionTemp,
-                                             CalcCompSuctionTempResidual,
-                                             CompSuctionTemp1,
-                                             CompSuctionTemp2,
-                                             Par);
+                                       ERR,
+                                       STOP1,
+                                       SolFlag,
+                                       state.dataWaterToAirHeatPump->CompSuctionTemp,
+                                       CalcCompSuctionTempResidual,
+                                       CompSuctionTemp1,
+                                       CompSuctionTemp2,
+                                       Par);
                     if (SolFlag == -1) {
                         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
                         return;
@@ -2155,8 +2155,7 @@ namespace WaterToAirHeatPump {
                 Par(2) = double(state.dataWaterToAirHeatPump->RefrigIndex);
                 Par(3) = SuperHeatEnth;
 
-                General::SolveRoot(
-                    state, ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par);
+                General::SolveRoot(state, ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par);
                 if (SolFlag == -1) {
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
                     return;

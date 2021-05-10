@@ -14647,14 +14647,14 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
         LowerBoundMassFlowRate = 0.01 * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
         General::SolveRoot(state,
-                               AccuracyTolerance,
-                               MaximumIterations,
-                               SolverFlag,
-                               PartLoadAirMassFlowRate,
-                               CalcTwoSpeedDXCoilIEERResidual,
-                               LowerBoundMassFlowRate,
-                               state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1),
-                               Par);
+                           AccuracyTolerance,
+                           MaximumIterations,
+                           SolverFlag,
+                           PartLoadAirMassFlowRate,
+                           CalcTwoSpeedDXCoilIEERResidual,
+                           LowerBoundMassFlowRate,
+                           state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1),
+                           Par);
 
         if (SolverFlag == -1) {
 

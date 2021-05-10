@@ -12270,8 +12270,7 @@ namespace UnitarySystems {
                                 min(1.0,
                                     ((mdot / this->MaxCoolCoilFluidFlow) +
                                      0.001)); // plant can limit flow and RegulaFalsi could hit max iteration limit (leave a little slop, 0.001)
-                            General::SolveRoot(
-                                state, Acc, MaxIte, SolFla, PartLoadFrac, this->coolWaterTempResidual, 0.0, maxPartLoadFrac, Par);
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->coolWaterTempResidual, 0.0, maxPartLoadFrac, Par);
 
                         } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) ||
                                    (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP)) {
@@ -12419,8 +12418,7 @@ namespace UnitarySystems {
                                 // dehumidification mode = 0 for normal mode, 1+ for enhanced mode
                                 Par[3] = double(DehumidMode);
                                 Par[4] = double(FanOpMode);
-                                General::SolveRoot(
-                                    state, Acc, MaxIte, SolFla, PartLoadFrac, this->multiModeDXCoilHumRatResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->multiModeDXCoilHumRatResidual, 0.0, 1.0, Par);
                             } else { // must be a sensible load so find PLR
                                 PartLoadFrac = ReqOutput / FullOutput;
                                 Par[1] = double(this->m_CoolingCoilIndex);
@@ -12504,8 +12502,7 @@ namespace UnitarySystems {
                             Par[1] = double(this->m_CoolingCoilIndex);
                             Par[2] = DesOutHumRat;
                             Par[5] = double(FanOpMode);
-                            General::SolveRoot(
-                                state, HumRatAcc, MaxIte, SolFlaLat, PartLoadFrac, this->DOE2DXCoilHumRatResidual, 0.0, 1.0, Par);
+                            General::SolveRoot(state, HumRatAcc, MaxIte, SolFlaLat, PartLoadFrac, this->DOE2DXCoilHumRatResidual, 0.0, 1.0, Par);
                             this->m_CompPartLoadRatio = PartLoadFrac;
 
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) {
@@ -12534,8 +12531,7 @@ namespace UnitarySystems {
                                     Par[4] = 0.0;
                                 }
                                 Par[5] = double(FanOpMode);
-                                General::SolveRoot(
-                                    state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
 
                                     //                   RegulaFalsi may not find latent PLR when the latent degradation model is used.
@@ -12578,14 +12574,14 @@ namespace UnitarySystems {
                                     }
                                     //                   tighter boundary of solution has been found, CALL RegulaFalsi a second time
                                     General::SolveRoot(state,
-                                                             HumRatAcc,
-                                                             MaxIte,
-                                                             SolFla,
-                                                             PartLoadFrac,
-                                                             this->HXAssistedCoolCoilHRResidual,
-                                                             TempMinPLR,
-                                                             TempMaxPLR,
-                                                             Par);
+                                                       HumRatAcc,
+                                                       MaxIte,
+                                                       SolFla,
+                                                       PartLoadFrac,
+                                                       this->HXAssistedCoolCoilHRResidual,
+                                                       TempMinPLR,
+                                                       TempMaxPLR,
+                                                       Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
                                             if (this->warnIndex.m_HXAssistedCRLatPLRIter < 1) {
@@ -12698,8 +12694,7 @@ namespace UnitarySystems {
                                     SpeedRatio = 0.0;
                                     Par[1] = double(this->m_CoolingCoilIndex);
                                     Par[2] = DesOutHumRat;
-                                    General::SolveRoot(
-                                        state, HumRatAcc, MaxIte, SolFla, CycRatio, this->DXCoilCyclingHumRatResidual, 0.0, 1.0, Par);
+                                    General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, CycRatio, this->DXCoilCyclingHumRatResidual, 0.0, 1.0, Par);
                                 }
                             }
 
@@ -12736,8 +12731,7 @@ namespace UnitarySystems {
                                     Par[1] = double(this->m_CoolingCoilIndex);
                                     Par[2] = DesOutHumRat;
                                     Par[3] = ReqOutput;
-                                    General::SolveRoot(
-                                        state, HumRatAcc, MaxIte, SolFla, CycRatio, this->DXCoilCyclingHumRatResidual, 0.0, 1.0, Par);
+                                    General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, CycRatio, this->DXCoilCyclingHumRatResidual, 0.0, 1.0, Par);
                                 }
                             }
                         } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
@@ -12801,8 +12795,7 @@ namespace UnitarySystems {
                                 Par[1] = double(this->m_CoolingCoilIndex);
                                 Par[2] = DesOutHumRat;
                                 Par[3] = double(this->m_UnitarySysNum);
-                                General::SolveRoot(
-                                    state, HumRatAcc, MaxIte, SolFla, CycRatio, this->DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, CycRatio, this->DXCoilVarSpeedHumRatResidual, 0.0, 1.0, Par);
                             }
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
 
@@ -12891,8 +12884,7 @@ namespace UnitarySystems {
                                 Par[1] = double(this->m_UnitarySysNum);
                                 Par[2] = 0.0; // DesOutTemp; set to 0 if humrat controlled
                                 Par[3] = DesOutHumRat;
-                                General::SolveRoot(
-                                    state, Acc, MaxIte, SolFla, PartLoadFrac, this->TESIceStorageCoilOutletResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->TESIceStorageCoilOutletResidual, 0.0, 1.0, Par);
                             }
 
                         } else {
@@ -13484,8 +13476,7 @@ namespace UnitarySystems {
                                 Par[8] = ReqOutput;
                                 if (this->m_HeatingSpeedNum > 1.0) {
                                     Par[4] = CycRatio;
-                                    General::SolveRoot(
-                                        state, Acc, MaxIte, SolFla, SpeedRatio, this->heatingCoilVarSpeedResidual, 0.0, 1.0, Par);
+                                    General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, this->heatingCoilVarSpeedResidual, 0.0, 1.0, Par);
                                     this->m_HeatingCycRatio = CycRatio;
                                     this->m_HeatingSpeedRatio = SpeedRatio;
                                     this->m_HeatingPartLoadFrac = SpeedRatio;
@@ -13495,8 +13486,7 @@ namespace UnitarySystems {
                                     SpeedRatio = 0.0;
                                     this->m_HeatingSpeedRatio = SpeedRatio;
                                     Par[4] = SpeedRatio;
-                                    General::SolveRoot(
-                                        state, Acc, MaxIte, SolFla, CycRatio, this->heatingCoilVarSpeedCycResidual, 0.0, 1.0, Par);
+                                    General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, this->heatingCoilVarSpeedCycResidual, 0.0, 1.0, Par);
                                     this->m_HeatingCycRatio = CycRatio;
                                     this->m_HeatingPartLoadFrac = CycRatio;
                                     this->calcPassiveSystem(state, AirLoopNum, FirstHVACIteration);

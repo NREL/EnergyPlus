@@ -66,7 +66,6 @@ namespace DataHVACGlobals {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-
     // MODULE PARAMETER DEFINITIONS:
 
     Real64 constexpr SmallHumRatDiff(1.0E-7);

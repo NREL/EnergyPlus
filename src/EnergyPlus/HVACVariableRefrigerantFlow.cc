@@ -12481,7 +12481,9 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     this->TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR;
 
     if (this->MinPLR > 0.0) {
-        if (this->VRFCondPLR < this->MinPLR && this->VRFCondPLR > 0.0) {
+        bool const plrTooLow = this->VRFCondPLR < this->MinPLR;
+        bool const plrGreaterThanZero = this->VRFCondPLR > 0.0;
+        if (plrTooLow && plrGreaterThanZero) {
             this->VRFCondPLR = this->MinPLR;
         }
     }
@@ -14409,14 +14411,14 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                     state, this->RefrigerantName, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
                 General::SolveRoot(state,
-                                         1.0e-3,
-                                         MaxIter,
-                                         SolFla,
-                                         SmallLoadTe,
-                                         CompResidual_FluidTCtrl,
-                                         MinOutdoorUnitTe,
-                                         T_suction,
-                                         Par);   // SmallLoadTe is the updated Te'
+                                   1.0e-3,
+                                   MaxIter,
+                                   SolFla,
+                                   SmallLoadTe,
+                                   CompResidual_FluidTCtrl,
+                                   MinOutdoorUnitTe,
+                                   T_suction,
+                                   Par);         // SmallLoadTe is the updated Te'
                 if (SolFla < 0) SmallLoadTe = 6; // MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
 
                 // Get an updated Te corresponding to the updated Te'

@@ -937,14 +937,14 @@ namespace FourPipeBeam {
                 this->coolingAvailable = false;
                 bool dummyParameter = false;
                 General::SolveRoot(state,
-                                         ErrTolerance,
-                                         50,
-                                         SolFlag,
-                                         mDotAirSolutionHeating,
-                                         std::bind(&HVACFourPipeBeam::residualSizing, this, _1, _2, _3),
-                                         0.0,
-                                         maxFlowHeat,
-                                         dummyParameter);
+                                   ErrTolerance,
+                                   50,
+                                   SolFlag,
+                                   mDotAirSolutionHeating,
+                                   std::bind(&HVACFourPipeBeam::residualSizing, this, _1, _2, _3),
+                                   0.0,
+                                   maxFlowHeat,
+                                   dummyParameter);
                 if (SolFlag == -1) {
                     ShowWarningError(state, "Heating load sizing search failed in four pipe beam unit called " + this->name);
                     ShowContinueError(state, "  Iteration limit exceeded in calculating size for design heating load");
@@ -1059,8 +1059,7 @@ namespace FourPipeBeam {
 
     Real64 HVACFourPipeBeam::residualSizing(EnergyPlusData &state,
                                             Real64 const airFlow, // air flow in kg/s
-                                            [[maybe_unused]] bool const dummyParameter
-    )
+                                            [[maybe_unused]] bool const dummyParameter)
     {
 
         static std::string const routineName("Real64 HVACFourPipeBeam::residualSizing ");
@@ -1472,7 +1471,9 @@ namespace FourPipeBeam {
         this->qDotTotalDelivered = this->qDotSystemAir + this->qDotBeamCooling + this->qDotBeamHeating;
     }
 
-    Real64 HVACFourPipeBeam::residualCooling(EnergyPlusData &state, Real64 const cWFlow, [[maybe_unused]] bool const dummyParameter  // cold water flow rate in kg/s
+    Real64 HVACFourPipeBeam::residualCooling(EnergyPlusData &state,
+                                             Real64 const cWFlow,
+                                             [[maybe_unused]] bool const dummyParameter // cold water flow rate in kg/s
     )
     {
 
@@ -1487,7 +1488,9 @@ namespace FourPipeBeam {
         }
         return Residuum;
     }
-    Real64 HVACFourPipeBeam::residualHeating(EnergyPlusData &state, Real64 const hWFlow, [[maybe_unused]] bool const dummyParameter  // hot water flow rate in kg/s
+    Real64 HVACFourPipeBeam::residualHeating(EnergyPlusData &state,
+                                             Real64 const hWFlow,
+                                             [[maybe_unused]] bool const dummyParameter // hot water flow rate in kg/s
     )
     {
 

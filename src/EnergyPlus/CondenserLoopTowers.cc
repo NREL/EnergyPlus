@@ -2790,7 +2790,7 @@ namespace CondenserLoopTowers {
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     // auto f1 = [this](EnergyPlusData &state, Real64 x, std::array<Real64, 6> p) -> Real64 { return this->residualUA(state, x, p); };
-                    auto f1 = [this](auto &state, auto x, const auto &p) { return this->residualUA(state,x,p); };
+                    auto f1 = [this](auto &state, auto x, const auto &p) { return this->residualUA(state, x, p); };
                     General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f1, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
@@ -6369,7 +6369,9 @@ namespace CondenserLoopTowers {
 
         // Check if OutletWaterTemp is below the minimum condenser loop temp and warn user
         Real64 const LoopMinTemp = state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-        if (this->OutletWaterTemp < LoopMinTemp && this->WaterMassFlowRate > 0.0) {
+        bool const outletWaterTempTooLow = this->OutletWaterTemp < LoopMinTemp;
+        bool const flowIsOn = this->WaterMassFlowRate > 0.0;
+        if (outletWaterTempTooLow && flowIsOn) {
             ++this->OutletWaterTempErrorCount;
             strip(CharErrOut);
             if (this->OutletWaterTempErrorCount < 2) {
