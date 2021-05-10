@@ -3407,7 +3407,7 @@ namespace DesiccantDehumidifiers {
                             Par[1] = 0.0;
                         }
                         Par[2] = RegenCoilLoad;
-                        General::SolveRoot<3>(
+                        General::SolveRoot(
                             state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
                         if (SolFlag == -1) {
                             if (DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex == 0) {

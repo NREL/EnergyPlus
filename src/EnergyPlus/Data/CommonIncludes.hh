@@ -192,6 +192,7 @@
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HighTempRadiantSystem.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>

@@ -58,6 +58,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
@@ -186,35 +187,35 @@ namespace TempSolveRoot {
                 break;
             }
             // new estimation
-            switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+            switch (state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver) {
+            case HVACSystemRootSolverAlgorithm::RegulaFalsi: {
                 XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
+            case HVACSystemRootSolverAlgorithm::Bisection: {
                 XTemp = (X1 + X0) / 2.0;
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-                if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+            case HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+                if (NIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-                if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+            case HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+                if (NIte <= state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-                if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+            case HVACSystemRootSolverAlgorithm::Alternation: {
+                if (AltIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
-                    if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                    if (AltIte >= 2 * state.dataRootFinder->HVACSystemRootFinding.NumOfIter) AltIte = 0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
@@ -363,35 +364,35 @@ namespace TempSolveRoot {
                 break;
             }
             // new estimation
-            switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+            switch (state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver) {
+            case HVACSystemRootSolverAlgorithm::RegulaFalsi: {
                 XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
+            case HVACSystemRootSolverAlgorithm::Bisection: {
                 XTemp = (X1 + X0) / 2.0;
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-                if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+            case HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+                if (NIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-                if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+            case HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+                if (NIte <= state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-                if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+            case HVACSystemRootSolverAlgorithm::Alternation: {
+                if (AltIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
-                    if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                    if (AltIte >= 2 * state.dataRootFinder->HVACSystemRootFinding.NumOfIter) AltIte = 0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
@@ -686,35 +687,35 @@ namespace TempSolveRoot {
                 break;
             }
             // new estimation
-            switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
+            switch (state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver) {
+            case HVACSystemRootSolverAlgorithm::RegulaFalsi: {
                 XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection: {
+            case HVACSystemRootSolverAlgorithm::Bisection: {
                 XTemp = (X1 + X0) / 2.0;
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-                if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+            case HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
+                if (NIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-                if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+            case HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
+                if (NIte <= state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
                 break;
             }
-            case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-                if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
+            case HVACSystemRootSolverAlgorithm::Alternation: {
+                if (AltIte > state.dataRootFinder->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
-                    if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                    if (AltIte >= 2 * state.dataRootFinder->HVACSystemRootFinding.NumOfIter) AltIte = 0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }

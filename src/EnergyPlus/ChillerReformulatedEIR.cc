@@ -1642,7 +1642,7 @@ void ReformulatedEIRChillerSpecs::control(EnergyPlusData &state, Real64 &MyLoad,
             Real64 FalsiCondOutTemp = 0.0; // RegulaFalsi condenser outlet temperature result [C]
             auto f = std::bind(
                 &ReformulatedEIRChillerSpecs::condOutTempResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            General::SolveRoot<4>(state, Acc, MaxIter, SolFla, FalsiCondOutTemp, f, Tmin, Tmax, Par);
+            General::SolveRoot(state, Acc, MaxIter, SolFla, FalsiCondOutTemp, f, Tmin, Tmax, Par);
 
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {

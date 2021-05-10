@@ -2789,8 +2789,9 @@ namespace CondenserLoopTowers {
                     this->AirWetBulb = this->DesInletAirWBTemp; // 25.6;
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
-                    auto f1 = [this](EnergyPlusData &state, Real64 x, std::array<Real64, 6> p) -> Real64 { return this->residualUA(state, x, p); };
-                    General::SolveRoot<6>(state, Acc, MaxIte, SolFla, UA, f1, UA0, UA1, Par);
+                    // auto f1 = [this](EnergyPlusData &state, Real64 x, std::array<Real64, 6> p) -> Real64 { return this->residualUA(state, x, p); };
+                    auto f1 = [this](auto &state, auto x, const auto &p) { return this->residualUA(state,x,p); };
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f1, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                         ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -2897,7 +2898,7 @@ namespace CondenserLoopTowers {
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                    General::SolveRoot<6>(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                         ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -2969,7 +2970,7 @@ namespace CondenserLoopTowers {
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot<6>(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -3108,7 +3109,7 @@ namespace CondenserLoopTowers {
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot<6>(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -3189,7 +3190,7 @@ namespace CondenserLoopTowers {
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot<6>(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "Autosizing of cooling tower UA failed for tower " + this->Name);
@@ -3276,7 +3277,7 @@ namespace CondenserLoopTowers {
 
             if (ModelCalibrated) {
                 auto f = std::bind(&CoolingTower::residualTa, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot<6>(
+                General::SolveRoot(
                     state, Acc, MaxIte, SolFla, WaterFlowRatio, f, DataPrecisionGlobals::constant_pointfive, MaxWaterFlowRateRatio, Par);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower water flow ratio during calibration");
@@ -3801,7 +3802,7 @@ namespace CondenserLoopTowers {
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot<6>(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                     ShowFatalError(state, "calculating cooling tower UA failed for tower " + this->Name);
@@ -3836,7 +3837,7 @@ namespace CondenserLoopTowers {
                 this->AirPress = state.dataEnvrn->StdBaroPress;
                 this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                 auto f2 = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                General::SolveRoot<6>(state, Acc, MaxIte, SolFla, UA, f2, UA0, UA1, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f2, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating tower free convection UA");
                     ShowFatalError(state, "calculating cooling tower UA failed for tower " + this->Name);
@@ -4068,7 +4069,7 @@ namespace CondenserLoopTowers {
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                    General::SolveRoot<6>(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowSevereError(state, "Iteration limit exceeded in calculating tower UA");
                         ShowFatalError(state, "calculating cooling tower UA failed for tower " + this->Name);
@@ -4105,7 +4106,7 @@ namespace CondenserLoopTowers {
                     this->AirPress = state.dataEnvrn->StdBaroPress;
                     this->AirHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, this->AirTemp, this->AirWetBulb, this->AirPress);
                     auto f3 = std::bind(&CoolingTower::residualUA, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                    General::SolveRoot<6>(state, Acc, MaxIte, SolFla, UA, f3, UA0, UA1, Par);
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, f3, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowSevereError(state, "Iteration limit exceeded in calculating tower free convection UA");
                         ShowFatalError(state, "calculating cooling tower UA failed for tower " + this->Name);
@@ -5113,7 +5114,7 @@ namespace CondenserLoopTowers {
                     Par[4] = Ta;  // desired approach temperature [C]
                     Par[5] = 1.0; // calculate the air flow rate ratio required for a balance
                     auto f = std::bind(&CoolingTower::residualTa, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-                    General::SolveRoot<6>(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag)
                             ShowWarningError(state,
@@ -5429,7 +5430,7 @@ namespace CondenserLoopTowers {
             Par[7] = this->WaterMassFlowRate;
 
             auto f = std::bind(&CoolingTower::residualMerkelLoad, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            General::SolveRoot<8>(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
+            General::SolveRoot(state, Acc, MaxIte, SolFla, this->airFlowRateRatio, f, this->MinimumVSAirFlowFrac, 1.0, Par);
 
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -5699,7 +5700,7 @@ namespace CondenserLoopTowers {
         Par[3] = Twb;                   // inlet air wet-bulb temperature [C]
         Real64 Tr;                      // range temperature which results in an energy balance
         auto f = std::bind(&CoolingTower::residualTr, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        General::SolveRoot<6>(state, Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp, Par);
+        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp, Par);
 
         Real64 OutletWaterTempLocal = this->WaterTemp - Tr;
 

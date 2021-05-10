@@ -1562,7 +1562,7 @@ namespace EvaporativeFluidCoolers {
                     this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                     this->inletConds.AirHumRat =
                         Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                    General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                     if (SolFla == -1) {
                         ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                         ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
@@ -1679,7 +1679,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
@@ -1754,7 +1754,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
@@ -1908,7 +1908,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError(state, "Iteration limit exceeded in calculating evaporative fluid cooler UA.");
                     ShowContinueError(state, "Autosizing of fluid cooler UA failed for evaporative fluid cooler = " + this->Name);
@@ -1965,7 +1965,7 @@ namespace EvaporativeFluidCoolers {
                 this->inletConds.AirPress = state.dataEnvrn->StdBaroPress;
                 this->inletConds.AirHumRat =
                     Psychrometrics::PsyWFnTdbTwbPb(state, this->inletConds.AirTemp, this->inletConds.AirWetBulb, this->inletConds.AirPress);
-                General::SolveRoot<4>(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, boundUAResidualFunc, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowSevereError(state, "Iteration limit exceeded in calculating EvaporativeFluidCooler UA");
                     ShowFatalError(state, "Autosizing of EvaporativeFluidCooler UA failed for EvaporativeFluidCooler " + this->Name);

@@ -7458,7 +7458,7 @@ namespace FluidProperties {
             Par[1] = Enthalpy;
             Par[2] = Pressure;
 
-            General::SolveRoot<3>(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
+            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
             ReturnValue = Temp;
         }
 

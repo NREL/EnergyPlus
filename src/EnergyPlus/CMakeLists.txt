@@ -331,6 +331,7 @@ set(SRC
     HVACSizingSimulationManager.hh
     HVACStandAloneERV.cc
     HVACStandAloneERV.hh
+    HVACSystemRootFindingAlgorithm.hh
     HVACUnitaryBypassVAV.cc
     HVACUnitaryBypassVAV.hh
     HVACVariableRefrigerantFlow.cc

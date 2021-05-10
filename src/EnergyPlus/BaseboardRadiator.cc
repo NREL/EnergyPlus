@@ -953,7 +953,7 @@ namespace BaseboardRadiator {
                             if (LoadMet > DesCoilLoad) { // if the load met is greater than design load, OK to iterate on UA
                                 // Invert the baseboard model: given the design inlet conditions and the design load,
                                 // find the design UA.
-                                General::SolveRoot<2>(state, Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par2);
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par2);
                                 // if the numerical inversion failed, issue error messages.
                                 if (SolFla == -1) {
                                     ShowSevereError(state,

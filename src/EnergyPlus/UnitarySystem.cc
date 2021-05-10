@@ -12245,7 +12245,7 @@ namespace UnitarySystems {
                                 0.0,
                             };
                             if (this->m_SingleMode == 1) Par[7] = 1.0;
-                            General::SolveRoot<8>(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
                             if (this->m_CoolingSpeedNum == 1) {
                                 this->m_CompPartLoadRatio = PartLoadFrac;
                                 SpeedRatio = 0.0;
@@ -12466,7 +12466,7 @@ namespace UnitarySystems {
                             0.0 // dummy because genericDXCoilResidual takes 8 Pars
                         };
 
-                        General::SolveRoot<8>(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
                         if (this->m_CoolingSpeedNum == 1) {
                             this->m_CompPartLoadRatio = PartLoadFrac;
                             SpeedRatio = 0.0;
@@ -12845,7 +12845,7 @@ namespace UnitarySystems {
                                 0.0  // dummy because genericDXCoilResidual takes 8 parameters
                             };
 
-                            General::SolveRoot<8>(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
+                            General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par2);
                             if (this->m_CoolingSpeedNum == 1) {
                                 this->m_CompPartLoadRatio = PartLoadFrac;
                                 SpeedRatio = 0.0;

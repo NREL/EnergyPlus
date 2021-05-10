@@ -1998,7 +1998,7 @@ namespace FuelCellElectricGenerator {
             Real64 tmpTprodGas = this->FCPM.TprodGasLeavingFCPM;
             auto boundFunc =
                 std::bind(&FCDataStruct::FuelCellProductGasEnthResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            General::SolveRoot<2>(
+            General::SolveRoot(
                 state, Acc, MaxIter, SolverFlag, tmpTprodGas, boundFunc, DataGenerators::MinProductGasTemp, DataGenerators::MaxProductGasTemp, Par);
 
             if (SolverFlag == -2) {

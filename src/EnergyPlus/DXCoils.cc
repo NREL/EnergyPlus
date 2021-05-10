@@ -14646,7 +14646,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
 
         LowerBoundMassFlowRate = 0.01 * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
-        General::SolveRoot<12>(state,
+        General::SolveRoot(state,
                                AccuracyTolerance,
                                MaximumIterations,
                                SolverFlag,
@@ -17587,7 +17587,7 @@ void ControlVRFIUCoil(EnergyPlusData &state,
             Par = {QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF};
 
             FanSpdRatioMax = 1.0;
-            SolveRoot<5>(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
+            SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
             if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
             FanSpdRatio = Ratio1;
             CoilOnOffRatio = 1.0;
@@ -17685,7 +17685,7 @@ void ControlVRFIUCoil(EnergyPlusData &state,
 
             FanSpdRatioMax = 1.0;
 
-            SolveRoot<5>(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
+            SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
             // this will likely cause problems eventually, -1 and -2 mean different things
             if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
             FanSpdRatio = Ratio1;

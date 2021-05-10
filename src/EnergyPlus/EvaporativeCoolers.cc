@@ -2603,7 +2603,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             Par[3] = InletDryBulbTempSec;
             Par[4] = InletWetBulbTempSec;
             Par[5] = InletHumRatioSec;
-            General::SolveRoot<6>(
+            General::SolveRoot(
                 state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
@@ -2669,7 +2669,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             Par[5] = InletHumRatioSec;
             // get dry operation performance first
             Par[1] = double(OperatingMode::DryModulated);
-            General::SolveRoot<6>(
+            General::SolveRoot(
                 state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
@@ -2722,7 +2722,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             EvapCoolerTotalElectricPowerDry = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryModulated, FlowRatioSecDry);
             // get wet operation performance
             Par[1] = double(OperatingMode::WetModulated);
-            General::SolveRoot<6>(
+            General::SolveRoot(
                 state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
@@ -2798,7 +2798,7 @@ void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
             Par[3] = InletDryBulbTempSec;
             Par[4] = InletWetBulbTempSec;
             Par[5] = InletHumRatioSec;
-            General::SolveRoot<6>(
+            General::SolveRoot(
                 state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
@@ -4657,7 +4657,7 @@ void ControlZoneEvapUnitOutput(EnergyPlusData &state,
     if (FullFlowSensibleOutput < ZoneCoolingLoad) {
         std::array<Real64, 2> Par = {Real64(UnitNum), ZoneCoolingLoad}; // Parameters passed to root solver
 
-        General::SolveRoot<2>(state, Tol, MaxIte, SolFla, PartLoadRatio, ZoneEvapUnitLoadResidual, 0.0, 1.0, Par);
+        General::SolveRoot(state, Tol, MaxIte, SolFla, PartLoadRatio, ZoneEvapUnitLoadResidual, 0.0, 1.0, Par);
         if (SolFla == -1) {
             if (ZoneEvapUnit(UnitNum).UnitLoadControlMaxIterErrorIndex == 0) {
                 ShowWarningError(state, "Iteration limit exceeded calculating evap unit part load ratio, for unit=" + ZoneEvapUnit(UnitNum).Name);
@@ -4800,7 +4800,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
         Par[4] = ZoneCoolingLoad;
         FanSpeedRatio = 1.0;
 
-        General::SolveRoot<5>(state, ErrorToler, MaxIte, SolFla, FanSpeedRatio, VSEvapUnitLoadResidual, 0.0, 1.0, Par);
+        General::SolveRoot(state, ErrorToler, MaxIte, SolFla, FanSpeedRatio, VSEvapUnitLoadResidual, 0.0, 1.0, Par);
         if (SolFla == -1) {
             if (ZoneEvapUnit(UnitNum).UnitVSControlMaxIterErrorIndex == 0) {
                 ShowWarningError(

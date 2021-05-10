@@ -7566,7 +7566,7 @@ namespace Furnaces {
                             Par[8] = 0.0;               // HXUnitOn is always false for HX
                             Par[9] = 0.0;
                             //         HeatErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                            General::SolveRoot<10>(state, HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
+                            General::SolveRoot(state, HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
                             //         OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
                             OnOffAirFlowRatio = state.dataFurnaces->OnOffAirFlowRatioSave;
                             if (SolFlag < 0) {
@@ -7790,7 +7790,7 @@ namespace Furnaces {
                             Par[8] = 0.0;               // HXUnitOn is always false for HX
                             Par[9] = 0.0;
                             //         HeatErrorToler is in fraction load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                            General::SolveRoot<10>(state, HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
+                            General::SolveRoot(state, HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
                             //         OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
                             OnOffAirFlowRatio = state.dataFurnaces->OnOffAirFlowRatioSave;
                             //         Reset HeatCoilLoad calculated in CalcFurnaceResidual (in case it was reset because output temp >
@@ -7848,7 +7848,7 @@ namespace Furnaces {
                                                       false);
                                 }
                                 //           Now solve again with tighter PLR limits
-                                General::SolveRoot<10>(
+                                General::SolveRoot(
                                     state, HeatErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, TempMinPLR, TempMaxPLR, Par);
                                 if (state.dataFurnaces->ModifiedHeatCoilLoad > 0.0) {
                                     HeatCoilLoad = state.dataFurnaces->ModifiedHeatCoilLoad;
@@ -8083,7 +8083,7 @@ namespace Furnaces {
                             //             Par(10) is the heating coil PLR, set this value to 0 for sensible PLR calculations.
                             Par[9] = 0.0;
                             //             CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                            General::SolveRoot<10>(state, CoolErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
+                            General::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, PartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
                             //             OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
                             OnOffAirFlowRatio = state.dataFurnaces->OnOffAirFlowRatioSave;
                             if (SolFlag < 0) {
@@ -8283,7 +8283,7 @@ namespace Furnaces {
                                 Par[9] = 0.0;
                             }
                             //           CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                            General::SolveRoot<10>(state, CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
+                            General::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, CalcFurnaceResidual, 0.0, 1.0, Par);
                             //           OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
                             OnOffAirFlowRatio = state.dataFurnaces->OnOffAirFlowRatioSave;
                             if (SolFlag == -1) {
@@ -8361,7 +8361,7 @@ namespace Furnaces {
                                                       CoolingHeatingPLRRatio);
                                 }
                                 //             tighter boundary of solution has been found, call RegulaFalsi a second time
-                                General::SolveRoot<10>(
+                                General::SolveRoot(
                                     state, CoolErrorToler, MaxIter, SolFlag, LatentPartLoadRatio, CalcFurnaceResidual, TempMinPLR2, TempMaxPLR, Par);
                                 //             OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
                                 OnOffAirFlowRatio = state.dataFurnaces->OnOffAirFlowRatioSave;
@@ -8872,7 +8872,7 @@ namespace Furnaces {
                 Par[7] = ZoneSensLoadMetFanONCompOFF; // Output with fan ON compressor OFF
                 Par[8] = 0.0;                         // HX is off for water-to-air HP
                 //         CoolErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
-                General::SolveRoot<9>(state, CoolErrorToler, MaxIter, SolFlag, CoolPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par);
+                General::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, CoolPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par);
                 if (SolFlag == -1 && !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = state.dataFurnaces->OnOffFanPartLoadFractionSave;
                     CalcFurnaceOutput(state,
@@ -9074,7 +9074,7 @@ namespace Furnaces {
                 Par[7] = ZoneSensLoadMetFanONCompOFF; // Output with fan ON compressor OFF
                 Par[8] = 0.0;                         // HX is OFF for water-to-air HP
                 //         HeatErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
-                General::SolveRoot<9>(state, HeatErrorToler, MaxIter, SolFlag, HeatPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par);
+                General::SolveRoot(state, HeatErrorToler, MaxIter, SolFlag, HeatPartLoadRatio, CalcWaterToAirResidual, 0.0, 1.0, Par);
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = state.dataFurnaces->OnOffFanPartLoadFractionSave;
                 CalcFurnaceOutput(state,
                                   FurnaceNum,
@@ -10421,7 +10421,7 @@ namespace Furnaces {
                         } else {
                             Par[3] = 0.0;
                         }
-                        General::SolveRoot<4>(
+                        General::SolveRoot(
                             state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
                         if (SolFlag == -1) {
                             if (state.dataFurnaces->Furnace(FurnaceNum).HotWaterCoilMaxIterIndex == 0) {
@@ -11100,7 +11100,7 @@ namespace Furnaces {
                     // Calculate the part load fraction
                     SpeedRatio = 0.0;
                     SpeedNum = 1;
-                    General::SolveRoot<10>(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
+                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountCyc == 0) {
@@ -11172,7 +11172,7 @@ namespace Furnaces {
                         }
                     }
                     Par[7] = SpeedNum;
-                    General::SolveRoot<10>(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
+                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (ErrCountVar == 0) {
@@ -11246,9 +11246,9 @@ namespace Furnaces {
                 Par[8] = CompOp;
                 Par[9] = 0.0;
                 if (SpeedNum < 2) {
-                    General::SolveRoot<10>(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
+                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, VSHPCyclingResidual, 0.0, 1.0, Par);
                 } else {
-                    General::SolveRoot<10>(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
+                    General::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, VSHPSpeedResidual, 1.0e-10, 1.0, Par);
                 }
                 if (SolFla == -1) {
                     if (!state.dataGlobal->WarmupFlag) {

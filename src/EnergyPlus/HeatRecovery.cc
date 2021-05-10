@@ -3964,7 +3964,7 @@ namespace HeatRecovery {
         Real64 const NTU1(50.0); // upper bound for NTU
         std::array<Real64, 2> Par = {Eps, Z};
 
-        SolveRoot<2>(state, Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par);
+        SolveRoot(state, Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par);
 
         if (SolFla == -2) {
             ShowFatalError(state, "HeatRecovery: Bad initial bounds for NTU in GetNTUforCrossFlowBothUnmixed");
