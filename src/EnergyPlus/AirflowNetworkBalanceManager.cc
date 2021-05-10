@@ -98,7 +98,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
@@ -6854,7 +6853,7 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
                     Par(1) = PressureSet;
-                    TempSolveRoot::SolveRoot(state,
+                    General::SolveRoot(state,
                                              ErrorToler,
                                              MaxIte,
                                              SolFla,
@@ -6951,7 +6950,7 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
                     Par(1) = PressureSet;
-                    TempSolveRoot::SolveRoot(state,
+                    General::SolveRoot(state,
                                              ErrorToler,
                                              MaxIte,
                                              SolFla,

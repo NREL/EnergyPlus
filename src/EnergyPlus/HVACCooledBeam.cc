@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -74,7 +75,6 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
@@ -1021,7 +1021,7 @@ namespace HVACCooledBeam {
                     Par(4) = QMin;
                     Par(5) = QMax;
                     ErrTolerance = 0.01;
-                    TempSolveRoot::SolveRoot(state, ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
+                    General::SolveRoot(state, ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
                     if (SolFlag == -1) {
                         ShowWarningError(state, "Cold water control failed in cooled beam unit " + CoolBeam(CBNum).Name);
                         ShowContinueError(state, "  Iteration limit exceeded in calculating cold water mass flow rate");
