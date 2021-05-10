@@ -98,7 +98,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterManager.hh>
@@ -9498,7 +9497,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
         //    Par(4) = OpMode
         Par(5) = QZnReq;
         Par(6) = OnOffAirFlowRatio;
-        TempSolveRoot::SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par);
+        General::SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, 0.0, 1.0, Par);
         if (SolFla == -1) {
             //     Very low loads may not converge quickly. Tighten PLR boundary and try again.
             TempMaxPLR = -0.1;
@@ -9534,7 +9533,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 if (VRFHeatingMode && TempOutput < QZnReq) ContinueIter = false;
                 if (VRFCoolingMode && TempOutput > QZnReq) ContinueIter = false;
             }
-            TempSolveRoot::SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par);
+            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, PartLoadRatio, PLRResidual, TempMinPLR, TempMaxPLR, Par);
             if (SolFla == -1) {
                 if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                     if (this->IterLimitExceeded == 0) {
@@ -11270,7 +11269,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
     using PlantUtilities::SetComponentFlowRate;
     using Psychrometrics::RhoH2O;
-    using TempSolveRoot::SolveRoot;
 
     static std::string const RoutineName("CalcVRFCondenser_FluidTCtrl");
 
@@ -12634,7 +12632,6 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
 
     using General::SolveRoot;
     using ScheduleManager::GetCurrentScheduleValue;
-    using TempSolveRoot::SolveRoot;
 
     int const MaxIte(500);        // maximum number of iterations
     Real64 const MinPLF(0.0);     // minimum part load factor allowed
@@ -13121,7 +13118,6 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
     //  OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
 
     using General::SolveRoot;
-    using TempSolveRoot::SolveRoot;
 
     Real64 AirMassFlowRate; // air mass flow rate of the coil (kg/s)
 
@@ -14285,7 +14281,6 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     using FluidProperties::GetSupHeatEnthalpyRefrig;
     using FluidProperties::GetSupHeatTempRefrig;
     using General::SolveRoot;
-    using TempSolveRoot::SolveRoot;
 
     int CounterCompSpdTemp;                // Index for the compressor speed level[-]
     int CompSpdLB;                         // index for Compressor speed low bound [-]
@@ -14413,7 +14408,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 MinOutdoorUnitTe = GetSatTemperatureRefrig(
                     state, this->RefrigerantName, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
 
-                TempSolveRoot::SolveRoot(state,
+                General::SolveRoot(state,
                                          1.0e-3,
                                          MaxIter,
                                          SolFla,
@@ -14640,7 +14635,6 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     using FluidProperties::GetSupHeatEnthalpyRefrig;
     using FluidProperties::GetSupHeatTempRefrig;
     using General::SolveRoot;
-    using TempSolveRoot::SolveRoot;
 
     int CounterCompSpdTemp;                // Index for the compressor speed level[-]
     int CompSpdLB;                         // index for Compressor speed low bound [-]
@@ -14736,7 +14730,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 Par(2) = Q_evap_req * C_cap_operation / this->RatedEvapCapacity;
                 Par(3) = this->OUCoolingCAPFT(CounterCompSpdTemp);
 
-                TempSolveRoot::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par);
+                General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, CompResidual_FluidTCtrl, MinOutdoorUnitTe, T_suction, Par);
                 if (SolFla < 0) SmallLoadTe = MinOutdoorUnitTe;
 
                 T_suction = SmallLoadTe;
@@ -14845,8 +14839,6 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
     using FluidProperties::GetSatPressureRefrig;
     using FluidProperties::GetSupHeatEnthalpyRefrig;
     using General::SolveRoot;
-
-    using TempSolveRoot::SolveRoot;
 
     Array1D<Real64> Par(7);     // Parameters passed to RegulaFalsi
     Real64 const ErrorTol(0.1); // tolerance for RegulaFalsi iterations
@@ -15094,7 +15086,7 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
             Par(6) = Q_c_TU_PL;
             Par(7) = m_air_evap_rated;
 
-            TempSolveRoot::SolveRoot(state, ErrorTol, MaxIte, SolFla, Tsuction_new, VRFOUTeResidual_FluidTCtrl, Tsuction_LB, Tsuction_HB, Par);
+            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Tsuction_new, VRFOUTeResidual_FluidTCtrl, Tsuction_LB, Tsuction_HB, Par);
             if (SolFla < 0) Tsuction_new = Tsuction_LB;
 
             // Update Q_c_tot_temp using updated Tsuction_new
@@ -15264,7 +15256,6 @@ void VRFCondenserEquipment::VRFOU_PipeLossC(
     using FluidProperties::FindRefrigerant;
     using FluidProperties::GetSupHeatDensityRefrig;
     using General::SolveRoot;
-    using TempSolveRoot::SolveRoot;
 
     int TUListNum;        // index to TU List
     int TUIndex;          // Index to terminal unit
@@ -15415,7 +15406,6 @@ void VRFCondenserEquipment::VRFOU_PipeLossH(
     using FluidProperties::GetSupHeatEnthalpyRefrig;
     using FluidProperties::GetSupHeatTempRefrig;
     using General::SolveRoot;
-    using TempSolveRoot::SolveRoot;
 
     int TUListNum;        // index to TU List
     int TUIndex;          // Index to terminal unit
@@ -15596,7 +15586,7 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                     }
                     Par[3] = SuppHeatCoilLoad;
 
-                    TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HotWaterHeatingCoilResidual, 0.0, 1.0, Par);
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->HotWaterHeatingCoilResidual, 0.0, 1.0, Par);
                     this->SuppHeatPartLoadRatio = PartLoadFrac;
                 } else {
                     this->SuppHeatPartLoadRatio = 1.0;
