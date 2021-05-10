@@ -107,6 +107,27 @@ namespace PlantManager {
 
     void CheckOngoingPlantWarnings(EnergyPlusData &state);
 
+struct EmptyPlantComponent : PlantComponent
+{
+    // this is for purely air side equipment or similar that dont need anything at all done on plant for now
+    // this could be a placeholder until those components are more integrated with plant side calcs.
+    void simulate([[maybe_unused]] EnergyPlusData &state,
+                  [[maybe_unused]] const PlantLocation &calledFromLocation,
+                  [[maybe_unused]] bool FirstHVACIteration,
+                  [[maybe_unused]] Real64 &CurLoad,
+                  [[maybe_unused]] bool RunFlag) override
+    {
+        // this is empty on purpose
+    }
+
+    static EmptyPlantComponent * factory() {
+        // returns a newly allocated dummy plant component, again this is only used for plant topology components
+        // that do not need any plant side calcs done
+        return new EmptyPlantComponent;
+    }
+
+};
+
 } // namespace PlantManager
 
 struct PlantMgrData : BaseGlobalStruct
