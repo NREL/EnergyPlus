@@ -69,7 +69,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
 
@@ -1576,7 +1575,7 @@ namespace WaterToAirHeatPump {
                     Par(2) = double(state.dataWaterToAirHeatPump->RefrigIndex);
                     Par(3) = SuperHeatEnth;
 
-                    TempSolveRoot::SolveRoot(state,
+                    General::SolveRoot(state,
                                              ERR,
                                              STOP1,
                                              SolFlag,
@@ -2156,7 +2155,7 @@ namespace WaterToAirHeatPump {
                 Par(2) = double(state.dataWaterToAirHeatPump->RefrigIndex);
                 Par(3) = SuperHeatEnth;
 
-                TempSolveRoot::SolveRoot(
+                General::SolveRoot(
                     state, ERR, STOP1, SolFlag, CompSuctionTemp, CalcCompSuctionTempResidual, CompSuctionTemp1, CompSuctionTemp2, Par);
                 if (SolFlag == -1) {
                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = false;
