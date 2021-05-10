@@ -63,7 +63,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -403,7 +402,7 @@ namespace StandardRatings {
                     Par(11) = OpenMotorEff;
                     CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
                     CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
-                    TempSolveRoot::SolveRoot(state,
+                    General::SolveRoot(state,
                                              Acc,
                                              IterMax,
                                              SolFla,

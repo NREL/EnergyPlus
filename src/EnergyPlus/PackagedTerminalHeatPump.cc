@@ -92,7 +92,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
@@ -5902,7 +5902,6 @@ void ControlPTUnitOutput(EnergyPlusData &state,
     using PlantUtilities::SetComponentFlowRate;
     using Psychrometrics::PsyCpAirFnW;
     using SteamCoils::SimulateSteamCoilComponents;
-    using TempSolveRoot::SolveRoot;
     using WaterCoils::SimulateWaterCoilComponents;
 
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6217,7 +6216,6 @@ void CalcPTUnit(EnergyPlusData &state,
     using Psychrometrics::PsyHFnTdbW;
     using SingleDuct::SimATMixer;
     using SteamCoils::SimulateSteamCoilComponents;
-    using TempSolveRoot::SolveRoot;
     using WaterCoils::SimulateWaterCoilComponents;
     using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 
@@ -7790,7 +7788,6 @@ void ControlVSHPOutput(EnergyPlusData &state,
     using PlantUtilities::SetComponentFlowRate;
     using Psychrometrics::PsyCpAirFnW;
     using SteamCoils::SimulateSteamCoilComponents;
-    using TempSolveRoot::SolveRoot;
     using WaterCoils::SimulateWaterCoilComponents;
 
     // Locals
@@ -8492,7 +8489,6 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
     using Psychrometrics::PsyHFnTdbW;
     using SingleDuct::SimATMixer;
     using SteamCoils::SimulateSteamCoilComponents;
-    using TempSolveRoot::SolveRoot;
     using VariableSpeedCoils::SimVariableSpeedCoils;
     using WaterCoils::SimulateWaterCoilComponents;
     using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;

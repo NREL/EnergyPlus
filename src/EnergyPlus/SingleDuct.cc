@@ -87,7 +87,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
@@ -4675,26 +4674,13 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     // on equip on/off combinations. Assign the heating load to the appropriate region and iteratively
     // solve for the appropriate control variable value using Regula-Falsi solver.
 
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
     using General::SolveRoot;
     using SteamCoils::GetCoilCapacity;
-    using TempSolveRoot::SolveRoot;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const BigLoad(1.0e+20);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MassFlow = 0; // [kg/sec]   Total Mass Flow Rate from Hot & Cold Inlets
