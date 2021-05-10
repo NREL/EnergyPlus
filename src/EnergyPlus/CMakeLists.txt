@@ -599,8 +599,6 @@ set(SRC
     TARCOGParams.hh
     TarcogShading.cc
     TarcogShading.hh
-    TempSolveRoot.cc
-    TempSolveRoot.hh
     ThermalChimney.cc
     ThermalChimney.hh
     ThermalComfort.cc
