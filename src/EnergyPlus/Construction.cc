@@ -1199,6 +1199,7 @@ void ConstructionProps::calculateExponentialMatrix()
     // precision variable is used as a more practical limit on the
     // exponentiation algorithm.
 
+    AMatRowNormMax *= fact;    // AMatRowNormMax was calculated based on the unfactored value so it must also be factored here
     CheckVal = min(3.0 * AMatRowNormMax + 6.0, 100.0);
     l = int(CheckVal);
 
