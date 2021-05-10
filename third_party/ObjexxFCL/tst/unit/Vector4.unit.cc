@@ -36,7 +36,7 @@ using namespace ObjexxFCL;
 
 TEST( Vector4Test, Basic )
 {
-	Vector4_float v( 15.0 ); // Uniform value construction
+	Vector4<float> v( 15.0 ); // Uniform value construction
 	EXPECT_EQ( 15.0f, v.x );
 	EXPECT_EQ( 15.0f, v.y );
 	EXPECT_EQ( 15.0f, v.z );
@@ -90,7 +90,7 @@ TEST( Vector4Test, Basic )
 
 TEST( Vector4Test, InitializerList )
 {
-	Vector4_int v( { 33, 52, 17, 42 } );
+	Vector4<int> v( { 33, 52, 17, 42 } );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
 	EXPECT_EQ( 17, v.z );
@@ -142,7 +142,7 @@ TEST( Vector4Test, InitializerList )
 TEST( Vector4Test, StdArray )
 {
 	std::array< int, 4 > arr = {{ 33, 52, 17, 42 }};
-	Vector4_int v( arr );
+	Vector4<int> v( arr );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
 	EXPECT_EQ( 17, v.z );
@@ -179,7 +179,7 @@ TEST( Vector4Test, StdArray )
 TEST( Vector4Test, StdVector )
 {
 	std::vector< int > vec( { 33, 52, 17, 42 } );
-	Vector4_int v( vec );
+	Vector4<int> v( vec );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
 	EXPECT_EQ( 17, v.z );
@@ -216,7 +216,7 @@ TEST( Vector4Test, StdVector )
 TEST( Vector4Test, Array )
 {
 	Array1D_int a( 4, { 33, 52, 17, 42 } );
-	Vector4_int v( a );
+	Vector4<int> v( a );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
 	EXPECT_EQ( 17, v.z );
@@ -252,10 +252,10 @@ TEST( Vector4Test, Array )
 
 TEST( Vector4Test, MinMax )
 {
-	Vector4_double v( 1.0, 5.0, 3.0, 2.0 );
-	Vector4_double w( 3.0, 2.0, 7.0, 5.0 );
-	Vector4_double min_vw( min( v, w ) );
-	Vector4_double max_vw( max( v, w ) );
+	Vector4<double> v( 1.0, 5.0, 3.0, 2.0 );
+	Vector4<double> w( 3.0, 2.0, 7.0, 5.0 );
+	Vector4<double> min_vw( min( v, w ) );
+	Vector4<double> max_vw( max( v, w ) );
 	EXPECT_EQ( 1.0, min_vw.x );
 	EXPECT_EQ( 2.0, min_vw.y );
 	EXPECT_EQ( 3.0, min_vw.z );
@@ -275,8 +275,8 @@ TEST( Vector4Test, MinMax )
 
 TEST( Vector4Test, Comparisons )
 {
-	Vector4_double v( 1.0, 2.0, 3.0, 4.0 );
-	Vector4_double w( 1.0, 2.0, 3.0, 4.0 );
+	Vector4<double> v( 1.0, 2.0, 3.0, 4.0 );
+	Vector4<double> w( 1.0, 2.0, 3.0, 4.0 );
 
 	EXPECT_EQ( v, w );
 
@@ -310,34 +310,34 @@ TEST( Vector4Test, Comparisons )
 
 TEST( Vector4Test, Generators )
 {
-	Vector4_double v( 1.0, 12.0, 21.0, 18.0 );
-	Vector4_double w( 2.0, 6.0, 7.0, 9.0 );
-	EXPECT_EQ( Vector4_double( 3.0, 18.0, 28.0, 27.0 ), v + w );
-	EXPECT_EQ( Vector4_double( -1.0, 6.0, 14.0, 9.0 ), v - w );
-	EXPECT_EQ( Vector4_double( 2.0, 72.0, 147.0, 162.0 ), v * w );
-	EXPECT_EQ( Vector4_double( 0.5, 2.0, 3.0, 2.0 ), v / w );
+	Vector4<double> v( 1.0, 12.0, 21.0, 18.0 );
+	Vector4<double> w( 2.0, 6.0, 7.0, 9.0 );
+	EXPECT_EQ( Vector4<double>( 3.0, 18.0, 28.0, 27.0 ), v + w );
+	EXPECT_EQ( Vector4<double>( -1.0, 6.0, 14.0, 9.0 ), v - w );
+	EXPECT_EQ( Vector4<double>( 2.0, 72.0, 147.0, 162.0 ), v * w );
+	EXPECT_EQ( Vector4<double>( 0.5, 2.0, 3.0, 2.0 ), v / w );
 }
 
 TEST( Vector4Test, Distance )
 {
-	Vector4_double v( 3.0, 3.0, 0.0, 1.0 );
-	Vector4_double w( 3.0, 2.0, 0.0, 1.0 );
+	Vector4<double> v( 3.0, 3.0, 0.0, 1.0 );
+	Vector4<double> w( 3.0, 2.0, 0.0, 1.0 );
 	EXPECT_DOUBLE_EQ( 1.0, distance( v, w ) );
 	EXPECT_DOUBLE_EQ( 1.0, distance_squared( v, w ) );
 }
 
 TEST( Vector4Test, Dot )
 {
-	Vector4_double x( 3.0, 0.0, 0.0, 5.0 );
-	Vector4_double y( 0.0, 2.0, 0.0, 0.0 );
+	Vector4<double> x( 3.0, 0.0, 0.0, 5.0 );
+	Vector4<double> y( 0.0, 2.0, 0.0, 0.0 );
 	EXPECT_EQ( 0.0, dot( x, y ) );
 }
 
 TEST( Vector4Test, Center )
 {
-	Vector4_double x( 4.0, 0.0, 77.0, 42.0 );
-	Vector4_double y( 0.0, 4.0, 77.0, 42.0 );
-	EXPECT_EQ( Vector4_double( 2.0, 2.0, 77.0, 42.0 ), cen( x, y ) );
+	Vector4<double> x( 4.0, 0.0, 77.0, 42.0 );
+	Vector4<double> y( 0.0, 4.0, 77.0, 42.0 );
+	EXPECT_EQ( Vector4<double>( 2.0, 2.0, 77.0, 42.0 ), cen( x, y ) );
 }
 
 TEST( Vector4Test, Angle )
@@ -345,22 +345,22 @@ TEST( Vector4Test, Angle )
 	double const Pi( std::acos( -1.0 ) );
 	double const Pi_2( std::asin( 1.0 ) );
 	{
-		Vector4_double a( 4.0, 0.0, 0.0, 0.0 );
-		Vector4_double b( 0.0, 4.0, 0.0, 0.0 );
+		Vector4<double> a( 4.0, 0.0, 0.0, 0.0 );
+		Vector4<double> b( 0.0, 4.0, 0.0, 0.0 );
 		EXPECT_DOUBLE_EQ( Pi_2, angle( a, b ) );
 		EXPECT_DOUBLE_EQ( 0.0, cos( a, b ) );
 		EXPECT_DOUBLE_EQ( 1.0, sin( a, b ) );
 	}
 	{
-		Vector4_double a( 4.0, 0.0, 0.0, 0.0 );
-		Vector4_double b( 0.0, 0.0, -6.0, 0.0 );
+		Vector4<double> a( 4.0, 0.0, 0.0, 0.0 );
+		Vector4<double> b( 0.0, 0.0, -6.0, 0.0 );
 		EXPECT_DOUBLE_EQ( Pi_2, angle( a, b ) );
 		EXPECT_DOUBLE_EQ( 0.0, cos( a, b ) );
 		EXPECT_DOUBLE_EQ( 1.0, sin( a, b ) );
 	}
 	{
-		Vector4_double a( 0.0, 4.0, 0.0, 0.0 );
-		Vector4_double b( 0.0, -1.0, 0.0, 0.0 );
+		Vector4<double> a( 0.0, 4.0, 0.0, 0.0 );
+		Vector4<double> b( 0.0, -1.0, 0.0, 0.0 );
 		EXPECT_DOUBLE_EQ( Pi, angle( a, b ) );
 		EXPECT_DOUBLE_EQ( -1.0, cos( a, b ) );
 		EXPECT_NEAR( 0.0, sin( a, b ), 1.0E-15 ); // EXPECT_DOUBLE_EQ tolerance is too small
@@ -369,9 +369,9 @@ TEST( Vector4Test, Angle )
 
 TEST( Vector4Test, BinaryOperations )
 {
-	Vector4_double v( 1.0, 2.0, 3.0, 4.0 );
-	Vector4_double w( 1.0, 2.0, 3.0, 4.0 );
-	Vector4_double const original( v );
+	Vector4<double> v( 1.0, 2.0, 3.0, 4.0 );
+	Vector4<double> w( 1.0, 2.0, 3.0, 4.0 );
+	Vector4<double> const original( v );
 
 	// Check dot product of equal vectors
 	EXPECT_DOUBLE_EQ( v.length_squared(), dot( v, w ) ); // v == w here
@@ -380,7 +380,7 @@ TEST( Vector4Test, BinaryOperations )
 	v += 1.0; w -= 1.0;
 
 	// Check midpoint (should match original vector)
-	Vector4_double const midpoint( mid( v, w ) );
+	Vector4<double> const midpoint( mid( v, w ) );
 	EXPECT_DOUBLE_EQ( original.x, midpoint.x );
 	EXPECT_DOUBLE_EQ( original.y, midpoint.y );
 	EXPECT_DOUBLE_EQ( original.z, midpoint.z );

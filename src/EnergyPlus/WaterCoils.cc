@@ -2127,7 +2127,7 @@ void CalcAdjustedCoilUA(EnergyPlusData &state, int const CoilNum)
             FaultsManager::FaultPropertiesFoulingCoil &fouling = state.dataFaultsMgr->FouledCoils(FaultIndex);
             Real64 FaultFrac = fouling.FaultFraction(state);
 
-            if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_UARated) {
+            if (fouling.FoulingInputMethod == FaultsManager::FouledCoil::UARated) {
                 // 1/UA' = Frac * (1/UAFouled) + (1-Frac) / UA
                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable =
                     1 / (FaultFrac / (fouling.UAFouled) + (1 - FaultFrac) / state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable);
@@ -2204,7 +2204,7 @@ void CalcAdjustedCoilUA(EnergyPlusData &state, int const CoilNum)
             FaultsManager::FaultPropertiesFoulingCoil &fouling = state.dataFaultsMgr->FouledCoils(FaultIndex);
             Real64 FaultFrac = fouling.FaultFraction(state);
 
-            if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_FoulingFactor) {
+            if (fouling.FoulingInputMethod == FaultsManager::FouledCoil::FoulingFactor) {
                 // Adjust the External (air) UA and Internal (water) UA accordingly
                 Real64 Rfoul_air = FaultFrac * (fouling.Rfa / fouling.Aout);
                 Real64 Rfoul_water = FaultFrac * (fouling.Rfw / (fouling.Aratio * fouling.Aout));

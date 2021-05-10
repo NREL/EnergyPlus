@@ -365,7 +365,7 @@ namespace General {
     }
 
     void CheckCreatedZoneItemName(EnergyPlusData &state,
-                                  std::string const &calledFrom,            // routine called from
+                                  std::string_view const calledFrom,        // routine called from
                                   std::string const &CurrentObject,         // object being parsed
                                   std::string const &ZoneName,              // Zone Name associated
                                   std::string::size_type MaxZoneNameLength, // maximum length of zonelist zone names
@@ -378,7 +378,7 @@ namespace General {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     inline void CheckCreatedZoneItemName(EnergyPlusData &state,
-                                         std::string const &calledFrom,                  // routine called from
+                                         std::string_view const calledFrom,              // routine called from
                                          std::string const &CurrentObject,               // object being parsed
                                          std::string const &ZoneName,                    // Zone Name associated
                                          std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names

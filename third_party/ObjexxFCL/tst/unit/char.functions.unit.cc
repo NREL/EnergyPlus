@@ -24,22 +24,10 @@ TEST( charFunctionsTest, Predicate )
 	EXPECT_TRUE( is_blank( ' ' ) );
 	EXPECT_FALSE( is_blank( 'x' ) );
 	EXPECT_TRUE( not_blank( 'x' ) );
-	EXPECT_TRUE( is_whitespace( ' ' ) );
-	EXPECT_TRUE( is_whitespace( '\t' ) );
-	EXPECT_FALSE( is_whitespace( 'x' ) );
-	EXPECT_FALSE( not_whitespace( ' ' ) );
-	EXPECT_FALSE( not_whitespace( '\t' ) );
-	EXPECT_TRUE( not_whitespace( 'x' ) );
 	EXPECT_TRUE( is_alpha( 'x' ) );
 	EXPECT_FALSE( is_alpha( '3' ) );
 	EXPECT_TRUE( is_consonant( 'x' ) );
 	EXPECT_FALSE( is_consonant( 'a' ) );
-	EXPECT_TRUE( is_vowel( 'e' ) );
-	EXPECT_FALSE( is_vowel( 'z' ) );
-	EXPECT_TRUE( is_alpha_numeric( 'B' ) );
-	EXPECT_TRUE( is_alpha_numeric( 'y' ) );
-	EXPECT_TRUE( is_alpha_numeric( '4' ) );
-	EXPECT_FALSE( is_alpha_numeric( '$' ) );
 	EXPECT_TRUE( is_digit( '4' ) );
 	EXPECT_FALSE( is_digit( 'P' ) );
 	EXPECT_TRUE( is_lower( 'e' ) );
@@ -82,9 +70,6 @@ TEST( charFunctionsTest, Comparison )
 	EXPECT_TRUE( LLE( 'a', 'b' ) );
 	EXPECT_TRUE( LLE( 'a', 'a' ) );
 	EXPECT_FALSE( LLE( 'b', 'a' ) );
-	EXPECT_FALSE( LGT( 'a', 'b' ) );
-	EXPECT_FALSE( LGT( 'a', 'a' ) );
-	EXPECT_TRUE( LGT( 'b', 'a' ) );
 	EXPECT_FALSE( LGE( 'a', 'b' ) );
 	EXPECT_TRUE( LGE( 'a', 'a' ) );
 	EXPECT_TRUE( LGE( 'b', 'a' ) );
@@ -106,7 +91,6 @@ TEST( charFunctionsTest, Comparison )
 TEST( charFunctionsTest, Conversion )
 {
 	EXPECT_EQ( 99, ICHAR( 'c' ) );
-	EXPECT_EQ( 99, IACHAR( 'c' ) );
 }
 
 TEST( charFunctionsTest, Modifier )

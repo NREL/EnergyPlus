@@ -119,7 +119,7 @@ namespace TarcogShading {
                  Array1D<Real64> const &Ah,
                  Array1D<Real64> const &vvent,
                  Array1D<Real64> const &tvent,
-                 Array1D_int const &LayerType,
+                 Array1D<TARCOGLayerType> LayerType,
                  Array1D<Real64> &Tgaps,
                  Array1D<Real64> &qv,
                  Array1D<Real64> &hcv, // Heat transfer coeefficient in gaps including airlow
@@ -368,7 +368,7 @@ namespace TarcogShading {
                     // speed1 = vvent(i)
                     // speed2 = vvent(i+1)
 
-                    if ((CalcForcedVentilation != 0) && ((vvent(i) != 0) || (vvent(i + 1) != 0))) {
+                    if ((static_cast<int>(CalcForcedVentilation::allow)) && ((vvent(i) != 0) || (vvent(i + 1) != 0))) {
                         forcedventilation(state,
                                           state.dataTarcogShading->iprop1,
                                           state.dataTarcogShading->frct1,
@@ -1017,7 +1017,7 @@ namespace TarcogShading {
             // dr...recalculate speed if forced speed exist
             // bi...skip forced vent for now
             //  if (forcedspeed.ne.0) then
-            if ((forcedspeed != 0.0) && (CalcForcedVentilation != 0)) {
+            if ((forcedspeed != 0.0) && (static_cast<int>(CalcForcedVentilation::allow))) {
                 speed = forcedspeed;
             } else {
                 speed = (std::sqrt(pow_2(A2) + std::abs(4.0 * A * A1)) - A2) / (2.0 * A1);
@@ -1063,36 +1063,36 @@ namespace TarcogShading {
         qv = dens2 * cp2 * speed * s * L * (Tenv - Tgapout) / (H * L);
     }
 
-    void updateEffectiveMultipliers(int const nlayer,                // Number of layers
-                                    Real64 const width,              // IGU width [m]
-                                    Real64 const height,             // IGU height [m]
-                                    const Array1D<Real64> &Atop,     // Top openning area [m2]
-                                    const Array1D<Real64> &Abot,     // Bottom openning area [m2]
-                                    const Array1D<Real64> &Al,       // Left side openning area [m2]
-                                    const Array1D<Real64> &Ar,       // Right side openning area [m2]
-                                    const Array1D<Real64> &Ah,       // Front side openning area [m2]
-                                    Array1D<Real64> &Atop_eff,       // Output - Effective top openning area [m2]
-                                    Array1D<Real64> &Abot_eff,       // Output - Effective bottom openning area [m2]
-                                    Array1D<Real64> &Al_eff,         // Output - Effective left side openning area [m2]
-                                    Array1D<Real64> &Ar_eff,         // Output - Effective right side openning area [m2]
-                                    Array1D<Real64> &Ah_eff,         // Output - Effective front side openning area [m2]
-                                    const Array1D_int &LayerType,    // Layer type
-                                    const Array1D<Real64> &SlatAngle // Venetian layer slat angle [deg]
+    void updateEffectiveMultipliers(int const nlayer,                          // Number of layers
+                                    Real64 const width,                        // IGU width [m]
+                                    Real64 const height,                       // IGU height [m]
+                                    const Array1D<Real64> &Atop,               // Top openning area [m2]
+                                    const Array1D<Real64> &Abot,               // Bottom openning area [m2]
+                                    const Array1D<Real64> &Al,                 // Left side openning area [m2]
+                                    const Array1D<Real64> &Ar,                 // Right side openning area [m2]
+                                    const Array1D<Real64> &Ah,                 // Front side openning area [m2]
+                                    Array1D<Real64> &Atop_eff,                 // Output - Effective top openning area [m2]
+                                    Array1D<Real64> &Abot_eff,                 // Output - Effective bottom openning area [m2]
+                                    Array1D<Real64> &Al_eff,                   // Output - Effective left side openning area [m2]
+                                    Array1D<Real64> &Ar_eff,                   // Output - Effective right side openning area [m2]
+                                    Array1D<Real64> &Ah_eff,                   // Output - Effective front side openning area [m2]
+                                    const Array1D<TARCOGLayerType> &LayerType, // Layer type
+                                    const Array1D<Real64> &SlatAngle           // Venetian layer slat angle [deg]
     )
     {
         for (int i = 1; i <= nlayer; ++i) {
-            if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
+            if (LayerType(i) == TARCOGLayerType::VENETBLIND_HORIZ || LayerType(i) == TARCOGLayerType::VENETBLIND_VERT) {
                 const Real64 slatAngRad = SlatAngle(i) * 2 * DataGlobalConstants::Pi / 360;
                 Real64 C1_VENET(0);
                 Real64 C2_VENET(0);
                 Real64 C3_VENET(0);
 
-                if (LayerType(i) == VENETBLIND_HORIZ) {
+                if (LayerType(i) == TARCOGLayerType::VENETBLIND_HORIZ) {
                     C1_VENET = C1_VENET_HORIZONTAL;
                     C2_VENET = C2_VENET_HORIZONTAL;
                     C3_VENET = C3_VENET_HORIZONTAL;
                 }
-                if (LayerType(i) == VENETBLIND_VERT) {
+                if (LayerType(i) == TARCOGLayerType::VENETBLIND_VERT) {
                     C1_VENET = C1_VENET_VERTICAL;
                     C2_VENET = C2_VENET_VERTICAL;
                     C3_VENET = C3_VENET_VERTICAL;
@@ -1102,7 +1102,9 @@ namespace TarcogShading {
                 Ar_eff(i) = 0.0;
                 Atop_eff(i) = Atop(i);
                 Abot_eff(i) = Abot(i);
-            } else if ((LayerType(i) == PERFORATED) || (LayerType(i) == DIFFSHADE) || (LayerType(i) == BSDF) || (LayerType(i) == WOVSHADE)) {
+            } else if BITF_TEST_ANY (BITF(LayerType(i)),
+                                     BITF(TARCOGLayerType::PERFORATED) | BITF(TARCOGLayerType::DIFFSHADE) | BITF(TARCOGLayerType::BSDF) |
+                                         BITF(TARCOGLayerType::WOVSHADE)) {
                 Ah_eff(i) = width * height * C1_SHADE * pow((Ah(i) / (width * height)), C2_SHADE);
                 Al_eff(i) = Al(i) * C3_SHADE;
                 Ar_eff(i) = Ar(i) * C3_SHADE;

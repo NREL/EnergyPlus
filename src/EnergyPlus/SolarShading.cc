@@ -6837,14 +6837,14 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     // call the ASHWAT fenestration model for optical properties
                     // determine the beam radiation absorptance and tranmittance of the
                     // the equivalent layer window model
-                    WindowEquivalentLayer::CalcEQLOpticalProperty(state, SurfNum, isBEAM, state.dataSolarShading->AbsSolBeamEQL);
+                    WindowEquivalentLayer::CalcEQLOpticalProperty(state, SurfNum, SolarArrays::BEAM, state.dataSolarShading->AbsSolBeamEQL);
                     auto &CFS = state.dataWindowEquivLayer->CFS;
                     // recalcuate the diffuse absorptance and transmittance of the
                     // the equivalent layer window model if there is shade control
                     int EQLNum = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction)
                                      .EQLConsPtr; // equivalent layer fenestration index
                     if (CFS(EQLNum).ISControlled) {
-                        WindowEquivalentLayer::CalcEQLOpticalProperty(state, SurfNum, isDIFF, state.dataSolarShading->AbsSolDiffEQL);
+                        WindowEquivalentLayer::CalcEQLOpticalProperty(state, SurfNum, SolarArrays::DIFF, state.dataSolarShading->AbsSolDiffEQL);
                     } else {
                         state.dataSolarShading->AbsSolDiffEQL(_, {1, CFS(EQLNum).NL + 1}) =
                             state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFS(EQLNum).NL + 1}, EQLNum);
@@ -6856,13 +6856,13 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         Real64 AbWinEQL = state.dataSolarShading->AbsSolBeamEQL(1, Lay) * CosInc * SunLitFract *
                                           state.dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(state.dataGlobal->HourOfDay);
                         ;
-                        if (CFS(EQLNum).L(1).LTYPE != LayerType::ltyGLAZE) {
+                        if (CFS(EQLNum).L(1).LTYPE != LayerType::GLAZE) {
                             // if the first layer is not glazing (or it is a shade) do not
                             state.dataSurface->SurfWinA(SurfNum, Lay) = AbWinEQL;
                         } else {
                             // the first layer is a glazing, include the outside reveal reflection
                             // and the inside reveal reflection until indoor shade layer is encountered.
-                            if (CFS(EQLNum).L(Lay).LTYPE == LayerType::ltyGLAZE) {
+                            if (CFS(EQLNum).L(Lay).LTYPE == LayerType::GLAZE) {
                                 state.dataSurface->SurfWinA(SurfNum, Lay) =
                                     AbWinEQL +
                                     state.dataSurface->SurfWinOutsRevealDiffOntoGlazing(SurfNum) * state.dataSolarShading->AbsSolBeamEQL(1, Lay) +
@@ -7378,27 +7378,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                 // Back surface is opaque interior or exterior wall
                                 // Interior solar absorptance of opaque surface
-                                Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNumBack).InsideAbsorpSolar;
-                                // Check for movable insulation; reproduce code from subr. EvalInsideMovableInsulation;
-                                // Can't call that routine here since cycle prevents SolarShadingGeometry from USEing
-                                // HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
-                                Real64 HMovInsul = 0.0; // Conductance of movable wall insulation
-                                Real64 AbsInt = 0.0;
-                                if (state.dataSurface->Surface(BackSurfNum).MaterialMovInsulInt > 0) {
-                                    Real64 MovInsulSchedVal =
-                                        GetCurrentScheduleValue(state, state.dataSurface->Surface(BackSurfNum).SchedMovInsulInt);
-                                    if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
-                                        HMovInsul = 0.0;
-                                    } else { // Movable insulation present
-                                        HMovInsul =
-                                            1.0 /
-                                            (MovInsulSchedVal *
-                                             state.dataMaterial->Material(state.dataSurface->Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
-                                        AbsInt =
-                                            state.dataMaterial->Material(state.dataSurface->Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
-                                    }
-                                }
-                                if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
+                                Real64 AbsIntSurf = state.dataHeatBalSurf->SurfAbsSolarInt(BackSurfNum);
                                 state.dataSurface->SurfOpaqAI(BackSurfNum) +=
                                     BOverlap * AbsIntSurf / state.dataSurface->Surface(BackSurfNum).Area; //[-]
                                 BABSZone += BOverlap * AbsIntSurf;                                        //[m2]
@@ -8135,30 +8115,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             if (state.dataConstruction->Construct(ConstrNumBack).TransDiff <= 0.0) {
 
                                 // Back surface is opaque interior or exterior wall
-
-                                Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNumBack).InsideAbsorpSolar;
-
-                                // Check for movable insulation; reproduce code from subr. EvalInsideMovableInsulation;
-                                // Can't call that routine here since cycle prevents SolarShadingGeometry from USEing
-                                // HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
-                                Real64 HMovInsul = 0.0;
-                                Real64 AbsInt = 0.0;
-                                if (state.dataSurface->Surface(BackSurfNum).MaterialMovInsulInt > 0) {
-                                    Real64 MovInsulSchedVal =
-                                        GetCurrentScheduleValue(state, state.dataSurface->Surface(BackSurfNum).SchedMovInsulInt);
-                                    if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
-                                        HMovInsul = 0.0;
-                                    } else { // Movable insulation present
-                                        HMovInsul =
-                                            1.0 /
-                                            (MovInsulSchedVal *
-                                             state.dataMaterial->Material(state.dataSurface->Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
-                                        AbsInt =
-                                            state.dataMaterial->Material(state.dataSurface->Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
-                                    }
-                                }
-                                if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
-
+                                Real64 AbsIntSurf = state.dataHeatBalSurf->SurfAbsSolarInt(BackSurfNum);
                                 state.dataSurface->SurfOpaqAI(BackSurfNum) +=
                                     BOverlap * AbsIntSurf / state.dataSurface->Surface(BackSurfNum).Area; //[-]
                                 BABSZone += BOverlap * AbsIntSurf;                                        //[m2]
@@ -8178,7 +8135,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 // or interior window (treates windows with/without shades as defined) for this timestep
 
                                 // call the ASHWAT fenestration model for beam radiation here
-                                WindowEquivalentLayer::CalcEQLOpticalProperty(state, BackSurfNum, isBEAM, state.dataSolarShading->AbsSolBeamBackEQL);
+                                WindowEquivalentLayer::CalcEQLOpticalProperty(
+                                    state, BackSurfNum, SolarArrays::BEAM, state.dataSolarShading->AbsSolBeamBackEQL);
                                 auto &CFS = state.dataWindowEquivLayer->CFS;
                                 int EQLNum = state.dataConstruction->Construct(ConstrNumBack).EQLConsPtr;
                                 state.dataSolarShading->AbsBeamWinEQL({1, CFS(EQLNum).NL}) =
@@ -8186,14 +8144,14 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 // get the interior beam transmitted through back exterior or interior EQL window
                                 TransBeamWin = state.dataSolarShading->AbsSolBeamBackEQL(1, CFS(EQLNum).NL + 1);
                                 //   Absorbed by the interior shade layer of back exterior window
-                                if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != LayerType::ltyGLAZE) {
+                                if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != LayerType::GLAZE) {
                                     state.dataSolarShading->IntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * state.dataSolarShading->AbsSolBeamBackEQL(1, CFS(EQLNum).NL) /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
                                     BABSZone += BOverlap * state.dataSolarShading->AbsSolBeamBackEQL(1, CFS(EQLNum).NL);
                                 }
                                 //   Absorbed by the exterior shade layer of back exterior window
-                                if (CFS(EQLNum).L(1).LTYPE != LayerType::ltyGLAZE) {
+                                if (CFS(EQLNum).L(1).LTYPE != LayerType::GLAZE) {
                                     state.dataSolarShading->IntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * state.dataSolarShading->AbsSolBeamBackEQL(1, 1) /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
@@ -8203,13 +8161,13 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 // determine the number of glass layers
                                 NBackGlass = 0;
                                 for (int Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
-                                    if (CFS(EQLNum).L(Lay).LTYPE != LayerType::ltyGLAZE) continue;
+                                    if (CFS(EQLNum).L(Lay).LTYPE != LayerType::GLAZE) continue;
                                     ++NBackGlass;
                                 }
                                 if (NBackGlass >= 2) {
                                     // If the number of glass is greater than 2, in between glass shade can be present
                                     for (int Lay = 2; Lay <= CFS(EQLNum).NL - 1; ++Lay) {
-                                        if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != LayerType::ltyGLAZE) {
+                                        if (CFS(EQLNum).L(CFS(EQLNum).NL).LTYPE != LayerType::GLAZE) {
                                             // if there is in between shade glass determine the shade absorptance
                                             state.dataSolarShading->IntBeamAbsByShadFac(BackSurfNum) +=
                                                 BOverlap * state.dataSolarShading->AbsSolBeamBackEQL(1, Lay) /
@@ -8756,26 +8714,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                     if (state.dataConstruction->Construct(ConstrNumBack).TransDiff <= 0.0) {
                         // Back surface is opaque interior or exterior wall
 
-                        Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNumBack).InsideAbsorpSolar;
-
-                        // Check for movable insulation; reproduce code from subr. EvalInsideMovableInsulation;
-                        // Can't call that routine here since cycle prevents SolarShadingGeometry from USEing
-                        // HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
-                        Real64 HMovInsul = 0.0;
-                        Real64 AbsInt = 0;
-                        if (state.dataSurface->Surface(BackSurfNum).MaterialMovInsulInt > 0) {
-                            Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->Surface(BackSurfNum).SchedMovInsulInt);
-                            if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
-                                HMovInsul = 0.0;
-                            } else { // Movable insulation present
-                                HMovInsul =
-                                    1.0 / (MovInsulSchedVal *
-                                           state.dataMaterial->Material(state.dataSurface->Surface(BackSurfNum).MaterialMovInsulInt).Resistance);
-                                AbsInt = state.dataMaterial->Material(state.dataSurface->Surface(BackSurfNum).MaterialMovInsulInt).AbsorpSolar;
-                            }
-                        }
-                        if (HMovInsul > 0.0) AbsIntSurf = AbsInt; // Movable inside insulation present
-
+                        Real64 AbsIntSurf = state.dataHeatBalSurf->SurfAbsSolarInt(BackSurfNum);
                         state.dataSurface->SurfOpaqAI(BackSurfNum) += BOverlap * AbsIntSurf / state.dataSurface->Surface(BackSurfNum).Area; //[-]
                         BABSZone += BOverlap * AbsIntSurf;                                                                                  //[m2]
                     }
@@ -11602,8 +11541,6 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
     using namespace DataWindowEquivalentLayer;
 
     Real64 AbsInt;               // Tmp var for Inside surface short-wave absorptance
-    Real64 MovInsulSchedVal;     // Value of the movable insulation schedule for current time
-    Real64 HMovInsul;            // Conductance of movable insulation
     Real64 InsideDifAbsorptance; // Inside diffuse solar absorptance of a surface
     Real64 InsideDifReflectance; // Inside diffuse solar reflectance of a surface
     int BlNum;                   // Blind number
@@ -11727,23 +11664,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
 
                     // Determine the inside (back) diffuse solar absorptance
                     // and reflectance of the current heat transfer surface
-                    InsideDifAbsorptance = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar;
-                    // Check for movable insulation; reproduce code from subr. EvalInsideMovableInsulation;
-                    // Can't call that routine here since cycle prevents SolarShadingGeometry from USEing
-                    // HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
-                    HMovInsul = 0.0;
-                    if (state.dataSurface->Surface(HeatTransSurfNum).MaterialMovInsulInt > 0) {
-                        MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->Surface(HeatTransSurfNum).SchedMovInsulInt);
-                        if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
-                            HMovInsul = 0.0;
-                        } else { // Movable insulation present
-                            HMovInsul =
-                                1.0 / (MovInsulSchedVal *
-                                       state.dataMaterial->Material(state.dataSurface->Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
-                            AbsInt = state.dataMaterial->Material(state.dataSurface->Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
-                        }
-                    }
-                    if (HMovInsul > 0.0) InsideDifAbsorptance = AbsInt; // Movable inside insulation present
+                    InsideDifAbsorptance = state.dataHeatBalSurf->SurfAbsSolarInt(HeatTransSurfNum);
                     // Inside (back) diffuse solar reflectance is assumed to be 1 - absorptance
                     InsideDifReflectance = 1.0 - InsideDifAbsorptance;
 
@@ -11990,7 +11911,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                         // SurfaceWindow(HeatTransSurfNum)%WindowModelType == WindowEQLModel
                         // ConstrNum=Surface(HeatTransSurfNum)%Construction
                         // call the ASHWAT fenestration model for diffuse radiation here
-                        WindowEquivalentLayer::CalcEQLOpticalProperty(state, HeatTransSurfNum, isDIFF, AbsSolDiffBackEQL);
+                        WindowEquivalentLayer::CalcEQLOpticalProperty(state, HeatTransSurfNum, SolarArrays::DIFF, AbsSolDiffBackEQL);
 
                         EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
                         for (Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
@@ -12156,8 +12077,6 @@ void CalcInteriorWinTransDifSolInitialDistribution(
     int TotGlassLayers;          // Number of glass layers in a window construction
     WinShadingType ShadeFlag;    // Shading flag
     Real64 AbsInt;               // Tmp var for Inside surface short-wave absorptance
-    Real64 MovInsulSchedVal;     // Value of the movable insulation schedule for current time
-    Real64 HMovInsul;            // Conductance of movable insulation
     Real64 InsideDifAbsorptance; // Inside diffuse solar absorptance of a surface
     Real64 InsideDifReflectance; // Inside diffuse solar reflectance of a surface
     int BlNum;                   // Blind number
@@ -12233,22 +12152,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(
 
             // Determine the inside (back) diffuse solar absorptance
             // and reflectance of the current heat transfer surface
-            InsideDifAbsorptance = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar;
-            // Check for movable insulation; reproduce code from subr. EvalInsideMovableInsulation;
-            // Can't call that routine here since cycle prevents SolarShadingGeometry from USEing
-            // HeatBalanceSurfaceManager, which contains EvalInsideMovableInsulation
-            HMovInsul = 0.0;
-            if (state.dataSurface->Surface(HeatTransSurfNum).MaterialMovInsulInt > 0) {
-                MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->Surface(HeatTransSurfNum).SchedMovInsulInt);
-                if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
-                    HMovInsul = 0.0;
-                } else { // Movable insulation present
-                    HMovInsul = 1.0 / (MovInsulSchedVal *
-                                       state.dataMaterial->Material(state.dataSurface->Surface(HeatTransSurfNum).MaterialMovInsulInt).Resistance);
-                    AbsInt = state.dataMaterial->Material(state.dataSurface->Surface(HeatTransSurfNum).MaterialMovInsulInt).AbsorpSolar;
-                }
-            }
-            if (HMovInsul > 0.0) InsideDifAbsorptance = AbsInt; // Movable inside insulation present
+            InsideDifAbsorptance = state.dataHeatBalSurf->SurfAbsSolarInt(HeatTransSurfNum);
             // Inside (back) diffuse solar reflectance is assumed to be 1 - absorptance
             InsideDifReflectance = 1.0 - InsideDifAbsorptance;
 
