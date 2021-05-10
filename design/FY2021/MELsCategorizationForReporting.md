@@ -107,7 +107,10 @@ ElectricEquipment,
        \retaincase
        \default General
 A6 ;   \field User-defined End-Use Subcategory
+       \note when the End-Use Subcategory is UserDefined , A6 - User-defined End-Use Subcategory is required.
+       \note Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table.
        \type alpha
+       \retaincase
 ```
 
 ## Testing/Validation/Data Source(s): ##
