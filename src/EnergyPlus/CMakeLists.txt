@@ -352,8 +352,6 @@ set(SRC
     HeatBalanceKivaManager.hh
     HeatBalanceManager.cc
     HeatBalanceManager.hh
-    HeatBalanceMovableInsulation.cc
-    HeatBalanceMovableInsulation.hh
     HeatBalanceSurfaceManager.cc
     HeatBalanceSurfaceManager.hh
     HeatPumpWaterToWaterCOOLING.cc
