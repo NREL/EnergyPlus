@@ -607,7 +607,6 @@ namespace UnitarySystems {
         if (AirLoopNum == -1) { // This DX system is component of ZoneHVAC:OutdoorAirUnit
             OutdoorAirUnitNum = ZoneOAUnitNum;
             OAUCoilOutletTemp = OAUCoilOutTemp;
-            state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = this->m_MaxCoolAirVolFlow;
         }
 
         // Scan hot water and steam heating coil plant components for one time initializations
