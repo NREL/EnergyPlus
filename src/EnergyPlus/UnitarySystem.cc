@@ -607,6 +607,7 @@ namespace UnitarySystems {
         if (AirLoopNum == -1) { // This DX system is component of ZoneHVAC:OutdoorAirUnit
             OutdoorAirUnitNum = ZoneOAUnitNum;
             OAUCoilOutletTemp = OAUCoilOutTemp;
+            state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = this->m_MaxCoolAirVolFlow;
         }
 
         // Scan hot water and steam heating coil plant components for one time initializations
@@ -2972,6 +2973,19 @@ namespace UnitarySystems {
         // all coil types, which comps exist, control type, heat recovery active, cooling coil index.
         bool errFlag = false;
         bool PrintMessage = false;
+
+        std::string loc_m_DesignSpecMultispeedHPType = input_data.design_specification_multispeed_object_type;
+        std::string loc_m_DesignSpecMultispeedHPName = input_data.design_specification_multispeed_object_name;
+        if (loc_m_DesignSpecMultispeedHPType != "" && loc_m_DesignSpecMultispeedHPName != "") {
+            this->m_DesignSpecMultispeedHPType = loc_m_DesignSpecMultispeedHPType;
+            this->m_DesignSpecMultispeedHPName = loc_m_DesignSpecMultispeedHPName;
+            int designSpecType_Num = 1;
+
+            DesignSpecMSHP thisDesignSpec;
+            this->m_CompPointerMSHP = thisDesignSpec.factory(state, designSpecType_Num, loc_m_DesignSpecMultispeedHPName);
+            this->m_DesignSpecMSHPIndex = getDesignSpecMSHPIndex(state, this->m_DesignSpecMultispeedHPName);
+        }
+
         // these are needed for call from GetOASysNumHeat(Cool)ingCoils
         std::string loc_heatingCoilType = input_data.heating_coil_object_type;
         if (loc_heatingCoilType.size() > 0) {
@@ -2985,6 +2999,13 @@ namespace UnitarySystems {
                 this->m_HeatingCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedHeating;
             } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Water")) {
                 this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
+                if (this->m_DesignSpecMSHPIndex > -1) {
+                    this->m_NumOfSpeedHeating = this->m_CompPointerMSHP->numOfSpeedHeating;
+                    if (this->m_NumOfSpeedHeating > 1) {
+                        this->m_MultiSpeedHeatingCoil = true;
+                        this->m_MultiOrVarSpeedHeatCoil = true;
+                    }
+                }
             } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Steam")) {
                 this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
             } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:WaterToAirHeatPump:EquationFit")) {
@@ -3031,8 +3052,22 @@ namespace UnitarySystems {
                 this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
             } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:Water")) {
                 this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
+                if (this->m_DesignSpecMSHPIndex > -1) {
+                    this->m_NumOfSpeedCooling = this->m_CompPointerMSHP->numOfSpeedCooling;
+                    if (this->m_NumOfSpeedCooling > 1) {
+                        this->m_DiscreteSpeedCoolingCoil = true;
+                        this->m_MultiOrVarSpeedCoolCoil = true;
+                    }
+                }
             } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
                 this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterDetailed;
+                if (this->m_DesignSpecMSHPIndex > -1) {
+                    this->m_NumOfSpeedCooling = this->m_CompPointerMSHP->numOfSpeedCooling;
+                    if (this->m_NumOfSpeedCooling > 1) {
+                        this->m_DiscreteSpeedCoolingCoil = true;
+                        this->m_MultiOrVarSpeedCoolCoil = true;
+                    }
+                }
             } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                 this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
             } else if (UtilityRoutines::SameString(loc_coolingCoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
@@ -3167,8 +3202,6 @@ namespace UnitarySystems {
         Real64 loc_m_MaxHROutletWaterTemp = input_data.maximum_temperature_for_heat_recovery;
         std::string loc_heatRecoveryInletNodeName = input_data.heat_recovery_water_inlet_node_name;
         std::string loc_heatRecoveryOutletNodeName = input_data.heat_recovery_water_outlet_node_name;
-        std::string loc_m_DesignSpecMultispeedHPType = input_data.design_specification_multispeed_object_type;
-        std::string loc_m_DesignSpecMultispeedHPName = input_data.design_specification_multispeed_object_name;
 
         std::string loc_m_SystemCoolControlNodeName = input_data.dx_cooling_coil_system_sensor_node_name;
 
@@ -14480,27 +14513,29 @@ namespace UnitarySystems {
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio = this->FanPartLoadRatio;
             state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio = this->m_CycRatio;
         }
-
         if (this->m_FirstPass) {
+            if (AirLoopNum > -1) {
+                if (!state.dataGlobal->SysSizingCalc) {
 
-            if (!state.dataGlobal->SysSizingCalc) {
-
-                if (CurOASysNum > 0) {
-                    OASysEqSizing(CurOASysNum).AirFlow = false;
-                    OASysEqSizing(CurOASysNum).CoolingAirFlow = false;
-                    OASysEqSizing(CurOASysNum).HeatingAirFlow = false;
-                    OASysEqSizing(CurOASysNum).Capacity = false;
-                    OASysEqSizing(CurOASysNum).CoolingCapacity = false;
-                    OASysEqSizing(CurOASysNum).HeatingCapacity = false;
-                    this->m_FirstPass = false;
-                } else if (state.dataSize->CurSysNum > 0) {
-                    state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).UnitarySysSimulating = false;
-                    DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, this->m_FirstPass);
-                } else if (state.dataSize->CurZoneEqNum > 0) {
-                    DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, this->m_FirstPass);
-                } else {
-                    this->m_FirstPass = false;
+                    if (CurOASysNum > 0) {
+                        OASysEqSizing(CurOASysNum).AirFlow = false;
+                        OASysEqSizing(CurOASysNum).CoolingAirFlow = false;
+                        OASysEqSizing(CurOASysNum).HeatingAirFlow = false;
+                        OASysEqSizing(CurOASysNum).Capacity = false;
+                        OASysEqSizing(CurOASysNum).CoolingCapacity = false;
+                        OASysEqSizing(CurOASysNum).HeatingCapacity = false;
+                        this->m_FirstPass = false;
+                    } else if (state.dataSize->CurSysNum > 0) {
+                        state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).UnitarySysSimulating = false;
+                        DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, this->m_FirstPass);
+                    } else if (state.dataSize->CurZoneEqNum > 0) {
+                        DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, this->m_FirstPass);
+                    } else {
+                        this->m_FirstPass = false;
+                    }
                 }
+            } else {
+                this->m_FirstPass = false;
             }
         }
 
