@@ -1391,12 +1391,6 @@ void GetPlantInput(EnergyPlusData &state)
                         //            ErrorsFound=.TRUE.
                     }
 
-                    if (!this_comp.compPtr) {
-                        //                        ShowSevereError(state, format("Comptype {} didnt get a pointer", this_comp_type));
-                        // temporary check to find all comptypes
-                        std::cout << "Comptype {} didnt get a pointer" << this_comp_type << "\n";
-                    };
-
                     this_comp.Name = CompNames(CompNum);
                     this_comp.NodeNameIn = InletNodeNames(CompNum);
                     this_comp.NodeNumIn = InletNodeNumbers(CompNum);
