@@ -114,18 +114,17 @@ namespace DataPlant {
         // If you add a module or new equipment type, you must set up this structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-            if (InitLoopEquip) {
+        if (InitLoopEquip) {
 
-                this->compPtr->onInitLoopEquip(state, this->location);
-                this->compPtr->getDesignCapacities(state, this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
-                this->compPtr->getDesignTemperatures(this->TempDesCondIn, this->TempDesEvapOut);
+            this->compPtr->onInitLoopEquip(state, this->location);
+            this->compPtr->getDesignCapacities(state, this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
+            this->compPtr->getDesignTemperatures(this->TempDesCondIn, this->TempDesEvapOut);
 
-                if (GetCompSizFac) {
-                    this->compPtr->getSizingFactor(this->SizFac);
-                }
+            if (GetCompSizFac) {
+                this->compPtr->getSizingFactor(this->SizFac);
             }
-            this->compPtr->simulate(state, this->location, FirstHVACIteration, this->MyLoad, this->ON);
-
+        }
+        this->compPtr->simulate(state, this->location, FirstHVACIteration, this->MyLoad, this->ON);
     }
 
 } // namespace DataPlant
