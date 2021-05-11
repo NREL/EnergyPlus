@@ -1079,7 +1079,7 @@ namespace UnitarySystems {
                             }
                         }
                     } else {
-                        state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = 0.0;
+                        if (this->UnitType != "CoilSystem:Cooling:DX") state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = 0.0;
                     }
                 }
             }
