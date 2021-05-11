@@ -105,7 +105,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.5;
 
   Timestep,6;
 
@@ -378,13 +378,17 @@
     0.5000000,               !- Solar Absorptance
     0.5000000;               !- Visible Absorptance
 
-  Construction:InternalSource,
-    Slab Floor with Radiant, !- Name
+  ConstructionProperty:InternalHeatSource,
+    Floor Source,            !- Name
+    Slab Floor with Radiant, !- Construction Name
     4,                       !- Source Present After Layer Number
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request
+    0.0;                     !- Two-Dimensional Position of Interior Temperature Calculation Request
+
+  Construction,
+    Slab Floor with Radiant, !- Name
     CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer
     INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2
     GYP1,                    !- Layer 3
@@ -1894,110 +1898,122 @@
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     West Zone Radiant Floor, !- Name
-    RadiantSysAvailSched,    !- Availability Schedule Name
-    West Zone,               !- Zone Name
-    Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
-    400.0,                   !- Hydronic Tubing Length {m}
-    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-    MeanAirTemperature,      !- Temperature Control Type
-    ZeroFlowPower,           !- Setpoint Type
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    0.00008,                 !- Maximum Hot Water Flow {m3/s}
-    West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-    West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
-    0.5,                     !- Heating Control Throttling Range {deltaC}
-    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    Autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
-    0.0012,                  !- Maximum Cold Water Flow {m3/s}
-    Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-    Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    0.5,                     !- Cooling Control Throttling Range {deltaC}
-    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    Off,                        !- Condensation Control Type
-    0.0,                        !- Condensation Control Dewpoint Offset {C}
-    ,                        !- Number of Circuits
-    ,                        !- Circuit Length {m}
+    West Zone Radiant Floor Design, !- Design_Object_Name
+    RadiantSysAvailSched, !- Availability_Schedule_Name
+    West Zone, !- Zone_Name
+    Zn001:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
+    400.0, !- Hydronic_Tubing_Length
+    Autosize, !- Heating_Design_Capacity
+    0.00008, !- Maximum_Hot_Water_Flow
+    West Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
+    West Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
+    Autosize, !- Cooling_Design_Capacity
+    0.0012, !- Maximum_Cold_Water_Flow
+    Zone 1 Cooling Water Inlet Node, !- Cooling_Water_Inlet_Node_Name
+    Zone 1 Cooling Water Outlet Node, !- Cooling_Water_Outlet_Node_Name
+    , !- Number_of_Circuits
+    ;                        !- Circuit Length {m}
+
+  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
+    West Zone Radiant Floor Design, !- Design_Object_Name
+    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
+    0.012, !- Hydronic_Tubing_Inside_Diameter
+    0.016, !- Hydronic_Tubing_Outside_Diameter
+    0.35, !- Hydronic_Tubing_Conductivity
+    MeanAirTemperature, !- Temperature_Control_Type
+    ZeroFlowPower, !- Setpoint_Control_Type
+    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
+    , !- Heating_Design_Capacity_Per_Floor_Area
+    , !- Fraction_of_Autosized_Heating_Design_Capacity
+    0.5, !- Heating_Control_Throttling_Range
+    Radiant Heating Setpoints, !- Heating_Control_Temperature_Schedule_Name
+    CoolingDesignCapacity, !- Cooling_Design_Capacity_Method
+    , !- Cooling_Design_Capacity_Per_Floor_Area
+    , !- Fraction_of_Autosized_Cooling_Design_Capacity
+    0.5, !- Cooling_Control_Throttling_Range
+    Radiant Cooling Setpoints, !- Cooling_Control_Temperature_Schedule_Name
+    Off, !- Condensation_Control_Type
+    0.0, !- Condensation_Control_Dewpoint_Offset
     ChangeoverSchedW;         !- Changeover delay schedule
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
     East Zone Radiant Floor, !- Name
-    RadiantSysAvailSched,    !- Availability Schedule Name
-    East Zone,               !- Zone Name
-    Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
-    400.0,                   !- Hydronic Tubing Length {m}
-    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-    MeanAirTemperature,      !- Temperature Control Type
-    ZeroFlowPower,           !- Setpoint Type
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    0.00008,                 !- Maximum Hot Water Flow {m3/s}
-    East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-    East Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
-    0.5,                     !- Heating Control Throttling Range {deltaC}
-    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    Autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
-    0.0012,                  !- Maximum Cold Water Flow {m3/s}
-    Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-    Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    0.5,                     !- Cooling Control Throttling Range {deltaC}
-    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    Off,                        !- Condensation Control Type
-    0.0,                        !- Condensation Control Dewpoint Offset {C}
-    ,                        !- Number of Circuits
-    ,                        !- Circuit Length {m}
+    East Zone Radiant Floor Design, !- Design_Object_Name
+    RadiantSysAvailSched, !- Availability_Schedule_Name
+    East Zone, !- Zone_Name
+    Zn002:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
+    400.0, !- Hydronic_Tubing_Length
+    Autosize, !- Heating_Design_Capacity
+    0.00008, !- Maximum_Hot_Water_Flow
+    East Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
+    East Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
+    Autosize, !- Cooling_Design_Capacity
+    0.0012, !- Maximum_Cold_Water_Flow
+    Zone 2 Cooling Water Inlet Node, !- Cooling_Water_Inlet_Node_Name
+    Zone 2 Cooling Water Outlet Node, !- Cooling_Water_Outlet_Node_Name
+    , !- Number_of_Circuits
+    ;                        !- Circuit Length {m}
+
+  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
+    East Zone Radiant Floor Design, !- Design_Object_Name
+    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
+    0.012, !- Hydronic_Tubing_Inside_Diameter
+    0.016, !- Hydronic_Tubing_Outside_Diameter
+    0.35, !- Hydronic_Tubing_Conductivity
+    MeanAirTemperature, !- Temperature_Control_Type
+    ZeroFlowPower, !- Setpoint_Control_Type
+    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
+    , !- Heating_Design_Capacity_Per_Floor_Area
+    , !- Fraction_of_Autosized_Heating_Design_Capacity
+    0.5, !- Heating_Control_Throttling_Range
+    Radiant Heating Setpoints, !- Heating_Control_Temperature_Schedule_Name
+    CoolingDesignCapacity, !- Cooling_Design_Capacity_Method
+    , !- Cooling_Design_Capacity_Per_Floor_Area
+    , !- Fraction_of_Autosized_Cooling_Design_Capacity
+    0.5, !- Cooling_Control_Throttling_Range
+    Radiant Cooling Setpoints, !- Cooling_Control_Temperature_Schedule_Name
+    Off, !- Condensation_Control_Type
+    0.0, !- Condensation_Control_Dewpoint_Offset
     ChangeoverSchedE;         !- Changeover delay schedule
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
-    North Zone Radiant Floor,!- Name
-    RadiantSysAvailSched,    !- Availability Schedule Name
-    North Zone,              !- Zone Name
-    Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
-    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-    0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    0.016,                   !- Hydronic Tubing Outside Diameter {m}
-    400.0,                   !- Hydronic Tubing Length {m}
-    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-    MeanAirTemperature,      !- Temperature Control Type
-    ZeroFlowPower,           !- Setpoint Type
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Heating Design Capacity
-    0.00010,                 !- Maximum Hot Water Flow {m3/s}
-    North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-    North Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
-    0.5,                     !- Heating Control Throttling Range {deltaC}
-    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    Autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity
-    0.0015,                  !- Maximum Cold Water Flow {m3/s}
-    Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-    Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-    0.5,                     !- Cooling Control Throttling Range {deltaC}
-    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
-    Off,                        !- Condensation Control Type
-    0.0,                        !- Condensation Control Dewpoint Offset {C}
-    ,                        !- Number of Circuits
-    ,                        !- Circuit Length {m}
+    North Zone Radiant Floor, !- Name
+    North Zone Radiant Floor Design, !- Design_Object_Name
+    RadiantSysAvailSched, !- Availability_Schedule_Name
+    North Zone, !- Zone_Name
+    Zn003:Flr001, !- Surface_Name_or_Radiant_Surface_Group_Name
+    400.0, !- Hydronic_Tubing_Length
+    Autosize, !- Heating_Design_Capacity
+    0.00010, !- Maximum_Hot_Water_Flow
+    North Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
+    North Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
+    Autosize, !- Cooling_Design_Capacity
+    0.0015, !- Maximum_Cold_Water_Flow
+    Zone 3 Cooling Water Inlet Node, !- Cooling_Water_Inlet_Node_Name
+    Zone 3 Cooling Water Outlet Node, !- Cooling_Water_Outlet_Node_Name
+    , !- Number_of_Circuits
+    ;                        !- Circuit Length {m}
+
+  ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
+    North Zone Radiant Floor Design, !- Design_Object_Name
+    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
+    0.012, !- Hydronic_Tubing_Inside_Diameter
+    0.016, !- Hydronic_Tubing_Outside_Diameter
+    0.35, !- Hydronic_Tubing_Conductivity
+    MeanAirTemperature, !- Temperature_Control_Type
+    ZeroFlowPower, !- Setpoint_Control_Type
+    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
+    , !- Heating_Design_Capacity_Per_Floor_Area
+    , !- Fraction_of_Autosized_Heating_Design_Capacity
+    0.5, !- Heating_Control_Throttling_Range
+    Radiant Heating Setpoints, !- Heating_Control_Temperature_Schedule_Name
+    CoolingDesignCapacity, !- Cooling_Design_Capacity_Method
+    , !- Cooling_Design_Capacity_Per_Floor_Area
+    , !- Fraction_of_Autosized_Cooling_Design_Capacity
+    0.5, !- Cooling_Control_Throttling_Range
+    Radiant Cooling Setpoints, !- Cooling_Control_Temperature_Schedule_Name
+    Off, !- Condensation_Control_Type
+    0.0, !- Condensation_Control_Dewpoint_Offset
     ChangeoverSchedN;         !- Changeover delay schedule
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;

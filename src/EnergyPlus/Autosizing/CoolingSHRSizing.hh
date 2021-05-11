@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,20 +52,21 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 struct CoolingSHRSizer : BaseSizer
 {
     CoolingSHRSizer()
     {
         this->sizingType = AutoSizingType::CoolingSHRSizing;
         this->sizingString = "Gross Rated Sensible Heat Ratio";
-
     }
     ~CoolingSHRSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 
-    void updateSizingString();
-
+    void updateSizingString(EnergyPlusData &state);
 };
 
 } // namespace EnergyPlus

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,9 +63,12 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
 
 class IdfParser;
 class Validation;
@@ -186,8 +189,7 @@ public:
 
     const json &getObjectInstances(std::string const &ObjType);
 
-    void clear_state();
-
+    //    void clear_state();
 private:
     friend class EnergyPlusFixture;
     friend class InputProcessorFixture;
@@ -242,7 +244,8 @@ private:
         std::size_t max_extensible_fields = 0;
     };
 
-    MaxFields findMaxFields(EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd);
+    MaxFields findMaxFields(
+        EnergyPlusData &state, json const &ep_object, std::string const &extension_key, json const &legacy_idd, std::size_t const min_fields);
 
     void setObjectItemValue(EnergyPlusData &state,
                             json const &ep_object,
@@ -309,7 +312,16 @@ private:
 
 }; // InputProcessor
 
-extern std::unique_ptr<InputProcessor> inputProcessor;
+struct DataInputProcessing : BaseGlobalStruct
+{
+    std::unique_ptr<InputProcessor> inputProcessor = InputProcessor::factory();
+    void clear_state() override
+    {
+        inputProcessor.reset();
+        inputProcessor = EnergyPlus::InputProcessor::factory();
+    }
+};
+
 } // namespace EnergyPlus
 
 #endif

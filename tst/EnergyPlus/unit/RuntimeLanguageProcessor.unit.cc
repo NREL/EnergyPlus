@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,11 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 
@@ -71,7 +71,7 @@ TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
 
     state->dataRuntimeLang->ErlExpression.allocate(1);
     auto &erlExpression = state->dataRuntimeLang->ErlExpression(1);
-    erlExpression.Operator = DataRuntimeLanguage::FuncExp;
+    erlExpression.Operator = DataRuntimeLanguage::ErlFunc::Exp;
     erlExpression.NumOperands = 1;
     erlExpression.Operand.allocate(1);
 
@@ -113,31 +113,27 @@ TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
 
 TEST_F(EnergyPlusFixture, TestOutOfRangeAlphaFields)
 {
-    std::string const idf_objects = delimited_string({
-        "EnergyManagementSystem:Sensor,",
-        "  EMSSensor,",
-        "  *,",
-        "  Electricity:Facility;",
-        "EnergyManagementSystem:Program,",
-        "  DummyProgram,",
-        "  SET N = EMSSensor;",
-        "EnergyManagementSystem:ProgramCallingManager,",
-        "  DummyManager,",
-        "  BeginTimestepBeforePredictor,",
-        "  DummyProgram;",
-        "EnergyManagementSystem:MeteredOutputVariable,",
-        "  MyLongMeteredOutputVariable,",
-        "  EMSSensor,",
-        "  ZoneTimeStep,",
-        "  ,",
-        "  Electricity,",
-        "  Building,",
-        "  ExteriorEquipment,",
-        "  Transformer,",
-        "  J;"
-    });
+    std::string const idf_objects = delimited_string({"EnergyManagementSystem:Sensor,",
+                                                      "  EMSSensor,",
+                                                      "  *,",
+                                                      "  Electricity:Facility;",
+                                                      "EnergyManagementSystem:Program,",
+                                                      "  DummyProgram,",
+                                                      "  SET N = EMSSensor;",
+                                                      "EnergyManagementSystem:ProgramCallingManager,",
+                                                      "  DummyManager,",
+                                                      "  BeginTimestepBeforePredictor,",
+                                                      "  DummyProgram;",
+                                                      "EnergyManagementSystem:MeteredOutputVariable,",
+                                                      "  MyLongMeteredOutputVariable,",
+                                                      "  EMSSensor,",
+                                                      "  ZoneTimeStep,",
+                                                      "  ,",
+                                                      "  Electricity,",
+                                                      "  Building,",
+                                                      "  ExteriorEquipment,",
+                                                      "  Transformer,",
+                                                      "  J;"});
     ASSERT_TRUE(process_idf(idf_objects));
     RuntimeLanguageProcessor::GetRuntimeLanguageUserInput(*state);
-
-
 }

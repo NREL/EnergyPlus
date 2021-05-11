@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,10 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/FluidProperties.hh>
 
-#include <cmath>
 #include <ctgmath>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -66,9 +65,12 @@ using namespace EnergyPlus::FluidProperties;
 TEST_F(EnergyPlusFixture, FluidProperties_GetDensityGlycol)
 {
 
-    std::string const idf_objects = delimited_string({"FluidProperties:GlycolConcentration,", "  GLHXFluid,       !- Name",
-                                                      "  PropyleneGlycol, !- Glycol Type", "  ,                !- User Defined Glycol Name",
-                                                      "  0.3;             !- Glycol Concentration", " "});
+    std::string const idf_objects = delimited_string({"FluidProperties:GlycolConcentration,",
+                                                      "  GLHXFluid,       !- Name",
+                                                      "  PropyleneGlycol, !- Glycol Type",
+                                                      "  ,                !- User Defined Glycol Name",
+                                                      "  0.3;             !- Glycol Concentration",
+                                                      " "});
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,11 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/TarcogShading.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -69,7 +68,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -82,7 +81,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = VENETBLIND_HORIZ;
+        LayerType(1) = TARCOGLayerType::VENETBLIND_HORIZ;
         Array1D<Real64> const SlatAngle(nlayer, 0);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
@@ -101,7 +100,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -114,7 +113,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = VENETBLIND_VERT;
+        LayerType(1) = TARCOGLayerType::VENETBLIND_VERT;
         Array1D<Real64> const SlatAngle(nlayer, 0);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
@@ -133,7 +132,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -146,7 +145,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlin
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = VENETBLIND_HORIZ;
+        LayerType(1) = TARCOGLayerType::VENETBLIND_HORIZ;
         Array1D<Real64> const SlatAngle(nlayer, 45);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
@@ -165,7 +164,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -178,7 +177,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = VENETBLIND_VERT;
+        LayerType(1) = TARCOGLayerType::VENETBLIND_VERT;
         Array1D<Real64> const SlatAngle(nlayer, 45);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
@@ -197,7 +196,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<TARCOGLayerType> LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -210,7 +209,7 @@ TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
         Array1D<Real64> const Al(nlayer, 0);
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
-        LayerType(1) = DIFFSHADE;
+        LayerType(1) = TARCOGLayerType::DIFFSHADE;
         Array1D<Real64> const SlatAngle(nlayer, 0);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);

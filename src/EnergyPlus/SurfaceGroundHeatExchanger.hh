@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -159,12 +159,15 @@ namespace SurfaceGroundHeatExchanger {
               LoopSideNum(0), BranchNum(0), CompNum(0),
 
               TsrcConstCoef(0.0), TsrcVarCoef(0.0), QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0), NumCTFTerms(0),
-              CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFcross({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFflux({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              CTFSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
               CTFTSourceOut({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              TsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
-              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0),
+              CTFTSourceQ({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              TtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), TsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              QbtmHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QtopHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),
+              QsrcHistory({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), QSrc(0.0), QSrcAvg(0.0), LastQSrc(0.0), LastSysTimeElapsed(0.0),
+              LastTimeStepSys(0.0),
 
               InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0), TopSurfaceTemp(0.0), BtmSurfaceTemp(0.0), TopSurfaceFlux(0.0), BtmSurfaceFlux(0.0),
               HeatTransferRate(0.0), SurfHeatTransferRate(0.0), Energy(0.0), SurfEnergy(0.0), SourceTemp(0.0),
@@ -173,7 +176,11 @@ namespace SurfaceGroundHeatExchanger {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
@@ -224,7 +231,7 @@ namespace SurfaceGroundHeatExchanger {
         //==============================================================================
 
         void CalcTopSurfTemp(Real64 FluxTop,             // top surface flux
-                             Real64 &TempTop,                  // top surface temperature
+                             Real64 &TempTop,            // top surface temperature
                              Real64 ThisDryBulb,         // dry bulb temperature
                              Real64 ThisWetBulb,         // wet bulb temperature
                              Real64 ThisSkyTemp,         // sky temperature
@@ -239,7 +246,7 @@ namespace SurfaceGroundHeatExchanger {
         //==============================================================================
 
         void CalcBottomSurfTemp(Real64 FluxBtm,       // bottom surface flux
-                                Real64 &TempBtm,            // bottom surface temperature
+                                Real64 &TempBtm,      // bottom surface temperature
                                 Real64 ThisDryBulb,   // dry bulb temperature
                                 Real64 ThisWindSpeed, // wind speed
                                 Real64 ThisGroundTemp // ground temperature
@@ -260,16 +267,17 @@ namespace SurfaceGroundHeatExchanger {
 
 } // namespace SurfaceGroundHeatExchanger
 
-struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {
+struct SurfaceGroundHeatExchangersData : BaseGlobalStruct
+{
 
     // utility variables initialized once
     bool NoSurfaceGroundTempObjWarning = true; // This will cause a warning to be issued if no "surface" ground
-    Real64 FlowRate = 0.0;       // water mass flow rate
-    Real64 TopSurfTemp = 0.0;    // Top  surface temperature
-    Real64 BtmSurfTemp = 0.0;    // Bottom  surface temperature
-    Real64 TopSurfFlux = 0.0;    // Top  surface heat flux
-    Real64 BtmSurfFlux = 0.0;    // Bottom  surface heat flux
-    Real64 SourceFlux = 0.0;     // total heat transfer rate, Watts
+    Real64 FlowRate = 0.0;                     // water mass flow rate
+    Real64 TopSurfTemp = 0.0;                  // Top  surface temperature
+    Real64 BtmSurfTemp = 0.0;                  // Bottom  surface temperature
+    Real64 TopSurfFlux = 0.0;                  // Top  surface heat flux
+    Real64 BtmSurfFlux = 0.0;                  // Bottom  surface heat flux
+    Real64 SourceFlux = 0.0;                   // total heat transfer rate, Watts
     Array1D_bool CheckEquipName;
 
     // weather data records updated every zone time step
@@ -293,6 +301,10 @@ struct SurfaceGroundHeatExchangersData : BaseGlobalStruct {
     bool InitializeTempTop = false;
 
     Array1D<SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData> SurfaceGHE;
+    Real64 FluxTop; // top surface flux
+    Real64 FluxBtm; // bottom surface flux
+    Real64 TempBtm; // bottom surface temp
+    Real64 TempTop; // top surface temp
 
     void clear_state() override
     {

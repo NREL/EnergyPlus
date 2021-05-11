@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -89,31 +90,33 @@ namespace Pipes {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
-        void simulate([[maybe_unused]] EnergyPlusData &states, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
+        void simulate([[maybe_unused]] EnergyPlusData &states,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
+        void oneTimeInit(EnergyPlusData &state) override;
+        void initEachEnvironment(EnergyPlusData &state) const;
     };
-
-    // Object Data
-    extern Array1D<LocalPipeData> LocalPipe; // dimension to number of pipes
-
-    // Functions
-    void clear_state();
 
     void GetPipeInput(EnergyPlusData &state);
 
 } // namespace Pipes
 
-    struct PipesData : BaseGlobalStruct {
-        int NumLocalPipes;
-        bool GetPipeInputFlag;
+struct PipesData : BaseGlobalStruct
+{
+    bool GetPipeInputFlag = true;
+    EPVector<Pipes::LocalPipeData> LocalPipe;
+    std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
 
-        PipesData() : NumLocalPipes(0), GetPipeInputFlag(true) {}
-
-        void clear_state() override {
-            NumLocalPipes = 0;
-            GetPipeInputFlag = true;
-        }
-    };
+    void clear_state() override
+    {
+        this->GetPipeInputFlag = true;
+        this->LocalPipe.deallocate();
+        this->LocalPipeUniqueNames.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -137,14 +137,15 @@ namespace ThermalChimney {
     //*****************************************************************************************
 
 } // namespace ThermalChimney
-struct ThermalChimneysData : BaseGlobalStruct {
+struct ThermalChimneysData : BaseGlobalStruct
+{
 
     bool ThermalChimneyGetInputFlag = true;
     int TotThermalChimney = 0; // Total ThermalChimney Statements in input
 
-    Array1D<ThermalChimney::ThermalChimneyData> ThermalChimneySys;
-    Array1D<ThermalChimney::ThermChimZnReportVars> ZnRptThermChim;
-    Array1D<ThermalChimney::ThermChimReportVars> ThermalChimneyReport;
+    EPVector<ThermalChimney::ThermalChimneyData> ThermalChimneySys;
+    EPVector<ThermalChimney::ThermChimZnReportVars> ZnRptThermChim;
+    EPVector<ThermalChimney::ThermChimReportVars> ThermalChimneyReport;
 
     void clear_state() override
     {

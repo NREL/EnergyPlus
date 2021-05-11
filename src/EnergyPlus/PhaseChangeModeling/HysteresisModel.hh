@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -71,8 +71,6 @@ namespace HysteresisPhaseChange {
         static const int CRYSTALLIZED = 2;
     };
 
-    extern int numHysteresisModels;
-
     class HysteresisPhaseChange
     {
 
@@ -136,19 +134,22 @@ namespace HysteresisPhaseChange {
         }
     };
 
-    extern std::vector<HysteresisPhaseChange> hysteresisPhaseChangeModels;
-
     void readAllHysteresisModels(EnergyPlusData &state);
-
-    void clear_state();
 
 } // namespace HysteresisPhaseChange
 
-struct HysteresisPhaseChangeData : BaseGlobalStruct {
+struct HysteresisPhaseChangeData : BaseGlobalStruct
+{
+
+    bool getHysteresisModels = true;
+    int numHysteresisModels = 0;
+    std::vector<HysteresisPhaseChange::HysteresisPhaseChange> hysteresisPhaseChangeModels;
 
     void clear_state() override
     {
-
+        numHysteresisModels = 0;
+        getHysteresisModels = true;
+        hysteresisPhaseChangeModels.clear();
     }
 };
 

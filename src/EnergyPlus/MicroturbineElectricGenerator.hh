@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,11 +64,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace MicroturbineElectricGenerator {
-
-    extern int NumMTGenerators; // number of MT Generators specified in input
-    extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
-
-    void clear_state();
 
     struct MTGeneratorSpecs : PlantComponent
     {
@@ -199,7 +194,11 @@ namespace MicroturbineElectricGenerator {
         {
         }
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void getDesignCapacities(EnergyPlusData &state,
                                  [[maybe_unused]] const PlantLocation &calledFromLocation,
@@ -217,24 +216,29 @@ namespace MicroturbineElectricGenerator {
                                   Real64 MyLoad // Generator demand (W)
         );
 
-        void UpdateMTGeneratorRecords();
+        void UpdateMTGeneratorRecords(EnergyPlusData &state);
 
         void setupOutputVars(EnergyPlusData &state);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
-
     void GetMTGeneratorInput(EnergyPlusData &state);
 
 } // namespace MicroturbineElectricGenerator
 
-struct MicroturbineElectricGeneratorData : BaseGlobalStruct {
+struct MicroturbineElectricGeneratorData : BaseGlobalStruct
+{
+
+    int NumMTGenerators = 0;
+    bool GetMTInput = true;
+    EPVector<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
 
     void clear_state() override
     {
-
+        this->NumMTGenerators = 0;
+        this->GetMTInput = true;
+        this->MTGenerator.clear();
     }
 };
 

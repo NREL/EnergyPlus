@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 
 namespace EnergyPlus {
@@ -61,10 +62,10 @@ class SQLiteFixture : public EnergyPlusFixture
 {
 
 protected:
-    static void SetUpTestCase()
-    {
-        EnergyPlusFixture::SetUpTestCase();
-    }
+    //    static void SetUpTestCase()
+    //    {
+    //        EnergyPlusFixture::SetUpTestCase();
+    //    }
     static void TearDownTestCase()
     {
     }
@@ -80,10 +81,11 @@ protected:
         std::string sql_filepath(":memory:");
         // Alternatively, when debugging a test, change outpath to the location on disk so you can query the database manually after test ran
         // std::string sql_filepath("/path/on/disk/to/eplusout.sql");
-        ASSERT_NO_THROW(EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite(ss, sql_filepath, "std::ostringstream", true, true)));
-        ASSERT_TRUE(EnergyPlus::sqlite->writeOutputToSQLite());
-        ASSERT_TRUE(EnergyPlus::sqlite->writeTabularDataToSQLite());
-        EnergyPlus::sqlite->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
+        ASSERT_NO_THROW(state->dataSQLiteProcedures->sqlite =
+                            std::unique_ptr<SQLite>(new SQLite(ss, sql_filepath, "std::ostringstream", true, true)));
+        ASSERT_TRUE(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite());
+        ASSERT_TRUE(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite());
+        state->dataSQLiteProcedures->sqlite->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
         EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss->str());
         ss->str(std::string());
     }
@@ -96,27 +98,27 @@ protected:
     void resetDatabase()
     {
         ss = std::make_shared<std::ostringstream>();
-        ASSERT_NO_THROW(EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite(ss, ":memory:", "std::ostringstream", true, true)));
-        ASSERT_TRUE(EnergyPlus::sqlite->writeOutputToSQLite());
-        ASSERT_TRUE(EnergyPlus::sqlite->writeTabularDataToSQLite());
-        EnergyPlus::sqlite->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
+        ASSERT_NO_THROW(state->dataSQLiteProcedures->sqlite = std::unique_ptr<SQLite>(new SQLite(ss, ":memory:", "std::ostringstream", true, true)));
+        ASSERT_TRUE(state->dataSQLiteProcedures->sqlite->writeOutputToSQLite());
+        ASSERT_TRUE(state->dataSQLiteProcedures->sqlite->writeTabularDataToSQLite());
+        state->dataSQLiteProcedures->sqlite->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
         EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss->str());
         ss->str(std::string());
     }
 
     std::string storageType(const int storageTypeIndex)
     {
-        return EnergyPlus::sqlite->storageType(storageTypeIndex);
+        return state->dataSQLiteProcedures->sqlite->storageType(storageTypeIndex);
     }
 
     std::string timestepTypeName(const int timestepType)
     {
-        return EnergyPlus::sqlite->timestepTypeName(timestepType);
+        return state->dataSQLiteProcedures->sqlite->timestepTypeName(timestepType);
     }
 
     std::string reportingFreqName(const int reportingFreqIndex)
     {
-        return EnergyPlus::sqlite->reportingFreqName(reportingFreqIndex);
+        return state->dataSQLiteProcedures->sqlite->reportingFreqName(reportingFreqIndex);
     }
 
     std::string columnText(const unsigned char *column)
@@ -126,12 +128,12 @@ protected:
 
     int logicalToInteger(const bool value)
     {
-        return EnergyPlus::sqlite->logicalToInteger(value);
+        return state->dataSQLiteProcedures->sqlite->logicalToInteger(value);
     }
 
     void adjustReportingHourAndMinutes(int &hour, int &minutes)
     {
-        EnergyPlus::sqlite->adjustReportingHourAndMinutes(hour, minutes);
+        state->dataSQLiteProcedures->sqlite->adjustReportingHourAndMinutes(hour, minutes);
     }
 
     bool indexExists(const std::string &indexName)
@@ -139,7 +141,7 @@ protected:
         sqlite3_stmt *sqlStmtPtr;
         std::string sql("pragma index_info(" + indexName + ");");
         bool success = false;
-        int rc = sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
+        int rc = sqlite3_prepare_v2(state->dataSQLiteProcedures->sqlite->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
         if (SQLITE_OK != rc) {
             sqlite3_finalize(sqlStmtPtr);
             return success;
@@ -155,7 +157,7 @@ protected:
     {
         sqlite3_stmt *sqlStmtPtr;
         std::string sql("pragma table_info(" + tableName + ");");
-        int rc = sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
+        int rc = sqlite3_prepare_v2(state->dataSQLiteProcedures->sqlite->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
         if (SQLITE_OK != rc) {
             sqlite3_finalize(sqlStmtPtr);
             return -1;
@@ -177,7 +179,7 @@ protected:
 
         sqlite3_stmt *sqlStmtPtr;
 
-        sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
+        sqlite3_prepare_v2(state->dataSQLiteProcedures->sqlite->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
         while (SQLITE_ROW == sqlite3_step(sqlStmtPtr)) {
             std::vector<std::string> valueVector;
             for (int i = 0; i < rowCount; ++i) {
@@ -195,18 +197,18 @@ protected:
     }
 
     // Helper method that will return the first double it finds, or -10000.0 if not found (abritrarily chosen value)
-    Real64 execAndReturnFirstDouble(const std::string& statement) {
+    Real64 execAndReturnFirstDouble(const std::string &statement)
+    {
 
         Real64 result(-10000.0);
 
-        sqlite3_stmt* sqlStmtPtr;
+        sqlite3_stmt *sqlStmtPtr;
 
-        int code = sqlite3_prepare_v2(EnergyPlus::sqlite->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
+        int code = sqlite3_prepare_v2(state->dataSQLiteProcedures->sqlite->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
 
         code = sqlite3_step(sqlStmtPtr);
-        if (code == SQLITE_ROW)
-        {
-          result = sqlite3_column_double(sqlStmtPtr, 0);
+        if (code == SQLITE_ROW) {
+            result = sqlite3_column_double(sqlStmtPtr, 0);
         }
 
         // must finalize to prevent memory leaks

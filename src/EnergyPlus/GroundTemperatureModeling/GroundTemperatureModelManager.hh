@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,32 +64,30 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
+class BaseGroundTempsModel;
 
 namespace GroundTemperatureManager {
 
-    extern int const objectType_KusudaGroundTemp;
-    extern int const objectType_FiniteDiffGroundTemp;
-    extern int const objectType_SiteBuildingSurfaceGroundTemp;
-    extern int const objectType_SiteShallowGroundTemp;
-    extern int const objectType_SiteDeepGroundTemp;
-    extern int const objectType_SiteFCFactorMethodGroundTemp;
-    extern int const objectType_XingGroundTemp;
-
-    extern Array1D_string const CurrentModuleObjects;
-
-    extern std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
-
     std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &type, std::string const &name);
-
-    void clear_state();
 
 } // namespace GroundTemperatureManager
 
-struct GroundTemperatureManagerData : BaseGlobalStruct {
+struct GroundTemperatureManagerData : BaseGlobalStruct
+{
+    Array1D_string const CurrentModuleObjects = Array1D_string({0, 6},
+                                                               {"Site:GroundTemperature:Undisturbed:KusudaAchenbach",
+                                                                "Site:GroundTemperature:Undisturbed:FiniteDifference",
+                                                                "Site:GroundTemperature:BuildingSurface",
+                                                                "Site:GroundTemperature:Shallow",
+                                                                "Site:GroundTemperature:Deep",
+                                                                "Site:GroundTemperature:FCfactorMethod",
+                                                                "Site:GroundTemperature:Undisturbed:Xing"});
+
+    std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 
     void clear_state() override
     {
-
+        this->groundTempModels.clear();
     }
 };
 

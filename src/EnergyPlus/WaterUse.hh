@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -227,7 +227,11 @@ namespace WaterUse {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void InitConnections(EnergyPlusData &state);
 
@@ -237,7 +241,7 @@ namespace WaterUse {
 
         void CalcConnectionsHeatRecovery(EnergyPlusData &state);
 
-        void UpdateWaterConnections();
+        void UpdateWaterConnections(EnergyPlusData &state);
 
         void ReportWaterUse(EnergyPlusData &state);
 
@@ -254,32 +258,33 @@ namespace WaterUse {
 
 } // namespace WaterUse
 
-    struct WaterUseData : BaseGlobalStruct {
+struct WaterUseData : BaseGlobalStruct
+{
 
-        int numWaterEquipment;
-        int numWaterConnections;
-        bool getWaterUseInputFlag;
-        bool MyEnvrnFlagLocal;
-        Array1D_bool CheckEquipName;
-        Array1D<WaterUse::WaterEquipmentType> WaterEquipment;
-        Array1D<WaterUse::WaterConnectionsType> WaterConnections;
+    int numWaterEquipment;
+    int numWaterConnections;
+    bool getWaterUseInputFlag;
+    bool MyEnvrnFlagLocal;
+    Array1D_bool CheckEquipName;
+    Array1D<WaterUse::WaterEquipmentType> WaterEquipment;
+    EPVector<WaterUse::WaterConnectionsType> WaterConnections;
 
-        void clear_state() override
-        {
-            this->numWaterEquipment = 0;
-            this->numWaterConnections = 0;
-            this->getWaterUseInputFlag = true;
-            this->MyEnvrnFlagLocal = true;
-            this->CheckEquipName.deallocate();
-            this->WaterEquipment.deallocate();
-            this->WaterConnections.deallocate();
-        }
+    void clear_state() override
+    {
+        this->numWaterEquipment = 0;
+        this->numWaterConnections = 0;
+        this->getWaterUseInputFlag = true;
+        this->MyEnvrnFlagLocal = true;
+        this->CheckEquipName.deallocate();
+        this->WaterEquipment.deallocate();
+        this->WaterConnections.deallocate();
+    }
 
-        // Default Constructor
-        WaterUseData() : numWaterEquipment(0), numWaterConnections(0), getWaterUseInputFlag(true), MyEnvrnFlagLocal(true)
-        {
-        }
-    };
+    // Default Constructor
+    WaterUseData() : numWaterEquipment(0), numWaterConnections(0), getWaterUseInputFlag(true), MyEnvrnFlagLocal(true)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

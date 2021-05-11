@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -999,17 +999,16 @@ private:
     std::vector<std::unique_ptr<SQLite::RoomAirModel>> roomAirModels;
 };
 
-extern std::unique_ptr<SQLite> sqlite;
-
 std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 
 void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
 
-struct SQLiteProceduresData : BaseGlobalStruct {
-
+struct SQLiteProceduresData : BaseGlobalStruct
+{
+    std::unique_ptr<SQLite> sqlite;
     void clear_state() override
     {
-
+        sqlite.reset(); // probably not necessary, as it is recreated in ManageSimulation, but it should be fine to delete it here
     }
 };
 

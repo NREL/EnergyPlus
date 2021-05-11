@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -85,7 +86,7 @@ namespace AirLoopHVACDOAS {
         ~AirLoopMixer() = default; // destructor
 
         static void getAirLoopMixer(EnergyPlusData &state);
-        void CalcAirLoopMixer();
+        void CalcAirLoopMixer(EnergyPlusData &state);
     };
 
     struct AirLoopSplitter
@@ -107,7 +108,7 @@ namespace AirLoopHVACDOAS {
         ~AirLoopSplitter() = default; // destructor
 
         static void getAirLoopSplitter(EnergyPlusData &state);
-        void CalcAirLoopSplitter(Real64 Temp, Real64 Humrat);
+        void CalcAirLoopSplitter(EnergyPlusData &state, Real64 Temp, Real64 Humrat);
     };
 
     struct AirLoopDOAS
@@ -207,27 +208,30 @@ namespace AirLoopHVACDOAS {
 
 } // namespace AirLoopHVACDOAS
 
-    struct AirLoopHVACDOASData : BaseGlobalStruct
+struct AirLoopHVACDOASData : BaseGlobalStruct
+{
+    bool GetInputOnceFlag = true;
+    bool getAirLoopMixerInputOnceFlag = true;
+    bool getAirLoopSplitterInputOnceFlag = true;
+    int numAirLoopDOAS = 0;
+    std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
+    std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
+    std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
+    bool SummerDesignDayFlag = true;
+    bool WinterDesignDayFlag = true;
+    void clear_state() override
     {
-        bool GetInputOnceFlag = true;
-        bool getAirLoopMixerInputOnceFlag = true;
-        bool getAirLoopSplitterInputOnceFlag = true;
-        int numAirLoopDOAS = 0;
-        std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
-        std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
-        std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
-
-        void clear_state() override
-        {
-            this->GetInputOnceFlag = true;
-            this->getAirLoopMixerInputOnceFlag = true;
-            this->getAirLoopSplitterInputOnceFlag = true;
-            this->numAirLoopDOAS = 0;
-            this->airloopDOAS.clear();
-            this->airloopMixer.clear();
-            this->airloopSplitter.clear();
-        }
-    };
+        this->GetInputOnceFlag = true;
+        this->getAirLoopMixerInputOnceFlag = true;
+        this->getAirLoopSplitterInputOnceFlag = true;
+        this->numAirLoopDOAS = 0;
+        this->airloopDOAS.clear();
+        this->airloopMixer.clear();
+        this->airloopSplitter.clear();
+        this->SummerDesignDayFlag = true;
+        this->WinterDesignDayFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 #endif // ENERGYPLUS_AIRLOOPHVACDOAS_HH

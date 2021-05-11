@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -90,7 +90,7 @@ bool SurfaceOctreeCube::contains(Surface const &surface) const
 }
 
 // Surfaces Outer Cube Initilization
-void SurfaceOctreeCube::init(Array1D<Surface> &surfaces)
+void SurfaceOctreeCube::init(EPVector<Surface> &surfaces)
 {
     assert(d_ == 0u);
     assert(n_ == 0u);
@@ -237,8 +237,5 @@ bool SurfaceOctreeCube::contains(Vertex const &l, Vertex const &u, Surface const
 // Static Data Member Definitions
 std::uint8_t const SurfaceOctreeCube::maxDepth_ = 255u;                   // Max tree depth
 SurfaceOctreeCube::size_type const SurfaceOctreeCube::maxSurfaces_ = 10u; // Max surfaces in a cube before subdividing
-
-// Globals
-SurfaceOctreeCube surfaceOctree;
 
 } // namespace EnergyPlus

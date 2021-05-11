@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,8 +72,6 @@ namespace HVACDuct {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumDucts;
-    extern Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
 
@@ -95,14 +93,11 @@ namespace HVACDuct {
     };
 
     // Object Data
-    extern Array1D<DuctData> Duct;
-
-    void clear_state();
 
     void SimDuct(EnergyPlusData &state,
-                 std::string const &CompName,   // name of the duct component
-                 bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep !unused1208
-                 int &CompIndex                 // index of duct component
+                 std::string const &CompName, // name of the duct component
+                 bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep !unused1208
+                 int &CompIndex               // index of duct component
     );
 
     void GetDuctInput(EnergyPlusData &state);
@@ -117,11 +112,20 @@ namespace HVACDuct {
 
 } // namespace HVACDuct
 
-struct HVACDuctData : BaseGlobalStruct {
+struct HVACDuctData : BaseGlobalStruct
+{
+
+    int NumDucts = 0;
+    Array1D_bool CheckEquipName;
+    Array1D<HVACDuct::DuctData> Duct;
+    bool GetInputFlag = true; // First time, input is "gotten"
 
     void clear_state() override
     {
-
+        NumDucts = 0;
+        CheckEquipName.clear();
+        Duct.clear();
+        GetInputFlag = true; // First time, input is "gotten"
     }
 };
 

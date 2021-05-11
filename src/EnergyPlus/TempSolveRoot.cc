@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -89,27 +89,11 @@ namespace TempSolveRoot {
 
     // Using/Aliasing
     using DataHVACGlobals::Bisection;
-    using DataHVACGlobals::HVACSystemRootFinding;
 
     // Data
     // This module should not contain variables in the module sense as it is
     // intended strictly to provide "interfaces" to routines used by other
     // parts of the simulation.
-
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE General
-    // PUBLIC  SaveCompDesWaterFlow
-    // PUBLIC  ErfFunction
 
     // Functions
 
@@ -119,8 +103,8 @@ namespace TempSolveRoot {
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
                    std::function<Real64(EnergyPlusData &state, Real64 const, Array1D<Real64> const &)> f,
-                   Real64 const X_0,         // 1st bound of interval that contains the solution
-                   Real64 const X_1,         // 2nd bound of interval that contains the solution
+                   Real64 const X_0,          // 1st bound of interval that contains the solution
+                   Real64 const X_1,          // 2nd bound of interval that contains the solution
                    Array1D<Real64> const &Par // array with additional parameters used for function evaluation
     )
     {
@@ -202,7 +186,7 @@ namespace TempSolveRoot {
                 break;
             }
             // new estimation
-            switch (HVACSystemRootFinding.HVACSystemRootSolver) {
+            switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
                 XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 break;
@@ -212,7 +196,7 @@ namespace TempSolveRoot {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-                if (NIte > HVACSystemRootFinding.NumOfIter) {
+                if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -220,7 +204,7 @@ namespace TempSolveRoot {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-                if (NIte <= HVACSystemRootFinding.NumOfIter) {
+                if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -228,9 +212,9 @@ namespace TempSolveRoot {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-                if (AltIte > HVACSystemRootFinding.NumOfIter) {
+                if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
-                    if (AltIte >= 2 * HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                    if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
@@ -296,8 +280,8 @@ namespace TempSolveRoot {
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
                    std::function<Real64(EnergyPlusData &state, Real64 const, std::vector<Real64> const &)> f,
-                   Real64 const X_0,         // 1st bound of interval that contains the solution
-                   Real64 const X_1,         // 2nd bound of interval that contains the solution
+                   Real64 const X_0,              // 1st bound of interval that contains the solution
+                   Real64 const X_1,              // 2nd bound of interval that contains the solution
                    std::vector<Real64> const &Par // array with additional parameters used for function evaluation
     )
     {
@@ -379,7 +363,7 @@ namespace TempSolveRoot {
                 break;
             }
             // new estimation
-            switch (HVACSystemRootFinding.HVACSystemRootSolver) {
+            switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
                 XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 break;
@@ -389,7 +373,7 @@ namespace TempSolveRoot {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-                if (NIte > HVACSystemRootFinding.NumOfIter) {
+                if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -397,7 +381,7 @@ namespace TempSolveRoot {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-                if (NIte <= HVACSystemRootFinding.NumOfIter) {
+                if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -405,9 +389,9 @@ namespace TempSolveRoot {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-                if (AltIte > HVACSystemRootFinding.NumOfIter) {
+                if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
-                    if (AltIte >= 2 * HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                    if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
@@ -475,7 +459,7 @@ namespace TempSolveRoot {
                    std::function<Real64(EnergyPlusData &state, Real64 const, Array1D<Real64> const &)> f,
                    Real64 const X_0,           // 1st bound of interval that contains the solution
                    Real64 const X_1,           // 2nd bound of interval that contains the solution
-                   Array1D<Real64> const &Par,  // array with additional parameters used for function evaluation
+                   Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
                    int const AlgorithmTypeNum, // ALgorithm selection
                    Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
@@ -702,7 +686,7 @@ namespace TempSolveRoot {
                 break;
             }
             // new estimation
-            switch (HVACSystemRootFinding.HVACSystemRootSolver) {
+            switch (state.dataHVACGlobal->HVACSystemRootFinding.HVACSystemRootSolver) {
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi: {
                 XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 break;
@@ -712,7 +696,7 @@ namespace TempSolveRoot {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection: {
-                if (NIte > HVACSystemRootFinding.NumOfIter) {
+                if (NIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -720,7 +704,7 @@ namespace TempSolveRoot {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi: {
-                if (NIte <= HVACSystemRootFinding.NumOfIter) {
+                if (NIte <= state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
@@ -728,9 +712,9 @@ namespace TempSolveRoot {
                 break;
             }
             case DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation: {
-                if (AltIte > HVACSystemRootFinding.NumOfIter) {
+                if (AltIte > state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) {
                     XTemp = (X1 + X0) / 2.0;
-                    if (AltIte >= 2 * HVACSystemRootFinding.NumOfIter) AltIte = 0;
+                    if (AltIte >= 2 * state.dataHVACGlobal->HVACSystemRootFinding.NumOfIter) AltIte = 0;
                 } else {
                     XTemp = (Y0 * X1 - Y1 * X0) / DY;
                 }
@@ -790,152 +774,152 @@ namespace TempSolveRoot {
         XRes = XTemp;
     }
 
-/*
-    void SolveRoot(Real64 const Eps, // required absolute accuracy
-                   int const MaxIte, // maximum number of allowed iterations
-                   int &Flag,        // integer storing exit status
-                   Real64 &XRes,     // value of x that solves f(x) = 0
-                   std::function<Real64(Real64 const)> f,
-                   Real64 const X_0,           // 1st bound of interval that contains the solution
-                   Real64 const X_1,           // 2nd bound of interval that contains the solution
-                   int const AlgorithmTypeNum, // ALgorithm selection
-                   Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
-                   Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
-    )
-    {
+    /*
+        void SolveRoot(Real64 const Eps, // required absolute accuracy
+                       int const MaxIte, // maximum number of allowed iterations
+                       int &Flag,        // integer storing exit status
+                       Real64 &XRes,     // value of x that solves f(x) = 0
+                       std::function<Real64(Real64 const)> f,
+                       Real64 const X_0,           // 1st bound of interval that contains the solution
+                       Real64 const X_1,           // 2nd bound of interval that contains the solution
+                       int const AlgorithmTypeNum, // ALgorithm selection
+                       Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
+                       Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
+        )
+        {
 
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Michael Wetter
-        //       DATE WRITTEN   March 1999
-        //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
-        //                      L. Gu, May 2017 - selcte an algorithm and output both bounds
-        //       RE-ENGINEERED  na
+            // SUBROUTINE INFORMATION:
+            //       AUTHOR         Michael Wetter
+            //       DATE WRITTEN   March 1999
+            //       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+            //                      L. Gu, May 2017 - selcte an algorithm and output both bounds
+            //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // Find the value of x between x0 and x1 such that f(x)
-        // is equal to zero.
+            // PURPOSE OF THIS SUBROUTINE:
+            // Find the value of x between x0 and x1 such that f(x)
+            // is equal to zero.
 
-        // METHODOLOGY EMPLOYED:
-        // Uses the Regula Falsi (false position) method (similar to secant method)
+            // METHODOLOGY EMPLOYED:
+            // Uses the Regula Falsi (false position) method (similar to secant method)
 
-        // REFERENCES:
-        // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
-        // 2nd edition, 1992. Page 347 ff.
+            // REFERENCES:
+            // See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+            // 2nd edition, 1992. Page 347 ff.
 
-        // USE STATEMENTS:
-        // na
+            // USE STATEMENTS:
+            // na
 
-        // Argument array dimensioning
+            // Argument array dimensioning
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // = -2: f(x0) and f(x1) have the same sign
-        // = -1: no convergence
-        // >  0: number of iterations performed
-        // optional
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SMALL(1.e-10);
+            // Locals
+            // SUBROUTINE ARGUMENT DEFINITIONS:
+            // = -2: f(x0) and f(x1) have the same sign
+            // = -1: no convergence
+            // >  0: number of iterations performed
+            // optional
+            // SUBROUTINE PARAMETER DEFINITIONS:
+            Real64 const SMALL(1.e-10);
 
-        // INTERFACE BLOCK SPECIFICATIONS
+            // INTERFACE BLOCK SPECIFICATIONS
 
-        // DERIVED TYPE DEFINITIONS
-        // na
+            // DERIVED TYPE DEFINITIONS
+            // na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 X0;       // present 1st bound
-        Real64 X1;       // present 2nd bound
-        Real64 XTemp;    // new estimate
-        Real64 Y0;       // f at X0
-        Real64 Y1;       // f at X1
-        Real64 YTemp;    // f at XTemp
-        Real64 DY;       // DY = Y0 - Y1
-        bool Conv;       // flag, true if convergence is achieved
-        bool StopMaxIte; // stop due to exceeding of maximum # of iterations
-        bool Cont;       // flag, if true, continue searching
-        int NIte;        // number of interations
+            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+            Real64 X0;       // present 1st bound
+            Real64 X1;       // present 2nd bound
+            Real64 XTemp;    // new estimate
+            Real64 Y0;       // f at X0
+            Real64 Y1;       // f at X1
+            Real64 YTemp;    // f at XTemp
+            Real64 DY;       // DY = Y0 - Y1
+            bool Conv;       // flag, true if convergence is achieved
+            bool StopMaxIte; // stop due to exceeding of maximum # of iterations
+            bool Cont;       // flag, if true, continue searching
+            int NIte;        // number of interations
 
-        X0 = X_0;
-        X1 = X_1;
-        XTemp = X0;
-        Conv = false;
-        StopMaxIte = false;
-        Cont = true;
-        NIte = 0;
+            X0 = X_0;
+            X1 = X_1;
+            XTemp = X0;
+            Conv = false;
+            StopMaxIte = false;
+            Cont = true;
+            NIte = 0;
 
-        Y0 = f(X0);
-        Y1 = f(X1);
-        // check initial values
-        if (Y0 * Y1 > 0) {
-            Flag = -2;
-            XRes = X0;
-            return;
-        }
-
-        while (Cont) {
-
-            DY = Y0 - Y1;
-            if (std::abs(DY) < SMALL) DY = SMALL;
-            if (std::abs(X1 - X0) < SMALL) {
-                break;
-            }
-            // new estimation
-            if (AlgorithmTypeNum == Bisection) {
-                // Bisection
-                XTemp = (X1 + X0) / 2.0;
-            } else {
-                // Regula Falsi
-                XTemp = (Y0 * X1 - Y1 * X0) / DY;
-            }
-            YTemp = f(XTemp);
-
-            ++NIte;
-
-            // check convergence
-            if (std::abs(YTemp) < Eps) Conv = true;
-
-            if (NIte > MaxIte) StopMaxIte = true;
-
-            if ((!Conv) && (!StopMaxIte)) {
-                Cont = true;
-            } else {
-                Cont = false;
+            Y0 = f(X0);
+            Y1 = f(X1);
+            // check initial values
+            if (Y0 * Y1 > 0) {
+                Flag = -2;
+                XRes = X0;
+                return;
             }
 
-            if (Cont) {
+            while (Cont) {
 
-                // reassign values (only if further iteration required)
-                if (Y0 < 0.0) {
-                    if (YTemp < 0.0) {
-                        X0 = XTemp;
-                        Y0 = YTemp;
-                    } else {
-                        X1 = XTemp;
-                        Y1 = YTemp;
-                    }
+                DY = Y0 - Y1;
+                if (std::abs(DY) < SMALL) DY = SMALL;
+                if (std::abs(X1 - X0) < SMALL) {
+                    break;
+                }
+                // new estimation
+                if (AlgorithmTypeNum == Bisection) {
+                    // Bisection
+                    XTemp = (X1 + X0) / 2.0;
                 } else {
-                    if (YTemp < 0.0) {
-                        X1 = XTemp;
-                        Y1 = YTemp;
+                    // Regula Falsi
+                    XTemp = (Y0 * X1 - Y1 * X0) / DY;
+                }
+                YTemp = f(XTemp);
+
+                ++NIte;
+
+                // check convergence
+                if (std::abs(YTemp) < Eps) Conv = true;
+
+                if (NIte > MaxIte) StopMaxIte = true;
+
+                if ((!Conv) && (!StopMaxIte)) {
+                    Cont = true;
+                } else {
+                    Cont = false;
+                }
+
+                if (Cont) {
+
+                    // reassign values (only if further iteration required)
+                    if (Y0 < 0.0) {
+                        if (YTemp < 0.0) {
+                            X0 = XTemp;
+                            Y0 = YTemp;
+                        } else {
+                            X1 = XTemp;
+                            Y1 = YTemp;
+                        }
                     } else {
-                        X0 = XTemp;
-                        Y0 = YTemp;
-                    }
-                } // ( Y0 < 0 )
+                        if (YTemp < 0.0) {
+                            X1 = XTemp;
+                            Y1 = YTemp;
+                        } else {
+                            X0 = XTemp;
+                            Y0 = YTemp;
+                        }
+                    } // ( Y0 < 0 )
 
-            } // (Cont)
+                } // (Cont)
 
-        } // Cont
+            } // Cont
 
-        if (Conv) {
-            Flag = NIte;
-        } else {
-            Flag = -1;
+            if (Conv) {
+                Flag = NIte;
+            } else {
+                Flag = -1;
+            }
+            XRes = XTemp;
+            XX_0 = X0;
+            XX_1 = X1;
         }
-        XRes = XTemp;
-        XX_0 = X0;
-        XX_1 = X1;
-    }
-*/
-} // namespace General
+    */
+} // namespace TempSolveRoot
 
 } // namespace EnergyPlus

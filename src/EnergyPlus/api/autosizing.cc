@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,12 +45,13 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/api/autosizing.h>
-#include <EnergyPlus/api/state.h>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/api/autosizing.h>
+#include <EnergyPlus/api/state.h>
 
-char * sizerGetLastErrorMessages(Sizer sizer) {
+char *sizerGetLastErrorMessages(Sizer sizer)
+{
     auto s = reinterpret_cast<EnergyPlus::BaseSizer *>(sizer);
     std::string const msg = s->getLastErrorMessages();
     // note that we cannot just return a c_str to the local string, as the string will be destructed upon leaving
@@ -61,16 +62,17 @@ char * sizerGetLastErrorMessages(Sizer sizer) {
     return p;
 }
 
-Sizer sizerHeatingAirflowUANew() {
+Sizer sizerHeatingAirflowUANew()
+{
     auto sizer = new EnergyPlus::HeatingAirflowUASizer();
     return reinterpret_cast<Sizer>(sizer);
 }
-void sizerHeatingAirflowUADelete(Sizer sizer) {
+void sizerHeatingAirflowUADelete(Sizer sizer)
+{
     delete reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
 }
 void sizerHeatingAirflowUAInitializeForZone(
-    EnergyPlusState, Sizer sizer, HeatingAirflowUAZoneConfigType zoneConfig, Real64 elevation, Real64 representativeFlowRate, Real64 reheatMultiplier
-)
+    EnergyPlusState, Sizer sizer, HeatingAirflowUAZoneConfigType zoneConfig, Real64 elevation, Real64 representativeFlowRate, Real64 reheatMultiplier)
 {
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     switch (zoneConfig) {
@@ -112,7 +114,8 @@ void sizerHeatingAirflowUAInitializeForSystem(EnergyPlusState,
         break;
     }
 }
-int sizerHeatingAirflowUASize(EnergyPlusState state, Sizer sizer) {
+int sizerHeatingAirflowUASize(EnergyPlusState state, Sizer sizer)
+{
     auto s = reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer);
     auto st = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     bool errorsFound = false;
@@ -122,6 +125,7 @@ int sizerHeatingAirflowUASize(EnergyPlusState state, Sizer sizer) {
     }
     return 0;
 }
-Real64 sizerHeatingAirflowUAValue(Sizer sizer) {
+Real64 sizerHeatingAirflowUAValue(Sizer sizer)
+{
     return reinterpret_cast<EnergyPlus::HeatingAirflowUASizer *>(sizer)->autoSizedValue;
 }

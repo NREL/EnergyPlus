@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,7 +102,8 @@ namespace DataConvergParams {
 
     constexpr int ConvergLogStackDepth(10);
 
-    enum class iCalledFrom {
+    enum class iCalledFrom
+    {
         AirSystemDemandSide,
         AirSystemSupplySideDeck1,
         AirSystemSupplySideDeck2
@@ -209,16 +210,17 @@ namespace DataConvergParams {
 
 } // namespace DataConvergParams
 
-struct ConvergParamsData : BaseGlobalStruct {
+struct ConvergParamsData : BaseGlobalStruct
+{
 
     int AirLoopConvergFail = 0;
 
-    Real64 MinTimeStepSys = (1.0 / 60.0);       // =1 minute
-    Real64 MinTimeStepTol = 1.0e-4;             // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
-    Real64 MaxZoneTempDiff = 0.3;               // 0.3 C = (1% OF 300 C) = max allowable difference between
-    int MaxIter = 20;                           // maximum number of iterations allowed
-    int MaxPlantSubIterations = 8;              // Iteration Max for Plant Simulation sub iterations
-    int MinPlantSubIterations = 2;              // Iteration Min for Plant Simulation sub iterations
+    Real64 MinTimeStepSys = (1.0 / 60.0); // =1 minute
+    Real64 MinTimeStepTol = 1.0e-4;       // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
+    Real64 MaxZoneTempDiff = 0.3;         // 0.3 C = (1% OF 300 C) = max allowable difference between
+    int MaxIter = 20;                     // maximum number of iterations allowed
+    int MaxPlantSubIterations = 8;        // Iteration Max for Plant Simulation sub iterations
+    int MinPlantSubIterations = 2;        // Iteration Min for Plant Simulation sub iterations
 
     // Object Data
     Array1D<DataConvergParams::HVACZoneInletConvergenceStruct> ZoneInletConvergence;
@@ -228,12 +230,12 @@ struct ConvergParamsData : BaseGlobalStruct {
     void clear_state() override
     {
         this->AirLoopConvergFail = 0;
-        this->MinTimeStepSys = (1.0 / 60.0);        // =1 minute
-        this->MinTimeStepTol = 1.0e-4;              // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
-        this->MaxZoneTempDiff = 0.3;                // 0.3 C = (1% OF 300 C) = max allowable difference between
-        this->MaxIter = 20;                         // maximum number of iterations allowed
-        this->MaxPlantSubIterations = 8;            // Iteration Max for Plant Simulation sub iterations
-        this->MinPlantSubIterations = 2;            // Iteration Min for Plant Simulation sub iterations
+        this->MinTimeStepSys = (1.0 / 60.0); // =1 minute
+        this->MinTimeStepTol = 1.0e-4;       // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
+        this->MaxZoneTempDiff = 0.3;         // 0.3 C = (1% OF 300 C) = max allowable difference between
+        this->MaxIter = 20;                  // maximum number of iterations allowed
+        this->MaxPlantSubIterations = 8;     // Iteration Max for Plant Simulation sub iterations
+        this->MinPlantSubIterations = 2;     // Iteration Min for Plant Simulation sub iterations
         this->ZoneInletConvergence.deallocate();
         this->AirLoopConvergence.deallocate();
         this->PlantConvergence.deallocate();

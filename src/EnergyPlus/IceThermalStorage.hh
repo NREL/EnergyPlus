@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -63,15 +64,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace IceThermalStorage {
-
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cIceStorageSimple;
-    extern std::string const cIceStorageDetailed;
-
-    // ITS numbers and FoundOrNot
-    extern int NumSimpleIceStorage;
-    extern int NumDetailedIceStorage;
-    extern int TotalNumIceStorage;
 
     enum class IceStorageType
     {
@@ -101,14 +93,14 @@ namespace IceThermalStorage {
 
     struct SimpleIceStorageData : PlantComponent
     {
-        std::string Name;     // User identifier
-        std::string ITSType;  // Ice Thermal Storage Type
-        enum ITSType ITSType_Num;      // Storage Type as number (IceOnCoilInternal,IceOnCoilExternal)
-        int MapNum;           // Number to Map structure
-        int UratePtr;         // Charging/Discharging SchedulePtr: u value schedule
-        Real64 ITSNomCap;     // Design nominal capacity of Ice Thermal Storage [J] (user input in GJ)
-        int PltInletNodeNum;  // Node number on the inlet side of the plant
-        int PltOutletNodeNum; // Node number on the outlet side of the plant
+        std::string Name;         // User identifier
+        std::string ITSType;      // Ice Thermal Storage Type
+        enum ITSType ITSType_Num; // Storage Type as number (IceOnCoilInternal,IceOnCoilExternal)
+        int MapNum;               // Number to Map structure
+        int UratePtr;             // Charging/Discharging SchedulePtr: u value schedule
+        Real64 ITSNomCap;         // Design nominal capacity of Ice Thermal Storage [J] (user input in GJ)
+        int PltInletNodeNum;      // Node number on the inlet side of the plant
+        int PltOutletNodeNum;     // Node number on the outlet side of the plant
         // loop topology variables
         int LoopNum;
         int LoopSideNum;
@@ -146,37 +138,38 @@ namespace IceThermalStorage {
 
         // Default Constructor
         SimpleIceStorageData()
-            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0),
-              BranchNum(0), CompNum(0), DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0),
-              UAIceDisCh(0.0), HLoss(0.0), XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0),
-              ITSCoolingRate(0.0), ITSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0),
-              ITSChargingEnergy(0.0), ITSmdot(0.0), ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
+            : MapNum(0), UratePtr(0), ITSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
+              DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForITSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0), UAIceDisCh(0.0), HLoss(0.0),
+              XCurIceFrac(0.0), ITSMassFlowRate(0.0), ITSInletTemp(0.0), ITSOutletTemp(0.0), ITSOutletSetPointTemp(0.0), ITSCoolingRate(0.0),
+              ITSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), IceFracRemain(0.0), ITSChargingRate(0.0), ITSChargingEnergy(0.0),
+              ITSmdot(0.0), ITSCoolingRate_rep(0.0), ITSCoolingEnergy_rep(0.0), MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void InitSimpleIceStorage(EnergyPlusData &state);
 
         void CalcIceStorageDormant(EnergyPlusData &state);
 
-        void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
+        void CalcIceStorageCapacity(EnergyPlusData &state, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
         void CalcIceStorageDischarge(EnergyPlusData &state, Real64 myLoad, bool RunFlag, Real64 MaxCap);
 
-        void CalcQiceDischageMax(Real64 &QiceMin);
+        void CalcQiceDischageMax(EnergyPlusData &state, Real64 &QiceMin);
 
         void CalcIceStorageCharge(EnergyPlusData &state);
 
-        void CalcQiceChargeMaxByChiller(Real64 &QiceMaxByChiller);
+        void CalcQiceChargeMaxByChiller(EnergyPlusData &state, Real64 &QiceMaxByChiller);
 
         void CalcQiceChargeMaxByITS(Real64 chillerOutletTemp, Real64 &QiceMaxByITS);
 
         void CalcUAIce(Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
 
-        void UpdateNode(Real64 myLoad, bool RunFlag);
+        void UpdateNode(EnergyPlusData &state, Real64 myLoad, bool RunFlag);
 
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
@@ -197,15 +190,15 @@ namespace IceThermalStorage {
         int PlantBranchNum;
         int PlantCompNum;
         Real64 DesignMassFlowRate;
-        int MapNum;                     // Number to Map structure
-        std::string DischargeCurveName; // Curve name for discharging (used to find the curve index)
-        int DischargeCurveNum;          // Curve index for discharging
-        enum CurveVars DischargeCurveTypeNum;    // Integer version of discharging curve independent variables type
-        std::string ChargeCurveName;    // Curve name for charging (used to find the curve index)
-        int ChargeCurveNum;             // Curve index for charging
-        enum CurveVars ChargeCurveTypeNum;       // Integer version of charging curve independent variables type
-        Real64 CurveFitTimeStep;        // Time step used to generate performance data [hours]
-        Real64 DischargeParaElecLoad;   // Parasitic electric load duing discharging [dimensionless]
+        int MapNum;                           // Number to Map structure
+        std::string DischargeCurveName;       // Curve name for discharging (used to find the curve index)
+        int DischargeCurveNum;                // Curve index for discharging
+        enum CurveVars DischargeCurveTypeNum; // Integer version of discharging curve independent variables type
+        std::string ChargeCurveName;          // Curve name for charging (used to find the curve index)
+        int ChargeCurveNum;                   // Curve index for charging
+        enum CurveVars ChargeCurveTypeNum;    // Integer version of charging curve independent variables type
+        Real64 CurveFitTimeStep;              // Time step used to generate performance data [hours]
+        Real64 DischargeParaElecLoad;         // Parasitic electric load duing discharging [dimensionless]
         // (This is multiplied by the tank capacity to obtain elec consump)
         Real64 ChargeParaElecLoad; // Parasitic electric load duing charging [dimensionless]
         // (This is multiplied by the tank capacity to obtain elec consump)
@@ -216,7 +209,7 @@ namespace IceThermalStorage {
         Real64 IceFracChange;             // Change in fraction of ice stored during the time step [fraction]
         Real64 IceFracRemaining;          // Fraction of ice remaining in storage [fraction]
         std::string ThawProcessIndicator; // User input determining whether system is inside or outside melt
-        enum DetIce ThawProcessIndex;             // Conversion of thaw process indicator to integer index
+        enum DetIce ThawProcessIndex;     // Conversion of thaw process indicator to integer index
         Real64 IceFracOnCoil;             // Fraction of ice on the coil (affects charging) [fraction]
         Real64 DischargingRate;           // Rate at which energy is being added (thawing) to ice unit [W]
         Real64 DischargingEnergy;         // Total energy added to the ice storage unit [J]
@@ -245,35 +238,31 @@ namespace IceThermalStorage {
             : ScheduleIndex(0), NomCapacity(0.0), PlantInNodeNum(0), PlantOutNodeNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0),
               PlantCompNum(0), DesignMassFlowRate(0.0), MapNum(0), DischargeCurveNum(0), ChargeCurveNum(0), CurveFitTimeStep(1.0),
               DischargeParaElecLoad(0.0), ChargeParaElecLoad(0.0), TankLossCoeff(0.0), FreezingTemp(0.0), CompLoad(0.0), IceFracChange(0.0),
-              IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0),
-              ChargingEnergy(0.0), MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0),
-              TankOutletTemp(0.0), ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0),
-              ChargeIterErrors(0), ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true), MyPlantScanFlag(true),
-              MyEnvrnFlag2(true)
+              IceFracRemaining(1.0), IceFracOnCoil(1.0), DischargingRate(0.0), DischargingEnergy(0.0), ChargingRate(0.0), ChargingEnergy(0.0),
+              MassFlowRate(0.0), BypassMassFlowRate(0.0), TankMassFlowRate(0.0), InletTemp(0.0), OutletTemp(0.0), TankOutletTemp(0.0),
+              ParasiticElecRate(0.0), ParasiticElecEnergy(0.0), DischargeIterErrors(0), DischargeErrorCount(0), ChargeIterErrors(0),
+              ChargeErrorCount(0), ResetXForITSFlag(false), MyEnvrnFlag(true), CheckEquipName(true), MyPlantScanFlag(true), MyEnvrnFlag2(true)
         {
         }
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void InitDetailedIceStorage(EnergyPlusData &state);
 
         void SimDetailedIceStorage(EnergyPlusData &state);
 
-        void UpdateDetailedIceStorage();
+        void UpdateDetailedIceStorage(EnergyPlusData &state);
 
-        void ReportDetailedIceStorage();
+        void ReportDetailedIceStorage(EnergyPlusData &state);
 
         void setupOutputVars(EnergyPlusData &state);
     };
-
-    // Object Data
-    extern Array1D<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
-    extern Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
-
-    // Static Functions
-    void clear_state();
 
     void GetIceStorageInput(EnergyPlusData &state);
 
@@ -283,26 +272,39 @@ namespace IceThermalStorage {
     );
 
     Real64 CalcQstar(EnergyPlusData &state,
-                     int CurveIndex,      // curve index
+                     int CurveIndex,                 // curve index
                      enum CurveVars CurveIndVarType, // independent variable type for ice storage
-                     Real64 FracCharged,  // fraction charged for ice storage unit
-                     Real64 LMTDstar,     // normalized log mean temperature difference across the ice storage unit
-                     Real64 MassFlowstar  // normalized mass flow rate through the ice storage unit
+                     Real64 FracCharged,             // fraction charged for ice storage unit
+                     Real64 LMTDstar,                // normalized log mean temperature difference across the ice storage unit
+                     Real64 MassFlowstar             // normalized mass flow rate through the ice storage unit
     );
 
     Real64 TempSItoIP(Real64 Temp);
 
     Real64 TempIPtoSI(Real64 Temp);
 
-    void UpdateIceFractions();
+    void UpdateIceFractions(EnergyPlusData &state);
 
 } // namespace IceThermalStorage
 
-struct IceThermalStorageData : BaseGlobalStruct {
+struct IceThermalStorageData : BaseGlobalStruct
+{
+
+    bool getITSInput = true;
+    int NumSimpleIceStorage = 0;
+    int NumDetailedIceStorage = 0;
+    int TotalNumIceStorage = 0;
+    EPVector<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
+    EPVector<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
 
     void clear_state() override
     {
-
+        this->getITSInput = true;
+        this->NumSimpleIceStorage = 0;
+        this->NumDetailedIceStorage = 0;
+        this->TotalNumIceStorage = 0;
+        this->SimpleIceStorage.deallocate();
+        this->DetailedIceStorage.deallocate();
     }
 };
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -91,7 +91,8 @@ namespace ThermalEN673Calc {
 
     // Functions
 
-    void Calc_EN673(TARCOGOutput::Files &files,
+    void Calc_EN673(EnergyPlusData &state,
+                    TARCOGOutput::Files &files,
                     int const standard,
                     int const nlayer,
                     Real64 const tout,
@@ -184,7 +185,8 @@ namespace ThermalEN673Calc {
         rtot = 0.0;
         sft = 0.0;
         if (GoAhead(nperr)) {
-            EN673ISO10292(nlayer,
+            EN673ISO10292(state,
+                          nlayer,
                           tout,
                           tind,
                           emis,
@@ -221,13 +223,15 @@ namespace ThermalEN673Calc {
                 solar_EN673(dir, totsol, rtot, rs, nlayer, asol, sft, standard, nperr, ErrorMessage);
                 if (GoAhead(nperr)) {
                     shgc = sft;
-                    if (files.WriteDebugOutput) WriteOutputEN673(files.DebugOutputFile, files.DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
+                    if (files.WriteDebugOutput)
+                        WriteOutputEN673(files.DebugOutputFile, files.DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
                 } // GoAhead after solar
             }     // GoAhead after EN673ISO10292
         }         // GopAhead after propcon90
     }
 
-    void EN673ISO10292(int const nlayer,
+    void EN673ISO10292(EnergyPlusData &state,
+                       int const nlayer,
                        Real64 const tout,
                        Real64 const tind,
                        const Array1D<Real64> &emis,
@@ -390,7 +394,8 @@ namespace ThermalEN673Calc {
                         ipropg(j) = iprop(i + 1, j);
                         frctg(j) = frct(i + 1, j);
                     }
-                    GASSES90(Tm,
+                    GASSES90(state,
+                             Tm,
                              ipropg,
                              frctg,
                              presure(i + 1),
@@ -458,7 +463,8 @@ namespace ThermalEN673Calc {
                                 ipropg(j) = iprop(i + 1, j);
                                 frctg(j) = frct(i + 1, j);
                             } // j, gas mix
-                            GASSES90(Tm,
+                            GASSES90(state,
+                                     Tm,
                                      ipropg,
                                      frctg,
                                      presure(i + 1),

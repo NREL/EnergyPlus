@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,27 +63,8 @@ struct EnergyPlusData;
 
 namespace HVACSingleDuctInduc {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const SingleDuct_CV_FourPipeInduc;
-    extern int const SingleDuct_CV_2PipeInduc;
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumIndUnits;
-    extern int NumFourPipes;
-    extern Array1D_bool CheckEquipName;
-    extern bool GetIUInputFlag; // First time, input is "gotten"
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
-
-    // PRIVATE UpdateIndUnit
-    // PRIVATE ReportIndUnit
-
-    // Types
+    int constexpr SingleDuct_CV_FourPipeInduc(1);
+    int constexpr SingleDuct_CV_2PipeInduc(2);
 
     struct IndUnitData
     {
@@ -159,14 +140,8 @@ namespace HVACSingleDuctInduc {
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<IndUnitData> IndUnit;
-
-    // Functions
-
-    void clear_state();
-
-    void SimIndUnit(EnergyPlusData &state, std::string const &CompName,   // name of the terminal unit
+    void SimIndUnit(EnergyPlusData &state,
+                    std::string const &CompName,   // name of the terminal unit
                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                     int const ZoneNum,             // index of zone served by the terminal unit
                     int const ZoneNodeNum,         // zone node number of zone served by the terminal unit
@@ -182,13 +157,15 @@ namespace HVACSingleDuctInduc {
 
     void SizeIndUnit(EnergyPlusData &state, int const IUNum);
 
-    void SimFourPipeIndUnit(EnergyPlusData &state, int const IUNum,              // number of the current unit being simulated
+    void SimFourPipeIndUnit(EnergyPlusData &state,
+                            int const IUNum,              // number of the current unit being simulated
                             int const ZoneNum,            // number of zone being served
                             int const ZoneNodeNum,        // zone node number
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void CalcFourPipeIndUnit(EnergyPlusData &state, int const IUNum,               // Unit index
+    void CalcFourPipeIndUnit(EnergyPlusData &state,
+                             int const IUNum,               // Unit index
                              bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                              int const ZoneNode,            // zone node number
                              Real64 const HWFlow,           // hot water flow (kg/s)
@@ -196,11 +173,13 @@ namespace HVACSingleDuctInduc {
                              Real64 &LoadMet                // load met by unit (watts)
     );
 
-    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state, Real64 const HWFlow,       // hot water flow rate in kg/s
+    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state,
+                                     Real64 const HWFlow,       // hot water flow rate in kg/s
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     );
 
-    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state, Real64 const CWFlow,       // cold water flow rate in kg/s
+    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state,
+                                     Real64 const CWFlow,       // cold water flow rate in kg/s
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     );
 
@@ -210,11 +189,33 @@ namespace HVACSingleDuctInduc {
 
 } // namespace HVACSingleDuctInduc
 
-struct HVACSingleDuctInducData : BaseGlobalStruct {
+struct HVACSingleDuctInducData : BaseGlobalStruct
+{
+    int NumIndUnits = 0;
+    int NumFourPipes = 0;
+    Array1D_bool CheckEquipName;
+    bool GetIUInputFlag = true; // First time, input is "gotten"
+    bool MyOneTimeFlag = true;
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MySizeFlag;
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyAirDistInitFlag;
+    Array1D<HVACSingleDuctInduc::IndUnitData> IndUnit;
+    bool ZoneEquipmentListChecked = false;
 
     void clear_state() override
     {
-
+        this->NumIndUnits = 0;
+        this->IndUnit.deallocate();
+        this->GetIUInputFlag = true;
+        this->NumFourPipes = 0;
+        this->MyOneTimeFlag = true;
+        this->MyEnvrnFlag.deallocate();
+        this->MySizeFlag.deallocate();
+        this->MyPlantScanFlag.deallocate();
+        this->MyAirDistInitFlag.deallocate();
+        this->CheckEquipName.deallocate();
+        this->ZoneEquipmentListChecked = false;
     }
 };
 

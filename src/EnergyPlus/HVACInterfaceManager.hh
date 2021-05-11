@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/Enums.hh>
 
 namespace EnergyPlus {
 
@@ -63,31 +64,19 @@ struct EnergyPlusData;
 
 namespace HVACInterfaceManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
     // Common Pipe Recirc Flow Directions
-    extern int const NoRecircFlow;
-    extern int const PrimaryRecirc;   // flow from Supply-outlet/Demand-inlet to Supply-inlet/demand-outlet
-    extern int const SecondaryRecirc; // flow from Supply-inlet/Demand-oulet to Supply-outlet/demand-inlet
+    constexpr int NoRecircFlow(0);
+    constexpr int PrimaryRecirc(1);   // flow from Supply-outlet/Demand-inlet to Supply-inlet/demand-outlet
+    constexpr int SecondaryRecirc(2); // flow from Supply-inlet/Demand-outlet to Supply-outlet/demand-inlet
 
-    extern int const FlowTypeNotSet;
-    extern int const ConstantFlow;
-    extern int const VariableFlow;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool CommonPipeSetupFinished;
-
-    // Types
+    constexpr int FlowTypeNotSet(9);
+    constexpr int ConstantFlow(10);
+    constexpr int VariableFlow(11);
 
     struct CommonPipeData
     {
         // Members
-        int CommonPipeType; // type of common pipe used if any
+        DataPlant::iCommonPipeType CommonPipeType; // type of common pipe used if any
         int SupplySideInletPumpType;
         int DemandSideInletPumpType;
         // Following report variables are used in uncontrolled common pipe
@@ -111,60 +100,73 @@ namespace HVACInterfaceManager {
 
         // Default Constructor
         CommonPipeData()
-            : CommonPipeType(0), SupplySideInletPumpType(FlowTypeNotSet), DemandSideInletPumpType(FlowTypeNotSet), FlowDir(0), Flow(0.0), Temp(0.0),
-              SecCPLegFlow(0.0), PriCPLegFlow(0.0), SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0), PriOutTemp(0.0), SecInTemp(0.0),
-              SecOutTemp(0.0), PriInletSetPoint(0.0), SecInletSetPoint(0.0), PriInletControlled(false), SecInletControlled(false), PriFlowRequest(0.0)
+            : CommonPipeType(DataPlant::iCommonPipeType::No), SupplySideInletPumpType(FlowTypeNotSet), DemandSideInletPumpType(FlowTypeNotSet),
+              FlowDir(0), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0), PriCPLegFlow(0.0), SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0),
+              PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0), PriInletSetPoint(0.0), SecInletSetPoint(0.0), PriInletControlled(false),
+              SecInletControlled(false), PriFlowRequest(0.0)
         {
         }
     };
 
-    // Object Data
-    extern Array1D<CommonPipeData> PlantCommonPipe;
-
     // Functions
 
     void UpdateHVACInterface(EnergyPlusData &state,
-                             int const AirLoopNum, // airloop number for which air loop this is
-                             DataConvergParams::iCalledFrom const CalledFrom,
-                             int const OutletNode,    // Node number for the outlet of the side of the loop just simulated
-                             int const InletNode,     // Node number for the inlet of the side that needs the outlet node data
+                             int AirLoopNum, // airloop number for which air loop this is
+                             DataConvergParams::iCalledFrom CalledFrom,
+                             int OutletNode,          // Node number for the outlet of the side of the loop just simulated
+                             int InletNode,           // Node number for the inlet of the side that needs the outlet node data
                              bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
     );
 
     //***************
 
     void UpdatePlantLoopInterface(EnergyPlusData &state,
-                                  int const LoopNum,                // The 'inlet/outlet node' loop number
-                                  int const ThisLoopSideNum,        // The 'outlet node' LoopSide number
-                                  int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
-                                  int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
-                                  bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
-                                  int const CommonPipeType);
+                                  int LoopNum,                // The 'inlet/outlet node' loop number
+                                  int ThisLoopSideNum,        // The 'outlet node' LoopSide number
+                                  int ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
+                                  int OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
+                                  bool &OutOfToleranceFlag,   // True when the other side of the loop need to be (re)simulated
+                                  DataPlant::iCommonPipeType CommonPipeType);
 
     //***************
 
-    void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, Real64 &TankOutletTemp);
+    void UpdateHalfLoopInletTemp(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, Real64 &TankOutletTemp);
 
-    void UpdateCommonPipe(EnergyPlusData &state, int const LoopNum, int const TankInletLoopSide, int const CommonPipeType, Real64 &MixedOutletTemp);
+    void
+    UpdateCommonPipe(EnergyPlusData &state, int LoopNum, int TankInletLoopSide, DataPlant::iCommonPipeType CommonPipeType, Real64 &MixedOutletTemp);
 
     void ManageSingleCommonPipe(EnergyPlusData &state,
-                                int const LoopNum,           // plant loop number
-                                int const LoopSide,          // plant loop side number
-                                Real64 const TankOutletTemp, // inlet temperature to the common pipe passed in from the capacitance calculation
-                                Real64 &MixedOutletTemp      // inlet temperature to the common pipe passed in from the capacitance calculation
+                                int LoopNum,            // plant loop number
+                                int LoopSide,           // plant loop side number
+                                Real64 TankOutletTemp,  // inlet temperature to the common pipe passed in from the capacitance calculation
+                                Real64 &MixedOutletTemp // inlet temperature to the common pipe passed in from the capacitance calculation
     );
 
-    void ManageTwoWayCommonPipe(EnergyPlusData &state, int const LoopNum, int const LoopSide, Real64 const TankOutletTemp);
+    void ManageTwoWayCommonPipe(EnergyPlusData &state, int LoopNum, int LoopSide, Real64 TankOutletTemp);
 
     void SetupCommonPipes(EnergyPlusData &state);
 
 } // namespace HVACInterfaceManager
 
-struct HVACInterfaceManagerData : BaseGlobalStruct {
+struct HVACInterfaceManagerData : BaseGlobalStruct
+{
+
+    bool CommonPipeSetupFinished = false;
+    Array1D<HVACInterfaceManager::CommonPipeData> PlantCommonPipe;
+    Array1D_bool MyEnvrnFlag_SingleCommonPipe;
+    Array1D_bool MyEnvrnFlag_TwoWayCommonPipe;
+    bool OneTimeData_SingleCommonPipe = true;
+    bool OneTimeData_TwoWayCommonPipe = true;
+    Array1D<Real64> TmpRealARR = Array1D<Real64>(DataConvergParams::ConvergLogStackDepth); // Tuned Made static
 
     void clear_state() override
     {
-
+        this->CommonPipeSetupFinished = false;
+        this->PlantCommonPipe.deallocate();
+        this->MyEnvrnFlag_SingleCommonPipe.deallocate();
+        this->MyEnvrnFlag_TwoWayCommonPipe.deallocate();
+        this->OneTimeData_SingleCommonPipe = true;
+        this->OneTimeData_TwoWayCommonPipe = true;
     }
 };
 
