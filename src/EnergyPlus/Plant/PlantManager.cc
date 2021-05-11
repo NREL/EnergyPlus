@@ -902,7 +902,7 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (has_prefixi(this_comp_type, "Pump") || has_prefixi(this_comp_type, "HeaderedPumps")) {
                         if (has_prefixi(this_comp_type, "Pump:VariableSpeed:Condensate")) {
                             this_comp.TypeOf_Num = TypeOf_PumpCondensate;
-                            //                            this_comp.compPtr = EmptyPlantComponent::factory();
+                            this_comp.compPtr = EmptyPlantComponent::factory();
                         } else if (has_prefixi(this_comp_type, "Pump:ConstantSpeed")) {
                             this_comp.TypeOf_Num = TypeOf_PumpConstantSpeed;
                             this_comp.compPtr = EmptyPlantComponent::factory();
