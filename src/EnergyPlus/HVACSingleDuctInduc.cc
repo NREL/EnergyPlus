@@ -177,7 +177,7 @@ namespace HVACSingleDuctInduc {
         {
             auto const SELECT_CASE_var(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num);
 
-            if (SELECT_CASE_var == SingleDuct_CV_FourPipeInduc) {
+            if (SELECT_CASE_var == SingleDuct_CV::FourPipeInduc) {
 
                 SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
@@ -290,7 +290,7 @@ namespace HVACSingleDuctInduc {
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name = Alphas(1);
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType = CurrentModuleObject;
-            state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num = SingleDuct_CV_FourPipeInduc;
+            state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num = SingleDuct_CV::FourPipeInduc;
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
