@@ -902,7 +902,7 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (has_prefixi(this_comp_type, "Pump") || has_prefixi(this_comp_type, "HeaderedPumps")) {
                         if (has_prefixi(this_comp_type, "Pump:VariableSpeed:Condensate")) {
                             this_comp.TypeOf_Num = TypeOf_PumpCondensate;
-                            this_comp.compPtr = EmptyPlantComponent::factory();
+                            //                            this_comp.compPtr = EmptyPlantComponent::factory();
                         } else if (has_prefixi(this_comp_type, "Pump:ConstantSpeed")) {
                             this_comp.TypeOf_Num = TypeOf_PumpConstantSpeed;
                             this_comp.compPtr = EmptyPlantComponent::factory();
@@ -1390,6 +1390,8 @@ void GetPlantInput(EnergyPlusData &state)
                         ShowContinueError(state, "...invalid component type=\"" + this_comp_type + "\", name=\"" + CompNames(CompNum) + "\".");
                         //            ErrorsFound=.TRUE.
                     }
+
+                    if (!this_comp.compPtr) ShowFatalError(state, format(" Plant component \"{}\" was not assigned a pointer.", this_comp_type));
 
                     this_comp.Name = CompNames(CompNum);
                     this_comp.NodeNameIn = InletNodeNames(CompNum);
