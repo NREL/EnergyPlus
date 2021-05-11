@@ -92,7 +92,6 @@ namespace General {
                    Real64 X_1, // 2nd bound of interval that contains the solution
                    const Payload &Par)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Michael Wetter
         //       DATE WRITTEN   March 1999
@@ -118,6 +117,8 @@ namespace General {
         // STATIC ASSERTIONS TO HELP DEBUG TEMPLATE COMPILATION ERRORS
         //        static_assert(std::is_member_function_pointer_v<decltype(&Payload::begin)>, "Par does not have a begin() method, is it an array?");
         //        static_assert(std::is_member_function_pointer_v<decltype(&Payload::end)>, "Par does not have a end() method, is it an array?");
+
+        static_assert(std::is_invocable_v<const Function &, EnergyPlusData &, Real64, const Payload &>, "Function passed in (f) cannot be called with the Payload (Par) passed in, the expected types do not match.");
 
         Real64 const SMALL(1.e-10);
 
