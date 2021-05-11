@@ -635,15 +635,9 @@ namespace DataSurfaces {
         bool MirroredSurf;      // True if it is a mirrored surface
 
         // Optional parameters specific to shadowing surfaces and subsurfaces (detached shading, overhangs, wings, etc.)
-        int SchedShadowSurfIndex;   // Schedule for a shadowing (sub)surface
-        bool IsTransparent;         // True if the schedule values are always 1.0 (or the minimum is 1.0)
-        Real64 SchedMinValue;       // Schedule minimum value.
-
-        // Optional parameters specific to solar reflection from surfaces
-        Real64 ShadowSurfDiffuseSolRefl; // Diffuse solar reflectance of opaque portion
-        Real64 ShadowSurfDiffuseVisRefl; // Diffuse visible reflectance of opaque portion
-        Real64 ShadowSurfGlazingFrac;    // Glazing fraction
-        int ShadowSurfGlazingConstruct;  // Glazing construction number
+        int SchedShadowSurfIndex; // Schedule for a shadowing (sub)surface
+        bool IsTransparent;       // True if the schedule values are always 1.0 (or the minimum is 1.0)
+        Real64 SchedMinValue;     // Schedule minimum value.
 
         int MaterialMovInsulExt; // Pointer to the material used for exterior movable insulation
         int MaterialMovInsulInt; // Pointer to the material used for interior movable insulation
@@ -677,13 +671,9 @@ namespace DataSurfaces {
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), ExtSolar(false),
               ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
-              MirroredSurf(false), SchedShadowSurfIndex(0),
-
-              IsTransparent(false), SchedMinValue(0.0),
-              ShadowSurfDiffuseSolRefl(0.0), ShadowSurfDiffuseVisRefl(0.0), ShadowSurfGlazingFrac(0.0), ShadowSurfGlazingConstruct(0),
-              MaterialMovInsulExt(0), MaterialMovInsulInt(0), SchedMovInsulExt(0), SchedMovInsulInt(0),
-              activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0),
-              SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
+              MirroredSurf(false), SchedShadowSurfIndex(0), IsTransparent(false), SchedMinValue(0.0), MaterialMovInsulExt(0), MaterialMovInsulInt(0),
+              SchedMovInsulExt(0), SchedMovInsulInt(0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0),
+              FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
         {
         }
 
@@ -1270,6 +1260,16 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfReflFacSkySolGnd;
     Array2D<Real64> SurfCosIncAveBmToBmSolObs;
 
+    // Optional parameters specific to solar reflection from surfaces
+    Array1D<Real64> SurfShadowDiffuseSolRefl;    // Diffuse solar reflectance of opaque portion
+    Array1D<Real64> SurfShadowDiffuseVisRefl;    // Diffuse visible reflectance of opaque portion
+    Array1D<Real64> SurfShadowGlazingFrac;       // Glazing fraction
+    Array1D<int> SurfShadowGlazingConstruct;     // Glazing construction number
+    Array1D<bool> SurfShadowPossibleObstruction; // True if a surface can be an exterior obstruction
+    Array1D<int> SurfShadowRecSurfNum;           // Receiving surface number
+    Array1D<std::vector<int>>
+        SurfShadowDisabledZoneList; // Array of all disabled shadowing zone number to the current surface the surface diffusion model
+
     // Surface EMS
     Array1D<bool> SurfEMSConstructionOverrideON;          // if true, EMS is calling to override the construction value
     Array1D<int> SurfEMSConstructionOverrideValue;        // pointer value to use for Construction when overridden
@@ -1330,12 +1330,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfIntConvWindowLocation;       // relative location of window in zone for interior Hc models
     Array1D<bool> SurfIntConvSurfGetsRadiantHeat;
     Array1D<bool> SurfIntConvSurfHasActiveInIt;
-
-    // Surface Shadow Properties
-    Array1D<bool> SurfShadowSurfPossibleObstruction; // True if a surface can be an exterior obstruction
-    Array1D<int> SurfShadowSurfRecSurfNum;           // Receiving surface number
-    Array1D<std::vector<int>>
-        SurfDisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface the surface diffusion model
 
     // Surface Window Heat Balance
     Array2D<Real64> SurfWinA;            // Time step value of factor for beam absorbed in window glass layers
@@ -1446,7 +1440,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfWinStormWinFlagPrevDay;                   // Previous time step value of StormWinFlag
     Array1D<Real64> SurfWinFracTimeShadingDeviceOn;            // For a single time step, = 0.0
                                                                // if no shading device or shading device is off = 1.0 if shading device is on;
-                                                    // For time intervals longer than a time step, = fraction of time that shading device is on.
+    // For time intervals longer than a time step, = fraction of time that shading device is on.
     EPVector<DataSurfaces::WinShadingType> SurfWinExtIntShadePrevTS; // 1 if exterior or interior blind or shade in place previous time step;
                                                                      // 0 otherwise
     Array1D<bool> SurfWinHasShadeOrBlindLayer;                       // mark as true if the window construction has a shade or a blind layer
@@ -1664,9 +1658,14 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfLowTempErrCount.deallocate();
         this->SurfHighTempErrCount.deallocate();
 
-        this->SurfShadowSurfPossibleObstruction.deallocate();
-        this->SurfShadowSurfRecSurfNum.deallocate();
-        this->SurfDisabledShadowingZoneList.deallocate();
+        this->SurfShadowDiffuseSolRefl.deallocate();
+        this->SurfShadowDiffuseVisRefl.deallocate();
+        this->SurfShadowGlazingFrac.deallocate();
+        this->SurfShadowGlazingConstruct.deallocate();
+        this->SurfShadowPossibleObstruction.deallocate();
+        this->SurfShadowRecSurfNum.deallocate();
+        this->SurfShadowDisabledZoneList.deallocate();
+
         this->SurfDaylightingShelfInd.deallocate();
         this->SurfSchedExternalShadingFrac.deallocate();
         this->SurfExternalShadingSchInd.deallocate();

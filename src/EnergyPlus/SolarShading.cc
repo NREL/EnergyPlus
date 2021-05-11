@@ -662,12 +662,12 @@ void GetShadowingInput(EnergyPlusData &state)
                             if (SurfZoneGroup == CurZoneGroup && DisableSelfShadingWithinGroup) {
                                 for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones;
                                      ZoneNum++) { // Loop through all zones in the zone list
-                                    state.dataSurface->SurfDisabledShadowingZoneList(SurfNum).push_back(
+                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
                                         state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
                                 }
                             } else if (SurfZoneGroup != CurZoneGroup && DisableSelfShadingBetweenGroup) {
                                 for (int ZoneNum = 1; ZoneNum <= state.dataHeatBal->ZoneList(CurZoneGroup).NumOfZones; ZoneNum++) {
-                                    state.dataSurface->SurfDisabledShadowingZoneList(SurfNum).push_back(
+                                    state.dataSurface->SurfShadowDisabledZoneList(SurfNum).push_back(
                                         state.dataHeatBal->ZoneList(CurZoneGroup).Zone(ZoneNum));
                                 }
                             }
@@ -5889,7 +5889,7 @@ void SHDGSS(EnergyPlusData &state,
                     continue; // Disable all shadowing surfaces in all zones. Attached shading surfaces are not part of a zone, zone value is 0.
                 }
             } else if (state.dataSysVars->DisableGroupSelfShading) {
-                std::vector<int> DisabledZones = state.dataSurface->SurfDisabledShadowingZoneList(CurSurf);
+                std::vector<int> DisabledZones = state.dataSurface->SurfShadowDisabledZoneList(CurSurf);
                 bool isDisabledShadowSurf = false;
                 for (int i : DisabledZones) {
                     if (surface.Zone == i) {

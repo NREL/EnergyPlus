@@ -1051,7 +1051,7 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
             if (state.dataSurface->Surface(surf).Class != SurfaceClass::Shading) continue;
             if (state.dataSurface->Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
             colorindex = ColorNo::ShdAtt;
-            if (state.dataSurface-SurfIsPV(surf)) colorindex = ColorNo::PV;
+            if (state.dataSurface->SurfIsPV(surf)) colorindex = ColorNo::PV;
             ++surfcount;
 
             print(dxffile, Format_710, state.dataSurface->Surface(surf).ZoneName + ':' + state.dataSurface->Surface(surf).Name);

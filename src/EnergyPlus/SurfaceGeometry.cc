@@ -931,9 +931,21 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfAirSkyRadSplit(SurfNum) = 0.0;
         }
         // Following are surface property arrays used in SurfaceGeometry
-        state.dataSurface->SurfShadowSurfPossibleObstruction.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfShadowSurfRecSurfNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfDisabledShadowingZoneList.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfShadowPossibleObstruction.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfShadowRecSurfNum.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfShadowDisabledZoneList.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfShadowDiffuseSolRefl.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfShadowDiffuseVisRefl.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfShadowGlazingFrac.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfShadowGlazingConstruct.allocate(state.dataSurface->TotSurfaces);
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            state.dataSurface->SurfShadowPossibleObstruction(SurfNum) = false;
+            state.dataSurface->SurfShadowRecSurfNum(SurfNum) = 0;
+            state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) = 0.0;
+            state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) = 0.0;
+            state.dataSurface->SurfShadowGlazingFrac(SurfNum) = 0.0;
+            state.dataSurface->SurfShadowGlazingConstruct(SurfNum) = 0;
+        }
         state.dataSurface->SurfSchedExternalShadingFrac.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfExternalShadingSchInd.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHasSurroundingSurfProperties.allocate(state.dataSurface->TotSurfaces);
@@ -951,8 +963,6 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIsShadowing.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = false;
-            state.dataSurface->SurfShadowSurfRecSurfNum(SurfNum) = 0;
             state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = false;
             state.dataSurface->SurfExternalShadingSchInd(SurfNum) = 0;
             state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum) = false;
@@ -1350,8 +1360,6 @@ namespace SurfaceGeometry {
         GetIntMassSurfaceData(state, ErrorsFound, NumSurfs);
 
         GetMovableInsulationData(state, ErrorsFound);
-
-        if (state.dataSurface->CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
 
         state.dataSurface->TotSurfaces = NumSurfs + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
 
@@ -2524,6 +2532,8 @@ namespace SurfaceGeometry {
 
         SetupShadeSurfacesForSolarCalcs(state); // if shading surfaces are solar collectors or PV, then we need full solar calc.
 
+        if (state.dataSurface->CalcSolRefl) GetShadingSurfReflectanceData(state, ErrorsFound);
+
         LayNumOutside = 0;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             // Check for EcoRoof and only 1 allowed to be used.
@@ -2552,7 +2562,7 @@ namespace SurfaceGeometry {
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = false;
+            state.dataSurface->SurfShadowPossibleObstruction(SurfNum) = false;
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf) {
                 state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
                 int const zoneNum(state.dataSurface->Surface(SurfNum).Zone);
@@ -2605,7 +2615,7 @@ namespace SurfaceGeometry {
             // Exclude air boundary surfaces
             if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) continue;
 
-            state.dataSurface->SurfShadowSurfPossibleObstruction(SurfNum) = true;
+            state.dataSurface->SurfShadowPossibleObstruction(SurfNum) = true;
         }
 
         // Check for IRT surfaces in invalid places.
@@ -7006,16 +7016,16 @@ namespace SurfaceGeometry {
         // For shading surfaces, initialize value of reflectance values to default values. These values
         // may be overridden below for shading surfaces with an associated Shading Surface Reflectance object.
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (!(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Shading ||
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_F ||
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B ||
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Overhang ||
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Fin))
+            if (!(state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Shading ||
+                  state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_F ||
+                  state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_B ||
+                  state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Overhang ||
+                  state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Fin))
                 continue;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl = 0.2;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl = 0.2;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingFrac = 0.0;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingConstruct = 0;
+            state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) = 0.2;
+            state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) = 0.2;
+            state.dataSurface->SurfShadowGlazingFrac(SurfNum) = 0.0;
+            state.dataSurface->SurfShadowGlazingConstruct(SurfNum) = 0;
         }
 
         // Get the total number of Shading Surface Reflectance objects
@@ -7038,8 +7048,8 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            SurfNum = UtilityRoutines::FindItemInList(
-                state.dataIPShortCut->cAlphaArgs(1), state.dataSurfaceGeometry->SurfaceTmp, state.dataSurface->TotSurfaces);
+            SurfNum =
+                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (SurfNum == 0) {
                 ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid specification");
                 ShowContinueError(state,
@@ -7051,47 +7061,47 @@ namespace SurfaceGeometry {
             // Check that associated surface is a shading surface
             WrongSurfaceType = false;
             if (SurfNum != 0) {
-                if (!(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Shading ||
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_F ||
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B ||
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Overhang ||
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Fin))
+                if (!(state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Shading ||
+                      state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_F ||
+                      state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_B ||
+                      state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Overhang ||
+                      state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Fin))
                     WrongSurfaceType = true;
                 if (WrongSurfaceType) {
                     ShowSevereError(state,
-                                    "GetShadingSurfReflectanceData: " + cCurrentModuleObject + "=\"" +
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", surface is not a shading surface.");
+                                    "GetShadingSurfReflectanceData: " + cCurrentModuleObject + "=\"" + state.dataSurface->Surface(SurfNum).Name +
+                                        "\", surface is not a shading surface.");
                     ErrorsFound = true;
                     continue;
                 }
             }
 
             // If associated surface is a shading surface, set reflectance values
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingFrac = state.dataIPShortCut->rNumericArgs(3);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl =
+            state.dataSurface->SurfShadowGlazingFrac(SurfNum) = state.dataIPShortCut->rNumericArgs(3);
+            state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) =
                 (1.0 - state.dataIPShortCut->rNumericArgs(3)) * state.dataIPShortCut->rNumericArgs(1);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl =
+            state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) =
                 (1.0 - state.dataIPShortCut->rNumericArgs(3)) * state.dataIPShortCut->rNumericArgs(2);
             if (state.dataIPShortCut->rNumericArgs(3) > 0.0) {
                 GlConstrNum = UtilityRoutines::FindItemInList(
                     state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct, state.dataHeatBal->TotConstructs);
                 if (GlConstrNum == 0) {
                     ShowSevereError(state,
-                                    cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", " +
+                                    cCurrentModuleObject + "=\"" + state.dataSurface->Surface(SurfNum).Name + "\", " +
                                         state.dataIPShortCut->cAlphaFieldNames(2) + " not found=" + state.dataIPShortCut->cAlphaArgs(2));
                     ErrorsFound = true;
                 } else {
                     state.dataConstruction->Construct(GlConstrNum).IsUsed = true;
                 }
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingConstruct = GlConstrNum;
+                state.dataSurface->SurfShadowGlazingConstruct(SurfNum) = GlConstrNum;
             }
             SurfNum = UtilityRoutines::FindItemInList(
-                "Mir-" + state.dataIPShortCut->cAlphaArgs(1), state.dataSurfaceGeometry->SurfaceTmp, state.dataSurface->TotSurfaces);
+                "Mir-" + state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             if (SurfNum == 0) continue;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingFrac = state.dataIPShortCut->rNumericArgs(3);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl =
+            state.dataSurface->SurfShadowGlazingFrac(SurfNum) = state.dataIPShortCut->rNumericArgs(3);
+            state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) =
                 (1.0 - state.dataIPShortCut->rNumericArgs(3)) * state.dataIPShortCut->rNumericArgs(1);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl =
+            state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) =
                 (1.0 - state.dataIPShortCut->rNumericArgs(3)) * state.dataIPShortCut->rNumericArgs(2);
             if (state.dataIPShortCut->rNumericArgs(3) > 0.0) {
                 GlConstrNum = UtilityRoutines::FindItemInList(
@@ -7099,7 +7109,7 @@ namespace SurfaceGeometry {
                 if (GlConstrNum != 0) {
                     state.dataConstruction->Construct(GlConstrNum).IsUsed = true;
                 }
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingConstruct = GlConstrNum;
+                state.dataSurface->SurfShadowGlazingConstruct(SurfNum) = GlConstrNum;
             }
 
         } // End of loop over Shading Surface Reflectance objects
@@ -7110,31 +7120,31 @@ namespace SurfaceGeometry {
               "Visible Reflectance,Surface Glazing Fraction,Surface Glazing Contruction\n");
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (!(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Shading ||
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_F ||
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B ||
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Overhang ||
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Fin))
+            if (!(state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Shading ||
+                  state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_F ||
+                  state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_B ||
+                  state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Overhang ||
+                  state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Fin))
                 continue;
 
             constexpr auto fmt{"ShadingProperty Reflectance,{},{},{:.2R},{:.2R},{:.2R}, {}\n"};
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingConstruct != 0) {
+            if (state.dataSurface->SurfShadowGlazingConstruct(SurfNum) != 0) {
                 print(state.files.eio,
                       fmt,
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                      cSurfaceClass(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class),
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl,
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl,
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingFrac,
-                      state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingConstruct).Name);
+                      state.dataSurface->Surface(SurfNum).Name,
+                      cSurfaceClass(state.dataSurface->Surface(SurfNum).Class),
+                      state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum),
+                      state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum),
+                      state.dataSurface->SurfShadowGlazingFrac(SurfNum),
+                      state.dataConstruction->Construct(state.dataSurface->SurfShadowGlazingConstruct(SurfNum)).Name);
             } else {
                 print(state.files.eio,
                       fmt,
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                      cSurfaceClass(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class),
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseSolRefl,
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfDiffuseVisRefl,
-                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ShadowSurfGlazingFrac,
+                      state.dataSurface->Surface(SurfNum).Name,
+                      cSurfaceClass(state.dataSurface->Surface(SurfNum).Class),
+                      state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum),
+                      state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum),
+                      state.dataSurface->SurfShadowGlazingFrac(SurfNum),
                       "N/A");
             }
         }

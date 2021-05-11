@@ -109,6 +109,9 @@ TEST_F(EnergyPlusFixture, BaseSurfaceRectangularTest)
     state->dataSurface->Surface(ThisSurf).Vertex(4).y = 0.0;
     state->dataSurface->Surface(ThisSurf).Vertex(4).z = 2.0;
 
+    state->dataSurface->SurfIsShadowing.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfIsShadowing = false;
+
     ProcessSurfaceVertices(*state, ThisSurf, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(SurfaceShape::Rectangle, state->dataSurface->Surface(ThisSurf).Shape);
