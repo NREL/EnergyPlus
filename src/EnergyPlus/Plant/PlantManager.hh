@@ -119,13 +119,6 @@ namespace PlantManager {
         {
             // this is empty on purpose
         }
-
-        static EmptyPlantComponent *factory()
-        {
-            // returns a newly allocated dummy plant component, again this is only used for plant topology components
-            // that do not need any plant side calcs done
-            return new EmptyPlantComponent;
-        }
     };
 
 } // namespace PlantManager
@@ -143,6 +136,7 @@ struct PlantMgrData : BaseGlobalStruct
     int OtherLoopDemandSideCallingIndex = 0;
     int NewOtherDemandSideCallingIndex = 0;
     int newCallingIndex = 0;
+    PlantManager::EmptyPlantComponent dummyPlantComponent;
 
     void clear_state() override
     {
@@ -156,6 +150,7 @@ struct PlantMgrData : BaseGlobalStruct
         this->OtherLoopDemandSideCallingIndex = 0;
         this->NewOtherDemandSideCallingIndex = 0;
         this->newCallingIndex = 0;
+        this->dummyPlantComponent = {};
     }
 };
 

@@ -125,6 +125,9 @@ namespace DataPlant {
             }
         }
         this->compPtr->simulate(state, this->location, FirstHVACIteration, this->MyLoad, this->ON);
+//        delete this->compPtr;
+
+//        if (this->compPtr == EmptyPlantComponent)
     }
 
 } // namespace DataPlant
