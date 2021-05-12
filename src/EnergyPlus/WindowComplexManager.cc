@@ -2597,7 +2597,7 @@ namespace WindowComplexManager {
         Real64 Tini;      // Initial temperature at time of fabrication (used only if CalcDeflection = 1)
         Real64 hin(0.0);  // Indoor combined film coefficient (if non-zero) [W/m^2.K]
         Real64 hout(0.0); // Outdoor combined film coefficient (if non-zero) [W/m^2.K]
-        int standard(1);  // Calculation standard switch:
+        TARCOGGassesParams::Stdrd standard(TARCOGGassesParams::Stdrd::ISO15099); // Calculation standard switch:
         //                 1 - ISO 15099,
         //                 2 - EN673 / ISO 10292 Declared,
         //                 3 - EN673 / ISO 10292 Design.

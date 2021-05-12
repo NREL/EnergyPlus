@@ -98,6 +98,7 @@
 #include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SurfaceOctree.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
@@ -9063,11 +9064,11 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                 if (SELECT_CASE_var == "ISO15099") {
-                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csISO15099;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::ISO15099;
                 } else if (SELECT_CASE_var == "EN673DECLARED") {
-                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csEN673Declared;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::EN673;
                 } else if (SELECT_CASE_var == "EN673DESIGN") {
-                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csEN673Design;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::EN673Design;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
