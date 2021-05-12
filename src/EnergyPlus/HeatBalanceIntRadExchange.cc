@@ -57,6 +57,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -65,7 +66,6 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
-#include <EnergyPlus/HeatBalanceMovableInsulation.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -140,7 +140,6 @@ namespace HeatBalanceIntRadExchange {
         typedef Array1D<Real64>::size_type size_type;
 
         // Using/Aliasing
-        using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
         using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
 
         Real64 const StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
@@ -228,9 +227,6 @@ namespace HeatBalanceIntRadExchange {
 
             if (SurfIterations == 0) {
 
-                Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
-                Real64 AbsInt; // Absorptivity of movable insulation material (supercedes that of the construction if interior movable insulation is
-                               // present)
                 bool IntMovInsulChanged; // True if the status of interior movable insulation has changed
 
                 IntShadeOrBlindStatusChanged = false;
@@ -252,7 +248,7 @@ namespace HeatBalanceIntRadExchange {
                                 IntShadeOrBlindStatusChanged = true;
                             }
                         } else {
-                            UpdateMovableInsulationFlag(state, IntMovInsulChanged, SurfNum);
+                            if (state.dataSurface->AnyMovableInsulation) UpdateMovableInsulationFlag(state, IntMovInsulChanged, SurfNum);
                         }
                     }
                 }
@@ -262,15 +258,10 @@ namespace HeatBalanceIntRadExchange {
                     for (int ZoneSurfNum = 1; ZoneSurfNum <= n_zone_Surfaces; ++ZoneSurfNum) {
                         int const SurfNum = zone_SurfacePtr(ZoneSurfNum);
                         int const ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                        zone_info.Emissivity(ZoneSurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
+                        zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow &&
                             ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                             zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBal->ITABSF(SurfNum);
-                        }
-                        if (state.dataSurface->Surface(SurfNum).MovInsulIntPresent) {
-                            HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
-                            zone_info.Emissivity(ZoneSurfNum) =
-                                state.dataMaterial->Material(state.dataSurface->Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
                         }
                         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
                             state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
@@ -444,15 +435,8 @@ namespace HeatBalanceIntRadExchange {
         // then the matrices which are used to calculate interior radiation must be recalculated.
 
         MovableInsulationChange = false;
-        if (state.dataSurface->Surface(SurfNum).MaterialMovInsulInt > 0) {
-            Real64 HMovInsul; // "Resistance" value of movable insulation (if present)
-            Real64 AbsInt;    // Absorptivity of movable insulation material
-                              // (supercedes that of the construction if interior movable insulation is present)
-            HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
-        } else {
-            state.dataSurface->Surface(SurfNum).MovInsulIntPresent = false;
-        }
-        if ((state.dataSurface->Surface(SurfNum).MovInsulIntPresent != state.dataSurface->Surface(SurfNum).MovInsulIntPresentPrevTS)) {
+
+        if (state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) != state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(SurfNum)) {
             auto const &thissurf(state.dataSurface->Surface(SurfNum));
             Real64 AbsorpDiff = std::abs(state.dataConstruction->Construct(thissurf.Construction).InsideAbsorpThermal -
                                          state.dataMaterial->Material(thissurf.MaterialMovInsulInt).AbsorpThermal);
