@@ -487,7 +487,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
                 auto const vars = fields.at("py_search_paths");
                 for (const auto &var : vars) {
                     try {
-                        PluginManager::addToPythonPath(state, PluginManager::sanitizedPath(var.at("search_path")), true);
+                        PluginManager::addToPythonPath(state, PluginManager::sanitizedPath(fs::path{std::string{var.at("search_path")}}), true);
                     } catch (nlohmann::json::out_of_range &e) {
                         // empty entry
                     }
