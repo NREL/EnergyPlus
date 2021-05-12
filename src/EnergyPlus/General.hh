@@ -118,7 +118,7 @@ namespace General {
         //        static_assert(std::is_member_function_pointer_v<decltype(&Payload::begin)>, "Par does not have a begin() method, is it an array?");
         //        static_assert(std::is_member_function_pointer_v<decltype(&Payload::end)>, "Par does not have a end() method, is it an array?");
 
-        static_assert(std::is_invocable_v<const Function &, EnergyPlusData &, Real64, const Payload &>,
+        static_assert(std::is_invocable_v<decltype(f), EnergyPlusData &, Real64, const Payload &>,
                       "Function passed in (f) cannot be called with the Payload (Par) passed in, the expected types do not match.");
 
         Real64 const SMALL(1.e-10);
