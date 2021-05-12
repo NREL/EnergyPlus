@@ -146,8 +146,8 @@ struct SystemVarsData : BaseGlobalStruct
     std::string MinReportFrequency; // String for minimum reporting frequency
     bool SortedIDD = true;          // after processing, use sorted IDD to obtain Defs, etc.
     bool lMinimalShadowing = false; // TRUE if MinimalShadowing is to override Solar Distribution flag
-    std::string envinputpath1;
-    std::string envinputpath2;
+    fs::path envinputpath1;
+    fs::path envinputpath2;
     bool TestAllPaths = false;
     int iEnvSetThreads = 0;
     bool lEnvSetThreadsInput = false;
