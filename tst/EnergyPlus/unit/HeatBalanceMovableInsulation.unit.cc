@@ -72,8 +72,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
 
     int SurfNum = 1;
     state->dataSurface->Surface.allocate(SurfNum);
-    state->dataSurface->Surface(SurfNum).SchedMovInsulExt = 1;
-    state->dataSurface->Surface(SurfNum).MaterialMovInsulExt = 1;
+    state->dataSurface->SurfSchedMovInsulExt.allocate(SurfNum);
+    state->dataSurface->SurfMaterialMovInsulExt.allocate(SurfNum);
+    state->dataSurface->SurfSchedMovInsulExt(SurfNum) = 1;
+    state->dataSurface->SurfMaterialMovInsulExt(SurfNum) = 1;
     state->dataHeatBalSurf->SurfMovInsulExtPresent.allocate(SurfNum);
     state->dataHeatBalSurf->SurfMovInsulHExt.allocate(SurfNum);
     state->dataHeatBalSurf->SurfAbsSolarExt.allocate(SurfNum);
@@ -120,8 +122,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
 
     int SurfNum = 1;
     state->dataSurface->Surface.allocate(SurfNum);
-    state->dataSurface->Surface(SurfNum).SchedMovInsulInt = 1;
-    state->dataSurface->Surface(SurfNum).MaterialMovInsulInt = 1;
+
+    state->dataSurface->SurfSchedMovInsulInt.allocate(SurfNum);
+    state->dataSurface->SurfMaterialMovInsulInt.allocate(SurfNum);
+    state->dataSurface->SurfSchedMovInsulInt(SurfNum) = 1;
+    state->dataSurface->SurfMaterialMovInsulInt(SurfNum) = 1;
     state->dataHeatBalSurf->SurfMovInsulIntPresent.allocate(SurfNum);
     state->dataHeatBalSurf->SurfMovInsulHInt.allocate(SurfNum);
     state->dataHeatBalSurf->SurfAbsSolarInt.allocate(SurfNum);
@@ -275,6 +280,8 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     // set surface data
     state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->SurfMaterialMovInsulExt.allocate(1);
     state->dataSurfaceGeometry->SurfaceTmp.allocate(1);
     int SurfNum = 0;
     int TotHTSurfs = state->dataSurface->TotSurfaces = 1;
@@ -284,10 +291,11 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     // get heat tranfer surface data
     SurfaceGeometry::GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
     // get movable insulation object data
+    state->dataSurface->Surface(1) = state->dataSurfaceGeometry->SurfaceTmp(1);
     SurfaceGeometry::GetMovableInsulationData(*state, ErrorsFound);
     // check movable insulation material
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");      // base surface name
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).MaterialMovInsulExt, 4);             // index to movable insulation material
+    EXPECT_EQ(state->dataSurface->SurfMaterialMovInsulExt(1), 4);             // index to movable insulation material
     EXPECT_EQ(state->dataMaterial->Material(4).Name, "SIMPLEGLAZINGSYSTEM");                 // name of movable insulation material
     EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::WindowSimpleGlazing); // invalid material group type
     EXPECT_TRUE(ErrorsFound);                                                                // error found due to invalid material

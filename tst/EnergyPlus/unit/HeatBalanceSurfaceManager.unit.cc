@@ -138,7 +138,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataSurface->Surface.allocate(SurfNum);
     state->dataSurface->Surface(SurfNum).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(SurfNum).Area = 10.0;
-    state->dataSurface->Surface(SurfNum).MaterialMovInsulExt = 1;
     state->dataSurface->SurfOutDryBulbTemp.allocate(SurfNum);
     state->dataSurface->SurfOutDryBulbTemp = 0;
     state->dataEnvrn->SkyTemp = 23.0;

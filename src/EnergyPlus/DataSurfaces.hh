@@ -639,11 +639,6 @@ namespace DataSurfaces {
         bool IsTransparent;       // True if the schedule values are always 1.0 (or the minimum is 1.0)
         Real64 SchedMinValue;     // Schedule minimum value.
 
-        int MaterialMovInsulExt; // Pointer to the material used for exterior movable insulation
-        int MaterialMovInsulInt; // Pointer to the material used for interior movable insulation
-        int SchedMovInsulExt;    // Schedule for exterior movable insulation
-        int SchedMovInsulInt;    // Schedule for interior movable insulation
-
         // Window Parameters (when surface is Window)
         int activeWindowShadingControl;            // Active window shading control (windows only)
         std::vector<int> windowShadingControlList; // List of possible window shading controls
@@ -671,8 +666,8 @@ namespace DataSurfaces {
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), ExtSolar(false),
               ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
-              MirroredSurf(false), SchedShadowSurfIndex(0), IsTransparent(false), SchedMinValue(0.0), MaterialMovInsulExt(0), MaterialMovInsulInt(0),
-              SchedMovInsulExt(0), SchedMovInsulInt(0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0),
+              MirroredSurf(false), SchedShadowSurfIndex(0), IsTransparent(false), SchedMinValue(0.0),
+              activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0),
               FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
         {
         }
@@ -1260,7 +1255,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfReflFacSkySolGnd;
     Array2D<Real64> SurfCosIncAveBmToBmSolObs;
 
-    // Optional parameters specific to solar reflection from surfaces
+    // Surface parameters specific to solar reflection from surfaces
     Array1D<Real64> SurfShadowDiffuseSolRefl;    // Diffuse solar reflectance of opaque portion
     Array1D<Real64> SurfShadowDiffuseVisRefl;    // Diffuse visible reflectance of opaque portion
     Array1D<Real64> SurfShadowGlazingFrac;       // Glazing fraction
@@ -1269,6 +1264,12 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfShadowRecSurfNum;           // Receiving surface number
     Array1D<std::vector<int>>
         SurfShadowDisabledZoneList; // Array of all disabled shadowing zone number to the current surface the surface diffusion model
+
+    // Surface movable insulation properties
+    Array1D<int> SurfMaterialMovInsulExt; // Pointer to the material used for exterior movable insulation
+    Array1D<int> SurfMaterialMovInsulInt; // Pointer to the material used for interior movable insulation
+    Array1D<int> SurfSchedMovInsulExt;    // Schedule for exterior movable insulation
+    Array1D<int> SurfSchedMovInsulInt;    // Schedule for interior movable insulation
 
     // Surface EMS
     Array1D<bool> SurfEMSConstructionOverrideON;          // if true, EMS is calling to override the construction value
@@ -1665,6 +1666,11 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfShadowPossibleObstruction.deallocate();
         this->SurfShadowRecSurfNum.deallocate();
         this->SurfShadowDisabledZoneList.deallocate();
+
+        this->SurfMaterialMovInsulExt.deallocate();
+        this->SurfMaterialMovInsulInt.deallocate();
+        this->SurfSchedMovInsulExt.deallocate();
+        this->SurfSchedMovInsulInt.deallocate();
 
         this->SurfDaylightingShelfInd.deallocate();
         this->SurfSchedExternalShadingFrac.deallocate();

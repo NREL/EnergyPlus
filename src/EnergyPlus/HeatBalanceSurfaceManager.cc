@@ -2335,7 +2335,7 @@ void EvalOutsideMovableInsulation(EnergyPlusData &state)
 {
     // This subroutine determines whether or not outside movable insulation on opaque surfaces is present at the current time.
     for (int SurfNum : state.dataHeatBalSurf->SurfMovInsulIndexList) {
-        Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->Surface(SurfNum).SchedMovInsulExt);
+        Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->SurfSchedMovInsulExt(SurfNum));
         if (MovInsulSchedVal <= 0) { // Movable insulation not present at current time
             state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum) = false;
             int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
@@ -2347,7 +2347,7 @@ void EvalOutsideMovableInsulation(EnergyPlusData &state)
                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
             continue;
         }
-        auto const MaterialIndex(state.dataSurface->Surface(SurfNum).MaterialMovInsulExt);
+        auto const MaterialIndex(state.dataSurface->SurfMaterialMovInsulExt(SurfNum));
         auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
         state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
@@ -2366,7 +2366,7 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
 {
     // This subroutine determines whether or not inside movable insulation is present at the current time.
     for (int SurfNum : state.dataHeatBalSurf->SurfMovInsulIndexList) {
-        Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->Surface(SurfNum).SchedMovInsulInt);
+        Real64 MovInsulSchedVal = GetCurrentScheduleValue(state, state.dataSurface->SurfSchedMovInsulInt(SurfNum));
         if (MovInsulSchedVal <= 0.0) { // Movable insulation not present at current time
             state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) = false;
             int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
@@ -2374,7 +2374,7 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
             state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
             continue;
         }
-        auto const MaterialIndex(state.dataSurface->Surface(SurfNum).MaterialMovInsulInt);
+        auto const MaterialIndex(state.dataSurface->SurfMaterialMovInsulInt(SurfNum));
         auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
         state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
@@ -3651,7 +3651,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 // the fraction that is absorbed plus the back reflected portion (first order reflection only)
                 // to the plane between the transparent insulation and the exterior surface face.
                 state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) =
-                    state.dataMaterial->Material(Surface(SurfNum).MaterialMovInsulExt).Trans * state.dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) *
+                    state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulExt(SurfNum)).Trans * state.dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) *
                     ((state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar / AbsExt) +
                      (1 - state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar));
                 state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(SurfNum) =
@@ -7086,7 +7086,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         ShowSevereError(state, "Interior movable insulation is not valid with embedded sources/sinks");
                         ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
                         ShowContinueError(state,
-                                          "interior movable insulation " + state.dataMaterial->Material(Surface(SurfNum).MaterialMovInsulInt).Name +
+                                          "interior movable insulation " + state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).Name +
                                               " for a surface with that construction.");
                         ShowContinueError(state,
                                           "This is not currently allowed because the heat balance equations do not currently accommodate "
@@ -8632,7 +8632,7 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
             ShowSevereError(state, "Exterior movable insulation is not valid with embedded sources/sinks");
             ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
             ShowContinueError(state,
-                              "exterior movable insulation " + state.dataMaterial->Material(Surface(SurfNum).MaterialMovInsulExt).Name +
+                              "exterior movable insulation " + state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulExt(SurfNum)).Name +
                                   " for a surface with that construction.");
             ShowContinueError(state,
                               "This is not currently allowed because the heat balance equations do not currently accommodate this combination.");

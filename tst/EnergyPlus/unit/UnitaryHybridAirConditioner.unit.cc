@@ -648,8 +648,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing
     EXPECT_EQ(state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1).OperatingModes.size(), expectedOperatingModesSize);
     EXPECT_EQ(state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(2).OperatingModes.size(), expectedOperatingModesSize);
     // check if names for HybridUnitaryAC are converted to upper case
-    EXPECT_EQ("Hybrid Unit 1", state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1).Name);
-    EXPECT_EQ("Hybrid Unit 2", state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(2).Name);
+    EXPECT_EQ("HYBRID UNIT 1", state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1).Name);
+    EXPECT_EQ("HYBRID UNIT 2", state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(2).Name);
 }
 
 TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInput)
