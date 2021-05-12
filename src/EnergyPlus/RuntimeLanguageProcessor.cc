@@ -1366,10 +1366,10 @@ void ParseExpression(EnergyPlusData &state,
             state.dataRuntimeLangProcessor->PEToken(NumTokens).Type = Token::Parenthesis;
             state.dataRuntimeLangProcessor->PEToken(NumTokens).String = StringToken;
             if (NextChar == '(') {
-                state.dataRuntimeLangProcessor->PEToken(NumTokens).Parenthesis = ParenthesisLeft;
+                state.dataRuntimeLangProcessor->PEToken(NumTokens).Parenthesis = Token::ParenthesisLeft;
                 OperatorProcessing = true;
             }
-            if (NextChar == ')') state.dataRuntimeLangProcessor->PEToken(NumTokens).Parenthesis = ParenthesisRight;
+            if (NextChar == ')') state.dataRuntimeLangProcessor->PEToken(NumTokens).Parenthesis = Token::ParenthesisRight;
 
         } else if (is_any_of(NextChar, "\"")) {
             // Parse a string literal token
@@ -1443,11 +1443,11 @@ int ProcessTokens(
         Depth = 0;
         for (TokenNum = 1; TokenNum <= NumTokens; ++TokenNum) {
             if (Token(TokenNum).Type == Token::Parenthesis) {
-                if (Token(TokenNum).Parenthesis == ParenthesisLeft) {
+                if (Token(TokenNum).Parenthesis == Token::ParenthesisLeft) {
                     if (Depth == 0) Pos = TokenNum; // Record position of first left parenthesis
                     ++Depth;
                 }
-                if (Token(TokenNum).Parenthesis == ParenthesisRight) {
+                if (Token(TokenNum).Parenthesis == Token::ParenthesisRight) {
                     --Depth;
                     if (Depth == 0) {
                         LastPos = TokenNum;
