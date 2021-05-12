@@ -1033,12 +1033,12 @@ namespace WindowComplexManager {
 
         Basis.Lamda.allocate(state.dataConstruction->Construct(IConst).BSDFInput.NBasis);
         Basis.SolAng.allocate(state.dataConstruction->Construct(IConst).BSDFInput.NBasis);
-        if (state.dataConstruction->Construct(IConst).BSDFInput.BasisType == DataBSDFWindow::BasisType_WINDOW) {
+        if (state.dataConstruction->Construct(IConst).BSDFInput.BasisType == DataBSDFWindow::BasisType::WINDOW) {
             //   WINDOW6 Basis
-            Basis.BasisType = DataBSDFWindow::BasisType_WINDOW;
-            if (state.dataConstruction->Construct(IConst).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_None) {
+            Basis.BasisType = DataBSDFWindow::BasisType::WINDOW;
+            if (state.dataConstruction->Construct(IConst).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::None) {
                 // No basis symmetry
-                Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_None;
+                Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::None;
                 Thetas(1) = 0.0;                                     // By convention, the first basis point is at the center (theta=0,phi=0)
                 Thetas(NThetas + 1) = 0.5 * DataGlobalConstants::Pi; // and there is an N+1st point (not a basis element) at Pi/2
                 NPhis(1) = 1;
@@ -1106,14 +1106,14 @@ namespace WindowComplexManager {
                                          LowerTheta,
                                          UpperTheta,
                                          DPhi,
-                                         DataBSDFWindow::BasisType_WINDOW); // This gets all the simple grid characteristics
+                                         DataBSDFWindow::BasisType::WINDOW); // This gets all the simple grid characteristics
                         Basis.Lamda(ElemNo) = Lamda;
                         Basis.SolAng(ElemNo) = SolAng;
                     }
                 }
             } else { // BST
                 //  Axisymmetric basis symmetry (Note this only useful specular systems, where it allows shorter data input)
-                Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_Axisymmetric;
+                Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::Axisymmetric;
                 Thetas(1) = 0.0;                                     // By convention, the first basis point is at the center (theta=0,phi=0)
                 Thetas(NThetas + 1) = 0.5 * DataGlobalConstants::Pi; // and there is an N+1st point (not a basis element) at Pi/2
                 NPhis = 1;                                           // As insurance, define one phi for each theta
@@ -1176,7 +1176,7 @@ namespace WindowComplexManager {
                                      LowerTheta,
                                      UpperTheta,
                                      DPhi,
-                                     DataBSDFWindow::BasisType_WINDOW); // This gets all the simple grid characteristics
+                                     DataBSDFWindow::BasisType::WINDOW); // This gets all the simple grid characteristics
                     Basis.Lamda(ElemNo) = Lamda;
                     Basis.SolAng(ElemNo) = SolAng;
                 }
@@ -1193,10 +1193,10 @@ namespace WindowComplexManager {
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,
-                          Real64 const LowerTheta, // Lower edge of element (polar angle)
-                          Real64 const UpperTheta, // Upper edge of element (polar angle)
-                          Real64 const DPhi,       // Width of element (azimuthal angle)
-                          int const InputType      // Basis type
+                          Real64 const LowerTheta,                  // Lower edge of element (polar angle)
+                          Real64 const UpperTheta,                  // Upper edge of element (polar angle)
+                          Real64 const DPhi,                        // Width of element (azimuthal angle)
+                          DataBSDFWindow::BasisType const InputType // Basis type
     )
     {
 
@@ -1209,7 +1209,7 @@ namespace WindowComplexManager {
         // PURPOSE OF THIS SUBROUTINE:
         // fill in values for all the components of a basis element
 
-        if (InputType == DataBSDFWindow::BasisType_WINDOW) {
+        if (InputType == DataBSDFWindow::BasisType::WINDOW) {
             // WINDOW6 Type BASIS
             if (Elem == 1) {
                 // first element, theta=0, is special case
@@ -2262,7 +2262,7 @@ namespace WindowComplexManager {
             RayIndex = 0;
             return RayIndex;
         }
-        if (Basis.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_None) {
+        if (Basis.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::None) {
             // Search the basis thetas
             if (Theta <= 0.0) {
                 // Special case, Theta = 0.; this is always the first basis element
@@ -2302,7 +2302,7 @@ namespace WindowComplexManager {
             }
             RayIndex = Basis.BasisIndex(IPhi, ITheta);
             return RayIndex;
-        } else if (Basis.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_Axisymmetric) {
+        } else if (Basis.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::Axisymmetric) {
             // Search the basis thetas
             if (Theta <= 0.0) {
                 // Special case, Theta = 0.; this is always the first basis element
@@ -2468,7 +2468,7 @@ namespace WindowComplexManager {
                                   Real64 &SurfInsideTemp,     // Inside window surface temperature
                                   Real64 &SurfOutsideTemp,    // Outside surface temperature (C)
                                   Real64 &SurfOutsideEmiss,
-                                  int const CalcCondition // Calucation condition (summer, winter or no condition)
+                                  DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
     )
     {
 
@@ -2733,7 +2733,7 @@ namespace WindowComplexManager {
         CalcDeflection = TARCOGParams::DeflectionCalculation::NONE;
         CalcSHGC = 0;
 
-        if (CalcCondition == DataBSDFWindow::noCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::noCondition) {
             ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -2763,7 +2763,7 @@ namespace WindowComplexManager {
         isky = 3; // IR radiation is provided from external source
         iwd = 0;  // assume windward for now.  TODO compare surface normal with wind direction
 
-        if (CalcCondition == DataBSDFWindow::noCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::noCondition) {
             ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
 
             // determine reference air temperature for this surface
@@ -3070,7 +3070,7 @@ namespace WindowComplexManager {
 
         } // End of loop over glass, gap and blind/shade layers in a window construction
 
-        if (CalcCondition == DataBSDFWindow::noCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::noCondition) {
             // now calculate correct areas for multipliers
             for (Lay = 1; Lay <= nlayer; ++Lay) {
                 if (LayerType(Lay) != TARCOGParams::TARCOGLayerType::SPECULAR) { // Layer is shading
@@ -3099,7 +3099,7 @@ namespace WindowComplexManager {
         // vector of absorbed solar energy fractions for each layer.
         asol = 0.0;
         // direct solar radiation
-        if (CalcCondition == DataBSDFWindow::noCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::noCondition) {
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
             dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
                   state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex); // TODO, check , !
@@ -3128,13 +3128,13 @@ namespace WindowComplexManager {
         }
 
         // Standard conditions run (winter and summer)
-        if (CalcCondition == DataBSDFWindow::winterCondition) {
+        if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
             tind = 294.15;
             tout = 255.15;
             hcout = 26.0;
             wso = 5.5;
             dir = 0.0;
-        } else if (CalcCondition == DataBSDFWindow::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
             tind = 297.15;
             tout = 305.15;
             hcout = 15.0;
@@ -3144,7 +3144,7 @@ namespace WindowComplexManager {
         }
 
         // Common condition data
-        if (CalcCondition != DataBSDFWindow::noCondition) {
+        if (CalcCondition != DataBSDFWindow::Condition::noCondition) {
             trmin = tind;
             outir = 0.0;
             tsky = tout;
@@ -3290,14 +3290,14 @@ namespace WindowComplexManager {
             ShowSevereError(state, "Window tarcog returned an error");
             tarcogErrorMessage = "message = \"" + tarcogErrorMessage + "\"";
             ShowContinueErrorTimeStamp(state, tarcogErrorMessage);
-            if (CalcCondition == DataBSDFWindow::noCondition) {
+            if (CalcCondition == DataBSDFWindow::Condition::noCondition) {
                 ShowContinueError(state, "surface name = " + state.dataSurface->Surface(SurfNum).Name);
             }
             ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
             ShowFatalError(state, "halting because of error in tarcog");
-        } else if (CalcCondition == DataBSDFWindow::winterCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::winterCondition) {
             state.dataHeatBal->NominalU(ConstrNum) = ufactor;
-        } else if (CalcCondition == DataBSDFWindow::summerCondition) {
+        } else if (CalcCondition == DataBSDFWindow::Condition::summerCondition) {
             // tempInt = SurfaceWindow(SurfNum)%ComplexFen%CurrentState
             // tempReal = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffTrans
 
@@ -3320,7 +3320,7 @@ namespace WindowComplexManager {
             state.dataConstruction->Construct(ConstrNum).SummerSHGC = shgc;
 
             // Construct(SurfNum)%VisTransNorm = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffVisTrans
-        } else if (CalcCondition == DataBSDFWindow::noCondition) { // expect converged results...
+        } else if (CalcCondition == DataBSDFWindow::Condition::noCondition) { // expect converged results...
             // Window heat balance solution has converged.
 
             state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;
