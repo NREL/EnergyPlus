@@ -824,7 +824,8 @@ namespace FanCoilUnits {
                     bool InletNodeFound = false;
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        InletNodeFound = isReturnPlenumInducedNode(state, FanCoil(FanCoilNum).AirInNode,
+                        InletNodeFound = isReturnPlenumInducedNode(state,
+                                                                   FanCoil(FanCoilNum).AirInNode,
                                                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumReturnNodes,
                                                                    state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode);
                         if (InletNodeFound) break;
