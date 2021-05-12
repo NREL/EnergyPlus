@@ -438,9 +438,9 @@ Real64 getInternalVariableValue(EnergyPlusState state, int handle)
     auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= (int)thisState->dataRuntimeLang->numEMSInternalVarsAvailable) {
         auto thisVar = thisState->dataRuntimeLang->EMSInternalVarsAvailable(handle);
-        if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrReal) {
+        if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Real) {
             return *thisVar.RealValue;
-        } else if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrInteger) {
+        } else if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Integer) {
             return (Real64)(*thisVar.IntValue);
         } else {
             // Doesn't look like this struct actually has a logical member type, so uh, throw here?
