@@ -111,11 +111,11 @@ New Space object (and related objects) with minimal changes to current inputs.
     ...
     
        
-![Figure 1 Spaces by Fraction of Zone Floor Area](Space Examples-FractionOfZone.png)
+![Figure 1 Spaces by Fraction of Zone Floor Area](Space-Examples-FractionOfZone.png)
 
-![Figure 2 Spaces by Floor Area](Space Examples-FloorArea.png)
+![Figure 2 Spaces by Floor Area](Space-Examples-FloorArea.png)
 
-![Figure 3 Spaces by Full Geometry](Space Examples-FullGeometry.png)
+![Figure 3 Spaces by Full Geometry](Space-Examples-FullGeometry.png)
 
 ## Sizing Considerations ##
 
