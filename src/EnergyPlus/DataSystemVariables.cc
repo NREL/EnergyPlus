@@ -171,7 +171,7 @@ namespace DataSystemVariables {
 
         std::vector<std::pair<fs::path, std::string>> pathsChecked;
 
-        const std::array<std::pair<std::string, std::string>, 7> pathsToCheck = {
+        const std::array<std::pair<fs::path, std::string>, 7> pathsToCheck = {
             {{InputFilePath, "Current Working Directory"},
              {state.dataStrGlobals->inputDirPath / InputFilePath, "IDF Directory"},
              {state.dataStrGlobals->exeDirectoryPath / InputFilePath, "EnergyPlus Executable Directory"},

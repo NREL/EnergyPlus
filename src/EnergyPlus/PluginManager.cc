@@ -514,7 +514,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
             auto const &fields = instance.value();
             auto const &thisObjectName = instance.key();
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
-            fs::path modulePath(fields.at("python_module_name"));
+            fs::path modulePath(std::string{fields.at("python_module_name")});
             std::string className = fields.at("plugin_class_name");
             std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
             bool warmup = false;
