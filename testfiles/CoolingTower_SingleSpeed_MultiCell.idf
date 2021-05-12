@@ -70,7 +70,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.5;
+  Version,10.0;
 
   Timestep,4;
 

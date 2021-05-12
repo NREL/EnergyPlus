@@ -7,7 +7,7 @@
 ! Plant:    None.
 ! SolDis=MinimalShadowing, Aniso, Detailed Interior and Exterior Convection
 
-  Version,9.5;
+  Version,10.0;
 
   Timestep,1;
 
