@@ -1253,21 +1253,20 @@ namespace UnitarySystems {
             }
         }
 
-        // set water-side economizer flags each time step
+        // no water side economizer
+        this->runWaterSideEconomizer = false;
+        this->WaterSideEconomizerStatus = 0;
+        // re-set water-side economizer flags each time step
         if (this->m_waterSideEconomizerFlag) {
             // enable water-side economizer cooling
             this->WaterSideEconomizerStatus = 1;
             this->runWaterSideEconomizer = true;
-            // disable free cooling water coil if entering fluid temp is > entering air temp minus user specified offset temp
+            // disable water-side economizer if entering fluid temp is > entering air temp minus user specified temp offset
             if (state.dataLoopNodes->Node(this->CoolCoilFluidInletNode).Temp >
                 (state.dataLoopNodes->Node(this->AirInNode).Temp - this->m_minAirToWaterTempOffset)) {
                 this->runWaterSideEconomizer = false;
                 this->WaterSideEconomizerStatus = 0;
             }
-        } else {
-            // no water side economizer
-            this->runWaterSideEconomizer = false;
-            this->WaterSideEconomizerStatus = 0;
         }
 
         this->m_CoolingPartLoadFrac = 0.0;
@@ -7473,12 +7472,12 @@ namespace UnitarySystems {
 
                     if (state.dataUnitarySystems->unitarySys[sysNum].m_waterSideEconomizerFlag) {
                         SetupOutputVariable(state,
-                            "Water Side Economizer Status",
-                            OutputProcessor::Unit::None,
-                            state.dataUnitarySystems->unitarySys[sysNum].WaterSideEconomizerStatus,
-                            "System",
-                            "Average",
-                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                                            "Water Side Economizer Status",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].WaterSideEconomizerStatus,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
                     // can this be called each time a system is gotten?
                     bool anyEMSRan;
@@ -11660,7 +11659,7 @@ namespace UnitarySystems {
 
             // disable waterside economizer if the condition is NOT favorable
             if (this->m_waterSideEconomizerFlag) {
-                if (!this->runWaterSideEconomizer ) {
+                if (!this->runWaterSideEconomizer) {
                     SensibleLoad = false;
                     LatentLoad = false;
                 }
