@@ -54,8 +54,8 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
 
 using namespace EnergyPlus;

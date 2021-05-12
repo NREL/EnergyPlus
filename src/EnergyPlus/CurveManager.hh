@@ -245,7 +245,7 @@ namespace CurveManager {
         fs::path filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
-        bool load(EnergyPlusData &state, fs::path const &path);        // Note: this returns 'True' if ErrorsFound
+        bool load(EnergyPlusData &state, fs::path const &path); // Note: this returns 'True' if ErrorsFound
         std::vector<double> &getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow);
 
     private:

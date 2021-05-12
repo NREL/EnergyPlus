@@ -93,9 +93,8 @@ namespace DataSystemVariables {
     // working folder, programs folder, etc.
     // Returns an empty path if not found.
     [[nodiscard]] fs::path CheckForActualFilePath(EnergyPlusData &state,
-                                                  fs::path const &originalInputFilePath,  // path (or filename only) as input for object
-                                                  const std::string& contextString = std::string()
-    );
+                                                  fs::path const &originalInputFilePath, // path (or filename only) as input for object
+                                                  const std::string &contextString = std::string());
 
     void processEnvironmentVariables(EnergyPlusData &state);
 

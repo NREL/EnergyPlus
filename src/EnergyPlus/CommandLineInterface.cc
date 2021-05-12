@@ -410,7 +410,7 @@ namespace CommandLineInterface {
         }
 
         // Helper to construct output file path
-        auto composePath = [&outputFilePrefixFullPath](const std::string& suffix) -> fs::path {
+        auto composePath = [&outputFilePrefixFullPath](const std::string &suffix) -> fs::path {
             return fs::path(outputFilePrefixFullPath.string() + suffix);
         };
 
@@ -591,11 +591,11 @@ namespace CommandLineInterface {
             state.dataStrGlobals->CurrentWorkingFolder = iniFile.filePath;
             // Relying on compiler to supply full path name here
             // TODO: not sure I understand this block
-            //const auto TempIndx = index(state.dataStrGlobals->CurrentWorkingFolder, state.dataStrGlobals->pathChar, true);
-            //if (TempIndx == std::string::npos) {
-                //state.dataStrGlobals->CurrentWorkingFolder = "";
+            // const auto TempIndx = index(state.dataStrGlobals->CurrentWorkingFolder, state.dataStrGlobals->pathChar, true);
+            // if (TempIndx == std::string::npos) {
+            // state.dataStrGlobals->CurrentWorkingFolder = "";
             //} else {
-                //state.dataStrGlobals->CurrentWorkingFolder.erase(TempIndx + 1);
+            // state.dataStrGlobals->CurrentWorkingFolder.erase(TempIndx + 1);
             //}
             //       Get directories from ini file
             std::string programPathStr;
@@ -607,7 +607,8 @@ namespace CommandLineInterface {
 
         // Check if specified files exist
         if (!FileSystem::fileExists(state.dataStrGlobals->inputFilePath)) {
-            DisplayString(state, "ERROR: Could not find input data file: " + FileSystem::getAbsolutePath(state.dataStrGlobals->inputFilePath).string() + ".");
+            DisplayString(
+                state, "ERROR: Could not find input data file: " + FileSystem::getAbsolutePath(state.dataStrGlobals->inputFilePath).string() + ".");
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
                 return static_cast<int>(ReturnCodes::Failure);
@@ -618,8 +619,9 @@ namespace CommandLineInterface {
 
         if (opt.isSet("-w") && !state.dataGlobal->DDOnlySimulation) {
             if (!FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
-                DisplayString(state, "ERROR: Could not find weather file: " +
-                                      FileSystem::getAbsolutePath(state.files.inputWeatherFilePath.filePath).string() + ".");
+                DisplayString(
+                    state,
+                    "ERROR: Could not find weather file: " + FileSystem::getAbsolutePath(state.files.inputWeatherFilePath.filePath).string() + ".");
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
@@ -659,10 +661,11 @@ namespace CommandLineInterface {
         }
 
         if (runExpandObjects) {
-            fs::path expandObjectsPath = (state.dataStrGlobals->exeDirectoryPath / fs::path("ExpandObjects")).replace_extension(FileSystem::exeExtension);
+            fs::path expandObjectsPath =
+                (state.dataStrGlobals->exeDirectoryPath / fs::path("ExpandObjects")).replace_extension(FileSystem::exeExtension);
             if (!FileSystem::fileExists(expandObjectsPath)) {
-                DisplayString(state, "ERROR: Could not find ExpandObjects executable: "
-                        + FileSystem::getAbsolutePath(expandObjectsPath).string() + ".");
+                DisplayString(state,
+                              "ERROR: Could not find ExpandObjects executable: " + FileSystem::getAbsolutePath(expandObjectsPath).string() + ".");
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
@@ -674,8 +677,9 @@ namespace CommandLineInterface {
 
             // check if IDD actually exists since ExpandObjects still requires it
             if (!FileSystem::fileExists(state.dataStrGlobals->inputIddFilePath)) {
-                DisplayString(state, "ERROR: Could not find input data dictionary: "
-                        + FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFilePath).string() + ".");
+                DisplayString(state,
+                              "ERROR: Could not find input data dictionary: " +
+                                  FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFilePath).string() + ".");
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
@@ -684,7 +688,8 @@ namespace CommandLineInterface {
                 }
             }
 
-            bool iddFilePathdEnergy = (FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFilePath) == FileSystem::getAbsolutePath("Energy+.idd"));
+            bool iddFilePathdEnergy =
+                (FileSystem::getAbsolutePath(state.dataStrGlobals->inputIddFilePath) == FileSystem::getAbsolutePath("Energy+.idd"));
 
             if (!inputFilePathdIn) {
                 FileSystem::linkFile(state.dataStrGlobals->inputFilePath, "in.idf");

@@ -232,9 +232,7 @@ std::string InputOutputFile::get_output()
     }
 }
 
-InputOutputFile::InputOutputFile(fs::path FilePath, const bool DefaultToStdout)
-  : filePath{std::move(FilePath)},
-    defaultToStdOut{DefaultToStdout}
+InputOutputFile::InputOutputFile(fs::path FilePath, const bool DefaultToStdout) : filePath{std::move(FilePath)}, defaultToStdOut{DefaultToStdout}
 {
 }
 

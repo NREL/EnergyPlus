@@ -48,8 +48,8 @@
 #ifndef CONFIGURED_FUNCTIONS_HH
 #define CONFIGURED_FUNCTIONS_HH
 
-#include <string>
 #include <EnergyPlus/FileSystem.hh>
+#include <string>
 
 namespace EnergyPlus {
 

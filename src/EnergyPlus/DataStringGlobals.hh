@@ -83,8 +83,8 @@ namespace DataStringGlobals {
     char constexpr CharTab('\t');      // tab
     char constexpr CharSpace(' ');     // space
 
-    extern std::string const VerString;    // String that represents version information
-    extern std::string const MatchVersion; // String to be matched by Version object
+    extern std::string const VerString;        // String that represents version information
+    extern std::string const MatchVersion;     // String to be matched by Version object
     extern std::string const PythonAPIVersion; // API version string to be matched when using the Python API
 
 } // namespace DataStringGlobals
@@ -128,8 +128,8 @@ struct DataStringGlobalsData : BaseGlobalStruct
     fs::path CurrentWorkingFolder; // Current working directory for run
     fs::path FullPath;             // Full name of file to open, including path
 
-    std::string IDDVerString;         // Version information from the IDD (line 1)
-    std::string CurrentDateTime;      // For printing current date and time at start of run
+    std::string IDDVerString;    // Version information from the IDD (line 1)
+    std::string CurrentDateTime; // For printing current date and time at start of run
     std::string VerStringVar;
 
     void clear_state() override

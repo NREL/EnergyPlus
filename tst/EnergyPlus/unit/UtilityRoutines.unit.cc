@@ -170,7 +170,6 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 
     // clean up the file
     fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
-
 }
 
 TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
@@ -208,5 +207,4 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
 
     // clean up the file
     fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
-
 }

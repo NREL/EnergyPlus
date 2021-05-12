@@ -48,6 +48,7 @@
 #ifndef IOFiles_hh_INCLUDED
 #define IOFiles_hh_INCLUDED
 
+#include <EnergyPlus/FileSystem.hh>
 #include <cassert>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
@@ -55,7 +56,6 @@
 #include <iostream>
 #include <ostream>
 #include <vector>
-#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 

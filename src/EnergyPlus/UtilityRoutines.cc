@@ -441,19 +441,20 @@ namespace UtilityRoutines {
                 if (state.files.outputControl.perflog) {
                     fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::out); // open file normally
                     if (!fsPerfLog) {
-                        ShowFatalError(
-                            state, "appendPerfLog: Could not open file \""
-                            + state.dataStrGlobals->outputPerfLogFilePath.string() + "\" for output (write).");
+                        ShowFatalError(state,
+                                       "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFilePath.string() +
+                                           "\" for output (write).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
             } else {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::app); //append to already existing file
+                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::app); // append to already existing file
                     if (!fsPerfLog) {
-                        ShowFatalError(state, "appendPerfLog: Could not open file \""
-                                + state.dataStrGlobals->outputPerfLogFilePath.string() + "\" for output (append).");
+                        ShowFatalError(state,
+                                       "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFilePath.string() +
+                                           "\" for output (append).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
@@ -726,11 +727,8 @@ int AbortEnergyPlus(EnergyPlusData &state)
         if (!tempfl.good()) {
             DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
         }
-        print(tempfl,
-              "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n",
-              NumWarnings,
-              NumSevere,
-              Elapsed);
+        print(
+            tempfl, "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
     }
 
     // Output detailed ZONE time series data

@@ -9378,7 +9378,8 @@ namespace WeatherManager {
                 auto epwFile = state.files.inputWeatherFilePath.try_open();
                 bool epwHasLeapYear(false);
                 if (!epwFile.good()) {
-                    ShowSevereError(state, "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + epwFile.filePath.string() + " for input (read).");
+                    ShowSevereError(state,
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + epwFile.filePath.string() + " for input (read).");
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }

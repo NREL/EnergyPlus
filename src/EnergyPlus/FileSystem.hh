@@ -49,23 +49,24 @@
 #define FileSystem_hh_INCLUDED
 
 #include <algorithm>
-#include <string>
 #include <fmt/format.h>
+#include <string>
 #if __has_include(<filesystem>)
-    #include <filesystem>
-    namespace fs = std::filesystem;
+#include <filesystem>
+namespace fs = std::filesystem;
 #elif __has_include(<experimental/filesystem>)
-    #include <experimental/filesystem>
-    namespace fs = std::experimental::filesystem;
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
 #else
-    #error "no filesystem support"
+#error "no filesystem support"
 #endif
 
 // Add a custom formatter for fmt
 namespace fmt {
-    template <>
-    struct formatter<fs::path> : formatter<std::string> {};
-}
+template <> struct formatter<fs::path> : formatter<std::string>
+{
+};
+} // namespace fmt
 
 // If we want to allow this kind of stuff
 // fs::path p = "folder/eplus";
@@ -78,15 +79,14 @@ namespace fmt {
 //    return fs::path(left)+=right;
 // }
 
-
 namespace EnergyPlus {
 
 namespace FileSystem {
 
     extern std::string const exeExtension;
 
-
-    enum class InputFileType {
+    enum class InputFileType
+    {
         EpJSON,
         IDF,
         CBOR,

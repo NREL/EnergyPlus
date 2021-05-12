@@ -89,11 +89,11 @@ namespace PluginManagement {
 
     void clear_state();
 
-    struct PluginInstance {
-        PluginInstance(const fs::path& _modulePath, const std::string& _className, std::string emsName, bool runPluginDuringWarmup) :
-                modulePath(_modulePath), className(_className),
-                emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup),
-                stringIdentifier(_modulePath.string() + "." + _className)
+    struct PluginInstance
+    {
+        PluginInstance(const fs::path &_modulePath, const std::string &_className, std::string emsName, bool runPluginDuringWarmup)
+            : modulePath(_modulePath), className(_className), emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup),
+              stringIdentifier(_modulePath.string() + "." + _className)
         {
         }
 
@@ -184,7 +184,7 @@ namespace PluginManagement {
         ~PluginManager();
 
         static int numActiveCallbacks(EnergyPlusData &state);
-        static void addToPythonPath(EnergyPlusData &state, const fs::path& path, bool userDefinedPath);
+        static void addToPythonPath(EnergyPlusData &state, const fs::path &path, bool userDefinedPath);
         static fs::path sanitizedPath(fs::path const &path);
         static void setupOutputVariables(EnergyPlusData &state);
 

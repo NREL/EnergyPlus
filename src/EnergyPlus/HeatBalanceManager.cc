@@ -77,8 +77,8 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
@@ -6674,7 +6674,8 @@ namespace HeatBalanceManager {
         ++FileLineCount;
         if (!has_prefixi(NextLine.data, "WINDOW5")) {
             ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFilePath.string());
-            ShowFatalError(state, "Error reading Window5 Data File: first word of window entry is \"" + NextLine.data.substr(0, 7) + "\", should be Window5.");
+            ShowFatalError(
+                state, "Error reading Window5 Data File: first word of window entry is \"" + NextLine.data.substr(0, 7) + "\", should be Window5.");
         }
 
     Label10:;

@@ -81,7 +81,7 @@ namespace TARCOGOutput {
         InputOutputFile DebugOutputFile{DebugOutputFilePath};
     };
 
-    void WriteInputArguments(EnergyPlusData &state, 
+    void WriteInputArguments(EnergyPlusData &state,
                              InputOutputFile &InArgumentsFile,
                              fs::path const &DBGC,
                              Real64 tout,

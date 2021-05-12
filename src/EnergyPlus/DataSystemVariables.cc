@@ -128,8 +128,8 @@ namespace DataSystemVariables {
     // Functions
 
     fs::path CheckForActualFilePath(EnergyPlusData &state,
-                                    fs::path const &originalInputFilePath,    // path (or filename only) as input for object
-                                    const std::string& contextString           //
+                                    fs::path const &originalInputFilePath, // path (or filename only) as input for object
+                                    const std::string &contextString       //
     )
     {
 
@@ -185,12 +185,11 @@ namespace DataSystemVariables {
         for (std::size_t i = 0; i < numPathsToNotTest; i++) {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
                 foundFilePath = pathsToCheck[i].first;
-                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second +")", FileSystem::getAbsolutePath(foundFilePath).string());
+                print(state.files.audit, "{}={}\n", "found (" + pathsToCheck[i].second + ")", FileSystem::getAbsolutePath(foundFilePath).string());
                 return foundFilePath;
             } else {
-                std::pair <fs::path,std::string> currentPath(
-                        FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
-                        pathsToCheck[i].second);
+                std::pair<fs::path, std::string> currentPath(FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(pathsToCheck[i].first)),
+                                                             pathsToCheck[i].second);
                 bool found = false;
                 for (auto path : pathsChecked) {
                     if (path.first == currentPath.first) {
@@ -200,16 +199,18 @@ namespace DataSystemVariables {
                 if (!found) {
                     pathsChecked.push_back(currentPath);
                 }
-                print(state.files.audit, "{}={}\n", "not found (" + pathsToCheck[i].second +")\"",
+                print(state.files.audit,
+                      "{}={}\n",
+                      "not found (" + pathsToCheck[i].second + ")\"",
                       FileSystem::getAbsolutePath(pathsToCheck[i].first).string());
             }
         }
 
         // If we get here, we didn't find the file
-        ShowSevereError(state, contextString+ "\"" + originalInputFilePath.string() + "\" not found.");
+        ShowSevereError(state, contextString + "\"" + originalInputFilePath.string() + "\" not found.");
         ShowContinueError(state, "  Paths searched:");
-        for(auto path: pathsChecked){
-            ShowContinueError(state, "    " + path.second +": \"" + path.first.string() +"\"");
+        for (auto path : pathsChecked) {
+            ShowContinueError(state, "    " + path.second + ": \"" + path.first.string() + "\"");
         }
 
         return foundFilePath;

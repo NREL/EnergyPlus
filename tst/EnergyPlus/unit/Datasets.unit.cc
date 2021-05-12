@@ -104,8 +104,7 @@ TEST_F(DataSetFixture, ElectricityUSAEnvironmentalImpactFactors)
 }
 TEST_F(DataSetFixture, ElectronicEnthalpyEconomizerCurves)
 {
-    ASSERT_TRUE(
-        process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/ElectronicEnthalpyEconomizerCurves.idf"))));
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() / "datasets/ElectronicEnthalpyEconomizerCurves.idf"))));
 }
 TEST_F(DataSetFixture, ExhaustFiredChiller)
 {

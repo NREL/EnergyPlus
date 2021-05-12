@@ -103,7 +103,7 @@ namespace FileSystem {
         // Note: this is needed because "/a/b/c".parent_path() = "/a/b/c/"
         std::string pathStr = path.string();
         while ((pathStr.back() == DataStringGlobals::pathChar) || (pathStr.back() == DataStringGlobals::altpathChar)) {
-            pathStr.erase(pathStr.size()-1);
+            pathStr.erase(pathStr.size() - 1);
         }
 
         // If empty, return "./" instead
@@ -112,7 +112,6 @@ namespace FileSystem {
             parent_path = "./";
         }
         return parent_path;
-
     }
 
     fs::path getAbsolutePath(fs::path const &path)
@@ -160,15 +159,14 @@ namespace FileSystem {
             }
         }
 
-
         // Workaround to maintain std::string & backward compat
         // TODO: is this wanted?
         // The problem is really only for unit tests, if you try to compare getAbsolutePath("sandbox/") == getAbsolutePath("sandbox") you get false
         // because one has the trailing sep, the other doesn't. Both paths have the same components though (if iterated on), and as long as you use
         // path operations (such as operator/) and not string concatenation, this works just fine.
-        //std::string s = result.string();
-        //if (fs::is_directory(s)) {
-            //s += '/';
+        // std::string s = result.string();
+        // if (fs::is_directory(s)) {
+        // s += '/';
         //}
         return result;
     }
@@ -202,7 +200,8 @@ namespace FileSystem {
 
     // TODO: remove? seems like fs::path::extension would do fine. It's only used in CommandLineInterface to check the input file type, so we could
     // just compare to ".EPJSON" instead of "EPJSON"...
-    fs::path getFileExtension(fs::path const &filePath) {
+    fs::path getFileExtension(fs::path const &filePath)
+    {
         std::string pext = fs::path(filePath).extension().string();
         if (!pext.empty()) {
             // remove '.'
@@ -212,26 +211,25 @@ namespace FileSystem {
     }
 
     // TODO: is this any better?
-    InputFileType getInputFileType(fs::path const &filePath) {
+    InputFileType getInputFileType(fs::path const &filePath)
+    {
         std::string pext = fs::path(filePath).extension().string();
         std::transform(pext.begin(), pext.end(), pext.begin(), ::toupper);
         if (pext == ".EPJSON" || pext == ".JSON") {
             return InputFileType::EpJSON;
         } else if (pext == ".IDF" || pext == ".IMF") {
-           return InputFileType::IDF;
+            return InputFileType::IDF;
         } else if (pext == ".CBOR") {
             return InputFileType::CBOR;
         } else if (pext == ".MSGPACK") {
-             return InputFileType::MsgPack;
+            return InputFileType::MsgPack;
         } else if (pext == ".UBJSON") {
             return InputFileType::UBJSON;
         } else if (pext == ".BSON") {
             return InputFileType::BSON;
         }
         return InputFileType::Unknown;
-
     }
-
 
     // TODO: remove for fs::path::replace_extension directly? Note that replace_extension mutates the object
     fs::path removeFileExtension(fs::path const &filePath)
@@ -245,7 +243,6 @@ namespace FileSystem {
         // return fs::path(filePath).stem().string();
         return fs::path(filePath).replace_extension(ext);
     }
-
 
     // TODO: remove? `fs::create_directory` for a single or `fs::create_directories` for nested directory creation
     void makeDirectory(fs::path const &directoryPath)
@@ -289,7 +286,7 @@ namespace FileSystem {
         // rename would fail if copying accross devices
         try {
             fs::rename(fs::path(filePath), destination);
-        } catch (fs::filesystem_error&) {
+        } catch (fs::filesystem_error &) {
             fs::copy(filePath, destination, fs::copy_options::update_existing);
             fs::remove(filePath);
         }

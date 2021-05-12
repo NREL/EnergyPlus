@@ -430,7 +430,7 @@ PluginManager::PluginManager(EnergyPlusData &state)
     PyRun_SimpleString("import sys"); // allows us to report sys.path later
 
     // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
-    fs::path pathToDynLoad = FileSystem::makeNativePath(sanitizedProgramDir /"python_standard_lib/lib-dynload");
+    fs::path pathToDynLoad = FileSystem::makeNativePath(sanitizedProgramDir / "python_standard_lib/lib-dynload");
     fs::path libDirDynLoad = PluginManager::sanitizedPath(pathToDynLoad);
     PluginManager::addToPythonPath(state, libDirDynLoad, false);
 
@@ -602,7 +602,7 @@ PluginManager::~PluginManager()
 }
 
 #if LINK_WITH_PYTHON == 1
-fs::path PluginManager::sanitizedPath(fs::path const& path)
+fs::path PluginManager::sanitizedPath(fs::path const &path)
 {
     // there are parts of this program that need to write out a string to execute in Python
     // because of that, escaped backslashes actually need double escaping
@@ -614,7 +614,7 @@ fs::path PluginManager::sanitizedPath(fs::path const& path)
     }
     std::string pathStr = path.string();
     if (pathStr.back() == '\\') {
-        pathStr.erase(pathStr.size()-1);
+        pathStr.erase(pathStr.size() - 1);
     }
     // then sanitize it to escape the backslashes for writing the string literal to Python
     std::string sanitizedDir;
@@ -628,7 +628,7 @@ fs::path PluginManager::sanitizedPath(fs::path const& path)
     return fs::path(sanitizedDir);
 }
 #else
-fs::path PluginManager::sanitizedPath([[maybe_unused]] fs::path const& path)
+fs::path PluginManager::sanitizedPath([[maybe_unused]] fs::path const &path)
 {
     return fs::path();
 }
@@ -792,8 +792,9 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     std::string const detectOverriddenFunctionName = "_detect_overridden";
     PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
     if (!detectFunction || !PyCallable_Check(detectFunction)) {
-        EnergyPlus::ShowSevereError(state, "Could not find or call function \"" + detectOverriddenFunctionName
-                + "\" on class \"" + this->modulePath.string() + "." + this->className + "\"");
+        EnergyPlus::ShowSevereError(state,
+                                    "Could not find or call function \"" + detectOverriddenFunctionName + "\" on class \"" +
+                                        this->modulePath.string() + "." + this->className + "\"");
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         } else {

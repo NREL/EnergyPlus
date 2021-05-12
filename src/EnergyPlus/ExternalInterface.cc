@@ -1051,7 +1051,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // in any case, the relative paths work fine here
 
         // post process as needed in case these are used later
-        state.dataExternalInterface->FMURootWorkingFolder = fs::path("tmp-fmus");  // getStringFromCharArray( FMUWorkingFolderCharArr );
+        state.dataExternalInterface->FMURootWorkingFolder = fs::path("tmp-fmus"); // getStringFromCharArray( FMUWorkingFolderCharArr );
 
         // Get and store the names of all FMUs in EnergyPlus data structure
         strippedFileName.allocate(state.dataExternalInterface->NumFMUObjects);
@@ -1193,7 +1193,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // write output folder where FMUs will be unpacked later on.
         for (i = 1; i <= state.dataExternalInterface->NumFMUObjects; ++i) {
             for (j = 1; j <= state.dataExternalInterface->FMU(i).NumInstances; ++j) {
-                state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder = state.dataExternalInterface->FMURootWorkingFolder /
+                state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder =
+                    state.dataExternalInterface->FMURootWorkingFolder /
                     fs::path(strippedFileName(i) + '_' + state.dataExternalInterface->FMU(i).Instance(j).Name);
             }
         }
@@ -1253,11 +1254,11 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                     // get the path to the binaries
                     // preprocess args for library call
                     auto workingFolderArr(getCharArrayFromString(state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string()));
-                    // Reserve some space in the string, becasue addLibPathCurrentWorkflowFolder doesn't allocate memory for the workingFolderWithLibArr
-                    // Note: you can't call str.resize(str.length() + 91) because the conversion to std::vector<char> will find the null
-                    // terminator and so it will have no effect
+                    // Reserve some space in the string, becasue addLibPathCurrentWorkflowFolder doesn't allocate memory for the
+                    // workingFolderWithLibArr Note: you can't call str.resize(str.length() + 91) because the conversion to std::vector<char> will
+                    // find the null terminator and so it will have no effect
                     std::string reservedString = state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder.string() +
-                        "                                                                                           ";
+                                                 "                                                                                           ";
                     auto workingFolderWithLibArr(getCharArrayFromString(reservedString));
 
                     // make the library call
@@ -1267,7 +1268,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                       &state.dataExternalInterface->FMU(i).Instance(j).Index);
 
                     // post process args in case they are used later
-                    state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib = fs::path(trim(getStringFromCharArray(workingFolderWithLibArr)));
+                    state.dataExternalInterface->FMU(i).Instance(j).WorkingFolder_wLib =
+                        fs::path(trim(getStringFromCharArray(workingFolderWithLibArr)));
 
                     if (retValfmiPathLib != 0) {
                         ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to");

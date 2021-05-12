@@ -105,7 +105,7 @@ TEST(FileSystem, getAbsolutePath)
     EXPECT_TRUE(absPathName.find(pathName) != std::string::npos); // Check that the path name appears in the absolute path
 
     std::string currentDirWithSep = std::string(".") + EnergyPlus::DataStringGlobals::pathChar;
-    pathName =  currentDirWithSep + std::string("FileSystemTest.idf");  // e.g., "./FileSystemTest.idf"
+    pathName = currentDirWithSep + std::string("FileSystemTest.idf"); // e.g., "./FileSystemTest.idf"
     absPathName = EnergyPlus::FileSystem::getAbsolutePath(pathName).string();
     EXPECT_FALSE(absPathName.find(currentDirWithSep) != std::string::npos); // Make sure "./" doesn't appear in absolute path
 }
@@ -117,7 +117,6 @@ TEST(FileSystem, Others)
         EXPECT_EQ("idf", EnergyPlus::FileSystem::getFileExtension(pathName));
         EXPECT_EQ("folder/FileSystemTest.txt", EnergyPlus::FileSystem::removeFileExtension(pathName));
         EXPECT_EQ(fs::path("folder"), EnergyPlus::FileSystem::getParentDirectoryPath(pathName));
-
     }
     {
         std::string pathName = "folder/FileSystemTest.txt";
@@ -204,26 +203,12 @@ TEST(FileSystem, Elaborate)
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox/"));
     EXPECT_GT(EnergyPlus::FileSystem::getAbsolutePath(pathName).string().size(), pathName.size());
     // fs::equivalent throws when it doesn't exist (because it checks for file status)
-    EXPECT_TRUE(fs::equivalent(
-                    fs::path("sandbox/"),
-                    EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName))
-                )
-    );
-    EXPECT_TRUE(fs::equivalent(
-                    fs::path("sandbox"),
-                    EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName))
-                )
-    );
-    EXPECT_TRUE(fs::equivalent(
-                    fs::path("sandbox"),
-                    EnergyPlus::FileSystem::getAbsolutePath("./sandbox")
-                )
-    );
-    EXPECT_TRUE(fs::equivalent(
-                    fs::path("sandbox"),
-                    EnergyPlus::FileSystem::getAbsolutePath("./sandbox/../sandbox")
-                )
-    );
+    EXPECT_TRUE(
+        fs::equivalent(fs::path("sandbox/"), EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName))));
+    EXPECT_TRUE(
+        fs::equivalent(fs::path("sandbox"), EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName))));
+    EXPECT_TRUE(fs::equivalent(fs::path("sandbox"), EnergyPlus::FileSystem::getAbsolutePath("./sandbox")));
+    EXPECT_TRUE(fs::equivalent(fs::path("sandbox"), EnergyPlus::FileSystem::getAbsolutePath("./sandbox/../sandbox")));
     EnergyPlus::FileSystem::removeFile(pathName);
     EXPECT_FALSE(EnergyPlus::FileSystem::pathExists(pathName));
     EXPECT_FALSE(EnergyPlus::FileSystem::fileExists(pathName));
@@ -259,8 +244,7 @@ TEST(FileSystem, getAbsolutePath_WithSymlink)
     EXPECT_EQ(exeName, fs::read_symlink(symlinkPath));
 
     // Now, we check that we can actually resolve it correctly
-    EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath(exePath),
-              EnergyPlus::FileSystem::getAbsolutePath(symlinkPath));
+    EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath(exePath), EnergyPlus::FileSystem::getAbsolutePath(symlinkPath));
 
     fs::remove_all("sandbox");
 }
