@@ -133,6 +133,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
     state->dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(SurfNum) = 0.0;
     state->dataSurface->SurfHasSurroundingSurfProperties.allocate(SurfNum);
     state->dataSurface->SurfHasSurroundingSurfProperties(SurfNum) = 0;
+    state->dataSurface->SurfMaterialMovInsulExt.allocate(SurfNum);
+    state->dataSurface->SurfMaterialMovInsulExt(SurfNum) = 1;
 
     state->dataHeatBalSurf->TH.allocate(2, 2, 1);
     state->dataSurface->Surface.allocate(SurfNum);

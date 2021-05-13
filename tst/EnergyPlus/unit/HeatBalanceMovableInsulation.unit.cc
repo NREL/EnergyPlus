@@ -282,6 +282,13 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     state->dataSurface->TotSurfaces = 1;
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->SurfMaterialMovInsulExt.allocate(1);
+    state->dataSurface->SurfSchedMovInsulExt.allocate(1);
+    state->dataSurface->SurfMaterialMovInsulInt.allocate(1);
+    state->dataSurface->SurfSchedMovInsulInt.allocate(1);
+    state->dataSurface->SurfMaterialMovInsulExt = 0;
+    state->dataSurface->SurfSchedMovInsulExt = 0;
+    state->dataSurface->SurfMaterialMovInsulInt = 0;
+    state->dataSurface->SurfSchedMovInsulInt = 0;
     state->dataSurfaceGeometry->SurfaceTmp.allocate(1);
     int SurfNum = 0;
     int TotHTSurfs = state->dataSurface->TotSurfaces = 1;

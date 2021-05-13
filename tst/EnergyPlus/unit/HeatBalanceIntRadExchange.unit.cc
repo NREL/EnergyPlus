@@ -309,7 +309,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     state->dataHeatBalSurf->SurfMovInsulIntPresent(1) = false;
     state->dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(1) = false;
     state->dataSurface->Surface(1).Construction = 1;
-    state->dataSurface->SurfMaterialMovInsulInt(1)= -1;
+    state->dataSurface->SurfMaterialMovInsulInt(1)= 1;
 
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     state->dataMaterial->Material(1).AbsorpThermal = 0.5;
