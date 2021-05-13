@@ -1197,9 +1197,26 @@ void ConstructionProps::calculateExponentialMatrix()
     // raised in order to calculate the exponential matrix.  A new cut-off
     // criteria based on the number of significant figures in a double-
     // precision variable is used as a more practical limit on the
-    // exponentiation algorithm.
+    // exponentiation algorithm.  One thing to note is that the EnergyPlus
+    // code is slightly different here than what is presented in Seem's
+    // dissertation.  In Seem's dissertation, AMatRowNormMax (delta, the
+    // timestep, is already factored into this term above) is divided by
+    // 2^k with k defined in the code above.  This should have been done
+    // here to follow Seem's algorithm exactly.  However, in EnergyPlus,
+    // this was not done and there is some uncertainty as to why it wasn't.
+    // Dividing AMatRowNormMax by 2^k would have the net effect of decreasing
+    // the value of AMatRowNormMax and thus potentially CheckVal as well.
+    // l, the integer value of CheckVal, is used to define the number of
+    // terms in the exponential matrix of AMat that are required for an
+    // accurate estimation of that matrix.  In practice, additional terms
+    // probably won't have a large effect but in general should make the
+    // calculation MORE accurate.  Also, if the new terms are too small,
+    // then as noted above the cut-off criteria will not use them.
+    // Given that there is no harm in making l (integer of CheckVal) larger
+    // but it could result in a more accurate solution, it was decided to
+    // keep the value of AMatRowNormMax as it has been traditionally done
+    // in EnergyPlus since it could lead to higher accuracy.
 
-    AMatRowNormMax /= std::pow(2.0, k);    // AMatRowNormMax was factored earlier by the time step but did not include this division
     CheckVal = min(3.0 * AMatRowNormMax + 6.0, 100.0);
     l = int(CheckVal);
 
