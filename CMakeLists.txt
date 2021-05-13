@@ -5,6 +5,8 @@ if(CCACHE_PROGRAM)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
+cmake_policy(SET CMP0048 NEW) # handling project_version_* variables
+
 project(EnergyPlus)
 
 cmake_minimum_required(VERSION 3.10)
