@@ -3651,7 +3651,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 // the fraction that is absorbed plus the back reflected portion (first order reflection only)
                 // to the plane between the transparent insulation and the exterior surface face.
                 state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(SurfNum) =
-                    state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulExt(SurfNum)).Trans * state.dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) *
+                    state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulExt(SurfNum)).Trans *
+                    state.dataHeatBalSurf->SurfQRadSWOutMvIns(SurfNum) *
                     ((state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar / AbsExt) +
                      (1 - state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpSolar));
                 state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(SurfNum) =
@@ -4589,7 +4590,8 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 
                 Surface(SurfNum).Construction = state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum);
                 state.dataConstruction->Construct(Surface(SurfNum).Construction).IsUsed = true;
-                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum);;
+                state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum);
+                ;
 
             } else { // have not checked yet or is not okay, so see if we need to warn about incompatible
                 if (!state.dataRuntimeLang->EMSConstructActuatorChecked(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum)) {
@@ -7086,7 +7088,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         ShowSevereError(state, "Interior movable insulation is not valid with embedded sources/sinks");
                         ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
                         ShowContinueError(state,
-                                          "interior movable insulation " + state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).Name +
+                                          "interior movable insulation " +
+                                              state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).Name +
                                               " for a surface with that construction.");
                         ShowContinueError(state,
                                           "This is not currently allowed because the heat balance equations do not currently accommodate "
@@ -8632,7 +8635,8 @@ void CalcOutsideSurfTemp(EnergyPlusData &state,
             ShowSevereError(state, "Exterior movable insulation is not valid with embedded sources/sinks");
             ShowContinueError(state, "Construction " + construct.Name + " contains an internal source or sink but also uses");
             ShowContinueError(state,
-                              "exterior movable insulation " + state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulExt(SurfNum)).Name +
+                              "exterior movable insulation " +
+                                  state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulExt(SurfNum)).Name +
                                   " for a surface with that construction.");
             ShowContinueError(state,
                               "This is not currently allowed because the heat balance equations do not currently accommodate this combination.");

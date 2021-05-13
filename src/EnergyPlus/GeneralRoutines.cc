@@ -946,7 +946,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Real64 sum_area = 0.0;
     Real64 sum_produc_area_drybulb = 0.0;
     Real64 sum_produc_area_wetbulb = 0.0;
-    for (int SurfNum: SurfPtrARR) {
+    for (int SurfNum : SurfPtrARR) {
         sum_area += state.dataSurface->Surface(SurfNum).Area;
         sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
         sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);

@@ -1903,7 +1903,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
 
     int SurfNum;
     for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
-        state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;           // Surf temp
+        state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;       // Surf temp
         state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22; // Air temp
         state->dataSurface->SurfExtConvCoeff(SurfNum) = -6;
         state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;

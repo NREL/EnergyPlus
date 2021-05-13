@@ -1137,9 +1137,8 @@ namespace SolarCollectors {
             {
                 auto const SELECT_CASE_var(state.dataSolarCollectors->Parameters(ParamNum).TestType);
                 if (SELECT_CASE_var == TestTypeEnum::INLET) {
-                    FRULpTest =
-                        state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                        state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
+                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
                     TestTypeMod = 1.0;
 
                 } else if (SELECT_CASE_var == TestTypeEnum::AVERAGE) {
@@ -1149,9 +1148,8 @@ namespace SolarCollectors {
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / (2.0 * mCpATest));
 
                 } else if (SELECT_CASE_var == TestTypeEnum::OUTLET) {
-                    FRULpTest =
-                        state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                        state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
+                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / mCpATest);
                 }
             }
@@ -1224,8 +1222,7 @@ namespace SolarCollectors {
                 // Calculate temperature of stagnant fluid in collector
                 Real64 A = -FRULT;
                 Real64 B = -FRUL + 2.0 * FRULT * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
-                Real64 C = -FRULT * pow_2(state.dataSurface->SurfOutDryBulbTemp(SurfNum)) +
-                           FRUL * state.dataSurface->SurfOutDryBulbTemp(SurfNum) -
+                Real64 C = -FRULT * pow_2(state.dataSurface->SurfOutDryBulbTemp(SurfNum)) + FRUL * state.dataSurface->SurfOutDryBulbTemp(SurfNum) -
                            FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
                 Real64 qEquation = (pow_2(B) - 4.0 * A * C);
                 if (qEquation < 0.0) {
@@ -1766,9 +1763,9 @@ namespace SolarCollectors {
         int NumCovers = state.dataSolarCollectors->Parameters(ParamNum).NumOfCovers;
         int SurfNum = this->Surface;
 
-        Real64 TempAbsPlate = this->SavedTempOfAbsPlate;                            // absorber plate average temperature [C]
-        Real64 TempInnerCover = this->SavedTempOfInnerCover;                        // inner cover average temperature [C]
-        Real64 TempOuterCover = this->SavedTempOfOuterCover;                        // outer cover average temperature [C]
+        Real64 TempAbsPlate = this->SavedTempOfAbsPlate;                        // absorber plate average temperature [C]
+        Real64 TempInnerCover = this->SavedTempOfInnerCover;                    // inner cover average temperature [C]
+        Real64 TempOuterCover = this->SavedTempOfOuterCover;                    // outer cover average temperature [C]
         Real64 TempOutdoorAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum); // outdoor air temperature [C]
 
         Real64 EmissOfAbsPlate = state.dataSolarCollectors->Parameters(ParamNum).EmissOfAbsPlate;   // emissivity of absorber plate

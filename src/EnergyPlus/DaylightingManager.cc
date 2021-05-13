@@ -3399,9 +3399,9 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 } else {
                     ObsVisRefl = state.dataSurface->SurfShadowDiffuseVisRefl(NearestHitSurfNum);
                     if (state.dataSurface->SurfShadowGlazingConstruct(NearestHitSurfNum) > 0)
-                        ObsVisRefl += state.dataSurface->SurfShadowGlazingFrac(NearestHitSurfNum) *
-                                      state.dataConstruction->Construct(state.dataSurface->SurfShadowGlazingConstruct(NearestHitSurfNum))
-                                          .ReflectVisDiffFront;
+                        ObsVisRefl +=
+                            state.dataSurface->SurfShadowGlazingFrac(NearestHitSurfNum) *
+                            state.dataConstruction->Construct(state.dataSurface->SurfShadowGlazingConstruct(NearestHitSurfNum)).ReflectVisDiffFront;
                 }
             }
             NearestHitSurfNumX = NearestHitSurfNum;
@@ -3803,11 +3803,10 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                     POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                             }
                             if (state.dataSurface->SurfIsShadowing(ReflSurfNum) && state.dataSurface->SurfShadowGlazingConstruct(ReflSurfNum) > 0)
-                                SpecReflectance =
-                                    state.dataSurface->SurfShadowGlazingFrac(ReflSurfNum) *
-                                    POLYF(std::abs(CosIncAngRefl),
-                                          state.dataConstruction->Construct(state.dataSurface->SurfShadowGlazingConstruct(ReflSurfNum))
-                                              .ReflSolBeamFrontCoef);
+                                SpecReflectance = state.dataSurface->SurfShadowGlazingFrac(ReflSurfNum) *
+                                                  POLYF(std::abs(CosIncAngRefl),
+                                                        state.dataConstruction->Construct(state.dataSurface->SurfShadowGlazingConstruct(ReflSurfNum))
+                                                            .ReflSolBeamFrontCoef);
                             TVisRefl = POLYF(CosIncAngRec, state.dataConstruction->Construct(IConst).TransVisBeamCoef) *
                                        state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                             state.dataDaylightingManager->EDIRSUdisk(iHour, 1) += SunVecMir(3) * SpecReflectance * TVisRefl; // Bare window
@@ -5907,8 +5906,7 @@ void DayltgHitObstruction(EnergyPlusData &state,
         // Lambda function for the octree to test for surface hit and update transmittance if hit
         auto solarTransmittance = [=, &state, &R1, &RN, &hit, &ObTrans](SurfaceData const &surface) -> bool {
             int const ObsSurfNum = surface.Index;
-            if (!state.dataSurface->SurfShadowPossibleObstruction(ObsSurfNum))
-                return false; // Do Consider separate octree without filtered surfaces
+            if (!state.dataSurface->SurfShadowPossibleObstruction(ObsSurfNum)) return false; // Do Consider separate octree without filtered surfaces
             auto const sClass(surface.Class);
             if ((sClass == SurfaceClass::Wall || sClass == SurfaceClass::Roof || sClass == SurfaceClass::Floor) && (&surface != window_base_p)) {
                 PierceSurface(surface, R1, RN, state.dataDaylightingManager->DayltgHitObstructionHP, hit);

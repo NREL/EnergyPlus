@@ -11364,8 +11364,8 @@ namespace SurfaceGeometry {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            SurfNum = UtilityRoutines::FindItemInList(
-                state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
+            SurfNum =
+                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
             MaterNum =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
@@ -11447,11 +11447,10 @@ namespace SurfaceGeometry {
                                     ShowSevereError(state,
                                                     cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                         state.dataIPShortCut->cAlphaArgs(2) + "\", already assigned.");
-                                    ShowContinueError(
-                                        state,
-                                        "\"Outside\", was already assigned Material=\"" +
-                                            state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).Name +
-                                            "\".");
+                                    ShowContinueError(state,
+                                                      "\"Outside\", was already assigned Material=\"" +
+                                                          state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).Name +
+                                                          "\".");
                                     ShowContinueError(state,
                                                       "attempting to assign Material=\"" + state.dataMaterial->Material(MaterNum).Name + "\".");
                                     ErrorsFound = true;
@@ -11494,11 +11493,10 @@ namespace SurfaceGeometry {
                                     ShowSevereError(state,
                                                     cCurrentModuleObject + ", " + state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" +
                                                         state.dataIPShortCut->cAlphaArgs(2) + "\", already assigned.");
-                                    ShowContinueError(
-                                        state,
-                                        "\"Inside\", was already assigned Material=\"" +
-                                            state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).Name +
-                                            "\".");
+                                    ShowContinueError(state,
+                                                      "\"Inside\", was already assigned Material=\"" +
+                                                          state.dataMaterial->Material(state.dataSurface->SurfMaterialMovInsulInt(SurfNum)).Name +
+                                                          "\".");
                                     ShowContinueError(state,
                                                       "attempting to assign Material=\"" + state.dataMaterial->Material(MaterNum).Name + "\".");
                                     ErrorsFound = true;

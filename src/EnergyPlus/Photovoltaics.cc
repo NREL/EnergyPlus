@@ -942,10 +942,10 @@ namespace Photovoltaics {
         state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IncidenceAngle =
             std::acos(state.dataHeatBal->SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians; // (deg) from dataHeatBalance
         state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.ZenithAngle =
-            std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                               //(degrees),
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb = state.dataSurface->SurfOutDryBulbTemp(ThisSurf); //(deg. C)
+            std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                              //(degrees),
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Tamb = state.dataSurface->SurfOutDryBulbTemp(ThisSurf);    //(deg. C)
         state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.WindSpeed = state.dataSurface->SurfOutWindSpeed(ThisSurf); // (m/s)
-        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                      // from DataEnvironment via USE
+        state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                     // from DataEnvironment via USE
 
         if (((state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcBeam + state.dataPhotovoltaic->PVarray(PVnum).SNLPVinto.IcDiffuse) >
              state.dataPhotovoltaic->MinIrradiance) &&

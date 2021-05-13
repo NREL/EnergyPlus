@@ -666,9 +666,9 @@ namespace DataSurfaces {
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), ExtSolar(false),
               ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
-              MirroredSurf(false), SchedShadowSurfIndex(0), IsTransparent(false), SchedMinValue(0.0),
-              activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0),
-              FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
+              MirroredSurf(false), SchedShadowSurfIndex(0), IsTransparent(false), SchedMinValue(0.0), activeWindowShadingControl(0),
+              HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0),
+              IsAirBoundarySurf(false)
         {
         }
 

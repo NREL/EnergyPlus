@@ -912,18 +912,18 @@ namespace TranspiredCollector {
 
         // determine average ambient temperature
         Real64 sum_area = 0.0;
-        for (int SurfNum: state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
             sum_area += state.dataSurface->Surface(SurfNum).Area;
         }
         if (!state.dataEnvrn->IsRain) {
             Real64 sum_produc_area_drybulb = 0.0;
-            for (int SurfNum: state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
                 sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
             }
             Tamb = sum_produc_area_drybulb / sum_area;
         } else { // when raining we use wet bulb not drybulb
             Real64 sum_produc_area_wetbulb = 0.0;
-            for (int SurfNum: state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
                 sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
             }
             Tamb = sum_produc_area_wetbulb / sum_area;
@@ -1035,18 +1035,18 @@ namespace TranspiredCollector {
         // Active UTSC calculation
         // first do common things for both correlations
         Real64 sum_area = 0.0;
-        for (int SurfNum: state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
             sum_area += state.dataSurface->Surface(SurfNum).Area;
         }
         if (!state.dataEnvrn->IsRain) {
             Real64 sum_produc_area_drybulb = 0.0;
-            for (int SurfNum: state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
                 sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
             }
             Tamb = sum_produc_area_drybulb / sum_area;
         } else { // when raining we use wet bulb not drybulb
             Real64 sum_produc_area_wetbulb = 0.0;
-            for (int SurfNum: state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
                 sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
             }
             Tamb = sum_produc_area_wetbulb / sum_area;
@@ -1322,7 +1322,7 @@ namespace TranspiredCollector {
         Real64 sum_area = 0.0;
         Real64 sum_produc_area_drybulb = 0.0;
         Real64 sum_produc_area_wetbulb = 0.0;
-        for (int SurfNum: state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
             sum_area += state.dataSurface->Surface(SurfNum).Area;
             sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
             sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
