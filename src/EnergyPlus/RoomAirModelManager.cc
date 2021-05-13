@@ -723,33 +723,17 @@ namespace RoomAirModelManager {
             {
                 auto const nodeType(state.dataIPShortCut->cAlphaArgs(2));
                 if (nodeType == "INLET") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = InletAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::InletAirNode;
                 } else if (nodeType == "FLOOR") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = FloorAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::FloorAirNode;
                 } else if (nodeType == "CONTROL") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = ControlAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ControlAirNode;
                 } else if (nodeType == "CEILING") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = CeilingAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::CeilingAirNode;
                 } else if (nodeType == "MUNDTROOM") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = MundtRoomAirNode;
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::MundtRoomAirNode;
                 } else if (nodeType == "RETURN") {
-                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = ReturnAirNode;
-                    //            CASE ('PLUME1')
-                    //                AirNode(AirNodeNum)%ClassType   = PlumeAirNode1
-                    //            CASE ('PLUME2')
-                    //                AirNode(AirNodeNum)%ClassType   = PlumeAirNode2
-                    //            CASE ('PLUME3')
-                    //                AirNode(AirNodeNum)%ClassType   = PlumeAirNode3
-                    //            CASE ('PLUME4')
-                    //                AirNode(AirNodeNum)%ClassType   = PlumeAirNode4
-                    //            CASE ('REESROOM1')
-                    //                AirNode(AirNodeNum)%ClassType   = RoomAirNode1
-                    //            CASE ('REESROOM2')
-                    //                AirNode(AirNodeNum)%ClassType   = RoomAirNode2
-                    //            CASE ('REESROOM3')
-                    //                AirNode(AirNodeNum)%ClassType   = RoomAirNode3
-                    //            CASE ('REESROOM4')
-                    //                AirNode(AirNodeNum)%ClassType   = RoomAirNode4
+                    state.dataRoomAirMod->AirNode(AirNodeNum).ClassType = AirNodeType::ReturnAirNode;
                 } else {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1));

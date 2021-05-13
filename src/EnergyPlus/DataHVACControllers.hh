@@ -62,42 +62,51 @@ namespace DataHVACControllers {
 
     int constexpr ControllerSimple_Type(1);
 
-    // Controller action used in modules HVACControllers and ZoneControllers
-    int constexpr iNoAction(0);
-    int constexpr iReverseAction(1);
-    int constexpr iNormalAction(2);
+    enum class ControllerAction // Controller action used in modules HVACControllers and ZoneControllers
+    {
+        NoAction = -1,
+        ReverseAction,
+        NormalAction
+    };
 
-    // Controller mode used in modules HVACControllers and ZoneControllers
-    int constexpr iModeWrongAction(-2); // Controller error. E.g., bad action
-    int constexpr iModeNone(-1);        // Controller mode not yet determined
-    int constexpr iModeOff(0);          // Controller off (no air flow in loop)
-    int constexpr iModeInactive(1);     // Controller inactive (equip not available for current step)
-    int constexpr iModeActive(2);       // Controller active (schedule>0 and min<actuated<max)
-    int constexpr iModeMinActive(3);    // Controller active and min-constrained (equip available and actuated=min)
-    int constexpr iModeMaxActive(4);    // Controller active and max-constrained (equip available and actuated=max)
+    enum class ControllerMode // Controller mode used in modules HVACControllers and ZoneControllers
+    {
+        invalid = -1, // Controller error. E.g., bad action
+        None,         // Controller mode not yet determined
+        Off,          // Controller off (no air flow in loop)
+        Inactive,     // Controller inactive (equip not available for current step)
+        Active,       // Controller active (schedule>0 and min<actuated<max)
+        MinActive,    // Controller active and min-constrained (equip available and actuated=min)
+        MaxActive     // Controller active and max-constrained (equip available and actuated=max)
+    };
 
-    int constexpr iFirstMode(iModeWrongAction); // First operating mode in range
-    int constexpr iLastMode(iModeMaxActive);    // Last operating mode in range
+    int constexpr iFirstMode(static_cast<int>(ControllerMode::invalid));  // First operating mode in range
+    int constexpr iLastMode(static_cast<int>(ControllerMode::MaxActive)); // Last operating mode in range
 
-    // Controller operation used in module HVACControllers
-    int constexpr iControllerOpColdStart(1);   // Reset for cold start
-    int constexpr iControllerOpWarmRestart(2); // Reset for warm restart with previous solution
-    int constexpr iControllerOpIterate(3);     // Check convergence and estimate next guess if needed
-    int constexpr iControllerOpEnd(4);         // Check convergence only and trace
+    enum class ControllerOperation // Controller operation used in module HVACControllers
+    {
+        Unassigned = -1,
+        ColdStart,   // Reset for cold start
+        WarmRestart, // Reset for warm restart with previous solution
+        Iterate,     // Check convergence and estimate next guess if needed
+        End          // Check convergence only and trace
 
-    // Controller restart flag used in module HVACControllers
-    int constexpr iControllerWarmRestartNone(-1);   // Indicates that warm restart was not attempted
-    int constexpr iControllerWarmRestartFail(0);    // Indicates that warm restart failed
-    int constexpr iControllerWarmRestartSuccess(1); // Indicates that warm restart was successful
+    };
+
+    enum class ControllerWarmRestart // Controller restart flag used in module HVACControllers
+    {
+        None = -1, // Indicates that warm restart was not attempted
+        Fail,      // Indicates that warm restart failed
+        Success    // Indicates that warm restart was successful
+    };
 
 } // namespace DataHVACControllers
 
 struct HVACCtrlData : BaseGlobalStruct
 {
-
     Array1D_string const ControllerTypes = Array1D_string(1, std::string("Controller:WaterCoil"));
-    Array1D_string const ActionTypes = Array1D_string({0, 2}, {"No action", "Reverse action", "Normal action"});
-    Array1D_string const ControllerModeTypes = Array1D_string({-2, 4},
+    Array1D_string const ActionTypes = Array1D_string({-1, 1}, {"No action", "Reverse action", "Normal action"});
+    Array1D_string const ControllerModeTypes = Array1D_string({-1, 5},
                                                               {"Wrong action mode",
                                                                "No controller mode",
                                                                "Off controller mode",
