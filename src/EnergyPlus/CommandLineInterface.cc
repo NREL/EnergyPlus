@@ -115,7 +115,7 @@ namespace CommandLineInterface {
 
         opt.overview = state.dataStrGlobals->VerStringVar;
         opt.overview.append("\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state));
-        opt.overview.append("\nBuildPlatform: " + DataStringGlobals::BuildPlatformString);
+        opt.overview.append("\nBuilt on Platform: " + DataStringGlobals::BuildPlatformString);
 
         opt.syntax = "energyplus [options] [input-file]";
 
