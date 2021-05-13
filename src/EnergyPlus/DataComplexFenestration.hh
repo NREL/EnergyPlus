@@ -60,24 +60,26 @@ namespace EnergyPlus {
 
 namespace DataComplexFenestration {
 
-    // Using/Aliasing
-
-    // Data
-
     // Parameters for gas definitions
-    constexpr int GasCoeffsCustom(0);
-    constexpr int GasCoeffsAir(1);
-    constexpr int GasCoeffsArgon(2);
-    constexpr int GasCoeffsKrypton(3);
-    constexpr int GasCoeffsXenon(4);
+    enum class GasCoeffs
+    {
+        Unassigned = -1,
+        Custom,
+        Air,
+        Argon,
+        Krypton,
+        Xenon
+    };
 
     // Parameters for thermal model
-    constexpr int tmISO15099(0);
-    constexpr int tmScaledCavityWidth(1);
-    constexpr int tmConvectiveScalarModel_NoSDThickness(2);
-    constexpr int tmConvectiveScalarModel_WithSDThickness(3);
-
-    // Types
+    enum class ThermalModel
+    {
+        Unassigned = -1,
+        ISO15099,
+        ScaledCavityWidth,
+        ConvectiveScalarModel_NoSDThickness,
+        ConvectiveScalarModel_WithSDThickness
+    };
 
     struct GapSupportPillar
     {

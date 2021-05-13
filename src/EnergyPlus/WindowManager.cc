@@ -2342,7 +2342,7 @@ namespace WindowManager {
         } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
 
             EQLWindowSurfaceHeatBalance(
-                state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::noCondition);
+                state, SurfNum, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, DataBSDFWindow::Condition::noCondition);
             state.dataWindowManager->hcout = HextConvCoeff;
             // Required for report variables calculations.
             if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)

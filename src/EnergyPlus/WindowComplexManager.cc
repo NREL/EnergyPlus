@@ -2486,7 +2486,6 @@ namespace WindowComplexManager {
         // based off of 1-26-2009 version of WinCOG/TARCOG solution from Carli, Inc.
 
         using namespace DataBSDFWindow;
-        using DataHeatBalance::GasCoeffsAir;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2702,7 +2701,7 @@ namespace WindowComplexManager {
         int CalcSHGC(0);              // SHGC calculations are not necessary for E+ run
         int NumOfIterations(0);
 
-        int GasType; // locally used coefficent to point at correct gas type
+        DataComplexFenestration::GasCoeffs GasType; // locally used coefficent to point at correct gas type
         int ICoeff;
 
         std::string tarcogErrorMessage; // store error text from tarcog
@@ -2964,13 +2963,13 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        GasType = GasCoeffsAir;
-        wght(iprop(1, 1)) = GasWght(GasType);
-        gama(iprop(1, 1)) = GasSpecificHeatRatio(GasType);
+        GasType = DataComplexFenestration::GasCoeffs::Air;
+        wght(iprop(1, 1)) = GasWght(static_cast<int>(GasType));
+        gama(iprop(1, 1)) = GasSpecificHeatRatio(static_cast<int>(GasType));
         for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon(ICoeff, GasType);
-            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis(ICoeff, GasType);
-            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp(ICoeff, GasType);
+            gcon(ICoeff, iprop(1, 1)) = GasCoeffsCon(ICoeff, static_cast<int>(GasType));
+            gvis(ICoeff, iprop(1, 1)) = GasCoeffsVis(ICoeff, static_cast<int>(GasType));
+            gcp(ICoeff, iprop(1, 1)) = GasCoeffsCp(ICoeff, static_cast<int>(GasType));
         }
 
         // Fill window layer properties needed for window layer heat balance calculation
