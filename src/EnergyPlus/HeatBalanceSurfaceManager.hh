@@ -96,6 +96,10 @@ namespace HeatBalanceSurfaceManager {
 
     void InitThermalAndFluxHistories(EnergyPlusData &state);
 
+    void EvalOutsideMovableInsulation(EnergyPlusData &state);
+
+    void EvalInsideMovableInsulation(EnergyPlusData &state);
+
     void InitSolarHeatGains(EnergyPlusData &state);
 
     void InitIntSolarDistribution(EnergyPlusData &state);
