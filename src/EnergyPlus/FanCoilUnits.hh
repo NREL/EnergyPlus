@@ -436,7 +436,6 @@ namespace FanCoilUnits {
                                            Array1D<Real64> const &Par // Function parameters
     );
 
-    bool isReturnPlenumInducedNode(EnergyPlusData &state, int const InletNodeNum, int const NumReturnNodes, Array1D<int> const &ReturnNode);
 } // namespace FanCoilUnits
 
 struct FanCoilUnitsData : BaseGlobalStruct

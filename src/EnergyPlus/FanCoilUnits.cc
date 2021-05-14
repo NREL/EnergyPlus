@@ -789,11 +789,10 @@ namespace FanCoilUnits {
                     }
                     bool InletNodeFound = false;
                     if (FanCoil(FanCoilNum).ControlZoneNum > 0) {
-                        InletNodeFound =
-                            isReturnPlenumInducedNode(state,
-                                                      FanCoil(FanCoilNum).AirInNode,
-                                                      state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).NumReturnNodes,
-                                                      state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode);
+                        InletNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                         FanCoil(FanCoilNum).AirInNode,
+                                                                         state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumReturnNodes,
+                                                                         state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode);
                     }
                     if (!InletNodeFound) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\"");
@@ -824,10 +823,10 @@ namespace FanCoilUnits {
                     bool InletNodeFound = false;
                     for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        InletNodeFound = isReturnPlenumInducedNode(state,
-                                                                   FanCoil(FanCoilNum).AirInNode,
-                                                                   state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumReturnNodes,
-                                                                   state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode);
+                        InletNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                         FanCoil(FanCoilNum).AirInNode,
+                                                                         state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumReturnNodes,
+                                                                         state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode);
                         if (InletNodeFound) break;
                     }
                     if (!InletNodeFound) {
@@ -5968,17 +5967,6 @@ namespace FanCoilUnits {
         Residuum = (FCOutletTempOn - MaxOutletTemp);
 
         return Residuum;
-    }
-
-    bool isReturnPlenumInducedNode(EnergyPlusData &state, int const InletNodeNum, int const NumReturnNodes, Array1D<int> const &ReturnNode)
-    {
-        bool InletNodeFound = false;
-        for (int NodeNum = 1; NodeNum <= NumReturnNodes; ++NodeNum) {
-            InletNodeFound = ZonePlenum::ValidateInducedNode(state, InletNodeNum, ReturnNode(NodeNum));
-            if (InletNodeFound) break;
-        }
-
-        return InletNodeFound;
     }
 
 } // namespace FanCoilUnits
