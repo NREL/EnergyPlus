@@ -1191,6 +1191,9 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (UtilityRoutines::SameString(this_comp_type, "DistrictHeating")) {
                         this_comp.TypeOf_Num = TypeOf_PurchHotWater;
                         this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, TypeOf_PurchHotWater, CompNames(CompNum));
+                    } else if (UtilityRoutines::SameString(this_comp_type, "DistrictHeatingSteam")) {
+                        this_comp.TypeOf_Num = TypeOf_PurchSteam;
+                        this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, TypeOf_PurchHotWater, CompNames(CompNum));
                     } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                         this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                         this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(state, CompNames(CompNum));
@@ -3790,6 +3793,10 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                             this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
                         } else if (SELECT_CASE_var == TypeOf_PurchHotWater) { //                    = 27
+                            this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
+                            this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+                            this_component.HowLoadServed = HowMet_ByNominalCapHiOutLimit;
+                        } else if (SELECT_CASE_var == TypeOf_PurchSteam) { //                    = 98
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                             this_component.HowLoadServed = HowMet_ByNominalCapHiOutLimit;
