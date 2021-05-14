@@ -5703,6 +5703,19 @@ namespace HeatBalanceManager {
         }
     }
 
+    void AllocateZoneHeatBalArrays(EnergyPlusData &state)
+    {
+        // Allocate zone / encl hb arrays
+        state.dataHeatBal->EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->EnclSolDBIntWin.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->EnclSolQSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->EnclSolQD.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->EnclSolQDforDaylight.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->EnclRadQThermalRad.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBal->ZoneMRT.dimension(state.dataGlobal->NumOfZones, 0.0);
+
+    }
     void AllocateHeatBalArrays(EnergyPlusData &state)
     {
 
@@ -5741,12 +5754,8 @@ namespace HeatBalanceManager {
         // Use the total number of zones or surfaces to allocate variables to avoid a limit
         // Allocate real Variables
         // Following used for Calculations
-        // Allocate zone / encl hb arrays
-        state.dataSurface->EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataSurface->EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBal->EnclSolQSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
-
         //  Allocate variables in DataHeatBalSys
+        AllocateZoneHeatBalArrays(state);
         state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -5860,6 +5869,17 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
 
         state.dataHeatBalMgr->CountWarmupDayPoints = 0;
+
+        for (int loop = 1; loop <= state.dataGlobal->NumOfZones; ++loop) {
+            // CurrentModuleObject='Zone'
+            SetupOutputVariable(state,
+                                "Zone Mean Radiant Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBal->ZoneMRT(loop),
+                                "Zone",
+                                "State",
+                                state.dataHeatBal->Zone(loop).Name);
+        }
     }
 
     // End Initialization Section of the Module

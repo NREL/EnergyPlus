@@ -3102,7 +3102,7 @@ namespace WindowComplexManager {
         if (CalcCondition == DataBSDFWindow::noCondition) {
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
             dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
-                  state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex); // TODO, check , !
+                  state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex); // TODO, check , !
             //                  currently using Exterior beam plus diffuse solar incident on surface
             //                  plus zone short wave.  CHECK
             // if (dir.ne.0.0d0) then
@@ -3460,11 +3460,11 @@ namespace WindowComplexManager {
             //                             Construct(ConstrNumSh)%TransDiff)
             // END IF
             state.dataSurface->SurfWinHeatGain(SurfNum) -=
-                state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
+                state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
             state.dataSurface->SurfWinHeatTransfer(SurfNum) -=
-                state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
+                state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
-                state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
+                state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) {
                 state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) =

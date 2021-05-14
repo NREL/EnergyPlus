@@ -217,18 +217,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     // unusedREAL(r64), ALLOCATABLE, DIMENSION(:) :: QBV                 !Beam solar absorbed by interior shades in a zone, plus
     // diffuse from beam not absorbed in zone, plus
     // beam absorbed at inside surfaces
-    Array1D<Real64> EnclSolQD; // Diffuse solar radiation in a zone from sky and ground diffuse entering
-    // through exterior windows and reflecting from interior surfaces,
-    // beam from exterior windows reflecting from interior surfaces,
-    // and beam entering through interior windows (considered diffuse)
-    Array1D<Real64> EnclSolQDforDaylight; // Diffuse solar radiation in a zone from sky and ground diffuse entering
-    // through exterior windows, beam from exterior windows reflecting
-    // from interior surfaces, and beam entering through interior windows
-    // (considered diffuse)
-    // Originally QD, now used only for EnclSolQSDifSol calc for daylighting
-    Array1D<Real64> EnclSolVMULT;              // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
+
     Array1D<Real64> SurfNetLWRadToSurf;        // Net interior long wavelength radiation to a surface from other surfaces
-    Array1D<Real64> ZoneMRT;                   // Zone Mean Radiant Temperature
     Array1D<Real64> SurfOpaqQRadSWLightsInAbs; // Short wave from Lights radiation absorbed on inside of opaque surface
     // Variables that are used in both the Surface Heat Balance and the Moisture Balance
     Array1D<Real64> SurfOpaqQRadSWOutAbs;  // Short wave radiation absorbed on outside of opaque surface
@@ -354,11 +344,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfOpaqInsFaceBeamSolAbsorbed.deallocate();
         this->SurfTempOut.deallocate();
         this->SurfQRadSWOutMvIns.deallocate();
-        this->EnclSolQD.deallocate();
-        this->EnclSolQDforDaylight.deallocate();
-        this->EnclSolVMULT.deallocate();
         this->SurfNetLWRadToSurf.deallocate();
-        this->ZoneMRT.deallocate();
         this->SurfOpaqQRadSWLightsInAbs.deallocate();
         this->SurfOpaqQRadSWOutAbs.deallocate();
         this->SurfOpaqQRadSWInAbs.deallocate();

@@ -318,14 +318,11 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->SurfHasLinkedOutAirNode(SurfNum)) {
-                state.dataSurface->SurfOutDryBulbTemp(SurfNum) =
-                    state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirDryBulb;
-                state.dataSurface->SurfOutWetBulbTemp(SurfNum) =
-                    state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWetBulb;
-                state.dataSurface->SurfOutWindSpeed(SurfNum) =
-                    state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWindSpeed;
-                state.dataSurface->SurfOutWindDir(SurfNum) =
-                    state.dataLoopNodes->Node(state.dataSurface->SurfLinkedOutAirNode(SurfNum)).OutAirWindDir;
+                int const linkedNode = state.dataSurface->SurfLinkedOutAirNode(SurfNum);
+                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirDryBulb;
+                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWetBulb;
+                state.dataSurface->SurfOutWindSpeed(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWindSpeed;
+                state.dataSurface->SurfOutWindDir(SurfNum) = state.dataLoopNodes->Node(linkedNode).OutAirWindDir;
             }
 
             if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime && state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
@@ -1347,7 +1344,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         state.dataHeatBalFanSys->CTFTuserConstPart.dimension(state.dataSurface->TotSurfaces, 0.0);
     }
 
-    state.dataHeatBal->SurfTempEffBulkAir.dimension(state.dataSurface->TotSurfaces, 23.0);
+    state.dataHeatBal->SurfTempEffBulkAir.dimension(state.dataSurface->TotSurfaces, ZoneInitialTemp);
     state.dataHeatBal->HConvIn.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->HcExtSurf.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->HAirExtSurf.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -2095,27 +2092,6 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
         }
     }
 
-    state.dataHeatBalSurf->EnclSolQD.dimension(state.dataGlobal->NumOfZones, 0.0);
-    state.dataHeatBalSurf->EnclSolQDforDaylight.dimension(state.dataGlobal->NumOfZones, 0.0);
-    state.dataHeatBal->QL.dimension(state.dataGlobal->NumOfZones, 0.0);
-
-    // UCSD
-    state.dataHeatBal->ZoneMRT.dimension(state.dataGlobal->NumOfZones, 0.0);
-
-    // Allocate Reporting Variables and set up tracking
-    state.dataHeatBalSurf->ZoneMRT.dimension(state.dataGlobal->NumOfZones, 0.0);
-
-    for (int loop = 1; loop <= state.dataGlobal->NumOfZones; ++loop) {
-        // CurrentModuleObject='Zone'
-        SetupOutputVariable(state,
-                            "Zone Mean Radiant Temperature",
-                            OutputProcessor::Unit::C,
-                            state.dataHeatBalSurf->ZoneMRT(loop),
-                            "Zone",
-                            "State",
-                            state.dataHeatBal->Zone(loop).Name);
-    }
-
     SetupOutputVariable(state,
                         "Site Total Surface Heat Emission to Air",
                         OutputProcessor::Unit::J,
@@ -2156,41 +2132,42 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     auto &Surface(state.dataSurface->Surface);
 
     // First do the "bulk" initializations of arrays sized to NumOfZones
-    state.dataHeatBal->ZoneMRT = 23.0;   // module level array
-    state.dataHeatBalFanSys->MAT = 23.0; // DataHeatBalFanSys array
-    state.dataHeatBalFanSys->ZT = 23.0;
-    state.dataHeatBalFanSys->ZTAV = 23.0;
-    state.dataHeatBalFanSys->XMAT = 23.0; // DataHeatBalFanSys array
-    state.dataHeatBalFanSys->XM2T = 23.0; // DataHeatBalFanSys array
-    state.dataHeatBalFanSys->XM3T = 23.0; // DataHeatBalFanSys array
-    state.dataHeatBalFanSys->XM4T = 23.0;
-    state.dataHeatBalFanSys->XMPT = 23.0;
-    state.dataHeatBalFanSys->DSXMAT = 23.0; // DataHeatBalFanSys array
-    state.dataHeatBalFanSys->DSXM2T = 23.0; // DataHeatBalFanSys array
-    state.dataHeatBalFanSys->DSXM3T = 23.0; // DataHeatBalFanSys array
-    state.dataHeatBalFanSys->DSXM4T = 23.0;
-    state.dataHeatBalFanSys->ZoneTMX = 23.0; // DataHeatBalFanSys array
-    state.dataHeatBalFanSys->ZoneTM2 = 23.0; // DataHeatBalFanSys array
-    // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
-    state.dataHeatBalFanSys->ZoneAirHumRatAvg = state.dataEnvrn->OutHumRat;
-    state.dataHeatBalFanSys->ZoneAirHumRat = state.dataEnvrn->OutHumRat;
-    state.dataHeatBalFanSys->ZoneAirHumRatOld = state.dataEnvrn->OutHumRat;
-    state.dataHeatBalFanSys->SumHmAW = 0.0;
-    state.dataHeatBalFanSys->SumHmARa = 0.0;
-    state.dataHeatBalFanSys->SumHmARaW = 0.0;
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        state.dataHeatBal->ZoneMRT(zoneNum) = ZoneInitialTemp;   // module level array
+        state.dataHeatBalFanSys->MAT(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
+        state.dataHeatBalFanSys->ZT(zoneNum) = ZoneInitialTemp;
+        state.dataHeatBalFanSys->ZTAV(zoneNum) = ZoneInitialTemp;
+        state.dataHeatBalFanSys->XMAT(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
+        state.dataHeatBalFanSys->XM2T(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
+        state.dataHeatBalFanSys->XM3T(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
+        state.dataHeatBalFanSys->XM4T(zoneNum) = ZoneInitialTemp;
+        state.dataHeatBalFanSys->XMPT(zoneNum) = ZoneInitialTemp;
+        state.dataHeatBalFanSys->DSXMAT(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
+        state.dataHeatBalFanSys->DSXM2T(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
+        state.dataHeatBalFanSys->DSXM3T(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
+        state.dataHeatBalFanSys->DSXM4T(zoneNum) = ZoneInitialTemp;
+        state.dataHeatBalFanSys->ZoneTMX(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
+        state.dataHeatBalFanSys->ZoneTM2(zoneNum) = ZoneInitialTemp; // DataHeatBalFanSys array
+        // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
+        state.dataHeatBalFanSys->ZoneAirHumRatAvg(zoneNum) = state.dataEnvrn->OutHumRat;
+        state.dataHeatBalFanSys->ZoneAirHumRat(zoneNum) = state.dataEnvrn->OutHumRat;
+        state.dataHeatBalFanSys->ZoneAirHumRatOld(zoneNum) = state.dataEnvrn->OutHumRat;
+        state.dataHeatBalFanSys->SumHmAW(zoneNum) = 0.0;
+        state.dataHeatBalFanSys->SumHmARa(zoneNum) = 0.0;
+        state.dataHeatBalFanSys->SumHmARaW(zoneNum) = 0.0;
+        state.dataHeatBalFanSys->TempTstatAir(zoneNum) = ZoneInitialTemp;
+    }
 
     // "Bulk" initializations of arrays sized to TotSurfaces
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        // Loop through zones...
-        state.dataHeatBal->SurfTempEffBulkAir(zoneNum) = 23.0;
-        state.dataHeatBalFanSys->TempTstatAir(zoneNum) = 23.0;
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
         for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+            state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = SurfInitialTemp;
             state.dataHeatBalSurf->SUMH(SurfNum) = 0;             // module level array
-            state.dataHeatBalSurf->TempSurfIn(SurfNum) = 23.0;    // module level array
-            state.dataHeatBalSurf->TempSurfInTmp(SurfNum) = 23.0; // module level array
-            state.dataHeatBal->HConvIn(SurfNum) = 3.076;          // module level array
+            state.dataHeatBalSurf->TempSurfIn(SurfNum) = SurfInitialTemp;    // module level array
+            state.dataHeatBalSurf->TempSurfInTmp(SurfNum) = SurfInitialTemp; // module level array
+            state.dataHeatBal->HConvIn(SurfNum) = SurfInitialConvCoeff;          // module level array
             state.dataHeatBalSurf->HcExtSurf(SurfNum) = 0.0;
             state.dataHeatBalSurf->HAirExtSurf(SurfNum) = 0.0;
             state.dataHeatBalSurf->HSkyExtSurf(SurfNum) = 0.0;
@@ -2240,12 +2217,12 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         if (firstSurfWin >= 0) {
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // Initialize window frame and divider temperatures
-                state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) = 23.0;
-                state.dataSurface->SurfWinFrameTempSurfInOld(SurfNum) = 23.0;
-                state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) = 23.0;
-                state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) = 23.0;
-                state.dataSurface->SurfWinDividerTempSurfInOld(SurfNum) = 23.0;
-                state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) = 23.0;
+                state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) = SurfInitialTemp;
+                state.dataSurface->SurfWinFrameTempSurfInOld(SurfNum) = SurfInitialTemp;
+                state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) = SurfInitialTemp;
+                state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) = SurfInitialTemp;
+                state.dataSurface->SurfWinDividerTempSurfInOld(SurfNum) = SurfInitialTemp;
+                state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) = SurfInitialTemp;
 
                 // Initialize previous-timestep shading indicators
                 state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum) = WinShadingType::NoShade;
@@ -2255,17 +2232,35 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
     } // end of Zone
 
     // "Bulk" initializations of temperature arrays with dimensions (TotSurface,MaxCTFTerms,2)
-    state.dataHeatBalSurf->TH = 23.0;  // module level array
-    state.dataHeatBalSurf->THM = 23.0; // module level array
-    state.dataHeatBalSurf->QH = 0.0;
-    state.dataHeatBalSurf->QHM = 0.0;
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+        int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+        for (int side = 1; side <= 2; ++side) {
+            for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                    state.dataHeatBalSurf->TH(side, CTFTermNum, SurfNum) = SurfInitialTemp;  // module level array
+                    state.dataHeatBalSurf->THM(side, CTFTermNum, SurfNum) = SurfInitialTemp; // module level array
+                    state.dataHeatBalSurf->QH(side, CTFTermNum, SurfNum) = 0.0;
+                    state.dataHeatBalSurf->QHM(side, CTFTermNum, SurfNum) = 0.0;
+                }
+            }
+        }
+    }
     if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
-        state.dataHeatBalSurf->TsrcHist = 23.0;
-        state.dataHeatBalSurf->TsrcHistM = 23.0;
-        state.dataHeatBalSurf->TuserHist = 23.0;
-        state.dataHeatBalSurf->TuserHistM = 23.0;
-        state.dataHeatBalSurf->QsrcHist = 0.0;
-        state.dataHeatBalSurf->QsrcHistM = 0.0;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+            int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
+                    state.dataHeatBalSurf->TsrcHist(SurfNum, CTFTermNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->TsrcHistM(SurfNum, CTFTermNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->TuserHist(SurfNum, CTFTermNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->TuserHistM(SurfNum, CTFTermNum) = SurfInitialTemp;
+                    state.dataHeatBalSurf->QsrcHist(SurfNum, CTFTermNum) = 0.0;
+                    state.dataHeatBalSurf->QsrcHistM(SurfNum, CTFTermNum) = 0.0;
+                }
+            }
+        }
     }
     state.dataHeatBal->CondFDRelaxFactor = state.dataHeatBal->CondFDRelaxFactorInput;
 
@@ -2347,8 +2342,8 @@ void EvalOutsideMovableInsulation(EnergyPlusData &state)
                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
             continue;
         }
-        auto const MaterialIndex(state.dataSurface->SurfMaterialMovInsulExt(SurfNum));
-        auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+        int const MaterialIndex(state.dataSurface->SurfMaterialMovInsulExt(SurfNum));
+        int const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
         state.dataHeatBalSurf->SurfMovInsulExtPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHExt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
         if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
@@ -2374,8 +2369,8 @@ void EvalInsideMovableInsulation(EnergyPlusData &state)
             state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
             continue;
         }
-        auto const MaterialIndex(state.dataSurface->SurfMaterialMovInsulInt(SurfNum));
-        auto const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
+        int const MaterialIndex(state.dataSurface->SurfMaterialMovInsulInt(SurfNum));
+        int const MaterialGroupNum(state.dataMaterial->Material(MaterialIndex).Group);
         state.dataHeatBalSurf->SurfMovInsulIntPresent(SurfNum) = true;
         state.dataHeatBalSurf->SurfMovInsulHInt(SurfNum) = 1.0 / (MovInsulSchedVal * state.dataMaterial->Material(MaterialIndex).Resistance);
         if (MaterialGroupNum == DataHeatBalance::WindowGlass || MaterialGroupNum == DataHeatBalance::GlassEquivalentLayer) {
@@ -2644,8 +2639,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
     }
     if (resetSolar) {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            state.dataHeatBalSurf->EnclSolQD(zoneNum) = 0.0;
-            state.dataHeatBalSurf->EnclSolQDforDaylight(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQD(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQDforDaylight(zoneNum) = 0.0;
         }
 
         // TTD domes are currently not considered in the window list of a zone
@@ -2753,9 +2748,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
             //  EnclSolDB needs to subtract this part since it is already counted in EnclSolDB.
             //  Use ZoneInitialDifSolReflW (Rob's previous work) as it better counts initial distribution of
             //   diffuse solar rather than using weighted area*absorptance
-            state.dataHeatBalSurf->EnclSolQDforDaylight(ZoneNum) =
-                (state.dataSurface->EnclSolDB(ZoneNum) - state.dataSurface->EnclSolDBIntWin(ZoneNum)) * state.dataEnvrn->BeamSolarRad +
-                state.dataSurface->EnclSolDBSSG(ZoneNum) + state.dataHeatBal->ZoneInitialDifSolReflW(ZoneNum);
+            state.dataHeatBal->EnclSolQDforDaylight(ZoneNum) =
+                (state.dataHeatBal->EnclSolDB(ZoneNum) - state.dataHeatBal->EnclSolDBIntWin(ZoneNum)) * state.dataEnvrn->BeamSolarRad +
+                state.dataHeatBal->EnclSolDBSSG(ZoneNum) + state.dataHeatBal->ZoneInitialDifSolReflW(ZoneNum);
 
             // to exclude diffuse solar now absorbed/transmitted in CalcWinTransDifSolInitialDistribution
             // EnclSolDB(ZoneNum) is Diffuse Solar from beam reflected from interior surfaces
@@ -2764,15 +2759,15 @@ void InitSolarHeatGains(EnergyPlusData &state)
             // QD(ZoneNum)  = EnclSolDB(ZoneNum)*BeamSolarRad  &
             //                +EnclSolDS(ZoneNum)*DifSolarRad  &
             //                +EnclSolDG(ZoneNum)*GndSolarRad
-            state.dataHeatBalSurf->EnclSolQD(ZoneNum) = state.dataSurface->EnclSolDB(ZoneNum) * state.dataEnvrn->BeamSolarRad +
-                                                        state.dataSurface->EnclSolDBSSG(ZoneNum) + state.dataHeatBal->ZoneInitialDifSolReflW(ZoneNum);
+            state.dataHeatBal->EnclSolQD(ZoneNum) = state.dataHeatBal->EnclSolDB(ZoneNum) * state.dataEnvrn->BeamSolarRad +
+                                                    state.dataHeatBal->EnclSolDBSSG(ZoneNum) + state.dataHeatBal->ZoneInitialDifSolReflW(ZoneNum);
         }
 
         // Flux of diffuse solar in each zone
 
         state.dataHeatBal->EnclSolQSDifSol = 0.0;
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
-            state.dataHeatBal->EnclSolQSDifSol(enclNum) = state.dataHeatBalSurf->EnclSolQDforDaylight(enclNum);
+            state.dataHeatBal->EnclSolQSDifSol(enclNum) = state.dataHeatBal->EnclSolQDforDaylight(enclNum);
         }
 
         if (state.dataHeatBalSurf->InterZoneWindow) {
@@ -2782,9 +2777,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     auto lZone(state.dataHeatBalSurf->FractDifShortZtoZ.index(enclNum, 1)); // Tuned Linear indexing
                     for (int otherEnclNum = 1; otherEnclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++otherEnclNum, ++lZone) {
                         if ((otherEnclNum != enclNum) && (state.dataHeatBalSurf->RecDifShortFromZ(otherEnclNum))) {
-                            EnclSolQSDifSol_sum +=
-                                state.dataHeatBalSurf->FractDifShortZtoZ[lZone] *
-                                state.dataHeatBalSurf->EnclSolQDforDaylight(otherEnclNum); // [ lZone ] == ( enclNum, otherEnclNum )
+                            EnclSolQSDifSol_sum += state.dataHeatBalSurf->FractDifShortZtoZ[lZone] *
+                                                   state.dataHeatBal->EnclSolQDforDaylight(otherEnclNum); // [ lZone ] == ( enclNum, otherEnclNum )
                         }
                     }
                     state.dataHeatBal->EnclSolQSDifSol(enclNum) += EnclSolQSDifSol_sum;
@@ -2795,9 +2789,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
             if (state.dataHeatBalSurf->InterZoneWindow)
                 state.dataHeatBal->EnclSolQSDifSol(enclNum) *=
-                    state.dataHeatBalSurf->FractDifShortZtoZ(enclNum, enclNum) * state.dataHeatBalSurf->EnclSolVMULT(enclNum);
+                    state.dataHeatBalSurf->FractDifShortZtoZ(enclNum, enclNum) * state.dataHeatBal->EnclSolVMULT(enclNum);
             else
-                state.dataHeatBal->EnclSolQSDifSol(enclNum) *= state.dataHeatBalSurf->EnclSolVMULT(enclNum);
+                state.dataHeatBal->EnclSolQSDifSol(enclNum) *= state.dataHeatBal->EnclSolVMULT(enclNum);
         }
 
         //    RJH - 09-12-07 commented out report varariable calcs here since they refer to old distribution method
@@ -3544,11 +3538,12 @@ void InitIntSolarDistribution(EnergyPlusData &state)
 
     auto &Surface(state.dataSurface->Surface);
 
-    if (!allocated(state.dataHeatBal->QS)) state.dataHeatBal->QS.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-    if (!allocated(state.dataHeatBal->QSLights)) state.dataHeatBal->QSLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+    if (!allocated(state.dataHeatBal->EnclSolQSWRad)) state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+    if (!allocated(state.dataHeatBal->EnclSolQSWRadLights))
+        state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
 
-    state.dataHeatBal->QS = 0.0;
-    state.dataHeatBal->QSLights = 0.0;
+    state.dataHeatBal->EnclSolQSWRad = 0.0;
+    state.dataHeatBal->EnclSolQSWRadLights = 0.0;
 
     // COMPUTE TOTAL SHORT-WAVE RADIATION ORIGINATING IN ZONE.
     // Note: If sun is not up, QS is only internal gains
@@ -3557,8 +3552,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
         for (int zoneNum : state.dataViewFactor->ZoneSolarInfo(enclosureNum).ZoneNums) {
             sumZoneQLTSW += state.dataHeatBal->ZoneIntGain(zoneNum).QLTSW;
         }
-        state.dataHeatBal->QS(enclosureNum) = state.dataHeatBalSurf->EnclSolQD(enclosureNum) + sumZoneQLTSW;
-        state.dataHeatBal->QSLights(enclosureNum) = sumZoneQLTSW;
+        state.dataHeatBal->EnclSolQSWRad(enclosureNum) = state.dataHeatBal->EnclSolQD(enclosureNum) + sumZoneQLTSW;
+        state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = sumZoneQLTSW;
     }
 
     if (state.dataHeatBalSurf->InterZoneWindow) { // DO INTERZONE DISTRIBUTION.
@@ -3574,11 +3569,11 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                         for (int zoneNum : state.dataViewFactor->ZoneSolarInfo(OtherenclosureNum).ZoneNums) {
                             sumZoneQLTSW += state.dataHeatBal->ZoneIntGain(zoneNum).QLTSW;
                         }
-                        state.dataHeatBal->QS(enclosureNum) += state.dataHeatBalSurf->FractDifShortZtoZ(enclosureNum, OtherenclosureNum) *
-                                                               (state.dataHeatBalSurf->EnclSolQD(OtherenclosureNum) + sumZoneQLTSW);
+                        state.dataHeatBal->EnclSolQSWRad(enclosureNum) += state.dataHeatBalSurf->FractDifShortZtoZ(enclosureNum, OtherenclosureNum) *
+                                                                          (state.dataHeatBal->EnclSolQD(OtherenclosureNum) + sumZoneQLTSW);
                         state.dataHeatBal->ZoneDifSolFrIntWinsRep(enclosureNum) +=
                             state.dataHeatBalSurf->FractDifShortZtoZ(enclosureNum, OtherenclosureNum) *
-                            state.dataHeatBalSurf->EnclSolQD(OtherenclosureNum);
+                            state.dataHeatBal->EnclSolQD(OtherenclosureNum);
                         state.dataHeatBal->ZoneDifSolFrIntWinsRepEnergy(enclosureNum) =
                             state.dataHeatBal->ZoneDifSolFrIntWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec;
                     }
@@ -3611,14 +3606,14 @@ void InitIntSolarDistribution(EnergyPlusData &state)
     // COMPUTE CONVECTIVE GAINS AND ZONE FLUX DENSITY.
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
         if (state.dataHeatBalSurf->InterZoneWindow) {
-            state.dataHeatBal->QS(enclosureNum) *=
-                state.dataHeatBalSurf->FractDifShortZtoZ(enclosureNum, enclosureNum) * state.dataHeatBalSurf->EnclSolVMULT(enclosureNum);
+            state.dataHeatBal->EnclSolQSWRad(enclosureNum) *=
+                state.dataHeatBalSurf->FractDifShortZtoZ(enclosureNum, enclosureNum) * state.dataHeatBal->EnclSolVMULT(enclosureNum);
             // CR 8695, VMULT not based on visible
-            state.dataHeatBal->QSLights(enclosureNum) *=
-                state.dataHeatBalSurf->FractDifShortZtoZ(enclosureNum, enclosureNum) * state.dataHeatBalSurf->EnclSolVMULT(enclosureNum);
+            state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) *=
+                state.dataHeatBalSurf->FractDifShortZtoZ(enclosureNum, enclosureNum) * state.dataHeatBal->EnclSolVMULT(enclosureNum);
         } else {
-            state.dataHeatBal->QS(enclosureNum) *= state.dataHeatBalSurf->EnclSolVMULT(enclosureNum);
-            state.dataHeatBal->QSLights(enclosureNum) *= state.dataHeatBalSurf->EnclSolVMULT(enclosureNum);
+            state.dataHeatBal->EnclSolQSWRad(enclosureNum) *= state.dataHeatBal->EnclSolVMULT(enclosureNum);
+            state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) *= state.dataHeatBal->EnclSolVMULT(enclosureNum);
         }
     }
 
@@ -3636,8 +3631,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
             Real64 AbsIntSurfVis =
                 state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar; // Inside opaque surface visible absorptance to fix CR 8695 change to
 
-            state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) += state.dataHeatBal->QS(solEnclosureNum) * AbsIntSurf;
-            state.dataHeatBalSurf->SurfOpaqQRadSWLightsInAbs(SurfNum) += state.dataHeatBal->QSLights(solEnclosureNum) * AbsIntSurfVis;
+            state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) += state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * AbsIntSurf;
+            state.dataHeatBalSurf->SurfOpaqQRadSWLightsInAbs(SurfNum) += state.dataHeatBal->EnclSolQSWRadLights(solEnclosureNum) * AbsIntSurfVis;
 
             // Calculate absorbed solar on outside if movable exterior insulation in place
             if (state.dataSurface->AnyMovableInsulation &&
@@ -3685,10 +3680,10 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 // These calculations are repeated from InitInternalHeatGains for the Zone Component Loads Report
                 Real64 pulseMultipler = 0.01; // use to create a pulse for the load component report computations, the W/sqft pulse for the zone
                 if (!state.dataGlobal->doLoadComponentPulseNow) {
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) =
-                        state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
+                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) *
+                                                                     state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                 } else {
-                    state.dataHeatBalSurfMgr->curQL = state.dataHeatBal->QL(radEnclosureNum);
+                    state.dataHeatBalSurfMgr->curQL = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum);
                     // for the loads component report during the special sizing run increase the radiant portion
                     // a small amount to create a "pulse" of heat that is used for the
                     state.dataHeatBalSurfMgr->adjQL =
@@ -3703,14 +3698,15 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 if (NOT_SHADED(ShadeFlag)) { // No window shading
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
-                            state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass);
+                            state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass);
                     }
                 } else if (ConstrNumSh != 0 && ShadeFlag != WinShadingType::SwitchableGlazing) {
                     // Interior, exterior or between-glass shade, screen or blind in place
                     for (int IGlass = 1; IGlass <= state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers; ++IGlass) {
                         if (ANY_SHADE_SCREEN(ShadeFlag)) {
                             state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
-                                state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass);
+                                state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) *
+                                state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass);
                         } else if (BITF_TEST_ANY(BITF(ShadeFlag), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind))) {
                             Real64 BlAbsDiffBk; // Glass layer back diffuse solar absorptance when blind in place
                             if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
@@ -3723,11 +3719,12 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             } else {
                                 BlAbsDiffBk = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(1, IGlass);
                             }
-                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) += state.dataHeatBal->QS(solEnclosureNum) * BlAbsDiffBk;
+                            state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
+                                state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * BlAbsDiffBk;
                         }
                     }
                     if (ShadeFlag == WinShadingType::IntShade) {
-                        state.dataSurface->SurfWinIntLWAbsByShade(SurfNum) = state.dataHeatBal->QL(radEnclosureNum) *
+                        state.dataSurface->SurfWinIntLWAbsByShade(SurfNum) = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) *
                                                                              state.dataConstruction->Construct(ConstrNumSh).ShadeAbsorpThermal *
                                                                              state.dataHeatBal->TMULT(radEnclosureNum);
                     } else if (ShadeFlag == WinShadingType::IntBlind) {
@@ -3742,11 +3739,11 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                             EffBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                         }
                         state.dataSurface->SurfWinIntLWAbsByShade(SurfNum) =
-                            state.dataHeatBal->QL(radEnclosureNum) * EffBlEmiss * state.dataHeatBal->TMULT(radEnclosureNum);
+                            state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) * EffBlEmiss * state.dataHeatBal->TMULT(radEnclosureNum);
                     }
                     if (ANY_SHADE_SCREEN(ShadeFlag)) {
                         state.dataSurface->SurfWinIntSWAbsByShade(SurfNum) =
-                            state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackShade;
+                            state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackShade;
                     } else if (ANY_BLIND(ShadeFlag)) {
                         Real64 AbsDiffBkBl;
                         if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
@@ -3758,7 +3755,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                         } else {
                             AbsDiffBkBl = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(1);
                         }
-                        state.dataSurface->SurfWinIntSWAbsByShade(SurfNum) = state.dataHeatBal->QS(solEnclosureNum) * AbsDiffBkBl;
+                        state.dataSurface->SurfWinIntSWAbsByShade(SurfNum) = state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * AbsDiffBkBl;
                     }
                     // Correct for divider shadowing
                     if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
@@ -3769,9 +3766,10 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
 
                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, IGlass) +=
-                            state.dataHeatBal->QS(solEnclosureNum) * InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
-                                                                              state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass),
-                                                                              state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass));
+                            state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) *
+                            InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
+                                     state.dataConstruction->Construct(ConstrNum).AbsDiffBack(IGlass),
+                                     state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass));
                     }
 
                 } // End of shading flag check
@@ -3779,8 +3777,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 // Note that FrameQRadInAbs is initially calculated in InitSolarHeatGains
                 if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0)
                     state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) +=
-                        (state.dataHeatBal->QS(solEnclosureNum) * state.dataSurface->SurfWinFrameSolAbsorp(SurfNum) +
-                         (state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) +
+                        (state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * state.dataSurface->SurfWinFrameSolAbsorp(SurfNum) +
+                         (state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) +
                           state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) +
                           state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
                           state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)) *
@@ -3829,8 +3827,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     }
                     // Note that DividerQRadInAbs is initially calculated in InitSolarHeatGains
                     state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) +=
-                        (state.dataHeatBal->QS(solEnclosureNum) * DividerSolAbs +
-                         (state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) +
+                        (state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * DividerSolAbs +
+                         (state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) +
                           state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) +
                           state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
                           state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)) *
@@ -3842,10 +3840,10 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 // These calculations are repeated from InitInternalHeatGains for the Zone Component Loads Report
                 Real64 pulseMultipler = 0.01; // the W/sqft pulse for the zone
                 if (!state.dataGlobal->doLoadComponentPulseNow) {
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) =
-                        state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
+                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) *
+                                                                     state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                 } else {
-                    state.dataHeatBalSurfMgr->curQL = state.dataHeatBal->QL(radEnclosureNum);
+                    state.dataHeatBalSurfMgr->curQL = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum);
                     // for the loads component report during the special sizing run increase the radiant portion
                     // a small amount to create a "pulse" of heat that is used for the
                     state.dataHeatBalSurfMgr->adjQL =
@@ -3860,7 +3858,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                 int EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
                 for (int Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
                     state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNum, Lay) +=
-                        state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL(Lay);
+                        state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffBackEQL(Lay);
                 }
                 // Window frame has not been included for equivalent layer model yet
 
@@ -3873,7 +3871,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                     for (int IGlass = 1; IGlass <= TotGlassLayers; ++IGlass) {
                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNumAdjZone, IGlass) +=
-                            state.dataHeatBal->QS(solEnclosureNum) *
+                            state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) *
                             state.dataConstruction->Construct(Surface(SurfNumAdjZone).Construction).AbsDiff(IGlass);
                         // Note that AbsDiff rather than AbsDiffBack is used in the above since the
                         // radiation from the current zone is incident on the outside of the adjacent
@@ -3884,7 +3882,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
                     int const EQLNum = state.dataConstruction->Construct(AdjConstrNum).EQLConsPtr;
                     for (int Lay = 1; Lay <= state.dataWindowEquivLayer->CFS(EQLNum).NL; ++Lay) {
                         state.dataHeatBal->SurfWinQRadSWwinAbs(SurfNumAdjZone, Lay) +=
-                            state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL(Lay);
+                            state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * state.dataConstruction->Construct(ConstrNum).AbsDiffFrontEQL(Lay);
                         // Note that AbsDiffFrontEQL rather than AbsDiffBackEQL is used in the above
                         // since the radiation from the current zone is incident on the outside of the
                         // adjacent zone's window.
@@ -4181,8 +4179,8 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
     Real64 const SmallestAreaAbsProductAllowed(
         0.01); // Avoid a division by zero of the user has entered a bunch of surfaces with zero absorptivity on the inside
 
-    if (!allocated(state.dataHeatBalSurf->EnclSolVMULT)) {
-        state.dataHeatBalSurf->EnclSolVMULT.dimension(state.dataViewFactor->NumOfSolarEnclosures, 0.0);
+    if (!allocated(state.dataHeatBal->EnclSolVMULT)) {
+        state.dataHeatBal->EnclSolVMULT.dimension(state.dataViewFactor->NumOfSolarEnclosures, 0.0);
     }
     if (state.dataHeatBalSurfMgr->ComputeIntSWAbsorpFactorsfirstTime) {
         state.dataHeatBalSurfMgr->FirstCalcZone.dimension(state.dataGlobal->NumOfZones, true);
@@ -4313,7 +4311,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
         }     // End of loop over surfaces in zone
 
         if (SUM1 > SmallestAreaAbsProductAllowed) { // Everything is okay, proceed with the regular calculation
-            state.dataHeatBalSurf->EnclSolVMULT(enclosureNum) = 1.0 / SUM1;
+            state.dataHeatBal->EnclSolVMULT(enclosureNum) = 1.0 / SUM1;
 
         } else { // the sum of area*solar absorptance for all surfaces in the zone is zero--either the user screwed up
             // or they really want to disallow any solar from being absorbed on the inside surfaces.  Fire off a
@@ -4327,7 +4325,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                                      state.dataViewFactor->ZoneSolarInfo(enclosureNum).Name);
                 state.dataHeatBalSurfMgr->FirstCalcZone(enclosureNum) = false;
             }
-            state.dataHeatBalSurf->EnclSolVMULT(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolVMULT(enclosureNum) = 0.0;
         }
     } // End of zone/enclosure loop
 }
@@ -4371,9 +4369,9 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
         if (!state.dataHeatBal->Zone(surfZoneNum).HasInterZoneWindow) continue;
         int NZ = Surface(SurfNum).SolarEnclIndex;
         int MZ = Surface(Surface(SurfNum).ExtBoundCond).SolarEnclIndex;
-        state.dataHeatBalSurf->FractDifShortZtoZ(NZ, MZ) += state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff *
-                                                            state.dataHeatBalSurf->EnclSolVMULT(NZ) * Surface(SurfNum).Area;
-        if (state.dataHeatBalSurf->EnclSolVMULT(NZ) != 0.0) state.dataHeatBalSurf->RecDifShortFromZ(NZ) = true;
+        state.dataHeatBalSurf->FractDifShortZtoZ(NZ, MZ) +=
+            state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff * state.dataHeatBal->EnclSolVMULT(NZ) * Surface(SurfNum).Area;
+        if (state.dataHeatBal->EnclSolVMULT(NZ) != 0.0) state.dataHeatBalSurf->RecDifShortFromZ(NZ) = true;
     }
     //          Compute fractions for multiple passes.
 
@@ -5581,8 +5579,6 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
     using SolarShading::ReportSurfaceShading;
 
     state.dataHeatBalSurf->SumSurfaceHeatEmission = 0.0;
-
-    state.dataHeatBalSurf->ZoneMRT({1, state.dataGlobal->NumOfZones}) = state.dataHeatBal->ZoneMRT({1, state.dataGlobal->NumOfZones});
 
     ReportSurfaceShading(state);
     auto &Surface(state.dataSurface->Surface);
@@ -7162,7 +7158,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                          (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
                           state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
                           state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum))) -
-                    state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * state.dataConstruction->Construct(surface.Construction).TransDiff;
+                    state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
+                        state.dataConstruction->Construct(surface.Construction).TransDiff;
                 // Transmitted solar | Convection | IR exchange | IR
                 // Zone diffuse interior shortwave reflected back into the TDD
                 state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
@@ -7175,8 +7172,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     (Sigma_Temp_4 - (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
                                      state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
                                      state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)));
-                state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
-                    state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * state.dataConstruction->Construct(surface.Construction).TransDiff;
+                state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
+                                                                           state.dataConstruction->Construct(surface.Construction).TransDiff;
             } else {                                                // Regular window
                 if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                     // Get outside convection coeff for exterior window here to avoid calling
@@ -7915,7 +7912,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                              (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(surfNum) +
                               state.dataHeatBalFanSys->QCoolingPanelSurf(surfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(surfNum) +
                               state.dataHeatBalFanSys->QSteamBaseboardSurf(surfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(surfNum))) -
-                        state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area *
+                        state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
                             state.dataConstruction->Construct(surface.Construction)
                                 .TransDiff; // Transmitted solar | Convection | IR exchange | IR
                                             // Zone diffuse interior shortwave reflected back into the TDD
@@ -7930,7 +7927,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                          (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(surfNum) +
                           state.dataHeatBalFanSys->QCoolingPanelSurf(surfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(surfNum) +
                           state.dataHeatBalFanSys->QSteamBaseboardSurf(surfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(surfNum)));
-                    state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area *
+                    state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) *
+                                                                               surface.Area *
                                                                                state.dataConstruction->Construct(surface.Construction).TransDiff;
                 } else {                                                // Regular window
                     if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once

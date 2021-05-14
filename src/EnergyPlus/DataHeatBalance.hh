@@ -282,6 +282,11 @@ namespace DataHeatBalance {
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
+    // Const for initialization
+    constexpr Real64 ZoneInitialTemp(23.0); // Zone temperature for initialization
+    constexpr Real64 SurfInitialTemp(23.0); // Surface temperature for initialization
+    constexpr Real64 SurfInitialConvCoeff(3.076); // Surface convective coefficient for initialization
+
     // Air       Argon     Krypton   Xenon
     extern Array2D<Real64> const GasCoeffsCon; // Gas conductivity coefficients for gases in a mixture
 
@@ -2155,12 +2160,30 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> MultCircumSolar;        // Contribution to eff sky view factor from circumsolar brightening
     Array1D<Real64> MultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
 
-    Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
-    Array1D<Real64> QSLights;                // Like QS, but Lights short-wave only.
-    Array1D<Real64> EnclSolQSDifSol;         // Like QS, but diffuse solar short-wave only.
-    Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
-    Array1D<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
-    Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
+    Array1D<Real64>
+        EnclSolQSWRad; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
+    Array1D<Real64> EnclSolQSWRadLights; // Like QS, but Lights short-wave only.
+    Array1D<Real64> EnclSolDB;           // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
+    Array1D<Real64> EnclSolDBSSG;        // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces.
+    // Used only for scheduled surface gains
+    Array1D<Real64> EnclSolDBIntWin; // Value of factor for beam solar entering a zone through interior windows
+    // (considered to contribute to diffuse in zone)
+    Array1D<Real64> EnclSolQSDifSol; // Like QS, but diffuse solar short-wave only.
+    Array1D<Real64> EnclSolQD;       // Diffuse solar radiation in a zone from sky and ground diffuse entering
+    // through exterior windows and reflecting from interior surfaces,
+    // beam from exterior windows reflecting from interior surfaces,
+    // and beam entering through interior windows (considered diffuse)
+    Array1D<Real64> EnclSolQDforDaylight; // Diffuse solar radiation in a zone from sky and ground diffuse entering
+    // through exterior windows, beam from exterior windows reflecting
+    // from interior surfaces, and beam entering through interior windows
+    // (considered diffuse)
+    // Originally QD, now used only for EnclSolQSDifSol calc for daylighting
+    Array1D<Real64> EnclSolVMULT;       // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
+    Array1D<Real64> EnclRadQThermalRad; // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
+
+    Array1D<Real64> ITABSF; // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
+    Array1D<Real64> TMULT;  // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
+
     Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
     Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
@@ -2431,12 +2454,21 @@ struct HeatBalanceData : BaseGlobalStruct
         this->MultIsoSky.deallocate();
         this->MultCircumSolar.deallocate();
         this->MultHorizonZenith.deallocate();
-        this->QS.deallocate();
-        this->QSLights.deallocate();
+
+        this->EnclSolQSWRad.deallocate();
+        this->EnclSolQSWRadLights.deallocate();
+        this->EnclSolDB.deallocate();
+        this->EnclSolDBSSG.deallocate();
+        this->EnclSolDBIntWin.deallocate();
         this->EnclSolQSDifSol.deallocate();
+        this->EnclSolQD.deallocate();
+        this->EnclSolQDforDaylight.deallocate();
+        this->EnclSolVMULT.deallocate();
+        this->EnclRadQThermalRad.deallocate();
+
         this->ITABSF.deallocate();
         this->TMULT.deallocate();
-        this->QL.deallocate();
+
         this->SunlitFracHR.deallocate();
         this->CosIncAngHR.deallocate();
         this->SunlitFrac.deallocate();

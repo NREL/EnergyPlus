@@ -6469,11 +6469,11 @@ namespace InternalHeatGains {
         // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
             auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
-            state.dataHeatBal->QL(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclRadQThermalRad(enclosureNum) = 0.0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 Real64 zoneQL;
                 SumAllInternalRadiationGains(state, zoneNum, zoneQL);
-                state.dataHeatBal->QL(enclosureNum) += zoneQL;
+                state.dataHeatBal->EnclRadQThermalRad(enclosureNum) += zoneQL;
             }
         }
 
@@ -6491,9 +6491,9 @@ namespace InternalHeatGains {
                 int const radEnclosureNum = state.dataHeatBal->Zone(zoneNum).RadiantEnclosureNum;
                 if (!state.dataGlobal->doLoadComponentPulseNow) {
                     state.dataHeatBal->SurfQRadThermInAbs(SurfNum) =
-                        state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
+                        state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                 } else {
-                    state.dataInternalHeatGains->curQL = state.dataHeatBal->QL(radEnclosureNum);
+                    state.dataInternalHeatGains->curQL = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum);
                     // for the loads component report during the special sizing run increase the radiant portion
                     // a small amount to create a "pulse" of heat that is used for the delayed loads
                     state.dataInternalHeatGains->adjQL =

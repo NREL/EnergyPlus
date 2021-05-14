@@ -10677,7 +10677,7 @@ void DayltgInterReflIllFrIntWins(EnergyPlusData &state, int &ZoneNum) // Zone nu
     // TH, CR 7873, 9/17/2009
     BmInterReflIll = 0.0;
     if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea > 0) {
-        BmInterReflIll = (state.dataSurface->EnclSolDBIntWin(ZoneNum) * state.dataEnvrn->BeamSolarRad * state.dataEnvrn->PDIRLW *
+        BmInterReflIll = (state.dataHeatBal->EnclSolDBIntWin(ZoneNum) * state.dataEnvrn->BeamSolarRad * state.dataEnvrn->PDIRLW *
                           state.dataDaylightingData->ZoneDaylight(ZoneNum).FloorVisRefl) /
                          (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea *
                           (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));

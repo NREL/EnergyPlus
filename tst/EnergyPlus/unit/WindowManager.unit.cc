@@ -563,7 +563,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfWinGainIRGlazToZoneRep.allocate(3);
     state->dataSurface->SurfWinGapConvHtFlowRep.allocate(3);
     state->dataSurface->SurfWinGapConvHtFlowRepEnergy.allocate(3);
-    state->dataHeatBal->QS.allocate(1);
+    state->dataHeatBal->EnclSolQSWRad.allocate(1);
     state->dataSurface->SurfWinLossSWZoneToOutWinRep.allocate(3);
     state->dataSurface->SurfWinSysSolTransmittance.allocate(3);
     state->dataSurface->SurfWinSysSolAbsorptance.allocate(3);
@@ -596,7 +596,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalFanSys->QSteamBaseboardSurf = 0.0;
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
-    state->dataHeatBal->QS = 0.0;
+    state->dataHeatBal->EnclSolQSWRad = 0.0;
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;
@@ -2792,7 +2792,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataSurface->SurfWinGainIRGlazToZoneRep.allocate(3);
     state->dataSurface->SurfWinGapConvHtFlowRep.allocate(3);
     state->dataSurface->SurfWinGapConvHtFlowRepEnergy.allocate(3);
-    state->dataHeatBal->QS.allocate(1);
+    state->dataHeatBal->EnclSolQSWRad.allocate(1);
     state->dataSurface->SurfWinLossSWZoneToOutWinRep.allocate(3);
     state->dataSurface->SurfWinSysSolTransmittance.allocate(3);
     state->dataSurface->SurfWinSysSolAbsorptance.allocate(3);
@@ -2824,7 +2824,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->QSteamBaseboardSurf = 0.0;
     state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
-    state->dataHeatBal->QS = 0.0;
+    state->dataHeatBal->EnclSolQSWRad = 0.0;
 
     Real64 inSurfTemp;
     Real64 outSurfTemp;

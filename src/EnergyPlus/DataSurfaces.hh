@@ -1210,11 +1210,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> Y0;                           // Y-component of translation vector
     Array1D<Real64> Z0;                           // Z-component of translation vector
 
-    Array1D<Real64> EnclSolDB;                  // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
-    Array1D<Real64> EnclSolDBSSG;               // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces.
-                                                // Used only for scheduled surface gains
-    Array1D<Real64> EnclSolDBIntWin;            // Value of factor for beam solar entering a zone through interior windows
-                                                // (considered to contribute to diffuse in zone)
     std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
@@ -1606,8 +1601,6 @@ struct SurfacesData : BaseGlobalStruct
         this->X0.deallocate();
         this->Y0.deallocate();
         this->Z0.deallocate();
-        this->EnclSolDB.deallocate();
-        this->EnclSolDBSSG.deallocate();
         this->SurfOpaqAI.deallocate();
         this->SurfOpaqAO.deallocate();
         this->SurfBmToBmReflFacObs.deallocate();
@@ -1625,7 +1618,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfReflFacSkySolObs.deallocate();
         this->SurfReflFacSkySolGnd.deallocate();
         this->SurfCosIncAveBmToBmSolObs.deallocate();
-        this->EnclSolDBIntWin.deallocate();
         this->SurfSunlitArea.deallocate();
         this->SurfSunlitFrac.deallocate();
         this->SurfSkySolarInc.deallocate();

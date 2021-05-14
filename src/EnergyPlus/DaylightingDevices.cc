@@ -1512,7 +1512,7 @@ namespace DaylightingDevices {
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
             QRefl +=
-                state.dataHeatBal->QS(state.dataSurface->Surface(DiffSurf).SolarEnclIndex) * state.dataSurface->Surface(DiffSurf).Area * transDiff;
+                state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(DiffSurf).SolarEnclIndex) * state.dataSurface->Surface(DiffSurf).Area * transDiff;
 
             TotTDDPipeGain = state.dataSurface->SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) -
                              state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) * state.dataSurface->Surface(DiffSurf).Area +

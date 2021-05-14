@@ -739,7 +739,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -772,7 +771,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     SolarShading::AllocateModuleArrays(*state);
-
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
 
@@ -803,7 +802,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     state->dataHeatBalSurf->TempSurfInTmp.deallocate();
-    state->dataHeatBal->SurfTempEffBulkAir.deallocate();
     state->dataHeatBalSurf->TH.deallocate();
     state->dataHeatBal->HConvIn.deallocate();
     state->dataMstBal->HConvInFD.deallocate();
@@ -1277,7 +1275,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -1317,6 +1314,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     // Set up
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
     OutAirNodeManager::GetOutAirNodesInput(*state);
@@ -1853,7 +1851,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -1887,6 +1884,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     // Set up
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
 
@@ -1974,7 +1972,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     state->dataConstruction->Construct(1).CTFTUserOut(0) = 0.5;
     state->dataConstruction->Construct(1).CTFTUserIn(0) = 0.25;
     state->dataConstruction->Construct(1).CTFTUserSource(0) = 0.25;
-
+    SurfaceGeometry::AllocateSurfaceArrays(*state);
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
     OutputProcessor::GetReportVariableInput(*state);
 
@@ -2421,7 +2419,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
     state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -2463,6 +2460,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
     state->dataSurface->SurfTAirRef(1) = DataSurfaces::ZoneMeanAirTemp;
@@ -2573,10 +2571,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
-    state->dataHeatBalSurf->EnclSolVMULT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->EnclSolVMULT.allocate(state->dataGlobal->NumOfZones);
     state->dataConstruction->Construct(1).TransDiff = 0.1;
-    state->dataHeatBalSurf->EnclSolVMULT(1) = 1.0;
-    state->dataHeatBalSurf->EnclSolVMULT(2) = 1.0;
+    state->dataHeatBal->EnclSolVMULT(1) = 1.0;
+    state->dataHeatBal->EnclSolVMULT(2) = 1.0;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Construction = 1;
@@ -3076,7 +3074,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
     state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
-    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataHeatBalSurf->TH.allocate(2, 2, 6);
     state->dataHeatBal->HConvIn.allocate(6);
@@ -3094,6 +3091,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::AllocateZoneHeatBalArrays(*state);
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
 

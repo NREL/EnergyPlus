@@ -6272,7 +6272,6 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
     Array2D<Real64> CFDirBoverlap; // Directional boverlap (Direction, IBack)
 
     if (state.dataSolarShading->MustAllocSolarShading) {
-        state.dataSurface->EnclSolDBIntWin.allocate(state.dataGlobal->NumOfZones);
         state.dataSolarShading->IntBeamAbsByShadFac.allocate(state.dataSurface->TotSurfaces);
         state.dataSolarShading->ExtBeamAbsByShadFac.allocate(state.dataSurface->TotSurfaces);
         state.dataSolarShading->WinTransBmSolar.allocate(state.dataSurface->TotSurfaces);
@@ -6288,9 +6287,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
     ++state.dataTimingsData->NumIntSolarDist_Calls;
 #endif
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        state.dataSurface->EnclSolDB(zoneNum) = 0.0;
-        state.dataSurface->EnclSolDBSSG(zoneNum) = 0.0;
-        state.dataSurface->EnclSolDBIntWin(zoneNum) = 0.0;
+        state.dataHeatBal->EnclSolDB(zoneNum) = 0.0;
+        state.dataHeatBal->EnclSolDBSSG(zoneNum) = 0.0;
+        state.dataHeatBal->EnclSolDBIntWin(zoneNum) = 0.0;
         int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
         int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -7934,7 +7933,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 int AdjSurfNum = state.dataSurface->Surface(BackSurfNum).ExtBoundCond;
                                 if (AdjSurfNum > 0) {
                                     int adjEnclosureNum = state.dataSurface->Surface(AdjSurfNum).SolarEnclIndex;
-                                    state.dataSurface->EnclSolDBIntWin(adjEnclosureNum) += BOverlap * TransBeamWin; //[m2]
+                                    state.dataHeatBal->EnclSolDBIntWin(adjEnclosureNum) += BOverlap * TransBeamWin; //[m2]
                                     state.dataSurface->SurfWinBmSolTransThruIntWinRep(BackSurfNum) +=
                                         BOverlap * TransBeamWin * state.dataEnvrn->BeamSolarRad; //[W]
                                     state.dataSurface->SurfWinBmSolTransThruIntWinRepEnergy(BackSurfNum) =
@@ -8069,7 +8068,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                 int AdjSurfNum = state.dataSurface->Surface(BackSurfaceNumber).ExtBoundCond;
                                                 if (AdjSurfNum > 0) {
                                                     int adjEnclosureNum = state.dataSurface->Surface(AdjSurfNum).SolarEnclIndex;
-                                                    state.dataSurface->EnclSolDBIntWin(adjEnclosureNum) +=
+                                                    state.dataHeatBal->EnclSolDBIntWin(adjEnclosureNum) +=
                                                         CFDirBoverlap(IBack, CurTrnDir) * state.dataSurface->SurfaceWindow(BackSurfaceNumber)
                                                                                               .ComplexFen.State(CurBackState)
                                                                                               .IntegratedBkTrans(bestBackTrn);
@@ -8204,7 +8203,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 int AdjSurfNum = state.dataSurface->Surface(BackSurfNum).ExtBoundCond;
                                 if (AdjSurfNum > 0) {
                                     int adjEnclosureNum = state.dataSurface->Surface(AdjSurfNum).SolarEnclIndex;
-                                    state.dataSurface->EnclSolDBIntWin(adjEnclosureNum) += BOverlap * TransBeamWin; //[m2]
+                                    state.dataHeatBal->EnclSolDBIntWin(adjEnclosureNum) += BOverlap * TransBeamWin; //[m2]
                                     state.dataSurface->SurfWinBmSolTransThruIntWinRep(BackSurfNum) +=
                                         BOverlap * TransBeamWin * state.dataEnvrn->BeamSolarRad; //[W]
                                     state.dataSurface->SurfWinBmSolTransThruIntWinRepEnergy(BackSurfNum) =
@@ -8270,7 +8269,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                             // Contribution (assumed diffuse) to adjacent zone of beam radiation passing
                             // through this window
-                            state.dataSurface->EnclSolDBIntWin(adjEnclosureNum) += BTOTWinZone * state.dataSolarShading->ISABSF(FloorNum) *
+                            state.dataHeatBal->EnclSolDBIntWin(adjEnclosureNum) += BTOTWinZone * state.dataSolarShading->ISABSF(FloorNum) *
                                                                                    state.dataConstruction->Construct(FlConstrNum).TransDiff /
                                                                                    AbsBeamTotWin;
 
@@ -8301,11 +8300,11 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                 }
             }
         }
-        state.dataSurface->EnclSolDBSSG(enclosureNum) = BTOTZoneSSG - BABSZoneSSG;
-        state.dataSurface->EnclSolDB(enclosureNum) = BTOTZone - BABSZone;
+        state.dataHeatBal->EnclSolDBSSG(enclosureNum) = BTOTZoneSSG - BABSZoneSSG;
+        state.dataHeatBal->EnclSolDB(enclosureNum) = BTOTZone - BABSZone;
 
-        if (state.dataSurface->EnclSolDB(enclosureNum) < 0.0) {
-            state.dataSurface->EnclSolDB(enclosureNum) = 0.0;
+        if (state.dataHeatBal->EnclSolDB(enclosureNum) < 0.0) {
+            state.dataHeatBal->EnclSolDB(enclosureNum) = 0.0;
         }
 
         // Variables for reporting
@@ -8472,8 +8471,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
     // Add interior window contribution to EnclSolDB
 
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-        state.dataSurface->EnclSolDB(enclosureNum) += state.dataSurface->EnclSolDBIntWin(enclosureNum);
-        state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum) = state.dataSurface->EnclSolDBIntWin(enclosureNum) * state.dataEnvrn->BeamSolarRad;
+        state.dataHeatBal->EnclSolDB(enclosureNum) += state.dataHeatBal->EnclSolDBIntWin(enclosureNum);
+        state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum) = state.dataHeatBal->EnclSolDBIntWin(enclosureNum) * state.dataEnvrn->BeamSolarRad;
         state.dataHeatBal->ZoneBmSolFrIntWinsRepEnergy(enclosureNum) =
             state.dataHeatBal->ZoneBmSolFrIntWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
     }
@@ -8556,13 +8555,9 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace MultiLayerOptics;
 
-    if (state.dataSolarShading->MustAllocSolarShading) {
-        state.dataSurface->EnclSolDBIntWin.allocate(state.dataGlobal->NumOfZones);
-    }
-
     // TODO - allocation
-    state.dataSurface->EnclSolDB = 0.0;
-    state.dataSurface->EnclSolDBIntWin = 0.0;
+    state.dataHeatBal->EnclSolDB = 0.0;
+    state.dataHeatBal->EnclSolDBIntWin = 0.0;
     state.dataSurface->SurfOpaqAI = 0.0;
     state.dataSurface->SurfOpaqAO = 0.0;
 
@@ -8755,7 +8750,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             state.dataHeatBal->ZoneDifSolFrExtWinsRepEnergy(enclosureNum) =
                 state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum) * state.dataGlobal->TimeStepZoneSec; //[J]
         }
-        state.dataSurface->EnclSolDB(enclosureNum) = BTOTZone - BABSZone;
+        state.dataHeatBal->EnclSolDB(enclosureNum) = BTOTZone - BABSZone;
     }
 }
 
