@@ -421,35 +421,7 @@ Real64 SurfaceData::getSWIncident(EnergyPlusData &state, const int t_SurfNum)
     // PURPOSE OF THIS SUBROUTINE:
     // Return total short wave incident to the surface
 
-    return state.dataHeatBal->SurfQRadSWOutIncident(t_SurfNum) + state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(t_SurfNum).SolarEnclIndex);
-}
-
-Real64 SurfaceData::getSWBeamIncident(EnergyPlusData &state, const int t_SurfNum)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Simon Vidanovic
-    //       DATE WRITTEN   July 2016
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Return total short wave incident from outside beam
-
-    return state.dataHeatBal->SurfQRadSWOutIncidentBeam(t_SurfNum);
-}
-
-Real64 SurfaceData::getSWDiffuseIncident(EnergyPlusData &state, const int t_SurfNum)
-{
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Simon Vidanovic
-    //       DATE WRITTEN   July 2016
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Return total short wave diffuse incident to the surface
-
-    return state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) +
+    return state.dataHeatBal->SurfQRadSWOutIncident(t_SurfNum) +
            state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(t_SurfNum).SolarEnclIndex);
 }
 

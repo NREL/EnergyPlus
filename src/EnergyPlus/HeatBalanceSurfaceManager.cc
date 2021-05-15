@@ -2164,10 +2164,10 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
         for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
             state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = SurfInitialTemp;
-            state.dataHeatBalSurf->SUMH(SurfNum) = 0;             // module level array
+            state.dataHeatBalSurf->SUMH(SurfNum) = 0;                        // module level array
             state.dataHeatBalSurf->TempSurfIn(SurfNum) = SurfInitialTemp;    // module level array
             state.dataHeatBalSurf->TempSurfInTmp(SurfNum) = SurfInitialTemp; // module level array
-            state.dataHeatBal->HConvIn(SurfNum) = SurfInitialConvCoeff;          // module level array
+            state.dataHeatBal->HConvIn(SurfNum) = SurfInitialConvCoeff;      // module level array
             state.dataHeatBalSurf->HcExtSurf(SurfNum) = 0.0;
             state.dataHeatBalSurf->HAirExtSurf(SurfNum) = 0.0;
             state.dataHeatBalSurf->HSkyExtSurf(SurfNum) = 0.0;
@@ -2724,8 +2724,11 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
         if (state.dataHeatBal->CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface(state);
 
-        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
-            CalcInteriorSolarDistributionWCE(state);
+        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+            CalcAbsorbedOnExteriorOpaqueSurfaces(state);
+        } else if (state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
+            CalcAbsorbedOnExteriorOpaqueSurfaces(state);
+            CalcInteriorSolarDistributionWCESimple(state);
         } else {
             CalcInteriorSolarDistribution(state);
         }

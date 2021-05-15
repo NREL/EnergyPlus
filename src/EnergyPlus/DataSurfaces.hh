@@ -692,10 +692,6 @@ namespace DataSurfaces {
 
         static Real64 getSWIncident(EnergyPlusData &state, int t_SurfNum);
 
-        static Real64 getSWBeamIncident(EnergyPlusData &state, int t_SurfNum);
-
-        static Real64 getSWDiffuseIncident(EnergyPlusData &state, int t_SurfNum);
-
         int getTotLayers(EnergyPlusData &state) const;
 
         Real64 get_average_height(EnergyPlusData &state) const;

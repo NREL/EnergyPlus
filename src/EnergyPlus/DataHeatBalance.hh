@@ -283,8 +283,8 @@ namespace DataHeatBalance {
     constexpr Real64 ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
 
     // Const for initialization
-    constexpr Real64 ZoneInitialTemp(23.0); // Zone temperature for initialization
-    constexpr Real64 SurfInitialTemp(23.0); // Surface temperature for initialization
+    constexpr Real64 ZoneInitialTemp(23.0);       // Zone temperature for initialization
+    constexpr Real64 SurfInitialTemp(23.0);       // Surface temperature for initialization
     constexpr Real64 SurfInitialConvCoeff(3.076); // Surface convective coefficient for initialization
 
     // Air       Argon     Krypton   Xenon

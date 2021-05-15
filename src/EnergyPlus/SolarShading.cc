@@ -761,6 +761,17 @@ void AllocateModuleArrays(EnergyPlusData &state)
     // TODO - check allocation here
     state.dataSolarShading->CTHETA.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSolarShading->SAREA.dimension(state.dataSurface->TotSurfaces, 0.0);
+    if (!state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() || !state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
+        state.dataSolarShading->IntBeamAbsByShadFac.allocate(state.dataSurface->TotSurfaces);
+        state.dataSolarShading->ExtBeamAbsByShadFac.allocate(state.dataSurface->TotSurfaces);
+        state.dataSolarShading->WinTransBmSolar.allocate(state.dataSurface->TotSurfaces);
+        state.dataSolarShading->WinTransDifSolar.allocate(state.dataSurface->TotSurfaces);
+        state.dataSolarShading->WinTransDifSolarGnd.allocate(state.dataSurface->TotSurfaces);
+        state.dataSolarShading->WinTransDifSolarSky.allocate(state.dataSurface->TotSurfaces);
+        state.dataSolarShading->WinTransBmBmSolar.allocate(state.dataSurface->TotSurfaces);
+        state.dataSolarShading->WinTransBmDifSolar.allocate(state.dataSurface->TotSurfaces);
+    }
+
     state.dataHeatBal->SunlitFracHR.dimension(24, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SunlitFrac.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SunlitFracWithoutReveal.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
@@ -6271,18 +6282,6 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
     Array1D<Real64> CFBoverlap;    // Sum of boverlap for each back surface
     Array2D<Real64> CFDirBoverlap; // Directional boverlap (Direction, IBack)
 
-    if (state.dataSolarShading->MustAllocSolarShading) {
-        state.dataSolarShading->IntBeamAbsByShadFac.allocate(state.dataSurface->TotSurfaces);
-        state.dataSolarShading->ExtBeamAbsByShadFac.allocate(state.dataSurface->TotSurfaces);
-        state.dataSolarShading->WinTransBmSolar.allocate(state.dataSurface->TotSurfaces);
-        state.dataSolarShading->WinTransDifSolar.allocate(state.dataSurface->TotSurfaces);
-        state.dataSolarShading->WinTransDifSolarGnd.allocate(state.dataSurface->TotSurfaces);
-        state.dataSolarShading->WinTransDifSolarSky.allocate(state.dataSurface->TotSurfaces);
-        state.dataSolarShading->WinTransBmBmSolar.allocate(state.dataSurface->TotSurfaces);
-        state.dataSolarShading->WinTransBmDifSolar.allocate(state.dataSurface->TotSurfaces);
-        state.dataSolarShading->MustAllocSolarShading = false;
-    }
-
 #ifdef EP_Count_Calls
     ++state.dataTimingsData->NumIntSolarDist_Calls;
 #endif
@@ -8521,25 +8520,6 @@ void CalcAbsorbedOnExteriorOpaqueSurfaces(EnergyPlusData &state)
     }
 }
 
-void CalcInteriorSolarDistributionWCE(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Simon Vidanovic
-    //       DATE WRITTEN   May 2017
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Calculates solar distribution
-
-    CalcAbsorbedOnExteriorOpaqueSurfaces(state);
-
-    if (state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
-        CalcInteriorSolarDistributionWCESimple(state);
-    } // else for built in BSDF (possible future implementation)
-}
-
 void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
 {
 
@@ -10021,11 +10001,7 @@ void WindowShadingManager(EnergyPlusData &state)
                         state.dataSurface->SurfWinSlatsAngIndex(ISurf) = SlatsAngIndex;
                         state.dataSurface->SurfWinSlatsAngInterpFac(ISurf) = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) * DeltaAng_inv;
 
-                        // TODO: floating point error is causing the result diff
-                        // double test1 = state.dataSurface->SurfWinSlatsAngInterpFac(ISurf);
-                        // double test2 = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) / DeltaAng;
-                        // std::cout << state.dataEnvrn->Month << "," << state.dataEnvrn->DayOfMonth << "," << state.dataGlobal->HourOfDay << "," <<
-                        // state.dataGlobal->TimeStep << "," << std::abs(test1 - test2) << "\n";
+
                     }
                 }
             } // End of check if interior or exterior or between glass blind in place

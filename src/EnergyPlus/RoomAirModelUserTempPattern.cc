@@ -207,7 +207,6 @@ void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number
     // appropriate subroutine
 
     // Using/Aliasing
-    using DataSurfaces::ZoneMeanAirTemp;
     using General::FindNumberInList;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -778,7 +777,6 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     using DataHVACGlobals::RetTempMin;
     using DataSurfaces::AdjacentAirTemp;
     using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
-    using DataSurfaces::ZoneMeanAirTemp;
     using InternalHeatGains::SumAllReturnAirConvectionGains;
     using InternalHeatGains::SumAllReturnAirLatentGains;
     using Psychrometrics::PsyCpAirFnW;
