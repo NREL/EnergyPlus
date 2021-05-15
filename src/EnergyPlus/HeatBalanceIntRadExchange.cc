@@ -2000,7 +2000,6 @@ namespace HeatBalanceIntRadExchange {
     {
         static std::string const routineName("GetRadiantSystemSurface: "); // include trailing blank space
 
-        // TODO - find by index?
         // For radiant zone equipment, find the referenced surface and check if it is in the same zone or radiant enclosure
         int const surfNum = UtilityRoutines::FindItemInList(SurfaceName, state.dataSurface->Surface);
 

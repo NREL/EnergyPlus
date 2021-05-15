@@ -97,14 +97,16 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> CTFSourceIn0;  // Construct.CTFSourceIn(0)
     Array1D<Real64> TH11Surf;      // TH(1,1,SurfNum)
     Array1D<Real64> QsrcHistSurf1; // QsrcHist(SurfNum, 1)
-    Array1D_int IsAdiabatic;       // 0 not adiabatic, 1 is adiabatic
-    Array1D_int IsNotAdiabatic;    // 1 not adiabatic, 0 is adiabatic
-    Array1D_int IsSource;          // 0 no internal source/sink, 1 has internal source/sing
-    Array1D_int IsNotSource;       // 1 no internal source/sink, 0 has internal source/sing
-    Array1D_int IsPoolSurf;        // 0 not pool, 1 is pool
-    Array1D_int IsNotPoolSurf;     // 1 not pool, 0 is pool
-    Array1D<Real64> TempTermSurf;  // TempTerm for heatbalance equation
-    Array1D<Real64> TempDivSurf;   // Divisor for heatbalance equation
+
+    // todo: merge Is and IsNot and reduce the assignation at each time steps
+    Array1D_int IsAdiabatic;      // 0 not adiabatic, 1 is adiabatic
+    Array1D_int IsNotAdiabatic;   // 1 not adiabatic, 0 is adiabatic
+    Array1D_int IsSource;         // 0 no internal source/sink, 1 has internal source/sing
+    Array1D_int IsNotSource;      // 1 no internal source/sink, 0 has internal source/sing
+    Array1D_int IsPoolSurf;       // 0 not pool, 1 is pool
+    Array1D_int IsNotPoolSurf;    // 1 not pool, 0 is pool
+    Array1D<Real64> TempTermSurf; // TempTerm for heatbalance equation
+    Array1D<Real64> TempDivSurf;  // Divisor for heatbalance equation
     // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
     Array1D<Real64> TempSurfIn;          // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempInsOld;          // TempSurfIn from previous iteration for convergence check
@@ -117,6 +119,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> TempUserLoc;         // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> TempSurfInRep;       // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempSurfInMovInsRep; // Temperature of interior movable insulation on the side facing the zone
+
+    // todo: to SurfRep arrays
     // (report)
     Array1D<Real64> QConvInReport; // Surface convection heat gain at inside face [J]
     Array1D<Real64> QdotConvInRep; // Surface convection heat transfer rate at inside face surface [W]

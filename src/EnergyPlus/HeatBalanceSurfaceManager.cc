@@ -2726,9 +2726,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
         if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
             CalcAbsorbedOnExteriorOpaqueSurfaces(state);
-        } else if (state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
-            CalcAbsorbedOnExteriorOpaqueSurfaces(state);
-            CalcInteriorSolarDistributionWCESimple(state);
+            if (state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
+                CalcInteriorSolarDistributionWCESimple(state);
+            }
         } else {
             CalcInteriorSolarDistribution(state);
         }
@@ -3540,13 +3540,6 @@ void InitIntSolarDistribution(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     auto &Surface(state.dataSurface->Surface);
-
-    if (!allocated(state.dataHeatBal->EnclSolQSWRad)) state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-    if (!allocated(state.dataHeatBal->EnclSolQSWRadLights))
-        state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
-
-    state.dataHeatBal->EnclSolQSWRad = 0.0;
-    state.dataHeatBal->EnclSolQSWRadLights = 0.0;
 
     // COMPUTE TOTAL SHORT-WAVE RADIATION ORIGINATING IN ZONE.
     // Note: If sun is not up, QS is only internal gains

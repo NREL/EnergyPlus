@@ -1218,6 +1218,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfOutWindSpeed;   // Surface outside wind speed, for surface heat balance (m/s)
     Array1D<Real64> SurfOutWindDir;     // Surface outside wind direction, for surface heat balance and ventilation(degree)
     Array1D<Real64> SurfGenericContam;  // [ppm] Surface generic contaminant as a storage term for
+    Array1D<int> SurfLowTempErrCount;
+    Array1D<int> SurfHighTempErrCount;
 
     // Surface solar arrays
     Array1D<Real64> SurfAirSkyRadSplit;     // Fractional split between the air and the sky for radiation from the surface
@@ -1281,8 +1283,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWindDirEMSOverrideValue;          // value to use for EMS override of outside wind direction (deg)
 
     // Surface Properties
-    Array1D<int> SurfLowTempErrCount;
-    Array1D<int> SurfHighTempErrCount;
     Array1D<int> SurfDaylightingShelfInd;           // Pointer to daylighting shelf
     Array1D<bool> SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
     Array1D<int> SurfExternalShadingSchInd;         // Schedule for a the external shading
@@ -1597,36 +1597,49 @@ struct SurfacesData : BaseGlobalStruct
         this->X0.deallocate();
         this->Y0.deallocate();
         this->Z0.deallocate();
-        this->SurfOpaqAI.deallocate();
-        this->SurfOpaqAO.deallocate();
+        this->AllHTSurfaceList.clear();
+        this->AllIZSurfaceList.clear();
+        this->AllHTNonWindowSurfaceList.clear();
+        this->AllHTWindowSurfaceList.clear();
+        this->AllSurfaceListReportOrder.clear();
+
+        this->SurfOutDryBulbTemp.deallocate();
+        this->SurfOutWetBulbTemp.deallocate();
+        this->SurfOutWindSpeed.deallocate();
+        this->SurfOutWindDir.deallocate();
+        this->SurfGenericContam.deallocate();
+        this->SurfLowTempErrCount.deallocate();
+        this->SurfHighTempErrCount.deallocate();
+        this->SurfAirSkyRadSplit.deallocate();
+        this->SurfSunCosHourly.deallocate();
+        this->SurfSunlitArea.deallocate();
+        this->SurfSunlitFrac.deallocate();
+        this->SurfSkySolarInc.deallocate();
+        this->SurfGndSolarInc.deallocate();
         this->SurfBmToBmReflFacObs.deallocate();
         this->SurfBmToDiffReflFacObs.deallocate();
         this->SurfBmToDiffReflFacGnd.deallocate();
         this->SurfSkyDiffReflFacGnd.deallocate();
-        this->SurfWinA.deallocate();
-        this->SurfWinADiffFront.deallocate();
-        this->SurfWinACFOverlap.deallocate();
-        this->SurfAirSkyRadSplit.deallocate();
-        this->SurfSunCosHourly.deallocate();
+        this->SurfOpaqAI.deallocate();
+        this->SurfOpaqAO.deallocate();
+        this->SurfPenumbraID.deallocate();
         this->SurfReflFacBmToDiffSolObs.deallocate();
         this->SurfReflFacBmToDiffSolGnd.deallocate();
         this->SurfReflFacBmToBmSolObs.deallocate();
         this->SurfReflFacSkySolObs.deallocate();
         this->SurfReflFacSkySolGnd.deallocate();
         this->SurfCosIncAveBmToBmSolObs.deallocate();
-        this->SurfSunlitArea.deallocate();
-        this->SurfSunlitFrac.deallocate();
-        this->SurfSkySolarInc.deallocate();
-        this->SurfGndSolarInc.deallocate();
-        this->AllHTSurfaceList.clear();
-        this->AllIZSurfaceList.clear();
-        this->AllHTNonWindowSurfaceList.clear();
-        this->AllHTWindowSurfaceList.clear();
-        this->AllSurfaceListReportOrder.clear();
-        this->SurfOutDryBulbTemp.deallocate();
-        this->SurfOutWetBulbTemp.deallocate();
-        this->SurfOutWindSpeed.deallocate();
-        this->SurfOutWindDir.deallocate();
+        this->SurfShadowDiffuseSolRefl.deallocate();
+        this->SurfShadowDiffuseVisRefl.deallocate();
+        this->SurfShadowGlazingFrac.deallocate();
+        this->SurfShadowGlazingConstruct.deallocate();
+        this->SurfShadowPossibleObstruction.deallocate();
+        this->SurfShadowRecSurfNum.deallocate();
+        this->SurfShadowDisabledZoneList.deallocate();
+        this->SurfMaterialMovInsulExt.deallocate();
+        this->SurfMaterialMovInsulInt.deallocate();
+        this->SurfSchedMovInsulExt.deallocate();
+        this->SurfSchedMovInsulInt.deallocate();
         this->SurfEMSConstructionOverrideON.deallocate();
         this->SurfEMSConstructionOverrideValue.deallocate();
         this->SurfEMSOverrideIntConvCoef.deallocate();
@@ -1643,23 +1656,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfViewFactorGroundEMSOverrideValue.deallocate();
         this->SurfWindDirEMSOverrideOn.deallocate();
         this->SurfWindDirEMSOverrideValue.deallocate();
-
-        this->SurfLowTempErrCount.deallocate();
-        this->SurfHighTempErrCount.deallocate();
-
-        this->SurfShadowDiffuseSolRefl.deallocate();
-        this->SurfShadowDiffuseVisRefl.deallocate();
-        this->SurfShadowGlazingFrac.deallocate();
-        this->SurfShadowGlazingConstruct.deallocate();
-        this->SurfShadowPossibleObstruction.deallocate();
-        this->SurfShadowRecSurfNum.deallocate();
-        this->SurfShadowDisabledZoneList.deallocate();
-
-        this->SurfMaterialMovInsulExt.deallocate();
-        this->SurfMaterialMovInsulInt.deallocate();
-        this->SurfSchedMovInsulExt.deallocate();
-        this->SurfSchedMovInsulInt.deallocate();
-
         this->SurfDaylightingShelfInd.deallocate();
         this->SurfSchedExternalShadingFrac.deallocate();
         this->SurfExternalShadingSchInd.deallocate();
@@ -1667,7 +1663,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfSurroundingSurfacesNum.deallocate();
         this->SurfHasLinkedOutAirNode.deallocate();
         this->SurfLinkedOutAirNode.deallocate();
-        this->SurfPenumbraID.deallocate();
         this->SurfExtEcoRoof.deallocate();
         this->SurfExtCavityPresent.deallocate();
         this->SurfExtCavNum.deallocate();
@@ -1677,10 +1672,9 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfICSPtr.deallocate();
         this->SurfIsRadSurfOrVentSlabOrPool.deallocate();
         this->SurfIsShadowing.deallocate();
-        this->SurfGenericContam.deallocate();
+        this->SurfTAirRef.deallocate();
         this->SurfIntConvCoeff.deallocate();
         this->SurfExtConvCoeff.deallocate();
-        this->SurfTAirRef.deallocate();
         this->SurfIntConvClassification.deallocate();
         this->SurfIntConvHcModelEq.deallocate();
         this->SurfIntConvHcUserCurveIndex.deallocate();
@@ -1700,6 +1694,9 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfIntConvSurfGetsRadiantHeat.deallocate();
         this->SurfIntConvSurfHasActiveInIt.deallocate();
 
+        this->SurfWinA.deallocate();
+        this->SurfWinADiffFront.deallocate();
+        this->SurfWinACFOverlap.deallocate();
         this->SurfWinTransSolar.deallocate();
         this->SurfWinBmSolar.deallocate();
         this->SurfWinBmBmSolar.deallocate();

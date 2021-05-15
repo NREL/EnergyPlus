@@ -50,7 +50,6 @@
 #include <cassert>
 #include <cmath>
 #include <string>
-#include <unordered_map>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
@@ -62,7 +61,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>

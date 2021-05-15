@@ -10000,8 +10000,6 @@ void WindowShadingManager(EnergyPlusData &state)
                         Real64 SlatsAngIndex = 1 + int(SlatAng * DeltaAng_inv);
                         state.dataSurface->SurfWinSlatsAngIndex(ISurf) = SlatsAngIndex;
                         state.dataSurface->SurfWinSlatsAngInterpFac(ISurf) = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) * DeltaAng_inv;
-
-
                     }
                 }
             } // End of check if interior or exterior or between glass blind in place

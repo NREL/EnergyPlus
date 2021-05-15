@@ -5706,15 +5706,30 @@ namespace HeatBalanceManager {
     void AllocateZoneHeatBalArrays(EnergyPlusData &state)
     {
         // Allocate zone / encl hb arrays
-        state.dataHeatBal->EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBal->EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBal->EnclSolDBIntWin.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBal->EnclSolQSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBal->EnclSolQD.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBal->EnclSolQDforDaylight.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBal->EnclRadQThermalRad.dimension(state.dataGlobal->NumOfZones, 0.0);
-        state.dataHeatBal->ZoneMRT.dimension(state.dataGlobal->NumOfZones, 0.0);
-
+        state.dataHeatBal->EnclSolDB.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolDBSSG.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolDBIntWin.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQD.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclRadQThermalRad.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            state.dataHeatBal->EnclSolDB(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolDBSSG(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolDBIntWin(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQSDifSol(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQD(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQDforDaylight(zoneNum) = 0.0;
+            state.dataHeatBal->EnclRadQThermalRad(zoneNum) = 0.0;
+            state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
+        }
+        state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            state.dataHeatBal->EnclSolQSWRad(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = 0.0;
+        }
     }
     void AllocateHeatBalArrays(EnergyPlusData &state)
     {

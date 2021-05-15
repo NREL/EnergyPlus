@@ -2143,10 +2143,11 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
 
+    // todo - rename and reordering
     Array1D<Real64> SurfTempEffBulkAir;     // air temperature adjacent to the surface used for inside surface heat balances
     Array1D<Real64> HConvIn;                // INSIDE CONVECTION COEFFICIENT
     Array1D<Real64> SurfAnisoSkyMult;       // Multiplier on exterior-surface sky view factor to account for
-                                            // anisotropy of sky radiance; = 1.0 for for isotropic sky // todo - solarshading
+                                            // anisotropy of sky radiance; = 1.0 for for isotropic sky
     Array1D<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
     Array3D<Real64> DifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
     Array1D<Real64> curDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
@@ -2181,9 +2182,11 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> EnclSolVMULT;       // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     Array1D<Real64> EnclRadQThermalRad; // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
 
+    // todo - the following in absorptance branch
     Array1D<Real64> ITABSF; // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
     Array1D<Real64> TMULT;  // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
 
+    // todo - the following in absorptance branch
     Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
     Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
