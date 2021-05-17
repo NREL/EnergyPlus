@@ -3962,10 +3962,7 @@ namespace HeatRecovery {
         int SolFla;              // Flag of solver
         Real64 const NTU0(0.0);  // lower bound for NTU
         Real64 const NTU1(50.0); // upper bound for NTU
-        Array1D<Real64> Par(2);
-
-        Par(1) = Eps;
-        Par(2) = Z;
+        std::array<Real64, 2> Par = {Eps, Z};
 
         SolveRoot(state, Acc, MaxIte, SolFla, NTU, GetResidCrossFlowBothUnmixed, NTU0, NTU1, Par);
 
@@ -3978,8 +3975,9 @@ namespace HeatRecovery {
         return NTU;
     }
 
-    Real64 GetResidCrossFlowBothUnmixed(Real64 const NTU,          // number of transfer units
-                                        Array1D<Real64> const &Par // par(1) = Eps, par(2) = Z
+    Real64 GetResidCrossFlowBothUnmixed([[maybe_unused]] EnergyPlusData &state,
+                                        Real64 const NTU,                // number of transfer units
+                                        std::array<Real64, 2> const &Par // par(1) = Eps, par(2) = Z
     )
     {
 
@@ -4010,23 +4008,7 @@ namespace HeatRecovery {
         // Return value
         Real64 Residuum; // residual to be minimized to zero
 
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        Residuum = 1.0 - std::exp((std::exp(-std::pow(NTU, 0.78) * Par(2)) - 1.0) / Par(2) * std::pow(NTU, 0.22)) - Par(1);
+        Residuum = 1.0 - std::exp((std::exp(-std::pow(NTU, 0.78) * Par[1]) - 1.0) / Par[1] * std::pow(NTU, 0.22)) - Par[0];
 
         return Residuum;
     }
