@@ -152,10 +152,10 @@ TEST(FileSystem, getParentDirectoryPath)
 
 TEST(FileSystem, make_and_remove_Directory)
 {
-    fs::remove_all("sandbox");
+    fs::remove_all("sandboxA");
 
-    fs::path dirPath("sandbox/a");
-    fs::path rootPath = "sandbox";
+    fs::path dirPath("sandboxA/a");
+    fs::path rootPath = "sandboxA";
     EXPECT_EQ(rootPath, EnergyPlus::FileSystem::getParentDirectoryPath(dirPath));
 
     EXPECT_FALSE(EnergyPlus::FileSystem::pathExists(rootPath));
@@ -176,7 +176,7 @@ TEST(FileSystem, make_and_remove_Directory)
     EXPECT_FALSE(EnergyPlus::FileSystem::fileExists(dirPath));
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists(dirPath));
 
-    fs::path filePath("sandbox/a/file.txt.idf");
+    fs::path filePath("sandboxA/a/file.txt.idf");
     std::ofstream(filePath).put('a'); // create regular file
 
     EXPECT_TRUE(EnergyPlus::FileSystem::pathExists(rootPath));
@@ -195,36 +195,36 @@ TEST(FileSystem, make_and_remove_Directory)
 
 TEST(FileSystem, Elaborate)
 {
-    EnergyPlus::FileSystem::makeDirectory("sandbox");
-    std::string pathName("sandbox/file1.txt.idf");
+    EnergyPlus::FileSystem::makeDirectory("sandboxB");
+    std::string pathName("sandboxB/file1.txt.idf");
     std::ofstream(pathName).put('a'); // create regular file
     EXPECT_TRUE(EnergyPlus::FileSystem::pathExists(pathName));
     EXPECT_TRUE(EnergyPlus::FileSystem::fileExists(pathName));
-    EXPECT_TRUE(EnergyPlus::FileSystem::pathExists("sandbox"));
-    EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox"));
-    EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandbox/"));
+    EXPECT_TRUE(EnergyPlus::FileSystem::pathExists("sandboxB"));
+    EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandboxB"));
+    EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists("sandboxB/"));
     EXPECT_GT(EnergyPlus::FileSystem::getAbsolutePath(pathName).string().size(), pathName.size());
     // fs::equivalent throws when it doesn't exist (because it checks for file status)
     EXPECT_TRUE(
-        fs::equivalent(fs::path("sandbox/"), EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName))));
+        fs::equivalent(fs::path("sandboxB/"), EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName))));
     EXPECT_TRUE(
-        fs::equivalent(fs::path("sandbox"), EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName))));
-    EXPECT_TRUE(fs::equivalent(fs::path("sandbox"), EnergyPlus::FileSystem::getAbsolutePath("./sandbox")));
-    EXPECT_TRUE(fs::equivalent(fs::path("sandbox"), EnergyPlus::FileSystem::getAbsolutePath("./sandbox/../sandbox")));
+        fs::equivalent(fs::path("sandboxB"), EnergyPlus::FileSystem::getParentDirectoryPath(EnergyPlus::FileSystem::getAbsolutePath(pathName))));
+    EXPECT_TRUE(fs::equivalent(fs::path("sandboxB"), EnergyPlus::FileSystem::getAbsolutePath("./sandboxB")));
+    EXPECT_TRUE(fs::equivalent(fs::path("sandboxB"), EnergyPlus::FileSystem::getAbsolutePath("./sandboxB/../sandboxB")));
     EnergyPlus::FileSystem::removeFile(pathName);
     EXPECT_FALSE(EnergyPlus::FileSystem::pathExists(pathName));
     EXPECT_FALSE(EnergyPlus::FileSystem::fileExists(pathName));
 
-    fs::remove_all("sandbox");
+    fs::remove_all("sandboxB");
 }
 
 // Windows support for symlink isn't great, you'd need admin priviledges
 #ifndef _WIN32
 TEST(FileSystem, getAbsolutePath_WithSymlink)
 {
-    fs::remove_all("sandbox");
+    fs::remove_all("sandboxSymlink");
 
-    fs::path productsDir = "sandbox/Products";
+    fs::path productsDir = "sandboxSymlink/Products";
     fs::create_directories(productsDir);
 
     fs::path exeName = "energyplus-9.5.0";
@@ -248,6 +248,6 @@ TEST(FileSystem, getAbsolutePath_WithSymlink)
     // Now, we check that we can actually resolve it correctly
     EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath(exePath), EnergyPlus::FileSystem::getAbsolutePath(symlinkPath));
 
-    fs::remove_all("sandbox");
+    fs::remove_all("sandboxSymlink");
 }
 #endif
