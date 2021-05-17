@@ -331,7 +331,7 @@ namespace AirflowNetworkBalanceManager {
         bool conditionsAreDefaulted(true);                                        // Conditions are defaulted?
         InputProcessor::json objectSchemaProps;                                   // Object schema properties
         CurrentModuleObject = "AirflowNetwork:MultiZone:ReferenceCrackConditions";
-        state.dataInputProcessing->inputProcessor->getObjectSchemaProps(state, CurrentModuleObject, objectSchemaProps);
+        objectSchemaProps = state.dataInputProcessing->inputProcessor->getObjectSchemaProps(state, CurrentModuleObject);
 
         auto instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -385,7 +385,7 @@ namespace AirflowNetworkBalanceManager {
 
         // *** Read AirflowNetwork simulation surface crack component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
-        state.dataInputProcessing->inputProcessor->getObjectSchemaProps(state, CurrentModuleObject, objectSchemaProps);
+        objectSchemaProps = state.dataInputProcessing->inputProcessor->getObjectSchemaProps(state, CurrentModuleObject);
         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
         instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);

@@ -605,7 +605,7 @@ Real64 InputProcessor::getRealFieldValue(
     }
     return value;
 }
-void InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord, json &schema_obj_props)
+json InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
 {
     auto const &schema_properties = schema.at("properties");
     const json &object_schema = schema_properties.at(objectWord);
@@ -613,7 +613,8 @@ void InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string con
             ShowFatalError(state, "InputProcessor::fieldValue: Invalid object type = " + objectWord);
     }
 
-    schema_obj_props = getPatternProperties(state, object_schema);
+    json schema_obj_props = getPatternProperties(state, object_schema);
+    return schema_obj_props;
 }
 
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)

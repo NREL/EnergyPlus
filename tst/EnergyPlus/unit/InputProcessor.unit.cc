@@ -4430,7 +4430,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromJSON)
     json objectSchemaProps;
 
     // Building object
-    state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type1, objectSchemaProps);
+    objectSchemaProps = state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type1);
     // User inputs from above
     // Note even though choice keys are case-sensitive during epJSON processing, getFieldValue pushes Alphas to UPPERcase
     alphaFieldValue = state->dataInputProcessing->inputProcessor->getAlphaFieldValue(*state, obj_type1, bldg1, objectSchemaProps, "terrain");
@@ -4455,7 +4455,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromJSON)
     EXPECT_NEAR(numericFieldValue, 1.0, 0.0001);
 
     // Material object
-    state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type2, objectSchemaProps);
+    objectSchemaProps = state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type2);
     // User inputs from above
     // Note even though choice keys are case-sensitive during epJSON processing, getObjectItem pushes Alphas to UPPERcase
     alphaFieldValue = state->dataInputProcessing->inputProcessor->getAlphaFieldValue(*state, obj_type2, mat1, objectSchemaProps, "roughness");
@@ -4496,7 +4496,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_AutosizefromJSON)
     json objectSchemaProps;
 
     // Water heater object
-    state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type1, objectSchemaProps);
+    objectSchemaProps = state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type1);
     // User inputs from above
     // If the field is autosizable and alpha input will return -99999
     numericFieldValue = state->dataInputProcessing->inputProcessor->getRealFieldValue(*state, obj_type1, wh1, objectSchemaProps, "tank_volume");
@@ -4566,7 +4566,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromIDF)
 
     // Water heater object
     std::string obj_type1 = "WaterHeater:Mixed";
-    state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type1, objectSchemaProps);
+    objectSchemaProps = state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type1);
     auto instances = state->dataInputProcessing->inputProcessor->epJSON.find(obj_type1);
     if (instances != state->dataInputProcessing->inputProcessor->epJSON.end()) {
         // globalSolverObject.referenceConditions.clear();

@@ -133,7 +133,7 @@ public:
     Real64 getRealFieldValue(
         EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json schema_obj_props, std::string const &fieldName);
 
-    void getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord, json &schema_obj_props);
+    json getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord);
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
