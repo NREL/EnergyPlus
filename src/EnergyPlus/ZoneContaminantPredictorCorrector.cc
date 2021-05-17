@@ -104,7 +104,7 @@ using ScheduleManager::GetCurrentScheduleValue;
 using ZoneTempPredictorCorrector::DownInterpolate4HistoryValues;
 
 void ManageZoneContaminanUpdates(EnergyPlusData &state,
-                                 int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                                 DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                                  bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
@@ -134,22 +134,22 @@ void ManageZoneContaminanUpdates(EnergyPlusData &state,
     {
         auto const SELECT_CASE_var(UpdateType);
 
-        if (SELECT_CASE_var == iGetZoneSetPoints) {
+        if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints) {
             InitZoneContSetPoints(state);
 
-        } else if (SELECT_CASE_var == iPredictStep) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep) {
             PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        } else if (SELECT_CASE_var == iCorrectStep) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep) {
             CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        } else if (SELECT_CASE_var == iRevertZoneTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories) {
             RevertZoneTimestepHistories(state);
 
-        } else if (SELECT_CASE_var == iPushZoneTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories) {
             PushZoneTimestepHistories(state);
 
-        } else if (SELECT_CASE_var == iPushSystemTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories) {
             PushSystemTimestepHistories(state);
         }
     }

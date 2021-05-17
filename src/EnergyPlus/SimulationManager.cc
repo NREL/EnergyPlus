@@ -3106,8 +3106,6 @@ void Resimulate(EnergyPlusData &state,
     //         ReportHeatBalance
 
     // Using/Aliasing
-    using DataHeatBalFanSys::iGetZoneSetPoints;
-    using DataHeatBalFanSys::iPredictStep;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
@@ -3142,14 +3140,22 @@ void Resimulate(EnergyPlusData &state,
 
     if (ResimHVAC) {
         // HVAC simulation
-        ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(state,
+                             DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
+                             ZoneTempChange,
+                             false,
+                             state.dataHVACGlobal->UseZoneTimeStepHistory,
+                             0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-            ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+            ManageZoneContaminanUpdates(
+                state, DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         CalcAirFlowSimple(
             state, 0, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
-        ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(
+            state, DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-            ManageZoneContaminanUpdates(state, iPredictStep, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+            ManageZoneContaminanUpdates(
+                state, DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
         ++state.dataDemandManager->DemandManagerHVACIterations;
