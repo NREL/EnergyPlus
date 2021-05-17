@@ -137,7 +137,9 @@ TEST(FileSystem, getProgramPath)
     fs::path programPath = EnergyPlus::FileSystem::getProgramPath();
     EXPECT_TRUE(EnergyPlus::FileSystem::pathExists(programPath));
     EXPECT_TRUE(programPath.string().find("energyplus_tests") != std::string::npos);
-    EXPECT_EQ("energyplus_tests", EnergyPlus::FileSystem::getFileName(programPath));
+    fs::path expectedPath{"energyplus_tests"};
+    expectedPath.replace_extension(EnergyPlus::FileSystem::exeExtension);
+    EXPECT_EQ(expectedPath, EnergyPlus::FileSystem::getFileName(programPath));
     EXPECT_TRUE(EnergyPlus::FileSystem::directoryExists(EnergyPlus::FileSystem::getParentDirectoryPath(programPath)));
 }
 
