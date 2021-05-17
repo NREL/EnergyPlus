@@ -248,6 +248,7 @@ struct RoomAirModelAirflowNetworkData;
 struct RoomAirModelData;
 struct RoomAirModelManagerData;
 struct RoomAirModelUserTempPatternData;
+struct RootFindingData;
 struct RuntimeLanguageData;
 struct RuntimeLanguageProcessorData;
 struct SQLiteProceduresData;
@@ -508,6 +509,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<RoomAirModelData> dataRoomAirMod;
     std::unique_ptr<RoomAirModelManagerData> dataRoomAirModelMgr;
     std::unique_ptr<RoomAirModelUserTempPatternData> dataRoomAirModelTempPattern;
+    std::unique_ptr<RootFindingData> dataRootFinder;
     std::unique_ptr<RuntimeLanguageData> dataRuntimeLang;
     std::unique_ptr<RuntimeLanguageProcessorData> dataRuntimeLangProcessor;
     std::unique_ptr<SQLiteProceduresData> dataSQLiteProcedures;

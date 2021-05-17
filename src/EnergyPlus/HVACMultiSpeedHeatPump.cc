@@ -82,7 +82,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -2986,19 +2985,9 @@ namespace HVACMultiSpeedHeatPump {
 
         using General::SolveRoot;
         using Psychrometrics::PsyCpAirFnW;
-        using TempSolveRoot::SolveRoot;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500); // maximum number of iterations
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput;         // unit full output when compressor is operating [W]
@@ -4456,7 +4445,6 @@ namespace HVACMultiSpeedHeatPump {
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
-        using TempSolveRoot::SolveRoot;
         using WaterCoils::SimulateWaterCoilComponents;
 
         // Locals
