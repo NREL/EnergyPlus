@@ -436,6 +436,8 @@ namespace FanCoilUnits {
                                            Array1D<Real64> const &Par // Function parameters
     );
 
+    void GetControlledZoneNum(EnergyPlusData &state, int const FanCoilNum, bool const NodeCheck = true);
+
 } // namespace FanCoilUnits
 
 struct FanCoilUnitsData : BaseGlobalStruct

@@ -775,24 +775,14 @@ namespace FanCoilUnits {
                     if (!ZoneNodeNotFound) break;
                 }
                 if (ZoneNodeNotFound) {
-                    // Varify zone number and return air node
-                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
-                            if (UtilityRoutines::SameString(FanCoil(FanCoilNum).Name, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
-                                UtilityRoutines::SameString(FanCoil(FanCoilNum).UnitType,
-                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
-                                FanCoil(FanCoilNum).ControlZoneNum = CtrlZone;
-                                break;
-                            }
-                        }
-                        if (FanCoil(FanCoilNum).ControlZoneNum > 0) break;
-                    }
+                    GetControlledZoneNum(state, FanCoilNum, false);
                     bool InletNodeFound = false;
                     if (FanCoil(FanCoilNum).ControlZoneNum > 0) {
-                        InletNodeFound = ZonePlenum::ValidateInducedNode(state,
-                                                                         FanCoil(FanCoilNum).AirInNode,
-                                                                         state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumReturnNodes,
-                                                                         state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode);
+                        InletNodeFound =
+                            ZonePlenum::ValidateInducedNode(state,
+                                                            FanCoil(FanCoilNum).AirInNode,
+                                                            state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).NumReturnNodes,
+                                                            state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).ReturnNode);
                     }
                     if (!InletNodeFound) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\"");
@@ -843,16 +833,11 @@ namespace FanCoilUnits {
                 }
                 // check that the fan coil outlet node is the same as one of the zone inlet nodes
                 state.dataFanCoilUnits->ZoneInNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (FanCoil(FanCoilNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                            FanCoil(FanCoilNum).ControlZoneNum = CtrlZone;
-                            FanCoil(FanCoilNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
-                            state.dataFanCoilUnits->ZoneInNodeNotFound = false;
-                        }
-                    }
+                GetControlledZoneNum(state, FanCoilNum);
+                if (FanCoil(FanCoilNum).ControlZoneNum > 0) {
+                    state.dataFanCoilUnits->ZoneInNodeNotFound = false;
                 }
+
                 if (state.dataFanCoilUnits->ZoneInNodeNotFound) {
                     ShowSevereError(state,
                                     CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
@@ -5967,6 +5952,36 @@ namespace FanCoilUnits {
         Residuum = (FCOutletTempOn - MaxOutletTemp);
 
         return Residuum;
+    }
+
+    void GetControlledZoneNum(EnergyPlusData &state, int const FanCoilNum, bool const NodeCheck)
+    {
+        auto &FanCoil(state.dataFanCoilUnits->FanCoil);
+        int ControlZoneNum = 0;
+
+        for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+            if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+            if (NodeCheck) {
+                for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                    if (FanCoil(FanCoilNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                        FanCoil(FanCoilNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
+                        ControlZoneNum = CtrlZone;
+                        break;
+                    }
+                }
+            } else {
+                for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
+                    if (UtilityRoutines::SameString(FanCoil(FanCoilNum).Name, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
+                        UtilityRoutines::SameString(FanCoil(FanCoilNum).UnitType, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
+                        ControlZoneNum = CtrlZone;
+                        break;
+                    }
+                }
+            }
+            if (ControlZoneNum > 0) break;
+        }
+
+        FanCoil(FanCoilNum).ControlZoneNum = ControlZoneNum;
     }
 
 } // namespace FanCoilUnits
