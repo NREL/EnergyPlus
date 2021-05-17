@@ -98,7 +98,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
@@ -6858,15 +6857,15 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
                     Par(1) = PressureSet;
-                    TempSolveRoot::SolveRoot(state,
-                                             ErrorToler,
-                                             MaxIte,
-                                             SolFla,
-                                             state.dataAirflowNetwork->ExhaustFanMassFlowRate,
-                                             AFNPressureResidual,
-                                             MinExhaustMassFlowrate,
-                                             MaxExhaustMassFlowrate,
-                                             Par);
+                    General::SolveRoot(state,
+                                       ErrorToler,
+                                       MaxIte,
+                                       SolFla,
+                                       state.dataAirflowNetwork->ExhaustFanMassFlowRate,
+                                       AFNPressureResidual,
+                                       MinExhaustMassFlowrate,
+                                       MaxExhaustMassFlowrate,
+                                       Par);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (state.dataAirflowNetworkBalanceManager->ErrCountVar == 0) {
@@ -6955,15 +6954,15 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     //    if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
                     Par(1) = PressureSet;
-                    TempSolveRoot::SolveRoot(state,
-                                             ErrorToler,
-                                             MaxIte,
-                                             SolFla,
-                                             state.dataAirflowNetwork->ReliefMassFlowRate,
-                                             AFNPressureResidual,
-                                             MinReliefMassFlowrate,
-                                             MaxReliefMassFlowrate,
-                                             Par);
+                    General::SolveRoot(state,
+                                       ErrorToler,
+                                       MaxIte,
+                                       SolFla,
+                                       state.dataAirflowNetwork->ReliefMassFlowRate,
+                                       AFNPressureResidual,
+                                       MinReliefMassFlowrate,
+                                       MaxReliefMassFlowrate,
+                                       Par);
                     if (SolFla == -1) {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (state.dataAirflowNetworkBalanceManager->ErrCountVar == 0) {

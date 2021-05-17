@@ -234,6 +234,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataRoomAirModelMgr = std::make_unique<RoomAirModelManagerData>();
     this->dataRoomAirModelTempPattern = std::make_unique<RoomAirModelUserTempPatternData>();
     this->dataRoomAirflowNetModel = std::make_unique<RoomAirModelAirflowNetworkData>();
+    this->dataRootFinder = std::make_unique<RootFindingData>();
     this->dataRptCoilSelection = std::make_unique<ReportCoilSelectionData>();
     this->dataRuntimeLang = std::make_unique<RuntimeLanguageData>();
     this->dataRuntimeLangProcessor = std::make_unique<RuntimeLanguageProcessorData>();
@@ -491,6 +492,7 @@ void EnergyPlusData::clear_state()
     this->dataRoomAirModelMgr->clear_state();
     this->dataRoomAirModelTempPattern->clear_state();
     this->dataRoomAirflowNetModel->clear_state();
+    this->dataRootFinder->clear_state();
     this->dataRptCoilSelection->clear_state();
     this->dataRuntimeLang->clear_state();
     this->dataRuntimeLangProcessor->clear_state();
