@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBalSurf->SurfAbsThermalInt(1) = 0.2;
     ComputeIntThermalAbsorpFactors(*state);
 
-    EXPECT_EQ(0.2, state->dataHeatBal->ITABSF(1));
+    EXPECT_EQ(0.2, state->dataHeatBalSurf->SurfAbsThermalInt(1));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)

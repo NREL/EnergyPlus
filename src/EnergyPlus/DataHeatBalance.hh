@@ -2183,8 +2183,8 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> EnclRadQThermalRad; // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
 
     // todo - the following in absorptance branch
-    Array1D<Real64> ITABSF; // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
-    Array1D<Real64> TMULT;  // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
+//    Array1D<Real64> ITABSF; // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
+    Array1D<Real64> ZoneThermAbsMult;  // ZoneThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
 
     // todo - the following in absorptance branch
     Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
@@ -2469,8 +2469,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->EnclSolVMULT.deallocate();
         this->EnclRadQThermalRad.deallocate();
 
-        this->ITABSF.deallocate();
-        this->TMULT.deallocate();
+//        this->ITABSF.deallocate();
+        this->ZoneThermAbsMult.deallocate();
 
         this->SunlitFracHR.deallocate();
         this->CosIncAngHR.deallocate();

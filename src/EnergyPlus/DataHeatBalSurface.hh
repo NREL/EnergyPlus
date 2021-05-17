@@ -259,6 +259,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<bool> SurfMovInsulExtPresent;       // True when interior movable insulation is present
     Array1D<bool> SurfMovInsulIntPresent;       // True when interior movable insulation is present
     Array1D<bool> SurfMovInsulIntPresentPrevTS; // True when interior movable insulation was present during the previous time step
+
     Array1D<Real64> SurfMovInsulHExt;           // Resistance or "h" value of exterior movable insulation
     Array1D<Real64> SurfMovInsulHInt;           // Resistance or "h" value of interior movable insulation
     Array1D<Real64> SurfAbsSolarExt;            // Solar Absorptivity of surface inside face or interior movable insulation if present
