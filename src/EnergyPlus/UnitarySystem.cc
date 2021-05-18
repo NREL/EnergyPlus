@@ -11376,6 +11376,7 @@ namespace UnitarySystems {
         int SolFlaLat = 0;
         Real64 NoLoadTempOut = 0.0;
         Real64 NoLoadHumRatOut = 0.0;
+        FullOutput = 0.0;
         Real64 OnOffAirFlowRatio = 0.0; // Autodesk:Init Patch to prevent use uninitialized in calls to SimVariableSpeedCoils
 
         if (this->m_CondenserNodeNum != 0) {
@@ -11697,17 +11698,12 @@ namespace UnitarySystems {
                     } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
                                (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit)) {
 
+                        CycRatio = 1.0;
+                        SpeedRatio = 1.0;
                         SensLoad = -1.0; // turns on coil
                         this->m_CoolingSpeedRatio = SpeedRatio;
                         this->m_CoolingPartLoadFrac = PartLoadFrac;
                         for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
-                            if (SpeedNum == 1) {
-                                CycRatio = 1.0;
-                                SpeedRatio = 0.0;
-                            } else {
-                                CycRatio = 0.0;
-                                SpeedRatio = 1.0;
-                            }
                             this->m_CoolingSpeedNum = SpeedNum;
                             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                       "",
@@ -11725,6 +11721,13 @@ namespace UnitarySystems {
                                                                       OnOffAirFlowRatio);
                             OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
                             if (OutletTemp < DesOutTemp && SensibleLoad) break;
+                        }
+                        if (SpeedNum == 1) {
+                            CycRatio = 1.0;
+                            SpeedRatio = 0.0;
+                        } else {
+                            CycRatio = 0.0;
+                            SpeedRatio = 1.0;
                         }
 
                     } else if (CoilType_Num ==
@@ -12070,6 +12073,8 @@ namespace UnitarySystems {
                         } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
                                    (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit)) {
 
+                            CycRatio = 1.0;
+                            SpeedRatio = 1.0;
                             Par[1] = double(this->m_CoolingCoilIndex);
                             Par[2] = DesOutTemp;
                             Par[3] = double(this->m_UnitarySysNum);
@@ -12091,6 +12096,7 @@ namespace UnitarySystems {
                                 this->m_CoolingSpeedRatio = SpeedRatio;
                                 Par[4] = SpeedRatio;
                                 General::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, this->DXCoilCyclingResidual, 0.0, 1.0, Par);
+                                SpeedRatio = 0.0;
                                 this->m_CoolingCycRatio = CycRatio;
                                 this->m_CoolingPartLoadFrac = CycRatio;
                                 this->calcPassiveSystem(state, AirLoopNum, FirstHVACIteration);
@@ -12402,7 +12408,7 @@ namespace UnitarySystems {
                                 //                   RegulaFalsi may not find latent PLR when the latent degradation model is used.
                                 //                   IF iteration limit is exceeded, find tighter boundary of solution and repeat RegulaFalsi
                                 TempMaxPLR = -0.1;
-                                TempOutletHumRatDXCoil = OutletHumRatDXCoil;
+                                TempOutletHumRatDXCoil = DesOutHumRat;
                                 while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) >= 0.0 && TempMaxPLR <= 1.0) {
                                     //                     find upper limit of LatentPLR
                                     TempMaxPLR += 0.1;
@@ -12418,18 +12424,18 @@ namespace UnitarySystems {
                                                                                         state.dataUnitarySystems->economizerFlag);
                                     OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                 }
+                                TempMaxPLR = min(1.0, TempMaxPLR + 0.1);
                                 TempMinPLR = TempMaxPLR;
                                 while ((OutletHumRatDXCoil - TempOutletHumRatDXCoil) <= 0.0 && TempMinPLR >= 0.0) {
                                     //                     pull upper limit of LatentPLR DOwn to last valid limit (i.e. latent output still
                                     //                     exceeds SystemMoisuterLoad)
-                                    TempMaxPLR = TempMinPLR;
                                     //                     find minimum limit of Latent PLR
-                                    TempMinPLR -= 0.01;
+                                    TempMinPLR -= 0.02;
                                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                                         CompName,
                                                                                         FirstHVACIteration,
                                                                                         state.dataUnitarySystems->On,
-                                                                                        TempMaxPLR,
+                                                                                        TempMinPLR,
                                                                                         this->m_CoolingCoilIndex,
                                                                                         FanOpMode,
                                                                                         HXUnitOn,
@@ -12437,6 +12443,7 @@ namespace UnitarySystems {
                                                                                         state.dataUnitarySystems->economizerFlag);
                                     OutletHumRatDXCoil = state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(this->m_CoolingCoilIndex);
                                 }
+                                TempMinPLR = max(0.0, TempMinPLR - 0.1);
                                 //                   tighter boundary of solution has been found, CALL RegulaFalsi a second time
                                 General::SolveRoot(
                                     state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par);
