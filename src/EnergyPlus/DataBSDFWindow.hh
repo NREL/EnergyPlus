@@ -146,7 +146,7 @@ namespace DataBSDFWindow {
     struct BasisStruct
     {
         // Members
-        Basis BasisType;             // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
+        Basis BasisType;                 // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
         BasisSymmetry BasisSymmetryType; // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
         int BasisMatIndex;               // pointer to matrix for basis
         int NBasis;                      // No. elements in basis

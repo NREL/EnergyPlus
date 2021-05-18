@@ -1193,9 +1193,9 @@ namespace WindowComplexManager {
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,
-                          Real64 const LowerTheta,                  // Lower edge of element (polar angle)
-                          Real64 const UpperTheta,                  // Upper edge of element (polar angle)
-                          Real64 const DPhi,                        // Width of element (azimuthal angle)
+                          Real64 const LowerTheta,              // Lower edge of element (polar angle)
+                          Real64 const UpperTheta,              // Upper edge of element (polar angle)
+                          Real64 const DPhi,                    // Width of element (azimuthal angle)
                           DataBSDFWindow::Basis const InputType // Basis type
     )
     {
