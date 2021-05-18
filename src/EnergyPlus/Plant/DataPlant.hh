@@ -227,8 +227,6 @@ namespace DataPlant {
 
 struct DataPlantData : BaseGlobalStruct
 {
-    std::vector<int> compsToSimAfterInitLoopEquip = {
-        DataPlant::TypeOf_Pipe, DataPlant::TypeOf_PipeSteam, DataPlant::TypeOf_SolarCollectorICS, DataPlant::TypeOf_SolarCollectorFlatPlate};
 
     int TotNumLoops = 0;     // number of plant and condenser loops
     int TotNumHalfLoops = 0; // number of half loops (2 * TotNumLoops)
