@@ -11697,12 +11697,17 @@ namespace UnitarySystems {
                     } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
                                (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit)) {
 
-                        CycRatio = 1.0;
-                        SpeedRatio = 1.0;
                         SensLoad = -1.0; // turns on coil
                         this->m_CoolingSpeedRatio = SpeedRatio;
                         this->m_CoolingPartLoadFrac = PartLoadFrac;
                         for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
+                            if (SpeedNum == 1) {
+                                CycRatio = 1.0;
+                                SpeedRatio = 0.0;
+                            } else {
+                                CycRatio = 0.0;
+                                SpeedRatio = 1.0;
+                            }
                             this->m_CoolingSpeedNum = SpeedNum;
                             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                       "",
@@ -12274,7 +12279,8 @@ namespace UnitarySystems {
                         // If sensible load and setpoint cannot be met, set PLR = 1. if no sensible load and
                         // latent load exists and setpoint cannot be met, set PLR = 1.
                         if ((OutletTempDXCoil > (DesOutTemp - (tempAcc * 2.0)) && SensibleLoad && this->m_RunOnSensibleLoad) ||
-                            (OutletHumRatDXCoil >= (DesOutHumRat - (tempHumRatAcc * 2.0)) && !SensibleLoad && LatentLoad && this->m_RunOnLatentLoad)) {
+                            (OutletHumRatDXCoil >= (DesOutHumRat - (tempHumRatAcc * 2.0)) && !SensibleLoad && LatentLoad &&
+                             this->m_RunOnLatentLoad)) {
                             PartLoadFrac = 1.0;
                             //                  ELSEIF ((SensibleLoad .and. LatentLoad .AND. .NOT. UnitarySystem(UnitarySysNum)%RunOnLatentLoad
                             //                  .AND. &
@@ -17161,14 +17167,14 @@ namespace UnitarySystems {
                         SetupOutputVariable(state,
                                             "Coil System Cycling Ratio",
                                             OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCycRatio,
                                             "System",
                                             "Average",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                         SetupOutputVariable(state,
                                             "Coil System Compressor Speed Ratio",
                                             OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
+                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingSpeedRatio,
                                             "System",
                                             "Average",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
