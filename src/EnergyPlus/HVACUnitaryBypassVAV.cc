@@ -89,7 +89,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -2372,7 +2371,7 @@ namespace HVACUnitaryBypassVAV {
                             } else {
                                 Par(6) = 0.0;
                             }
-                            TempSolveRoot::SolveRoot(
+                            General::SolveRoot(
                                 state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, HXAssistDXCoilResidual, 0.0, 1.0, Par);
                             HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                                 CBVAV(CBVAVNum).DXCoolCoilName,
@@ -2450,7 +2449,7 @@ namespace HVACUnitaryBypassVAV {
                             Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
                             Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
                             Par(3) = OnOffAirFlowRatio;
-                            TempSolveRoot::SolveRoot(
+                            General::SolveRoot(
                                 state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par);
                             DXCoils::SimDXCoil(state,
                                                CBVAV(CBVAVNum).DXCoolCoilName,
@@ -2685,7 +2684,7 @@ namespace HVACUnitaryBypassVAV {
                                     Par(2) = DesOutTemp;
                                     Par(5) = double(DataHVACGlobals::ContFanCycCoil);
                                     Par(3) = double(SpeedNum);
-                                    TempSolveRoot::SolveRoot(
+                                    General::SolveRoot(
                                         state, tempAccuracy, MaxIte, SolFla, SpeedRatio, HVACDXSystem::VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
 
                                     if (SolFla == -1) {
@@ -2738,7 +2737,7 @@ namespace HVACUnitaryBypassVAV {
                                     Par(1) = double(CBVAV(CBVAVNum).CoolCoilCompIndex);
                                     Par(2) = DesOutTemp;
                                     Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                                    TempSolveRoot::SolveRoot(
+                                    General::SolveRoot(
                                         state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, HVACDXSystem::VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
@@ -2842,7 +2841,7 @@ namespace HVACUnitaryBypassVAV {
                             Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
                             // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
                             Par(3) = double(DehumidMode);
-                            TempSolveRoot::SolveRoot(
+                            General::SolveRoot(
                                 state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
                             if (SolFla == -1) {
                                 if (CBVAV(CBVAVNum).MMDXIterationExceeded < 1) {
@@ -2917,7 +2916,7 @@ namespace HVACUnitaryBypassVAV {
                                 Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
                                 // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
                                 Par(3) = double(DehumidMode);
-                                TempSolveRoot::SolveRoot(
+                                General::SolveRoot(
                                     state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
                                     if (CBVAV(CBVAVNum).DMDXIterationExceeded < 1) {
@@ -3007,7 +3006,7 @@ namespace HVACUnitaryBypassVAV {
                                 Par(2) = CBVAV(CBVAVNum).CoilTempSetPoint;
                                 // Dehumidification mode = 0 for normal mode, 1+ for enhanced mode
                                 Par(3) = double(DehumidMode);
-                                TempSolveRoot::SolveRoot(
+                                General::SolveRoot(
                                     state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, MultiModeDXCoilResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
                                     if (CBVAV(CBVAVNum).CRDXIterationExceeded < 1) {
@@ -3208,7 +3207,7 @@ namespace HVACUnitaryBypassVAV {
                             Par(1) = double(CBVAV(CBVAVNum).HeatCoilIndex);
                             Par(2) = min(CBVAV(CBVAVNum).CoilTempSetPoint, CBVAV(CBVAVNum).MaxLATHeating);
                             Par(3) = OnOffAirFlowRatio;
-                            TempSolveRoot::SolveRoot(
+                            General::SolveRoot(
                                 state, DataHVACGlobals::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
                             DXCoils::SimDXCoil(state,
                                                CBVAV(CBVAVNum).HeatCoilName,
@@ -3430,7 +3429,7 @@ namespace HVACUnitaryBypassVAV {
                             Par(2) = DesOutTemp;
                             Par(5) = double(DataHVACGlobals::ContFanCycCoil);
                             Par(3) = double(SpeedNum);
-                            TempSolveRoot::SolveRoot(
+                            General::SolveRoot(
                                 state, tempAccuracy, MaxIte, SolFla, SpeedRatio, HVACDXHeatPumpSystem::VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
 
                             if (SolFla == -1) {
@@ -3494,7 +3493,7 @@ namespace HVACUnitaryBypassVAV {
                             Par(1) = double(CBVAV(CBVAVNum).DXHeatCoilIndexNum);
                             Par(2) = DesOutTemp;
                             Par(5) = double(DataHVACGlobals::ContFanCycCoil);
-                            TempSolveRoot::SolveRoot(
+                            General::SolveRoot(
                                 state, tempAccuracy, MaxIte, SolFla, PartLoadFrac, HVACDXHeatPumpSystem::VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
                             if (SolFla == -1) {
                                 if (!state.dataGlobal->WarmupFlag) {
@@ -4225,7 +4224,7 @@ namespace HVACUnitaryBypassVAV {
                             Par(2) = 0.0;
                         }
                         Par(3) = HeatCoilLoad;
-                        TempSolveRoot::SolveRoot(
+                        General::SolveRoot(
                             state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
                         if (SolFlag == -1) {
                             if (CBVAV(CBVAVNum).HotWaterCoilMaxIterIndex == 0) {

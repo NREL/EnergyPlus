@@ -98,7 +98,6 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
@@ -4537,7 +4536,6 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
 {
     using General::SolveRoot;
     using SetPointManager::GetCoilFreezingCheckFlag;
-    using TempSolveRoot::SolveRoot;
 
     static std::string const RoutineName("CalcOAEconomizer: ");
     static std::string const CurrentModuleObject(CurrentModuleObjects(CMO_OAController));

@@ -81,6 +81,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -550,7 +551,7 @@ namespace HeatBalanceManager {
         // ZoneAirContaminantBalance, Added by L. Gu, 06/10
 
         // Using/Aliasing
-        auto &HVACSystemRootFinding = state.dataHVACGlobal->HVACSystemRootFinding;
+        auto &HVACSystemRootFinding = state.dataRootFinder->HVACSystemRootFinding;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1315,17 +1316,17 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if ((SELECT_CASE_var == "REGULAFALSI")) {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
                     } else if (SELECT_CASE_var == "BISECTION") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
                     } else if (SELECT_CASE_var == "BISECTIONTHENREGULAFALSI") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
                     } else if (SELECT_CASE_var == "REGULAFALSITHENBISECTION") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
                     } else if (SELECT_CASE_var == "ALTERNATION") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Alternation;
                     } else {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
                         ShowWarningError(state,
                                          state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
                                              state.dataIPShortCut->cAlphaFieldNames(1) + ". The default choice is assigned = " + AlphaName(1));
@@ -1339,7 +1340,7 @@ namespace HeatBalanceManager {
             }
         } else {
             HVACSystemRootFinding.Algorithm = "RegulaFalsi";
-            HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+            HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
