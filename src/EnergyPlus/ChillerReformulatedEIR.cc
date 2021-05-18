@@ -68,6 +68,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -79,7 +80,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/StandardRatings.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::ChillerReformulatedEIR {
@@ -1623,26 +1623,26 @@ void ReformulatedEIRChillerSpecs::control(EnergyPlusData &state, Real64 &MyLoad,
 
         if (CondTempMin > Tmin && CondTempMax < Tmax) {
 
-            Array1D<Real64> Par(6); // Pass parameters for RegulaFalsi solver
+            std::array<Real64, 4> Par; // Pass parameters for RegulaFalsi solver
 
             //    Initialize iteration parameters for RegulaFalsi function
-            Par(2) = MyLoad;
+            Par[1] = MyLoad;
             if (RunFlag) {
-                Par(3) = 1.0;
+                Par[2] = 1.0;
             } else {
-                Par(3) = 0.0;
+                Par[2] = 0.0;
             }
             if (FirstIteration) {
-                Par(4) = 1.0;
+                Par[3] = 1.0;
             } else {
-                Par(4) = 0.0;
+                Par[3] = 0.0;
             }
 
             int SolFla;                    // Feedback flag from General::SolveRoot
             Real64 FalsiCondOutTemp = 0.0; // RegulaFalsi condenser outlet temperature result [C]
             auto f = std::bind(
                 &ReformulatedEIRChillerSpecs::condOutTempResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            TempSolveRoot::SolveRoot(state, Acc, MaxIter, SolFla, FalsiCondOutTemp, f, Tmin, Tmax, Par);
+            General::SolveRoot(state, Acc, MaxIter, SolFla, FalsiCondOutTemp, f, Tmin, Tmax, Par);
 
             if (SolFla == -1) {
                 if (!state.dataGlobal->WarmupFlag) {
@@ -1844,7 +1844,7 @@ void ReformulatedEIRChillerSpecs::update(EnergyPlusData &state, Real64 const MyL
     }
 }
 
-Real64 ReformulatedEIRChillerSpecs::condOutTempResidual(EnergyPlusData &state, Real64 const FalsiCondOutTemp, Array1D<Real64> const &Par)
+Real64 ReformulatedEIRChillerSpecs::condOutTempResidual(EnergyPlusData &state, Real64 const FalsiCondOutTemp, std::array<Real64, 4> const &Par)
 {
 
     // FUNCTION INFORMATION:
@@ -1860,8 +1860,8 @@ Real64 ReformulatedEIRChillerSpecs::condOutTempResidual(EnergyPlusData &state, R
     // METHODOLOGY EMPLOYED:
     //  Regula Falsi solver is used to calculate condenser outlet temperature.
 
-    Real64 MyLoad = Par(2);
-    bool RunFlag = (int(Par(3)) == 1);
+    Real64 MyLoad = Par[1];
+    bool RunFlag = (int(Par[2]) == 1);
 
     this->calculate(state, MyLoad, RunFlag, FalsiCondOutTemp);
     Real64 CondOutTempResidual = FalsiCondOutTemp - this->CondOutletTemp; // CondOutletTemp is module level variable, final value used for reporting

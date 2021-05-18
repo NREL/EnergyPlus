@@ -85,7 +85,6 @@
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
@@ -8437,7 +8436,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                             Par(5) = MdotWater;
                             int SolFla;
                             std::string IterNum;
-                            TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
+                            General::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                             if (SolFla == -1) {
                                 IterNum = fmt::to_string(MaxIte);
                                 if (!state.dataGlobal->WarmupFlag) {
@@ -8558,7 +8557,7 @@ void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, b
                                 Par(5) = MdotWater;
                                 int SolFla;
                                 std::string IterNum;
-                                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                                 if (SolFla == -1) {
                                     IterNum = fmt::to_string(MaxIte);
                                     if (!state.dataGlobal->WarmupFlag) {
@@ -9288,7 +9287,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
             if (zeroResidual > 0.0) { // then iteration
                 int SolFla;
-                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, state.dataWaterThermalTanks->hpPartLoadRatio, boundPLRFunc, 0.0, 1.0, Par);
+                General::SolveRoot(state, Acc, MaxIte, SolFla, state.dataWaterThermalTanks->hpPartLoadRatio, boundPLRFunc, 0.0, 1.0, Par);
                 if (SolFla == -1) {
                     std::string IterNum;
                     IterNum = fmt::to_string(MaxIte);
@@ -9485,7 +9484,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                                                   std::placeholders::_1,
                                                   std::placeholders::_2,
                                                   std::placeholders::_3);
-                    TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, boundPLRFunc, 1.0e-10, 1.0, ParVS);
+                    General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, boundPLRFunc, 1.0e-10, 1.0, ParVS);
 
                     if (SolFla == -1) {
                         IterNum = fmt::to_string(MaxIte);

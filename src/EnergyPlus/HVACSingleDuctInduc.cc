@@ -75,7 +75,6 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
@@ -1204,27 +1203,14 @@ namespace HVACSingleDuctInduc {
         // (3) If there is a heating coil load, control the heating coil to meet the load and keep
         //     the cooling coil off.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
 
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
-        using TempSolveRoot::SolveRoot;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const SolveMaxIter(50);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QZnReq;           // heating or cooling needed by zone [Watts]
