@@ -394,8 +394,8 @@ namespace PollutionModule {
 
         // Default Constructor
         FuelTypeProps()
-            : FuelTypeNames({1, static_cast<int>(PollFactor::NUM)}), Elec(0.0), NatGas(0.0), FuelOil1(0.0), FuelOil2(0.0), Coal(0.0),
-              Gasoline(0.0), Propane(0.0), Diesel(0.0), OtherFuel1(0.0), OtherFuel2(0.0), ElecPurch(0.0), ElecSold(0.0), ElecFacilityIndex(0),
+            : FuelTypeNames({1, static_cast<int>(PollFactor::NUM)}), Elec(0.0), NatGas(0.0), FuelOil1(0.0), FuelOil2(0.0), Coal(0.0), Gasoline(0.0),
+              Propane(0.0), Diesel(0.0), OtherFuel1(0.0), OtherFuel2(0.0), ElecPurch(0.0), ElecSold(0.0), ElecFacilityIndex(0),
               DieselFacilityIndex(0), PurchCoolFacilityIndex(0), PurchHeatFacilityIndex(0), NatGasFacilityIndex(0), GasolineFacilityIndex(0),
               CoalFacilityIndex(0), FuelOil1FacilityIndex(0), FuelOil2FacilityIndex(0), PropaneFacilityIndex(0), OtherFuel1FacilityIndex(0),
               OtherFuel2FacilityIndex(0), ElecProducedFacilityIndex(0), SteamFacilityIndex(0), ElecPurchasedFacilityIndex(0),
