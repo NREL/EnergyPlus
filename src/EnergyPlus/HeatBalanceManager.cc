@@ -81,6 +81,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -550,7 +551,7 @@ namespace HeatBalanceManager {
         // ZoneAirContaminantBalance, Added by L. Gu, 06/10
 
         // Using/Aliasing
-        auto &HVACSystemRootFinding = state.dataHVACGlobal->HVACSystemRootFinding;
+        auto &HVACSystemRootFinding = state.dataRootFinder->HVACSystemRootFinding;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1315,17 +1316,17 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if ((SELECT_CASE_var == "REGULAFALSI")) {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
                     } else if (SELECT_CASE_var == "BISECTION") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
                     } else if (SELECT_CASE_var == "BISECTIONTHENREGULAFALSI") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
                     } else if (SELECT_CASE_var == "REGULAFALSITHENBISECTION") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
                     } else if (SELECT_CASE_var == "ALTERNATION") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Alternation;
                     } else {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
                         ShowWarningError(state,
                                          state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
                                              state.dataIPShortCut->cAlphaFieldNames(1) + ". The default choice is assigned = " + AlphaName(1));
@@ -1339,7 +1340,7 @@ namespace HeatBalanceManager {
             }
         } else {
             HVACSystemRootFinding.Algorithm = "RegulaFalsi";
-            HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+            HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
@@ -5549,6 +5550,7 @@ namespace HeatBalanceManager {
             HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(state);
         }
 
+        // Init storm window pointers
         if (state.dataSurface->TotStormWin > 0) {
             if (state.dataGlobal->BeginDayFlag) {
                 SetStormWindowControl(state);
@@ -5877,7 +5879,6 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
-        int SurfNum;
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -5938,8 +5939,10 @@ namespace HeatBalanceManager {
 
         // Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
         // exchange algorithm knows whether there has been a change in interior movable insulation or not.
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->Surface(SurfNum).MovInsulIntPresentPrevTS = state.dataSurface->Surface(SurfNum).MovInsulIntPresent;
+        if (state.dataSurface->AnyMovableInsulation) {
+            for (int surfNum : state.dataHeatBalSurf->SurfMovInsulIndexList) {
+                state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(surfNum) = state.dataHeatBalSurf->SurfMovInsulIntPresent(surfNum);
+            }
         }
 
         // For non-complex windows, update a report variable so this shows up in the output as something other than zero
