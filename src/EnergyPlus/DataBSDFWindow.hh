@@ -66,7 +66,7 @@ namespace DataBSDFWindow {
     // Using/Aliasing
     using DataVectorTypes::Vector;
 
-    enum class BasisType
+    enum class Basis
     {
         Unassigned = -1,
         WINDOW,
@@ -146,7 +146,7 @@ namespace DataBSDFWindow {
     struct BasisStruct
     {
         // Members
-        BasisType BasisType;             // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
+        Basis BasisType;             // BasisType_WINDOW or BasisType_Custom  (see HeatBalanceManager)
         BasisSymmetry BasisSymmetryType; // BasisSymmetry_Axisymmetric or BasisSymmetry_None  (see HeatBalanceManager)
         int BasisMatIndex;               // pointer to matrix for basis
         int NBasis;                      // No. elements in basis
@@ -160,7 +160,7 @@ namespace DataBSDFWindow {
         Array1D<BasisElemDescr> Grid;    // actual basis (to be constructed from matrix)
 
         // Default Constructor
-        BasisStruct() : BasisType(BasisType::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), BasisMatIndex(0), NBasis(0), NThetas(0)
+        BasisStruct() : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), BasisMatIndex(0), NBasis(0), NThetas(0)
         {
         }
     };
@@ -395,7 +395,7 @@ namespace DataBSDFWindow {
     {
         // Members
         // nested data for Construction
-        BasisType BasisType;
+        Basis BasisType;
         BasisSymmetry BasisSymmetryType;
         int ThermalModel;            // Pointer to thermal model
         int BasisMatIndex;           // pointer to matrix for basis
@@ -424,7 +424,7 @@ namespace DataBSDFWindow {
 
         // Default Constructor
         BSDFWindowInputStruct()
-            : BasisType(BasisType::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0),
+            : BasisType(Basis::Unassigned), BasisSymmetryType(BasisSymmetry::Unassigned), ThermalModel(0), BasisMatIndex(0), BasisMatNrows(0),
               BasisMatNcols(0), NBasis(0), SolFrtTransIndex(0), SolFrtTransNrows(0), SolFrtTransNcols(0), SolBkReflIndex(0), SolBkReflNrows(0),
               SolBkReflNcols(0), VisFrtTransIndex(0), VisFrtTransNrows(0), VisFrtTransNcols(0), VisBkReflIndex(0), VisBkReflNrows(0),
               VisBkReflNcols(0), NumLayers(0)

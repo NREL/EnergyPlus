@@ -168,7 +168,7 @@ namespace WindowComplexManager {
                           Real64 const LowerTheta,                  // Lower edge of element (polar angle)
                           Real64 const UpperTheta,                  // Upper edge of element (polar angle)
                           Real64 const DPhi,                        // Width of element (azimuthal angle)
-                          DataBSDFWindow::BasisType const InputType // Basis type
+                          DataBSDFWindow::Basis const InputType // Basis type
     );
 
     void SetupComplexWindowStateGeometry(EnergyPlusData &state,

@@ -1033,9 +1033,9 @@ namespace WindowComplexManager {
 
         Basis.Lamda.allocate(state.dataConstruction->Construct(IConst).BSDFInput.NBasis);
         Basis.SolAng.allocate(state.dataConstruction->Construct(IConst).BSDFInput.NBasis);
-        if (state.dataConstruction->Construct(IConst).BSDFInput.BasisType == DataBSDFWindow::BasisType::WINDOW) {
+        if (state.dataConstruction->Construct(IConst).BSDFInput.BasisType == DataBSDFWindow::Basis::WINDOW) {
             //   WINDOW6 Basis
-            Basis.BasisType = DataBSDFWindow::BasisType::WINDOW;
+            Basis.BasisType = DataBSDFWindow::Basis::WINDOW;
             if (state.dataConstruction->Construct(IConst).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::None) {
                 // No basis symmetry
                 Basis.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::None;
@@ -1106,7 +1106,7 @@ namespace WindowComplexManager {
                                          LowerTheta,
                                          UpperTheta,
                                          DPhi,
-                                         DataBSDFWindow::BasisType::WINDOW); // This gets all the simple grid characteristics
+                                         DataBSDFWindow::Basis::WINDOW); // This gets all the simple grid characteristics
                         Basis.Lamda(ElemNo) = Lamda;
                         Basis.SolAng(ElemNo) = SolAng;
                     }
@@ -1176,7 +1176,7 @@ namespace WindowComplexManager {
                                      LowerTheta,
                                      UpperTheta,
                                      DPhi,
-                                     DataBSDFWindow::BasisType::WINDOW); // This gets all the simple grid characteristics
+                                     DataBSDFWindow::Basis::WINDOW); // This gets all the simple grid characteristics
                     Basis.Lamda(ElemNo) = Lamda;
                     Basis.SolAng(ElemNo) = SolAng;
                 }
@@ -1196,7 +1196,7 @@ namespace WindowComplexManager {
                           Real64 const LowerTheta,                  // Lower edge of element (polar angle)
                           Real64 const UpperTheta,                  // Upper edge of element (polar angle)
                           Real64 const DPhi,                        // Width of element (azimuthal angle)
-                          DataBSDFWindow::BasisType const InputType // Basis type
+                          DataBSDFWindow::Basis const InputType // Basis type
     )
     {
 
@@ -1209,7 +1209,7 @@ namespace WindowComplexManager {
         // PURPOSE OF THIS SUBROUTINE:
         // fill in values for all the components of a basis element
 
-        if (InputType == DataBSDFWindow::BasisType::WINDOW) {
+        if (InputType == DataBSDFWindow::Basis::WINDOW) {
             // WINDOW6 Type BASIS
             if (Elem == 1) {
                 // first element, theta=0, is special case
