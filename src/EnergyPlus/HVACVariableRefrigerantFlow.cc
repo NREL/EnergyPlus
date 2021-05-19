@@ -886,7 +886,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
 
             if (FractionalDefrostTime > 0.0) {
                 // Calculate defrost adjustment factors depending on defrost control strategy
-                if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy == ReverseCycle) {
+                if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                     LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) *
                                        (state.dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity / 1.01667);
                     DefrostEIRTempModFac = CurveValue(
@@ -2184,16 +2184,18 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATCCHeater = rNumericArgs(19);
 
         if (!lAlphaFieldBlanks(31)) {
-            if (UtilityRoutines::SameString(cAlphaArgs(31), "ReverseCycle")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = ReverseCycle;
-            if (UtilityRoutines::SameString(cAlphaArgs(31), "Resistive")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = Resistive;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == 0) {
+            if (UtilityRoutines::SameString(cAlphaArgs(31), "ReverseCycle"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
+            if (UtilityRoutines::SameString(cAlphaArgs(31), "Resistive"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Unassigned) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(31) +
                                     " not found: " + cAlphaArgs(31));
                 ErrorsFound = true;
             }
         } else {
-            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = ReverseCycle;
+            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
         }
 
         if (!lAlphaFieldBlanks(32)) {
@@ -2223,7 +2225,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).Name,          // Object Name
                                                             cAlphaFieldNames(33));                               // Field Name
             } else {
-                if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle) {
+                if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(33) +
                                         " not found:" + cAlphaArgs(33));
@@ -2231,7 +2233,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
             }
         } else {
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle) {
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(33) +
                                     " not found:" + cAlphaArgs(33));
@@ -2241,7 +2243,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         state.dataHVACVarRefFlow->VRF(VRFNum).DefrostFraction = rNumericArgs(20);
         state.dataHVACVarRefFlow->VRF(VRFNum).DefrostCapacity = rNumericArgs(21);
-        if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostCapacity == 0.0 && state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == Resistive) {
+        if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostCapacity == 0.0 &&
+            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Resistive) {
             ShowWarningError(state,
                              cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cNumericFieldNames(21) +
                                  " = 0.0 for defrost strategy = RESISTIVE.");
@@ -2773,16 +2776,18 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // Defrost
         if (!lAlphaFieldBlanks(8)) {
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "ReverseCycle")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = ReverseCycle;
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "Resistive")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = Resistive;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == 0) {
+            if (UtilityRoutines::SameString(cAlphaArgs(8), "ReverseCycle"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
+            if (UtilityRoutines::SameString(cAlphaArgs(8), "Resistive"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Unassigned) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(8) +
                                     " not found: " + cAlphaArgs(8));
                 ErrorsFound = true;
             }
         } else {
-            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = ReverseCycle;
+            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
         }
 
         if (!lAlphaFieldBlanks(9)) {
@@ -2812,7 +2817,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).Name,          // Object Name
                                                             cAlphaFieldNames(10));                               // Field Name
             } else {
-                if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle &&
+                if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
                     state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
@@ -2821,7 +2826,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
             }
         } else {
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle &&
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
@@ -2833,7 +2838,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).DefrostFraction = rNumericArgs(27);
         state.dataHVACVarRefFlow->VRF(VRFNum).DefrostCapacity = rNumericArgs(28);
         state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATDefrost = rNumericArgs(29);
-        if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostCapacity == 0.0 && state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == Resistive) {
+        if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostCapacity == 0.0 &&
+            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Resistive) {
             ShowWarningError(state,
                              cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cNumericFieldNames(28) +
                                  " = 0.0 for defrost strategy = RESISTIVE.");
@@ -3244,16 +3250,18 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // Defrost
         if (!lAlphaFieldBlanks(8)) {
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "ReverseCycle")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = ReverseCycle;
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "Resistive")) state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = Resistive;
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == 0) {
+            if (UtilityRoutines::SameString(cAlphaArgs(8), "ReverseCycle"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
+            if (UtilityRoutines::SameString(cAlphaArgs(8), "Resistive"))
+                state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Unassigned) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(8) +
                                     " not found: " + cAlphaArgs(8));
                 ErrorsFound = true;
             }
         } else {
-            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = ReverseCycle;
+            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
         }
 
         if (!lAlphaFieldBlanks(9)) {
@@ -3283,7 +3291,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                             state.dataHVACVarRefFlow->VRF(VRFNum).Name,          // Object Name
                                                             cAlphaFieldNames(10));                               // Field Name
             } else {
-                if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle &&
+                if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
                     state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
@@ -3292,7 +3300,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
             }
         } else {
-            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == ReverseCycle &&
+            if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
                 state.dataHVACVarRefFlow->VRF(VRFNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cAlphaFieldNames(10) +
@@ -3304,7 +3312,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataHVACVarRefFlow->VRF(VRFNum).DefrostFraction = rNumericArgs(34);
         state.dataHVACVarRefFlow->VRF(VRFNum).DefrostCapacity = rNumericArgs(35);
         state.dataHVACVarRefFlow->VRF(VRFNum).MaxOATDefrost = rNumericArgs(36);
-        if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostCapacity == 0.0 && state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == Resistive) {
+        if (state.dataHVACVarRefFlow->VRF(VRFNum).DefrostCapacity == 0.0 &&
+            state.dataHVACVarRefFlow->VRF(VRFNum).DefrostStrategy == StandardRatings::DefrostStrat::Resistive) {
             ShowWarningError(state,
                              cCurrentModuleObject + ", \"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\" " + cNumericFieldNames(35) +
                                  " = 0.0 for defrost strategy = RESISTIVE.");
@@ -5325,8 +5334,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                 state.dataHVACVarRefFlow->VRF(NumCond).Name);
         }
 
-        if (state.dataHVACVarRefFlow->VRF(NumCond).DefrostStrategy == Resistive ||
-            (state.dataHVACVarRefFlow->VRF(NumCond).DefrostStrategy == ReverseCycle &&
+        if (state.dataHVACVarRefFlow->VRF(NumCond).DefrostStrategy == StandardRatings::DefrostStrat::Resistive ||
+            (state.dataHVACVarRefFlow->VRF(NumCond).DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
              state.dataHVACVarRefFlow->VRF(NumCond).FuelTypeNum == DataGlobalConstants::ResourceType::Electricity)) {
             SetupOutputVariable(state,
                                 "VRF Heat Pump Defrost Electricity Rate",
@@ -8987,7 +8996,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostCapacity == AutoSize) {
                 IsAutoSize = true;
             }
-            if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy == Resistive) {
+            if (state.dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy == StandardRatings::DefrostStrat::Resistive) {
                 DefrostCapacityDes = state.dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity;
             } else {
                 DefrostCapacityDes = 0.0;
@@ -12300,7 +12309,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
             if (FractionalDefrostTime > 0.0) {
                 // Calculate defrost adjustment factors depending on defrost control strategy
-                if (this->DefrostStrategy == ReverseCycle && this->DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
+                if (this->DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
+                    this->DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                     LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (this->HeatingCapacity / 1.01667);
                     DefrostEIRTempModFac = CurveValue(state, this->DefrostEIRPtr, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
 
