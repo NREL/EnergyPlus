@@ -1387,16 +1387,16 @@ bool ValidateInducedNode(EnergyPlusData &state, int const InduceNodeNum, int con
 
     if (state.dataZonePlenum->NumZoneReturnPlenums > 0) {
         for (PlenumNum = 1; PlenumNum <= state.dataZonePlenum->NumZoneReturnPlenums; ++PlenumNum) {
-            for (InNodeCtr = 1; InNodeCtr <= state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).NumInletNodes; ++InNodeCtr) {
-                for (int ReturnNodeNum = 1; ReturnNodeNum <= NumReturnNodes; ++ReturnNodeNum) {
-                    if (ReturnNode(ReturnNodeNum) != state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).InletNode(InNodeCtr)) continue;
-                    for (InduceNodeCtr = 1; InduceNodeCtr <= state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).NumInducedNodes; ++InduceNodeCtr) {
-                        if (InduceNodeNum == state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).InducedNode(InduceNodeCtr)) {
+            for (InduceNodeCtr = 1; InduceNodeCtr <= state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).NumInducedNodes; ++InduceNodeCtr) {
+                if (InduceNodeNum == state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).InducedNode(InduceNodeCtr)) {
+                    for (InNodeCtr = 1; InNodeCtr <= state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).NumInletNodes; ++InNodeCtr) {
+                        for (int ReturnNodeNum = 1; ReturnNodeNum <= NumReturnNodes; ++ReturnNodeNum) {
+                            if (ReturnNode(ReturnNodeNum) != state.dataZonePlenum->ZoneRetPlenCond(PlenumNum).InletNode(InNodeCtr)) continue;
                             Nodefound = true;
                             break;
                         }
+                        if (Nodefound) break;
                     }
-                    if (Nodefound) break;
                 }
                 if (Nodefound) break;
             }
