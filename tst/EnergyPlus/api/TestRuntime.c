@@ -198,7 +198,7 @@ int main(int argc, const char *argv[])
     // create a new state and run it with console output muted
     printf("Running EnergyPlus with Console Output Muted...\n");
     EnergyPlusState state2 = stateNew();
-    setConsoleOutputMuteState(state2, 1);
+    setConsoleOutputState(state2, 0);
     energyplus(state2, argc, argv);
     printf("...and it is done.");
     return 0;

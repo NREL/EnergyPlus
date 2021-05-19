@@ -80,13 +80,13 @@ void stopSimulation(EnergyPlusState state)
     thisState->dataGlobal->stopSimulation = true;
 }
 
-void setConsoleOutputMuteState(EnergyPlusState state, int muteOutput)
+void setConsoleOutputState(EnergyPlusState state, int outputStatus)
 {
     auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    if (muteOutput == 0) {
-        thisState->dataGlobal->muteConsoleOutput = false;
+    if (outputStatus == 0) {
+        thisState->dataGlobal->printConsoleOutput = false;
     } else {
-        thisState->dataGlobal->muteConsoleOutput = true;
+        thisState->dataGlobal->printConsoleOutput = true;
     }
 }
 

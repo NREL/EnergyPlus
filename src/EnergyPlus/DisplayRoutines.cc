@@ -78,7 +78,7 @@ void DisplayString(EnergyPlusData &state, std::string const &String) // String t
     if (state.dataGlobal->messageCallback) state.dataGlobal->messageCallback(String.c_str());
 
     if (state.dataGlobal->KickOffSimulation && !state.dataSysVars->DeveloperFlag) return;
-    if (state.dataGlobal->muteConsoleOutput) return;
+    if (!state.dataGlobal->printConsoleOutput) return;
     std::cout << String << std::endl;
 }
 
@@ -98,7 +98,7 @@ void DisplayString(EnergyPlusData &state, char const *String) // String to be di
     if (state.dataGlobal->messageCallback) state.dataGlobal->messageCallback(String);
 
     if (state.dataGlobal->KickOffSimulation && !state.dataSysVars->DeveloperFlag) return;
-    if (state.dataGlobal->muteConsoleOutput) return;
+    if (!state.dataGlobal->printConsoleOutput) return;
     std::cout << String << std::endl;
 }
 
@@ -128,7 +128,7 @@ void DisplayNumberAndString(EnergyPlusData &state,
     if (state.dataGlobal->messageCallback) state.dataGlobal->messageCallback(sstm.str().c_str());
 
     if (state.dataGlobal->KickOffSimulation && !state.dataSysVars->DeveloperFlag) return;
-    if (state.dataGlobal->muteConsoleOutput) return;
+    if (!state.dataGlobal->printConsoleOutput) return;
     std::cout << String << ' ' << Number << std::endl;
 }
 
