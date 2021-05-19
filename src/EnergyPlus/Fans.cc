@@ -612,9 +612,9 @@ void GetFanInput(EnergyPlusData &state)
             {
                 auto const SELECT_CASE_var(cAlphaArgs(7));
                 if (SELECT_CASE_var == "COUPLED") {
-                    Fan(FanNum).AvailManagerMode = state.dataFans->ExhaustFanCoupledToAvailManagers;
+                    Fan(FanNum).AvailManagerMode = ExhaustFanCoupledToAvailManagers;
                 } else if (SELECT_CASE_var == "DECOUPLED") {
-                    Fan(FanNum).AvailManagerMode = state.dataFans->ExhaustFanDecoupledFromAvailManagers;
+                    Fan(FanNum).AvailManagerMode = ExhaustFanDecoupledFromAvailManagers;
                 } else {
                     ShowSevereError(state,
                                     RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(7) + " entered =" + cAlphaArgs(7) + " for " +
@@ -623,7 +623,7 @@ void GetFanInput(EnergyPlusData &state)
                 }
             }
         } else {
-            Fan(FanNum).AvailManagerMode = state.dataFans->ExhaustFanCoupledToAvailManagers;
+            Fan(FanNum).AvailManagerMode = ExhaustFanCoupledToAvailManagers;
         }
 
         if (NumAlphas > 7 && !lAlphaFieldBlanks(8)) {
@@ -2081,7 +2081,7 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
     //  and TurnFansOff to LocalTurnFansOff in the IF statement below.
 
     // apply controls to determine if operating
-    if (Fan(FanNum).AvailManagerMode == state.dataFans->ExhaustFanCoupledToAvailManagers) {
+    if (Fan(FanNum).AvailManagerMode == ExhaustFanCoupledToAvailManagers) {
         if (((GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0) || state.dataHVACGlobal->TurnFansOn) &&
             !state.dataHVACGlobal->TurnFansOff && MassFlow > 0.0) { // available
             if (Fan(FanNum).MinTempLimitSchedNum > 0) {
@@ -2097,7 +2097,7 @@ void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
             FanIsRunning = false;
         }
 
-    } else if (Fan(FanNum).AvailManagerMode == state.dataFans->ExhaustFanDecoupledFromAvailManagers) {
+    } else if (Fan(FanNum).AvailManagerMode == ExhaustFanDecoupledFromAvailManagers) {
         if (GetCurrentScheduleValue(state, Fan(FanNum).AvailSchedPtrNum) > 0.0 && MassFlow > 0.0) {
             if (Fan(FanNum).MinTempLimitSchedNum > 0) {
                 if (Tin >= GetCurrentScheduleValue(state, Fan(FanNum).MinTempLimitSchedNum)) {
