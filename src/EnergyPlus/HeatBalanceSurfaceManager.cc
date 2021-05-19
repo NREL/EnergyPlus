@@ -7782,7 +7782,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                 bool movableInsulPresent = state.dataSurface->AnyMovableInsulation && state.dataHeatBalSurf->SurfMovInsulIntPresent(surfNum);
                 if (movableInsulPresent) { // Movable insulation present, recalc surface temps
                     Real64 HMovInsul = state.dataHeatBalSurf->SurfMovInsulHInt(surfNum);
-                    Real64 F1 = HMovInsul / (HMovInsul + state.dataHeatBal->HConvIn(surfNum) + state.dataHeatBalSurf->IterDampConst);
+                    Real64 F1 = HMovInsul / (HMovInsul + state.dataHeatBal->HConvIn(surfNum) + iterDampConstant);
                     state.dataHeatBalSurf->TempSurfIn(surfNum) =
                         (state.dataHeatBalSurf->CTFConstInPart(surfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) +
                          state.dataHeatBalSurf->CTFCross0(surfNum) * state.dataHeatBalSurf->TH11Surf(surfNum) +
@@ -7792,7 +7792,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                state.dataHeatBalFanSys->QCoolingPanelSurf(surfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(surfNum) +
                                state.dataHeatBalFanSys->QSteamBaseboardSurf(surfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(surfNum) +
                                state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) +
-                               state.dataHeatBalSurf->IterDampConst * state.dataHeatBalSurf->TempInsOld(surfNum))) /
+                               iterDampConstant * state.dataHeatBalSurf->TempInsOld(surfNum))) /
                         (state.dataHeatBalSurf->CTFInside0(surfNum) + HMovInsul - F1 * HMovInsul); // Convection from surface to zone air
 
                     state.dataHeatBalSurf->TempSurfInTmp(surfNum) =
@@ -7876,14 +7876,12 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         (state.dataHeatBal->SurfQRadThermInAbs(surfNum) + state.dataHeatBal->SurfWinQRadSWwinAbs(surfNum, 1) / 2.0 +
                          state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) +
                          HConvIn_surf * state.dataHeatBalSurfMgr->RefAirTemp(surfNum) + state.dataHeatBalSurf->SurfNetLWRadToSurf(surfNum) +
-                         state.dataHeatBalSurf->IterDampConst * state.dataHeatBalSurf->TempInsOld(surfNum) +
-                         Ueff * state.dataHeatBalSurf->TH(1, 1, domeNum)) /
-                        (Ueff + HConvIn_surf +
-                         state.dataHeatBalSurf->IterDampConst); // LW radiation from internal sources | SW radiation from internal sources and
-                                                                // solar | Convection from surface to zone air | Net radiant exchange with
-                                                                // other zone surfaces | Iterative damping term (for stability) | Current
-                                                                // conduction from the outside surface | Coefficient for conduction (current
-                                                                // time) | Convection and damping term
+                         iterDampConstant * state.dataHeatBalSurf->TempInsOld(surfNum) + Ueff * state.dataHeatBalSurf->TH(1, 1, domeNum)) /
+                        (Ueff + HConvIn_surf + iterDampConstant); // LW radiation from internal sources | SW radiation from internal sources and
+                                                                  // solar | Convection from surface to zone air | Net radiant exchange with
+                                                                  // other zone surfaces | Iterative damping term (for stability) | Current
+                                                                  // conduction from the outside surface | Coefficient for conduction (current
+                                                                  // time) | Convection and damping term
 
                     Real64 const Sigma_Temp_4(DataGlobalConstants::StefanBoltzmann * pow_4(state.dataHeatBalSurf->TempSurfIn(surfNum)));
 
