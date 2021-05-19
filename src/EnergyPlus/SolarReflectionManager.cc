@@ -1230,7 +1230,8 @@ namespace SolarReflectionManager {
                                 for (state.dataSolarReflectionManager->iObsSurfNum = 1;
                                      state.dataSolarReflectionManager->iObsSurfNum <= state.dataSurface->TotSurfaces;
                                      ++state.dataSolarReflectionManager->iObsSurfNum) {
-                                    if (!state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).IsShadowPossibleObstruction) continue;
+                                    if (!state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).IsShadowPossibleObstruction)
+                                        continue;
                                     // Horizontal roof surfaces cannot be obstructions for rays from ground
                                     if (state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).Tilt < 5.0) continue;
                                     if (!state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).IsShadowing) {
