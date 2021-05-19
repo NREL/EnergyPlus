@@ -317,6 +317,7 @@ struct ZoneTempPredictorCorrectorData;
 
 struct EnergyPlusData : BaseGlobalStruct
 {
+    bool ready = true;
 
     IOFiles files;
 
