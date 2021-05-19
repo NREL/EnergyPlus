@@ -1366,14 +1366,14 @@ namespace SystemAvailabilityManager {
             int Item = 0;
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++Item;
-                auto const &fields = instance.value();
+                auto const &objectFields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).Name = thisObjectName;
 
-                auto extensibles = fields.find("managers");
+                auto extensibles = objectFields.find("managers");
                 auto const &extensionSchemaProps = objectSchemaProps["managers"]["items"]["properties"];
-                if (extensibles != fields.end()) {
+                if (extensibles != objectFields.end()) {
                     auto extensiblesArray = extensibles.value();
                     int numExtensibles = extensiblesArray.size();
                     state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).NumItems = numExtensibles;

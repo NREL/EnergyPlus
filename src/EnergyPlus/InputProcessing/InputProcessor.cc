@@ -543,7 +543,7 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
 }
 
 std::string InputProcessor::getAlphaFieldValue(
-    EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json schema_obj_props, std::string const &fieldName)
+    EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     auto const &schema_field_obj = schema_obj_props[fieldName];
     if (schema_field_obj.empty()) {
@@ -572,7 +572,7 @@ std::string InputProcessor::getAlphaFieldValue(
 }
 
 Real64 InputProcessor::getRealFieldValue(
-    EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json schema_obj_props, std::string const &fieldName)
+    EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     auto const &schema_field_obj = schema_obj_props[fieldName];
     if (schema_field_obj.empty()) {
@@ -610,7 +610,7 @@ json InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string con
     auto const &schema_properties = schema.at("properties");
     const json &object_schema = schema_properties.at(objectWord);
     if (object_schema.empty()) {
-            ShowFatalError(state, "InputProcessor::fieldValue: Invalid object type = " + objectWord);
+        ShowFatalError(state, "InputProcessor::fieldValue: Invalid object type = " + objectWord);
     }
 
     json schema_obj_props = getPatternProperties(state, object_schema);
