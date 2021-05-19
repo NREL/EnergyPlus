@@ -1337,6 +1337,9 @@ namespace SimulationManager {
             }
         }
 
+        // Force zone-by-zone convergence just for testing
+        state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones = false;
+
         if (ErrorsFound) {
             ShowFatalError(state, "Errors found getting Project Input");
         }
