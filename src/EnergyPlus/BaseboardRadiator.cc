@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -75,16 +76,11 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
-
-// Note: This file contains two modules:
-// Module BaseboardRadiator -- (ref: Object: ZoneHVAC:Baseboard:Convective:Water)
-// Module BaseboardElectric -- (ref: Object: ZoneHVAC:Baseboard:Convective:Electric)
-
 namespace BaseboardRadiator {
+
     // Module containing the routines dealing with the BASEBOARD HEATER
     // component(s).
 
@@ -939,8 +935,7 @@ namespace BaseboardRadiator {
                         // pick an air  mass flow rate that is twice the water mass flow rate (CR8842)
                         baseboard->Baseboard(BaseboardNum).DesAirMassFlowRate = 2.0 * rho * baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax;
                         // pass along the coil number and the design load to the residual calculation
-                        Par(1) = DesCoilLoad;
-                        Par(2) = BaseboardNum;
+                        std::array<Real64, 2> Par2 = {DesCoilLoad, Real64(BaseboardNum)};
                         // set the lower and upper limits on the UA
                         UA0 = 0.001 * DesCoilLoad;
                         UA1 = DesCoilLoad;
@@ -958,7 +953,7 @@ namespace BaseboardRadiator {
                             if (LoadMet > DesCoilLoad) { // if the load met is greater than design load, OK to iterate on UA
                                 // Invert the baseboard model: given the design inlet conditions and the design load,
                                 // find the design UA.
-                                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par);
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, UA, HWBaseboardUAResidual, UA0, UA1, Par2);
                                 // if the numerical inversion failed, issue error messages.
                                 if (SolFla == -1) {
                                     ShowSevereError(state,
@@ -1235,8 +1230,8 @@ namespace BaseboardRadiator {
     }
 
     Real64 HWBaseboardUAResidual(EnergyPlusData &state,
-                                 Real64 const UA,           // UA of coil
-                                 Array1D<Real64> const &Par // par(1) = design coil load [W]
+                                 Real64 const UA,                 // UA of coil
+                                 std::array<Real64, 2> const &Par // par(1) = design coil load [W]
     )
     {
 
@@ -1261,10 +1256,10 @@ namespace BaseboardRadiator {
         int BaseboardIndex;
         Real64 LoadMet;
 
-        BaseboardIndex = int(Par(2));
+        BaseboardIndex = int(Par[1]);
         state.dataBaseboardRadiator->Baseboard(BaseboardIndex).UA = UA;
         SimHWConvective(state, BaseboardIndex, LoadMet);
-        Residuum = (Par(1) - LoadMet) / Par(1);
+        Residuum = (Par[0] - LoadMet) / Par[0];
 
         return Residuum;
     }
