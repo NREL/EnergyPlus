@@ -2724,7 +2724,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
         if (state.dataHeatBal->CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface(state);
 
-        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
+        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
             CalcAbsorbedOnExteriorOpaqueSurfaces(state);
             if (state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCESimple(state);
