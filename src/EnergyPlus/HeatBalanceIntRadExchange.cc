@@ -58,6 +58,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -204,8 +205,12 @@ namespace HeatBalanceIntRadExchange {
         }
 
         for (int enclosureNum = startEnclosure; enclosureNum <= endEnclosure; ++enclosureNum) {
-
             auto &zone_info(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
+            int zoneNum = zone_info.ZoneNums[0];
+            if (!state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones && state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) {
+                continue;
+            }
+
             auto &zone_ScriptF(zone_info.ScriptF); // Tuned Transposed
             auto &zone_SurfacePtr(zone_info.SurfacePtr);
             int const n_zone_Surfaces(zone_info.NumOfSurfaces);

@@ -7689,10 +7689,10 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
             }
         }
 
-        // Loop over non-window surfaces
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
             if (!state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones && state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) continue;
             ++state.dataHeatBal->ZoneInsideSurfIterations(zoneNum);
+            // Loop over non-window surfaces
             int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
             int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             Real64 const iterDampConstant = state.dataHeatBalSurf->IterDampConst; // local for vectorization
