@@ -285,7 +285,7 @@ namespace ChillerReformulatedEIR {
 
         void checkMinMaxCurveBoundaries(EnergyPlusData &state, bool FirstIteration);
 
-        Real64 condOutTempResidual(EnergyPlusData &state, Real64 FalsiCondOutTemp, Array1D<Real64> const &Par);
+        Real64 condOutTempResidual(EnergyPlusData &state, Real64 FalsiCondOutTemp, std::array<Real64, 4> const &Par);
     };
 
     void GetElecReformEIRChillerInput(EnergyPlusData &state);
