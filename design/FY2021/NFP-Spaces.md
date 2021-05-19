@@ -19,8 +19,8 @@
  - Revised, May 18, 2021
     * Make Space optional for input
     * Make Space Type just a tag
-    * All optional Space Name field to surfaces
-    * Add Space to be assigned to floor surface(s) only or full geometry
+    * Add optional Space Name field to surfaces
+    * Allow Space to be assigned to floor surface(s) only or full set of surfaces
     
 
 ## Justification for New Feature ##
@@ -53,7 +53,7 @@ New Space object (and related objects) with minimal changes to current inputs.
  * *Surfaces may reference a Space Name (optional)*
  * *Two space geometry options:* 
    * Floor surface(s): Area based on floor surface(s) attached to the Space
-   * FullGeometry: Define the Space with surfaces on all sides.
+   * Full geometry: Define the Space with surfaces on all sides.
  * *New SpaceList object* (equivalent to ZoneList, but for Spaces).
 
 ### Iternal Gains and HVAC
@@ -75,7 +75,7 @@ New Space object (and related objects) with minimal changes to current inputs.
       Space Name,
       Zone Name,
       Space Type,
-			*Optional Tags for Reporting*      
+      *Optional Tags for Reporting*      
       Tag 1,
       Tag 2,
       ...
@@ -119,7 +119,7 @@ New Space object (and related objects) with minimal changes to current inputs.
 ## Sizing Considerations ##
 
  * Zone sizing calculations and reports are all at the Zone level. 
- * Possible future work could add Space level sizing calculations and reports for FullGeometry Spaces.
+ * Possible future work could add Space level sizing calculations and reports for Spaces.
  * New DesignSpecification:OutdoorAir:List allows space-level OA specifications to be combined
  
 ## Testing/Validation/Data Sources ##
@@ -146,7 +146,7 @@ should stay exactly the same, but some table headings may change.
   * Internal gains attached directly to a Space.
   * Internal gains attached to a Zone apportioned by Space floor area.
   * Floor area for each Space.
-  * Walls and other surfaces would only be reported at the Space level for FullGeometry Spaces.
+  * Walls and other surfaces would only be reported at the Space level for full geometry Spaces.
 
 ## Engineering Reference ##
 
