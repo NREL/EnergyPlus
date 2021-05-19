@@ -9,12 +9,12 @@ CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
       ! TODO: Update this section as appropriate
-      VerString='Conversion 9.5 => 10.0'
-      VersionNum=10.0
-      sVersionNum='10.0'
+      VerString='Conversion 9.5 => 9.6'
+      VersionNum=9.6
+      sVersionNum='9.6'
       IDDFileNameWithPath=TRIM(ProgramPath)//'V9-5-0-Energy+.idd'
-      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V10-0-0-Energy+.idd'
-      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 9-5-0 to 10-0-0.csv'
+      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V9-6-0-Energy+.idd'
+      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 9-5-0 to 9-6-0.csv'
 END SUBROUTINE
 
 END MODULE

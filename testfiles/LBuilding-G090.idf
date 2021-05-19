@@ -59,7 +59,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,10.0;
+  Version,9.6;
 
   Building,
     LBuilding-G090,          !- Name

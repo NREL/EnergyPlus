@@ -107,7 +107,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 !
-Version,10.0;                 !- Version Identifier
+Version,9.6;                 !- Version Identifier
 
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========

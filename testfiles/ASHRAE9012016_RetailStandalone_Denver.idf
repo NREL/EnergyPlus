@@ -111,7 +111,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,10.0;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

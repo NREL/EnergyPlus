@@ -22,7 +22,7 @@
 ! Plant:    None.
 ! SolDis=FullExterior, Aniso, Simple Interior and Exterior Convection
 
-  Version,10.0;
+  Version,9.6;
 
   Timestep,4;
 

@@ -99,7 +99,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,10.0;
+  Version,9.6;
 
   Building,
     Single family House,     !- Name

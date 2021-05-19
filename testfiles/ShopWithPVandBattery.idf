@@ -54,7 +54,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                Yes, circa 2004, Reliant , TX
 
-  Version,10.0;
+  Version,9.6;
 
   Timestep,6;
 
