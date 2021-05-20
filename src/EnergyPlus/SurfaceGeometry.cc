@@ -2731,7 +2731,6 @@ namespace SurfaceGeometry {
         // Initialize run time surface arrays
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
-            state.dataSurface->Surface(SurfNum).Index = SurfNum;
         }
         // Initialize surface with movable insulation index list
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {

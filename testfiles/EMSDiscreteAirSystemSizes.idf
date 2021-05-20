@@ -67,7 +67,7 @@
 ! ExtWallConstruction=Steel-Framed
 ! End SimMetaData
 
-  Version,9.5;
+  Version,9.6;
 
   Timestep,6;
 

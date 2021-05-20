@@ -551,7 +551,6 @@ namespace DataSurfaces {
         using Plane = Vector4<Real64>;
 
         // Members
-        int Index;
         std::string Name;                 // User supplied name of the surface (must be unique)
         int Construction;                 // Pointer to the construction in the Construct derived type
         int ConstructionStoredInputValue; // holds the original value for Construction per surface input
@@ -659,7 +658,7 @@ namespace DataSurfaces {
         bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary)
         // Default Constructor
         SurfaceData()
-            : Index(0), Construction(0), ConstructionStoredInputValue(0), Class(SurfaceClass::None), Shape(SurfaceShape::None), Sides(0), Area(0.0),
+            : Construction(0), ConstructionStoredInputValue(0), Class(SurfaceClass::None), Shape(SurfaceShape::None), Sides(0), Area(0.0),
               GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0), Width(0.0),
               shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
@@ -678,11 +677,11 @@ namespace DataSurfaces {
             // Set Precomputed Parameters
         void set_computed_geometry();
 
-        void SetOutBulbTempAt(EnergyPlusData &state);
+        void SetOutBulbTempAt(EnergyPlusData &state, int const SurfNum);
 
-        void SetWindDirAt(EnergyPlusData &state, Real64 const fac);
+        void SetWindDirAt(EnergyPlusData &state, int const SurfNum, Real64 const fac);
 
-        void SetWindSpeedAt(EnergyPlusData &state, Real64 const fac);
+        void SetWindSpeedAt(EnergyPlusData &state, int const SurfNum, Real64 const fac);
 
         Real64 getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
 
