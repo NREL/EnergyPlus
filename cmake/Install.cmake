@@ -189,16 +189,13 @@ target_architecture(TARGET_ARCH)
 # End debug
 
 include(cmake/SystemDetails.cmake)
+set_system_nickname()
 if(APPLE)
-  set(nickname "")
-  MAC_SYSTEM_NICKNAME(nickname)
   # eg: '-macOS10.13'
-  set(SYSTEM_VERSION "-${nickname}")
+  set(SYSTEM_VERSION "-${SYSTEM_NICKNAME}")
 elseif(UNIX)
-  set(nickname "")
-  UNIX_SYSTEM_NICKNAME(nickname)
   # eg: `-Ubuntu18.04`
-  set(SYSTEM_VERSION "-${nickname}")
+  set(SYSTEM_VERSION "-${SYSTEM_NICKNAME}")
 elseif(MSVC)
   # no-op
   set(SYSTEM_VERSION "")
