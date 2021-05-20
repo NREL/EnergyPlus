@@ -45,98 +45,35 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SZVAVModel_hh_INCLUDED
-#define SZVAVModel_hh_INCLUDED
+#ifndef ENERGYPLUS_HVACSYSTEMROOTFINDINGALGORITHM_HH
+#define ENERGYPLUS_HVACSYSTEMROOTFINDINGALGORITHM_HH
 
-// C++ Headers
-#include <functional>
-#include <type_traits>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array2A.hh>
-#include <ObjexxFCL/Optional.hh>
-
-// EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
-#include <EnergyPlus/UnitarySystem.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 
 namespace EnergyPlus {
-
-// Forward declarations
-struct EnergyPlusData;
-
-namespace SZVAVModel {
-
-    // Data
-    // This module should not contain variables in the module sense as it is
-    // intended strictly to provide "interfaces" to routines used by other
-    // parts of the simulation.
-
-    // MODULE PARAMETER DEFINITIONS
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE General
-    // PUBLIC  SaveCompDesWaterFlow
-    // PUBLIC  ErfFunction
-
-    // Functions
-
-    void calcSZVAVModel(EnergyPlusData &state,
-                        PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
-                        Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
-                        Real64 &PartLoadFrac,
-                        int const &CompressorONFlag
-
-    );
-
-    void calcSZVAVModel(EnergyPlusData &state,
-                        FanCoilUnits::FanCoilData &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
-                        Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
-                        Real64 &PartLoadFrac,
-                        int const &CompressorONFlag
-
-    );
-
-    void calcSZVAVModel(EnergyPlusData &state,
-                        UnitarySystems::UnitarySys &SZVAVModel,
-                        int const &SysIndex,
-                        bool const &FirstHVACIteration,
-                        bool const &CoolingLoad,
-                        bool const &HeatingLoad,
-                        Real64 const &ZoneLoad,
-                        Real64 &OnOffAirFlowRatio,
-                        bool const &HXUnitOn,
-                        int const &AirLoopNum,
-                        Real64 &PartLoadFrac,
-                        int const &CompressorONFlag);
-
-} // namespace SZVAVModel
+enum class HVACSystemRootSolverAlgorithm : int
+{
+    RegulaFalsi = 0,
+    Bisection,
+    RegulaFalsiThenBisection,
+    BisectionThenRegulaFalsi,
+    Alternation
+};
+struct HVACSystemRootFindingAlgorithm
+{
+    std::string Algorithm = {}; // Choice of algorithm
+    int NumOfIter = 5;          // Number of Iteration Before Algorith Switch
+    HVACSystemRootSolverAlgorithm HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
+};
+struct RootFindingData : BaseGlobalStruct
+{
+    HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
+    void clear_state() override
+    {
+        this->HVACSystemRootFinding = {};
+    }
+};
 
 } // namespace EnergyPlus
 
-#endif
+#endif // ENERGYPLUS_HVACSYSTEMROOTFINDINGALGORITHM_HH
