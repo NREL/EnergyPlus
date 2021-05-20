@@ -204,7 +204,7 @@ void SurfaceData::set_computed_geometry()
     }
 }
 
-void SurfaceData::SetOutBulbTempAt(EnergyPlusData &state)
+void SetOutBulbTempAt(EnergyPlusData &state, int const SurfNum)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Noel Keen (LBL)/Linda Lawrie
@@ -216,27 +216,27 @@ void SurfaceData::SetOutBulbTempAt(EnergyPlusData &state)
     // Routine provides facility for doing bulk Set Temperature at Height.
 
     if (state.dataEnvrn->SiteTempGradient == 0.0) {
-        state.dataSurface->SurfOutDryBulbTemp(Index) = state.dataEnvrn->OutDryBulbTemp;
-        state.dataSurface->SurfOutWetBulbTemp(Index) = state.dataEnvrn->OutWetBulbTemp;
+        state.dataSurface->SurfOutDryBulbTemp(SurfNum) = state.dataEnvrn->OutDryBulbTemp;
+        state.dataSurface->SurfOutWetBulbTemp(SurfNum) = state.dataEnvrn->OutWetBulbTemp;
     } else {
         // Base temperatures at Z = 0 (C)
         Real64 const BaseDryTemp(state.dataEnvrn->OutDryBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff);
         Real64 const BaseWetTemp(state.dataEnvrn->OutWetBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff);
 
-        Real64 const Z(Centroid.z); // Centroid value
+        Real64 const Z(state.dataSurface->Surface(SurfNum).Centroid.z); // Centroid value
         if (Z <= 0.0) {
-            state.dataSurface->SurfOutDryBulbTemp(Index) = BaseDryTemp;
-            state.dataSurface->SurfOutWetBulbTemp(Index) = BaseWetTemp;
+            state.dataSurface->SurfOutDryBulbTemp(SurfNum) = BaseDryTemp;
+            state.dataSurface->SurfOutWetBulbTemp(SurfNum) = BaseWetTemp;
         } else {
-            state.dataSurface->SurfOutDryBulbTemp(Index) =
+            state.dataSurface->SurfOutDryBulbTemp(SurfNum) =
                 BaseDryTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
-            state.dataSurface->SurfOutWetBulbTemp(Index) =
+            state.dataSurface->SurfOutWetBulbTemp(SurfNum) =
                 BaseWetTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
         }
     }
 }
 
-void SurfaceData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
+void SetWindSpeedAt(EnergyPlusData &state, int const SurfNum, Real64 const fac)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
@@ -248,21 +248,21 @@ void SurfaceData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
     // Routine provides facility for doing bulk Set Windspeed at Height.
 
     if (state.dataEnvrn->SiteWindExp == 0.0) {
-        state.dataSurface->SurfOutWindSpeed(Index) = state.dataEnvrn->WindSpeed;
+        state.dataSurface->SurfOutWindSpeed(SurfNum) = state.dataEnvrn->WindSpeed;
     } else {
-        Real64 const Z(Centroid.z); // Centroid value
+        Real64 const Z(state.dataSurface->Surface(SurfNum).Centroid.z); // Centroid value
         if (Z <= 0.0) {
-            state.dataSurface->SurfOutWindSpeed(Index) = 0.0;
+            state.dataSurface->SurfOutWindSpeed(SurfNum) = 0.0;
         } else {
             //  [Met] - at meterological Station, Height of measurement is usually 10m above ground
             //  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
             //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-            state.dataSurface->SurfOutWindSpeed(Index) = fac * std::pow(Z, state.dataEnvrn->SiteWindExp);
+            state.dataSurface->SurfOutWindSpeed(SurfNum) = fac * std::pow(Z, state.dataEnvrn->SiteWindExp);
         }
     }
 }
 
-void SurfaceData::SetWindDirAt(EnergyPlusData &state, Real64 const fac)
+void SetWindDirAt(EnergyPlusData &state, int const SurfNum, Real64 const fac)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         X Luo
@@ -274,7 +274,7 @@ void SurfaceData::SetWindDirAt(EnergyPlusData &state, Real64 const fac)
     // Routine provides facility for doing bulk Set Windspeed locally.
 
     // Using/Aliasing
-    state.dataSurface->SurfOutWindDir(Index) = fac;
+    state.dataSurface->SurfOutWindDir(SurfNum) = fac;
 }
 
 Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const
@@ -601,8 +601,8 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
 
 void SetSurfaceOutBulbTempAt(EnergyPlusData &state)
 {
-    for (auto &surface : state.dataSurface->Surface) {
-        surface.SetOutBulbTempAt(state);
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+        SetOutBulbTempAt(state, SurfNum);
     }
 }
 
@@ -623,16 +623,16 @@ void SetSurfaceWindSpeedAt(EnergyPlusData &state)
 {
     Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff *
                      std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
-    for (auto &surface : state.dataSurface->Surface) {
-        surface.SetWindSpeedAt(state, fac);
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+        SetWindSpeedAt(state, SurfNum, fac);
     }
 }
 
 void SetSurfaceWindDirAt(EnergyPlusData &state)
 {
     // Using/Aliasing
-    for (auto &surface : state.dataSurface->Surface) {
-        surface.SetWindDirAt(state, state.dataEnvrn->WindDir);
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+        SetWindDirAt(state, SurfNum, state.dataEnvrn->WindDir);
     }
 }
 
