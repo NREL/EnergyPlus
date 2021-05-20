@@ -701,9 +701,9 @@ namespace SolarReflectionManager {
                     //  according to the the right hand rule. If user inputs do not follow the rule, use the following
                     //  code to check the mirrored shading surface
                     if (state.dataSolarReflectionManager->HitPtSurfNum > 0) {
-                        if (state.dataSurface->SurfIsShadowing(state.dataSolarReflectionManager->HitPtSurfNum)) {
+                        if (state.dataSurface->Surface(state.dataSolarReflectionManager->HitPtSurfNum).IsShadowing) {
                             if (state.dataSolarReflectionManager->HitPtSurfNum + 1 < state.dataSurface->TotSurfaces) {
-                                if (state.dataSurface->SurfIsShadowing(state.dataSolarReflectionManager->HitPtSurfNum + 1) &&
+                                if (state.dataSurface->Surface(state.dataSolarReflectionManager->HitPtSurfNum + 1).IsShadowing &&
                                     state.dataSurface->Surface(state.dataSolarReflectionManager->HitPtSurfNum + 1).MirroredSurf) {
                                     // Check whether the sun is behind the mirrored shading surface
                                     state.dataSolarReflectionManager->CosIncBmAtHitPt2 =
@@ -930,7 +930,7 @@ namespace SolarReflectionManager {
                         state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop); // Reflecting surface number
                     // Keep windows; keep shading surfaces with specular reflectance
                     if ((state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(ReflSurfNum).ExtSolar) ||
-                        (state.dataSurface->SurfShadowGlazingFrac(ReflSurfNum) > 0.0 && state.dataSurface->SurfIsShadowing(ReflSurfNum))) {
+                        (state.dataSurface->SurfShadowGlazingFrac(ReflSurfNum) > 0.0 && state.dataSurface->Surface(ReflSurfNum).IsShadowing)) {
                         // Skip if window and not sunlit
                         if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window &&
                             state.dataHeatBal->SunlitFrac(1, iHour, ReflSurfNum) < 0.01)
@@ -1012,7 +1012,7 @@ namespace SolarReflectionManager {
                                     }
                                 } else { // Reflecting surface is a building shade
                                     for (int ObsSurfNum = 1; ObsSurfNum <= state.dataSurface->TotSurfaces; ++ObsSurfNum) {
-                                        if (!state.dataSurface->SurfShadowPossibleObstruction(ObsSurfNum)) continue;
+                                        if (!state.dataSurface->Surface(ObsSurfNum).IsShadowPossibleObstruction) continue;
                                         if (ObsSurfNum == ReflSurfNum) continue;
 
                                         // TH2 CR8959 -- Skip mirrored surfaces
@@ -1042,7 +1042,7 @@ namespace SolarReflectionManager {
                                         std::abs(state.dataSolarReflectionManager->CosIncAngRefl),
                                         state.dataConstruction->Construct(state.dataSolarReflectionManager->ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
-                                if (state.dataSurface->SurfIsShadowing(ReflSurfNum) &&
+                                if (state.dataSurface->Surface(ReflSurfNum).IsShadowing &&
                                     state.dataSurface->SurfShadowGlazingConstruct(ReflSurfNum) > 0) {
                                     state.dataSolarReflectionManager->ConstrNumRefl = state.dataSurface->SurfShadowGlazingConstruct(ReflSurfNum);
                                     state.dataSolarReflectionManager->SpecReflectance =
@@ -1173,7 +1173,7 @@ namespace SolarReflectionManager {
                         // Each shading surface has a "mirror" duplicate surface facing in the opposite direction.
                         // The following gets the correct side of a shading surface in order to get the right value
                         // of DifShdgRatioIsoSky (the two sides can have different sky shadowing).
-                        if (state.dataSurface->SurfIsShadowing(state.dataSolarReflectionManager->HitPntSurfNum)) {
+                        if (state.dataSurface->Surface(state.dataSolarReflectionManager->HitPntSurfNum).IsShadowing) {
                             if (dot(state.dataSolarReflectionManager->SolReflRecSurf(state.dataSolarReflectionManager->iRecSurfNum)
                                         .RayVec(state.dataSolarReflectionManager->iRayNum),
                                     state.dataSurface->Surface(state.dataSolarReflectionManager->HitPntSurfNum).OutNormVec) > 0.0) {
@@ -1230,10 +1230,11 @@ namespace SolarReflectionManager {
                                 for (state.dataSolarReflectionManager->iObsSurfNum = 1;
                                      state.dataSolarReflectionManager->iObsSurfNum <= state.dataSurface->TotSurfaces;
                                      ++state.dataSolarReflectionManager->iObsSurfNum) {
-                                    if (!state.dataSurface->SurfShadowPossibleObstruction(state.dataSolarReflectionManager->iObsSurfNum)) continue;
+                                    if (!state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).IsShadowPossibleObstruction)
+                                        continue;
                                     // Horizontal roof surfaces cannot be obstructions for rays from ground
                                     if (state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).Tilt < 5.0) continue;
-                                    if (!state.dataSurface->SurfIsShadowing(state.dataSolarReflectionManager->iObsSurfNum)) {
+                                    if (!state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).IsShadowing) {
                                         if (dot(state.dataSolarReflectionManager->URay,
                                                 state.dataSurface->Surface(state.dataSolarReflectionManager->iObsSurfNum).OutNormVec) >= 0.0)
                                             continue;

@@ -374,11 +374,11 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfAirSkyRadSplit(SurfNum) = std::sqrt(0.5 * (1.0 + state.dataSurface->Surface(SurfNum).CosTilt));
 
             // Set flag that determines whether a surface is a shadowing surface
-            state.dataSurface->SurfIsShadowing(SurfNum) = false;
+            state.dataSurface->Surface(SurfNum).IsShadowing = false;
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Shading ||
                 state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_F ||
                 state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Detached_B) {
-                state.dataSurface->SurfIsShadowing(SurfNum) = true;
+                state.dataSurface->Surface(SurfNum).IsShadowing = true;
                 if (state.dataSurface->ShadingSurfaceFirst == -1) state.dataSurface->ShadingSurfaceFirst = SurfNum;
                 state.dataSurface->ShadingSurfaceLast = SurfNum;
             }
@@ -929,7 +929,6 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfAirSkyRadSplit(SurfNum) = 0.0;
         }
         // Following are surface property arrays used in SurfaceGeometry
-        state.dataSurface->SurfShadowPossibleObstruction.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfShadowRecSurfNum.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfShadowDisabledZoneList.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfShadowDiffuseSolRefl.allocate(state.dataSurface->TotSurfaces);
@@ -941,7 +940,6 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfSchedMovInsulExt.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfSchedMovInsulInt.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfShadowPossibleObstruction(SurfNum) = false;
             state.dataSurface->SurfShadowRecSurfNum(SurfNum) = 0;
             state.dataSurface->SurfShadowDiffuseSolRefl(SurfNum) = 0.0;
             state.dataSurface->SurfShadowDiffuseVisRefl(SurfNum) = 0.0;
@@ -967,7 +965,6 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfICSPtr.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfDaylightingShelfInd.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIsShadowing.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfSchedExternalShadingFrac(SurfNum) = false;
             state.dataSurface->SurfExternalShadingSchInd(SurfNum) = 0;
@@ -984,7 +981,6 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfICSPtr(SurfNum) = 0;
             state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfNum) = false;
             state.dataSurface->SurfDaylightingShelfInd(SurfNum) = 0;
-            state.dataSurface->SurfIsShadowing(SurfNum) = false;
         }
         state.dataSurface->SurfLowTempErrCount.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHighTempErrCount.allocate(state.dataSurface->TotSurfaces);
@@ -2568,7 +2564,7 @@ namespace SurfaceGeometry {
         // Set flag that determines whether a surface can be an exterior obstruction
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->SurfShadowPossibleObstruction(SurfNum) = false;
+            state.dataSurface->Surface(SurfNum).IsShadowPossibleObstruction = false;
             if (state.dataSurface->Surface(SurfNum).HeatTransSurf) {
                 state.dataSurface->AllHTSurfaceList.push_back(SurfNum);
                 int const zoneNum(state.dataSurface->Surface(SurfNum).Zone);
@@ -2621,7 +2617,7 @@ namespace SurfaceGeometry {
             // Exclude air boundary surfaces
             if (state.dataSurface->Surface(SurfNum).IsAirBoundarySurf) continue;
 
-            state.dataSurface->SurfShadowPossibleObstruction(SurfNum) = true;
+            state.dataSurface->Surface(SurfNum).IsShadowPossibleObstruction = true;
         }
 
         // Check for IRT surfaces in invalid places.
@@ -12449,7 +12445,7 @@ namespace SurfaceGeometry {
         HeatTransSurf = state.dataSurface->Surface(ThisSurf).HeatTransSurf;
 
         // Kludge for daylighting shelves
-        if (state.dataSurface->SurfIsShadowing(ThisSurf)) {
+        if (state.dataSurface->Surface(ThisSurf).IsShadowing) {
             ThisBaseSurface = ThisSurf;
             HeatTransSurf = true;
         }

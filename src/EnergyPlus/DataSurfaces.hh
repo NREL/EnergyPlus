@@ -633,6 +633,8 @@ namespace DataSurfaces {
         int OSCPtr;             // Pointer to OSC data structure
         int OSCMPtr;            // "Pointer" to OSCM data structure (other side conditions from a model)
         bool MirroredSurf;      // True if it is a mirrored surface
+        bool IsShadowing;       // True if a surface is a shadowing surface
+        bool IsShadowPossibleObstruction; // True if a surface can be an exterior obstruction
 
         // Optional parameters specific to shadowing surfaces and subsurfaces (detached shading, overhangs, wings, etc.)
         int SchedShadowSurfIndex; // Schedule for a shadowing (sub)surface
@@ -666,9 +668,9 @@ namespace DataSurfaces {
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), ExtSolar(false),
               ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
-              MirroredSurf(false), SchedShadowSurfIndex(0), IsTransparent(false), SchedMinValue(0.0), activeWindowShadingControl(0),
-              HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0),
-              IsAirBoundarySurf(false)
+              MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
+              SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0),
+              Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
         {
         }
 
@@ -1249,12 +1251,11 @@ struct SurfacesData : BaseGlobalStruct
     Array2D<Real64> SurfCosIncAveBmToBmSolObs;
 
     // Surface parameters specific to solar reflection from surfaces
-    Array1D<Real64> SurfShadowDiffuseSolRefl;    // Diffuse solar reflectance of opaque portion
-    Array1D<Real64> SurfShadowDiffuseVisRefl;    // Diffuse visible reflectance of opaque portion
-    Array1D<Real64> SurfShadowGlazingFrac;       // Glazing fraction
-    Array1D<int> SurfShadowGlazingConstruct;     // Glazing construction number
-    Array1D<bool> SurfShadowPossibleObstruction; // True if a surface can be an exterior obstruction
-    Array1D<int> SurfShadowRecSurfNum;           // Receiving surface number
+    Array1D<Real64> SurfShadowDiffuseSolRefl; // Diffuse solar reflectance of opaque portion
+    Array1D<Real64> SurfShadowDiffuseVisRefl; // Diffuse visible reflectance of opaque portion
+    Array1D<Real64> SurfShadowGlazingFrac;    // Glazing fraction
+    Array1D<int> SurfShadowGlazingConstruct;  // Glazing construction number
+    Array1D<int> SurfShadowRecSurfNum;        // Receiving surface number
     Array1D<std::vector<int>>
         SurfShadowDisabledZoneList; // Array of all disabled shadowing zone number to the current surface the surface diffusion model
 
@@ -1298,7 +1299,6 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsPool;                       // true if this is a pool
     Array1D<int> SurfICSPtr;                        // Index to ICS collector
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool;    // surface cannot be part of both a radiant surface & ventilated slab group
-    Array1D<bool> SurfIsShadowing;                  // True if a surface is a shadowing surface
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;                     // Flag for reference air temperature
@@ -1633,7 +1633,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfShadowDiffuseVisRefl.deallocate();
         this->SurfShadowGlazingFrac.deallocate();
         this->SurfShadowGlazingConstruct.deallocate();
-        this->SurfShadowPossibleObstruction.deallocate();
         this->SurfShadowRecSurfNum.deallocate();
         this->SurfShadowDisabledZoneList.deallocate();
         this->SurfMaterialMovInsulExt.deallocate();
@@ -1671,7 +1670,6 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfIsPool.deallocate();
         this->SurfICSPtr.deallocate();
         this->SurfIsRadSurfOrVentSlabOrPool.deallocate();
-        this->SurfIsShadowing.deallocate();
         this->SurfTAirRef.deallocate();
         this->SurfIntConvCoeff.deallocate();
         this->SurfExtConvCoeff.deallocate();
