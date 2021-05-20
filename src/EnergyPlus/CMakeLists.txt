@@ -881,6 +881,15 @@ if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
   get_filename_component(RESOLVED_PYTHON_LIBRARY "${Python_LIBRARIES}" REALPATH)
   if(WIN32)
+
+    # In case you have both release and debug Python libraries on your system, Python_LIBRARIES might be "optimized;C:/.../python38.lib;debug;C:/.../python38_d.lib"
+    # so it can't be used directly, we could use a generator expression to find the $<TARGET_FILE:Python::Python> library used and that'd point directly
+    # to the DLL. But it won't work nicely for the install(code ...) command below... so we do a hack, get the optimized one always...
+    list(LENGTH RESOLVED_PYTHON_LIBRARY _LEN)
+    if (_LEN GREATER 1)
+      list(GET RESOLVED_PYTHON_LIBRARY 1 RESOLVED_PYTHON_LIBRARY)
+    endif()
+
     # Windows is being ugly and linking against the Python DLL but not running
     # unless it's close by Force it here.
     add_custom_command(
