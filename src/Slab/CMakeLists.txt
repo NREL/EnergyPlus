@@ -22,36 +22,12 @@ set(SRC
     InputProcessor.f90
     SimData.f90)
 
-set(STATIC_EXE FALSE)
+set(CMAKE_SKIP_RPATH ${FORTRAN_SKIP_RPATH})
+set(SKIP_BUILD_RPATH true)
 
-if(APPLE)
-  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
-  endif()
-elseif(UNIX)
-  set(CMAKE_SKIP_RPATH TRUE)
-  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
-  else()
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
-    set(STATIC_EXE TRUE)
-  endif()
-else()
-  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    # Set release flags to be empty
-    set(CMAKE_Fortran_FLAGS_RELEASE "")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:static")
-  else()
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
-    set(STATIC_EXE TRUE)
-  endif()
-endif()
-
-set(SKIP_BUILD_RPATH TRUE)
 add_executable(Slab ${SRC})
+target_link_libraries(Slab PRIVATE fortran_project_options)
 set_target_properties(Slab PROPERTIES FOLDER Auxiliary)
-
-set_target_properties(Slab PROPERTIES COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}")
 
 install(TARGETS Slab DESTINATION PreProcess/GrndTempCalc)
 if(NOT ${STATIC_EXE})
