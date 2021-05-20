@@ -834,6 +834,7 @@ namespace FanCoilUnits {
                 // check that the fan coil outlet node is the same as one of the zone inlet nodes
                 state.dataFanCoilUnits->ZoneInNodeNotFound = true;
                 if (FanCoil(FanCoilNum).ControlZoneNum > 0) {
+                    FanCoil(FanCoilNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(FanCoil(FanCoilNum).ControlZoneNum).ZoneNode;
                     state.dataFanCoilUnits->ZoneInNodeNotFound = false;
                 }
 
