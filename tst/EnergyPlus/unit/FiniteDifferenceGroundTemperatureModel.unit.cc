@@ -71,7 +71,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModelTest)
 
     std::shared_ptr<FiniteDiffGroundTempsModel> thisModel(new FiniteDiffGroundTempsModel());
 
-    thisModel->objectType = GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectType = GroundTempObjType::FiniteDiffGroundTemp;
     thisModel->objectName = "Test";
     thisModel->baseConductivity = 1.08;
     thisModel->baseDensity = 962.0;
@@ -147,7 +147,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather)
 
     std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
 
-    thisModel->objectType = EnergyPlus::GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectType = EnergyPlus::GroundTempObjType::FiniteDiffGroundTemp;
     thisModel->objectName = "Test";
     thisModel->baseConductivity = 1.08;
     thisModel->baseDensity = 962.0;
@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
 
     std::shared_ptr<EnergyPlus::FiniteDiffGroundTempsModel> thisModel(new EnergyPlus::FiniteDiffGroundTempsModel());
 
-    thisModel->objectType = EnergyPlus::GroundTemperatureManager::objectType_FiniteDiffGroundTemp;
+    thisModel->objectType = EnergyPlus::GroundTempObjType::FiniteDiffGroundTemp;
     thisModel->objectName = "Test";
     thisModel->baseConductivity = 1.08;
     thisModel->baseDensity = 962.0;

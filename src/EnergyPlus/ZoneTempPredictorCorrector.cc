@@ -88,7 +88,6 @@
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -7938,7 +7937,7 @@ void GetComfortSetPoints(EnergyPlusData &state,
     if (PMVSet > PMVMin && PMVSet < PMVMax) {
         Par(1) = PMVSet;
         Par(2) = double(PeopleNum);
-        TempSolveRoot::SolveRoot(state, Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
+        General::SolveRoot(state, Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
         if (SolFla == -1) {
             if (!state.dataGlobal->WarmupFlag) {
                 ++state.dataZoneTempPredictorCorrector->IterLimitExceededNum1;
