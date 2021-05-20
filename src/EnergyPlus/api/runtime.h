@@ -136,6 +136,14 @@ ENERGYPLUSLIB_API int energyplus(EnergyPlusState state, int argc, const char *ar
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 ENERGYPLUSLIB_API void stopSimulation(EnergyPlusState state);
 
+/// \brief Allows disabling and enabling console output (stdout and stderr) during a run.
+/// \details Normally EnergyPlus will print lots of status update messages while running.  These can get in the way
+///          when calling EnergyPlus as a library.  This function allows the client to mute (and unmute) the standard output messages.
+///          Note that output messages can still be retrieved using callback functionality, even with the console output is muted.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] outputStatus An integer describing whether the console output should be printed: nonzero integer for yes, 0 for no.
+ENERGYPLUSLIB_API void setConsoleOutputState(EnergyPlusState state, int outputStatus);
+
 /// \brief Asks EnergyPlus to issue a warning message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to alert the user using
 ///          this function, which will issue a warning note in the standard error file and continue the simulation.
