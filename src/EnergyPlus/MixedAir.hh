@@ -141,14 +141,19 @@ namespace MixedAir {
 
     // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
     // Multiple Get Input routines in this module or these would be in individual routines.
-    constexpr int CMO_OASystem(1);
-    constexpr int CMO_AirLoopEqList(2);
-    constexpr int CMO_ControllerList(3);
-    constexpr int CMO_SysAvailMgrList(4);
-    constexpr int CMO_OAController(5);
-    constexpr int CMO_ERVController(6);
-    constexpr int CMO_MechVentilation(7);
-    constexpr int CMO_OAMixer(8);
+    enum class CMO
+    {
+        Unassigned = -1,
+        None,
+        OASystem,
+        AirLoopEqList,
+        ControllerList,
+        SysAvailMgrList,
+        OAController,
+        ERVController,
+        MechVentilation,
+        OAMixer
+    };
 
     // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor
     constexpr int limitFactorNone = 0;        // No limit other than fixed OA amount
