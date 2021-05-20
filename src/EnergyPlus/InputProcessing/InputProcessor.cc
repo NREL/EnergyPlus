@@ -605,6 +605,7 @@ Real64 InputProcessor::getRealFieldValue(
     }
     return value;
 }
+
 json InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
 {
     auto const &schema_properties = schema.at("properties");

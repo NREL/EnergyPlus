@@ -4601,6 +4601,121 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromIDF)
     }
 }
 
+TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
+{
+
+    std::string const idf_objects = delimited_string({
+        "ZoneHVAC:EquipmentList,",
+        " Space Equipment,          !- Name",
+        " UniformPLR,               !- Load Distribution Scheme",
+        " ZoneHVAC:Baseboard:RadiantConvective:Electric,  !- Zone Equipment 1 Object Type",
+        " Baseboard Heat,           !- Zone Equipment 1 Name",
+        " 0,                        !- Zone Equipment 1 Cooling Sequence",
+        " 3,                        !- Zone Equipment 1 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        " ,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction Schedule Name",
+        " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+        " Air Terminal ADU,         !- Zone Equipment 2 Name",
+        " 2,                        !- Zone Equipment 2 Cooling Sequence",
+        " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " ADU Cooling Fraction Schedule, !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
+        " ADU Heating Fraction Schedule, !- Zone Equipment 2 Sequential Heating or No-Load Fraction Schedule Name",
+        " Fan:ZoneExhaust,          !- Zone Equipment 2 Object Type",
+        " Exhaust Fan,              !- Zone Equipment 3 Name",
+        " 1,                        !- Zone Equipment 3 Cooling Sequence",
+        " 1,                        !- Zone Equipment 3 Heating or No-Load Sequence",
+        " ,                         !- Zone Equipment 3 Sequential Cooling Fraction Schedule Name",
+        " ;                         !- Zone Equipment 3 Sequential Heating or No-Load Fraction Schedule Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    state->dataGlobal->isEpJSON = false;
+    state->dataInputProcessing->inputProcessor->initializeMaps();
+    std::string alphaFieldValue;
+    Real64 numericFieldValue = 0.0;
+    json objectSchemaProps;
+
+    // Water heater object
+    std::string obj_type1 = "ZoneHVAC:EquipmentList";
+    objectSchemaProps = state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, obj_type1);
+    auto instances = state->dataInputProcessing->inputProcessor->epJSON.find(obj_type1);
+    if (instances != state->dataInputProcessing->inputProcessor->epJSON.end()) {
+        // globalSolverObject.referenceConditions.clear();
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &objectFields = instance.value();
+            auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+            EXPECT_EQ(thisObjectName, "SPACE EQUIPMENT");
+            // Fields before extensibles
+            alphaFieldValue = state->dataInputProcessing->inputProcessor->getAlphaFieldValue(
+                *state, obj_type1, objectFields, objectSchemaProps, "load_distribution_scheme");
+            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "UniformPLR"));
+
+            // Extensibles
+
+            auto extensibles = objectFields.find("equipment");
+            auto const &extensionSchemaProps = objectSchemaProps["equipment"]["items"]["properties"];
+            std::vector<std::string> equipmentNames;
+            std::vector<std::string> equipmentTypes;
+            std::vector<std::string> coolFracSchedNames;
+            std::vector<std::string> heatFracSchedNames;
+            std::vector<int> coolSeqNums;
+            std::vector<int> heatSeqNums;
+            if (extensibles != objectFields.end()) {
+                auto extensiblesArray = extensibles.value();
+                int numExtensibles = extensiblesArray.size();
+                EXPECT_EQ(numExtensibles, 3);
+
+                equipmentNames.resize(numExtensibles);
+                equipmentTypes.resize(numExtensibles);
+                coolFracSchedNames.resize(numExtensibles);
+                heatFracSchedNames.resize(numExtensibles);
+                coolSeqNums.resize(numExtensibles);
+                heatSeqNums.resize(numExtensibles);
+
+                int counter = 0;
+                for (auto extensibleInstance : extensiblesArray) {
+                    equipmentNames[counter] = state->dataInputProcessing->inputProcessor->getAlphaFieldValue(
+                        *state, obj_type1, extensibleInstance, extensionSchemaProps, "zone_equipment_name");
+                    equipmentTypes[counter] = state->dataInputProcessing->inputProcessor->getAlphaFieldValue(
+                        *state, obj_type1, extensibleInstance, extensionSchemaProps, "zone_equipment_object_type");
+                    coolFracSchedNames[counter] = state->dataInputProcessing->inputProcessor->getAlphaFieldValue(
+                        *state, obj_type1, extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_cooling_fraction_schedule_name");
+                    heatFracSchedNames[counter] = state->dataInputProcessing->inputProcessor->getAlphaFieldValue(
+                        *state, obj_type1, extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_heating_fraction_schedule_name");
+                    coolSeqNums[counter] = int(state->dataInputProcessing->inputProcessor->getRealFieldValue(
+                        *state, obj_type1, extensibleInstance, extensionSchemaProps, "zone_equipment_cooling_sequence"));
+                    heatSeqNums[counter] = int(state->dataInputProcessing->inputProcessor->getRealFieldValue(
+                        *state, obj_type1, extensibleInstance, extensionSchemaProps, "zone_equipment_heating_or_no_load_sequence"));
+                    ++counter;
+                }
+                EXPECT_EQ(counter, 3);
+            }
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[0], "Baseboard Heat"));
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[0], "ZoneHVAC:Baseboard:RadiantConvective:Electric"));
+            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[0], ""));
+            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[0], ""));
+            EXPECT_EQ(coolSeqNums[0], 0);
+            EXPECT_EQ(heatSeqNums[0], 3);
+
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[1], "Air Terminal ADU"));
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[1], "ZoneHVAC:AirDistributionUnit"));
+            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[1], "ADU Cooling Fraction Schedule"));
+            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[1], "ADU Heating Fraction Schedule"));
+            EXPECT_EQ(coolSeqNums[1], 2);
+            EXPECT_EQ(heatSeqNums[1], 2);
+
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[2], "Exhaust Fan"));
+            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[2], "Fan:ZoneExhaust"));
+            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[2], ""));
+            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[2], ""));
+            EXPECT_EQ(coolSeqNums[2], 1);
+            EXPECT_EQ(heatSeqNums[2], 1);
+        }
+    }
+}
+
 /*
    TEST_F( InputProcessorFixture, processIDF_json )
    {
