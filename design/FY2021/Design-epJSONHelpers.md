@@ -43,13 +43,17 @@ Here's a prototype `getInput` function using 3 new functions:
             auto const &objectFields = instance.value();
             auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key());
+            // For incoming idf, maintain object order
+            ++instanceCounter;
+            itemNum = state.dataInputProcessing->inputProcessor->getIDFObjNum(state, state.dataHeatBalMgr->CurrentModuleObject, instanceCounter);
  
             // Get simple input fields (if blank will return default or blank or zero)
-            Real64 coeff = state.dataInputProcessing->inputProcessor->getRealFieldValue(
+            Real64 crack(itemNum).coeff = state.dataInputProcessing->inputProcessor->getRealFieldValue(
                 state, CurrentModuleObject, objectFields, objectSchemaProps, "air_mass_flow_coefficient_at_reference_conditions");
             
-            std::string referenceCrackConditionsName = state.dataInputProcessing->inputProcessor->getAlphaFieldValue(
+            std::string crack(itemNum).referenceCrackConditionsName = state.dataInputProcessing->inputProcessor->getAlphaFieldValue(
                 state, CurrentModuleObject, objectFields, objectSchemaProps, "reference_crack_conditions");
+            
         }
     }
 
