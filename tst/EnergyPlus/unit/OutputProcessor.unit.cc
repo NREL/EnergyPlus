@@ -1335,47 +1335,47 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_determineMeterIPUnits)
     {
-        int ipUnits = -999999;
+        OutputProcessor::RT_IPUnits ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
         bool errorFound = false;
 
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(RT_IPUnits_Electricity, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Electricity, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "GAS", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(RT_IPUnits_Gas, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Gas, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "COOL", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(RT_IPUnits_Cooling, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Cooling, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "WATER", OutputProcessor::Unit::m3, errorFound);
-        EXPECT_EQ(RT_IPUnits_Water, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Water, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::m3, errorFound);
-        EXPECT_EQ(RT_IPUnits_OtherM3, ipUnits);
+        EXPECT_EQ(RT_IPUnits::OtherM3, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::kg, errorFound);
-        EXPECT_EQ(RT_IPUnits_OtherKG, ipUnits);
+        EXPECT_EQ(RT_IPUnits::OtherKG, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::L, errorFound);
-        EXPECT_EQ(RT_IPUnits_OtherL, ipUnits);
+        EXPECT_EQ(RT_IPUnits::OtherL, ipUnits);
         EXPECT_FALSE(errorFound);
 
         state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-        ipUnits = -999999;
+        ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
         DetermineMeterIPUnits(*state, ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound); // was "badunits"
-        EXPECT_EQ(RT_IPUnits_OtherJ, ipUnits);
+        EXPECT_EQ(RT_IPUnits::OtherJ, ipUnits);
         EXPECT_TRUE(errorFound);
 
-        ipUnits = -999999;
+        ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::unknown, errorFound); // was "kWh"
-        EXPECT_EQ(RT_IPUnits_Electricity, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Electricity, ipUnits);
         EXPECT_TRUE(errorFound);
 
         auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
@@ -4004,7 +4004,7 @@ namespace OutputProcessor {
         });
 
         for (auto const &result : meters_result) {
-            EXPECT_EQ(std::get<0>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).TypeOfMeter);
+            EXPECT_EQ(std::get<0>(result.second), static_cast<int>(state->dataOutputProcessor->EnergyMeters(result.first).TypeOfMeter));
             EXPECT_EQ(std::get<1>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).Name);
             EXPECT_EQ(std::get<2>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).ResourceType);
             EXPECT_EQ(std::get<3>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).EndUse);
@@ -4054,7 +4054,7 @@ namespace OutputProcessor {
         });
 
         for (auto const &result : meters_result) {
-            EXPECT_EQ(std::get<0>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).TypeOfMeter);
+            EXPECT_EQ(std::get<0>(result.second), static_cast<int>(state->dataOutputProcessor->EnergyMeters(result.first).TypeOfMeter));
             EXPECT_EQ(std::get<1>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).Name);
             EXPECT_EQ(std::get<2>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).ResourceType);
             EXPECT_EQ(std::get<3>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).EndUse);

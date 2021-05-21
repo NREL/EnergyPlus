@@ -1335,7 +1335,7 @@ namespace OutputProcessor {
                 if (!MeterCreated) {
                     MeterUnits = UnitsVar; // meter units are same as first variable on custom meter
                     AddMeter(state, state.dataIPShortCut->cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
-                    op->EnergyMeters(op->NumEnergyMeters).TypeOfMeter = MeterType_Custom;
+                    op->EnergyMeters(op->NumEnergyMeters).TypeOfMeter = MtrType::Custom;
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
                     GetStandardMeterResourceType(state,
                                                  op->EnergyMeters(op->NumEnergyMeters).ResourceType,
@@ -1568,7 +1568,7 @@ namespace OutputProcessor {
                 if (!MeterCreated) {
                     MeterUnits = UnitsVar;
                     AddMeter(state, state.dataIPShortCut->cAlphaArgs(1), UnitsVar, std::string(), std::string(), std::string(), std::string());
-                    op->EnergyMeters(op->NumEnergyMeters).TypeOfMeter = MeterType_CustomDec;
+                    op->EnergyMeters(op->NumEnergyMeters).TypeOfMeter = MtrType::CustomDec;
                     op->EnergyMeters(op->NumEnergyMeters).SourceMeter = WhichMeter;
 
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
@@ -2410,10 +2410,10 @@ namespace OutputProcessor {
     }
 
     void DetermineMeterIPUnits(EnergyPlusData &state,
-                               int &CodeForIPUnits,                   // Output Code for IP Units
-                               std::string const &ResourceType,       // Resource Type
-                               OutputProcessor::Unit const &MtrUnits, // Meter units
-                               bool &ErrorsFound                      // true if errors found during subroutine
+                               OutputProcessor::RT_IPUnits &CodeForIPUnits, // Output Code for IP Units
+                               std::string const &ResourceType,             // Resource Type
+                               OutputProcessor::Unit const &MtrUnits,       // Meter units
+                               bool &ErrorsFound                            // true if errors found during subroutine
     )
     {
 
@@ -2441,24 +2441,24 @@ namespace OutputProcessor {
         ErrorsFound = false;
         UC_ResourceType = UtilityRoutines::MakeUPPERCase(ResourceType);
 
-        CodeForIPUnits = RT_IPUnits_OtherJ;
+        CodeForIPUnits = RT_IPUnits::OtherJ;
         if (has(UC_ResourceType, "ELEC")) {
-            CodeForIPUnits = RT_IPUnits_Electricity;
+            CodeForIPUnits = RT_IPUnits::Electricity;
         } else if (has(UC_ResourceType, "GAS")) {
-            CodeForIPUnits = RT_IPUnits_Gas;
+            CodeForIPUnits = RT_IPUnits::Gas;
         } else if (has(UC_ResourceType, "COOL")) {
-            CodeForIPUnits = RT_IPUnits_Cooling;
+            CodeForIPUnits = RT_IPUnits::Cooling;
         }
         if (MtrUnits == OutputProcessor::Unit::m3 && has(UC_ResourceType, "WATER")) {
-            CodeForIPUnits = RT_IPUnits_Water;
+            CodeForIPUnits = RT_IPUnits::Water;
         } else if (MtrUnits == OutputProcessor::Unit::m3) {
-            CodeForIPUnits = RT_IPUnits_OtherM3;
+            CodeForIPUnits = RT_IPUnits::OtherM3;
         }
         if (MtrUnits == OutputProcessor::Unit::kg) {
-            CodeForIPUnits = RT_IPUnits_OtherKG;
+            CodeForIPUnits = RT_IPUnits::OtherKG;
         }
         if (MtrUnits == OutputProcessor::Unit::L) {
-            CodeForIPUnits = RT_IPUnits_OtherL;
+            CodeForIPUnits = RT_IPUnits::OtherL;
         }
         //  write(outputfiledebug,*) 'resourcetype=',TRIM(resourcetype)
         //  write(outputfiledebug,*) 'ipunits type=',CodeForIPUnits
@@ -2632,7 +2632,7 @@ namespace OutputProcessor {
         auto &op(state.dataOutputProcessor);
 
         for (Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
-            if (op->EnergyMeters(Meter).TypeOfMeter != MeterType_CustomDec && op->EnergyMeters(Meter).TypeOfMeter != MeterType_CustomDiff) {
+            if (op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDec && op->EnergyMeters(Meter).TypeOfMeter != MtrType::CustomDiff) {
                 op->EnergyMeters(Meter).TSValue += op->MeterValue(Meter);
                 op->EnergyMeters(Meter).HRValue += op->MeterValue(Meter);
                 SetMinMax(op->EnergyMeters(Meter).TSValue,
@@ -3519,8 +3519,8 @@ namespace OutputProcessor {
         auto &op(state.dataOutputProcessor);
 
         for (Loop = 1; Loop <= op->NumEnergyMeters; ++Loop) {
-            int const RT_forIPUnits(op->EnergyMeters(Loop).RT_forIPUnits);
-            if (RT_forIPUnits == RT_IPUnits_Electricity) {
+            OutputProcessor::RT_IPUnits const RT_forIPUnits(op->EnergyMeters(Loop).RT_forIPUnits);
+            if (RT_forIPUnits == RT_IPUnits::Electricity) {
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchEMelecannual,
                                  op->EnergyMeters(Loop).Name,
@@ -3541,7 +3541,7 @@ namespace OutputProcessor {
                                  state.dataOutRptPredefined->pdchEMelecmaxvaluetime,
                                  op->EnergyMeters(Loop).Name,
                                  DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_Gas) {
+            } else if (RT_forIPUnits == RT_IPUnits::Gas) {
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchEMgasannual,
                                  op->EnergyMeters(Loop).Name,
@@ -3562,7 +3562,7 @@ namespace OutputProcessor {
                                  state.dataOutRptPredefined->pdchEMgasmaxvaluetime,
                                  op->EnergyMeters(Loop).Name,
                                  DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_Cooling) {
+            } else if (RT_forIPUnits == RT_IPUnits::Cooling) {
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchEMcoolannual,
                                  op->EnergyMeters(Loop).Name,
@@ -3583,7 +3583,7 @@ namespace OutputProcessor {
                                  state.dataOutRptPredefined->pdchEMcoolmaxvaluetime,
                                  op->EnergyMeters(Loop).Name,
                                  DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_Water) {
+            } else if (RT_forIPUnits == RT_IPUnits::Water) {
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchEMwaterannual, op->EnergyMeters(Loop).Name, op->EnergyMeters(Loop).FinYrSMValue);
                 PreDefTableEntry(state,
@@ -3602,7 +3602,7 @@ namespace OutputProcessor {
                                  state.dataOutRptPredefined->pdchEMwatermaxvaluetime,
                                  op->EnergyMeters(Loop).Name,
                                  DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_OtherKG) {
+            } else if (RT_forIPUnits == RT_IPUnits::OtherKG) {
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchEMotherKGannual, op->EnergyMeters(Loop).Name, op->EnergyMeters(Loop).FinYrSMValue);
                 PreDefTableEntry(state,
@@ -3623,7 +3623,7 @@ namespace OutputProcessor {
                                  state.dataOutRptPredefined->pdchEMotherKGmaxvaluetime,
                                  op->EnergyMeters(Loop).Name,
                                  DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_OtherM3) {
+            } else if (RT_forIPUnits == RT_IPUnits::OtherM3) {
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchEMotherM3annual, op->EnergyMeters(Loop).Name, op->EnergyMeters(Loop).FinYrSMValue, 3);
                 PreDefTableEntry(state,
@@ -3644,7 +3644,7 @@ namespace OutputProcessor {
                                  state.dataOutRptPredefined->pdchEMotherM3maxvaluetime,
                                  op->EnergyMeters(Loop).Name,
                                  DateToStringWithMonth(op->EnergyMeters(Loop).FinYrSMMaxValDate));
-            } else if (RT_forIPUnits == RT_IPUnits_OtherL) {
+            } else if (RT_forIPUnits == RT_IPUnits::OtherL) {
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchEMotherLannual, op->EnergyMeters(Loop).Name, op->EnergyMeters(Loop).FinYrSMValue, 3);
                 PreDefTableEntry(state,
@@ -3854,7 +3854,7 @@ namespace OutputProcessor {
             bool CustDecWritten = false;
 
             for (int VarMeter = 1; VarMeter <= op->NumVarMeterArrays; ++VarMeter) {
-                if (op->EnergyMeters(Meter).TypeOfMeter == MeterType_Normal) {
+                if (op->EnergyMeters(Meter).TypeOfMeter == MtrType::Normal) {
                     if (any_eq(op->VarMeterArrays(VarMeter).OnMeters, Meter)) {
                         for (int VarMeter1 = 1; VarMeter1 <= op->VarMeterArrays(VarMeter).NumOnMeters; ++VarMeter1) {
                             if (op->VarMeterArrays(VarMeter).OnMeters(VarMeter1) != Meter) continue;
@@ -3872,10 +3872,10 @@ namespace OutputProcessor {
                         }
                     }
                 }
-                if (op->EnergyMeters(Meter).TypeOfMeter != MeterType_Normal) {
+                if (op->EnergyMeters(Meter).TypeOfMeter != MtrType::Normal) {
                     if (op->VarMeterArrays(VarMeter).NumOnCustomMeters > 0) {
                         if (any_eq(op->VarMeterArrays(VarMeter).OnCustomMeters, Meter)) {
-                            if (!CustDecWritten && op->EnergyMeters(Meter).TypeOfMeter == MeterType_CustomDec) {
+                            if (!CustDecWritten && op->EnergyMeters(Meter).TypeOfMeter == MtrType::CustomDec) {
                                 print(state.files.mtd,
                                       " Values for this meter will be Source Meter={}; but will be decremented by:\n",
                                       op->EnergyMeters(op->EnergyMeters(Meter).SourceMeter).Name);
@@ -7533,7 +7533,7 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
     auto &energy_meter(op->EnergyMeters(MeterNumber));
     auto &cache_beg(energy_meter.InstMeterCacheStart);
     auto &cache_end(energy_meter.InstMeterCacheEnd);
-    if (energy_meter.TypeOfMeter != MeterType_CustomDec) {
+    if (energy_meter.TypeOfMeter != MtrType::CustomDec) {
         // section added to speed up the execution of this routine
         // instead of looping through all the VarMeterArrays to see if a RVariableType is used for a
         // specific meter, create a list of all the indexes for RVariableType that are used for that
