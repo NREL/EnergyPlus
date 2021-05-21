@@ -146,14 +146,15 @@ namespace DataZoneEquipment {
         std::string Group;
         int ReportVarIndex;
         OutputProcessor::TimeStepType ReportVarIndexType;
-        int ReportVarType;
+        OutputProcessor::VarblType ReportVarType;
         Real64 CurMeterReading;
 
         // Default Constructor
         EquipMeterData()
             : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
               EndUse_CompMode(SystemReports::iEndUseType::NoHeatNoCool), ReportVarIndex(0),
-              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(0), CurMeterReading(0.0)
+              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(OutputProcessor::VarblType::NotFound),
+              CurMeterReading(0.0)
         {
         }
     };

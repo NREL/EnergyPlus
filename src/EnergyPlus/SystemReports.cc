@@ -158,7 +158,7 @@ void InitEnergyReports(EnergyPlusData &state)
     int MainBranchNum;
     int SupplyCoolBranchNum;
     int SupplyHeatBranchNum;
-    int VarType;
+    OutputProcessor::VarblType VarType;
     int VarIndex;
     int OutNum;
     int NodeCount;

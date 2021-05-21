@@ -338,7 +338,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
     std::vector<AnnualFieldSet>::iterator fldStRemainIt;
     for (unsigned int row = 0; row != m_objectNames.size(); row++) { // loop through by row.
         for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
-            int curTypeOfVar = fldStIt->m_typeOfVar;
+            OutputProcessor::VarblType curTypeOfVar = fldStIt->m_typeOfVar;
             OutputProcessor::TimeStepType curStepType = fldStIt->m_varStepType;
             if (curStepType == kindOfTimeStep) // this is a much simpler conditional than the code in monthly gathering
             {
@@ -498,7 +498,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                                 break; // for fldStRemainIt
                             } else if (fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::valueWhenMaxMin) {
                                 // this case is when the value should be set
-                                int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
+                                OutputProcessor::VarblType scanTypeOfVar = fldStRemainIt->m_typeOfVar;
                                 // int scanStepType = fldStRemainIt->m_varStepType;
                                 int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
                                 if (scanVarNum > 0) {
@@ -518,7 +518,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                     // and accumulate
                     if (activeHoursShown) {
                         for (fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); ++fldStRemainIt) {
-                            int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
+                            OutputProcessor::VarblType scanTypeOfVar = fldStRemainIt->m_typeOfVar;
                             // int scanStepType = fldStRemainIt->m_varStepType;
                             int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
                             Real64 oldScanValue = fldStRemainIt->m_cell[row].result;

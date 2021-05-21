@@ -128,11 +128,11 @@ public:
                                   std::vector<std::string> &namesOfKeys,
                                   std::vector<int> &indexesForKeyVar);
 
-    std::string m_variMeter;              // the name of the variable or meter
-    std::string m_colHead;                // the column header to use instead of the variable name (only for predefined)
-    AggregationKind m_aggregate;          // the type of aggregation for the variable (see aggType parameters)
-    int m_showDigits;                     // the number of digits to be shown
-    OutputProcessor::Unit m_varUnits;     // Units sting, may be blank
+    std::string m_variMeter;                // the name of the variable or meter
+    std::string m_colHead;                  // the column header to use instead of the variable name (only for predefined)
+    AggregationKind m_aggregate;            // the type of aggregation for the variable (see aggType parameters)
+    int m_showDigits;                       // the number of digits to be shown
+    OutputProcessor::Unit m_varUnits;       // Units sting, may be blank
     OutputProcessor::VarblType m_typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
     int m_keyCount;
     OutputProcessor::StoreType m_varAvgSum;      // Variable  is Averaged=1 or Summed=2

@@ -81,8 +81,11 @@ int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state,
     return numkeys;
 }
 
-void AnnualFieldSet::getVariableKeysFromFldSt(
-    EnergyPlusData &state, OutputProcessor::VarblType &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar)
+void AnnualFieldSet::getVariableKeysFromFldSt(EnergyPlusData &state,
+                                              OutputProcessor::VarblType &typeVar,
+                                              int keyCount,
+                                              std::vector<std::string> &namesOfKeys,
+                                              std::vector<int> &indexesForKeyVar)
 {
     // this hides the Objexx arrays and returns regular vectors
     Array1D_string tempNamesOfKeys;

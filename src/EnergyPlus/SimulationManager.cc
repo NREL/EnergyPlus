@@ -2942,7 +2942,7 @@ namespace SimulationManager {
         Array1D_int VarIndexes;
         Array1D_int VarIDs;
         Array1D<OutputProcessor::TimeStepType> IndexTypes;
-        Array1D_int VarTypes;
+        Array1D<OutputProcessor::VarblType> VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_string VarNames;
         std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;

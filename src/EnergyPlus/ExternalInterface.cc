@@ -1024,9 +1024,9 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     std::string Name_NEW;        // Units sting, may be blank
     std::string Name_OLD;        // Units sting, may be blank
 
-    Array1D_int keyIndexes(1);     // Array index for
-    Array1D_int varTypes(1);       // Array index for
-    Array1D_string NamesOfKeys(1); // Specific key name
+    Array1D_int keyIndexes(1);                       // Array index for
+    Array1D<OutputProcessor::VarblType> varTypes(1); // Array index for
+    Array1D_string NamesOfKeys(1);                   // Specific key name
     int retValfmiVersion;
     int retValfmiPathLib;
     Array1D_string NameListInstances(5);
@@ -2355,16 +2355,13 @@ void CalcExternalInterface(EnergyPlusData &state)
         // Get EnergyPlus variables
         if (state.dataExternalInterface->firstCall) { // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
             for (i = 1; i <= nDblWri; ++i) {
-                dblValWri(i) = GetInternalVariableValue(state,
-                                                        state.dataExternalInterface->varTypes(i),
-                                                        state.dataExternalInterface->keyVarIndexes(i));
+                dblValWri(i) =
+                    GetInternalVariableValue(state, state.dataExternalInterface->varTypes(i), state.dataExternalInterface->keyVarIndexes(i));
             }
         } else {
             for (i = 1; i <= nDblWri; ++i) {
-                dblValWri(i) =
-                    GetInternalVariableValueExternalInterface(state,
-                                                              state.dataExternalInterface->varTypes(i),
-                                                              state.dataExternalInterface->keyVarIndexes(i));
+                dblValWri(i) = GetInternalVariableValueExternalInterface(
+                    state, state.dataExternalInterface->varTypes(i), state.dataExternalInterface->keyVarIndexes(i));
             }
         }
 
@@ -2457,12 +2454,13 @@ void CalcExternalInterface(EnergyPlusData &state)
     state.dataExternalInterface->firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
 }
 
-void GetReportVariableKey(EnergyPlusData &state,
-                          const Array1D_string &varKeys,  // Standard variable name
-                          int const numberOfKeys,         // Number of keys=size(state.dataExternalInterface->varKeys)
-                          const Array1D_string &VarNames, // Standard variable name
-                          Array1D_int &keyVarIndexes,     // Array index
-                          Array1D<OutputProcessor::VarblType> &varTypes // Types of variables in state.dataExternalInterface->keystate.dataExternalInterface->varIndexes
+void GetReportVariableKey(
+    EnergyPlusData &state,
+    const Array1D_string &varKeys,                // Standard variable name
+    int const numberOfKeys,                       // Number of keys=size(state.dataExternalInterface->varKeys)
+    const Array1D_string &VarNames,               // Standard variable name
+    Array1D_int &keyVarIndexes,                   // Array index
+    Array1D<OutputProcessor::VarblType> &varTypes // Types of variables in state.dataExternalInterface->keystate.dataExternalInterface->varIndexes
 )
 {
     // SUBROUTINE INFORMATION:

@@ -3545,7 +3545,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
     int kOtherColumn; // variable used in loop to scan through additional columns
     int scanColumn;
     Real64 scanValue;
-    int scanTypeOfVar;
+    OutputProcessor::VarblType scanTypeOfVar;
     int scanVarNum;
     Real64 oldScanValue;
     // local copies of some of the MonthlyColumns array references since
