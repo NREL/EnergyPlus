@@ -173,7 +173,6 @@ namespace OutputProcessor {
         OtherL
     };
 
-    // Types
     enum class Unit
     {
         kg_s,
