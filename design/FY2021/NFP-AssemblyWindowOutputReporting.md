@@ -3,7 +3,7 @@ Assembly Window Output Reporting
 
 **Jason Glazer, GARD Analytics**
 
- - April 30, 2021
+ - May 21, 2021
  
 
 ## Justification for New Feature ##
@@ -156,7 +156,11 @@ summer conditions), glass visible transmittance, <ins>NFRC Product Type, assembl
 U-Factor, assembly SHGC, assembly visible transmittance,</ins> conductance 
 (frame, divider), indication of shade control, the name of the parent surface, 
 azimuth, tilt, cardinal direction. <ins>The assembly result include the effect
-of the frame and divider.</ins>
+of the frame and divider and are only produced when WindowProperty:FrameAndDivider
+input object is used. In addition, the assembly columns are shown for most 
+configurations but are not shown when using Construction:WindowEquivalentLayer and
+other equivalent layer input object or when using Construction:WindowDataFile 
+with a Window5DataFile.dat file.</ins>
 
 <ins>Differences should still be expected between the results from EnergyPlus 
 and the WINDOW program for the u-factor, SHGC, and visible transmittance, 
@@ -675,6 +679,7 @@ VT and a new footnote has been added:
   </tr>
 </table>
 <i>Note: Values shown on this table may not match results from the WINDOW program or the NFRC label.</i>
+<i>Note: Assembly calculations are not performed when using equivalent layer input objects or the Window5DataFile.dat data file.</i>
 
 <br><br>
 <b>Interior Fenestration</b><br><br>
@@ -709,6 +714,7 @@ VT and a new footnote has been added:
   </tr>
 </table>
 <i>Note: Values shown on this table may not match results from the WINDOW program or the NFRC label.</i>
+<i>Note: Assembly calculations are not performed when using equivalent layer input objects or the Window5DataFile.dat data file.</i>
 <br>
 
 
@@ -739,6 +745,8 @@ All example files that use WindowProperty:FrameAndDivider will have the new fiel
 
 Output changes to the tabular output files are as described above.
 
+
+
 ## References ##
 
 [WINDOW Technical Documentation -Chapter 2 and 3](https://windows.lbl.gov/sites/default/files/Downloads/WINDOW%20Technical%20Documentation.pdf)
@@ -746,6 +754,31 @@ Output changes to the tabular output files are as described above.
 [ANSI/NFRC 100-2020](https://nfrccommunity.org/store/viewproduct.aspx?id=1380591) Procedure for Determining Fenestration Product U-factors
 
 [ANSI/NFRC 200-2020](https://nfrccommunity.org/store/viewproduct.aspx?id=1402116) Procedure for Determining Fenestration Product Solar Heat Gain Coefficient and Visible Transmittance at Normal Incidence 
+
+
+
+## Design Document ##
+
+The EnvelopeSummary report is defined in the OutputReportPredefined.cc file in SetPredefinedTables() and this will be further modified to add the 
+new columns and footnotes.
+
+HeatBalanceSurfaceManager.cc in GatherForPredefinedReport() is where most of the columns are populated which is called 
+when state.dataGlobal->BeginSimFlag is true
+
+Additional calls from this routine will add the values for the additional columns which will utilize recently added functionality of the WindowsCalculationEngine.
+
+An example of this is shown at:
+
+https://github.com/LBNL-ETA/Windows-CalcEngine/blob/main/src/Tarcog/tst/units/SingleVisionWindow.unit.cpp
+
+and consists of creating a window based on Tarcog::ISO15099::WindowSingleVision, adding the glazing and frame and
+then calling vt(), uValue(), and shgc() methods. The size of the window will be based the user selected size entered
+by the user in the new "NFRC Product Type for Assembly Calculations" field in the WindowProperty:FrameAndDivider
+input object.
+
+Additional unit tests in OutputReportTabular.unit.cc and HeatBalanceSurfaceManager.unit.cc
+
+Additional changes may also be required to implement the feature.
 
 
 
