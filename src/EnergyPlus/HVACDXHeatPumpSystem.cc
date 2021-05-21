@@ -64,7 +64,6 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -562,7 +561,6 @@ namespace HVACDXHeatPumpSystem {
         using General::SolveRoot;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdpFnWPb;
-        using TempSolveRoot::SolveRoot;
         using VariableSpeedCoils::SimVariableSpeedCoils;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -929,7 +927,7 @@ namespace HVACDXHeatPumpSystem {
                                         Par(2) = DesOutTemp;
                                         Par(5) = double(FanOpMode);
                                         Par(3) = double(SpeedNum);
-                                        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+                                        General::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
 
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag) {
@@ -1008,7 +1006,7 @@ namespace HVACDXHeatPumpSystem {
                                         Par(1) = double(VSCoilIndex);
                                         Par(2) = DesOutTemp;
                                         Par(5) = double(FanOpMode);
-                                        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                                        General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
                                         if (SolFla == -1) {
                                             if (!state.dataGlobal->WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {

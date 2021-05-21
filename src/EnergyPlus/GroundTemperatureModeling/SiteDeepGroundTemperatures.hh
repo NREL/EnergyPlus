@@ -76,7 +76,7 @@ public:
     {
     }
 
-    static std::shared_ptr<SiteDeepGroundTemps> DeepGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
+    static std::shared_ptr<SiteDeepGroundTemps> DeepGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName);
 
     Real64 getGroundTemp([[maybe_unused]] EnergyPlusData &state) override;
 

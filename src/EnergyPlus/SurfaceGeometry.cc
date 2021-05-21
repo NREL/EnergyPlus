@@ -881,7 +881,7 @@ namespace SurfaceGeometry {
         state.dataSurface->X0.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->Y0.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->Z0.dimension(state.dataSurface->TotSurfaces, 0.0);
-
+        // TODO: allocate surface hb arrays here? ecl arrays to dataHB?
         state.dataSurface->EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataSurface->EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->QSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -891,6 +891,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfBmToDiffReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfBmToDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfSkyDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
+        // TODO: these are solar shading arrays
         state.dataSurface->SurfWinA.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
         state.dataSurface->SurfWinADiffFront.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
         state.dataSurface->SurfWinACFOverlap.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
@@ -2592,6 +2593,12 @@ namespace SurfaceGeometry {
         // Initialize run time surface arrays
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
             state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+        }
+        // Initialize surface with movable insulation index list
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            if (state.dataSurface->Surface(SurfNum).MaterialMovInsulExt > 0 || state.dataSurface->Surface(SurfNum).MaterialMovInsulInt > 0) {
+                state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
+            }
         }
     }
 
@@ -11316,6 +11323,7 @@ namespace SurfaceGeometry {
                                 }
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MaterialMovInsulExt = MaterNum;
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMovInsulExt = SchNum;
+                                state.dataSurface->AnyMovableInsulation = true;
                                 if (state.dataMaterial->Material(MaterNum).Resistance <= 0.0) {
                                     if (state.dataMaterial->Material(MaterNum).Conductivity <= 0.0 ||
                                         state.dataMaterial->Material(MaterNum).Thickness <= 0.0) {
@@ -11362,6 +11370,7 @@ namespace SurfaceGeometry {
                                 }
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MaterialMovInsulInt = MaterNum;
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMovInsulInt = SchNum;
+                                state.dataSurface->AnyMovableInsulation = true;
                                 if (state.dataMaterial->Material(MaterNum).Resistance <= 0.0) {
                                     if (state.dataMaterial->Material(MaterNum).Conductivity <= 0.0 ||
                                         state.dataMaterial->Material(MaterNum).Thickness <= 0.0) {
