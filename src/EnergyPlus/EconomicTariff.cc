@@ -4096,7 +4096,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
                     elecTotalCost += tariff(iTariff).totalAnnualCost;
                     elecTariffNames += ' ' + tariff(iTariff).tariffName;
                     elecUnits = tariff(iTariff).convChoice;
-                } else if (tariff(iTariff).reportMeterIndx == gasFacilMeter) {
+                } else if (tariff(iTariff).kindGasMtr == kindMeterGas) {
                     if (tariff(iTariff).totalAnnualEnergy > gasTotalEne) gasTotalEne = tariff(iTariff).totalAnnualEnergy;
                     gasTotalCost += tariff(iTariff).totalAnnualCost;
                     gasTariffNames += ' ' + tariff(iTariff).tariffName;
@@ -4295,7 +4295,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         allTotalCost += tariff(iTariff).totalAnnualCost;
                         if (tariff(iTariff).kindElectricMtr >= kindMeterElecSimple) {
                             elecTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else if (tariff(iTariff).reportMeterIndx == gasFacilMeter) {
+                        } else if (tariff(iTariff).kindGasMtr == kindMeterGas) {
                             gasTotalCost += tariff(iTariff).totalAnnualCost;
                         } else {
                             otherTotalCost += tariff(iTariff).totalAnnualCost;
