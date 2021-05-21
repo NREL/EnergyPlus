@@ -1445,14 +1445,7 @@ namespace UnitarySystems {
 
         bool errorsFound(false);
 
-        if (state.dataUnitarySystems->getCoilWaterSysInputOnceFlag) {
-            bool errorsFound(false);
-            UnitarySys::getCoilWaterSystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
-            // if (errorsFound) {
-            //    ShowFatalError(state, "getCoilWaterSystemInputData: previous errors cause termination. Check inputs");
-            //}
-            state.dataUnitarySystems->getCoilWaterSysInputOnceFlag = false;
-        }
+        UnitarySys::getCoilWaterSystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
 
         UnitarySys::getUnitarySystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
 
@@ -6846,7 +6839,7 @@ namespace UnitarySystems {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-                if (!UtilityRoutines::SameString(CoilSysName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
+                if (!UtilityRoutines::SameString(CoilSysName, thisObjectName) && !state.dataUnitarySystems->getCoilWaterSysInputOnceFlag) continue;
 
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(state.dataUnitarySystems->coilSysCoolingWaterObjectName, thisObjectName);
                 ++CoilSysNum;
@@ -6922,7 +6915,6 @@ namespace UnitarySystems {
                 } else {
                     state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
                 }
-
             }
 
             if (errorsFound) {
@@ -6930,6 +6922,8 @@ namespace UnitarySystems {
                     routineName + "Errors found in getting " + state.dataUnitarySystems->coilSysCoolingWaterObjectName +
                     " input. Preceding condition(s) causes termination.");
             }
+            // at this all CoilWaterSys objects must be read 
+            state.dataUnitarySystems->getCoilWaterSysInputOnceFlag = false;
         }
     }
 
