@@ -645,6 +645,7 @@ namespace DataSurfaces {
         std::vector<int> windowShadingControlList; // List of possible window shading controls
         bool HasShadeControl;                      // True if the surface is listed in a WindowShadingControl object
         int activeShadedConstruction;              // The currently active shaded construction (windows only)
+        int activeShadedConstructionPrev;          // The currently active shaded construction (windows only)
         std::vector<int> shadedConstructionList;   // List of shaded constructions that correspond with window shading controls (windows only - same
                                                    // indexes as windowShadingControlList)
         std::vector<int> shadedStormWinConstructionList; // List of shaded constructions with storm window that correspond with window shading
@@ -668,8 +669,8 @@ namespace DataSurfaces {
               HeatTransferAlgorithm(iHeatTransferModel::NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), ExtSolar(false),
               ExtWind(false), ViewFactorGround(0.0), ViewFactorSky(0.0), ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0),
               MirroredSurf(false), IsShadowing(false), IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false),
-              SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), FrameDivider(0),
-              Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
+              SchedMinValue(0.0), activeWindowShadingControl(0), HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0),
+              FrameDivider(0), Multiplier(1.0), SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false)
         {
         }
 
@@ -1199,6 +1200,7 @@ struct SurfacesData : BaseGlobalStruct
     bool AnyHeatBalanceInsideSourceTerm = false;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
     bool AnyMovableInsulation = false;            // True if any movable insulation presents
+    bool AnyMovableSlat = false;                  // True if there are any movable slats for window blinds presented
     Array1D_int InsideGlassCondensationFlag;      // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
     Array1D_int InsideFrameCondensationFlag;      // 1 if frame inside surface temp < zone air dew point; 0 otherwise
     Array1D_int InsideDividerCondensationFlag;    // 1 if divider inside surface temp < zone air dew point;  0 otherwise
@@ -1589,6 +1591,7 @@ struct SurfacesData : BaseGlobalStruct
         this->AirflowWindows = false;
         this->ShadingTransmittanceVaries = false;
         this->AnyMovableInsulation = false;
+        this->AnyMovableSlat = false;
         this->InsideGlassCondensationFlag.deallocate();
         this->InsideFrameCondensationFlag.deallocate();
         this->InsideDividerCondensationFlag.deallocate();

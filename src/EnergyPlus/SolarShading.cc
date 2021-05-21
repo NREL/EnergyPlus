@@ -9539,6 +9539,7 @@ void WindowShadingManager(EnergyPlusData &state)
                 state.dataSurface->Surface(ISurf).activeWindowShadingControl =
                     state.dataSurface->Surface(ISurf).windowShadingControlList[indexWindowShadingControl];
             }
+            state.dataSurface->Surface(ISurf).activeShadedConstructionPrev = state.dataSurface->Surface(ISurf).activeShadedConstruction;
             if (!state.dataSurface->Surface(ISurf).shadedConstructionList.empty() &&
                 indexWindowShadingControl <= state.dataSurface->Surface(ISurf).shadedConstructionList.size() - 1) {
                 state.dataSurface->Surface(ISurf).activeShadedConstruction =
