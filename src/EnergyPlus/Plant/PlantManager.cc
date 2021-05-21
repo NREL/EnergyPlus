@@ -2178,7 +2178,12 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                             .LoopSide(LoopSideNum)
                             .Branch(BranchNum)
                             .Comp(CompNum)
-                            .simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                            .initLoopEquip(state, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        state.dataPlnt->PlantLoop(LoopNum)
+                            .LoopSide(LoopSideNum)
+                            .Branch(BranchNum)
+                            .Comp(CompNum)
+                            .simulate(state, FirstHVACIteration);
                     } //-CompNum
                 }     //-BranchNum
             }
@@ -2229,7 +2234,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         .LoopSide(LoopSideNum)
                         .Branch(BranchNum)
                         .Comp(CompNum)
-                        .simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        .simulate(state, FirstHVACIteration);
                 } //-CompNum
             }     //-BranchNum
             //                if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
@@ -2261,7 +2266,13 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         .LoopSide(LoopSideNum)
                         .Branch(BranchNum)
                         .Comp(CompNum)
-                        .simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        .initLoopEquip(state, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+
+                    state.dataPlnt->PlantLoop(LoopNum)
+                        .LoopSide(LoopSideNum)
+                        .Branch(BranchNum)
+                        .Comp(CompNum)
+                        .simulate(state, FirstHVACIteration);
                 } //-CompNum
             }     //-BranchNum
         }
@@ -2286,7 +2297,12 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         .LoopSide(LoopSideNum)
                         .Branch(BranchNum)
                         .Comp(CompNum)
-                        .simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        .initLoopEquip(state, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                    state.dataPlnt->PlantLoop(LoopNum)
+                        .LoopSide(LoopSideNum)
+                        .Branch(BranchNum)
+                        .Comp(CompNum)
+                        .simulate(state, FirstHVACIteration);
                 } //-CompNum
             }     //-BranchNum
             // pumps are special so call them directly
@@ -3006,7 +3022,7 @@ void SizePlantLoop(EnergyPlusData &state,
                         .LoopSide(SupplySide)
                         .Branch(BranchNum)
                         .Comp(CompNum)
-                        .simulate(state, true, localInitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        .simulate(state, true);
                     BranchSizFac = max(BranchSizFac, state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).SizFac);
                 }
                 LoopSizFac += BranchSizFac;

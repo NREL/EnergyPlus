@@ -114,7 +114,9 @@ namespace DataPlant {
         {
         }
 
-        void simulate(EnergyPlusData &state, bool FirstHVACIteration, bool &InitLoopEquip, bool GetCompSizFac);
+        void initLoopEquip(EnergyPlusData &state, bool &InitLoopEquip, bool const GetCompSizFac);
+
+        void simulate(EnergyPlusData &state, bool FirstHVACIteration);
 
         bool isPump();
     };
