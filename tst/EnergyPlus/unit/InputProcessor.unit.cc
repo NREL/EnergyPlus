@@ -4559,7 +4559,6 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromIDF)
 
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataGlobal->isEpJSON = false;
-    state->dataInputProcessing->inputProcessor->initializeMaps();
     std::string alphaFieldValue;
     Real64 numericFieldValue = 0.0;
     json objectSchemaProps;
@@ -4631,9 +4630,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
 
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataGlobal->isEpJSON = false;
-    state->dataInputProcessing->inputProcessor->initializeMaps();
     std::string alphaFieldValue;
-    Real64 numericFieldValue = 0.0;
     json objectSchemaProps;
 
     // Water heater object
