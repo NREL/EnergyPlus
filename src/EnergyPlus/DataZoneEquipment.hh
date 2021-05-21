@@ -465,6 +465,8 @@ namespace DataZoneEquipment {
                                       Optional_bool_const MaxOAVolFlowFlag = _ // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
     );
 
+    int GetZoneEquipControlledZoneNum(EnergyPlusData &state, std::string const &EquipmentType, std::string const &EquipmentName);
+
 } // namespace DataZoneEquipment
 
 struct DataZoneEquipmentData : BaseGlobalStruct

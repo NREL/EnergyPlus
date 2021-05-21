@@ -1764,4 +1764,23 @@ Real64 EquipList::SequentialCoolingFraction(EnergyPlusData &state, const int equ
     return ScheduleManager::GetCurrentScheduleValue(state, SequentialCoolingFractionSchedPtr(equipNum));
 }
 
+int GetZoneEquipControlledZoneNum(EnergyPlusData &state, std::string const &EquipmentType, std::string const &EquipmentName)
+{
+    int ControlZoneNum = 0;
+
+    for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
+        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
+        for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
+            if (UtilityRoutines::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
+                UtilityRoutines::SameString(EquipmentType, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
+                ControlZoneNum = CtrlZone;
+                break;
+            }
+        }
+        if (ControlZoneNum > 0) break;
+    }
+
+    return ControlZoneNum;
+}
+
 } // namespace EnergyPlus::DataZoneEquipment
