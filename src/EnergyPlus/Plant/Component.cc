@@ -68,7 +68,7 @@ namespace DataPlant {
         return false;
     }
 
-    void CompData::initLoopEquip(EnergyPlusData &state, bool &InitLoopEquip, bool const GetCompSizFac)
+    void CompData::initLoopEquip(EnergyPlusData &state, bool const GetCompSizFac)
     {
         this->compPtr->onInitLoopEquip(state, this->location);
         this->compPtr->getDesignCapacities(state, this->location, this->MaxLoad, this->MinLoad, this->OptLoad);

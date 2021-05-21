@@ -2163,7 +2163,6 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
         state.dataPlnt->PlantFinalSizesOkayToReport = false;
         state.dataPlantMgr->GetCompSizFac = true;
         for (passNum = 1; passNum <= 4; ++passNum) { // begin while loop to iterate over the next calls sequentially
-            state.dataPlantMgr->InitLoopEquip = true;
 
             // Step 2, call component models it  using PlantCallingOrderInfo for sizing
             for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
@@ -2178,7 +2177,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                             .LoopSide(LoopSideNum)
                             .Branch(BranchNum)
                             .Comp(CompNum)
-                            .initLoopEquip(state, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                            .initLoopEquip(state, state.dataPlantMgr->GetCompSizFac);
                         state.dataPlnt->PlantLoop(LoopNum)
                             .LoopSide(LoopSideNum)
                             .Branch(BranchNum)
@@ -2253,7 +2252,6 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
     if (state.dataGlobal->RedoSizesHVACSimulation && !state.dataPlnt->PlantReSizingCompleted) {
 
         // cycle through plant equipment calling with InitLoopEquip true
-        state.dataPlantMgr->InitLoopEquip = true;
         state.dataPlantMgr->GetCompSizFac = false;
         for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
             LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
@@ -2266,7 +2264,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         .LoopSide(LoopSideNum)
                         .Branch(BranchNum)
                         .Comp(CompNum)
-                        .initLoopEquip(state, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        .initLoopEquip(state, state.dataPlantMgr->GetCompSizFac);
 
                     state.dataPlnt->PlantLoop(LoopNum)
                         .LoopSide(LoopSideNum)
@@ -2283,8 +2281,6 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
             ResizePlantLoopLevelSizes(state, LoopNum);
         }
 
-        state.dataPlantMgr->InitLoopEquip = true;
-
         // now call everything again to reporting turned on
         for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
             LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
@@ -2297,7 +2293,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         .LoopSide(LoopSideNum)
                         .Branch(BranchNum)
                         .Comp(CompNum)
-                        .initLoopEquip(state, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        .initLoopEquip(state, state.dataPlantMgr->GetCompSizFac);
                     state.dataPlnt->PlantLoop(LoopNum)
                         .LoopSide(LoopSideNum)
                         .Branch(BranchNum)
