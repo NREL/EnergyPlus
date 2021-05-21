@@ -9913,7 +9913,7 @@ namespace HeatBalanceManager {
         bool ErrorsFound(false); // Flag for input error condition
         bool DoCTFErrorReport(false);
 
-        if (state.dataCache->cacheExists) {
+        if (state.dataCache->ctfObjectsInCache) {
 
             // cache exists, check each construction for cached CTF values
             for (auto &construction : state.dataConstruction->Construct) {

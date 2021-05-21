@@ -131,8 +131,21 @@ void loadCache(EnergyPlusData &state)
 {
     // load cache file if it exists
     if (FileSystem::fileExists(state.dataStrGlobals->outputCacheFileName) && !state.dataGlobal->RunningFromUnittest) {
-        state.dataCache->cacheExists = true;
         readJSONfile(state, state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
+
+        // file exists but is empty, so don't try to read data
+        if (state.dataCache->cache.empty()) return;
+
+        try {
+            // load these up one time up front
+            // nlohmann::json is loading this by default as an ordered set of data, but it needs to be unordered for the search later
+            nlohmann::json allCTFs = state.dataCache->cache.at(Cache::CTFKey);
+            allCTFs.get_to(state.dataCache->unorderedCTFObjects);
+            state.dataCache->ctfObjectsInCache = true;
+        } catch (nlohmann::json::out_of_range &e) {
+            state.dataCache->ctfObjectsInCache = false;
+        }
+
     }
 }
 

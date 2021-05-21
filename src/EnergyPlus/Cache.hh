@@ -96,12 +96,14 @@ struct CacheData : BaseGlobalStruct
 {
 
     nlohmann::json cache;
-    bool cacheExists = false;
+    bool ctfObjectsInCache = false;
+    std::unordered_map<std::string, nlohmann::json> unorderedCTFObjects;
 
     void clear_state() override
     {
         this->cache.clear();
-        this->cacheExists = false;
+        this->ctfObjectsInCache = false;
+        this->unorderedCTFObjects.clear();
     }
 };
 

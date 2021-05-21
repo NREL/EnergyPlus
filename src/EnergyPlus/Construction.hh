@@ -333,6 +333,8 @@ namespace Construction {
         void loadFromCache(EnergyPlusData &state);
 
         std::string getCacheKey(EnergyPlusData &state);
+
+        std::string getCacheKeyString(EnergyPlusData &state);
     };
 } // namespace Construction
 

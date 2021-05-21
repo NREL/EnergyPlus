@@ -45,6 +45,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// C++ Headers
+#include <cmath>
+
 // EnergyPlus Headers
 #include <EnergyPlus/Cache.hh>
 #include <EnergyPlus/Construction.hh>
@@ -2070,6 +2073,9 @@ void ConstructionProps::writeCacheData(EnergyPlusData &state)
     cacheData["ctf_timestep"] = this->CTFTimeStep;
     cacheData["u_value"] = this->UValue;
 
+    // long verification key
+    cacheData["full_data_key"] = this->getCacheKeyString(state);
+
     // write to cache
     std::string key = this->getCacheKey(state);
     state.dataCache->cache[Cache::CTFKey][key] = cacheData;
@@ -2080,8 +2086,23 @@ void ConstructionProps::loadFromCache(EnergyPlusData &state)
     try {
         // load cached data
         std::string key = this->getCacheKey(state);
-        nlohmann::json allCTFs = state.dataCache->cache.at(Cache::CTFKey);
-        nlohmann::json thisConstrData = allCTFs.at(key);
+
+        // get the cached data if it exists. if it doesn't nlohmann::json throws out_of_range
+        nlohmann::json thisConstrData = state.dataCache->unorderedCTFObjects.at(key);
+
+        // nlohmann::json does some weird things when directly accessing strings
+        // explicitly setting these as string objects here so we do a proper comparison
+        std::string a = thisConstrData.at("full_data_key");
+        std::string b = this->getCacheKeyString(state);
+
+        // final confirmation that the object we found matches exactly with the current construction
+        if (a != b) {
+            // show warning message here?
+            this->CTFLoadedFromCache = false;
+            return;
+        }
+
+        // we can load the data if if we've made it this far
 
         // CTF arrays
         Cache::jsonToArray(state, this->CTFCross, thisConstrData, "ctf_cross");
@@ -2098,12 +2119,33 @@ void ConstructionProps::loadFromCache(EnergyPlusData &state)
         this->CTFLoadedFromCache = true;
     } catch (const nlohmann::json::out_of_range &e) {
         // should already be defaulted to false, but this makes sure
-        // we might need other error handling if we get to this point
         this->CTFLoadedFromCache = false;
     }
 }
 
 std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
+{
+    // lambda to round to specified precision
+    auto roundWithPrecision = [](double const &x, double const &precision) { return (unsigned long long)llround(x * precision); };
+
+    unsigned long long key = 0;
+
+    // data from material layers
+    // adding the layer num to get a unique key for objects with reversed layers
+    for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
+        int CurrentLayer = this->LayerPoint(Layer);
+        auto &mat = state.dataMaterial->Material(CurrentLayer);
+        key ^= roundWithPrecision(mat.Thickness, 1E8) + Layer;
+        key ^= roundWithPrecision(mat.Conductivity, 1E8) + Layer;
+        key ^= roundWithPrecision(mat.Density, 1E8) + Layer;
+        key ^= roundWithPrecision(mat.SpecHeat, 1E8) + Layer;
+        key ^= roundWithPrecision(mat.Resistance, 1E8) + Layer;
+    }
+
+    return format("{}", key);
+}
+
+std::string ConstructionProps::getCacheKeyString(EnergyPlusData &state)
 {
     std::string key;
 
