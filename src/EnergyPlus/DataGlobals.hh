@@ -164,6 +164,7 @@ struct DataGlobal : BaseGlobalStruct
     bool CountNonZoneEquip = true;
     int FDsimDay = 0;
     int FDnumIterYears = 0;
+    bool printConsoleOutput = true;
 
     // This is a temporary hack for running unit tests with the cache
     // Do not merge to develop until an appropriate solution is implemented
@@ -269,6 +270,7 @@ struct DataGlobal : BaseGlobalStruct
         this->CountNonZoneEquip = true;
         this->FDsimDay = 0;
         this->FDnumIterYears = 0;
+        this->printConsoleOutput = true;
         this->RunningFromUnittest = false;
     }
 };
