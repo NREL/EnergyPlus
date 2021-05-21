@@ -1093,8 +1093,8 @@ void ConstructionProps::calculateExponentialMatrix()
     // new cut-off criteria based on the significant figures of double-
     // precision variables has been added.  The main loop for higher powers
     // of AMat is now stopped whenever these powers of AMat will no longer
-    // add to the summation (AExp) instead ofstopping potentially at the
-    // artifical limit of AMat**100.
+    // add to the summation (AExp) instead of stopping potentially at the
+    // artificial limit of AMat**100.
 
     // REFERENCES:
     // Seem, J.E.  "Modeling of Heat Transfer in Buildings",
