@@ -4027,8 +4027,8 @@ void LEEDtariffReporting(EnergyPlusData &state)
 
     using namespace OutputReportPredefined;
 
-    int elecFacilMeter;
-    int gasFacilMeter;
+    // int elecFacilMeter;
+    // int gasFacilMeter;
     int distCoolFacilMeter;
     int distHeatFacilMeter;
     Real64 elecTotalEne;
@@ -4061,8 +4061,8 @@ void LEEDtariffReporting(EnergyPlusData &state)
     auto &tariff(state.dataEconTariff->tariff);
 
     if (state.dataEconTariff->numTariff > 0) {
-        elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
-        gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
+        // elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
+        // gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
         distCoolFacilMeter = GetMeterIndex(state, "DISTRICTCOOLING:FACILITY");
         distHeatFacilMeter = GetMeterIndex(state, "DISTRICTHEATING:FACILITY");
         elecTotalEne = 0.0;
