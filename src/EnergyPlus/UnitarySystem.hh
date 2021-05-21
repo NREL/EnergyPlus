@@ -118,8 +118,6 @@ namespace UnitarySystems {
         std::string heat_recovery_water_outlet_node_name;
         std::string design_specification_multispeed_object_type;
         std::string design_specification_multispeed_object_name;
-        std::string allow_unitarysystem_as_water_side_eonomizer;
-        Real64 minimum_air_to_water_temperature_offset;
 
         UnitarySysInputSpec();
 
@@ -814,6 +812,9 @@ namespace UnitarySystems {
         static void getUnitarySystemInputData(
             EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
+        static void getCoilWaterSystemInputData(
+            EnergyPlusData &state, std::string const &CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
@@ -952,6 +953,10 @@ struct UnitarySystemsData : BaseGlobalStruct
     bool myOneTimeFlag = true;
     bool getInputFlag = true;
 
+    bool getCoilWaterSysInputOnceFlag = true;
+    std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
+    int numCoilWaterSystems = 0;
+
     void clear_state() override
     {
         numUnitarySystems = 0;
@@ -984,6 +989,8 @@ struct UnitarySystemsData : BaseGlobalStruct
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         myOneTimeFlag = true;
         getInputFlag = true;
+
+        getCoilWaterSysInputOnceFlag = true;
     }
 
     // Default Constructor

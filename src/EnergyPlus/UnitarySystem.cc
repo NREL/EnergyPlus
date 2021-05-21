@@ -118,8 +118,7 @@ namespace UnitarySystems {
           no_load_supply_air_flow_rate_per_unit_of_capacity_during_heating_operation(-999.0), maximum_supply_air_temperature(80.0),
           maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation(21.0), maximum_cycling_rate(2.5), heat_pump_time_constant(60.0),
           fraction_of_on_cycle_power_use(0.01), heat_pump_fan_delay_time(60.0), ancillary_on_cycle_electric_power(0.0),
-          ancillary_off_cycle_electric_power(0.0), design_heat_recovery_water_flow_rate(0.0), maximum_temperature_for_heat_recovery(80.0), 
-          minimum_air_to_water_temperature_offset(0.0)
+          ancillary_off_cycle_electric_power(0.0), design_heat_recovery_water_flow_rate(0.0), maximum_temperature_for_heat_recovery(80.0) 
     {
     }
 
@@ -1445,6 +1444,15 @@ namespace UnitarySystems {
     {
 
         bool errorsFound(false);
+
+        if (state.dataUnitarySystems->getCoilWaterSysInputOnceFlag) {
+            bool errorsFound(false);
+            UnitarySys::getCoilWaterSystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
+            // if (errorsFound) {
+            //    ShowFatalError(state, "getCoilWaterSystemInputData: previous errors cause termination. Check inputs");
+            //}
+            state.dataUnitarySystems->getCoilWaterSysInputOnceFlag = false;
+        }
 
         UnitarySys::getUnitarySystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
 
@@ -3032,8 +3040,6 @@ namespace UnitarySystems {
         std::string loc_heatRecoveryOutletNodeName = input_data.heat_recovery_water_outlet_node_name;
         std::string loc_m_DesignSpecMultispeedHPType = input_data.design_specification_multispeed_object_type;
         std::string loc_m_DesignSpecMultispeedHPName = input_data.design_specification_multispeed_object_name;
-        std::string loc_m_waterSideEconomizerChoice = input_data.allow_unitarysystem_as_water_side_eonomizer;
-        Real64 loc_m_MinAir2WaterTempOffset = input_data.minimum_air_to_water_temperature_offset;
 
         int FanInletNode = 0;
         int FanOutletNode = 0;
@@ -6823,17 +6829,110 @@ namespace UnitarySystems {
             }
         }
 
-        // set water-side economizer flag
-        if (loc_m_waterSideEconomizerChoice == "YES") {
-            // set water-side economizer temperature offset
-            this->m_minAirToWaterTempOffset = loc_m_MinAir2WaterTempOffset;
-            this->m_waterSideEconomizerFlag = true;
-        } else {
-            this->m_minAirToWaterTempOffset = 0.0;
-            this->m_waterSideEconomizerFlag = false;
-        }
         this->m_setupOutputVars = true;
     }
+
+    void UnitarySys::getCoilWaterSystemInputData(
+        EnergyPlusData &state, std::string const &CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
+    {
+
+        static const std::string routineName("UnitarySys::getCoilWaterSystemInputData: ");
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(state.dataUnitarySystems->coilSysCoolingWaterObjectName);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            int CoilSysNum = 0;
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                if (!UtilityRoutines::SameString(CoilSysName, thisObjectName) && !state.dataUnitarySystems->getInputOnceFlag) continue;
+
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(state.dataUnitarySystems->coilSysCoolingWaterObjectName, thisObjectName);
+                ++CoilSysNum;
+                ++state.dataUnitarySystems->numCoilWaterSystems;
+                ++state.dataUnitarySystems->numUnitarySystems;
+
+                //std::string cCurrentModuleObject("AirLoopHVAC:UnitarySystem");
+                std::string cCurrentModuleObject = state.dataUnitarySystems->coilSysCoolingWaterObjectName;
+
+                UnitarySysInputSpec input_specs;
+                input_specs.name = thisObjectName;
+                input_specs.control_type = "Setpoint";
+
+                input_specs.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                input_specs.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_inlet_node_name"));
+                input_specs.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_outlet_node_name"));
+                std::string availScheduleName("");
+                if (fields.find("availability_schedule_name") != fields.end()) { // not required field, has default value of Always On
+                    availScheduleName = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
+                }
+                input_specs.availability_schedule_name = availScheduleName;
+                input_specs.cooling_coil_object_type = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));
+                input_specs.cooling_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_name"));
+                // optional input fields
+                Real64 minAir2FluidTempOffset(0.0);
+                if (fields.find("minimum_air_to_water_temperature_offset") != fields.end()) { // not required field, has default value of 0.0
+                    minAir2FluidTempOffset = fields.at("minimum_air_to_water_temperature_offset");
+                }
+                std::string dehumidControlType("None");
+                if (fields.find("dehumidification_control_type") != fields.end()) {
+                    dehumidControlType = UtilityRoutines::MakeUPPERCase(fields.at("dehumidification_control_type"));
+                }
+                input_specs.dehumidification_control_type = dehumidControlType;
+
+                std::string runOnSensibleLoad("Yes");
+                if (fields.find("run_on_sensible_load") != fields.end()) {
+                    runOnSensibleLoad = UtilityRoutines::MakeUPPERCase(fields.at("run_on_sensible_load"));
+                }
+                std::string runOnLatentLoad("No");
+                if (fields.find("run_on_latent_load") != fields.end()) {
+                    runOnLatentLoad = UtilityRoutines::MakeUPPERCase(fields.at("run_on_latent_load"));
+                }
+
+                if (runOnSensibleLoad == "YES" && runOnLatentLoad == "NO") {
+                    input_specs.latent_load_control = "SensibleOnlyLoadControl";
+                } else if (runOnSensibleLoad == "NO" && runOnLatentLoad == "YES") {
+                    input_specs.latent_load_control = "LatentOnlyLoadControl";
+                } else if (runOnSensibleLoad == "YES" && runOnLatentLoad == "YES") {
+                    // not sure if this is control type is allowed
+                    input_specs.latent_load_control = "LatentOrSensibleLoadControl";
+                }
+
+                // now translate to UnitarySystem
+                UnitarySys thisSys;
+                //thisSys.UnitType = cCurrentModuleObject;
+                thisSys.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisSys.m_unitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
+                input_specs.name = thisObjectName;
+                input_specs.control_type = "Setpoint";
+                thisSys.m_CoolCoilExists = true; // is always true
+                thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
+                // set water-side economizer temperature offset
+                thisSys.m_minAirToWaterTempOffset = minAir2FluidTempOffset;
+                // set water-side economizer flag
+                thisSys.m_waterSideEconomizerFlag = true;
+                
+                int sysNum = state.dataUnitarySystems->numUnitarySystems;
+                thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
+                sysNum = getUnitarySystemIndex(state, thisObjectName);
+                
+                if (sysNum == -1) {
+                    state.dataUnitarySystems->unitarySys.push_back(thisSys);
+                } else {
+                    state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
+                }
+
+            }
+
+            if (errorsFound) {
+                ShowFatalError(state,
+                    routineName + "Errors found in getting " + state.dataUnitarySystems->coilSysCoolingWaterObjectName +
+                    " input. Preceding condition(s) causes termination.");
+            }
+        }
+    }
+
 
     void UnitarySys::getUnitarySystemInputData(
         EnergyPlusData &state, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
@@ -7072,15 +7171,6 @@ namespace UnitarySystems {
                 if (fields.find("design_specification_multispeed_object_name") != fields.end()) { // not required field
                     input_spec.design_specification_multispeed_object_name =
                         UtilityRoutines::MakeUPPERCase(fields.at("design_specification_multispeed_object_name"));
-                }
-                if (fields.find("allow_unitarysystem_as_water_side_eonomizer") != fields.end()) { // not required field, has default
-                    input_spec.allow_unitarysystem_as_water_side_eonomizer =
-                        UtilityRoutines::MakeUPPERCase(fields.at("allow_unitarysystem_as_water_side_eonomizer"));
-                } else {
-                    input_spec.allow_unitarysystem_as_water_side_eonomizer = "NO";
-                }
-                if (fields.find("minimum_air_to_water_temperature_offset") != fields.end()) { // not required field, has default
-                    input_spec.minimum_air_to_water_temperature_offset = fields.at("minimum_air_to_water_temperature_offset");
                 }
 
                 thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);

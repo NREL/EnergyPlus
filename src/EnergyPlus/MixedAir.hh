@@ -123,6 +123,7 @@ namespace MixedAir {
     constexpr int Fan_System_Object(22);
     constexpr int UnitarySystemModel(23);
     constexpr int VRFTerminalUnit(24);
+    constexpr int CoilSystemWater(25);
 
     enum class iControllerType
     {
