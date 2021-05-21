@@ -7543,5 +7543,10 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
     ceilingHeight_expected = 3.25 * (state->dataSurface->Surface(7).GrossArea + state->dataSurface->Surface(8).GrossArea) / totalGrossCeilingArea +
                              4.0 * state->dataSurface->Surface(6).GrossArea / totalGrossCeilingArea;
 
+    Real64 ceilingHeight_old = 0.0;
+    ceilingHeight_old = 3.25 * (state->dataSurface->Surface(7).Area + state->dataSurface->Surface(8).Area) / totalNetCeilingArea +
+                        4.0 * state->dataSurface->Surface(6).Area / totalNetCeilingArea;
+
     EXPECT_NEAR(state->dataHeatBal->Zone(1).CeilingHeight, ceilingHeight_expected, 1e-6);
+    EXPECT_NE(state->dataHeatBal->Zone(1).CeilingHeight, ceilingHeight_old);
 }
