@@ -145,7 +145,6 @@ void loadCache(EnergyPlusData &state)
         } catch (nlohmann::json::out_of_range &e) {
             state.dataCache->ctfObjectsInCache = false;
         }
-
     }
 }
 

@@ -47,9 +47,9 @@
 
 // C++ Headers
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <string>
-#include <chrono>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -9921,21 +9921,11 @@ namespace HeatBalanceManager {
                 if (!construction.IsUsedCTF) continue;
 
                 // try loading from cache
-                auto t1 = std::chrono::high_resolution_clock::now();
                 construction.loadFromCache(state);
 
                 // if they were not found, compute the CTF values and write to a file
                 if (!construction.CTFLoadedFromCache) {
                     construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
-                    auto t2 = std::chrono::high_resolution_clock::now();
-                    std::chrono::duration<double, std::milli> ms_double = t2 - t1;
-                    auto msg = format("Calculated CTFs {}: {} ms\n", construction.Name, ms_double.count());
-                    std::cout << msg;
-                } else {
-                    auto t2 = std::chrono::high_resolution_clock::now();
-                    std::chrono::duration<double, std::milli> ms_double = t2 - t1;
-                    auto msg = format("Loaded CTFs {}: {} ms\n", construction.Name, ms_double.count());
-                    std::cout << msg;
                 }
             }
         } else {
@@ -9943,12 +9933,7 @@ namespace HeatBalanceManager {
             // cache doesn't exist, so we must compute the CTFs and write them to the cache file
             for (auto &construction : state.dataConstruction->Construct) {
                 if (!construction.IsUsedCTF) continue;
-                auto t1 = std::chrono::high_resolution_clock::now();
                 construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
-                auto t2 = std::chrono::high_resolution_clock::now();
-                std::chrono::duration<double, std::milli> ms_double = t2 - t1;
-                auto msg = format("Calculated CTFs {}: {} ms\n", construction.Name, ms_double.count());
-                std::cout << msg;
             }
         }
 
