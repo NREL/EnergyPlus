@@ -172,7 +172,7 @@ void AnnualTable::setupGathering(EnergyPlusData &state)
 // input fields, and ems variables are gathered.
 {
     int keyCount = 0;
-    int typeVar = 0;
+    OutputProcessor::VarblType typeVar = OutputProcessor::VarblType::NotFound;
     OutputProcessor::StoreType avgSumVar;
     OutputProcessor::TimeStepType stepTypeVar;
     OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
@@ -1363,9 +1363,9 @@ void AnnualTable::columnHeadersToTitleCase(EnergyPlusData &state)
         if (fldStIt->m_variMeter == fldStIt->m_colHead) {
             if (fldStIt->m_indexesForKeyVar.size() > 0) {
                 int varNum = fldStIt->m_indexesForKeyVar[0];
-                if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Real) {
+                if (fldStIt->m_typeOfVar == OutputProcessor::VarblType::Real) {
                     fldStIt->m_colHead = state.dataOutputProcessor->RVariableTypes(varNum).VarNameOnly;
-                } else if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Meter) {
+                } else if (fldStIt->m_typeOfVar == OutputProcessor::VarblType::Meter) {
                     fldStIt->m_colHead = state.dataOutputProcessor->EnergyMeters(varNum).Name;
                 }
             }
@@ -1407,7 +1407,7 @@ std::vector<std::string> AnnualTable::inspectTableFieldSets(int fldIndex)
     std::string outStr = std::to_string(fldSt.m_showDigits);
     // ints
     ret.push_back(outStr);
-    outStr = std::to_string(fldSt.m_typeOfVar);
+    outStr = std::to_string(static_cast<int>(fldSt.m_typeOfVar));
     ret.push_back(outStr);
     outStr = std::to_string(fldSt.m_keyCount);
     ret.push_back(outStr);

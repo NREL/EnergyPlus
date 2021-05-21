@@ -70,7 +70,7 @@ AnnualFieldSet::AnnualFieldSet(std::string varName, AnnualFieldSet::AggregationK
 }
 
 int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state,
-                                                        int &typeVar,
+                                                        OutputProcessor::VarblType &typeVar,
                                                         OutputProcessor::StoreType &avgSumVar,
                                                         OutputProcessor::TimeStepType &stepTypeVar,
                                                         OutputProcessor::Unit &unitsVar)
@@ -82,7 +82,7 @@ int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state,
 }
 
 void AnnualFieldSet::getVariableKeysFromFldSt(
-    EnergyPlusData &state, int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar)
+    EnergyPlusData &state, OutputProcessor::VarblType &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar)
 {
     // this hides the Objexx arrays and returns regular vectors
     Array1D_string tempNamesOfKeys;

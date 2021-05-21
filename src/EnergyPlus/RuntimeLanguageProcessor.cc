@@ -329,7 +329,8 @@ void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state)
 
     // reinitilize sensors
     for (SensorNum = 1; SensorNum <= state.dataRuntimeLang->NumSensors; ++SensorNum) {
-        SetInternalVariableValue(state, state.dataRuntimeLang->Sensor(SensorNum).Type, state.dataRuntimeLang->Sensor(SensorNum).Index, 0.0, 0);
+        SetInternalVariableValue(
+            state, state.dataRuntimeLang->Sensor(SensorNum).VariableType, state.dataRuntimeLang->Sensor(SensorNum).Index, 0.0, 0);
     }
 }
 

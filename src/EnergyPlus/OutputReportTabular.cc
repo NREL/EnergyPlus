@@ -541,7 +541,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
     std::string curVariMeter; // current variable or meter
     int colNum;               // loop index for columns
     int KeyCount;
-    int TypeVar;
+    OutputProcessor::VarblType TypeVar;
     OutputProcessor::StoreType AvgSumVar;
     OutputProcessor::TimeStepType StepTypeVar;
     OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units enum
@@ -594,7 +594,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             curVariMeter = UtilityRoutines::MakeUPPERCase(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
             // call the key count function but only need count during this pass
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
-            if (TypeVar == OutputProcessor::VarType_NotFound) {
+            if (TypeVar == OutputProcessor::VarblType::NotFound) {
                 ShowWarningError(
                     state, "In Output:Table:Monthly '" + ort->MonthlyInput(TabNum).name + "' invalid Variable or Meter Name '" + curVariMeter + "'");
             }
@@ -686,7 +686,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
     for (auto &e : ort->MonthlyColumns) {
         e.varName.clear();
         e.varNum = 0;
-        e.typeOfVar = 0;
+        e.typeOfVar = OutputProcessor::VarblType::NotFound;
         e.avgSum = OutputProcessor::StoreType::Averaged;
         e.stepType = OutputProcessor::TimeStepType::TimeStepZone;
         e.units = OutputProcessor::Unit::None;
@@ -904,7 +904,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     }
                     ort->MonthlyColumns(mColumn).varName = curVariMeter;
                     ort->MonthlyColumns(mColumn).varNum = 0;
-                    ort->MonthlyColumns(mColumn).typeOfVar = 0;
+                    ort->MonthlyColumns(mColumn).typeOfVar = OutputProcessor::VarblType::NotFound;
                     ort->MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Averaged;
                     ort->MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::TimeStepZone;
                     ort->MonthlyColumns(mColumn).units = OutputProcessor::Unit::None;
@@ -1119,7 +1119,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
                                    ort->OutputTableBinned(iInObj).avgSum,
                                    ort->OutputTableBinned(iInObj).stepType,
                                    ort->OutputTableBinned(iInObj).units);
-        if (ort->OutputTableBinned(iInObj).typeOfVar == 0) {
+        if (ort->OutputTableBinned(iInObj).typeOfVar == OutputProcessor::VarblType::NotFound) {
             ShowWarningError(state,
                              CurrentModuleObject + ": User specified meter or variable not found: " + ort->OutputTableBinned(iInObj).varOrMeter);
         }
@@ -3402,7 +3402,7 @@ void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     int curIntervalCount;
     int curResIndex;
     int curNumTables;
-    int curTypeOfVar;
+    OutputProcessor::VarblType curTypeOfVar;
     int curScheduleIndex;
     Real64 elapsedTime;
     bool gatherThisTime;
@@ -3526,7 +3526,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
     int jColumn; // loop variable for monthlyColumns
     int curCol;
     Real64 curValue;
-    int curTypeOfVar;
+    OutputProcessor::VarblType curTypeOfVar;
     int curVarNum;
     Real64 elapsedTime;
     Real64 oldResultValue;

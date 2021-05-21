@@ -7999,7 +7999,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     std::string NameOfComp;
 
     Array1D_int VarIndexes;                                         // Variable Numbers
-    Array1D_int VarTypes;                                           // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::VarblType> VarTypes;                   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes;              // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar;                     // units from enum for each variable
     std::map<int, DataGlobalConstants::ResourceType> ResourceTypes; // ResourceTypes for each variable
