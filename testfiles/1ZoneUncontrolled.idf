@@ -364,6 +364,10 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
+  Output:Variable,*,Site Total Sky Cover,hourly;
+
+  Output:Variable,*,Site Opaque Sky Cover,hourly;
+
   Output:Variable,*,Site Daylight Saving Time Status,daily;
 
   Output:Variable,*,Site Day Type Index,daily;
