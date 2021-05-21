@@ -98,7 +98,6 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
@@ -3411,7 +3410,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 if ((SELECT_CASE_var == iEconoOp::FixedDryBulb) || (SELECT_CASE_var == iEconoOp::DifferentialDryBulb) ||
                     (SELECT_CASE_var == iEconoOp::FixedDewPointAndDryBulb) || (SELECT_CASE_var == iEconoOp::ElectronicEnthalpy) ||
                     (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_OutdoorAir) {
+                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::TemperatureSensorOffset_OutdoorAir) {
                         // FaultModel:TemperatureSensorOffset:OutdoorAir
                         thisOAController.OATemp += rOffset;
                         thisOAController.InletTemp += rOffset;
@@ -3424,7 +3423,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             {
                 auto const SELECT_CASE_var(iEco);
                 if ((SELECT_CASE_var == iEconoOp::FixedDewPointAndDryBulb) || (SELECT_CASE_var == iEconoOp::ElectronicEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_HumiditySensorOffset_OutdoorAir) {
+                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::HumiditySensorOffset_OutdoorAir) {
                         // FaultModel:HumiditySensorOffset:OutdoorAir
                         thisOAController.OAHumRat += rOffset;
                         thisOAController.InletHumRat += rOffset;
@@ -3438,7 +3437,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 auto const SELECT_CASE_var(iEco);
                 if ((SELECT_CASE_var == iEconoOp::FixedEnthalpy) || (SELECT_CASE_var == iEconoOp::ElectronicEnthalpy) ||
                     (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_OutdoorAir) {
+                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::EnthalpySensorOffset_OutdoorAir) {
                         // FaultModel:EnthalpySensorOffset:OutdoorAir
                         thisOAController.OAEnth += rOffset;
                         thisOAController.InletEnth += rOffset;
@@ -3451,7 +3450,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             {
                 auto const SELECT_CASE_var(iEco);
                 if ((SELECT_CASE_var == iEconoOp::DifferentialDryBulb) || (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_TemperatureSensorOffset_ReturnAir) {
+                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::TemperatureSensorOffset_ReturnAir) {
                         // FaultModel:TemperatureSensorOffset:ReturnAir
                         thisOAController.RetTemp += rOffset;
                     }
@@ -3463,7 +3462,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             {
                 auto const SELECT_CASE_var(iEco);
                 if ((SELECT_CASE_var == iEconoOp::ElectronicEnthalpy) || (SELECT_CASE_var == iEconoOp::DifferentialDryBulbAndEnthalpy)) {
-                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == iFault_EnthalpySensorOffset_ReturnAir) {
+                    if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::EnthalpySensorOffset_ReturnAir) {
                         // FaultModel:EnthalpySensorOffset:ReturnAir
                         thisOAController.RetEnth += rOffset;
                     }
@@ -4513,7 +4512,6 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
 {
     using General::SolveRoot;
     using SetPointManager::GetCoilFreezingCheckFlag;
-    using TempSolveRoot::SolveRoot;
 
     static std::string const RoutineName("CalcOAEconomizer: ");
     static std::string const CurrentModuleObject(CurrentModuleObjects(CMO_OAController));

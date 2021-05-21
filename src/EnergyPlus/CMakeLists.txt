@@ -331,6 +331,7 @@ set(SRC
     HVACSizingSimulationManager.hh
     HVACStandAloneERV.cc
     HVACStandAloneERV.hh
+    HVACSystemRootFindingAlgorithm.hh
     HVACUnitaryBypassVAV.cc
     HVACUnitaryBypassVAV.hh
     HVACVariableRefrigerantFlow.cc
@@ -351,8 +352,6 @@ set(SRC
     HeatBalanceKivaManager.hh
     HeatBalanceManager.cc
     HeatBalanceManager.hh
-    HeatBalanceMovableInsulation.cc
-    HeatBalanceMovableInsulation.hh
     HeatBalanceSurfaceManager.cc
     HeatBalanceSurfaceManager.hh
     HeatPumpWaterToWaterCOOLING.cc
@@ -600,8 +599,6 @@ set(SRC
     TARCOGParams.hh
     TarcogShading.cc
     TarcogShading.hh
-    TempSolveRoot.cc
-    TempSolveRoot.hh
     ThermalChimney.cc
     ThermalChimney.hh
     ThermalComfort.cc
