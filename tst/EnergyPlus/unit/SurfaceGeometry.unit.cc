@@ -7243,17 +7243,15 @@ TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
     EXPECT_NEAR(state->dataSurface->Surface(8).Area, 10.0, 1e-6);
 
     Real64 totalGrossCeilingArea = 0.0;
-    totalGrossCeilingArea = state->dataSurface->Surface(6).GrossArea + state->dataSurface->Surface(7).GrossArea + state->dataSurface->Surface(8).GrossArea;
-    
+    totalGrossCeilingArea =
+        state->dataSurface->Surface(6).GrossArea + state->dataSurface->Surface(7).GrossArea + state->dataSurface->Surface(8).GrossArea;
+
     Real64 totalNetCeilingArea = 0.0;
-    totalNetCeilingArea =
-        state->dataSurface->Surface(6).Area + state->dataSurface->Surface(7).Area + state->dataSurface->Surface(8).Area;
+    totalNetCeilingArea = state->dataSurface->Surface(6).Area + state->dataSurface->Surface(7).Area + state->dataSurface->Surface(8).Area;
 
     Real64 ceilingHeight_expected = 0.0;
-    ceilingHeight_expected =
-        3.25 * (state->dataSurface->Surface(7).GrossArea + state->dataSurface->Surface(8).GrossArea) / totalGrossCeilingArea +
-        4.0 * state->dataSurface->Surface(6).GrossArea / totalGrossCeilingArea;
-    
-    EXPECT_NEAR(state->dataHeatBal->Zone(1).CeilingHeight, ceilingHeight_expected, 1e-6);
+    ceilingHeight_expected = 3.25 * (state->dataSurface->Surface(7).GrossArea + state->dataSurface->Surface(8).GrossArea) / totalGrossCeilingArea +
+                             4.0 * state->dataSurface->Surface(6).GrossArea / totalGrossCeilingArea;
 
+    EXPECT_NEAR(state->dataHeatBal->Zone(1).CeilingHeight, ceilingHeight_expected, 1e-6);
 }
