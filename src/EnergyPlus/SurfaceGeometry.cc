@@ -414,7 +414,8 @@ namespace SurfaceGeometry {
                 state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
                 state.dataHeatBal->Zone(ZoneNum).HasWindow = true;
             }
-            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) ZoneCeilingArea(ZoneNum) += state.dataSurface->Surface(SurfNum).GrossArea;
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof)
+                ZoneCeilingArea(ZoneNum) += state.dataSurface->Surface(SurfNum).GrossArea;
             if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) {
                 if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment ||
                     state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
@@ -505,8 +506,7 @@ namespace SurfaceGeometry {
                       state.dataHeatBal->Zone(ZoneNum).ExtWindowArea);
             }
             // Use AllSurfaceFirst which includes air boundaries
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
-                 ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) {
                     // Use Average Z for surface, more important for roofs than floors...
                     ++CeilCount;
