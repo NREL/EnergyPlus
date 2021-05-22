@@ -984,8 +984,8 @@ namespace SurfaceGeometry {
         }
         state.dataSurface->SurfLowTempErrCount.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHighTempErrCount.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvCoeff.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvCoeff.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfIntConvCoeffIndex.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfExtConvCoeffIndex.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfTAirRef.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvClassification.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfIntConvHcModelEq.allocate(state.dataSurface->TotSurfaces);
@@ -1008,8 +1008,8 @@ namespace SurfaceGeometry {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfLowTempErrCount(SurfNum) = 0;
             state.dataSurface->SurfHighTempErrCount(SurfNum) = 0;
-            state.dataSurface->SurfIntConvCoeff(SurfNum) = 0.0;
-            state.dataSurface->SurfExtConvCoeff(SurfNum) = 0.0;
+            state.dataSurface->SurfIntConvCoeffIndex(SurfNum) = 0;
+            state.dataSurface->SurfExtConvCoeffIndex(SurfNum) = 0;
             state.dataSurface->SurfTAirRef(SurfNum) = 0;
             state.dataSurface->SurfIntConvClassification(SurfNum) = 0;
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) = 0;

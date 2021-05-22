@@ -6214,7 +6214,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                         if (state.dataEnvrn->IsRain) { // Raining: since wind exposed, outside surface gets wet
 
-                            if (state.dataSurface->SurfExtConvCoeff(SurfNum) <= 0) { // Reset HcExtSurf because of wetness
+                            if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) <= 0) { // Reset HcExtSurf because of wetness
                                 state.dataHeatBalSurf->HcExtSurf(SurfNum) = 1000.0;
                             } else { // User set
                                 state.dataHeatBalSurf->HcExtSurf(SurfNum) = SetExtConvectionCoeff(state, SurfNum);
@@ -7194,7 +7194,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                             EmisOut = WindowEquivalentLayer::EQLWindowOutsideEffectiveEmiss(state, ConstrNum);
                         }
                         // Set Exterior Convection Coefficient...
-                        if (state.dataSurface->SurfExtConvCoeff(SurfNum) > 0) {
+                        if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) > 0) {
 
                             state.dataHeatBalSurf->HcExtSurf(SurfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, SurfNum);
 
@@ -7233,7 +7233,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                         }
                     } else { // Interior Surface
 
-                        if (state.dataSurface->SurfExtConvCoeff(SurfNum) > 0) {
+                        if (state.dataSurface->SurfExtConvCoeffIndex(SurfNum) > 0) {
                             state.dataHeatBalSurf->HcExtSurf(SurfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, SurfNum);
                         } else {
                             // Exterior Convection Coefficient for the Interior or Interzone Window is the Interior Convection Coeff of
@@ -7952,7 +7952,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                 EmisOut = WindowEquivalentLayer::EQLWindowOutsideEffectiveEmiss(state, ConstrNum);
                             }
                             // Set Exterior Convection Coefficient...
-                            if (state.dataSurface->SurfExtConvCoeff(surfNum) > 0) {
+                            if (state.dataSurface->SurfExtConvCoeffIndex(surfNum) > 0) {
 
                                 state.dataHeatBalSurf->HcExtSurf(surfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, surfNum);
 
@@ -7991,7 +7991,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             }
                         } else { // Interior Surface
 
-                            if (state.dataSurface->SurfExtConvCoeff(surfNum) > 0) {
+                            if (state.dataSurface->SurfExtConvCoeffIndex(surfNum) > 0) {
                                 state.dataHeatBalSurf->HcExtSurf(surfNum) = ConvectionCoefficients::SetExtConvectionCoeff(state, surfNum);
                             } else {
                                 // Exterior Convection Coefficient for the Interior or Interzone Window is the Interior Convection Coeff of
