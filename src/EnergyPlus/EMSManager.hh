@@ -122,7 +122,7 @@ namespace EMSManager {
     void ProcessEMSInput(EnergyPlusData &state, bool reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
     void GetVariableTypeAndIndex(
-        EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, OutputProcessor::VarblType &VarType, int &VarIndex);
+        EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, OutputProcessor::VariableType &VarType, int &VarIndex);
 
     void EchoOutActuatorKeyChoices(EnergyPlusData &state);
 

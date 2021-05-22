@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
     SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, "Zone", "Average", "Lite3");
 
     int keyCount = 0;
-    OutputProcessor::VarblType typeVar = OutputProcessor::VarblType::NotFound;
+    OutputProcessor::VariableType typeVar = OutputProcessor::VariableType::NotFound;
     OutputProcessor::StoreType avgSumVar;
     OutputProcessor::TimeStepType stepTypeVar;
     OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;

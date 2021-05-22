@@ -1210,7 +1210,7 @@ namespace OutputProcessor {
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None);   // Units enumeration
         OutputProcessor::Unit MeterUnits(OutputProcessor::Unit::None); // Units enumeration
         int KeyCount;
-        VarblType TypeVar;
+        VariableType TypeVar;
         OutputProcessor::StoreType AvgSumVar;
         OutputProcessor::TimeStepType StepTypeVar;
         int iKey;
@@ -1324,7 +1324,7 @@ namespace OutputProcessor {
                 Tagged = false;
                 GetVariableKeyCountandType(
                     state, state.dataIPShortCut->cAlphaArgs(fldIndex + 1), KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
-                if (TypeVar == VarblType::NotFound) {
+                if (TypeVar == VariableType::NotFound) {
                     ShowWarningError(state,
                                      cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " +
                                          state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + "=\"" +
@@ -1367,7 +1367,7 @@ namespace OutputProcessor {
                                           ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     continue;
                 }
-                if ((TypeVar == VarblType::Real || TypeVar == VarblType::Integer) && AvgSumVar == StoreType::Summed) {
+                if ((TypeVar == VariableType::Real || TypeVar == VariableType::Integer) && AvgSumVar == StoreType::Summed) {
                     Tagged = true;
                     NamesOfKeys.allocate(KeyCount);
                     IndexesForKeyVar.allocate(KeyCount);
@@ -1409,7 +1409,7 @@ namespace OutputProcessor {
                     NamesOfKeys.deallocate();
                     IndexesForKeyVar.deallocate();
                 }
-                if (TypeVar == VarblType::Meter && AvgSumVar == StoreType::Summed) {
+                if (TypeVar == VariableType::Meter && AvgSumVar == StoreType::Summed) {
                     Tagged = true;
                     NamesOfKeys.allocate(KeyCount);
                     IndexesForKeyVar.allocate(KeyCount);
@@ -1557,7 +1557,7 @@ namespace OutputProcessor {
                 // Don't build/check things out if there were errors anywhere.  Use "GetVariableKeys" to map to actual variables...
                 GetVariableKeyCountandType(
                     state, state.dataIPShortCut->cAlphaArgs(fldIndex + 1), KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
-                if (TypeVar == VarblType::NotFound) {
+                if (TypeVar == VariableType::NotFound) {
                     ShowWarningError(state,
                                      cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " +
                                          state.dataIPShortCut->cAlphaFieldNames(fldIndex + 1) + "=\"" +
@@ -1602,7 +1602,7 @@ namespace OutputProcessor {
                                           ", units for this variable=" + unitEnumToString(UnitsVar) + '.');
                     continue;
                 }
-                if ((TypeVar == VarblType::Real || TypeVar == VarblType::Integer) && AvgSumVar == StoreType::Summed) {
+                if ((TypeVar == VariableType::Real || TypeVar == VariableType::Integer) && AvgSumVar == StoreType::Summed) {
                     Tagged = true;
                     NamesOfKeys.allocate(KeyCount);
                     IndexesForKeyVar.allocate(KeyCount);
@@ -1644,7 +1644,7 @@ namespace OutputProcessor {
                     NamesOfKeys.deallocate();
                     IndexesForKeyVar.deallocate();
                 }
-                if (TypeVar == VarblType::Meter && AvgSumVar == StoreType::Summed) {
+                if (TypeVar == VariableType::Meter && AvgSumVar == StoreType::Summed) {
                     Tagged = true;
                     NamesOfKeys.allocate(KeyCount);
                     IndexesForKeyVar.allocate(KeyCount);
@@ -5061,7 +5061,7 @@ namespace OutputProcessor {
     }
 
     void SetInternalVariableValue(EnergyPlusData &state,
-                                  OutputProcessor::VarblType const varType, // 1=integer, 2=real, 3=meter
+                                  OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
                                   int const keyVarIndex,                    // Array index
                                   Real64 const SetRealVal,                  // real value to set, if type is real or meter
                                   int const SetIntVal                       // integer value to set if type is integer
@@ -5103,11 +5103,11 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         auto &op(state.dataOutputProcessor);
 
-        if (varType == VarblType::Integer) {
+        if (varType == VariableType::Integer) {
             *op->IVariableTypes(keyVarIndex).VarPtr.Which = SetIntVal;
-        } else if (varType == VarblType::Real) {
+        } else if (varType == VariableType::Real) {
             *op->RVariableTypes(keyVarIndex).VarPtr.Which = SetRealVal;
-        } else if (varType == VarblType::Meter) {
+        } else if (varType == VariableType::Meter) {
             op->EnergyMeters(keyVarIndex).CurTSValue = SetRealVal;
         }
     }
@@ -5529,9 +5529,9 @@ void SetupOutputVariable(EnergyPlusData &state,
         VariableType = validateVariableType(state, VariableTypeKey);
 
         if (present(customUnitName)) {
-            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VarblType::Real, VariableUnit, customUnitName);
+            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Real, VariableUnit, customUnitName);
         } else {
-            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VarblType::Real, VariableUnit);
+            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Real, VariableUnit);
         }
         ++op->NumTotalRVariable;
 
@@ -5723,7 +5723,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey, "SetupOutputVariable");
         VariableType = validateVariableType(state, VariableTypeKey);
 
-        AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VarblType::Integer, VariableUnit);
+        AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Integer, VariableUnit);
         ++op->NumTotalIVariable;
 
         if (!ThisOneOnTheList) continue;
@@ -7668,7 +7668,7 @@ void IncrementInstMeterCache(EnergyPlusData &state)
 }
 
 Real64 GetInternalVariableValue(EnergyPlusData &state,
-                                OutputProcessor::VarblType const varType, // 1=integer, 2=real, 3=meter
+                                OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
                                 int const keyVarIndex                     // Array index
 )
 {
@@ -7716,9 +7716,9 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
     auto &op(state.dataOutputProcessor);
 
     // Select based on variable type:  integer, real, or meter
-    if (varType == VarblType::NotFound) { // Variable not a found variable
+    if (varType == VariableType::NotFound) { // Variable not a found variable
         resultVal = 0.0;
-    } else if (varType == VarblType::Integer) {
+    } else if (varType == VariableType::Integer) {
         if (keyVarIndex > op->NumOfIVariable) {
             ShowFatalError(state, "GetInternalVariableValue: Integer variable passed index beyond range of array.");
             ShowContinueError(state, format("Index = {} Number of integer variables = {}", keyVarIndex, op->NumOfIVariable));
@@ -7729,7 +7729,7 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
 
         // must use %Which, %Value is always zero if variable is not a requested report variable
         resultVal = double(*op->IVariableTypes(keyVarIndex).VarPtr.Which);
-    } else if (varType == VarblType::Real) {
+    } else if (varType == VariableType::Real) {
         if (keyVarIndex > op->NumOfRVariable) {
             ShowFatalError(state, "GetInternalVariableValue: Real variable passed index beyond range of array.");
             ShowContinueError(state, format("Index = {} Number of real variables = {}", keyVarIndex, op->NumOfRVariable));
@@ -7740,9 +7740,9 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
 
         // must use %Which, %Value is always zero if variable is not a requested report variable
         resultVal = *op->RVariableTypes(keyVarIndex).VarPtr.Which;
-    } else if (varType == VarblType::Meter) {
+    } else if (varType == VariableType::Meter) {
         resultVal = GetCurrentMeterValue(state, keyVarIndex);
-    } else if (varType == VarblType::Schedule) {
+    } else if (varType == VariableType::Schedule) {
         resultVal = GetCurrentScheduleValue(state, keyVarIndex);
     } else {
         resultVal = 0.0;
@@ -7752,7 +7752,7 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
 }
 
 Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
-                                                 OutputProcessor::VarblType const varType, // 1=integer, 2=REAL(r64), 3=meter
+                                                 OutputProcessor::VariableType const varType, // 1=integer, 2=REAL(r64), 3=meter
                                                  int const keyVarIndex                     // Array index
 )
 {
@@ -7800,9 +7800,9 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
     auto &op(state.dataOutputProcessor);
 
     // Select based on variable type:  integer, REAL(r64), or meter
-    if (varType == VarblType::NotFound) { // Variable not a found variable
+    if (varType == VariableType::NotFound) { // Variable not a found variable
         resultVal = 0.0;
-    } else if (varType == VarblType::Integer) {
+    } else if (varType == VariableType::Integer) {
         if (keyVarIndex > op->NumOfIVariable) {
             ShowFatalError(state, "GetInternalVariableValueExternalInterface: passed index beyond range of array.");
         }
@@ -7812,7 +7812,7 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
 
         // must use %EITSValue, %This is the last-zonetimestep value
         resultVal = double(op->IVariableTypes(keyVarIndex).VarPtr.EITSValue);
-    } else if (varType == VarblType::Real) {
+    } else if (varType == VariableType::Real) {
         if (keyVarIndex > op->NumOfRVariable) {
             ShowFatalError(state, "GetInternalVariableValueExternalInterface: passed index beyond range of array.");
         }
@@ -7822,9 +7822,9 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
 
         // must use %EITSValue, %This is the last-zonetimestep value
         resultVal = op->RVariableTypes(keyVarIndex).VarPtr.EITSValue;
-    } else if (varType == VarblType::Meter) {
+    } else if (varType == VariableType::Meter) {
         resultVal = GetCurrentMeterValue(state, keyVarIndex);
-    } else if (varType == VarblType::Schedule) {
+    } else if (varType == VariableType::Schedule) {
         resultVal = GetCurrentScheduleValue(state, keyVarIndex);
     } else {
         resultVal = 0.0;
@@ -7875,7 +7875,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VarblType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable
@@ -7921,7 +7921,7 @@ void GetMeteredVariables(EnergyPlusData &state,
         if (MeterPtr) {
             ++NumVariables;
             VarIndexes(NumVariables) = Loop;
-            VarTypes(NumVariables) = VarblType::Real;
+            VarTypes(NumVariables) = VariableType::Real;
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
@@ -7958,7 +7958,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VarblType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable
@@ -8004,7 +8004,7 @@ void GetMeteredVariables(EnergyPlusData &state,
         if (MeterPtr) {
             ++NumVariables;
             VarIndexes(NumVariables) = Loop;
-            VarTypes(NumVariables) = VarblType::Real;
+            VarTypes(NumVariables) = VariableType::Real;
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
@@ -8039,7 +8039,7 @@ void GetMeteredVariables(EnergyPlusData &state,
 void GetVariableKeyCountandType(EnergyPlusData &state,
                                 std::string const &varName, // Standard variable name
                                 int &numKeys,               // Number of keys found
-                                OutputProcessor::VarblType &varType,
+                                OutputProcessor::VariableType &varType,
                                 OutputProcessor::StoreType &varAvgSum,      // Variable  is Averaged=1 or Summed=2
                                 OutputProcessor::TimeStepType &varStepType, // Variable time step is Zone=1 or HVAC=2
                                 OutputProcessor::Unit &varUnits             // Units enumeration
@@ -8125,7 +8125,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     }
 
     op->keyVarIndexes = 0;
-    varType = VarblType::NotFound;
+    varType = VariableType::NotFound;
     numKeys = 0;
     varAvgSum = StoreType::Averaged;
     varStepType = TimeStepType::TimeStepZone;
@@ -8140,7 +8140,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         varType = op->DDVariableTypes(op->ivarNames(VFound)).VariableType;
     }
 
-    if (varType == VarblType::Integer) {
+    if (varType == VariableType::Integer) {
         // Search Integer Variables
         for (Loop = 1; Loop <= op->NumOfIVariable; ++Loop) {
             VarKeyPlusName = op->IVariableTypes(Loop).VarNameUC;
@@ -8148,7 +8148,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
             if (Position != std::string::npos) {
                 if (VarKeyPlusName.substr(Position + 1) == varNameUpper) {
                     Found = true;
-                    varType = VarblType::Integer;
+                    varType = VariableType::Integer;
                     Duplicate = false;
                     // Check if duplicate - duplicates happen if the same report variable/key name
                     // combination is requested more than once in the idf at different reporting
@@ -8169,12 +8169,12 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
                 }
             }
         }
-    } else if (varType == VarblType::Real) {
+    } else if (varType == VariableType::Real) {
         // Search real Variables Next
         for (Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
             if (op->RVariableTypes(Loop).VarNameOnlyUC == varNameUpper) {
                 Found = true;
-                varType = VarblType::Real;
+                varType = VariableType::Real;
                 Duplicate = false;
                 // Check if duplicate - duplicates happen if the same report variable/key name
                 // combination is requested more than once in the idf at different reporting
@@ -8205,7 +8205,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         if (op->keyVarIndexes(1) > 0) {
             Found = true;
             numKeys = 1;
-            varType = VarblType::Meter;
+            varType = VariableType::Meter;
             varUnits = op->EnergyMeters(op->keyVarIndexes(1)).Units;
             varAvgSum = StoreType::Summed;
             varStepType = TimeStepType::TimeStepZone;
@@ -8220,7 +8220,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         if (op->keyVarIndexes(1) > 0) {
             Found = true;
             numKeys = 1;
-            varType = VarblType::Schedule;
+            varType = VariableType::Schedule;
             varUnits = unitStringToEnum(GetScheduleType(state, op->keyVarIndexes(1)));
             varAvgSum = StoreType::Averaged;
             varStepType = TimeStepType::TimeStepZone;
@@ -8230,7 +8230,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
 
 void GetVariableKeys(EnergyPlusData &state,
                      std::string const &varName,               // Standard variable name
-                     OutputProcessor::VarblType const varType, // 1=integer, 2=real, 3=meter
+                     OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
                      Array1D_string &keyNames,                 // Specific key name
                      Array1D_int &keyVarIndexes                // Array index for
 )
@@ -8281,7 +8281,7 @@ void GetVariableKeys(EnergyPlusData &state,
     auto &op(state.dataOutputProcessor);
 
     // Select based on variable type:  integer, real, or meter
-    if (varType == VarblType::Integer) { // Integer
+    if (varType == VariableType::Integer) { // Integer
         for (Loop = 1; Loop <= op->NumOfIVariable; ++Loop) {
             VarKeyPlusName = op->IVariableTypes(Loop).VarNameUC;
             Position = index(VarKeyPlusName, ':' + varNameUpper, true);
@@ -8305,7 +8305,7 @@ void GetVariableKeys(EnergyPlusData &state,
                 }
             }
         }
-    } else if (varType == VarblType::Real) { // Real
+    } else if (varType == VariableType::Real) { // Real
         for (Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
             if (op->RVariableTypes(Loop).VarNameOnlyUC == varNameUpper) {
                 Duplicate = false;
@@ -8326,14 +8326,14 @@ void GetVariableKeys(EnergyPlusData &state,
                 }
             }
         }
-    } else if (varType == VarblType::Meter) { // Meter
+    } else if (varType == VariableType::Meter) { // Meter
         numKeys = 1;
         if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
             ShowFatalError(state, "Invalid array size in GetVariableKeys");
         }
         keyNames(1) = "Meter";
         keyVarIndexes(1) = GetMeterIndex(state, varName);
-    } else if (varType == VarblType::Schedule) { // Schedule
+    } else if (varType == VariableType::Schedule) { // Schedule
         numKeys = 1;
         if ((numKeys > maxKeyNames) || (numKeys > maxkeyVarIndexes)) {
             ShowFatalError(state, "Invalid array size in GetVariableKeys");
@@ -8844,7 +8844,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
                              std::string const &VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,
                              OutputProcessor::StoreType const StateType,
-                             OutputProcessor::VarblType const VariableType,
+                             OutputProcessor::VariableType const VariableType,
                              OutputProcessor::Unit const unitsForVar,
                              Optional_string_const customUnitName // the custom name for the units from EMS definition of units
 )

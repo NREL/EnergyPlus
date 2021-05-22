@@ -86,7 +86,7 @@ namespace OutputProcessor {
     constexpr int IMinSetValue(999999);
     constexpr int IMaxSetValue(-999999);
 
-    enum class VarblType
+    enum class VariableType
     {
         Unassigned = -1,
         NotFound, // ref: GetVariableKeyCountandType, 0 = not found
@@ -337,7 +337,7 @@ namespace OutputProcessor {
         // Members
         TimeStepType timeStepType;     // Type whether Zone or HVAC
         StoreType storeType;           // Variable Type (Summed/Non-Static or Average/Static)
-        VarblType VariableType;        // Integer, Real.
+        VariableType VariableType;        // Integer, Real.
         int Next;                      // Next variable of same name (different units)
         bool ReportedOnDDFile;         // true after written to .rdd/.mdd file
         std::string VarNameOnly;       // Name of Variable
@@ -346,7 +346,7 @@ namespace OutputProcessor {
 
         // Default Constructor
         VariableTypeForDDOutput()
-            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), VariableType(VarblType::NotFound), Next(0),
+            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), VariableType(VariableType::NotFound), Next(0),
               ReportedOnDDFile(false), units(OutputProcessor::Unit::None)
         {
         }
@@ -870,7 +870,7 @@ namespace OutputProcessor {
     std::string DetermineIndexGroupFromMeterGroup(MeterType const &meter); // the meter
 
     void SetInternalVariableValue(EnergyPlusData &state,
-                                  OutputProcessor::VarblType const varType, // 1=integer, 2=real, 3=meter
+                                  OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
                                   int const keyVarIndex,                    // Array index
                                   Real64 const SetRealVal,                  // real value to set, if type is real or meter
                                   int const SetIntVal                       // integer value to set if type is integer
@@ -979,12 +979,12 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
 void IncrementInstMeterCache(EnergyPlusData &state);
 
 Real64 GetInternalVariableValue(EnergyPlusData &state,
-                                OutputProcessor::VarblType const varType, // 1=integer, 2=real, 3=meter
+                                OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
                                 int const keyVarIndex                     // Array index
 );
 
 Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
-                                                 OutputProcessor::VarblType const varType, // 1=integer, 2=REAL(r64), 3=meter
+                                                 OutputProcessor::VariableType const varType, // 1=integer, 2=REAL(r64), 3=meter
                                                  int const keyVarIndex                     // Array index
 );
 
@@ -997,7 +997,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VarblType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable
@@ -1011,7 +1011,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VarblType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable
@@ -1024,7 +1024,7 @@ void GetMeteredVariables(EnergyPlusData &state,
 void GetVariableKeyCountandType(EnergyPlusData &state,
                                 std::string const &varName, // Standard variable name
                                 int &numKeys,               // Number of keys found
-                                OutputProcessor::VarblType &varType,
+                                OutputProcessor::VariableType &varType,
                                 OutputProcessor::StoreType &varAvgSum,      // Variable  is Averaged=1 or Summed=2
                                 OutputProcessor::TimeStepType &varStepType, // Variable time step is Zone=1 or HVAC=2
                                 OutputProcessor::Unit &varUnits             // Units enumeration
@@ -1032,7 +1032,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
 
 void GetVariableKeys(EnergyPlusData &state,
                      std::string const &varName, // Standard variable name
-                     OutputProcessor::VarblType const varType,
+                     OutputProcessor::VariableType const varType,
                      Array1D_string &keyNames,  // Specific key name
                      Array1D_int &keyVarIndexes // Array index for
 );
@@ -1047,7 +1047,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
                              std::string const &VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,
                              OutputProcessor::StoreType const StateType,
-                             OutputProcessor::VarblType const VariableType,
+                             OutputProcessor::VariableType const VariableType,
                              OutputProcessor::Unit const unitsForVar,
                              Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );

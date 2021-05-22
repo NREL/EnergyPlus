@@ -70,7 +70,7 @@ AnnualFieldSet::AnnualFieldSet(std::string varName, AnnualFieldSet::AggregationK
 }
 
 int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state,
-                                                        OutputProcessor::VarblType &typeVar,
+                                                        OutputProcessor::VariableType &typeVar,
                                                         OutputProcessor::StoreType &avgSumVar,
                                                         OutputProcessor::TimeStepType &stepTypeVar,
                                                         OutputProcessor::Unit &unitsVar)
@@ -82,7 +82,7 @@ int AnnualFieldSet::getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state,
 }
 
 void AnnualFieldSet::getVariableKeysFromFldSt(EnergyPlusData &state,
-                                              OutputProcessor::VarblType &typeVar,
+                                              OutputProcessor::VariableType &typeVar,
                                               int keyCount,
                                               std::vector<std::string> &namesOfKeys,
                                               std::vector<int> &indexesForKeyVar)

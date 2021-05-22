@@ -95,7 +95,7 @@ public:
     // default constructor
     AnnualFieldSet()
         : m_variMeter(""), m_colHead(""), m_aggregate(sumOrAvg), m_varUnits(OutputProcessor::Unit::None),
-          m_typeOfVar(OutputProcessor::VarblType::NotFound), m_keyCount(0), m_varAvgSum(OutputProcessor::StoreType::Averaged), m_bottomBinValue(0),
+          m_typeOfVar(OutputProcessor::VariableType::NotFound), m_keyCount(0), m_varAvgSum(OutputProcessor::StoreType::Averaged), m_bottomBinValue(0),
           m_topBinValue(0)
     {
     }
@@ -117,13 +117,13 @@ public:
     };
 
     int getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state,
-                                            OutputProcessor::VarblType &typeVar,
+                                            OutputProcessor::VariableType &typeVar,
                                             OutputProcessor::StoreType &avgSumVar,
                                             OutputProcessor::TimeStepType &stepTypeVar,
                                             OutputProcessor::Unit &unitsVar);
 
     void getVariableKeysFromFldSt(EnergyPlusData &state,
-                                  OutputProcessor::VarblType &typeVar,
+                                  OutputProcessor::VariableType &typeVar,
                                   int keyCount,
                                   std::vector<std::string> &namesOfKeys,
                                   std::vector<int> &indexesForKeyVar);
@@ -133,7 +133,7 @@ public:
     AggregationKind m_aggregate;            // the type of aggregation for the variable (see aggType parameters)
     int m_showDigits;                       // the number of digits to be shown
     OutputProcessor::Unit m_varUnits;       // Units sting, may be blank
-    OutputProcessor::VarblType m_typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
+    OutputProcessor::VariableType m_typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
     int m_keyCount;
     OutputProcessor::StoreType m_varAvgSum;      // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType m_varStepType; // Variable time step is Zone=1 or HVAC=2

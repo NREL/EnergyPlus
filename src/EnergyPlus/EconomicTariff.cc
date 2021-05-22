@@ -151,7 +151,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
     bool isNotNumeric;
     // variables for getting report variable/meter index
     int KeyCount;
-    OutputProcessor::VarblType TypeVar;
+    OutputProcessor::VariableType TypeVar;
     OutputProcessor::StoreType AvgSumVar;
     OutputProcessor::TimeStepType StepTypeVar;
     OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units sting, may be blank

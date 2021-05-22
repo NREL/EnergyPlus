@@ -833,13 +833,13 @@ namespace SetPointManager {
         int ChillerIndexPlantSide;                          // plant side chiller index
         int BranchIndexPlantSide;                           // plant side branch index
         int LoopIndexPlantSide;                             // plant side loop index
-        OutputProcessor::VarblType ChllrVarType;            // report variable type
+        OutputProcessor::VariableType ChllrVarType;            // report variable type
         int ChllrVarIndex;                                  // report variable index
-        OutputProcessor::VarblType ChlPumpVarType;          // report variable type
+        OutputProcessor::VariableType ChlPumpVarType;          // report variable type
         int ChlPumpVarIndex;                                // report variable index
-        Array1D<OutputProcessor::VarblType> ClTowerVarType; // report variable type
+        Array1D<OutputProcessor::VariableType> ClTowerVarType; // report variable type
         Array1D_int ClTowerVarIndex;                        // report variable index
-        OutputProcessor::VarblType CndPumpVarType;          // report variable type
+        OutputProcessor::VariableType CndPumpVarType;          // report variable type
         int CndPumpVarIndex;                                // report variable index
         int TypeNum;                                        // chiller type number
         Array1D_int TowerNum;                               // cooling tower number
@@ -855,8 +855,8 @@ namespace SetPointManager {
         // Default Constructor
         DefineIdealCondEntSetPointManager()
             : MinimumLiftTD(0.0), MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), BranchIndexPlantSide(0),
-              LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VarblType::NotFound), ChllrVarIndex(0),
-              ChlPumpVarType(OutputProcessor::VarblType::NotFound), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VarblType::NotFound),
+              LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VariableType::NotFound), ChllrVarIndex(0),
+              ChlPumpVarType(OutputProcessor::VariableType::NotFound), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VariableType::NotFound),
               CndPumpVarIndex(0), TypeNum(0), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0), ChilledPumpNum(0),
               ChilledPumpBranchNum(0), SetupIdealCondEntSetPtVars(true)
         {

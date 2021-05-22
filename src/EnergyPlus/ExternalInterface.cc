@@ -1025,7 +1025,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     std::string Name_OLD;        // Units sting, may be blank
 
     Array1D_int keyIndexes(1);                       // Array index for
-    Array1D<OutputProcessor::VarblType> varTypes(1); // Array index for
+    Array1D<OutputProcessor::VariableType> varTypes(1); // Array index for
     Array1D_string NamesOfKeys(1);                   // Specific key name
     int retValfmiVersion;
     int retValfmiPathLib;
@@ -2460,7 +2460,7 @@ void GetReportVariableKey(
     int const numberOfKeys,                       // Number of keys=size(state.dataExternalInterface->varKeys)
     const Array1D_string &VarNames,               // Standard variable name
     Array1D_int &keyVarIndexes,                   // Array index
-    Array1D<OutputProcessor::VarblType> &varTypes // Types of variables in state.dataExternalInterface->keystate.dataExternalInterface->varIndexes
+    Array1D<OutputProcessor::VariableType> &varTypes // Types of variables in state.dataExternalInterface->keystate.dataExternalInterface->varIndexes
 )
 {
     // SUBROUTINE INFORMATION:
@@ -2473,7 +2473,7 @@ void GetReportVariableKey(
     // Gets the sensor key index and type for the specified variable key and name
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    OutputProcessor::VarblType varType(OutputProcessor::VarblType::NotFound);               // 0=not found, 1=integer, 2=real, 3=meter
+    OutputProcessor::VariableType varType(OutputProcessor::VariableType::NotFound);               // 0=not found, 1=integer, 2=real, 3=meter
     int numKeys(0);                                                                         // Number of keys found
     OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);             // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::TimeStepZone); // Variable time step is Zone=1 or HVAC=2
@@ -2485,7 +2485,7 @@ void GetReportVariableKey(
     // Get pointers for variables to be sent to Ptolemy
     for (Loop = 1; Loop <= numberOfKeys; ++Loop) {
         GetVariableKeyCountandType(state, VarNames(Loop), numKeys, varType, varAvgSum, varStepType, varUnits);
-        if (varType != OutputProcessor::VarblType::NotFound) {
+        if (varType != OutputProcessor::VariableType::NotFound) {
             NamesOfKeys.allocate(numKeys);
             keyIndexes.allocate(numKeys);
             GetVariableKeys(state, VarNames(Loop), varType, NamesOfKeys, keyIndexes);
@@ -2501,7 +2501,7 @@ void GetReportVariableKey(
             keyIndexes.deallocate();
             NamesOfKeys.deallocate();
         }
-        if ((varType == OutputProcessor::VarblType::NotFound) || (iKey > numKeys)) {
+        if ((varType == OutputProcessor::VariableType::NotFound) || (iKey > numKeys)) {
             ShowSevereError(state,
                             "ExternalInterface: Simulation model has no variable \"" + VarNames(Loop) + "\" with key \"" + varKeys(Loop) + "\".");
             state.dataExternalInterface->ErrorsFound = true;

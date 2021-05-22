@@ -116,12 +116,12 @@ namespace ExternalInterface {
         Real64 RTSValue;                    // Real value of variable at the Zone Time Step
         int ITSValue;                       // Integer value of variable at the Zone Time Step
         int VarIndex;                       // Index Value of variable
-        OutputProcessor::VarblType VarType; // Type of variable at the Zone Time Step
+        OutputProcessor::VariableType VarType; // Type of variable at the Zone Time Step
         std::string VarUnits;               // Units string, may be blank
 
         // Default Constructor
         eplusOutputVariableType()
-            : Name(std::string()), VarKey(std::string()), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(OutputProcessor::VarblType::NotFound),
+            : Name(std::string()), VarKey(std::string()), RTSValue(0.0), ITSValue(0), VarIndex(0), VarType(OutputProcessor::VariableType::NotFound),
               VarUnits(std::string())
         {
         }
@@ -300,7 +300,7 @@ namespace ExternalInterface {
                               int numberOfKeys,
                               const Array1D_string &varNames,
                               Array1D_int &keyVarIndexes,
-                              Array1D<OutputProcessor::VarblType> &varTypes);
+                              Array1D<OutputProcessor::VariableType> &varTypes);
 
     std::vector<char> getCharArrayFromString(std::string const &originalString);
 
@@ -356,7 +356,7 @@ struct ExternalInterfaceData : BaseGlobalStruct
     int simulationStatus = 1; // Status flag. Used to report during which phase an error occurred. (1=initialization, 2=time stepping)
 
     Array1D<int> keyVarIndexes;                   // Array index for specific key name
-    Array1D<OutputProcessor::VarblType> varTypes; // Types of variables in keyVarIndexes
+    Array1D<OutputProcessor::VariableType> varTypes; // Types of variables in keyVarIndexes
     Array1D<int> varInd;                          // Index of ErlVariables for ExternalInterface
     int socketFD = -1;                            // socket file descriptor
     bool ErrorsFound = false;                     // Set to true if errors are found
