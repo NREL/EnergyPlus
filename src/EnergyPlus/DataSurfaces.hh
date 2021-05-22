@@ -1303,8 +1303,8 @@ struct SurfacesData : BaseGlobalStruct
 
     // Surface ConvCoeff Properties
     Array1D<int> SurfTAirRef;                     // Flag for reference air temperature
-    Array1D<Real64> SurfIntConvCoeff;             // Interior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<Real64> SurfExtConvCoeff;             // Exterior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<int> SurfIntConvCoeffIndex;                // Interior Convection Coefficient pointer (different data structure) when being overridden
+    Array1D<int> SurfExtConvCoeffIndex;                // Exterior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<int> SurfIntConvClassification;       // current classification for inside face air flow regime and surface orientation
     Array1D<int> SurfIntConvHcModelEq;            // current convection model for inside face
     Array1D<int> SurfIntConvHcUserCurveIndex;     // current index to user convection model if used
@@ -1673,8 +1673,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfICSPtr.deallocate();
         this->SurfIsRadSurfOrVentSlabOrPool.deallocate();
         this->SurfTAirRef.deallocate();
-        this->SurfIntConvCoeff.deallocate();
-        this->SurfExtConvCoeff.deallocate();
+        this->SurfIntConvCoeffIndex.deallocate();
+        this->SurfExtConvCoeffIndex.deallocate();
         this->SurfIntConvClassification.deallocate();
         this->SurfIntConvHcModelEq.deallocate();
         this->SurfIntConvHcUserCurveIndex.deallocate();

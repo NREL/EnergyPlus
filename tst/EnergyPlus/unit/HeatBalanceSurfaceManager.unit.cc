@@ -1347,7 +1347,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     // Test if local value used in surface hc calculation
     // Surface(1) - local; Surface(2) - global;
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = -1;
+        state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = -1;
     }
     CalcHeatBalanceOutsideSurf(*state);
     Real64 HExt_Expect_Surf1 = ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff(5, 1.5);
@@ -1903,7 +1903,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
         state->dataHeatBalSurf->TH(1, 1, SurfNum) = 20;       // Surf temp
         state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22; // Air temp
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = -6;
+        state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = -6;
         state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;
     }
     CalcHeatBalanceOutsideSurf(*state);
@@ -2469,7 +2469,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     InitSurfaceHeatBalance(*state);
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = -1;
+        state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = -1;
     }
 
     // Test Additional Heat Source Calculation

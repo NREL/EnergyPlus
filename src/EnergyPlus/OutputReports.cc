@@ -1569,10 +1569,10 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                            << format("{:.2R}", state.dataSurface->Surface(surf).Width) << ","
                            << format("{:.2R}", state.dataSurface->Surface(surf).Height) << ","
                            << format("{:.2R}", state.dataSurface->Surface(surf).Reveal) << ",";
-                if (state.dataSurface->SurfIntConvCoeff(surf) > 0) {
+                if (state.dataSurface->SurfIntConvCoeffIndex(surf) > 0) {
                     {
                         auto const SELECT_CASE_var(
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeff(surf)).OverrideType);
+                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(surf)).OverrideType);
                         if (SELECT_CASE_var == ConvCoefValue) {
                             IntConvCoeffCalc = "User Supplied Value";
                         } else if (SELECT_CASE_var == ConvCoefSchedule) {
@@ -1583,13 +1583,13 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                             ExtConvCoeffCalc = "User Specified Model";
                         }
                     }
-                } else if (state.dataSurface->SurfIntConvCoeff(surf) < 0) { // not in use yet.
-                    IntConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfIntConvCoeff(surf)));
+                } else if (state.dataSurface->SurfIntConvCoeffIndex(surf) < 0) { // not in use yet.
+                    IntConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfIntConvCoeffIndex(surf)));
                 }
-                if (state.dataSurface->SurfExtConvCoeff(surf) > 0) {
+                if (state.dataSurface->SurfExtConvCoeffIndex(surf) > 0) {
                     {
                         auto const SELECT_CASE_var(
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeff(surf)).OverrideType);
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(surf)).OverrideType);
                         if (SELECT_CASE_var == ConvCoefValue) {
                             ExtConvCoeffCalc = "User Supplied Value";
                         } else if (SELECT_CASE_var == ConvCoefSchedule) {
@@ -1600,8 +1600,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                             ExtConvCoeffCalc = "User Specified Model";
                         }
                     }
-                } else if (state.dataSurface->SurfExtConvCoeff(surf) < 0) {
-                    ExtConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfExtConvCoeff(surf)));
+                } else if (state.dataSurface->SurfExtConvCoeffIndex(surf) < 0) {
+                    ExtConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfExtConvCoeffIndex(surf)));
                 }
                 if (state.dataSurface->Surface(surf).ExtBoundCond == ExternalEnvironment) {
                     *eiostream << "ExternalEnvironment"
