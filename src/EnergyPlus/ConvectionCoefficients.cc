@@ -3271,8 +3271,8 @@ Real64 SetExtConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
             state.dataSurface->SurfOutConvHfModelEq(SurfNum) = HcExt_UserValue; // reporting
             state.dataSurface->SurfOutConvHnModelEq(SurfNum) = HcExt_None;      // reporting
         } else if (SELECT_CASE_var == ConvCoefSchedule) {
-            HExt = GetCurrentScheduleValue(state,
-                                           state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).ScheduleIndex);
+            HExt = GetCurrentScheduleValue(
+                state, state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).ScheduleIndex);
             // Need to check for validity
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
@@ -3342,8 +3342,8 @@ Real64 SetIntConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
             }
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) = HcInt_UserValue; // reporting
         } else if (SELECT_CASE_var == ConvCoefSchedule) {
-            HInt = GetCurrentScheduleValue(state,
-                                           state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).ScheduleIndex);
+            HInt = GetCurrentScheduleValue(
+                state, state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).ScheduleIndex);
             // Need to check for validity
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
