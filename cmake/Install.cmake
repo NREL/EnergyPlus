@@ -188,31 +188,14 @@ target_architecture(TARGET_ARCH)
 #
 # End debug
 
+include(cmake/SystemDetails.cmake)
+set_system_nickname()
 if(APPLE)
-  # Looking at cmake source code OS_RELEASE is already set to the output of `sw_vers -productVersion` which is what we want
-  cmake_host_system_information(RESULT OSX_VERSION QUERY OS_RELEASE)
-  message("-- OS_RELEASE variable is set to: " ${OSX_VERSION})
-  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-    message("Using CMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
-    set(OSX_VERSION "${CMAKE_OSX_DEPLOYMENT_TARGET}")
-  endif()
-
-  # The output is like 10.12.6 or 10.13, let's strip the end component if any
-  string(REGEX REPLACE "^([0-9]+\\.[0-9]+)\\.?.*" "\\1" OSX_VERSION_MAJOR_MINOR ${OSX_VERSION})
-
-  set(SYSTEM_VERSION "-macOS${OSX_VERSION_MAJOR_MINOR}")
-
+  # eg: '-macOS10.13'
+  set(SYSTEM_VERSION "-${SYSTEM_NICKNAME}")
 elseif(UNIX)
-  # OS_RELEASE is the result of `uname -r` which is unhelpful (eg '5.4.0-42-generic')
-  find_program(LSB_RELEASE lsb_release)
-  # -rs outputs only 16.04, or 18.04
-  execute_process(COMMAND ${LSB_RELEASE} -rs OUTPUT_VARIABLE LSB_RELEASE_VERSION_SHORT OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-  # -is outputs "Ubuntu" or "Fedora"
-  execute_process(COMMAND ${LSB_RELEASE} -is OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT OUTPUT_STRIP_TRAILING_WHITESPACE)
-
   # eg: `-Ubuntu18.04`
-  set(SYSTEM_VERSION "-${LSB_RELEASE_ID_SHORT}${LSB_RELEASE_VERSION_SHORT}")
+  set(SYSTEM_VERSION "-${SYSTEM_NICKNAME}")
 elseif(MSVC)
   # no-op
   set(SYSTEM_VERSION "")
@@ -370,7 +353,7 @@ install(
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
-set(RULES_XLS Rules9-2-0-to-9-3-0.md)
+set(RULES_XLS Rules9-5-0-to-9-6-0.md)
 install(FILES "${PROJECT_SOURCE_DIR}/release/Bugreprt.txt" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/favicon.png" DESTINATION "./")
 install(FILES "${PROJECT_SOURCE_DIR}/release/readme.html" DESTINATION "./")
@@ -380,8 +363,8 @@ endif()
 set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${PROJECT_SOURCE_DIR}/idd/V9-4-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-5-0-Energy+.idd")
+install(FILES "${PROJECT_SOURCE_DIR}/idd/V9-5-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-6-0-Energy+.idd")
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)
