@@ -58,10 +58,9 @@ namespace EnergyPlus::DataRootFinder {
 
 enum class Slope
 {
-    Unassigned = -1,
-    None,       // Undefined slope specification
-    Increasing, // For overall increasing function F(X) between min and max points
-    Decreasing  // For overall decreasing function F(X) between min and max points
+    Unassigned = -1, // Undefined slope specification
+    Increasing,      // For overall increasing function F(X) between min and max points
+    Decreasing       // For overall decreasing function F(X) between min and max points
 };
 
 enum class iStatus

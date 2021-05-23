@@ -718,7 +718,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     Real64 SrdSurfViewFac; // View factor of a surrounding surface
     Real64 OutSrdIR;
 
-    if (CalcCondition != DataBSDFWindow::Condition::noCondition) return;
+    if (CalcCondition != DataBSDFWindow::Condition::Unassigned) return;
 
     ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
     QXConv = 0.0;
@@ -727,7 +727,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
     HcIn = state.dataHeatBal->HConvIn(SurfNum); // windows inside surface convective film conductance
 
-    if (CalcCondition == DataBSDFWindow::Condition::noCondition) {
+    if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
         ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
         SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
 

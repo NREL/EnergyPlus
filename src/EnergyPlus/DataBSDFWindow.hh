@@ -87,7 +87,6 @@ namespace DataBSDFWindow {
     enum class Condition
     {
         Unassigned = -1,
-        noCondition,
         summerCondition,
         winterCondition
     };

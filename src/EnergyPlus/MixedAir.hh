@@ -101,7 +101,7 @@ namespace MixedAir {
     constexpr int Off(0); // signal coil shouldn't run
 
     // component types addressed by this module
-    enum class CompType
+    enum class ComponentType
     {
         Unassigned = -1,
         None,
@@ -435,9 +435,9 @@ namespace MixedAir {
     void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void SimOAComponent(EnergyPlusData &state,
-                        std::string const &CompType, // the component type
-                        std::string const &CompName, // the component Name
-                        int const CompTypeNum,       // Component Type -- Integerized for this module
+                        std::string const &CompType,               // the component type
+                        std::string const &CompName,               // the component Name
+                        MixedAir::ComponentType const CompTypeNum, // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
                         int &CompIndex,
                         int const AirLoopNum, // air loop index for economizer lockout coordination
