@@ -1764,7 +1764,7 @@ Real64 EquipList::SequentialCoolingFraction(EnergyPlusData &state, const int equ
     return ScheduleManager::GetCurrentScheduleValue(state, SequentialCoolingFractionSchedPtr(equipNum));
 }
 
-int GetZoneEquipControlledZoneNum(EnergyPlusData &state, std::string const &EquipmentType, std::string const &EquipmentName)
+int GetZoneEquipControlledZoneNum(EnergyPlusData &state, int const ZoneEquipTypeNum, std::string const &EquipmentName)
 {
     int ControlZoneNum = 0;
 
@@ -1772,7 +1772,7 @@ int GetZoneEquipControlledZoneNum(EnergyPlusData &state, std::string const &Equi
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
         for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
             if (UtilityRoutines::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
-                UtilityRoutines::SameString(EquipmentType, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
+                ZoneEquipTypeNum == state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType_Num(Num)) {
                 ControlZoneNum = CtrlZone;
                 break;
             }
