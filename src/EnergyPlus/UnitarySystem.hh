@@ -991,6 +991,7 @@ struct UnitarySystemsData : BaseGlobalStruct
         getInputFlag = true;
 
         getCoilWaterSysInputOnceFlag = true;
+        numCoilWaterSystems = 0;
     }
 
     // Default Constructor

@@ -3614,7 +3614,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
                                   ZoneEquipFlag,
                                   sensOut,
                                   latOut);
-        } else if (SELECT_CASE_var == CoilSystemWater) { // 'AirLoopHVAC:UnitarySystem'
+        } else if (SELECT_CASE_var == CoilSystemWater) { // 'CoilSystemCooling:Water'
 
             if (CompPointer == nullptr) {
                 UnitarySystems::UnitarySys thisSys;

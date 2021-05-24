@@ -6894,8 +6894,8 @@ namespace UnitarySystems {
 
                 // now translate to UnitarySystem
                 UnitarySys thisSys;
-                //thisSys.UnitType = cCurrentModuleObject;
-                thisSys.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisSys.UnitType = cCurrentModuleObject;
+                thisSys.Name = thisObjectName;
                 thisSys.m_unitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
                 input_specs.name = thisObjectName;
                 input_specs.control_type = "Setpoint";
@@ -6922,7 +6922,7 @@ namespace UnitarySystems {
                     routineName + "Errors found in getting " + state.dataUnitarySystems->coilSysCoolingWaterObjectName +
                     " input. Preceding condition(s) causes termination.");
             }
-            // at this all CoilWaterSys objects must be read 
+            // at this point all CoilWaterSys objects must be read 
             state.dataUnitarySystems->getCoilWaterSysInputOnceFlag = false;
         }
     }

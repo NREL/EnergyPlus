@@ -17185,3 +17185,80 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     // heating coil air inlet node temp is less than heating coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(5).Temp, state->dataLoopNodes->Node(4).Temp);
 }
+
+TEST_F(EnergyPlusFixture, getCoilWaterSystemInputDataTest)
+{
+    std::string const idf_objects = delimited_string({
+
+        " Coil:Cooling:Water,",
+        "   Water Cooling Coil,   !- Name",
+        "   ,                     !- Availability Schedule Name",
+        "   0.0002,               !- Design Water Flow Rate { m3 / s }",
+        "   0.5000,               !- Design Air Flow Rate { m3 / s }",
+        "   8.33,                 !- Design Inlet Water Temperature { Cv }",
+        "   26.0,                 !- Design Inlet Air Temperature { C }",
+        "   16.0,                 !- Design Outlet Air Temperature { C }",
+        "   0.0095,               !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "   0.0090,               !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "   CoilFluidInletNode,   !- Water Inlet Node Name",
+        "   CoilFluidOutletNode,  !- Water Outlet Node Name",
+        "   CoilAirInletNode,     !- Air Inlet Node Name",
+        "   CoilAirOutletNode,    !- Air Outlet Node Name",
+        "   SimpleAnalysis,       !- Type of Analysis",
+        "   CrossFlow;            !- Heat Exchanger Configuration",
+
+        " CoilSystem:Cooling:Water,",
+        "   Coil System Water,    !- Name",
+        "   CoilAirInletNode,     !- Air Inlet Node Name",
+        "   CoilAirOutletNode,    !- Air Outlet Node Name",
+        "   ,                     !- Availability Schedule Name",
+        "   Coil:Cooling:Water,   !- Cooling Coil Object Type",
+        "   Water Cooling Coil,   !- Cooling Coil Name",
+        "   None,                 !- Dehumidification Control Type",
+        "   Yes,                  !- Run on Sensible Load",
+        "   No,                   !- Run on Latent Load",
+        "   2.0;                  !- Minimum Air To Water Temperature Offset",
+
+        });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    bool zoneEquipment = false;
+    bool FirstHVACIteration = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataLoopNodes->Node.allocate(2);
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumOut = 1;
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
+
+    int unitarSysIndex(0);
+    bool ErrorsFound(false);
+    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarSysIndex];
+    auto &thisSys = unitSys[unitarSysIndex];
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
+    EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
+    EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
+    EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
+    EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
+    EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
+    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
+    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
+    EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
+    EXPECT_TRUE(thisSys.m_CoolCoilExists);
+    EXPECT_TRUE(thisSys.m_waterSideEconomizerFlag);
+    EXPECT_TRUE(thisSys.m_RunOnSensibleLoad);
+    EXPECT_FALSE(thisSys.m_RunOnLatentLoad);
+}
