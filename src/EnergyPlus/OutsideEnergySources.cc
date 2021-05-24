@@ -148,7 +148,8 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
     // GET NUMBER OF ALL EQUIPMENT TYPES
     int const NumDistrictUnitsHeat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeating");
     int const NumDistrictUnitsCool = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictCooling");
-    state.dataOutsideEnergySrcs->NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
+    int const NumDistrictUnitsHeatSteam = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "DistrictHeatingSteam");
+    state.dataOutsideEnergySrcs->NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool + NumDistrictUnitsHeatSteam;
 
     if (allocated(state.dataOutsideEnergySrcs->EnergySource)) return;
 
@@ -158,6 +159,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
     bool ErrorsFound(false); // If errors detected in input
     int heatIndex = 0;
     int coolIndex = 0;
+    int heatSteamIndex = 0;
 
     for (int EnergySourceNum = 1; EnergySourceNum <= state.dataOutsideEnergySrcs->NumDistrictUnits; ++EnergySourceNum) {
 
@@ -172,13 +174,20 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
             typeOf = DataPlant::TypeOf_PurchHotWater;
             heatIndex++;
             thisIndex = heatIndex;
-        } else {
+        } else if (EnergySourceNum > NumDistrictUnitsHeat && EnergySourceNum <= NumDistrictUnitsHeat + NumDistrictUnitsCool) {
             state.dataIPShortCut->cCurrentModuleObject = "DistrictCooling";
             reportVarPrefix = "District Cooling ";
             nodeNames = "Chilled Water Nodes";
             typeOf = DataPlant::TypeOf_PurchChilledWater;
             coolIndex++;
             thisIndex = coolIndex;
+        } else {
+            state.dataIPShortCut->cCurrentModuleObject = "DistrictHeatingSteam";
+            reportVarPrefix = "District Heating Steam ";
+            nodeNames = "Steam Nodes";
+            typeOf = DataPlant::TypeOf_PurchSteam;
+            heatSteamIndex++;
+            thisIndex = heatSteamIndex;
         }
 
         int NumAlphas = 0, NumNums = 0, IOStat = 0;
@@ -203,26 +212,51 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                      ErrorsFound);
         }
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).InletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(2),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                1,
-                                                DataLoopNode::ObjectIsNotParent);
-        state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(3),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                1,
-                                                DataLoopNode::ObjectIsNotParent);
+        
+        if (EnergySourceNum <= NumDistrictUnitsHeat + NumDistrictUnitsCool) {
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).InletNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    state.dataIPShortCut->cAlphaArgs(2),
+                                                    ErrorsFound,
+                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    1,
+                                                    DataLoopNode::ObjectIsNotParent);
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    state.dataIPShortCut->cAlphaArgs(3),
+                                                    ErrorsFound,
+                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Water,
+                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    1,
+                                                    DataLoopNode::ObjectIsNotParent);
+        } else {
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).InletNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    state.dataIPShortCut->cAlphaArgs(2),
+                                                    ErrorsFound,
+                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Steam,
+                                                    DataLoopNode::NodeConnectionType::Inlet,
+                                                    1,
+                                                    DataLoopNode::ObjectIsNotParent);
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum =
+                NodeInputManager::GetOnlySingleNode(state,
+                                                    state.dataIPShortCut->cAlphaArgs(3),
+                                                    ErrorsFound,
+                                                    state.dataIPShortCut->cCurrentModuleObject,
+                                                    state.dataIPShortCut->cAlphaArgs(1),
+                                                    DataLoopNode::NodeFluidType::Steam,
+                                                    DataLoopNode::NodeConnectionType::Outlet,
+                                                    1,
+                                                    DataLoopNode::ObjectIsNotParent);
+        }
+
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            state.dataIPShortCut->cAlphaArgs(1),
@@ -310,19 +344,24 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
         // this may need some help, if the objects change location later, due to a push_back,
         //  then the pointers to these output variables will be bad
         // for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
-        std::string hotOrChilled = "Hot ";
+        std::string hotOrChilled = "Hot Water ";
         std::string reportVarPrefix = "District Heating ";
         std::string heatingOrCooling = "Heating";
         std::string typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchHotWater);
         if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
-            hotOrChilled = "Chilled ";
+            hotOrChilled = "Chilled Water ";
             reportVarPrefix = "District Cooling ";
             heatingOrCooling = "Cooling";
             typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
+        } else if (this->EnergyType == DataPlant::TypeOf_PurchSteam) {
+            hotOrChilled = "Steam ";
+            reportVarPrefix = "District Heating Steam ";
+            heatingOrCooling = "Heating";
+            typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchSteam);
         }
 
         SetupOutputVariable(state,
-                            reportVarPrefix + hotOrChilled + "Water Energy",
+                            reportVarPrefix + hotOrChilled + "Energy",
                             OutputProcessor::Unit::J,
                             this->EnergyTransfer,
                             "System",
@@ -334,7 +373,7 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
                             _,
                             "Plant");
         SetupOutputVariable(
-            state, reportVarPrefix + hotOrChilled + "Water Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
+            state, reportVarPrefix + hotOrChilled + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
 
         SetupOutputVariable(state, reportVarPrefix + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
         SetupOutputVariable(state, reportVarPrefix + "Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
@@ -393,8 +432,10 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
     std::string typeName;
     if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
         typeName = "Cooling";
-    } else { // Heating
+    } else if (this->EnergyType == DataPlant::TypeOf_PurchHotWater) {
         typeName = "Heating";
+    } else { // DataPlant::TypeOf_PurchSteam
+        typeName = "HeatingSteam";
     }
 
     int const PltSizNum = state.dataPlnt->PlantLoop(this->LoopNum).PlantSizNum;
@@ -488,6 +529,8 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
         if (MyLoad > 0.0) MyLoad = 0.0;
     } else if (this->EnergyType == DataPlant::TypeOf_PurchHotWater) {
+        if (MyLoad < 0.0) MyLoad = 0.0;
+    } else if (this->EnergyType == DataPlant::TypeOf_PurchSteam) {
         if (MyLoad < 0.0) MyLoad = 0.0;
     }
 
