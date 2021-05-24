@@ -329,10 +329,7 @@ namespace AirflowNetworkBalanceManager {
         std::unordered_map<std::string, ReferenceConditions> referenceConditions; // Map for lookups
         ReferenceConditions defaultReferenceConditions("Default");                // Defaulted conditions
         bool conditionsAreDefaulted(true);                                        // Conditions are defaulted?
-        InputProcessor::json objectSchemaProps;                                   // Object schema properties
         CurrentModuleObject = "AirflowNetwork:MultiZone:ReferenceCrackConditions";
-        objectSchemaProps = state.dataInputProcessing->inputProcessor->getObjectSchemaProps(state, CurrentModuleObject);
-
         auto instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
             // globalSolverObject.referenceConditions.clear();
@@ -341,27 +338,27 @@ namespace AirflowNetworkBalanceManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-                Real64 temperature = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, CurrentModuleObject, fields, objectSchemaProps, "reference_temperature");
-                Real64 pressure = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, CurrentModuleObject, fields, objectSchemaProps, "reference_barometric_pressure");
-                if (std::abs((pressure - state.dataEnvrn->StdBaroPress) / state.dataEnvrn->StdBaroPress) > 0.1) { // 10% off
-                    ShowWarningError(state,
-                                     format("{}: {}: Pressure = {:.0R} differs by more than 10% from Standard Barometric Pressure = {:.0R}.",
-                                            RoutineName,
-                                            CurrentModuleObject,
-                                            pressure,
-                                            state.dataEnvrn->StdBaroPress));
-                    ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + thisObjectName);
+                Real64 temperature{fields.at("reference_temperature")};
+                Real64 pressure(101325.0);
+                if (fields.find("reference_barometric_pressure") != fields.end()) { // not required field, has default value
+                    pressure = fields.at("reference_barometric_pressure");
+                    if (std::abs((pressure - state.dataEnvrn->StdBaroPress) / state.dataEnvrn->StdBaroPress) > 0.1) { // 10% off
+                        ShowWarningError(state,
+                                         format("{}: {}: Pressure = {:.0R} differs by more than 10% from Standard Barometric Pressure = {:.0R}.",
+                                                RoutineName,
+                                                CurrentModuleObject,
+                                                pressure,
+                                                state.dataEnvrn->StdBaroPress));
+                        ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + thisObjectName);
+                    }
+                    if (pressure <= 31000.0) {
+                        ShowSevereError(state,
+                                        RoutineName + ": " + CurrentModuleObject + ": " + thisObjectName +
+                                            ". Reference Barometric Pressure must be greater than 31000 Pa.");
+                        success = false;
+                    }
                 }
-                if (pressure <= 31000.0) {
-                    ShowSevereError(state,
-                                    RoutineName + ": " + CurrentModuleObject + ": " + thisObjectName +
-                                        ". Reference Barometric Pressure must be greater than 31000 Pa.");
-                    success = false;
-                }
-                Real64 humidity = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, CurrentModuleObject, fields, objectSchemaProps, "reference_humidity_ratio");
+                Real64 humidity{fields.at("reference_humidity_ratio")};
                 // globalSolverObject.referenceConditions.emplace_back(thisObjectName, temperature, pressure, humidity);
                 referenceConditions.emplace(std::piecewise_construct,
                                             std::forward_as_tuple(thisObjectName),
@@ -385,7 +382,6 @@ namespace AirflowNetworkBalanceManager {
 
         // *** Read AirflowNetwork simulation surface crack component
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface:Crack";
-        objectSchemaProps = state.dataInputProcessing->inputProcessor->getObjectSchemaProps(state, CurrentModuleObject);
         state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurCracks =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
         instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
@@ -399,22 +395,22 @@ namespace AirflowNetworkBalanceManager {
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                Real64 coeff = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, CurrentModuleObject, fields, objectSchemaProps, "air_mass_flow_coefficient_at_reference_conditions");
-                Real64 expnt = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, CurrentModuleObject, fields, objectSchemaProps, "air_mass_flow_exponent");
+                Real64 coeff{fields.at("air_mass_flow_coefficient_at_reference_conditions")}; // Required field
+                Real64 expnt{0.65};
+                if (fields.find("air_mass_flow_exponent") != fields.end()) { // not required field, has default value
+                    expnt = fields.at("air_mass_flow_exponent");
+                }
                 Real64 refT = defaultReferenceConditions.temperature;
                 Real64 refP = defaultReferenceConditions.pressure;
                 Real64 refW = defaultReferenceConditions.humidityRatio;
                 if (!conditionsAreDefaulted) {
-                    std::string referenceCrackConditionsName = state.dataInputProcessing->inputProcessor->getAlphaFieldValue(
-                        state, CurrentModuleObject, fields, objectSchemaProps, "reference_crack_conditions");
-                    if (!referenceCrackConditionsName.empty()) { // not required field, could be blank
-                        auto result = referenceConditions.find(referenceCrackConditionsName);
+                    if (fields.find("reference_crack_conditions") != fields.end()) { // not required field, *should* have default value
+                        auto result = referenceConditions.find(fields.at("reference_crack_conditions"));
                         if (result == referenceConditions.end()) {
                             ShowSevereError(state,
                                             RoutineName + CurrentModuleObject + ": " + thisObjectName +
-                                                ". Cannot find reference crack conditions object \"" + referenceCrackConditionsName + "\".");
+                                                ". Cannot find reference crack conditions object \"" +
+                                                fields.at("reference_crack_conditions").get<std::string>() + "\".");
                             success = false;
                         } else {
                             refT = result->second.temperature;
