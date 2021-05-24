@@ -101,7 +101,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterManager.hh>
@@ -1645,7 +1644,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
             UA0 = 0.1 * state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal;
             UA1 = 10.0 * state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal;
             // Invert the simple cooling coil model: given the design inlet conditions and the design load, find the design UA
-            TempSolveRoot::SolveRoot(state, 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, state.dataWaterCoils->Par);
+            General::SolveRoot(state, 0.001, MaxIte, SolFla, UA, SimpleCoolingCoilUAResidual, UA0, UA1, state.dataWaterCoils->Par);
             // if the numerical inversion failed, issue error messages.
             if (SolFla == -1) {
                 ShowSevereError(state, "Calculation of cooling coil design UA failed for coil " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
@@ -2127,7 +2126,7 @@ void CalcAdjustedCoilUA(EnergyPlusData &state, int const CoilNum)
             FaultsManager::FaultPropertiesFoulingCoil &fouling = state.dataFaultsMgr->FouledCoils(FaultIndex);
             Real64 FaultFrac = fouling.FaultFraction(state);
 
-            if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_UARated) {
+            if (fouling.FoulingInputMethod == FaultsManager::FouledCoil::UARated) {
                 // 1/UA' = Frac * (1/UAFouled) + (1-Frac) / UA
                 state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable =
                     1 / (FaultFrac / (fouling.UAFouled) + (1 - FaultFrac) / state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable);
@@ -2204,7 +2203,7 @@ void CalcAdjustedCoilUA(EnergyPlusData &state, int const CoilNum)
             FaultsManager::FaultPropertiesFoulingCoil &fouling = state.dataFaultsMgr->FouledCoils(FaultIndex);
             Real64 FaultFrac = fouling.FaultFraction(state);
 
-            if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_FoulingFactor) {
+            if (fouling.FoulingInputMethod == FaultsManager::FouledCoil::FoulingFactor) {
                 // Adjust the External (air) UA and Internal (water) UA accordingly
                 Real64 Rfoul_air = FaultFrac * (fouling.Rfa / fouling.Aout);
                 Real64 Rfoul_water = FaultFrac * (fouling.Rfw / (fouling.Aratio * fouling.Aout));
@@ -6576,7 +6575,7 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
     Par(1) = H;
     Par(2) = RH;
     Par(3) = PB;
-    TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par);
+    General::SolveRoot(state, Acc, MaxIte, SolFla, Tprov, EnthalpyResidual, T0, T1, Par);
     // if the numerical inversion failed, issue error messages.
     if (SolFla == -1) {
         ShowSevereError(state, "Calculation of drybulb temperature failed in TdbFnHRhPb(H,RH,PB)");

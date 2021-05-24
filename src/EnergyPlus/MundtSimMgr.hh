@@ -92,14 +92,14 @@ namespace MundtSimMgr {
     struct DefineLinearModelNode
     {
         // Members
-        std::string AirNodeName; // Name of air nodes
-        int ClassType;           // Type of air nodes
-        Real64 Height;           // Z coordinates [m] node's Control Vol. center
-        Real64 Temp;             // Surface temperature BC
-        Array1D_bool SurfMask;   // Limit of 60 surfaces at current sizing
+        std::string AirNodeName;                 // Name of air nodes
+        DataRoomAirModel::AirNodeType ClassType; // Type of air nodes
+        Real64 Height;                           // Z coordinates [m] node's Control Vol. center
+        Real64 Temp;                             // Surface temperature BC
+        Array1D_bool SurfMask;                   // Limit of 60 surfaces at current sizing
 
         // Default Constructor
-        DefineLinearModelNode() : ClassType(0), Height(0.0), Temp(0.0)
+        DefineLinearModelNode() : ClassType(DataRoomAirModel::AirNodeType::Unassigned), Height(0.0), Temp(0.0)
         {
         }
     };

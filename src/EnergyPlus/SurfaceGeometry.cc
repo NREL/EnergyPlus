@@ -260,6 +260,9 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinSpecTemp.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinWindowModelType.dimension(NumSurfaces, Window5DetailedModel);
         state.dataSurface->SurfWinTDDPipeNum.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinStormWinConstr.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfActiveConstruction.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinActiveShadedConstruction.dimension(NumSurfaces, 0);
     }
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound)
@@ -878,7 +881,7 @@ namespace SurfaceGeometry {
         state.dataSurface->X0.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->Y0.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->Z0.dimension(state.dataSurface->TotSurfaces, 0.0);
-
+        // TODO: allocate surface hb arrays here? ecl arrays to dataHB?
         state.dataSurface->EnclSolDB.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataSurface->EnclSolDBSSG.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBal->QSDifSol.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -888,6 +891,7 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfBmToDiffReflFacObs.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfBmToDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
         state.dataSurface->SurfSkyDiffReflFacGnd.dimension(state.dataSurface->TotSurfaces, 0.0);
+        // TODO: these are solar shading arrays
         state.dataSurface->SurfWinA.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
         state.dataSurface->SurfWinADiffFront.dimension(state.dataSurface->TotSurfaces, CFSMAXNL + 1, 0.0);
         state.dataSurface->SurfWinACFOverlap.dimension(state.dataSurface->TotSurfaces, state.dataHeatBal->MaxSolidWinLayers, 0.0);
@@ -2584,6 +2588,17 @@ namespace SurfaceGeometry {
         int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
         if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight(state))) {
             ShowWarningError(state, RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
+        }
+
+        // Initialize run time surface arrays
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+        }
+        // Initialize surface with movable insulation index list
+        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+            if (state.dataSurface->Surface(SurfNum).MaterialMovInsulExt > 0 || state.dataSurface->Surface(SurfNum).MaterialMovInsulInt > 0) {
+                state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
+            }
         }
     }
 
@@ -4852,7 +4867,6 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedConstructionList.clear();
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = 0;
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList.clear();
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeStormWinShadedConstruction = 0;
 
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Window ||
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
@@ -5243,7 +5257,6 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedConstructionList.clear();
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = 0;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList.clear();
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeStormWinShadedConstruction = 0;
 
                 InitialAssociateWindowShadingControlFenestration(state, ErrorsFound, SurfNum);
 
@@ -11310,6 +11323,7 @@ namespace SurfaceGeometry {
                                 }
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MaterialMovInsulExt = MaterNum;
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMovInsulExt = SchNum;
+                                state.dataSurface->AnyMovableInsulation = true;
                                 if (state.dataMaterial->Material(MaterNum).Resistance <= 0.0) {
                                     if (state.dataMaterial->Material(MaterNum).Conductivity <= 0.0 ||
                                         state.dataMaterial->Material(MaterNum).Thickness <= 0.0) {
@@ -11356,6 +11370,7 @@ namespace SurfaceGeometry {
                                 }
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MaterialMovInsulInt = MaterNum;
                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMovInsulInt = SchNum;
+                                state.dataSurface->AnyMovableInsulation = true;
                                 if (state.dataMaterial->Material(MaterNum).Resistance <= 0.0) {
                                     if (state.dataMaterial->Material(MaterNum).Conductivity <= 0.0 ||
                                         state.dataMaterial->Material(MaterNum).Thickness <= 0.0) {
@@ -13029,7 +13044,7 @@ namespace SurfaceGeometry {
                 ConstrNewSt = createConstructionWithStorm(
                     state, ConstrNum, ConstrNameSt, state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
             }
-            state.dataSurface->Surface(SurfNum).StormWinConstruction = ConstrNewSt;
+            state.dataSurface->SurfWinStormWinConstr(SurfNum) = ConstrNewSt;
 
             // create shaded constructions with storm window
             state.dataSurface->Surface(SurfNum).shadedStormWinConstructionList.resize(
@@ -13573,10 +13588,6 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).windowShadingControlList =
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).StormWinConstruction =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).StormWinConstruction;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).activeStormWinShadedConstruction =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeStormWinShadedConstruction;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).shadedStormWinConstructionList =
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList;
         state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).FrameDivider =
