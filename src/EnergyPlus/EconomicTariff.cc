@@ -4203,8 +4203,8 @@ void WriteTabularTariffReports(EnergyPlusData &state)
     Array1D_string rowHead;
     Array2D_string tableBody;
     // other local variables
-    int elecFacilMeter;
-    int gasFacilMeter;
+    // int elecFacilMeter;
+    // int gasFacilMeter;
     Real64 elecTotalCost;
     Real64 gasTotalCost;
     Real64 otherTotalCost;
@@ -4248,8 +4248,8 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             // Economics Results Summary Report
             //---------------------------------
             WriteReportHeaders(state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
-            gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
+            // elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
+            // gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
