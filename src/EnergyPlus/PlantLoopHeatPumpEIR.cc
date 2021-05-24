@@ -1221,7 +1221,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
 void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
 {
-    // This will do a recurring warning for concurrent companion operation.
+    // This will do a severe error for concurrent companion operation.
     // This function should be called at the end of the time-step to ensure any iteration-level operation
     //  is worked out and the results are final.
     // This function does not try to be intelligent about only reporting for one of the companions.  The only
@@ -1234,9 +1234,17 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
             continue;
         }
         if (thisPLHP.running && thisPLHP.companionHeatPumpCoil->running) {
-            ShowRecurringWarningErrorAtEnd(state,
-                                           "Companion heat pump objects running concurrently, check operation.  Base object name: " + thisPLHP.name,
-                                           thisPLHP.recurringConcurrentOperationWarningIndex);
+            ShowSevereError(state, "Concurrent plant loop heat pump companion operation.");
+            ShowContinueErrorTimeStamp(state, "");
+            ShowContinueError(state, "PLHP name= " + thisPLHP.name);
+            ShowContinueError(state, format("PLHP source side inlet temperature= {:.2R} {{C}}", thisPLHP.sourceSideInletTemp));
+            ShowContinueError(state, format("PLHP source side outlet temperature= {:.2R} {{C}}", thisPLHP.sourceSideOutletTemp));
+            ShowContinueError(state, format("PLHP source side heat transfer rate= {:.2R} {{W}}", thisPLHP.sourceSideHeatTransfer));
+            ShowContinueError(state, "PLHP companion coil name= " + thisPLHP.companionHeatPumpCoil->name);
+            ShowContinueError(state, format("PLHP companion coil source side inlet temperature= {:.2R} {{C}}", thisPLHP.companionHeatPumpCoil->sourceSideInletTemp));
+            ShowContinueError(state, format("PLHP companion coil source side outlet temperature= {:.2R} {{C}}", thisPLHP.companionHeatPumpCoil->sourceSideOutletTemp));
+            ShowContinueError(state, format("PLHP companion coil source side heat transfer rate= {:.2R} {{W}}", thisPLHP.companionHeatPumpCoil->sourceSideHeatTransfer));
+            ShowFatalError(state, "CheckConcurrentOperation: Simulation terminated because of problems in plant loop heat pump operation");
         }
     }
 }
