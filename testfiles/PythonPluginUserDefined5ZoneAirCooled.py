@@ -127,6 +127,9 @@ class InitChiller(EnergyPlusPlugin):
     def on_user_defined_component_model(self, state) -> int:
         if not self.glycol:
             self.glycol = self.api.functional.glycol(state, u"water")
+        # for many use cases, the client will want to check `self.api.exchange.api_data_fully_ready before
+        # attempting to get handles and such.  In the case of user defined components, however, the calling structure
+        # shouldn't need it, so it isn't used in this example.
         if self.need_to_get_handles:
             self.get_handles(state)
             if not self.handles_are_valid(state):
@@ -216,6 +219,9 @@ class SimChiller(EnergyPlusPlugin):
     def on_user_defined_component_model(self, state) -> int:
         if not self.glycol:
             self.glycol = self.api.functional.glycol(state, u"water")
+        # for many use cases, the client will want to check `self.api.exchange.api_data_fully_ready before
+        # attempting to get handles and such.  In the case of user defined components, however, the calling structure
+        # shouldn't need it, so it isn't used in this example.
         if self.need_to_get_handles:
             self.get_handles(state)
             if not self.handles_are_valid(state):
