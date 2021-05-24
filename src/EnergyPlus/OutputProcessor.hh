@@ -337,7 +337,7 @@ namespace OutputProcessor {
         // Members
         TimeStepType timeStepType;     // Type whether Zone or HVAC
         StoreType storeType;           // Variable Type (Summed/Non-Static or Average/Static)
-        VariableType VariableType;        // Integer, Real.
+        VariableType variableType;     // Integer, Real.
         int Next;                      // Next variable of same name (different units)
         bool ReportedOnDDFile;         // true after written to .rdd/.mdd file
         std::string VarNameOnly;       // Name of Variable
@@ -346,7 +346,7 @@ namespace OutputProcessor {
 
         // Default Constructor
         VariableTypeForDDOutput()
-            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), VariableType(VariableType::NotFound), Next(0),
+            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), variableType(VariableType::NotFound), Next(0),
               ReportedOnDDFile(false), units(OutputProcessor::Unit::None)
         {
         }
@@ -871,9 +871,9 @@ namespace OutputProcessor {
 
     void SetInternalVariableValue(EnergyPlusData &state,
                                   OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
-                                  int const keyVarIndex,                    // Array index
-                                  Real64 const SetRealVal,                  // real value to set, if type is real or meter
-                                  int const SetIntVal                       // integer value to set if type is integer
+                                  int const keyVarIndex,                       // Array index
+                                  Real64 const SetRealVal,                     // real value to set, if type is real or meter
+                                  int const SetIntVal                          // integer value to set if type is integer
     );
 
     std::string unitEnumToStringBrackets(Unit const &unitIn);
@@ -980,12 +980,12 @@ void IncrementInstMeterCache(EnergyPlusData &state);
 
 Real64 GetInternalVariableValue(EnergyPlusData &state,
                                 OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
-                                int const keyVarIndex                     // Array index
+                                int const keyVarIndex                        // Array index
 );
 
 Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
                                                  OutputProcessor::VariableType const varType, // 1=integer, 2=REAL(r64), 3=meter
-                                                 int const keyVarIndex                     // Array index
+                                                 int const keyVarIndex                        // Array index
 );
 
 int GetNumMeteredVariables(EnergyPlusData &state,
@@ -997,7 +997,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VariableType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable
@@ -1011,7 +1011,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VariableType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable

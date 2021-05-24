@@ -5062,9 +5062,9 @@ namespace OutputProcessor {
 
     void SetInternalVariableValue(EnergyPlusData &state,
                                   OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
-                                  int const keyVarIndex,                    // Array index
-                                  Real64 const SetRealVal,                  // real value to set, if type is real or meter
-                                  int const SetIntVal                       // integer value to set if type is integer
+                                  int const keyVarIndex,                       // Array index
+                                  Real64 const SetRealVal,                     // real value to set, if type is real or meter
+                                  int const SetIntVal                          // integer value to set if type is integer
     )
     {
 
@@ -7669,7 +7669,7 @@ void IncrementInstMeterCache(EnergyPlusData &state)
 
 Real64 GetInternalVariableValue(EnergyPlusData &state,
                                 OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
-                                int const keyVarIndex                     // Array index
+                                int const keyVarIndex                        // Array index
 )
 {
     // FUNCTION INFORMATION:
@@ -7753,7 +7753,7 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
 
 Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
                                                  OutputProcessor::VariableType const varType, // 1=integer, 2=REAL(r64), 3=meter
-                                                 int const keyVarIndex                     // Array index
+                                                 int const keyVarIndex                        // Array index
 )
 {
     // FUNCTION INFORMATION:
@@ -7875,7 +7875,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VariableType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable
@@ -7958,7 +7958,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D<OutputProcessor::VariableType> &VarTypes,                   // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable
@@ -8137,7 +8137,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
     // Search Variable List First
     VFound = UtilityRoutines::FindItemInSortedList(varNameUpper, op->varNames, op->numVarNames);
     if (VFound != 0) {
-        varType = op->DDVariableTypes(op->ivarNames(VFound)).VariableType;
+        varType = op->DDVariableTypes(op->ivarNames(VFound)).variableType;
     }
 
     if (varType == VariableType::Integer) {
@@ -8229,10 +8229,10 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
 }
 
 void GetVariableKeys(EnergyPlusData &state,
-                     std::string const &varName,               // Standard variable name
+                     std::string const &varName,                  // Standard variable name
                      OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
-                     Array1D_string &keyNames,                 // Specific key name
-                     Array1D_int &keyVarIndexes                // Array index for
+                     Array1D_string &keyNames,                    // Specific key name
+                     Array1D_int &keyVarIndexes                   // Array index for
 )
 {
 
@@ -8898,7 +8898,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
         }
         op->DDVariableTypes(op->NumVariablesForOutput).timeStepType = TimeStepType;
         op->DDVariableTypes(op->NumVariablesForOutput).storeType = StateType;
-        op->DDVariableTypes(op->NumVariablesForOutput).VariableType = VariableType;
+        op->DDVariableTypes(op->NumVariablesForOutput).variableType = VariableType;
         op->DDVariableTypes(op->NumVariablesForOutput).VarNameOnly = VarName;
         op->DDVariableTypes(op->NumVariablesForOutput).units = unitsForVar;
         if (present(customUnitName) && unitsForVar == OutputProcessor::Unit::customEMS) {
@@ -8921,7 +8921,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
             }
             op->DDVariableTypes(op->NumVariablesForOutput).timeStepType = TimeStepType;
             op->DDVariableTypes(op->NumVariablesForOutput).storeType = StateType;
-            op->DDVariableTypes(op->NumVariablesForOutput).VariableType = VariableType;
+            op->DDVariableTypes(op->NumVariablesForOutput).variableType = VariableType;
             op->DDVariableTypes(op->NumVariablesForOutput).VarNameOnly = VarName;
             op->DDVariableTypes(op->NumVariablesForOutput).units = unitsForVar;
             if (present(customUnitName) && unitsForVar == OutputProcessor::Unit::customEMS) {

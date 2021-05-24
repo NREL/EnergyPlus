@@ -111,13 +111,13 @@ namespace ExternalInterface {
     struct eplusOutputVariableType
     {
 
-        std::string Name;                   // Variable name in EnergyPlus
-        std::string VarKey;                 // Key value in EnergyPlus
-        Real64 RTSValue;                    // Real value of variable at the Zone Time Step
-        int ITSValue;                       // Integer value of variable at the Zone Time Step
-        int VarIndex;                       // Index Value of variable
+        std::string Name;                      // Variable name in EnergyPlus
+        std::string VarKey;                    // Key value in EnergyPlus
+        Real64 RTSValue;                       // Real value of variable at the Zone Time Step
+        int ITSValue;                          // Integer value of variable at the Zone Time Step
+        int VarIndex;                          // Index Value of variable
         OutputProcessor::VariableType VarType; // Type of variable at the Zone Time Step
-        std::string VarUnits;               // Units string, may be blank
+        std::string VarUnits;                  // Units string, may be blank
 
         // Default Constructor
         eplusOutputVariableType()
@@ -355,12 +355,12 @@ struct ExternalInterfaceData : BaseGlobalStruct
     bool haveExternalInterfaceFMUExport = false; // Flag for FMU-Export interface
     int simulationStatus = 1; // Status flag. Used to report during which phase an error occurred. (1=initialization, 2=time stepping)
 
-    Array1D<int> keyVarIndexes;                   // Array index for specific key name
+    Array1D<int> keyVarIndexes;                      // Array index for specific key name
     Array1D<OutputProcessor::VariableType> varTypes; // Types of variables in keyVarIndexes
-    Array1D<int> varInd;                          // Index of ErlVariables for ExternalInterface
-    int socketFD = -1;                            // socket file descriptor
-    bool ErrorsFound = false;                     // Set to true if errors are found
-    bool noMoreValues = false;                    // Flag, true if no more values will be sent by the server
+    Array1D<int> varInd;                             // Index of ErlVariables for ExternalInterface
+    int socketFD = -1;                               // socket file descriptor
+    bool ErrorsFound = false;                        // Set to true if errors are found
+    bool noMoreValues = false;                       // Flag, true if no more values will be sent by the server
 
     Array1D<std::string> varKeys;     // Keys of report variables used for data exchange
     Array1D<std::string> varNames;    // Names of report variables used for data exchange

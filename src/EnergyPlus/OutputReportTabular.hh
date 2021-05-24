@@ -349,18 +349,18 @@ namespace OutputReportTabular {
     struct MonthlyColumnsType
     {
         // Members
-        std::string varName;                    // name of variable
-        std::string colHead;                    // column header (not used for user defined monthly)
-        int varNum;                             // variable or meter number
-        OutputProcessor::VariableType typeOfVar;   // 0=not found, 1=integer, 2=real, 3=meter
-        OutputProcessor::StoreType avgSum;      // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType stepType; // Variable time step is Zone=1 or HVAC=2
-        OutputProcessor::Unit units;            // the units string, may be blank
-        iAggType aggType;                       // index to the type of aggregation (see list of parameters)
-        Array1D<Real64> reslt;                  // monthly results
-        Array1D<Real64> duration;               // the time during which results are summed for use in averages
-        Array1D_int timeStamp;                  // encoded timestamp of max or min
-        Real64 aggForStep;                      // holds the aggregation for the HVAC time steps when smaller than
+        std::string varName;                     // name of variable
+        std::string colHead;                     // column header (not used for user defined monthly)
+        int varNum;                              // variable or meter number
+        OutputProcessor::VariableType typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
+        OutputProcessor::StoreType avgSum;       // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType stepType;  // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::Unit units;             // the units string, may be blank
+        iAggType aggType;                        // index to the type of aggregation (see list of parameters)
+        Array1D<Real64> reslt;                   // monthly results
+        Array1D<Real64> duration;                // the time during which results are summed for use in averages
+        Array1D_int timeStamp;                   // encoded timestamp of max or min
+        Real64 aggForStep;                       // holds the aggregation for the HVAC time steps when smaller than
         // the zone timestep
 
         // Default Constructor

@@ -78,7 +78,7 @@ namespace OutputProcessor {
     {
         int const NumVariables = 2;
         Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-        Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);      // Variable Types (1=integer, 2=real, 3=meter)
+        Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
         std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
@@ -3411,7 +3411,7 @@ namespace OutputProcessor {
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(1).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->DDVariableTypes(1).VarNameOnly);
@@ -3419,7 +3419,7 @@ namespace OutputProcessor {
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(2).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(2).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(2).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(2).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(2).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(2).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Wetbulb Temperature", state->dataOutputProcessor->DDVariableTypes(2).VarNameOnly);
@@ -3427,7 +3427,7 @@ namespace OutputProcessor {
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(3).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(3).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(3).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(3).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(3).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(3).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Humidity Ratio", state->dataOutputProcessor->DDVariableTypes(3).VarNameOnly);
@@ -3435,7 +3435,7 @@ namespace OutputProcessor {
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(4).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(4).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(4).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(4).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(4).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(4).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Relative Humidity", state->dataOutputProcessor->DDVariableTypes(4).VarNameOnly);
@@ -3476,7 +3476,7 @@ namespace OutputProcessor {
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType);
-        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(1).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->DDVariableTypes(1).VarNameOnly);

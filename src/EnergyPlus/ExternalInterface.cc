@@ -1024,9 +1024,9 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     std::string Name_NEW;        // Units sting, may be blank
     std::string Name_OLD;        // Units sting, may be blank
 
-    Array1D_int keyIndexes(1);                       // Array index for
+    Array1D_int keyIndexes(1);                          // Array index for
     Array1D<OutputProcessor::VariableType> varTypes(1); // Array index for
-    Array1D_string NamesOfKeys(1);                   // Specific key name
+    Array1D_string NamesOfKeys(1);                      // Specific key name
     int retValfmiVersion;
     int retValfmiPathLib;
     Array1D_string NameListInstances(5);
@@ -2456,10 +2456,10 @@ void CalcExternalInterface(EnergyPlusData &state)
 
 void GetReportVariableKey(
     EnergyPlusData &state,
-    const Array1D_string &varKeys,                // Standard variable name
-    int const numberOfKeys,                       // Number of keys=size(state.dataExternalInterface->varKeys)
-    const Array1D_string &VarNames,               // Standard variable name
-    Array1D_int &keyVarIndexes,                   // Array index
+    const Array1D_string &varKeys,                   // Standard variable name
+    int const numberOfKeys,                          // Number of keys=size(state.dataExternalInterface->varKeys)
+    const Array1D_string &VarNames,                  // Standard variable name
+    Array1D_int &keyVarIndexes,                      // Array index
     Array1D<OutputProcessor::VariableType> &varTypes // Types of variables in state.dataExternalInterface->keystate.dataExternalInterface->varIndexes
 )
 {
@@ -2473,7 +2473,7 @@ void GetReportVariableKey(
     // Gets the sensor key index and type for the specified variable key and name
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    OutputProcessor::VariableType varType(OutputProcessor::VariableType::NotFound);               // 0=not found, 1=integer, 2=real, 3=meter
+    OutputProcessor::VariableType varType(OutputProcessor::VariableType::NotFound);         // 0=not found, 1=integer, 2=real, 3=meter
     int numKeys(0);                                                                         // Number of keys found
     OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);             // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::TimeStepZone); // Variable time step is Zone=1 or HVAC=2
