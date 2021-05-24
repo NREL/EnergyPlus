@@ -45,9 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <cmath>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Cache.hh>
 #include <EnergyPlus/Construction.hh>
@@ -2103,7 +2100,7 @@ void ConstructionProps::loadFromCache(EnergyPlusData &state)
         nlohmann::json thisConstrData = state.dataCache->unorderedCTFObjects.at(key);
 
         // nlohmann::json does some weird things when directly accessing strings
-        // explicitly setting these as string objects here so we do a proper comparison
+        // explicitly setting these as string objects here so we can do a proper comparison
         std::string a = thisConstrData.at("full_data_key");
         std::string b = this->getCacheKeyString(state);
 
@@ -2138,7 +2135,9 @@ void ConstructionProps::loadFromCache(EnergyPlusData &state)
 std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
 {
     // lambda to round to specified precision
-    auto roundWithPrecision = [](double const &x, double const &precision) { return (unsigned long long)llround(x * precision); };
+    auto castWithPrecision = [](double const x, unsigned int const precision_bits) {
+        return *reinterpret_cast<unsigned long long const *>(&x) >> (64 - 12 - precision_bits);
+    };
 
     unsigned long long key = 0;
 
@@ -2147,11 +2146,11 @@ std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
     for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
         int CurrentLayer = this->LayerPoint(Layer);
         auto &mat = state.dataMaterial->Material(CurrentLayer);
-        key ^= roundWithPrecision(mat.Thickness, 1E8) + Layer;
-        key ^= roundWithPrecision(mat.Conductivity, 1E8) + Layer;
-        key ^= roundWithPrecision(mat.Density, 1E8) + Layer;
-        key ^= roundWithPrecision(mat.SpecHeat, 1E8) + Layer;
-        key ^= roundWithPrecision(mat.Resistance, 1E8) + Layer;
+        key ^= castWithPrecision(mat.Thickness, 15) + Layer;
+        key ^= castWithPrecision(mat.Conductivity, 15) + Layer;
+        key ^= castWithPrecision(mat.Density, 15) + Layer;
+        key ^= castWithPrecision(mat.SpecHeat, 15) + Layer;
+        key ^= castWithPrecision(mat.Resistance, 15) + Layer;
     }
 
     return format("{}", key);
