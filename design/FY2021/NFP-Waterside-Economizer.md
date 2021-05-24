@@ -39,6 +39,17 @@ RR: Yes, MultiMode would be used for the HX. If that choice were used the HX wou
 
 MJWitte: Or HeatExchangerControl or ActivateHeatExchanger. I think including HeatExchanger in the option name is good. If some other way of controlling humidity comes along then a new option can be added.
 
+MJWitte Comment on Github: 04/29/21
+@rraustad has demonstrated a method for the AirLoopHVACX:UnitarySystem code to simulate CoilSystem:Cooling:DX in #8729. It should be possible to do the same here with the small addition of support for the cutoff
+temperature difference. That means this feature will not need a new source file, just a new input function in UnitarySystem. This may reduce (or eliminate) the need for changes in other source files as well.
+
+MJWitte added that, my vision of this is that CoilSystem:Cooling:Water would be just an abbreviated synonym for AirloopHVAC:UnitarySystem. It would instantiate a unitarysystem internally and that code will do all the work. 
+With that approach, there's no need for CoilWaterSystem.hh or cc
+
+B Bigusse on Github: 04/29/21: Agreed to use Mike's suggestion. This appraoch is a minimal code changes in the get input to track that the unitarysystem is intended as a water-side economizer, sets a flag if the condition is favorable 
+for economizer to operate and if logics to turn off the UnitarySystem if the condition is not favorable. So, the new codes added does not change any existing controls but sets a control flgas to be able to turn on or 
+off the system coil depending on the condition.
+
 
 ## Overview ##
 
@@ -127,87 +138,87 @@ It may be time to begin consolodating these exising wrappers as done with the Co
 ## Input Description ##
 
 
-    CoilSystem:Cooling:Water
-        \memo Virtual container component that consists of a water cooling coil
-        \memo and its associated controls. This control object supports the
-        \memo available water coil types and may be placed directly on an
-        \memo air loop branch or in an outdoor air equipment list.
-        \min-fields 6
-    A1, \field Name
-        \required-field
-        \reference WaterCoilSystemName
-        \type alpha
-        \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames
-        \reference-class-name validOASysEquipmentTypes
-        \reference validOASysEquipmentNames
-    A2, \field Cooling Coil System Inlet Node Name
-        \required-field
-        \type node
-    A3, \field Cooling Coil System Outlet Node Name
-        \required-field
-        \type node
-    A4, \field Availability Schedule Name
-        \note Availability schedule name for this system. Schedule value > 0
-        \note means the system is available.
-        \note If this field is blank, the system is always available.
-        \type object-list
-        \object-list ScheduleNames
-    A5, \field Cooling Coil Object Type
-        \type choice
-        \required-field
-        \key Coil:Cooling:Water
-        \key Coil:Cooling:Water:DetailedGeometry
-        \key CoilSystem:Cooling:Water:HeatExchangerAssisted ??
-    A6, \field Cooling Coil Name
-        \required-field
-        \type object-list
-        \object-list CoolingCoilsWater
-    N1, \field Minimum Air To Water Temperature Offset
-        \note Coil will turn on as required when inlet air temperature is above
-        \note water temperature by amount of offset. To model a waterside
-        \note economizer connect to condenser loop and increase offset as desired.
-        \type real
-        \units C
-        \minimum 0.0
-        \default 0.0
-    A7, \field Dehumidification Control Type
-        \type choice
-        \key None
-        \key HeatExchangerControl
-        \key CoolReheat
-        \default None
-        \note None = meet sensible load only
-        \note HeatExchangerControl = activate water coil and meet sensible load.
-        \note If no sensible load exists, and Run on Latent Load = Yes, and a latent
-        \note load exists, the coil will operate to meet the latent load.
-        \note If the latent load cannot be met the heat exchanger will be activated.
-        \note IF Run on Latent Load = No, the heat exchanger will always be active.
-        \note CoolReheat = cool beyond the dry-bulb setpoint as required
-        \note to meet the humidity setpoint.
-        \note For all dehumidification controls, the max
-        \note humidity setpoint on the Sensor Node is used.
-        \note SetpointManager:SingleZone:Humidity:Maximum,
-        \note SetpointManager:MultiZone:Humidity:Maximum, or
-        \note SetpointManager:MultiZone:MaximumHumidity:Average, and
-        \note SetpointManager:OutdoorAirPretreat (optional) objects.
-    A8, \field Run on Sensible Load
-        \type choice
-        \key Yes
-        \key No
-        \default Yes
-        \note If Yes, unit will run if there is a sensible load.
-        \note If No, unit will not run if there is only a sensible load.
-        \note Dehumidification controls will be active if specified.
-    A9; \field Run on Latent Load
-        \type choice
-        \key Yes
-        \key No
-        \default No
-        \note If Yes, unit will run if there is a latent load.
-        \note even if there is no sensible load.
-        \note If No, unit will not run only if there is a latent load.
-        \note Dehumidification controls will be active if specified.
+CoilSystem:Cooling:Water,
+       \memo Virtual container component that consists of a water cooling coil
+       \memo and its associated controls. This control object supports the
+       \memo available water coil types and may be placed directly on an
+       \memo air loop branch or in an outdoor air equipment list.
+       \min-fields 6
+   A1, \field Name
+       \required-field
+       \reference WaterCoilSystemName
+       \type alpha
+       \reference-class-name validBranchEquipmentTypes
+       \reference validBranchEquipmentNames
+       \reference-class-name validOASysEquipmentTypes
+       \reference validOASysEquipmentNames
+   A2, \field Air Inlet Node Name
+       \required-field
+       \type node
+   A3, \field Air Outlet Node Name
+       \required-field
+       \type node
+   A4, \field Availability Schedule Name
+       \note Availability schedule name for this system. Schedule value > 0
+       \note means the system is available.
+       \note If this field is blank, the system is always available.
+       \type object-list
+       \object-list ScheduleNames
+   A5, \field Cooling Coil Object Type
+       \type choice
+       \required-field
+       \key Coil:Cooling:Water
+       \key Coil:Cooling:Water:DetailedGeometry
+       \key CoilSystem:Cooling:Water:HeatExchangerAssisted ??
+   A6, \field Cooling Coil Name
+       \required-field
+       \type object-list
+       \object-list CoolingCoilsWater
+   A7, \field Dehumidification Control Type
+       \type choice
+       \key None
+       \key HeatExchangerControl
+       \key CoolReheat
+       \default None
+       \note None = meet sensible load only
+       \note HeatExchangerControl = activate water coil and meet sensible load.
+       \note If no sensible load exists, and Run on Latent Load = Yes, and a latent
+       \note load exists, the coil will operate to meet the latent load.
+       \note If the latent load cannot be met the heat exchanger will be activated.
+       \note IF Run on Latent Load = No, the heat exchanger will always be active.
+       \note CoolReheat = cool beyond the dry-bulb setpoint as required
+       \note to meet the humidity setpoint.
+       \note For all dehumidification controls, the max
+       \note humidity setpoint on the Sensor Node is used.
+       \note SetpointManager:SingleZone:Humidity:Maximum,
+       \note SetpointManager:MultiZone:Humidity:Maximum, or
+       \note SetpointManager:MultiZone:MaximumHumidity:Average, and
+       \note SetpointManager:OutdoorAirPretreat (optional) objects.
+   A8, \field Run on Sensible Load
+       \type choice
+       \key Yes
+       \key No
+       \default Yes
+       \note If Yes, unit will run if there is a sensible load.
+       \note If No, unit will not run if there is only a sensible load.
+       \note Dehumidification controls will be active if specified.
+   A9, \field Run on Latent Load
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note If Yes, unit will run if there is a latent load.
+       \note even if there is no sensible load.
+       \note If No, unit will not run only if there is a latent load.
+       \note Dehumidification controls will be active if specified.
+   N1; \field Minimum Air To Water Temperature Offset
+       \note Coil will turn on as required when inlet air temperature is above
+       \note water temperature by amount of offset. To model a waterside
+       \note economizer connect to condenser loop and increase offset as desired.
+       \type real
+       \units C
+       \minimum 0.0
+       \default 0.0
 
 Several considerations need to be resolved for this new object.
 
@@ -225,16 +236,10 @@ Add new IO section for new object.
 
 ## Outputs Description ##
 
-	Cooling Coil Water Flow Rate
-	Cooling Coil Water Flow Fraction
-	Cooling Coil Total Cooling Rate
-	Cooling Coil Total Cooling Energy
-	Cooling Coil Source Side Heat Transfer Energy
-	Cooling Coil Sensible Cooling Rate
-	Cooling Coil Sensible Cooling Energy
-	Cooling Coil Latent Cooling Rate
-	Cooling Coil Latent Cooling Energy
-	Cooling Coil Water-Side Economizer Status
+	Uses existing unitary system report variables
+	
+	May be add additional new variables as needed:
+	**Cooling Coil Water-Side Economizer Status**
 
 ## Engineering Reference ##
 
@@ -263,223 +268,138 @@ SimAirServingZones::SimAirLoopComponent
                              HVACSystemData *CompPointer); // HVACSystemData pointer
 
 
-### EnergyPlusData ###
-EnergyPlusData
 
+### UniatrySystem.hh ###
+Modification to the UnitarySystem header file:
 
-namespace EnergyPlus {
+UnitarySystem.hh
+		
+namespace UnitarySystems {
 
-    EnergyPlusData::EnergyPlusData() {
-        // todo, try to eliminate the need for the singleton
-        IOFiles::setSingleton(&files);
-
-        this->dataAirflowNetworkBalanceManager =
-              std::make_unique<AirflowNetworkBalanceManagerData>();
-        this->dataAirLoop = std::make_unique<DataAirLoopData>();
-        this->dataAirLoopHVACDOAS = std::make_unique<AirLoopHVACDOASData>();
-        this->dataAirSystemsData = std::make_unique<AirSystemsData>();
-
-        **New pointer:**
-
-        this->dataCoilWaterSystems = std::make_unique<CoilWaterSystemsData>();
-        ...
-    } // EnergyPlusData::EnergyPlusData()
-
-
-    void EnergyPlusData::clear_state() {
-        this->dataAirflowNetworkBalanceManager->clear_state();
-        this->dataAirLoop->clear_state();
-        this->dataAirLoopHVACDOAS->clear_state();
-        this->dataAirSystemsData->clear_state();
-
-        **New clear_state call:**
-
-        this->dataCoilWaterSystems->clear_state();
-        ...
-    }
-} // namespace EnergyPlus
-
-### CoilWaterSystems ###
-New header file:
-
-CoilWaterSystems.hh
-
-    New classes:
-
-namespace CoilWaterSystems {
-
-    enum class CCoils
+    struct UnitarySysInputSpec
     {
-        Unassigned,
-        Simple,
-        Detailed,
-        HXAssist
+
+        UnitarySysInputSpec();
+
+        ~UnitarySysInputSpec()
+        {
+        }
     };
 
-    enum class DehumCtrlType : int
+    struct UnitarySys : HVACSystemData
     {
-        None,
-        CoolReheat,
-        HeatExchangerControl
-    };
 
-    struct CoilSysCoolingWaterInputSpecification
-    {
-        std::string name;
-        std::string cooling_coil_system_inlet_node_name;
-        std::string cooling_coil_system_outlet_node_name;
-        std::string availability_schedule_name;
-        std::string cooling_coil_object_type;
-        std::string cooling_coil_name;
-        Real64 minimum_air_to_water_temperature_offset;
-        std::string dehumidification_control_type;
-        std::string run_on_sensible_load;
-        std::string run_on_latent_load;
-    };
+        **Adds new private member variables:**
+		
+        bool m_waterSideEconomizerFlag;  // true if water-side economizer coil is active
+        Real64 m_minAirToWaterTempOffset; // coil entering air to entering water temp offset
+ 
+    public:
+        // SZVAV variables
 
-    struct CoilWaterSys : HVACSystemData
-    {
-        // member variables
-        CoilSysCoolingWaterInputSpecification original_input_specs;
-
-        std::string name;              // name of water coooling coil
-        bool myOneTimeInitFlag = true; // executed only once flag
-        int coilWaterSysIndex = 0;     // index of coil system cooling water object
-        int airInletNodeIndex = 0;     // cooling coil system inlet node name
-        int airOutletNodeIndex = 0;    // cooling coil system outlet node name
-        int availScheduleIndex = 0;    // index of availability schedule
-        CCoils waterCoolingCoilType;   // type of water coooling coil type
-        std::string coolingCoilName;   // type of water coooling coil name
-        int coolingCoilType_Num = 0;   // water cooling coil type number (Coil_CoolingWater, Coil_CoolingWaterDetailed, CoilWater_CoolingHXAssisted)
-        Real64 minAirToWaterTempOffset = 0.0; // entering air to entering water temperature offset
-        int coolingCoilIndex = 0;             // index of coil cooling water
-        DehumCtrlType dehumControlType;       // dehumidification control type
-        bool runOnSensibleLoad = true;        // true if this system runs to meet a sensible load
-        bool runOnLatentLoad = false;         // true if this system runs to meet a latent-only load
-
-        bool myPlantScanFlag = true;       // one time plant scan flag
-        Real64 maxCoolCoilFluidFlow = 0.0; // maximum coil water flow rate
-        int waterInletNodeIndex = 0;       // index of water coil entering node
-        int waterOutletNodeIndex = 0;      // index of water coil leaving node
-        int coolCoilLoopNum = 0;           // index plant loop (condenser loop)
-        int coolCoilLoopSide = 0;          // index plant loop side
-        int coolCoilBranchNum = 0;         // index plant loop branch
-        int coolCoilCompNum = 0;           // index of water coil on a branch
-
-        // CoilWaterSys() = default;
-        // member functions
-        static void getInput(EnergyPlusData &state);
-        void instantiateFromInputSpec(EnergyPlusData &state, const CoilSysCoolingWaterInputSpecification &input_data);
-        void setOutputReportVariables(EnergyPlus::EnergyPlusData &state);
-        void initCoilWaterSystems(EnergyPlusData &state, int const AirLoopNum);
-        void controlCoilWaterSystems(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration);
-        static Real64 coolWaterTempResidual(EnergyPlusData &state, Real64 const WaterFlowFraction, std::vector<Real64> const &Par);
-        static Real64 coolWaterHumRatResidual(EnergyPlusData &state, Real64 const WaterFlowFraction, std::vector<Real64> const &Par);
-        static Real64 HXAssistedCoolCoilHRResidual(EnergyPlusData &state, Real64 const WaterFlowFraction, std::vector<Real64> const &Par);
-        static Real64 HXAssistedCoolCoilTempResidual(EnergyPlusData &state, Real64 const WaterFlowFraction, std::vector<Real64> const &Par);
-        void reportCoilWaterSystems(EnergyPlus::EnergyPlusData &state);
+        **Adds new public member variables:**
+        bool runWaterSideEconomizer;  // true if water-side economizer conditioon is favorbale
+        int WaterSideEconomizerStatus; // water side economizer status flag, report variable 
 
     public:
-        // external variables
-        // external functions
+        UnitarySys(); // constructor
 
-        CoilWaterSys(); // constructor
-
-        ~CoilWaterSys() // destructor
+        ~UnitarySys() // destructor
         {
         }
 
-        static void getInputData(EnergyPlusData &state);
+        ** Adds new get input function for CoilSystem:Cooling:Water object**
+        static void getCoilWaterSystemInputData(
+            EnergyPlusData &state, std::string const &CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
-        static HVACSystemData *
-            factory(EnergyPlusData &state, int const object_type_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
+    };
 
-        void simulateSys(EnergyPlusData &state,
-                         std::string const &Name,
-                         bool const firstHVACIteration,
-                         int const &AirLoopNum,
-                         int &CompIndex,
-                         bool &HeatActive,
-                         bool &CoolActive,
-                         int const OAUnitNum,         // system is OutdoorAirUnit
-                         Real64 const OAUCoilOutTemp, // Tinlet OutdoorAirUnit
-                         bool const ZoneEquipment,    // TRUE if zone equipment
-                         Real64 &sysOutputProvided,   // supply node sensible output
-                         Real64 &latOutputProvided    // supply node latent output
-        );
+} // namespace UnitarySystems
 
-        void simulate(EnergyPlusData &state,
-                      std::string const &Name,
-                      bool const firstHVACIteration,
-                      int const &AirLoopNum,
-                      int &CompIndex,
-                      bool &HeatActive,
-                      bool &CoolActive,
-                      int const OAUnitNum,         // system is OutdoorAirUnit
-                      Real64 const OAUCoilOutTemp, // Tinlet OutdoorAirUnit
-                      bool const ZoneEquipment,    // TRUE if zone equipment
-                      Real64 &sysOutputProvided,   // supply node sensible output
-                      Real64 &latOutputProvided    // supply node latent output
-                      ) override;
-
-
-    }; // struct CoilWaterSys : HVACSystemData
-
-} // namespace CoilWaterSystems
-
-struct CoilWaterSystemsData : BaseGlobalStruct
+struct UnitarySystemsData : BaseGlobalStruct
 {
 
-    std::vector<CoilWaterSystems::CoilWaterSys> coilWaterSys;
+    // MODULE PARAMETER DEFINITIONS
+
+    ** Adds new member variables for coilsystem**  
+    bool getCoilWaterSysInputOnceFlag = true;
     std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
     int numCoilWaterSystems = 0;
-    bool initCoilWaterSystemsErrFlag = true;
-    bool coilWaterSystemsGetInputFlag = true;
-    int CoolingCoilIndex = 0;          // index of water coooling coil
-    int waterInletNodeIndex = 0;       // index of water entering node of a water cooling coil
-    bool myOneTimeFlag = true;         // one time flag
-    bool mySetPointCheckFlag = true;   // one time setpoint check flag
-    bool getInputOnceFlag = true;      // get input flag
-    bool economizerFlag = false;       // holds air loop economizer status
-    bool waterCoilDisableFlag = false; // true if coil water inlet temp > coil air inlet temp - minus offset
-    bool initCoilWaterSysErrFlag = false;
-    int const On = 1; // normal water coil operation, always on
 
     void clear_state() override
     {
-        coilWaterSys.clear();
+        getCoilWaterSysInputOnceFlag = true;
         numCoilWaterSystems = 0;
-        coilWaterSystemsGetInputFlag = true;
-        initCoilWaterSystemsErrFlag = true;
-        CoolingCoilIndex = 0;
-        waterInletNodeIndex = 0;
-        myOneTimeFlag = true;
-        mySetPointCheckFlag = true;
-        getInputOnceFlag = true;
-        economizerFlag = false;
-        waterCoilDisableFlag = false;
-        initCoilWaterSysErrFlag = false;
     }
 
     // Default Constructor
-    CoilWaterSystemsData() = default;
+    UnitarySystemsData() = default;
 };
 
+
+### UniatrySystem.cc ###
+UnitarySystem.cc
+
+** Add Adds new get input function for CoilSystem:Cooling:Water object**
+    void UnitarySys::getCoilWaterSystemInputData(
+        EnergyPlusData &state, std::string const &CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
+    {
+
+        static const std::string routineName("UnitarySys::getCoilWaterSystemInputData: ");
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(state.dataUnitarySystems->coilSysCoolingWaterObjectName);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+
+                auto const &fields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+
+                if (!UtilityRoutines::SameString(CoilSysName, thisObjectName) && !state.dataUnitarySystems->getCoilWaterSysInputOnceFlag) continue;
+
+                state.dataInputProcessing->inputProcessor->markObjectAsUsed(state.dataUnitarySystems->coilSysCoolingWaterObjectName, thisObjectName);
+                ++state.dataUnitarySystems->numCoilWaterSystems;
+                ++state.dataUnitarySystems->numUnitarySystems;
+
+                std::string cCurrentModuleObject = state.dataUnitarySystems->coilSysCoolingWaterObjectName;
+		
+				set input values here as follows:
+                UnitarySysInputSpec input_specs;
+				
+                input_specs.name = thisObjectName;
+                input_specs.control_type = "Setpoint";
+                input_specs.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                input_specs.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_inlet_node_name"));
+                input_specs.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_outlet_node_name"));
+
+                ...
+				
+                // now translate to UnitarySystem
+                UnitarySys thisSys;
+                thisSys.UnitType = cCurrentModuleObject;
+
+                // set water-side economizer flag
+                thisSys.m_waterSideEconomizerFlag = true;              
+                int sysNum = state.dataUnitarySystems->numUnitarySystems;
+                thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
+                sysNum = getUnitarySystemIndex(state, thisObjectName);
+                
+                if (sysNum == -1) {
+                    state.dataUnitarySystems->unitarySys.push_back(thisSys);
+                } else {
+                    state.dataUnitarySystems->unitarySys[sysNum] = thisSys;
+                }
+            }
+            // at this point all CoilWaterSys objects must be read 
+            state.dataUnitarySystems->getCoilWaterSysInputOnceFlag = false;
+        }
+    }
 
 ### SimAirServingZones::GetAirPathData ###
 Adds a "CoilSystem:Cooling:Water" coil type and a pointer to the airpath data
 
 SimAirServingZones::GetAirPathData
 
-    } else if (componentType == "COILSYSTEM:COOLING:DX") {
-        state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).
-            Comp(CompNum).CompType_Num = DXSystem;
-    } else if (componentType == "COILSYSTEM:HEATING:DX") {
-        state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).
-            Comp(CompNum).CompType_Num = DXHeatPumpSystem;
-    } else if (componentType == "COIL:USERDEFINED") {
-        state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).
-            Comp(CompNum).CompType_Num = CoilUserDefined;
+
     } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
         state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).
             Comp(CompNum).CompType_Num = UnitarySystemModel;
@@ -493,7 +413,7 @@ SimAirServingZones::GetAirPathData
                             false,
                             0);
 
-    **New factory call:**
+    **New factory call: uses unitarysystem factory call**
 
     } else if (componentType == "COILSYSTEM:COOLING:WATER") {
         state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).
@@ -511,6 +431,21 @@ SimAirServingZones::GetAirPathData
     } else {}...
 
 ### SimAirServingZones::SimAirLoopComponent ###
+
+Adds three new argument to SimAirLoopComponent() to be able to retrive a compPointer during Sim():
+
+    void SimAirLoopComponent(EnergyPlusData &state,
+                             std::string const &CompName, // the component Name
+                             int CompType_Num,            // numeric equivalent for component type
+                             bool FirstHVACIteration,     // TRUE if first full HVAC iteration in an HVAC timestep
+                             int AirLoopNum,              // Primary air loop number
+                             int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
+                             HVACSystemData *CompPointer, // equipment actual pointer
+                             int const &airLoopNum,       // index to AirloopHVAC
+                             int const &branchNum,        // index to AirloopHVAC branch
+                             int const &compNum           // index to AirloopHVAC branch component
+    );
+	
 
 Adds new simulate call using override for HVACSystemData::simulate:
 
@@ -553,8 +488,14 @@ SimAirServingZones::SimAirLoopComponent
 
             **New simulate call for CoilWaterSystem using override for HVACSystemData::simulate:**
 
-            } else if (SELECT_CASE_var == CoilWaterSystem) {
-                // 'CoilSystem:Cooling:Water'
+            else if (SELECT_CASE_var == CoilSystemWater) { // 'CoilSystem:Cooling:Water'
+			
+				if (CompPointer == nullptr) {
+					UnitarySystems::UnitarySys thisSys;
+					CompPointer = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+					// temporary fix for saving pointer, eventually apply to UnitarySystem 25 lines down
+					state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Branch(branchNum).Comp(compNum).compPointer = CompPointer;
+				}			
                 Real64 sensOut = 0.0;
                 Real64 latOut = 0.0;
                 CompPointer->simulate(state,
@@ -578,105 +519,6 @@ Add component type for 'CoilSystem:Cooling:Water' in Primary Air Loop
 
     Add component type here
     constexpr int CoilWaterSystems(31);
-
-### CoilWaterSystems.cc ###
-New file:
-
-    void CoilWaterSys::simulate(EnergyPlusData &state,
-                                std::string const &Name,
-                                bool const FirstHVACIteration,
-                                int const &AirLoopNum,
-                                int &CompIndex,
-                                bool &HeatActive,
-                                bool &CoolActive,
-                                int const ZoneOAUnitNum,
-                                Real64 const OAUCoilOutTemp,
-                                bool const ZoneEquipment,
-                                Real64 &sysOutputProvided,
-                                Real64 &latOutputProvided)
-    {
-
-
-		Get Input Here
-
-	    if (this->myOneTimeInitFlag) {
-		    set report variables here
-            this->setOutputReportVariables(state);
-            this->myOneTimeInitFlag = false;
-        }
-
-        init water systems coils
-        this->initCoilWaterSystems(state, AirLoopNum, FirstHVACIteration);
-
-		control water systems coils
-        this->controlCoilWaterSystems(state, AirLoopNum, FirstHVACIteration);
-
-        report the current output:
-        this->reportCoilWaterSystems(state, AirLoopNum);
-
-    }
-
-	void CoilWaterSys::initCoilWaterSystems(EnergyPlusData &state,
-	                                        int const AirLoopNum)
-	{
-		check if there is a setpoint on the coil air outlet node
-
-		get setpoint value each iteration for temperature or humidity ratio setpoints
-
-		initialize cooling coil water flow rates on the demand side of condenser loop
-		at the beginning of each environment
-
-		set the waster-side econmizer enable/disbale flag
-
-	}
-
-    void CoilWaterSys::controlWaterCoolingCoil(EnergyPlusData &state,
-	                                           int const AirLoopNum,
-                                               bool const FirstHVACIteration
-    )
-	{
-	    determines coil water flow rate that meets the temperature or humidity setpoint
-	    for each water coil type. Uses regulafolsi to compute coil water flow fraction
-
-		implementation steps:
-		(1) check the coil is available and air flow rate is not zero
-		(2) check the water-side economizer enabling falg
-		(3) check the control type: RunOnSensibleLoad or RunOnLatentLoad
-		(4) do calculation for each control type and for each cooling coil type
-		(5) First: do temperature control calculation
-		(6) check if dehumid control is active and check if desired HumRat is met
-		(7) Second: do HumRat control calculation if the desired HumRat is not met
-		(8) save output variables
-
-	}
-
-    void CoilWaterSys::setupOutputVariables(EnergyPlus::EnergyPlusData &state)
-    {
-	    Adds the following report variables
-
-		Cooling Coil Water Flow Rate
-		Cooling Coil Water Flow Fraction
-		Cooling Coil Total Cooling Rate
-		Cooling Coil Total Cooling Energy
-		Cooling Coil Source Side Heat Transfer Energy
-		Cooling Coil Sensible Cooling Rate
-		Cooling Coil Sensible Cooling Energy
-	    Cooling Coil Water-Side Economizer Status
-	}
-
-	Real64 CoilWaterSys::calcCoilWaterSystemTempResidual(EnergyPlusData &state,
-	             Real64 const WaterFlowFraction, std::vector<Real64> const &Par)
-	{}
-
-	Real64 CoilWaterSys::calcCoilWaterSystemHumRatResidual(EnergyPlusData &state,
-	             Real64 const WaterFlowFraction, std::vector<Real64> const &Par)
-	{}
-
-	void CoilWaterSys::reportCoilWaterSystems(EnergyPlusData &state,
-	                                          int const AirLoopNum)
-    {
-	     update report variables for water cooling coils
-	}
 
 
 ### DataPlant.cc ###
@@ -703,18 +545,6 @@ New file:
 						  .LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 					...
 
-				   } else if (UtilityRoutines::SameString(this_comp_type,
-				        "Coil:Cooling:Water")) {
-						this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
-						this_comp.CurOpSchemeType = DemandOpSchemeType;
-					} else if (UtilityRoutines::SameString(this_comp_type,
-			            "Coil:Cooling:Water:DetailedGeometry")) {
-						this_comp.TypeOf_Num = TypeOf_CoilWaterDetailedFlatCooling;
-						this_comp.CurOpSchemeType = DemandOpSchemeType;
-					} else if (UtilityRoutines::SameString(this_comp_type,
-					    "Coil:Heating:Water")) {
-						this_comp.TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
-						this_comp.CurOpSchemeType = DemandOpSchemeType;
 					} else if (UtilityRoutines::SameString(this_comp_type,
 					    "Coil:Heating:Steam")) {
 						this_comp.TypeOf_Num = TypeOf_CoilSteamAirHeating;
@@ -753,6 +583,13 @@ Add similate calling point under SimOAComponent() function
 		**New simulate call for CoilWaterSystem**
 		} else if (SELECT_CASE_var == CoilWaterSystem) { // // 'CoilSystem:Cooling:Water'
 
+                if (state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] == nullptr) {
+                    UnitarySystems::UnitarySys thisSys;
+                    state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompIndex] =
+                        thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                    UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
+                }
+				
 	            if (Sim) {
                 bool HeatingActive = false;
                 bool CoolingActive = false;
