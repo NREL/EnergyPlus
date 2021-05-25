@@ -410,7 +410,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Water,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  2,
+                                  NodeInputManager::compFluidStream::Secondary,
                                   ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -420,7 +420,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Water,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  2,
+                                  NodeInputManager::compFluidStream::Secondary,
                                   ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                                               AlphArray(4),
@@ -429,7 +429,7 @@ namespace WaterToAirHeatPumpSimple {
                                                                                                               AlphArray(1),
                                                                                                               DataLoopNode::NodeFluidType::Air,
                                                                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                              1,
+                                                                                                              NodeInputManager::compFluidStream::Primary,
                                                                                                               ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -439,7 +439,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
@@ -588,7 +588,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Water,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  2,
+                                  NodeInputManager::compFluidStream::Secondary,
                                   ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WaterOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -598,7 +598,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Water,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  2,
+                                  NodeInputManager::compFluidStream::Secondary,
                                   ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                                               AlphArray(4),
@@ -607,7 +607,7 @@ namespace WaterToAirHeatPumpSimple {
                                                                                                               AlphArray(1),
                                                                                                               DataLoopNode::NodeFluidType::Air,
                                                                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                              1,
+                                                                                                              NodeInputManager::compFluidStream::Primary,
                                                                                                               ObjectIsNotParent);
             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).AirOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -617,7 +617,7 @@ namespace WaterToAirHeatPumpSimple {
                                   AlphArray(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
