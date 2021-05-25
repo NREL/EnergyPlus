@@ -17224,7 +17224,6 @@ TEST_F(EnergyPlusFixture, getCoilWaterSystemInputDataTest)
     EXPECT_TRUE(process_idf(idf_objects, false));
 
     bool zoneEquipment = false;
-    bool FirstHVACIteration = true;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
 
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
