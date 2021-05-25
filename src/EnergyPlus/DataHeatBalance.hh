@@ -2181,11 +2181,9 @@ struct HeatBalanceData : BaseGlobalStruct
     // Originally QD, now used only for EnclSolQSDifSol calc for daylighting
     Array1D<Real64> EnclSolVMULT;       // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     Array1D<Real64> EnclRadQThermalRad; // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
-
-    // todo - the following in absorptance branch
-//    Array1D<Real64> ITABSF; // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
-    Array1D<Real64> ZoneThermAbsMult;  // ZoneThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
-
+    Array1D<Real64> ZoneThermAbsMult;   // ZoneThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
+    Array1D<bool> ZoneSolAbsFirstCalc;  // for error message
+    Array1D<bool> EnclRadReCalc;        // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
     // todo - the following in absorptance branch
     Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
@@ -2468,10 +2466,9 @@ struct HeatBalanceData : BaseGlobalStruct
         this->EnclSolQDforDaylight.deallocate();
         this->EnclSolVMULT.deallocate();
         this->EnclRadQThermalRad.deallocate();
-
-//        this->ITABSF.deallocate();
         this->ZoneThermAbsMult.deallocate();
-
+        this->ZoneSolAbsFirstCalc.deallocate();
+        this->EnclRadReCalc.deallocate();
         this->SunlitFracHR.deallocate();
         this->CosIncAngHR.deallocate();
         this->SunlitFrac.deallocate();

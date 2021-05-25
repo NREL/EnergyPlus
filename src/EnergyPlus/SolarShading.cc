@@ -10019,6 +10019,23 @@ void WindowShadingManager(EnergyPlusData &state)
             }
         } // End of surface loop
     }
+    for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+        state.dataHeatBal->EnclRadReCalc(enclosureNum) = false;
+        for (int const SurfNum : state.dataViewFactor->ZoneRadiantInfo(enclosureNum).SurfacePtr) {
+            bool surfShadingStatusChange =
+                state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum) != state.dataSurface->SurfWinShadingFlag(SurfNum) ||
+                state.dataSurface->Surface(SurfNum).activeShadedConstruction != state.dataSurface->Surface(SurfNum).activeShadedConstructionPrev ||
+                state.dataSurface->SurfWinMovableSlats(SurfNum);
+            if (surfShadingStatusChange || state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TCFlag == 1 ||
+                state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
+                state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+                break;
+            }
+        }
+        if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel ||
+            state.dataWindowManager->winOpticalModel->isSimplifiedModel())
+            state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+    }
 }
 
 DataSurfaces::WinShadingType findValueInEnumeration(Real64 controlValue)
@@ -11582,7 +11599,6 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
         // Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
         for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
             // Skip surfaces that are not exterior, except for TDD_Diffusers
-            // TODO: why not ExtSolar
             if (((state.dataSurface->Surface(DifTransSurfNum).ExtBoundCond != ExternalEnvironment) &&
                  (state.dataSurface->Surface(DifTransSurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
                 state.dataSurface->SurfWinOriginalClass(DifTransSurfNum) != SurfaceClass::TDD_Diffuser)

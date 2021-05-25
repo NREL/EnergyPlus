@@ -4031,6 +4031,9 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
                 Real64 BlindEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                 Real64 GlassEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
                 state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) = BlindEmiss + GlassEmiss;
+            } else {
+                int ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
+                state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
             }
         }
     }
@@ -4057,19 +4060,12 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
             }
         }
     }
-    if (state.dataEnvrn->Month == 7 && state.dataEnvrn->DayOfMonth == 21)
-        std::cout << state.dataGlobal->HourOfDay << ", " << state.dataHeatBalSurf->SurfAbsThermalInt(7) << std::endl;
 
     for (int radEnclosureNum = 1; radEnclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++radEnclosureNum) {
-
-        Real64 SUM1 = 0.0;
         auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(radEnclosureNum));
-
+        if (!state.dataHeatBal->EnclRadReCalc(radEnclosureNum)) continue;
+        Real64 SUM1 = 0.0;
         for (int const SurfNum : thisEnclosure.SurfacePtr) {
-//            if (!state.dataGlobal->BeginSimFlag &&
-//                state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum) == state.dataSurface->SurfWinShadingFlag(SurfNum) &&
-//                Surface(SurfNum).activeShadedConstruction == Surface(SurfNum).activeShadedConstructionPrev)
-//                continue;
             if (!Surface(SurfNum).HeatTransSurf) continue;
             int const ConstrNum = Surface(SurfNum).Construction;
             WinShadingType ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
@@ -4169,24 +4165,13 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
     // REFERENCES:
     // BLAST Routine - CIVAF - Compute Surface Absorption Factors For Short Wave Radiation
     //                         From Zone Lights And Diffuse Solar.
-    // Using/Aliasing
-    using General::InterpSw;
-    using namespace DataWindowEquivalentLayer;
 
     auto &Surface(state.dataSurface->Surface);
-
-    Real64 const SmallestAreaAbsProductAllowed(
-        0.01); // Avoid a division by zero of the user has entered a bunch of surfaces with zero absorptivity on the inside
-
-    if (!allocated(state.dataHeatBal->EnclSolVMULT)) {
-        state.dataHeatBal->EnclSolVMULT.dimension(state.dataViewFactor->NumOfSolarEnclosures, 0.0);
-    }
-    if (state.dataHeatBalSurfMgr->ComputeIntSWAbsorpFactorsfirstTime) {
-        state.dataHeatBalSurfMgr->FirstCalcZone.dimension(state.dataGlobal->NumOfZones, true);
-        state.dataHeatBalSurfMgr->ComputeIntSWAbsorpFactorsfirstTime = false;
-    }
+    // Avoid a division by zero of the user has entered a bunch of surfaces with zero absorptivity on the inside
+    Real64 const SmallestAreaAbsProductAllowed(0.01);
 
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+        if (!state.dataHeatBal->EnclRadReCalc(enclosureNum)) continue;
         Real64 SUM1 = 0.0; // Intermediate calculation value for solar absorbed and transmitted
 
         for (int const SurfNum : state.dataViewFactor->ZoneSolarInfo(enclosureNum).SurfacePtr) {
@@ -4229,7 +4214,8 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
 
                         // Switchable glazing
                         if (ShadeFlag == WinShadingType::SwitchableGlazing)
-                            AbsDiffLayWin = InterpSw(SwitchFac, AbsDiffLayWin, state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(Lay));
+                            AbsDiffLayWin =
+                                General::InterpSw(SwitchFac, AbsDiffLayWin, state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(Lay));
 
                         AbsDiffTotWin += AbsDiffLayWin;
                     }
@@ -4265,7 +4251,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
                     // Switchable glazing
 
                     if (ShadeFlag == WinShadingType::SwitchableGlazing)
-                        TransDiffWin = InterpSw(SwitchFac, TransDiffWin, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
+                        TransDiffWin = General::InterpSw(SwitchFac, TransDiffWin, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
 
                     SUM1 += Surface(SurfNum).Area * (TransDiffWin + AbsDiffTotWin + DiffAbsShade);
 
@@ -4318,16 +4304,15 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
             // back out whatever window is there.  Note that this also assumes that the shade has no effect.
             // That's probably not correct, but how correct is it to assume that no solar is absorbed anywhere
             // in the zone?
-            if (state.dataHeatBalSurfMgr->FirstCalcZone(enclosureNum)) {
+            if (state.dataHeatBal->ZoneSolAbsFirstCalc(enclosureNum)) {
                 ShowWarningError(state,
                                  "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: " +
                                      state.dataViewFactor->ZoneSolarInfo(enclosureNum).Name);
-                state.dataHeatBalSurfMgr->FirstCalcZone(enclosureNum) = false;
+                state.dataHeatBal->ZoneSolAbsFirstCalc(enclosureNum) = false;
             }
             state.dataHeatBal->EnclSolVMULT(enclosureNum) = 0.0;
         }
     } // End of zone/enclosure loop
-    //    std::cout << state.dataGlobal->HourOfDay << ", " << state.dataGlobal->TimeStep << ", " << state.dataHeatBal->EnclSolVMULT(1) << "\n";
 }
 
 void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEnclosures) // Number of solar enclosures
@@ -4560,18 +4545,15 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // change construction on surface if overriden by EMS
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool SurfConstructOverridesPresent(false); // detect if EMS ever used for this and inits need to execute
-
     auto &Surface(state.dataSurface->Surface);
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (state.dataSurface->SurfEMSConstructionOverrideON(SurfNum)) {
-            SurfConstructOverridesPresent = true;
+            state.dataGlobal->AnyConstrOverridesInModel = true;
             break;
         }
     }
-    if (!SurfConstructOverridesPresent) return;
+    if (!state.dataGlobal->AnyConstrOverridesInModel) return;
 
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
