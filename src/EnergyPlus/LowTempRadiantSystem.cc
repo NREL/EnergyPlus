@@ -743,7 +743,7 @@ namespace LowTempRadiantSystem {
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                          1,
+                                                          NodeInputManager::compFluidStream::Primary,
                                                           ObjectIsNotParent);
 
             thisRadSys.HotWaterOutNode = GetOnlySingleNode(state,
@@ -753,7 +753,7 @@ namespace LowTempRadiantSystem {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                           1,
+                                                           NodeInputManager::compFluidStream::Primary,
                                                            ObjectIsNotParent);
 
             if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
@@ -803,7 +803,7 @@ namespace LowTempRadiantSystem {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           2,
+                                                           NodeInputManager::compFluidStream::Secondary,
                                                            ObjectIsNotParent);
 
             thisRadSys.ColdWaterOutNode = GetOnlySingleNode(state,
@@ -813,7 +813,7 @@ namespace LowTempRadiantSystem {
                                                             Alphas(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            2,
+                                                            NodeInputManager::compFluidStream::Secondary,
                                                             ObjectIsNotParent);
 
             if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
@@ -1028,7 +1028,7 @@ namespace LowTempRadiantSystem {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           1,
+                                                           NodeInputManager::compFluidStream::Primary,
                                                            ObjectIsNotParent);
 
             thisCFloSys.HotWaterOutNode = GetOnlySingleNode(state,
@@ -1038,7 +1038,7 @@ namespace LowTempRadiantSystem {
                                                             Alphas(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            1,
+                                                            NodeInputManager::compFluidStream::Primary,
                                                             ObjectIsNotParent);
 
             if ((!lAlphaBlanks(7)) || (!lAlphaBlanks(8))) {
@@ -1085,7 +1085,7 @@ namespace LowTempRadiantSystem {
                                                             Alphas(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                            2,
+                                                            NodeInputManager::compFluidStream::Secondary,
                                                             ObjectIsNotParent);
 
             thisCFloSys.ColdWaterOutNode = GetOnlySingleNode(state,
@@ -1095,7 +1095,7 @@ namespace LowTempRadiantSystem {
                                                              Alphas(1),
                                                              DataLoopNode::NodeFluidType::Water,
                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                             2,
+                                                             NodeInputManager::compFluidStream::Secondary,
                                                              ObjectIsNotParent);
 
             if ((!lAlphaBlanks(13)) || (!lAlphaBlanks(14))) {

@@ -722,7 +722,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
                       std::string const &NodeObjectName,                         // Node Object Name (i.e. "MyChiller")
                       DataLoopNode::NodeFluidType const NodeFluidType,           // Fluidtype for checking/setting node FluidType
                       DataLoopNode::NodeConnectionType const NodeConnectionType, // Node Connection Type (see DataLoopNode)
-                      compFluidStream const NodeFluidStream,                     // Which Fluid Stream (1,2,3,...)
+                      compFluidStream const NodeFluidStream,                     // Which Fluid Stream
                       bool const ObjectIsParent,                                 // True/False
                       Optional_string_const InputFieldName                       // Input Field Name
 )
