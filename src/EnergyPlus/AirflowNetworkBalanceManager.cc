@@ -2552,7 +2552,7 @@ namespace AirflowNetworkBalanceManager {
                                                     "AirflowNetwork:Multizone:Surface",
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     ObjectIsParent);
                         state.dataAirflowNetwork->MultizoneExternalNodeData(i).OutAirNodeNum = NodeNum;       // Name of outdoor air node
                         state.dataAirflowNetwork->MultizoneExternalNodeData(i).height = Node(NodeNum).Height; // Nodal height

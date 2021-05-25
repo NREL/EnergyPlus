@@ -75,15 +75,15 @@ using namespace DataLoopNode;
 using namespace DataBranchNodeConnections;
 
 void RegisterNodeConnection(EnergyPlusData &state,
-                            int const NodeNumber,                // Number for this Node
-                            std::string const &NodeName,         // Name of this Node
-                            std::string const &ObjectType,       // Type of object this Node is connected to (e.g. Chiller:Electric)
-                            std::string const &ObjectName,       // Name of object this Node is connected to (e.g. MyChiller)
-                            std::string const &ConnectionType,   // Connection Type for this Node (must be valid)
-                            int const FluidStream,               // Count on Fluid Streams
-                            bool const IsParent,                 // True when node is a parent node
-                            bool &errFlag,                       // Will be True if errors already detected or if errors found here
-                            Optional_string_const InputFieldName // Input Field Name
+                            int const NodeNumber,                                // Number for this Node
+                            std::string const &NodeName,                         // Name of this Node
+                            std::string const &ObjectType,                       // Type of object this Node is connected to (e.g. Chiller:Electric)
+                            std::string const &ObjectName,                       // Name of object this Node is connected to (e.g. MyChiller)
+                            std::string const &ConnectionType,                   // Connection Type for this Node (must be valid)
+                            NodeInputManager::compFluidStream const FluidStream, // Count on Fluid Streams
+                            bool const IsParent,                                 // True when node is a parent node
+                            bool &errFlag,                                       // Will be True if errors already detected or if errors found here
+                            Optional_string_const InputFieldName                 // Input Field Name
 )
 {
 
