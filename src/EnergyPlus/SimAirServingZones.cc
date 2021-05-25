@@ -1238,10 +1238,10 @@ void GetAirPathData(EnergyPlusData &state)
                         UnitarySystems::UnitarySys thisSys;
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
                             thisSys.factory(state,
-                                DataHVACGlobals::UnitarySys_AnyCoilType,
-                                PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
-                                false,
-                                0);
+                                            DataHVACGlobals::UnitarySys_AnyCoilType,
+                                            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
+                                            false,
+                                            0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {
@@ -3615,7 +3615,6 @@ void SimAirLoopComponent(EnergyPlusData &state,
                                   sensOut,
                                   latOut);
         } else if (SELECT_CASE_var == CoilSystemWater) { // 'CoilSystemCooling:Water'
-
             if (CompPointer == nullptr) {
                 UnitarySystems::UnitarySys thisSys;
                 CompPointer = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
@@ -3625,18 +3624,17 @@ void SimAirLoopComponent(EnergyPlusData &state,
             Real64 sensOut = 0.0;
             Real64 latOut = 0.0;
             CompPointer->simulate(state,
-                CompName,
-                FirstHVACIteration,
-                AirLoopNum,
-                CompIndex,
-                HeatingActive,
-                CoolingActive,
-                OAUnitNum,
-                OAUCoilOutTemp,
-                ZoneEquipFlag,
-                sensOut,
-                latOut);
-
+                                  CompName,
+                                  FirstHVACIteration,
+                                  AirLoopNum,
+                                  CompIndex,
+                                  HeatingActive,
+                                  CoolingActive,
+                                  OAUnitNum,
+                                  OAUCoilOutTemp,
+                                  ZoneEquipFlag,
+                                  sensOut,
+                                  latOut);
         } else if (SELECT_CASE_var == Furnace_UnitarySys_HeatOnly || SELECT_CASE_var == Furnace_UnitarySys_HeatCool) {
             // 'AirLoopHVAC:Unitary:Furnace:HeatOnly', 'AirLoopHVAC:Unitary:Furnace:HeatCool',
             // 'AirLoopHVAC:UnitaryHeatOnly', 'AirLoopHVAC:UnitaryHeatCool'
