@@ -888,6 +888,7 @@ namespace UnitarySystems {
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
     // void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
     bool searchTotalComponents(EnergyPlusData &state, std::string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
+    void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct
@@ -952,6 +953,7 @@ struct UnitarySystemsData : BaseGlobalStruct
 
     bool myOneTimeFlag = true;
     bool getInputFlag = true;
+    bool reportVariablesAreSetup = false;
 
     bool getCoilWaterSysInputOnceFlag = true;
     std::string const coilSysCoolingWaterObjectName = "CoilSystem:Cooling:Water";
@@ -985,6 +987,7 @@ struct UnitarySystemsData : BaseGlobalStruct
         initUnitarySystemsQActual = 0.0;
         getMSHPInputOnceFlag = true;
         getInputOnceFlag = true;
+        reportVariablesAreSetup = false;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         myOneTimeFlag = true;
