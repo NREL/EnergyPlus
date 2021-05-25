@@ -428,6 +428,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
     state->dataEconTariff->tariff(2).isSelected = true;
     state->dataEconTariff->tariff(2).totalAnnualCost = 415.56;
     state->dataEconTariff->tariff(2).totalAnnualEnergy = 0.00;
+    state->dataEconTariff->tariff(2).kindGasMtr = 1;
     state->dataEconTariff->tariff(2).reportMeterIndx = 2;
 
     state->dataEconTariff->tariff(3).tariffName = "DistrictCoolingUnit";
