@@ -48,6 +48,9 @@
 #ifndef ScheduleManager_hh_INCLUDED
 #define ScheduleManager_hh_INCLUDED
 
+// C++ Headers
+#include <set>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.hh>
@@ -328,6 +331,107 @@ namespace ScheduleManager {
 
     int GetNumberOfSchedules(EnergyPlusData &state);
 
+    struct CSVRow
+    {
+        std::string_view operator[](std::size_t index) const;
+        std::size_t rowEnd();
+        std::string delimiter{'*'}; // eg. comma in CSV
+        void readNextRow(std::istream &str);
+
+    private:
+        std::string m_line;
+        std::vector<int> m_data;
+    };
+
+    std::istream &operator>>(std::istream &str, CSVRow &data);
+
+    void PreProcessIDF(EnergyPlus::EnergyPlusData &state, int &SchNum, int NumCommaFileSchedules);
+
+    struct schedInputIdfPreprocessObject
+    {
+        std::string name;     // <- can inherit from parent sched class
+        std::string fileName; // <- can inherit from parent sched class
+        int ScheduleTypePtr{-1};
+        int columnOfInterest{-1};
+        int numHourlyValues{-1};
+        int MinutesPerItem{-1};
+        int rowsToSkip{-1};
+        bool FileIntervalInterpolated{false};
+        std::basic_string<char> columnSeperator{"*"};
+        int columnarDataIndex{-1}; // TODO : Figure out what to do here (size_t to int conversion)
+        int SchNum{-1};
+
+        schedInputIdfPreprocessObject(std::string name,     // <- can inherit from parent sched class
+                                      std::string fileName, // <- can inherit from parent sched class
+                                      int ScheduleTypePtr = -1,
+                                      int columnOfInterest = -1,
+                                      int numHourlyValues = -1,
+                                      int MinutesPerItem = -1,
+                                      int rowsToSkip = -1,
+                                      bool FileIntervalInterpolated = false,
+                                      std::basic_string<char> columnSeperator = "*",
+                                      int SchNum = -1)
+        {
+
+            this->name = name;
+            this->fileName = fileName;
+            this->ScheduleTypePtr = ScheduleTypePtr;
+            this->columnOfInterest = columnOfInterest - 1; // - 1 to get index to match with c++ containers (start at 0)
+            this->numHourlyValues = numHourlyValues;
+            this->MinutesPerItem = MinutesPerItem;
+            this->rowsToSkip = rowsToSkip;
+            this->FileIntervalInterpolated = FileIntervalInterpolated;
+            this->columnSeperator = columnSeperator;
+            this->SchNum = SchNum;
+        }
+        void setColumnarDataIndex(int incomingData)
+        {
+            this->columnarDataIndex = incomingData;
+        }
+    };
+
+    void PopulateSetOfFilenames(const std::vector<schedInputIdfPreprocessObject> &allIdfSchedData, std::set<std::string> &setOfFilenames);
+
+    struct PreProcessedColumn
+    {
+        std::string name;
+        int columnOfInterest = -1;
+        int numHourlyValues = -1;
+        int MinutesPerItem = -1;
+        int rowsToSkip = -1;
+        bool FileIntervalInterpolated = false;
+        int ScheduleTypePtr = -1;
+        int SchNum = -1;
+        std::string fileName;
+        std::string delimiter;
+        std::vector<Real64> vals; // rows to skip + number of hours*items/hour
+
+        PreProcessedColumn(std::string name, // <- can inherit from parent sched class
+                           int columnOfInterest,
+                           int numHourlyValues,
+                           int MinutesPerItem,
+                           int rowsToSkip,
+                           bool FileIntervalInterpolated,
+                           std::string fileName,
+                           std::string delimiter,
+                           int ScheduleTypePtr,
+                           int SchNum,
+                           std::vector<Real64> vals)
+        {
+            this->name = name; // <- can inherit from parent sched class
+            this->columnOfInterest = columnOfInterest;
+            this->numHourlyValues = numHourlyValues;
+            this->MinutesPerItem = MinutesPerItem;
+            this->rowsToSkip = rowsToSkip;
+            this->FileIntervalInterpolated = FileIntervalInterpolated;
+            this->fileName = fileName;
+            this->delimiter = delimiter;
+            this->ScheduleTypePtr = ScheduleTypePtr;
+            this->SchNum = SchNum;
+            this->vals = vals;
+        }
+    };
+
 } // namespace ScheduleManager
 
 struct ScheduleManagerData : BaseGlobalStruct
@@ -355,6 +459,10 @@ struct ScheduleManagerData : BaseGlobalStruct
     Array1D<ScheduleManager::WeekScheduleData> WeekSchedule; // Week Schedule Storage
     Array1D<ScheduleManager::ScheduleData> Schedule;         // Schedule Storage
 
+    // Schedule:File variables
+    std::vector<ScheduleManager::schedInputIdfPreprocessObject> allIdfSchedData;
+    std::vector<ScheduleManager::PreProcessedColumn> columnarData;
+
     void clear_state() override
     {
         CheckScheduleValueMinMaxRunOnceOnly = true;
@@ -376,6 +484,9 @@ struct ScheduleManagerData : BaseGlobalStruct
         DaySchedule.clear();  // Day Schedule Storage
         WeekSchedule.clear(); // Week Schedule Storage
         Schedule.clear();     // Schedule Storage
+
+        allIdfSchedData.clear();
+        columnarData.clear();
     }
 };
 

@@ -1695,354 +1695,233 @@ namespace ScheduleManager {
             hourlyFileValues.allocate(8784 * 60); // sized to accomodate any interval for schedule file.
         }
         CurrentModuleObject = "Schedule:File";
-        for (LoopIndex = 1; LoopIndex <= NumCommaFileSchedules; ++LoopIndex) {
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     CurrentModuleObject,
-                                                                     LoopIndex,
-                                                                     Alphas,
-                                                                     NumAlphas,
-                                                                     Numbers,
-                                                                     NumNumbers,
-                                                                     Status,
-                                                                     lNumericBlanks,
-                                                                     lAlphaBlanks,
-                                                                     cAlphaFields,
-                                                                     cNumericFields);
-            GlobalNames::VerifyUniqueInterObjectName(
-                state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-            ++SchNum;
-            state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
-            state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
-            // Validate ScheduleType
-            if (state.dataScheduleMgr->NumScheduleTypes > 0) {
-                CheckIndex = 0;
-                if (!lAlphaBlanks(2))
-                    CheckIndex =
-                        UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
-                if (CheckIndex == 0) {
-                    if (!lAlphaBlanks(2)) {
-                        ShowWarningError(state,
-                                         "ProcessScheduleInput: For " + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
-                                             Alphas(2) + "\" not found -- will not be validated");
-                    } else {
-                        ShowWarningError(state,
-                                         "For " + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
-                                             " input -- will not be validated.");
-                    }
-                } else {
-                    state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr = CheckIndex;
+
+        std::set<std::string> setOfFilenames;
+
+        PreProcessIDF(state, SchNum, NumCommaFileSchedules);
+        PopulateSetOfFilenames(state.dataScheduleMgr->allIdfSchedData, setOfFilenames);
+
+        //        for (const std::string &item : setOfFilenames) {
+        //            std::cout << (item) << ", Cols: " << state.dataScheduleMgr->maxColByFile[item] << " set \n";
+        //        }
+
+        // for item in allIdfSchedData, emplace_back in columnarData, calling constructor forPreProcessedColumn which will take information
+
+        // reserving vector space and assign attributes to each columnarData object
+
+        // we use fileName in the outer loop so that the columnarData vector is easy to populate later
+        for (const std::string& fileNameItem : setOfFilenames) {
+            for (schedInputIdfPreprocessObject &item : state.dataScheduleMgr->allIdfSchedData) {
+                if (item.fileName == fileNameItem) {
+                    int numberOfRows = (item.numHourlyValues * 60.0) / item.MinutesPerItem;
+                    std::vector<Real64> vals;
+                    vals.reserve(numberOfRows); // pre-allocating the big vector
+                    item.setColumnarDataIndex(state.dataScheduleMgr->columnarData.size()); // TODO: this is a kludgy-hack
+
+                    // give each schedule it's own column in columnarData
+                    state.dataScheduleMgr->columnarData.emplace_back(item.name,
+                                                                     item.columnOfInterest,
+                                                                     item.numHourlyValues,
+                                                                     item.MinutesPerItem,
+                                                                     item.rowsToSkip,
+                                                                     item.FileIntervalInterpolated,
+                                                                     item.fileName,
+                                                                     item.columnSeperator,
+                                                                     item.ScheduleTypePtr,
+                                                                     item.SchNum,
+                                                                     vals);
                 }
             }
-            hourlyFileValues = 0.0; // set default values to zero
+        }
 
-            // Numbers(1) - which column
-            curcolCount = Numbers(1);
-            // Numbers(2) - number of rows to skip
-            skiprowCount = Numbers(2);
-            if (Numbers(3) == 0) Numbers(3) = 8760.0;
-            if (Numbers(3) != 8760 && Numbers(3) != 8784) {
-                ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cNumericFields(3) +
-                                    " must = 8760 or 8784 (for a leap year)");
-                ShowContinueError(state, format("..Value for field = {:.0T}, Schedule not processed.", Numbers(3)));
-                ErrorsFound = true;
-                continue;
-            }
+        // make a map of index and Names - Not needed
+        // map of allIdfSchedData.colNumber() and columnarData.index
+        // While walking through the file,
+        // filename,colNumber  is  corresponding to ColumnarData.index
+        // correct row - dont check now
+        // columnarData[<column> index].vals[<row>] = token being read
 
-            if (lAlphaBlanks(4) || UtilityRoutines::SameString(Alphas(4), "comma")) {
-                ColumnSep = CharComma;
-                Alphas(4) = "comma";
-            } else if (UtilityRoutines::SameString(Alphas(4), "semicolon")) {
-                ColumnSep = CharSemicolon;
-            } else if (UtilityRoutines::SameString(Alphas(4), "tab")) {
-                ColumnSep = CharTab;
-            } else if (UtilityRoutines::SameString(Alphas(4), "space")) {
-                ColumnSep = CharSpace;
-            } else {
-                ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(4) + " illegal value=\"" + Alphas(4) +
-                                    "\".");
-                ShowContinueError(state, "..must be Comma, Semicolon, Tab, or Space.");
-                ErrorsFound = true;
-                continue;
-            }
-
-            // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
-            FileIntervalInterpolated = false;
-            if (lAlphaBlanks(5)) Alphas(5) = "NO";
-            if (Alphas(5) != "NO" && Alphas(5) != "YES") {
-                ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(5) + "\" field=\"" +
-                                    Alphas(5) + "\"");
-                ErrorsFound = true;
-            } else if (Alphas(5) != "YES") { // No validation done on the value of the interpolation field
-                FileIntervalInterpolated = false;
-            } else {
-                FileIntervalInterpolated = true;
-            }
-
-            // is it a sub-hourly schedule or not?
-            MinutesPerItem = 60;
-            if (NumNumbers > 3) {
-                MinutesPerItem = int(Numbers(4));
-                NumExpectedItems = 1440 / MinutesPerItem;
-                if (mod(60, MinutesPerItem) != 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1));
-                    ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(4), MinutesPerItem));
-                    ErrorsFound = true;
-                    continue;
+        // for item in setOfFilenames fill in appropriate  cells of columnar data
+        for (const std::string& fileNameItem : setOfFilenames) {
+            // go through all in allIdfSchedData, filter which sched belong to this file
+            // get their column map
+            std::map<int, int> colNumToColDataIndex;
+            std::vector<int> vectorOfCSVColNumbers;
+            for (const schedInputIdfPreprocessObject& item : state.dataScheduleMgr->allIdfSchedData) {
+                if (item.fileName == fileNameItem) {
+                    colNumToColDataIndex[item.columnOfInterest] = item.columnarDataIndex;
+                    vectorOfCSVColNumbers.push_back(item.columnOfInterest);
                 }
             }
 
-            numHourlyValues = Numbers(3);
-            rowLimitCount = (Numbers(3) * 60.0) / MinutesPerItem;
-            hrLimitCount = 60 / MinutesPerItem;
+            // find if there is a many to one mapping
+            std::sort(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // sorting to use std::adjacent_find
+            const auto duplicate = std::adjacent_find(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // what if there are multiple last elements?
+            if (duplicate != vectorOfCSVColNumbers.end())
+                std::cout << "Duplicate element = " << *duplicate << "\n";
 
-            //    ! Number of numbers in the Numbers list okay to process
-            //    Hr=1
-            //    CurMinute=MinutesPerItem
-            //    SCount=1
-            //    DO NumFields=2,NumNumbers
-            //      MinuteValue(Hr,SCount:CurMinute)=Numbers(NumFields)
-            //      SCount=CurMinute+1
-            //      CurMinute=CurMinute+MinutesPerItem
-            //      IF (CurMinute > 60) THEN
-            //        CurMinute=MinutesPerItem
-            //        SCount=1
-            //        Hr=Hr+1
-            //      ENDIF
-            //    ENDDO
-            //    ! Now parcel into TS Value....
-            //    IF (DaySchedule(Count)%IntervalInterpolated) THEN
-            //      DO Hr=1,24
-            //        SCount=1
-            //        CurMinute=MinutesPerTimeStep
-            //        DO TS=1,NumOfTimeStepInHour
-            //          DaySchedule(Count)%TSValue(Hr,TS)=SUM(MinuteValue(Hr,SCount:CurMinute))/REAL(MinutesPerTimeStep,r64)
-            //          SCount=CurMinute+1
-            //          CurMinute=CurMinute+MinutesPerTimeStep
-            //        ENDDO
-            //      ENDDO
-            //    ELSE
-            //      DO Hr=1,24
-            //        CurMinute=MinutesPerTimeStep
-            //        DO TS=1,NumOfTimeStepInHour
-            //          DaySchedule(Count)%TSValue(Hr,TS)=MinuteValue(Hr,CurMinute)
-            //          Curminute=CurMinute+MinutesPerTimeStep
-            //        ENDDO
-            //      ENDDO
-            //    ENDIF
+            // what if there are multiple last elements? - remove last element and check if duplicate is still the same
 
-            std::string contextString = CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + ": ";
+            // if vector not empty - flag to do these elements separately
+            // remove from the main map
+            // get maps for these elements
 
-            CheckForActualFileName(state, Alphas(3), FileExists, state.files.TempFullFileName.fileName, contextString);
+            // what if rows to be skipped?
+            // find min of rows to be skipped
+            // skip em and subtract from columnarData element.rowstoskip
 
-            //    INQUIRE(file=Alphas(3),EXIST=FileExists)
-            // Setup file reading parameters
-            if (!FileExists) {
-                ErrorsFound = true;
-            } else {
-                auto SchdFile = state.files.TempFullFileName.try_open();
-                if (!SchdFile.good()) {
-                    ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                        "\" cannot be opened.");
-                    ShowContinueError(state, "... It may be open in another program (such as Excel).  Please close and try again.");
-                    ShowFatalError(state, "Program terminates due to previous condition.");
+
+            std::ifstream file(fileNameItem);
+            CSVRow row;
+            // TODO : Fix delimiter issue
+            row.delimiter = state.dataScheduleMgr->columnarData[colNumToColDataIndex[vectorOfCSVColNumbers[0]]].delimiter; // all schedules in one file will have the same delimiter
+
+            while (file >> row)
+                // find which columns of this csv map to which schedule - not needed
+                //  How to do this? Make a mapOfMaps which has for each fileName, a map of scheduleNames, ColumnNumbers
+
+                // find schedules to be filled with columns from this file
+                // if column is important, check if this row needs to be skipped
+                // Else add to the right cell
+            {
+                for (int colNum : vectorOfCSVColNumbers) {
+
+                    std::string x = static_cast<std::string>(row[colNum]);
+
+                    Real64 a = UtilityRoutines::ProcessNumber(x, ErrorsFound);
+
+                    state.dataScheduleMgr->columnarData[colNumToColDataIndex[colNum]].vals.emplace_back(a); // row[colNum]
+
+                    // TODO : if there are multiple common elements in vectorOfCSVColNumbers, there is an error.
                 }
-                // check for stripping
-                auto LineIn = SchdFile.readLine();
-                const auto endLine = len(LineIn.data);
-                if (endLine > 0) {
-                    if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
-                        ShowSevereError(state,
-                                        RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                            " appears to be a Unicode or binary file.");
-                        ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
-                        ShowFatalError(state, "Program terminates due to previous condition.");
-                    }
-                }
-                SchdFile.backspace();
+            }
+        }
 
-                // skip lines if any need to be skipped.
-                numerrors = 0;
-                rowCnt = 0;
-                if (skiprowCount > 0) {   // Numbers(2) has number of rows to skip
-                    while (!LineIn.eof) { // end of file
-                        LineIn = SchdFile.readLine();
-                        ++rowCnt;
-                        if (rowCnt == skiprowCount) {
-                            break;
+        // schedule values have been filled into the columnarData.vals vectors.
+
+
+        // skip rows when needed
+        for (auto &schedule : state.dataScheduleMgr->columnarData)
+        {
+            if (schedule.rowsToSkip != -1) {
+                schedule.vals.erase(schedule.vals.begin(), schedule.vals.begin() + schedule.rowsToSkip);
+            }
+        }
+
+        for (const PreProcessedColumn &schedule : state.dataScheduleMgr->columnarData) {
+            if (numerrors > 0) {
+                ShowWarningError(state,
+                                 format("{}{}=\"{}\" {} records had errors - these values are set to 0.",
+                                        RoutineName,
+                                        CurrentModuleObject,
+                                        schedule.name,
+                                        numerrors));
+                ShowContinueError(state, "Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error.");
+            }
+            if (rowCnt < rowLimitCount) {
+                ShowWarningError(state,
+                                 format("{}{}=\"{}\" less than {} hourly values read from file.",
+                                        RoutineName,
+                                        CurrentModuleObject,
+                                        schedule.name,
+                                        schedule.numHourlyValues));
+                ShowContinueError(state,
+                                  format("..Specified Number of Hourly Values={} Actual number of hourly values included={}",
+                                         schedule.numHourlyValues,
+                                         (rowCnt * 60) / MinutesPerItem));
+            }
+        }
+
+        // process the data into the normal schedule data structures
+        // note -- schedules are ALWAYS 366 days so some special measures have to be done at 29 Feb "day of year" (60)
+        for (const PreProcessedColumn &schedule : state.dataScheduleMgr->columnarData) {
+            iDay = 0;
+            int rowCountFld{0};
+            while (true) {
+                // create string of which day of year
+                ++iDay;
+                if (iDay > 366) break;
+                ExtraField = fmt::to_string(iDay);
+                // increment both since a week schedule is being defined for each day so that a day is valid
+                // no matter what the day type that is used in a design day.
+                ++AddWeekSch;
+                ++AddDaySch;
+                hrLimitCount = 60 / schedule.MinutesPerItem;
+                // define week schedule
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = schedule.name + "_wk_" + ExtraField;
+                // for all day types point the week schedule to the newly defined day schedule
+                for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
+                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
+                }
+                // day schedule
+                state.dataScheduleMgr->DaySchedule(AddDaySch).Name = schedule.name + "_dy_" + ExtraField;
+                state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(schedule.SchNum).ScheduleTypePtr;
+                // schedule is pointing to the week schedule
+                state.dataScheduleMgr->Schedule(schedule.SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
+                int iRowNum{};
+                if (schedule.MinutesPerItem == 60) {
+                    for (int jHour = 1; jHour <= 24; ++jHour) {
+                        for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                            state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) =
+                                schedule.vals[rowCountFld];
+                            ++rowCountFld; // hourlyFileValues((hDay - 1) * 24 + jHour)
                         }
                     }
-                }
-
-                //  proper number of lines are skipped.  read the file
-                // for the rest of the lines read from the file
-                rowCnt = 0;
-                firstLine = true;
-                while (!LineIn.eof) { // end of file
-                    LineIn = SchdFile.readLine();
-                    ++rowCnt;
-                    colCnt = 0;
-                    wordStart = 0;
-                    columnValue = 0.0;
-                    // scan through the line looking for a specific column
-                    while (true) {
-                        sepPos = index(LineIn.data, ColumnSep);
-                        ++colCnt;
-                        if (sepPos != std::string::npos) {
-                            if (sepPos > 0) {
-                                wordEnd = sepPos - 1;
-                            } else {
-                                wordEnd = wordStart;
-                            }
-                            subString = LineIn.data.substr(wordStart, wordEnd - wordStart + 1);
-                            // the next word will start after the comma
-                            wordStart = sepPos + 1;
-                            // get rid of separator so next INDEX will find next separator
-                            LineIn.data.erase(0, wordStart);
-                            firstLine = false;
-                            wordStart = 0;
-                        } else {
-                            // no more commas
-                            subString = LineIn.data.substr(wordStart);
-                            if (firstLine && subString == BlankString) {
-                                ShowWarningError(state,
-                                                 RoutineName + CurrentModuleObject + "=\"" + Alphas(1) +
-                                                     "\" first line does not contain the indicated column separator=" + Alphas(4) + '.');
-                                ShowContinueError(state, "...first 40 characters of line=[" + LineIn.data.substr(0, 40) + ']');
-                                firstLine = false;
-                            }
-                            break;
-                        }
-                        if (colCnt == curcolCount) break;
-                    }
-                    if (colCnt == curcolCount) {
-                        columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
-                        if (errFlag) {
-                            std::string test = subString;
-                            ++numerrors;
-                            columnValue = 0.0;
-                        }
-                    } else {
-                        columnValue = 0.0;
-                    }
-                    hourlyFileValues(rowCnt) = columnValue;
-                    if (rowCnt == rowLimitCount) break;
-                }
-                SchdFile.close();
-
-                // schedule values have been filled into the hourlyFileValues array.
-
-                if (numerrors > 0) {
-                    ShowWarningError(state,
-                                     format("{}{}=\"{}\" {} records had errors - these values are set to 0.",
-                                            RoutineName,
-                                            CurrentModuleObject,
-                                            Alphas(1),
-                                            numerrors));
-                    ShowContinueError(state, "Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error.");
-                }
-                if (rowCnt < rowLimitCount) {
-                    ShowWarningError(
-                        state,
-                        format(
-                            "{}{}=\"{}\" less than {} hourly values read from file.", RoutineName, CurrentModuleObject, Alphas(1), numHourlyValues));
-                    ShowContinueError(state, format("..Number read={}.", (rowCnt * 60) / MinutesPerItem));
-                }
-                if (rowCnt < rowLimitCount) {
-                    ShowWarningError(state,
-                                     RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than specified hourly values read from file.");
-                    ShowContinueError(state,
-                                      format("..Specified Number of Hourly Values={} Actual number of hourly values included={}",
-                                             numHourlyValues,
-                                             (rowCnt * 60) / MinutesPerItem));
-                }
-                // process the data into the normal schedule data structures
-                // note -- schedules are ALWAYS 366 days so some special measures have to be done at 29 Feb "day of year" (60)
-                iDay = 0;
-                hDay = 0;
-                ifld = 0;
-                while (true) {
-                    // create string of which day of year
-                    ++iDay;
-                    ++hDay;
-                    if (iDay > 366) break;
-                    ExtraField = fmt::to_string(iDay);
-                    // increment both since a week schedule is being defined for each day so that a day is valid
-                    // no matter what the day type that is used in a design day.
-                    ++AddWeekSch;
-                    ++AddDaySch;
-                    // define week schedule
-                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = Alphas(1) + "_wk_" + ExtraField;
-                    // for all day types point the week schedule to the newly defined day schedule
-                    for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
-                        state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
-                    }
-                    // day schedule
-                    state.dataScheduleMgr->DaySchedule(AddDaySch).Name = Alphas(1) + "_dy_" + ExtraField;
-                    state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
-                    // schedule is pointing to the week schedule
-                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
-                    if (MinutesPerItem == 60) {
-                        for (jHour = 1; jHour <= 24; ++jHour) {
-                            ++ifld;
-                            curHrVal = hourlyFileValues(ifld); // hourlyFileValues((hDay - 1) * 24 + jHour)
-                            for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                                state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
-                            }
-                        }
-                    } else { // Minutes Per Item < 60
-                        for (Hr = 1; Hr <= 24; ++Hr) {
-                            CurMinute = MinutesPerItem;
+                } else { // Minutes Per Item < 60
+                    if (schedule.FileIntervalInterpolated) {
+                        for (int Hr = 1; Hr <= 24; ++Hr) {
+                            int minuteEnd = schedule.MinutesPerItem;
                             SCount = 1;
-                            for (NumFields = 1; NumFields <= hrLimitCount; ++NumFields) {
-                                ++ifld;
-                                MinuteValue({SCount, CurMinute}, Hr) = hourlyFileValues(ifld);
+                            CurMinute = state.dataGlobal->MinutesPerTimeStep;
+                            for (iRowNum = 1; iRowNum <= hrLimitCount; ++iRowNum) {
+                                MinuteValue({SCount, minuteEnd}, Hr) =
+                                    schedule.vals[rowCountFld];
+                                SCount = minuteEnd + 1;
+                                minuteEnd += schedule.MinutesPerItem;
+                                ++rowCountFld;
+                            }
+                            for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                                state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, Hr) =
+                                    sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
                                 SCount = CurMinute + 1;
-                                CurMinute += MinutesPerItem;
+                                CurMinute += state.dataGlobal->MinutesPerTimeStep;
                             }
                         }
-                        if (FileIntervalInterpolated) {
-                            for (Hr = 1; Hr <= 24; ++Hr) {
-                                SCount = 1;
-                                CurMinute = state.dataGlobal->MinutesPerTimeStep;
-                                for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                                    state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, Hr) =
-                                        sum(MinuteValue({SCount, CurMinute}, Hr)) / double(state.dataGlobal->MinutesPerTimeStep);
-                                    SCount = CurMinute + 1;
-                                    CurMinute += state.dataGlobal->MinutesPerTimeStep;
-                                }
+                    } else {
+                        for (int Hr = 1; Hr <= 24; ++Hr) {
+                            SCount = 1;
+                            int minuteEnd = schedule.MinutesPerItem;
+                            CurMinute = state.dataGlobal->MinutesPerTimeStep;
+                            for (iRowNum = 1; iRowNum <= hrLimitCount; ++iRowNum) {
+                                MinuteValue({SCount, minuteEnd}, Hr) = schedule.vals[rowCountFld];
+                                SCount = minuteEnd + 1;
+                                minuteEnd += schedule.MinutesPerItem;
+                                ++rowCountFld;
                             }
-                        } else {
-                            for (Hr = 1; Hr <= 24; ++Hr) {
-                                CurMinute = state.dataGlobal->MinutesPerTimeStep;
-                                for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                                    state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
-                                    CurMinute += state.dataGlobal->MinutesPerTimeStep;
-                                }
+                            for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                                state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, Hr) = MinuteValue(CurMinute, Hr);
+                                CurMinute += state.dataGlobal->MinutesPerTimeStep;
                             }
                         }
                     }
-                    if (iDay == 59 && rowCnt < 8784 * hrLimitCount) { // 28 Feb
-                        // Dup 28 Feb to 29 Feb (60)
-                        ++iDay;
-                        state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) =
-                            state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
-                    }
+                }
+                if (iDay == 59 && rowCountFld < 8784 * hrLimitCount) { // 28 Feb is copied to 29 Feb
+                    // Dup 28 Feb to 29 Feb (60)
+                    ++iDay;
+                    state.dataScheduleMgr->Schedule(schedule.SchNum).WeekSchedulePointer(iDay) =
+                        state.dataScheduleMgr->Schedule(schedule.SchNum).WeekSchedulePointer(iDay - 1);
+                }
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
+                    SetupEMSActuator(state,
+                                     "Schedule:File",
+                                     state.dataScheduleMgr->Schedule(schedule.SchNum).Name,
+                                     "Schedule Value",
+                                     "[ ]",
+                                     state.dataScheduleMgr->Schedule(schedule.SchNum).EMSActuatedOn,
+                                     state.dataScheduleMgr->Schedule(schedule.SchNum).EMSValue);
                 }
             }
 
-            if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup constant schedules as actuators
-                SetupEMSActuator(state,
-                                 "Schedule:File",
-                                 state.dataScheduleMgr->Schedule(SchNum).Name,
-                                 "Schedule Value",
-                                 "[ ]",
-                                 state.dataScheduleMgr->Schedule(SchNum).EMSActuatedOn,
-                                 state.dataScheduleMgr->Schedule(SchNum).EMSValue);
-            }
         }
         if (NumCommaFileSchedules > 0) {
             hourlyFileValues.deallocate();
@@ -5233,6 +5112,200 @@ namespace ScheduleManager {
         NumberOfSchedules = state.dataScheduleMgr->NumSchedules;
 
         return NumberOfSchedules;
+    }
+
+    std::istream &operator>>(std::istream &str, CSVRow &data)
+    {
+        // Function: This function overloads the >> operator
+        data.readNextRow(str);
+        return str;
+    }
+
+    void CSVRow::readNextRow(std::istream &str)
+    {
+        std::getline(str, m_line);
+        m_data.clear();
+        m_data.emplace_back(-1);
+        std::string::size_type pos = 0;
+        while ((pos = m_line.find(this->delimiter, pos)) != std::string::npos) {
+            m_data.emplace_back(pos);
+            ++pos;
+        }
+        pos = m_line.size();
+        m_data.emplace_back(pos);
+    }
+    std::size_t CSVRow::rowEnd()
+    {
+        // Function: This function returns the number of Columns in the CSV file
+        return m_data.size();
+    }
+    std::string_view CSVRow::operator[](std::size_t index) const
+    {
+        return std::string_view(&m_line[m_data[index] + 1], m_data[index + 1] - (m_data[index] + 1));
+    }
+
+    void PreProcessIDF(EnergyPlus::EnergyPlusData &state, int &SchNum, int NumCommaFileSchedules)
+    {
+
+        using namespace EnergyPlus;
+        using namespace DataStringGlobals;
+        using namespace DataSystemVariables;
+        using namespace ScheduleManager;
+        auto constexpr RoutineName("PreProcessIDF: ");
+
+        for (int LoopIndex = 1; LoopIndex <= NumCommaFileSchedules; ++LoopIndex) {
+            std::string CurrentModuleObject{"Schedule:File"};
+            Array1D_string Alphas;
+            int NumAlphas;
+            Array1D<Real64> Numbers;
+            int NumNumbers;
+            int Status;
+            Array1D_bool lNumericBlanks;
+            Array1D_bool lAlphaBlanks;
+            Array1D_string cAlphaFields;
+            Array1D_string cNumericFields;
+
+            bool ErrorsFound;
+
+            Alphas.allocate(10); // Maximum Alphas possible
+            cAlphaFields.allocate(10);
+            cNumericFields.allocate(10);
+            Numbers.dimension(10, 0.0); // Maximum Numbers possible
+            lAlphaBlanks.dimension(10, true);
+            lNumericBlanks.dimension(10, true);
+
+            int CheckIndex;
+            bool FileIntervalInterpolated = false;
+
+            state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                     CurrentModuleObject,
+                                                                     LoopIndex,
+                                                                     Alphas,
+                                                                     NumAlphas,
+                                                                     Numbers,
+                                                                     NumNumbers,
+                                                                     Status,
+                                                                     lNumericBlanks,
+                                                                     lAlphaBlanks,
+                                                                     cAlphaFields,
+                                                                     cNumericFields);
+            EnergyPlus::GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueScheduleNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            ++SchNum;
+
+            state.dataScheduleMgr->Schedule(SchNum).Name = Alphas(1);
+            state.dataScheduleMgr->Schedule(SchNum).SchType = EnergyPlus::ScheduleManager::SchedType::ScheduleInput_file;
+
+            // Validate ScheduleType
+            if (state.dataScheduleMgr->NumScheduleTypes > 0) {
+                CheckIndex = 0;
+                if (!lAlphaBlanks(2))
+                    CheckIndex = EnergyPlus::UtilityRoutines::FindItemInList(
+                        Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                if (CheckIndex == 0) {
+                    if (!lAlphaBlanks(2)) {
+                        ShowWarningError(state,
+                                         "ProcessScheduleInput: For " + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                             Alphas(2) + "\" not found -- will not be validated");
+                    } else {
+                        ShowWarningError(state,
+                                         "For " + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
+                                             " input -- will not be validated.");
+                    }
+                } else {
+                    state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr = CheckIndex;
+                }
+            }
+            Array1D<Real64> hourlyFileValues{0.0}; // set default values to zero
+
+            // Numbers(1) - which column
+            int curcolCount = Numbers(1);
+            // Numbers(2) - number of rows to skip
+            int skiprowCount = Numbers(2);
+            if (Numbers(3) == 0) Numbers(3) = 8760.0;
+            if (Numbers(3) != 8760 && Numbers(3) != 8784) {
+                ShowSevereError(state,
+                                RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cNumericFields(3) +
+                                    " must = 8760 or 8784 (for a leap year)");
+                ShowContinueError(state, EnergyPlus::format("..Value for field = {:.0T}, Schedule not processed.", Numbers(3)));
+                ErrorsFound = true;
+                continue;
+            }
+
+            std::string ColumnSep;
+            if (lAlphaBlanks(4) || EnergyPlus::UtilityRoutines::SameString(Alphas(4), "comma")) {
+                ColumnSep = CharComma;
+                Alphas(4) = "comma";
+            } else if (EnergyPlus::UtilityRoutines::SameString(Alphas(4), "semicolon")) {
+                ColumnSep = CharSemicolon;
+            } else if (EnergyPlus::UtilityRoutines::SameString(Alphas(4), "tab")) {
+                ColumnSep = CharTab;
+            } else if (EnergyPlus::UtilityRoutines::SameString(Alphas(4), "space")) {
+                ColumnSep = CharSpace;
+            } else {
+                ShowSevereError(state,
+                                RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(4) + " illegal value=\"" + Alphas(4) +
+                                    "\".");
+                ShowContinueError(state, "..must be Comma, Semicolon, Tab, or Space.");
+                ErrorsFound = true;
+                continue;
+            }
+
+            // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
+            FileIntervalInterpolated = false;
+            if (lAlphaBlanks(5)) Alphas(5) = "NO";
+            if (Alphas(5) != "NO" && Alphas(5) != "YES") {
+                ShowSevereError(state,
+                                RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(5) + "\" field=\"" +
+                                    Alphas(5) + "\"");
+                ErrorsFound = true;
+            } else if (Alphas(5) != "YES") { // No validation done on the value of the interpolation field
+                FileIntervalInterpolated = false;
+            } else {
+                FileIntervalInterpolated = true;
+            }
+
+            // is it a sub-hourly schedule or not?
+            int MinutesPerItem = 60;
+            if (NumNumbers > 3) {
+                MinutesPerItem = int(Numbers(4));
+                int NumExpectedItems = 1440 / MinutesPerItem;
+                if (mod(60, MinutesPerItem) != 0) {
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1));
+                    ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(4), MinutesPerItem));
+                    ErrorsFound = true;
+                    continue;
+                }
+            }
+
+            int numHourlyValues = Numbers(3);
+
+            std::string contextString = CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + ": ";
+
+            bool FileExists;
+
+            CheckForActualFileName(state, Alphas(3), FileExists, state.files.TempFullFileName.fileName, contextString);
+
+            state.dataScheduleMgr->allIdfSchedData.emplace_back(Alphas(1),
+                                                                state.files.TempFullFileName.fileName,
+                                                                state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr,
+                                                                curcolCount,
+                                                                numHourlyValues,
+                                                                MinutesPerItem,
+                                                                skiprowCount,
+                                                                FileIntervalInterpolated,
+                                                                ColumnSep,
+                                                                SchNum);
+        }
+    }
+
+    void PopulateSetOfFilenames(const std::vector<schedInputIdfPreprocessObject> &allIdfSchedData, std::set<std::string> &setOfFilenames)
+    {
+        for (const schedInputIdfPreprocessObject &idfObject : allIdfSchedData) {
+            if (setOfFilenames.find(idfObject.fileName) == setOfFilenames.end()) {
+                setOfFilenames.insert(idfObject.fileName);
+            }
+        }
     }
 
 } // namespace ScheduleManager
