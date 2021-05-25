@@ -281,7 +281,6 @@ namespace FanCoilUnits {
         Array1D<Real64> Numbers;         // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
-        int CtrlZone;                    // index to loop counter
         int NodeNum;                     // index to loop counter
         std::string ATMixerName;
 
