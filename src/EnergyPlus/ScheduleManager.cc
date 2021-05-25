@@ -259,7 +259,6 @@ namespace ScheduleManager {
         std::string subString;
         Real64 columnValue;
         int iDay;
-        int hDay;
         int jHour;
         int kDayType;
         Real64 curHrVal;
@@ -269,11 +268,7 @@ namespace ScheduleManager {
         int MaxNums1;
         std::string ColumnSep;
         bool firstLine;
-        bool FileIntervalInterpolated;
         int rowLimitCount;
-        int skiprowCount;
-        int curcolCount;
-        int numHourlyValues;
         int numerrors;
         int ifld;
         int hrLimitCount;
@@ -5262,7 +5257,6 @@ namespace ScheduleManager {
             int MinutesPerItem = 60;
             if (NumNumbers > 3) {
                 MinutesPerItem = int(Numbers(4));
-                int NumExpectedItems = 1440 / MinutesPerItem;
                 if (mod(60, MinutesPerItem) != 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1));
                     ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(4), MinutesPerItem));
