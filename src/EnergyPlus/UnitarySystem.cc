@@ -3152,11 +3152,10 @@ namespace UnitarySystems {
                     int ZoneInletNum = 0;
                     ZoneInletNodeFound = searchZoneInletNodes(state, this->AirOutNode, this->ControlZoneNum, ZoneInletNum);
                     if (ZoneInletNodeFound) {
-                        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes; ++NodeNum) {
-                            InducedNodeFound = ZonePlenum::ValidateInducedNode(
-                                state, this->AirInNode, state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode(NodeNum));
-                            if (InducedNodeFound) break;
-                        }
+                        InducedNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                           this->AirInNode,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode);
                         if (InducedNodeFound) {
                             this->m_ZoneInletNode = this->AirOutNode;
                             ZoneEquipmentFound = true;
@@ -3177,11 +3176,10 @@ namespace UnitarySystems {
                     int ZoneInletNum = 0;
                     ZoneInletNodeFound = searchZoneInletNodes(state, this->AirOutNode, this->ControlZoneNum, ZoneInletNum);
                     if (ZoneInletNodeFound) {
-                        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes; ++NodeNum) {
-                            InducedNodeFound = ZonePlenum::ValidateInducedNode(
-                                state, this->m_ATMixerSecNode, state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode(NodeNum));
-                            if (InducedNodeFound) break;
-                        }
+                        InducedNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                           this->m_ATMixerSecNode,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode);
                         if (InducedNodeFound) {
                             this->m_ZoneInletNode = this->AirOutNode;
                             ZoneEquipmentFound = true;
@@ -3202,11 +3200,10 @@ namespace UnitarySystems {
                     int ZoneInletNum = 0;
                     ZoneInletNodeFound = searchZoneInletNodes(state, this->ATMixerOutNode, this->ControlZoneNum, ZoneInletNum);
                     if (ZoneInletNodeFound) {
-                        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes; ++NodeNum) {
-                            InducedNodeFound = ZonePlenum::ValidateInducedNode(
-                                state, this->AirInNode, state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode(NodeNum));
-                            if (InducedNodeFound) break;
-                        }
+                        InducedNodeFound = ZonePlenum::ValidateInducedNode(state,
+                                                                           this->AirInNode,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).NumReturnNodes,
+                                                                           state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ReturnNode);
                         if (InducedNodeFound) {
                             this->m_ZoneInletNode = this->ATMixerOutNode;
                             ZoneEquipmentFound = true;
