@@ -10021,20 +10021,26 @@ void WindowShadingManager(EnergyPlusData &state)
     }
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
         state.dataHeatBal->EnclRadReCalc(enclosureNum) = false;
+        if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel ||
+            (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel())) {
+            state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+            continue;
+        }
         for (int const SurfNum : state.dataViewFactor->ZoneRadiantInfo(enclosureNum).SurfacePtr) {
-            bool surfShadingStatusChange =
-                state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum) != state.dataSurface->SurfWinShadingFlag(SurfNum) ||
-                state.dataSurface->Surface(SurfNum).activeShadedConstruction != state.dataSurface->Surface(SurfNum).activeShadedConstructionPrev ||
-                state.dataSurface->SurfWinMovableSlats(SurfNum);
-            if (surfShadingStatusChange || state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TCFlag == 1 ||
+            if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TCFlag == 1 ||
                 state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
                 state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
                 break;
             }
+            bool surfShadingStatusChange =
+                state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum) != state.dataSurface->SurfWinShadingFlag(SurfNum) ||
+                state.dataSurface->Surface(SurfNum).activeShadedConstruction != state.dataSurface->Surface(SurfNum).activeShadedConstructionPrev ||
+                state.dataSurface->SurfWinMovableSlats(SurfNum);
+            if (surfShadingStatusChange) {
+                state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+                break;
+            }
         }
-        if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel ||
-            state.dataWindowManager->winOpticalModel->isSimplifiedModel())
-            state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
     }
 }
 

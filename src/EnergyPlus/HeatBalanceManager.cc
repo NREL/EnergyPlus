@@ -5715,7 +5715,7 @@ namespace HeatBalanceManager {
         state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->EnclRadQThermalRad.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->ZoneThermAbsMult.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclRadThermAbsMult.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->ZoneSolAbsFirstCalc.allocate(state.dataGlobal->NumOfZones);
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             state.dataHeatBal->EnclSolDB(zoneNum) = 0.0;
@@ -5726,7 +5726,7 @@ namespace HeatBalanceManager {
             state.dataHeatBal->EnclSolQDforDaylight(zoneNum) = 0.0;
             state.dataHeatBal->EnclRadQThermalRad(zoneNum) = 0.0;
             state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
-            state.dataHeatBal->ZoneThermAbsMult(zoneNum) = 0.0;
+            state.dataHeatBal->EnclRadThermAbsMult(zoneNum) = 0.0;
             state.dataHeatBal->ZoneSolAbsFirstCalc(zoneNum) = true;
         }
         state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
