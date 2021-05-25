@@ -2136,6 +2136,12 @@ std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
 {
     unsigned long long key = 0;
 
+#ifdef USE_REINTERPRET_CAST
+    constexpr int precision_bits(15);
+#else
+    constexpr double precision(1E5);
+#endif
+
     // data from material layers
     // adding the layer num to get a unique key for objects with reversed layers
     for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
@@ -2143,25 +2149,25 @@ std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
         auto &mat = state.dataMaterial->Material(CurrentLayer);
 
 #ifdef USE_REINTERPRET_CAST
-        key ^= Cache::prepFloatForCacheKey(mat.Thickness, 15) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, 15) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Density, 15) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, 15) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Resistance, 15) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Thickness, precision_bits) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, precision_bits) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Density, precision_bits) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, precision_bits) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Resistance, precision_bits) + Layer;
 #endif
 #ifdef USE_STATIC_CAST_AND_FP_MULT
-        key ^= Cache::prepFloatForCacheKey(mat.Thickness, 1E5) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, 1E5) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Density, 1E5) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, 1E5) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Resistance, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Thickness, precision) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, precision) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Density, precision) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, precision) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Resistance, precision) + Layer;
 #endif
 #ifdef USE_C_CAST_AND_FP_MULT
-        key ^= Cache::prepFloatForCacheKey(mat.Thickness, 1E5) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, 1E5) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Density, 1E5) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, 1E5) + Layer;
-        key ^= Cache::prepFloatForCacheKey(mat.Resistance, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Thickness, precision) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, precision) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Density, precision) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, precision) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Resistance, precision) + Layer;
 #endif
     }
 

@@ -95,6 +95,7 @@ namespace Cache {
 #ifdef USE_REINTERPRET_CAST
     inline unsigned long long prepFloatForCacheKey(double const x, unsigned int const precision_bits)
     {
+        assert(sizeof(double) == sizeof(unsigned long long));
         return *reinterpret_cast<unsigned long long const *>(&x) >> (64 - 12 - precision_bits);
     }
 #endif
