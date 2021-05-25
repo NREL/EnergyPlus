@@ -322,7 +322,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                  Alphas(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 1,
+                                                                                                 NodeInputManager::compFluidStream::Primary,
                                                                                                  DataLoopNode::ObjectIsNotParent);
         state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                                   Alphas(7),
@@ -331,7 +331,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                   Alphas(1),
                                                                                                   DataLoopNode::NodeFluidType::Water,
                                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                  1,
+                                                                                                  NodeInputManager::compFluidStream::Primary,
                                                                                                   DataLoopNode::ObjectIsNotParent);
         if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");

@@ -910,7 +910,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                    cAlphaArgs(1),
                                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                                    DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                   1,
+                                                                                                   NodeInputManager::compFluidStream::Primary,
                                                                                                    ObjectIsNotParent);
         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
                                                                                                         cAlphaArgs(5),
@@ -919,7 +919,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                         cAlphaArgs(1),
                                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                                         DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                        1,
+                                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                                         ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
@@ -1030,7 +1030,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                    cAlphaArgs(1),
                                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                                    DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                   1,
+                                                                                                   NodeInputManager::compFluidStream::Primary,
                                                                                                    ObjectIsNotParent);
         state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
                                                                                                         cAlphaArgs(5),
@@ -1039,7 +1039,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                         cAlphaArgs(1),
                                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                                         DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                        1,
+                                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                                         ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
@@ -1149,7 +1149,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                    cAlphaArgs(1),
                                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                                    DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                   1,
+                                                                                                   NodeInputManager::compFluidStream::Primary,
                                                                                                    ObjectIsNotParent);
         state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
                                                                                                         cAlphaArgs(5),
@@ -1158,7 +1158,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                         cAlphaArgs(1),
                                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                                         DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                        1,
+                                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                                         ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
@@ -1477,7 +1477,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                              cAlphaArgs(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::Sensor,
-                                                                                             1,
+                                                                                             NodeInputManager::compFluidStream::Primary,
                                                                                              ObjectIsNotParent);
         state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode = GetOnlySingleNode(state,
                                                                                                cAlphaArgs(4),
@@ -1486,7 +1486,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                                DataLoopNode::NodeConnectionType::Sensor,
-                                                                                               1,
+                                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                                ObjectIsNotParent);
         state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode = GetOnlySingleNode(state,
                                                                                                 cAlphaArgs(5),
@@ -1495,7 +1495,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                 cAlphaArgs(1),
                                                                                                 DataLoopNode::NodeFluidType::Air,
                                                                                                 DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                1,
+                                                                                                NodeInputManager::compFluidStream::Primary,
                                                                                                 ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
@@ -1556,7 +1556,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                         cAlphaArgs(1),
                                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                                         DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                        1,
+                                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                                         ObjectIsNotParent);
             state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CoolCoilOutNode = GetOnlySingleNode(state,
                                                                                                          cAlphaArgs(8),
@@ -1565,7 +1565,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                          cAlphaArgs(1),
                                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                         1,
+                                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                                          ObjectIsNotParent);
             if (NumNums == 1) {
                 state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).MinCoolCoilOutTemp = rNumericArgs(1);
@@ -1674,7 +1674,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                cAlphaArgs(1),
                                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                                DataLoopNode::NodeConnectionType::Sensor,
-                                                                                               1,
+                                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                                ObjectIsNotParent);
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode = GetOnlySingleNode(state,
                                                                                                     cAlphaArgs(4),
@@ -1683,7 +1683,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                     cAlphaArgs(1),
                                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                                     DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                    1,
+                                                                                                    NodeInputManager::compFluidStream::Primary,
                                                                                                     ObjectIsNotParent);
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode = GetOnlySingleNode(state,
                                                                                                 cAlphaArgs(5),
@@ -1692,7 +1692,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                 cAlphaArgs(1),
                                                                                                 DataLoopNode::NodeFluidType::Air,
                                                                                                 DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                1,
+                                                                                                NodeInputManager::compFluidStream::Primary,
                                                                                                 ObjectIsNotParent);
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode = GetOnlySingleNode(state,
                                                                                                     cAlphaArgs(6),
@@ -1701,7 +1701,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                     cAlphaArgs(1),
                                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                                     DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                    1,
+                                                                                                    NodeInputManager::compFluidStream::Primary,
                                                                                                     ObjectIsNotParent);
         NodeListError = false;
         GetNodeNums(state,
@@ -2885,7 +2885,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                          cAlphaArgs(1),
                                                                                                          DataLoopNode::NodeFluidType::blank,
                                                                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                         1,
+                                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                                          ObjectIsNotParent);
         state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType = cAlphaArgs(4);
         if (UtilityRoutines::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType, "NodeWetBulb")) {
@@ -3602,7 +3602,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                               cAlphaArgs(1),
                               DataLoopNode::NodeFluidType::blank,
                               DataLoopNode::NodeConnectionType::SetPoint,
-                              1,
+                              NodeInputManager::compFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFieldNames(2)); // setpoint nodes
         state.dataSetPointManager->ReturnWaterResetChWSetPtMgr(SetPtMgrNum).returnNodeIndex =
@@ -3613,7 +3613,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                               cAlphaArgs(1),
                               DataLoopNode::NodeFluidType::blank,
                               DataLoopNode::NodeConnectionType::Sensor,
-                              1,
+                              NodeInputManager::compFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFieldNames(3)); // setpoint nodes
 
@@ -3699,7 +3699,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                               cAlphaArgs(1),
                               DataLoopNode::NodeFluidType::blank,
                               DataLoopNode::NodeConnectionType::SetPoint,
-                              1,
+                              NodeInputManager::compFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFieldNames(2)); // setpoint nodes
         state.dataSetPointManager->ReturnWaterResetHWSetPtMgr(SetPtMgrNum).returnNodeIndex =
@@ -3710,7 +3710,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                               cAlphaArgs(1),
                               DataLoopNode::NodeFluidType::blank,
                               DataLoopNode::NodeConnectionType::Sensor,
-                              1,
+                              NodeInputManager::compFluidStream::Primary,
                               ObjectIsNotParent,
                               cAlphaFieldNames(3)); // setpoint nodes
 

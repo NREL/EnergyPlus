@@ -384,7 +384,7 @@ namespace SolarCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -394,7 +394,7 @@ namespace SolarCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
@@ -675,7 +675,7 @@ namespace SolarCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -685,7 +685,7 @@ namespace SolarCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
