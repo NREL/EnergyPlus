@@ -649,6 +649,59 @@ namespace ScheduleManager {
               "{}\n",
               "  Processing Schedule Input -- Start");
 
+
+        std::string curName;
+        Array1D<Real64> timestepColumnValues;
+        for (auto &NameValue : CSVAllColumnNames) {
+            curName = NameValue.first + "_shading";
+            timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            ++SchNum;
+            state.dataScheduleMgr->Schedule(SchNum).Name = curName;
+            state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
+
+            iDay = 0;
+            ifld = 0;
+            while (true) {
+                // create string of which day of year
+                ++iDay;
+                if (iDay > 366) {
+                    break;
+                }
+                ExtraField = fmt::to_string(iDay);
+                // increment both since a week schedule is being defined for each day so that a day is valid
+                // no matter what the day type that is used in a design day.
+                ++AddWeekSch;
+                ++AddDaySch;
+                // define week schedule
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = curName + "_shading_wk_" + ExtraField;
+                // for all day types point the week schedule to the newly defined day schedule
+                for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
+                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
+                }
+                // day schedule
+                state.dataScheduleMgr->DaySchedule(AddDaySch).Name = curName + "_shading_dy_" + ExtraField;
+                state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
+                // schedule is pointing to the week schedule
+                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
+
+                for (jHour = 1; jHour <= 24; ++jHour) {
+                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                        ++ifld;
+                        curHrVal = timestepColumnValues(ifld);
+                        state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
+                    }
+                }
+                if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
+                    // Dup 28 Feb to 29 Feb (60)
+                    ++iDay;
+                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) =
+                        state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
+                }
+            }
+        }
+
         //!! Get Schedule Types
 
         CurrentModuleObject = "ScheduleTypeLimits";
@@ -1995,57 +2048,6 @@ namespace ScheduleManager {
             hourlyFileValues.deallocate();
         }
 
-        std::string curName;
-        Array1D<Real64> timestepColumnValues;
-        for (auto &NameValue : CSVAllColumnNames) {
-            curName = NameValue.first + "_shading";
-            timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
-            GlobalNames::VerifyUniqueInterObjectName(
-                state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-            ++SchNum;
-            state.dataScheduleMgr->Schedule(SchNum).Name = curName;
-            state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
-
-            iDay = 0;
-            ifld = 0;
-            while (true) {
-                // create string of which day of year
-                ++iDay;
-                if (iDay > 366) {
-                    break;
-                }
-                ExtraField = fmt::to_string(iDay);
-                // increment both since a week schedule is being defined for each day so that a day is valid
-                // no matter what the day type that is used in a design day.
-                ++AddWeekSch;
-                ++AddDaySch;
-                // define week schedule
-                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = curName + "_shading_wk_" + ExtraField;
-                // for all day types point the week schedule to the newly defined day schedule
-                for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
-                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
-                }
-                // day schedule
-                state.dataScheduleMgr->DaySchedule(AddDaySch).Name = curName + "_shading_dy_" + ExtraField;
-                state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
-                // schedule is pointing to the week schedule
-                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
-
-                for (jHour = 1; jHour <= 24; ++jHour) {
-                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        ++ifld;
-                        curHrVal = timestepColumnValues(ifld);
-                        state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
-                    }
-                }
-                if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
-                    // Dup 28 Feb to 29 Feb (60)
-                    ++iDay;
-                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) =
-                        state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
-                }
-            }
-        }
 
         MinuteValue.deallocate();
         SetMinuteValue.deallocate();
