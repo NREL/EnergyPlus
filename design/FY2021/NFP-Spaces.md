@@ -21,7 +21,8 @@
     * Make Space Type just a tag
     * Add optional Space Name field to surfaces
     * Allow Space to be assigned to floor surface(s) only or full set of surfaces
-    
+ - Revised, May 25, 2021
+    * Add clarifications from May 19 conference call
 
 ## Justification for New Feature ##
 
@@ -100,7 +101,7 @@ New Space object (and related objects) with minimal changes to current inputs.
       Name,
       ...
       Zone Name,  !- Required
-      Space Name, !- Optional
+      Space Name, !- Optional new field
       ...
       
     DesignSpecification:OutdoorAir:List  !- Optional new object
@@ -142,11 +143,12 @@ should stay exactly the same, but some table headings may change.
 * Table reports summarizing inputs at the zone level will remain the same.
 * Table reports summarizing inputs at the Space Type level will be added.
 * Table reports allocating energy at the Space Type level *may* be added.
-* Space-level outputs would include:
+* Space-level outputs will include:
   * Internal gains attached directly to a Space.
   * Internal gains attached to a Zone apportioned by Space floor area.
   * Floor area for each Space.
-  * Walls and other surfaces would only be reported at the Space level for full geometry Spaces.
+  * Walls and other surfaces will only be reported at the Space level for full geometry Spaces.
+* Enclosures will be reported with a list of Spaces for each enclosure.
 
 ## Engineering Reference ##
 
@@ -156,6 +158,23 @@ The basic calculations will not change, so changes will be minimal to clarify Sp
 
 * Transition required to add a blank Space Name field to all surfaces.
 * Take one or more example files and add Spaces (using a mix of floor only and full surfaces).
+
+## Q&A from May 19 Conference Call
+1. Room air models will remain at the Zone level.
+2. AirflowNetwork (AFN) will remain at the Zone level.
+3. HVAC will remain at the Zone level - one air node and one thermostat per zone. Future work may extend this to the Space level.
+4. The current unitary system control-zone concept with subzones remains at the zone level. Future work may extend this to the Space level.
+5. Surfaces between spaces will be treated the same as between zones (Outside Boundary Condition = Adiabatic or Surface). Existing warnings
+about interzone surfaces in the same zone will be modified to warn if in the same space.
+6. For a zone which has Spaces with walls, throw a warning that the spaces will be lumped together with a single air node.
+7. Thermal comfort will be calculated using all surfaces within the same Enclosure (or as specified in ComfortViewFactorAngles).
+8. ComfortViewFactorAngles Zone name will be optional (if it is not already).
+9. Need to temper expectations about the heat balance (zones, not spaces).
+10. Space Types are user-defined (no standard list).
+11. Space is the atom that allows us to create a flexible relationship between zone and enclosure.
+12. Non-convex enclosures will be handled as they are currently (should generate a severe error when using FullInterior solar distribution with PolygonClipping).
+13. The Pixel-counting method should be unaffected by this (works with surfaces and enclosures).
+
 
 ##  Relationship Assumptions
 *(getting deep in the weeds here)*
