@@ -313,7 +313,7 @@ namespace HVACSingleDuctInduc {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsParent,
                                                                                            cAlphaFields(3));
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).SecAirInNode = GetOnlySingleNode(state,
@@ -323,7 +323,7 @@ namespace HVACSingleDuctInduc {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsParent,
                                                                                            cAlphaFields(4));
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode = GetOnlySingleNode(state,
@@ -333,7 +333,7 @@ namespace HVACSingleDuctInduc {
                                                                                          Alphas(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                         1,
+                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                          ObjectIsParent,
                                                                                          cAlphaFields(5));
 

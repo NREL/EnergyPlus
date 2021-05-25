@@ -1821,7 +1821,7 @@ void GetIHPInput(EnergyPlusData &state)
                                                                                                    AlphArray(1),
                                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                                    DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                   2,
+                                                                                                   NodeInputManager::compFluidStream::Secondary,
                                                                                                    ObjectIsNotParent);
 
         // outdoor air node connections for water heating coils

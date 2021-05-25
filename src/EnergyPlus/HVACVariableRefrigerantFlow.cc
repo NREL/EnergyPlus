@@ -2291,7 +2291,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                                DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                                               1,
+                                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                                ObjectIsNotParent);
                     if (!CheckOutAirNodeNumber(state, state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum)) {
                         ShowSevereError(state,
@@ -2308,7 +2308,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                                state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                                               2,
+                                                                                               NodeInputManager::compFluidStream::Secondary,
                                                                                                ObjectIsNotParent);
                 } else {
                 }
@@ -2323,7 +2323,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                              state.dataHVACVarRefFlow->VRF(VRFNum).Name,
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             2,
+                                                                                             NodeInputManager::compFluidStream::Secondary,
                                                                                              ObjectIsNotParent);
             TestCompSet(
                 state, cCurrentModuleObject, state.dataHVACVarRefFlow->VRF(VRFNum).Name, cAlphaArgs(35), cAlphaArgs(36), "Condenser Water Nodes");
@@ -3485,7 +3485,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         ObjectIsParent);
 
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum = GetOnlySingleNode(state,
@@ -3495,7 +3495,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                                          state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                         1,
+                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                          ObjectIsParent);
 
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow = rNumericArgs(1);

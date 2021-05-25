@@ -5265,7 +5265,7 @@ namespace HeatBalanceManager {
                                             state.dataIPShortCut->cAlphaArgs(1),
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Inlet,
-                                            1,
+                                            NodeInputManager::compFluidStream::Primary,
                                             ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                     ShowSevereError(state,

@@ -611,7 +611,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                 AlphArray(1),
                                                                 DataLoopNode::NodeFluidType::blank,
                                                                 DataLoopNode::NodeConnectionType::Sensor,
-                                                                1,
+                                                                NodeInputManager::compFluidStream::Primary,
                                                                 ObjectIsNotParent);
             ControllerProps(Num).ActuatedNode = GetOnlySingleNode(state,
                                                                   AlphArray(6),
@@ -620,7 +620,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                   AlphArray(1),
                                                                   DataLoopNode::NodeFluidType::blank,
                                                                   DataLoopNode::NodeConnectionType::Actuator,
-                                                                  1,
+                                                                  NodeInputManager::compFluidStream::Primary,
                                                                   ObjectIsNotParent);
             ControllerProps(Num).Offset = NumArray(1);
             ControllerProps(Num).MaxVolFlowActuated = NumArray(2);
