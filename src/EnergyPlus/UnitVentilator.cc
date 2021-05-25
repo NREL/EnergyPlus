@@ -277,7 +277,6 @@ namespace UnitVentilator {
         Array1D_string cNumericFields; // Numeric field names
         Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        int CtrlZone;                  // index to loop counter
         int NodeNum;                   // index to loop counter
         bool ZoneNodeNotFound;         // used in error checking
 
@@ -454,6 +453,13 @@ namespace UnitVentilator {
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_InletSide ||
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_SupplySide) {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists = true;
+            }
+            state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
+                state, DataZoneEquipment::UnitVentilator_Num, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
+            if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr == 0) {
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\",");
+                ShowContinueError(state, "... Unable to find the controlled zone based on Object Type and Name in the ZONEHVAC:EQUIPMENTLIST.");
+                ErrorsFound = true;
             }
 
             if (!state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
@@ -1018,28 +1024,23 @@ namespace UnitVentilator {
             if (!state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerExists) {
                 // check that unit ventilator air inlet node is the same as a zone exhaust node
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
-                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                            ZoneNodeNotFound = false;
-                            break;
-                        }
+                for (NodeNum = 1;
+                     NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumExhaustNodes;
+                     ++NodeNum) {
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ExhaustNode(NodeNum)) {
+                        ZoneNodeNotFound = false;
+                        break;
                     }
-                    if (!ZoneNodeNotFound) break;
                 }
                 if (ZoneNodeNotFound) {
                     bool InletNodeFound = false;
-                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumReturnNodes; ++NodeNum) {
-                            InletNodeFound = ZonePlenum::ValidateInducedNode(state,
-                                                                             state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
-                                                                             state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode(NodeNum));
-                            if (InletNodeFound) break;
-                        }
-                        if (InletNodeFound) break;
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr > 0) {
+                        InletNodeFound = ZonePlenum::ValidateInducedNode(
+                            state,
+                            state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumReturnNodes,
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ReturnNode);
                     }
                     if (!InletNodeFound) {
                         ShowSevereError(
@@ -1057,15 +1058,13 @@ namespace UnitVentilator {
                 }
                 // check that unit ventilator air outlet node is the same as a zone inlet node.
                 ZoneNodeNotFound = true;
-                for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                    for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
-                            state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                            state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = CtrlZone;
-                            ZoneNodeNotFound = false;
-                            break;
-                        }
+                for (NodeNum = 1;
+                     NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumInletNodes;
+                     ++NodeNum) {
+                    if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
+                        state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).InletNode(NodeNum)) {
+                        ZoneNodeNotFound = false;
+                        break;
                     }
                 }
                 if (ZoneNodeNotFound) {
@@ -1082,15 +1081,13 @@ namespace UnitVentilator {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerType == ATMixer_InletSide) {
                     // check that unit ventilator air outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = CtrlZone;
-                                ZoneNodeNotFound = false;
-                                break;
-                            }
+                    for (NodeNum = 1;
+                         NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumInletNodes;
+                         ++NodeNum) {
+                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode ==
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).InletNode(NodeNum)) {
+                            ZoneNodeNotFound = false;
+                            break;
                         }
                     }
                     if (ZoneNodeNotFound) {
@@ -1133,17 +1130,14 @@ namespace UnitVentilator {
 
                     // check that air teminal mixer outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
-                    for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
-                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
-                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode ==
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
-                                state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr = CtrlZone;
-                                ZoneNodeNotFound = false;
-                                break;
-                            }
+                    for (NodeNum = 1;
+                         NodeNum <= state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumInletNodes;
+                         ++NodeNum) {
+                        if (state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerOutNode ==
+                            state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).InletNode(NodeNum)) {
+                            ZoneNodeNotFound = false;
+                            break;
                         }
-                        if (!ZoneNodeNotFound) break;
                     }
                     if (ZoneNodeNotFound) {
                         ShowSevereError(state,
@@ -1157,9 +1151,12 @@ namespace UnitVentilator {
                     } else {
                         bool ExhastNodeNotFound = true;
                         // check exhaust node
-                        for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
+                        for (NodeNum = 1;
+                             NodeNum <=
+                             state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumExhaustNodes;
+                             ++NodeNum) {
                             if (state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode ==
-                                state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
+                                state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ExhaustNode(NodeNum)) {
                                 ExhastNodeNotFound = false;
                                 break;
                             }
@@ -1167,14 +1164,12 @@ namespace UnitVentilator {
                         // check induce node
                         if (ExhastNodeNotFound) {
                             bool InletNodeFound = false;
-                            for (NodeNum = 1;
-                                 NodeNum <=
-                                 state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumReturnNodes;
-                                 ++NodeNum) {
-                                InletNodeFound = ZonePlenum::ValidateInducedNode(state,
-                                                                                 state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
-                                                                                 state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ReturnNode(NodeNum));
-                                if (InletNodeFound) break;
+                            if (state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr > 0) {
+                                InletNodeFound = ZonePlenum::ValidateInducedNode(
+                                    state,
+                                    state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode,
+                                    state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).NumReturnNodes,
+                                    state.dataZoneEquip->ZoneEquipConfig(state.dataUnitVentilators->UnitVent(UnitVentNum).ZonePtr).ReturnNode);
                             }
                             if (!InletNodeFound) {
                                 ShowSevereError(
