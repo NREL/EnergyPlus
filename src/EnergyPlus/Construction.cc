@@ -2134,11 +2134,6 @@ void ConstructionProps::loadFromCache(EnergyPlusData &state)
 
 std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
 {
-    // lambda to round to specified precision
-    auto castWithPrecision = [](double const x, unsigned int const precision_bits) {
-        return *reinterpret_cast<unsigned long long const *>(&x) >> (64 - 12 - precision_bits);
-    };
-
     unsigned long long key = 0;
 
     // data from material layers
@@ -2146,11 +2141,28 @@ std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
     for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
         int CurrentLayer = this->LayerPoint(Layer);
         auto &mat = state.dataMaterial->Material(CurrentLayer);
-        key ^= castWithPrecision(mat.Thickness, 15) + Layer;
-        key ^= castWithPrecision(mat.Conductivity, 15) + Layer;
-        key ^= castWithPrecision(mat.Density, 15) + Layer;
-        key ^= castWithPrecision(mat.SpecHeat, 15) + Layer;
-        key ^= castWithPrecision(mat.Resistance, 15) + Layer;
+
+#ifdef USE_REINTERPRET_CAST
+        key ^= Cache::prepFloatForCacheKey(mat.Thickness, 15) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, 15) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Density, 15) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, 15) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Resistance, 15) + Layer;
+#endif
+#ifdef USE_STATIC_CAST_AND_FP_MULT
+        key ^= Cache::prepFloatForCacheKey(mat.Thickness, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Density, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Resistance, 1E5) + Layer;
+#endif
+#ifdef USE_C_CAST_AND_FP_MULT
+        key ^= Cache::prepFloatForCacheKey(mat.Thickness, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Density, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, 1E5) + Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Resistance, 1E5) + Layer;
+#endif
     }
 
     return format("{}", key);
