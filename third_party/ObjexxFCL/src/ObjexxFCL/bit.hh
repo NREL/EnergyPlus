@@ -28,24 +28,6 @@ namespace ObjexxFCL {
 
 namespace bit { // Protect from collisions with C++11 <functional> functors
 
-// Bitwise And
-template< typename I, typename J >
-inline
-I
-bit_and( I const & i, J const & j )
-{
-	return ( i & j );
-}
-
-// Bitwise Exclusive Or
-template< typename I, typename J >
-inline
-I
-bit_xor( I const & i, J const & j )
-{
-	return ( i ^ j );
-}
-
 // Bit Shifted
 template< typename I, typename S, class = typename std::enable_if< std::is_unsigned< I >::value >::type >
 inline

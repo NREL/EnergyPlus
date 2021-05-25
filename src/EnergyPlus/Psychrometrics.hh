@@ -652,7 +652,6 @@ namespace Psychrometrics {
 #endif
 
         Int64 const Tdb_tag(bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
-        //        Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
         Int64 const hash(Tdb_tag & psatcache_mask);
         auto &cPsat(state.dataPsychCache->cached_Psat(hash));
 
@@ -711,7 +710,7 @@ namespace Psychrometrics {
         H_tag = bit_shift(H_tag, -Grid_Shift);
         Pb_tag = bit_transfer(Pb, Pb_tag);
         Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
-        hash = bit_and(bit_xor(H_tag, Pb_tag), Int64(tsat_hbp_cache_size - 1));
+        hash = (H_tag ^ Pb_tag) & Int64(tsat_hbp_cache_size - 1);
         auto &cached_Tsat_HPb = state.dataPsychCache->cached_Tsat_HPb;
         if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
             cached_Tsat_HPb(hash).iH = H_tag;

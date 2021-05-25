@@ -201,9 +201,7 @@ using ObjexxFCL::trim;
 using ObjexxFCL::trimmed;
 using ObjexxFCL::uppercase;
 using ObjexxFCL::uppercased;
-using ObjexxFCL::bit::bit_and;
 using ObjexxFCL::bit::bit_shift;
 using ObjexxFCL::bit::bit_transfer;
-using ObjexxFCL::bit::bit_xor;
 
 #endif

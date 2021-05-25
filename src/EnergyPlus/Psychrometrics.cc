@@ -385,7 +385,7 @@ namespace Psychrometrics {
         Tdb_tag = bit_shift(Tdb_tag, -Grid_Shift);
         W_tag = bit_shift(W_tag, -Grid_Shift);
         Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
-        hash = bit_and(bit_xor(Tdb_tag, bit_xor(W_tag, Pb_tag)), Int64(twbcache_size - 1));
+        hash = (Tdb_tag ^ (W_tag ^ Pb_tag)) & Int64(twbcache_size - 1);
 
         auto &cached_Twb = state.dataPsychCache->cached_Twb;
 
