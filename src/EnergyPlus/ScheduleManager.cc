@@ -649,7 +649,6 @@ namespace ScheduleManager {
               "{}\n",
               "  Processing Schedule Input -- Start");
 
-
         std::string curName;
         Array1D<Real64> timestepColumnValues;
         for (auto &NameValue : CSVAllColumnNames) {
@@ -1710,12 +1709,12 @@ namespace ScheduleManager {
         // reserving vector space and assign attributes to each columnarData object
 
         // we use fileName in the outer loop so that the columnarData vector is easy to populate later
-        for (const std::string& fileNameItem : setOfFilenames) {
+        for (const std::string &fileNameItem : setOfFilenames) {
             for (schedInputIdfPreprocessObject &item : state.dataScheduleMgr->allIdfSchedData) {
                 if (item.fileName == fileNameItem) {
                     int numberOfRows = (item.numHourlyValues * 60.0) / item.MinutesPerItem;
                     std::vector<Real64> vals;
-                    vals.reserve(numberOfRows); // pre-allocating the big vector
+                    vals.reserve(numberOfRows);                                            // pre-allocating the big vector
                     item.setColumnarDataIndex(state.dataScheduleMgr->columnarData.size()); // TODO: this is a kludgy-hack
 
                     // give each schedule it's own column in columnarData
@@ -1742,12 +1741,12 @@ namespace ScheduleManager {
         // columnarData[<column> index].vals[<row>] = token being read
 
         // for item in setOfFilenames fill in appropriate  cells of columnar data
-        for (const std::string& fileNameItem : setOfFilenames) {
+        for (const std::string &fileNameItem : setOfFilenames) {
             // go through all in allIdfSchedData, filter which sched belong to this file
             // get their column map
             std::map<int, int> colNumToColDataIndex;
             std::vector<int> vectorOfCSVColNumbers;
-            for (const schedInputIdfPreprocessObject& item : state.dataScheduleMgr->allIdfSchedData) {
+            for (const schedInputIdfPreprocessObject &item : state.dataScheduleMgr->allIdfSchedData) {
                 if (item.fileName == fileNameItem) {
                     colNumToColDataIndex[item.columnOfInterest] = item.columnarDataIndex;
                     vectorOfCSVColNumbers.push_back(item.columnOfInterest);
@@ -1756,9 +1755,9 @@ namespace ScheduleManager {
 
             // find if there is a many to one mapping
             std::sort(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // sorting to use std::adjacent_find
-            const auto duplicate = std::adjacent_find(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // what if there are multiple last elements?
-            if (duplicate != vectorOfCSVColNumbers.end())
-                std::cout << "Duplicate element = " << *duplicate << "\n";
+            const auto duplicate =
+                std::adjacent_find(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // what if there are multiple last elements?
+            if (duplicate != vectorOfCSVColNumbers.end()) std::cout << "Duplicate element = " << *duplicate << "\n";
 
             // what if there are multiple last elements? - remove last element and check if duplicate is still the same
 
@@ -1770,19 +1769,19 @@ namespace ScheduleManager {
             // find min of rows to be skipped
             // skip em and subtract from columnarData element.rowstoskip
 
-
             std::ifstream file(fileNameItem);
             CSVRow row;
             // TODO : Fix delimiter issue
-            row.delimiter = state.dataScheduleMgr->columnarData[colNumToColDataIndex[vectorOfCSVColNumbers[0]]].delimiter; // all schedules in one file will have the same delimiter
+            row.delimiter = state.dataScheduleMgr->columnarData[colNumToColDataIndex[vectorOfCSVColNumbers[0]]]
+                                .delimiter; // all schedules in one file will have the same delimiter
 
             while (file >> row)
-                // find which columns of this csv map to which schedule - not needed
-                //  How to do this? Make a mapOfMaps which has for each fileName, a map of scheduleNames, ColumnNumbers
+            // find which columns of this csv map to which schedule - not needed
+            //  How to do this? Make a mapOfMaps which has for each fileName, a map of scheduleNames, ColumnNumbers
 
-                // find schedules to be filled with columns from this file
-                // if column is important, check if this row needs to be skipped
-                // Else add to the right cell
+            // find schedules to be filled with columns from this file
+            // if column is important, check if this row needs to be skipped
+            // Else add to the right cell
             {
                 for (int colNum : vectorOfCSVColNumbers) {
 
@@ -1799,10 +1798,8 @@ namespace ScheduleManager {
 
         // schedule values have been filled into the columnarData.vals vectors.
 
-
         // skip rows when needed
-        for (auto &schedule : state.dataScheduleMgr->columnarData)
-        {
+        for (auto &schedule : state.dataScheduleMgr->columnarData) {
             if (schedule.rowsToSkip != -1) {
                 schedule.vals.erase(schedule.vals.begin(), schedule.vals.begin() + schedule.rowsToSkip);
             }
@@ -1862,8 +1859,7 @@ namespace ScheduleManager {
                 if (schedule.MinutesPerItem == 60) {
                     for (int jHour = 1; jHour <= 24; ++jHour) {
                         for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                            state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) =
-                                schedule.vals[rowCountFld];
+                            state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = schedule.vals[rowCountFld];
                             ++rowCountFld; // hourlyFileValues((hDay - 1) * 24 + jHour)
                         }
                     }
@@ -1874,8 +1870,7 @@ namespace ScheduleManager {
                             SCount = 1;
                             CurMinute = state.dataGlobal->MinutesPerTimeStep;
                             for (iRowNum = 1; iRowNum <= hrLimitCount; ++iRowNum) {
-                                MinuteValue({SCount, minuteEnd}, Hr) =
-                                    schedule.vals[rowCountFld];
+                                MinuteValue({SCount, minuteEnd}, Hr) = schedule.vals[rowCountFld];
                                 SCount = minuteEnd + 1;
                                 minuteEnd += schedule.MinutesPerItem;
                                 ++rowCountFld;
@@ -1921,12 +1916,10 @@ namespace ScheduleManager {
                                      state.dataScheduleMgr->Schedule(schedule.SchNum).EMSValue);
                 }
             }
-
         }
         if (NumCommaFileSchedules > 0) {
             hourlyFileValues.deallocate();
         }
-
 
         MinuteValue.deallocate();
         SetMinuteValue.deallocate();
