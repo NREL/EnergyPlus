@@ -1472,9 +1472,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariff_with_Custom_Meter)
     LEEDtariffReporting(*state);
 
     EXPECT_EQ("ExampleA ExampleI-Sell", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Electricity"));
-    
-    EXPECT_EQ("ExampleA-Gas Sample with All Utilities_NGas", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas"));
-    
+
+    EXPECT_EQ("ExampleA-Gas Sample with All Utilities_NGas",
+              RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas"));
+
     EXPECT_EQ("DistrictCoolingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling"));
 
     EXPECT_EQ("DistrictHeatingUnit", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating"));
