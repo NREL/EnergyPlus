@@ -90,27 +90,11 @@ namespace Cache {
 
     void writeCache(EnergyPlusData &state);
 
-#define USE_REINTERPRET_CAST
-
-#ifdef USE_REINTERPRET_CAST
     inline unsigned long long prepFloatForCacheKey(double const x, unsigned int const precision_bits)
     {
         assert(sizeof(double) == sizeof(unsigned long long));
         return *reinterpret_cast<unsigned long long const *>(&x) >> (64 - 12 - precision_bits);
     }
-#endif
-#ifdef USE_STATIC_CAST_AND_FP_MULT
-    inline unsigned long long prepFloatForCacheKey(double const x, unsigned int const precision)
-    {
-        return static_cast<unsigned long long const>(x * precision);
-    }
-#endif
-#ifdef USE_C_CAST_AND_FP_MULT
-    inline unsigned long long prepFloatForCacheKey(double const x, double const precision)
-    {
-        return (unsigned long long)(x * precision);
-    }
-#endif
 
 } // namespace Cache
 
