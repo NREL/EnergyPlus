@@ -573,8 +573,9 @@ namespace HeatRecovery {
                                          Real64 const Z    // capacity rate ratio
     );
 
-    Real64 GetResidCrossFlowBothUnmixed(Real64 const NTU,          // number of transfer units
-                                        Array1D<Real64> const &Par // par(1) = Eps, par(2) = Z
+    Real64 GetResidCrossFlowBothUnmixed(EnergyPlusData &state,
+                                        Real64 const NTU,                // number of transfer units
+                                        std::array<Real64, 2> const &Par // par(1) = Eps, par(2) = Z
     );
 
     void CheckModelBoundsTempEq(EnergyPlusData &state,

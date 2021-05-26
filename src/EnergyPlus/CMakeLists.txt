@@ -3,8 +3,15 @@ if(WIN32)
   configure_file(energyplusapi.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc")
 endif()
 
+include(../../cmake/SystemDetails.cmake)
+set_system_nickname()
+
+include(../../cmake/TargetArch.cmake)
+target_architecture(TARGET_ARCH)
+
 set(PYTHON_API_VERSION_MAJOR 0)
 set(PYTHON_API_VERSION_MINOR 2)
+set(BUILD_PLATFORM_STRING "${SYSTEM_NICKNAME}_${TARGET_ARCH}")
 configure_file(DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc")
 configure_file(ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc")
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema")
@@ -331,6 +338,7 @@ set(SRC
     HVACSizingSimulationManager.hh
     HVACStandAloneERV.cc
     HVACStandAloneERV.hh
+    HVACSystemRootFindingAlgorithm.hh
     HVACUnitaryBypassVAV.cc
     HVACUnitaryBypassVAV.hh
     HVACVariableRefrigerantFlow.cc
@@ -598,8 +606,6 @@ set(SRC
     TARCOGParams.hh
     TarcogShading.cc
     TarcogShading.hh
-    TempSolveRoot.cc
-    TempSolveRoot.hh
     ThermalChimney.cc
     ThermalChimney.hh
     ThermalComfort.cc
