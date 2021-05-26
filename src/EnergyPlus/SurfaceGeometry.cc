@@ -925,7 +925,7 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfOutWindSpeed(SurfNum) = 0.0;
             state.dataSurface->SurfOutWindDir(SurfNum) = 0.0;
             state.dataSurface->SurfGenericContam(SurfNum) = 0.0;
-            state.dataSurface->SurfPenumbraID(SurfNum) = 0;
+            state.dataSurface->SurfPenumbraID(SurfNum) = -1;
             state.dataSurface->SurfAirSkyRadSplit(SurfNum) = 0.0;
         }
         // Following are surface property arrays used in SurfaceGeometry
