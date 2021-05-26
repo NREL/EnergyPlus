@@ -17218,8 +17218,7 @@ TEST_F(EnergyPlusFixture, getCoilWaterSystemInputDataTest)
         "   Yes,                  !- Run on Sensible Load",
         "   No,                   !- Run on Latent Load",
         "   2.0;                  !- Minimum Air To Water Temperature Offset",
-
-        });
+    });
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
