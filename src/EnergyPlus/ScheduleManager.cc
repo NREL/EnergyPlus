@@ -1849,9 +1849,10 @@ namespace ScheduleManager {
                 if (schedule.MinutesPerItem == 60) {
                     for (int jHour = 1; jHour <= 24; ++jHour) {
                         for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                            auto a = state.dataGlobal->NumOfTimeStepInHour;
                             state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = schedule.vals[rowCountFld];
-                            ++rowCountFld; // hourlyFileValues((hDay - 1) * 24 + jHour)
                         }
+                        ++rowCountFld; // hourlyFileValues((hDay - 1) * 24 + jHour)
                     }
                 } else { // Minutes Per Item < 60
                     if (schedule.FileIntervalInterpolated) {
