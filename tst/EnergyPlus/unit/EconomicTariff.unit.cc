@@ -1410,10 +1410,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariff_with_Custom_Meter)
     state->dataOutputProcessor->EnergyMeters(6).Name = "WATER:FACILITY";
     state->dataOutputProcessor->EnergyMeters(7).Name = "Building Natural Gas";
 
-    int elecFacilMeter = GetMeterIndex(*state, "ELECTRICITY:FACILITY");
-    int gasFacilMeter = GetMeterIndex(*state, "NATURALGAS:FACILITY");
-    int distCoolFacilMeter = GetMeterIndex(*state, "DISTRICTCOOLING:FACILITY");
-    int distHeatFacilMeter = GetMeterIndex(*state, "DISTRICTHEATING:FACILITY");
+    //int elecFacilMeter = GetMeterIndex(*state, "ELECTRICITY:FACILITY");
+    //int gasFacilMeter = GetMeterIndex(*state, "NATURALGAS:FACILITY");
+    //int distCoolFacilMeter = GetMeterIndex(*state, "DISTRICTCOOLING:FACILITY");
+    //int distHeatFacilMeter = GetMeterIndex(*state, "DISTRICTHEATING:FACILITY");
 
     state->dataEconTariff->numTariff = 7;
     state->dataEconTariff->tariff.allocate(state->dataEconTariff->numTariff);
