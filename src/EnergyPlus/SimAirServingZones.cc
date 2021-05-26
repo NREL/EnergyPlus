@@ -1235,13 +1235,6 @@ void GetAirPathData(EnergyPlusData &state)
                                             0);
                     } else if (componentType == "COILSYSTEM:COOLING:WATER") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CoilSystemWater;
-                        UnitarySystems::UnitarySys thisSys;
-                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
-                            thisSys.factory(state,
-                                            DataHVACGlobals::UnitarySys_AnyCoilType,
-                                            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
-                                            false,
-                                            0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {
@@ -3618,7 +3611,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
             if (CompPointer == nullptr) {
                 UnitarySystems::UnitarySys thisSys;
                 CompPointer = thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
-                // temporary fix for saving pointer, eventually apply to UnitarySystem 25 lines down
+                // temporary fix for saving pointer, eventually apply to UnitarySystem 16 lines above
                 state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Branch(branchNum).Comp(compNum).compPointer = CompPointer;
             }
             Real64 sensOut = 0.0;
