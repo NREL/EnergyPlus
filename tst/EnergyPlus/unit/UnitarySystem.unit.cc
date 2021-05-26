@@ -17249,7 +17249,7 @@ TEST_F(EnergyPlusFixture, getCoilWaterSystemInputDataTest)
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
     EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
-    EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
+    EXPECT_EQ(thisSys.UnitType, "AirLoopHVAC:UnitarySystem"); //  "CoilSystem:Cooling:Water"
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
     EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);
