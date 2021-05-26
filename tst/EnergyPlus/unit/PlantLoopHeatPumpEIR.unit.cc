@@ -1741,7 +1741,7 @@ TEST_F(EnergyPlusFixture, TestConcurrentOperationChecking)
     coil4->running = true;
 
     // check fatal error about concurrent operation
-    EXPECT_THROW(EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(*state), std::runtime_error);
+    EXPECT_THROW(EIRPlantLoopHeatPump::checkConcurrentOperation(*state), std::runtime_error);
 
 }
 
