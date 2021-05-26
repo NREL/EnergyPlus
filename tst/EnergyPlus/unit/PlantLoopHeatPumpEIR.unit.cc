@@ -1742,7 +1742,6 @@ TEST_F(EnergyPlusFixture, TestConcurrentOperationChecking)
 
     // check fatal error about concurrent operation
     EXPECT_THROW(EIRPlantLoopHeatPump::checkConcurrentOperation(*state), std::runtime_error);
-
 }
 
 TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
