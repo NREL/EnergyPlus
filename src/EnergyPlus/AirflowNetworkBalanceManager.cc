@@ -11159,7 +11159,7 @@ namespace AirflowNetworkBalanceManager {
         // Eliminate node not related to AirLoopHVAC
         for (k = 1; k <= state.dataBranchNodeConnections->NumOfNodeConnections; ++k) {
             if (NodeFound(state.dataBranchNodeConnections->NodeConnections(k).NodeNumber)) continue;
-            if (state.dataBranchNodeConnections->NodeConnections(k).FluidStream == 2) {
+            if (state.dataBranchNodeConnections->NodeConnections(k).FluidStream == NodeInputManager::compFluidStream::Secondary) {
                 NodeFound(state.dataBranchNodeConnections->NodeConnections(k).NodeNumber) = true;
             }
         }

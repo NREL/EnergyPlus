@@ -355,40 +355,43 @@ namespace TranspiredCollector {
                     state.dataTranspiredCollector->UTSC(Item).ZoneNode = 0;
                     for (NumOASys = 1; NumOASys <= state.dataTranspiredCollector->UTSC(Item).NumOASysAttached; ++NumOASys) {
                         ACountBase = (NumOASys - 1) * 4 + 2;
-                        state.dataTranspiredCollector->UTSC(Item).InletNode(NumOASys) = GetOnlySingleNode(state,
-                                                                                                          AlphasSplit(ACountBase),
-                                                                                                          ErrorsFound,
-                                                                                                          CurrentModuleObject,
-                                                                                                          AlphasSplit(1),
-                                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                          static_cast<NodeInputManager::compFluidStream>(NumOASys-1),
-                                                                                                          ObjectIsNotParent);
+                        state.dataTranspiredCollector->UTSC(Item).InletNode(NumOASys) =
+                            GetOnlySingleNode(state,
+                                              AlphasSplit(ACountBase),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              AlphasSplit(1),
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::NodeConnectionType::Inlet,
+                                              static_cast<NodeInputManager::compFluidStream>(NumOASys),
+                                              ObjectIsNotParent);
 
-                        state.dataTranspiredCollector->UTSC(Item).OutletNode(NumOASys) = GetOnlySingleNode(state,
-                                                                                                           AlphasSplit(ACountBase + 1),
-                                                                                                           ErrorsFound,
-                                                                                                           CurrentModuleObject,
-                                                                                                           AlphasSplit(1),
-                                                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                           static_cast<NodeInputManager::compFluidStream>(NumOASys-1),
-                                                                                                           ObjectIsNotParent);
+                        state.dataTranspiredCollector->UTSC(Item).OutletNode(NumOASys) =
+                            GetOnlySingleNode(state,
+                                              AlphasSplit(ACountBase + 1),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              AlphasSplit(1),
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::NodeConnectionType::Outlet,
+                                              static_cast<NodeInputManager::compFluidStream>(NumOASys),
+                                              ObjectIsNotParent);
                         TestCompSet(state,
                                     CurrentModuleObject,
                                     AlphasSplit(1),
                                     AlphasSplit(ACountBase),
                                     AlphasSplit(ACountBase + 1),
                                     "Transpired Collector Air Nodes"); // appears that test fails by design??
-                        state.dataTranspiredCollector->UTSC(Item).ControlNode(NumOASys) = GetOnlySingleNode(state,
-                                                                                                            AlphasSplit(ACountBase + 2),
-                                                                                                            ErrorsFound,
-                                                                                                            CurrentModuleObject,
-                                                                                                            AlphasSplit(1),
-                                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                                            DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                            NodeInputManager::compFluidStream::Primary,
-                                                                                                            ObjectIsNotParent);
+                        state.dataTranspiredCollector->UTSC(Item).ControlNode(NumOASys) =
+                            GetOnlySingleNode(state,
+                                              AlphasSplit(ACountBase + 2),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              AlphasSplit(1),
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::NodeConnectionType::Sensor,
+                                              NodeInputManager::compFluidStream::Primary,
+                                              ObjectIsNotParent);
 
                         state.dataTranspiredCollector->UTSC(Item).ZoneNode(NumOASys) = GetOnlySingleNode(state,
                                                                                                          AlphasSplit(ACountBase + 3),

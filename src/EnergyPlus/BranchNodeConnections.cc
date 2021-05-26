@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::BranchNodeConnections {
@@ -206,9 +207,9 @@ void OverrideNodeConnectionType(EnergyPlusData &state,
                                 std::string const &ObjectType,     // Type of object this Node is connected to (e.g. Chiller:Electric)
                                 std::string const &ObjectName,     // Name of object this Node is connected to (e.g. MyChiller)
                                 std::string const &ConnectionType, // Connection Type for this Node (must be valid)
-                                int const FluidStream,             // Count on Fluid Streams
-                                bool const IsParent,               // True when node is a parent node
-                                bool &errFlag                      // Will be True if errors already detected or if errors found here
+                                NodeInputManager::compFluidStream const FluidStream, // Count on Fluid Streams
+                                bool const IsParent,                                 // True when node is a parent node
+                                bool &errFlag // Will be True if errors already detected or if errors found here
 )
 {
 
@@ -693,7 +694,7 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
     // Check 10 -- fluid streams cannot have multiple inlet/outlet nodes on same component
     //  can have multiple inlets with one outlet or vice versa but cannot have multiple both inlet and outlet
     if (state.dataBranchNodeConnections->NumOfNodeConnections > 0) {
-        MaxFluidStream = maxval(state.dataBranchNodeConnections->NodeConnections, &NodeConnectionDef::FluidStream);
+        MaxFluidStream = static_cast<int>(maxval(state.dataBranchNodeConnections->NodeConnections, &NodeConnectionDef::FluidStream));
         FluidStreamInletCount.allocate(MaxFluidStream);
         FluidStreamOutletCount.allocate(MaxFluidStream);
         FluidStreamCounts.allocate(MaxFluidStream);
@@ -730,18 +731,18 @@ void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ObjectIsParent) continue;
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType ==
                 ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
-                ++FluidStreamInletCount(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream);
+                ++FluidStreamInletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream));
             if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType ==
                 ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
-                ++FluidStreamOutletCount(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream);
+                ++FluidStreamOutletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop1).FluidStream));
             for (Loop2 = Loop1 + 1; Loop2 <= NodeObjects(Object + 1) - 1; ++Loop2) {
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ObjectIsParent) continue;
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
                     ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet))
-                    ++FluidStreamInletCount(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream);
+                    ++FluidStreamInletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream));
                 if (state.dataBranchNodeConnections->NodeConnections(Loop2).ConnectionType ==
                     ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet))
-                    ++FluidStreamOutletCount(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream);
+                    ++FluidStreamOutletCount(static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop2).FluidStream));
             }
             for (Loop2 = 1; Loop2 <= MaxFluidStream; ++Loop2) {
                 if (FluidStreamInletCount(Loop2) > 1 && FluidStreamOutletCount(Loop2) > 1) {
@@ -1043,11 +1044,11 @@ void GetComponentData(EnergyPlusData &state,
                       int &NumInlets,
                       Array1D_string &InletNodeNames,
                       Array1D_int &InletNodeNums,
-                      Array1D_int &InletFluidStreams,
+                      Array1D<NodeInputManager::compFluidStream> &InletFluidStreams,
                       int &NumOutlets,
                       Array1D_string &OutletNodeNames,
                       Array1D_int &OutletNodeNums,
-                      Array1D_int &OutletFluidStreams,
+                      Array1D<NodeInputManager::compFluidStream> &OutletFluidStreams,
                       bool &ErrorsFound // set to true if errors found, unchanged otherwise
 )
 {
@@ -1099,10 +1100,10 @@ void GetComponentData(EnergyPlusData &state,
 
     InletNodeNames = std::string();
     InletNodeNums = 0;
-    InletFluidStreams = 0;
+    InletFluidStreams = NodeInputManager::compFluidStream::Unassigned;
     OutletNodeNames = std::string();
     OutletNodeNums = 0;
-    OutletFluidStreams = 0;
+    OutletFluidStreams = NodeInputManager::compFluidStream::Unassigned;
     NumInlets = 0;
     NumOutlets = 0;
     ErrInObject = false;

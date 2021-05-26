@@ -2451,10 +2451,10 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     Array1D_string SubCompNames;
     Array1D_string InletNodeNames;
     Array1D_int InletNodeNumbers;
-    Array1D_int InletFluidStreams;
+    Array1D<NodeInputManager::compFluidStream> InletFluidStreams;
     Array1D_string OutletNodeNames;
     Array1D_int OutletNodeNumbers;
-    Array1D_int OutletFluidStreams;
+    Array1D<NodeInputManager::compFluidStream> OutletFluidStreams;
     int NumChildren;
     int NumGrandChildren;
     bool IsParent;

@@ -73,9 +73,9 @@ namespace NodeInputManager {
     enum class compFluidStream
     {
         Unassigned = -1,
-        Primary,
-        Secondary,
-        Tertiary
+        Primary = 1,
+        Secondary = 2,
+        Tertiary = 3
     };
 
     struct NodeListDef // Derived Type for Node Lists

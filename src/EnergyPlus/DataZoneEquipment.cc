@@ -677,7 +677,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::ZoneInlet,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -729,7 +729,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::ZoneExhaust,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -769,7 +769,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::ZoneReturn,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -818,7 +818,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::Sensor,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {

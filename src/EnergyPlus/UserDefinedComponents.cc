@@ -623,7 +623,7 @@ namespace UserDefinedComponents {
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                static_cast<NodeInputManager::compFluidStream>(ConnectionLoop - 1),
+                                                                static_cast<NodeInputManager::compFluidStream>(ConnectionLoop),
                                                                 DataLoopNode::ObjectIsNotParent);
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).OutletNodeNum =
                             NodeInputManager::GetOnlySingleNode(state,
@@ -633,7 +633,7 @@ namespace UserDefinedComponents {
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                static_cast<NodeInputManager::compFluidStream>(ConnectionLoop - 1),
+                                                                static_cast<NodeInputManager::compFluidStream>(ConnectionLoop),
                                                                 DataLoopNode::ObjectIsNotParent);
 
                         BranchNodeConnections::TestCompSet(
@@ -1671,7 +1671,7 @@ namespace UserDefinedComponents {
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                static_cast<NodeInputManager::compFluidStream>((ConnectionLoop + 2) - 1),
+                                                                static_cast<NodeInputManager::compFluidStream>(ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent);
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).OutletNodeNum =
                             NodeInputManager::GetOnlySingleNode(state,
@@ -1681,7 +1681,7 @@ namespace UserDefinedComponents {
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                static_cast<NodeInputManager::compFluidStream>((ConnectionLoop + 2) - 1),
+                                                                static_cast<NodeInputManager::compFluidStream>(ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent);
                         BranchNodeConnections::TestCompSet(
                             state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
@@ -2174,7 +2174,7 @@ namespace UserDefinedComponents {
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
                                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                                static_cast<NodeInputManager::compFluidStream>((ConnectionLoop + 2) - 1),
+                                                                static_cast<NodeInputManager::compFluidStream>(ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent,
                                                                 cAlphaFieldNames(aArgCount));
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).OutletNodeNum =
@@ -2185,7 +2185,7 @@ namespace UserDefinedComponents {
                                                                 cAlphaArgs(1),
                                                                 DataLoopNode::NodeFluidType::Water,
                                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                                static_cast<NodeInputManager::compFluidStream>((ConnectionLoop + 2) - 1),
+                                                                static_cast<NodeInputManager::compFluidStream>(ConnectionLoop + 2),
                                                                 DataLoopNode::ObjectIsNotParent,
                                                                 cAlphaFieldNames(aArgCount + 1));
                         BranchNodeConnections::TestCompSet(
