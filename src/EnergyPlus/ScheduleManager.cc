@@ -1690,20 +1690,15 @@ namespace ScheduleManager {
         }
         CurrentModuleObject = "Schedule:File";
 
-        std::set<std::string> setOfFilenames;
-
+        // Runs getObjectItem for Schedule:File and saves it to vector in state: allIdfSchedData
         PreProcessIDF(state, SchNum, NumCommaFileSchedules);
+
+        // Because we are focusing on saving performance by decreasing number of file open-close operations, get set of filenames
+        std::set<std::string> setOfFilenames;
         PopulateSetOfFilenames(state.dataScheduleMgr->allIdfSchedData, setOfFilenames);
 
-        //        for (const std::string &item : setOfFilenames) {
-        //            std::cout << (item) << ", Cols: " << state.dataScheduleMgr->maxColByFile[item] << " set \n";
-        //        }
-
-        // for item in allIdfSchedData, emplace_back in columnarData, calling constructor forPreProcessedColumn which will take information
-
-        // reserving vector space and assign attributes to each columnarData object
-
-        // we use fileName in the outer loop so that the columnarData vector is easy to populate later
+        // we create a new vector of data with the pre-processed data, arranged according to filenames
+        // we use fileName in the outer loop so as to minimize opening and closing files
         for (const std::string &fileNameItem : setOfFilenames) {
             for (schedInputIdfPreprocessObject &item : state.dataScheduleMgr->allIdfSchedData) {
                 if (item.fileName == fileNameItem) {
@@ -1781,9 +1776,9 @@ namespace ScheduleManager {
                 for (int colNum : vectorOfCSVColNumbers) {
 
                     std::string x = static_cast<std::string>(row[colNum]);
-
-                    Real64 a = UtilityRoutines::ProcessNumber(x, ErrorsFound);
-
+///a
+                    Real64 a = UtilityRoutines::ProcessNumber(x, ErrorsFound); // Overload
+///b
                     state.dataScheduleMgr->columnarData[colNumToColDataIndex[colNum]].vals.emplace_back(a); // row[colNum]
 
                     // TODO : if there are multiple common elements in vectorOfCSVColNumbers, there is an error.
