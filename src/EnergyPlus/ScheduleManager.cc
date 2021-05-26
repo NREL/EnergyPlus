@@ -1776,9 +1776,9 @@ namespace ScheduleManager {
                 for (int colNum : vectorOfCSVColNumbers) {
 
                     std::string x = static_cast<std::string>(row[colNum]);
-///a
-                    Real64 a = UtilityRoutines::ProcessNumber(x, ErrorsFound); // Overload
-///b
+                    /// a
+                    Real64 a = UtilityRoutines::ProcessNumber(x, ErrorsFound);                              // Overload
+                                                                                                            /// b
                     state.dataScheduleMgr->columnarData[colNumToColDataIndex[colNum]].vals.emplace_back(a); // row[colNum]
 
                     // TODO : if there are multiple common elements in vectorOfCSVColNumbers, there is an error.
@@ -1849,7 +1849,6 @@ namespace ScheduleManager {
                 if (schedule.MinutesPerItem == 60) {
                     for (int jHour = 1; jHour <= 24; ++jHour) {
                         for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                            auto a = state.dataGlobal->NumOfTimeStepInHour;
                             state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = schedule.vals[rowCountFld];
                         }
                         ++rowCountFld; // hourlyFileValues((hDay - 1) * 24 + jHour)
