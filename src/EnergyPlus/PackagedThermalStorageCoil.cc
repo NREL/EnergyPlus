@@ -1720,15 +1720,16 @@ void GetTESCoilInput(EnergyPlusData &state)
             state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantConnectionAvailable = false;
         }
         if (!state.dataIPShortCut->lAlphaFieldBlanks(63)) {
-            state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantOutletNodeNum = GetOnlySingleNode(state,
-                                                                                                          state.dataIPShortCut->cAlphaArgs(63),
-                                                                                                          ErrorsFound,
-                                                                                                          cCurrentModuleObject,
-                                                                                                          state.dataIPShortCut->cAlphaArgs(1),
-                                                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                          NodeInputManager::compFluidStream::Secondary,
-                                                                                                          ObjectIsNotParent);
+            state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(63),
+                                  ErrorsFound,
+                                  cCurrentModuleObject,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::NodeConnectionType::Outlet,
+                                  NodeInputManager::compFluidStream::Secondary,
+                                  ObjectIsNotParent);
         } else {
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantConnectionAvailable) {
                 ShowSevereError(

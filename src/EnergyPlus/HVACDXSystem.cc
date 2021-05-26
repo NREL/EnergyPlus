@@ -405,15 +405,16 @@ namespace HVACDXSystem {
                 }
             }
 
-            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum = GetOnlySingleNode(state,
-                                                                                                             Alphas(3),
-                                                                                                             ErrorsFound,
-                                                                                                             CurrentModuleObject,
-                                                                                                             Alphas(1),
-                                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                             NodeInputManager::compFluidStream::Primary,
-                                                                                                             ObjectIsParent);
+            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(3),
+                                  ErrorsFound,
+                                  CurrentModuleObject,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::NodeConnectionType::Inlet,
+                                  NodeInputManager::compFluidStream::Primary,
+                                  ObjectIsParent);
             state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum =
                 GetOnlySingleNode(state,
                                   Alphas(4),
