@@ -1431,11 +1431,11 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependen
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->Surface(1).CosTilt = 0;
 
-    state->dataHeatBal->HConvIn.allocate(1);
+    state->dataHeatBal->SurfHConvInt.allocate(1);
 
     CalcASHRAESimpleIntConvCoeff(*state, 1, 20.0, 30.0);
 
-    ConvectionCoefficient = state->dataHeatBal->HConvIn(1);
+    ConvectionCoefficient = state->dataHeatBal->SurfHConvInt(1);
 
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }
@@ -1583,14 +1583,14 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
-    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->TempSurfInTmp);
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->SurfTempInTmp);
 
     int algorithm_identifier;
 
@@ -1698,7 +1698,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
     algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
 
-    state->dataHeatBalSurf->TempSurfInTmp.deallocate();
+    state->dataHeatBalSurf->SurfTempInTmp.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
@@ -1822,14 +1822,14 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(6);
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
-    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(4) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(5) = 25.0;
-    state->dataHeatBalSurf->TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->TempSurfInTmp);
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->SurfTempInTmp);
     ConvectionCoefficients::GetUserConvectionCoefficients(*state);
 
     int algorithm_identifier;
@@ -1938,7 +1938,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
     algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
 
-    state->dataHeatBalSurf->TempSurfInTmp.deallocate();
+    state->dataHeatBalSurf->SurfTempInTmp.deallocate();
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)

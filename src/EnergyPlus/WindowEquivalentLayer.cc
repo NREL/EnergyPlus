@@ -726,7 +726,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     ConvHeatFlowNatural = 0.0;
 
     EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
-    HcIn = state.dataHeatBal->HConvIn(SurfNum); // windows inside surface convective film conductance
+    HcIn = state.dataHeatBal->SurfHConvInt(SurfNum); // windows inside surface convective film conductance
 
     if (CalcCondition == DataBSDFWindow::noCondition) {
         ZoneNum = state.dataSurface->Surface(SurfNum).Zone;

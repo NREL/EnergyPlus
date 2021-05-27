@@ -2931,8 +2931,8 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
-    state->dataHeatBalSurf->TempSurfIn.allocate(1);
-    state->dataHeatBalSurf->TempUserLoc.allocate(1);
+    state->dataHeatBalSurf->SurfTempIn.allocate(1);
+    state->dataHeatBalSurf->SurfTempUserLoc.allocate(1);
     state->dataLowTempRadSys->HydrRadSys.allocate(1);
     state->dataLowTempRadSys->CFloRadSys.allocate(1);
     state->dataLowTempRadSys->ElecRadSys.allocate(1);
@@ -2942,8 +2942,8 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     state->dataHeatBal->ZoneMRT(1) = 12.345;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 34.567;
     state->dataHeatBal->Zone(1).OutWetBulbTemp = 1.234;
-    state->dataHeatBalSurf->TempSurfIn(1) = 5.678;
-    state->dataHeatBalSurf->TempUserLoc(1) = 7.890;
+    state->dataHeatBalSurf->SurfTempIn(1) = 5.678;
+    state->dataHeatBalSurf->SurfTempUserLoc(1) = 7.890;
     state->dataLowTempRadSys->HydrRadSys(1).ZonePtr = 1;
     state->dataLowTempRadSys->HydrRadSys(1).SurfacePtr.allocate(1);
     state->dataLowTempRadSys->HydrRadSys(1).SurfacePtr(1) = 1;
@@ -3056,19 +3056,19 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 6: Surface Inside Face Temperature Control
     state->dataLowTempRadSys->HydrRadSys(1).ControlType = LowTempRadiantControlTypes::SurfFaceTempControl;
-    expectedResult = state->dataHeatBalSurf->TempSurfIn(1);
+    expectedResult = state->dataHeatBalSurf->SurfTempIn(1);
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).ControlType = LowTempRadiantControlTypes::SurfFaceTempControl;
-    expectedResult = state->dataHeatBalSurf->TempSurfIn(1);
+    expectedResult = state->dataHeatBalSurf->SurfTempIn(1);
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).ControlType = LowTempRadiantControlTypes::SurfFaceTempControl;
-    expectedResult = state->dataHeatBalSurf->TempSurfIn(1);
+    expectedResult = state->dataHeatBalSurf->SurfTempIn(1);
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).ControlType);
@@ -3076,19 +3076,19 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 7: Surface Inside (within the slab) Temperature Control
     state->dataLowTempRadSys->HydrRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
-    expectedResult = state->dataHeatBalSurf->TempUserLoc(1);
+    expectedResult = state->dataHeatBalSurf->SurfTempUserLoc(1);
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
-    expectedResult = state->dataHeatBalSurf->TempUserLoc(1);
+    expectedResult = state->dataHeatBalSurf->SurfTempUserLoc(1);
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).ControlType = LowTempRadiantControlTypes::SurfIntTempControl;
-    expectedResult = state->dataHeatBalSurf->TempUserLoc(1);
+    expectedResult = state->dataHeatBalSurf->SurfTempUserLoc(1);
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).ControlType);

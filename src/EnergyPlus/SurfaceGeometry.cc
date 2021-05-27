@@ -188,8 +188,8 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinFrameEmis.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio.dimension(NumSurfaces, 1.0);
         state.dataSurface->SurfWinFrameEdgeArea.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinFrameTempSurfIn.dimension(NumSurfaces, 23.0);
-        state.dataSurface->SurfWinFrameTempSurfInOld.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinFramerTempIn.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinFramerTempInOld.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinFrameTempSurfOut.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinProjCorrFrOut.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinProjCorrFrIn.dimension(NumSurfaces, 0);
@@ -201,8 +201,8 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinDividerEmis.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio.dimension(NumSurfaces, 1);
         state.dataSurface->SurfWinDividerEdgeArea.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinDividerTempSurfIn.dimension(NumSurfaces, 23.0);
-        state.dataSurface->SurfWinDividerTempSurfInOld.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinDividerTempIn.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinDividerTempInOld.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinDividerTempSurfOut.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinProjCorrDivOut.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinProjCorrDivIn.dimension(NumSurfaces, 0);

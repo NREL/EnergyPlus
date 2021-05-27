@@ -210,7 +210,7 @@ void InitSolarCalculations(EnergyPlusData &state)
         state.dataSolarShading->SAREA = 0.0;
         state.dataSurface->SurfSunlitArea = 0.0;
         state.dataSurface->SurfSunlitFrac = 0.0;
-        state.dataHeatBal->SunlitFracHR = 0.0;
+        state.dataHeatBal->SurfSunlitFracHR = 0.0;
         state.dataHeatBal->SunlitFrac = 0.0;
         state.dataHeatBal->SunlitFracWithoutReveal = 0.0;
         state.dataHeatBal->BackSurfaces = 0;
@@ -772,7 +772,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
         state.dataSolarShading->WinTransBmDifSolar.allocate(state.dataSurface->TotSurfaces);
     }
 
-    state.dataHeatBal->SunlitFracHR.dimension(24, state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBal->SurfSunlitFracHR.dimension(24, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SunlitFrac.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->SunlitFracWithoutReveal.dimension(state.dataGlobal->NumOfTimeStepInHour, 24, state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->BackSurfaces.dimension(
@@ -798,6 +798,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
     state.dataHeatBal->MultIsoSky.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->MultCircumSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBal->MultHorizonZenith.dimension(state.dataSurface->TotSurfaces, 0.0);
+
     state.dataSurface->SurfWinTransSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfWinBmSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfWinBmBmSolar.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -824,6 +825,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
     state.dataSurface->InsideGlassCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
     state.dataSurface->InsideFrameCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
     state.dataSurface->InsideDividerCondensationFlag.dimension(state.dataSurface->TotSurfaces, 0);
+
     state.dataHeatBal->ZoneTransSolar.dimension(state.dataGlobal->NumOfZones, 0.0);
     state.dataHeatBal->ZoneBmSolFrExtWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
     state.dataHeatBal->ZoneBmSolFrIntWinsRep.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -1467,7 +1469,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                     SetupOutputVariable(state,
                                         "Surface Window Frame Inside Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataSurface->SurfWinFrameTempSurfIn(SurfLoop),
+                                        state.dataSurface->SurfWinFramerTempIn(SurfLoop),
                                         "Zone",
                                         "Average",
                                         state.dataSurface->Surface(SurfLoop).Name);
@@ -1498,7 +1500,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                     SetupOutputVariable(state,
                                         "Surface Window Divider Inside Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataSurface->SurfWinDividerTempSurfIn(SurfLoop),
+                                        state.dataSurface->SurfWinDividerTempIn(SurfLoop),
                                         "Zone",
                                         "Average",
                                         state.dataSurface->Surface(SurfLoop).Name);
@@ -1935,7 +1937,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                         SetupOutputVariable(state,
                                             "Surface Window Frame Inside Temperature",
                                             OutputProcessor::Unit::C,
-                                            state.dataSurface->SurfWinFrameTempSurfIn(SurfLoop),
+                                            state.dataSurface->SurfWinFramerTempIn(SurfLoop),
                                             "Zone",
                                             "Average",
                                             state.dataSurface->Surface(SurfLoop).Name);
@@ -1965,7 +1967,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                         SetupOutputVariable(state,
                                             "Surface Window Divider Inside Temperature",
                                             OutputProcessor::Unit::C,
-                                            state.dataSurface->SurfWinDividerTempSurfIn(SurfLoop),
+                                            state.dataSurface->SurfWinDividerTempIn(SurfLoop),
                                             "Zone",
                                             "Average",
                                             state.dataSurface->Surface(SurfLoop).Name);
@@ -4788,7 +4790,7 @@ void CalcPerSolarBeam(EnergyPlusData &state,
 
     // Initialize some values for the appropriate period
     if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-        state.dataHeatBal->SunlitFracHR = 0.0;
+        state.dataHeatBal->SurfSunlitFracHR = 0.0;
         state.dataHeatBal->SunlitFrac = 0.0;
         state.dataHeatBal->SunlitFracWithoutReveal = 0.0;
         state.dataSolarShading->CTHETA = 0.0;
@@ -4802,7 +4804,7 @@ void CalcPerSolarBeam(EnergyPlusData &state,
             e.InOutProjSLFracMult = 1.0;
         }
     } else {
-        state.dataHeatBal->SunlitFracHR(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
+        state.dataHeatBal->SurfSunlitFracHR(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
         state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
         state.dataHeatBal->SunlitFracWithoutReveal(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) =
             0.0;
@@ -4942,9 +4944,9 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
                 SurfArea = state.dataSurface->Surface(SurfNum).NetAreaShadowCalc;
                 if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                     if (iTimeStep == state.dataGlobal->NumOfTimeStepInHour)
-                        state.dataHeatBal->SunlitFracHR(iHour, SurfNum) = state.dataSolarShading->SAREA(SurfNum) / SurfArea;
+                        state.dataHeatBal->SurfSunlitFracHR(iHour, SurfNum) = state.dataSolarShading->SAREA(SurfNum) / SurfArea;
                 } else {
-                    state.dataHeatBal->SunlitFracHR(iHour, SurfNum) = state.dataSolarShading->SAREA(SurfNum) / SurfArea;
+                    state.dataHeatBal->SurfSunlitFracHR(iHour, SurfNum) = state.dataSolarShading->SAREA(SurfNum) / SurfArea;
                 }
                 state.dataHeatBal->SunlitFrac(iTimeStep, iHour, SurfNum) = state.dataSolarShading->SAREA(SurfNum) / SurfArea;
                 if (state.dataHeatBal->SunlitFrac(iTimeStep, iHour, SurfNum) < 1.e-5) state.dataHeatBal->SunlitFrac(iTimeStep, iHour, SurfNum) = 0.0;

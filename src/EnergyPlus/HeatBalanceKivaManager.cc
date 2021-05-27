@@ -1234,7 +1234,7 @@ void KivaManager::calcKivaSurfaceResults(EnergyPlusData &state)
             std::string contextStr = "Surface=\"" + state.dataSurface->Surface(surfNum).Name + "\"";
             Kiva::setMessageCallback(kivaErrorCallback, &contextStr);
             surfaceMap[surfNum].calc_weighted_results();
-            state.dataHeatBal->HConvIn(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;
+            state.dataHeatBal->SurfHConvInt(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;
         }
     }
     Kiva::setMessageCallback(kivaErrorCallback, nullptr);

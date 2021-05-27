@@ -8200,7 +8200,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
             if (ISky == 1) {
-                ZSU = state.dataDaylightingManager->GILSU(IHR) * state.dataHeatBal->SunlitFracHR(IHR, OutShelfSurf) *
+                ZSU = state.dataDaylightingManager->GILSU(IHR) * state.dataHeatBal->SurfSunlitFracHR(IHR, OutShelfSurf) *
                       state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
                 FLCWSU(1) += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
             }
@@ -8228,7 +8228,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
     // Beam reaching window directly (without specular reflection from exterior obstructions)
 
-    if (state.dataHeatBal->SunlitFracHR(IHR, IWin) > 0.0) {
+    if (state.dataHeatBal->SurfSunlitFracHR(IHR, IWin) > 0.0) {
         // Cos of angle of incidence
         COSBSun = state.dataDaylightingManager->SPHSUN * std::sin(state.dataSurface->SurfWinPhi(IWin)) +
                   state.dataDaylightingManager->CPHSUN * std::cos(state.dataSurface->SurfWinPhi(IWin)) *
@@ -8237,10 +8237,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
         if (COSBSun > 0.0) {
             // Multiply direct normal illuminance (normalized to 1.0 lux)
             // by incident angle factor and by fraction of window that is sunlit.
-            // Note that in the following SunlitFracHR accounts for possibly non-zero transmittance of
+            // Note that in the following SurfSunlitFracHR accounts for possibly non-zero transmittance of
             // shading surfaces.
 
-            ZSU1 = COSBSun * state.dataHeatBal->SunlitFracHR(IHR, IWin);
+            ZSU1 = COSBSun * state.dataHeatBal->SurfSunlitFracHR(IHR, IWin);
 
             // Contribution to window luminance and downgoing flux
 
@@ -8375,7 +8375,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 } // End of loop over slat angles
             }     // End of window with shade or blind
         }         // COSBSun > 0
-    }             // SunlitFracHR > 0
+    }             // SurfSunlitFracHR > 0
 
     // Beam reaching window after specular reflection from exterior obstruction
 
@@ -8559,7 +8559,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
                 0.5 * state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi * LambdaInc;
         }
         // Sun beam calculations
-        if ((SolBmIndex == iIncElem) && (state.dataHeatBal->SunlitFracHR(IHR, IWin) > 0.0)) {
+        if ((SolBmIndex == iIncElem) && (state.dataHeatBal->SurfSunlitFracHR(IHR, IWin) > 0.0)) {
             ElementLuminanceSunDisk(iIncElem) = 1.0;
         }
     }
@@ -8750,7 +8750,7 @@ void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
     } else {
         COSIncSun = 0.0;
     }
-    ElementLuminanceSunDisk *= state.dataHeatBal->SunlitFracHR(IHR, IWin) * COSIncSun;
+    ElementLuminanceSunDisk *= state.dataHeatBal->SurfSunlitFracHR(IHR, IWin) * COSIncSun;
 
     //        FLSKTot = 0.0;
     FLSUTot = 0.0;

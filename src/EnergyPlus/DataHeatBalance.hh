@@ -2143,9 +2143,9 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
 
-    // todo - rename and reordering
+    // todo - reordering
     Array1D<Real64> SurfTempEffBulkAir;     // air temperature adjacent to the surface used for inside surface heat balances
-    Array1D<Real64> HConvIn;                // INSIDE CONVECTION COEFFICIENT
+    Array1D<Real64> SurfHConvInt;                // INSIDE CONVECTION COEFFICIENT
     Array1D<Real64> SurfAnisoSkyMult;       // Multiplier on exterior-surface sky view factor to account for
                                             // anisotropy of sky radiance; = 1.0 for for isotropic sky
     Array1D<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
@@ -2187,7 +2187,7 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> TMULT;  // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
 
     // todo - the following in absorptance branch
-    Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
+    Array2D<Real64> SurfSunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
     Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
     Array3D<Real64> SunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction  without shadowing by the reveal
@@ -2443,7 +2443,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NominalRforNominalUCalculation.deallocate();
         this->NominalU.deallocate();
         this->SurfTempEffBulkAir.deallocate();
-        this->HConvIn.deallocate();
+        this->SurfHConvInt.deallocate();
         this->SurfAnisoSkyMult.deallocate();
         this->DifShdgRatioIsoSky.deallocate();
         this->DifShdgRatioIsoSkyHRTS.deallocate();
@@ -2472,7 +2472,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ITABSF.deallocate();
         this->TMULT.deallocate();
 
-        this->SunlitFracHR.deallocate();
+        this->SurfSunlitFracHR.deallocate();
         this->CosIncAngHR.deallocate();
         this->SunlitFrac.deallocate();
         this->SunlitFracWithoutReveal.deallocate();

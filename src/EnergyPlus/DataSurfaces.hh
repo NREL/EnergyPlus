@@ -1454,8 +1454,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio;  // Ratio of frame edge of glass conductance (without air films) to center of glass conductance
                                                        // (without air films)
     Array1D<Real64> SurfWinFrameEdgeArea;              // Area of glass near frame (m2)
-    Array1D<Real64> SurfWinFrameTempSurfIn;            // Frame inside surface temperature (C)
-    Array1D<Real64> SurfWinFrameTempSurfInOld;         // Previous value of frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFramerTempIn;            // Frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFramerTempInOld;         // Previous value of frame inside surface temperature (C)
     Array1D<Real64> SurfWinFrameTempSurfOut;           // Frame outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrFrOut;              // Correction factor to absorbed radiation due to frame outside projection
     Array1D<Real64> SurfWinProjCorrFrIn;               // Correction factor to absorbed radiation due to frame inside projection
@@ -1468,8 +1468,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinDivEdgeToCenterGlCondRatio; // Ratio of divider edge of glass conductance (without air films) to center of glass
                                                        // conductance (without air films)
     Array1D<Real64> SurfWinDividerEdgeArea;            // Area of glass near dividers (m2)
-    Array1D<Real64> SurfWinDividerTempSurfIn;          // Divider inside surface temperature (C)
-    Array1D<Real64> SurfWinDividerTempSurfInOld;       // Previous value of divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempIn;          // Divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempInOld;       // Previous value of divider inside surface temperature (C)
     Array1D<Real64> SurfWinDividerTempSurfOut;         // Divider outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrDivOut;             // Correction factor to absorbed radiation due to divider outside projection
     Array1D<Real64> SurfWinProjCorrDivIn;              // Correction factor to absorbed radiation due to divider inside projection
@@ -1799,8 +1799,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinFrameEmis.deallocate();
         this->SurfWinFrEdgeToCenterGlCondRatio.deallocate();
         this->SurfWinFrameEdgeArea.deallocate();
-        this->SurfWinFrameTempSurfIn.deallocate();
-        this->SurfWinFrameTempSurfInOld.deallocate();
+        this->SurfWinFramerTempIn.deallocate();
+        this->SurfWinFramerTempInOld.deallocate();
         this->SurfWinFrameTempSurfOut.deallocate();
         this->SurfWinProjCorrFrOut.deallocate();
         this->SurfWinProjCorrFrIn.deallocate();
@@ -1812,8 +1812,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinDividerEmis.deallocate();
         this->SurfWinDivEdgeToCenterGlCondRatio.deallocate();
         this->SurfWinDividerEdgeArea.deallocate();
-        this->SurfWinDividerTempSurfIn.deallocate();
-        this->SurfWinDividerTempSurfInOld.deallocate();
+        this->SurfWinDividerTempIn.deallocate();
+        this->SurfWinDividerTempInOld.deallocate();
         this->SurfWinDividerTempSurfOut.deallocate();
         this->SurfWinProjCorrDivOut.deallocate();
         this->SurfWinProjCorrDivIn.deallocate();

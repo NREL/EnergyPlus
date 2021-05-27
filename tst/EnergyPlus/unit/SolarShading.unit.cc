@@ -94,7 +94,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataSurface->TotSurfaces = 3;
     state->dataBSDFWindow->MaxBkSurf = 3;
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SunlitFracHR.allocate(24, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfSunlitFracHR.allocate(24, state->dataSurface->TotSurfaces);
     state->dataHeatBal->SunlitFrac.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
     state->dataHeatBal->SunlitFracWithoutReveal.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
     state->dataSolarShading->CTHETA.allocate(state->dataSurface->TotSurfaces);
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     // Clean up
     state->dataSurface->SurfaceWindow.deallocate();
-    state->dataHeatBal->SunlitFracHR.deallocate();
+    state->dataHeatBal->SurfSunlitFracHR.deallocate();
     state->dataHeatBal->SunlitFrac.deallocate();
     state->dataHeatBal->SunlitFracWithoutReveal.deallocate();
     state->dataSolarShading->CTHETA.deallocate();

@@ -2915,7 +2915,7 @@ namespace WindowComplexManager {
                         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
 
-            hin = state.dataHeatBal->HConvIn(SurfNum); // Room-side surface convective film conductance
+            hin = state.dataHeatBal->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
             ibc(2) = 0;                                // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
 
             // hcout=HextConvCoeff  ! Exterior convection coefficient is passed in from outer routine
@@ -3324,7 +3324,7 @@ namespace WindowComplexManager {
             // Window heat balance solution has converged.
 
             state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;
-            state.dataHeatBal->HConvIn(SurfNum) = hcin;
+            state.dataHeatBal->SurfHConvInt(SurfNum) = hcin;
 
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
