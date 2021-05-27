@@ -17238,17 +17238,17 @@ TEST_F(EnergyPlusFixture, getCoilWaterSystemInputDataTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
 
-    int unitarSysIndex(0);
+    int unitarySysIndex(0);
     bool ErrorsFound(false);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
-    UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarSysIndex];
-    auto &thisSys = unitSys[unitarSysIndex];
+    UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
+    auto &thisSys = unitSys[unitarySysIndex];
 
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
     EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
-    EXPECT_EQ(thisSys.UnitType, "AirLoopHVAC:UnitarySystem"); //  "CoilSystem:Cooling:Water"
+    EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
     EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::None);

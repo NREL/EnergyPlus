@@ -65,6 +65,7 @@ namespace UnitarySystems {
 
     struct UnitarySysInputSpec
     {
+        std::string system_type;
         std::string name;
         std::string control_type;
         std::string controlling_zone_or_thermostat_location;
@@ -452,7 +453,7 @@ namespace UnitarySystems {
         Real64 LoadSHR;                // Load sensible heat ratio with humidity control
         Real64 CoilSHR;                // Load sensible heat ratio with humidity control
         bool runWaterSideEconomizer;   // true if water-side economizer conditioon is favorbale
-        int WaterSideEconomizerStatus; // water side economizer status flag, report variable 
+        int WaterSideEconomizerStatus; // water side economizer status flag, report variable
 
         //    private:
         // private members not initialized in constructor

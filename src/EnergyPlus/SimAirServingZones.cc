@@ -792,6 +792,8 @@ void GetAirPathData(EnergyPlusData &state)
                         PackagedUnit(AirSysNum) = true;
                     } else if (componentType == "COILSYSTEM:HEATING:DX") {
                         PackagedUnit(AirSysNum) = true;
+                    } else if (componentType == "COILSYSTEM:COOLING:WATER") {
+                        PackagedUnit(AirSysNum) = true;
                     } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         PackagedUnit(AirSysNum) = true;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {

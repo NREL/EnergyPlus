@@ -2928,8 +2928,9 @@ namespace UnitarySystems {
 
         static std::string const unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
-        std::string cCurrentModuleObject("AirLoopHVAC:UnitarySystem");
+        std::string cCurrentModuleObject = input_data.system_type;
         std::string thisObjectName = input_data.name;
+        this->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
 
         std::string loc_AirInNodeName = input_data.air_inlet_node_name;
         if (state.dataUnitarySystems->getInputOnceFlag)
@@ -6829,10 +6830,10 @@ namespace UnitarySystems {
         EnergyPlusData &state, std::string const &CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
 
-        static const std::string routineName("UnitarySys::getCoilWaterSystemInputData: ");
-        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(state.dataUnitarySystems->coilSysCoolingWaterObjectName);
+        std::string cCurrentModuleObject("CoilSystem:Cooling:Water");
+        static const std::string routineName("getCoilWaterSystemInputData: ");
+        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            int CoilSysNum = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
 
@@ -6842,15 +6843,13 @@ namespace UnitarySystems {
                 if (!UtilityRoutines::SameString(CoilSysName, thisObjectName) && !state.dataUnitarySystems->getCoilWaterSysInputOnceFlag) continue;
 
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(state.dataUnitarySystems->coilSysCoolingWaterObjectName, thisObjectName);
-                ++CoilSysNum;
                 ++state.dataUnitarySystems->numCoilWaterSystems;
                 ++state.dataUnitarySystems->numUnitarySystems;
 
                 UnitarySysInputSpec input_specs;
                 input_specs.name = thisObjectName;
+                input_specs.system_type = cCurrentModuleObject;
                 input_specs.control_type = "Setpoint";
-
-                input_specs.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
                 input_specs.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_inlet_node_name"));
                 input_specs.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_outlet_node_name"));
                 std::string availScheduleName("");
@@ -6891,11 +6890,9 @@ namespace UnitarySystems {
 
                 // now translate to UnitarySystem
                 UnitarySys thisSys;
-                std::string cCurrentModuleObject("AirLoopHVAC:UnitarySystem");
+
                 thisSys.UnitType = cCurrentModuleObject;
-                thisSys.Name = thisObjectName;
                 thisSys.m_unitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
-                input_specs.name = thisObjectName;
                 input_specs.control_type = "Setpoint";
                 thisSys.m_CoolCoilExists = true; // is always true
                 thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
@@ -6906,6 +6903,7 @@ namespace UnitarySystems {
 
                 int sysNum = state.dataUnitarySystems->numUnitarySystems;
                 thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
+
                 sysNum = getUnitarySystemIndex(state, thisObjectName);
 
                 if (sysNum == -1) {
@@ -6968,6 +6966,7 @@ namespace UnitarySystems {
 
                 UnitarySysInputSpec input_spec;
                 input_spec.name = thisObjectName;
+                input_spec.system_type = cCurrentModuleObject;
                 input_spec.control_type = fields.at("control_type");
                 if (fields.find("controlling_zone_or_thermostat_location") != fields.end()) { // not required field
                     input_spec.controlling_zone_or_thermostat_location =
