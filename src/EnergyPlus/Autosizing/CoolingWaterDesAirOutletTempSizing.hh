@@ -60,7 +60,7 @@ struct CoolingWaterDesAirOutletTempSizer : BaseSizerWithFanHeatInputs
     CoolingWaterDesAirOutletTempSizer()
     {
         this->sizingType = AutoSizingType::CoolingWaterDesAirOutletTempSizing;
-        this->sizingString = "Design Outlet Air Temperature [C]";
+        this->sizingString = "Outlet Air Temperature [C]";
     }
     ~CoolingWaterDesAirOutletTempSizer() = default;
 

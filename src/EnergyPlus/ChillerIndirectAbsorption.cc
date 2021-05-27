@@ -1166,13 +1166,13 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                 this->EvapVolFlowRate = tmpEvapVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "Chiller:Absorption:Indirect", this->Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                        state, "Chiller:Absorption:Indirect", this->Name, "Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Absorption:Indirect",
                                                  this->Name,
-                                                 "Initial Design Size Design Chilled Water Flow Rate [m3/s]",
+                                                 "Initial Design Size Chilled Water Flow Rate [m3/s]",
                                                  tmpEvapVolFlowRate);
                 }
             } else {
@@ -1182,18 +1182,18 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:Absorption:Indirect",
                                                      this->Name,
-                                                     "Design Size Design Chilled Water Flow Rate [m3/s]",
+                                                     "Design Size Chilled Water Flow Rate [m3/s]",
                                                      tmpEvapVolFlowRate,
-                                                     "User-Specified Design Chilled Water Flow Rate [m3/s]",
+                                                     "User-Specified Chilled Water Flow Rate [m3/s]",
                                                      EvapVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerElectricIndirect: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state,
-                                                  format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
+                                                  format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                    state, format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1216,7 +1216,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Absorption:Indirect",
                                                  this->Name,
-                                                 "User-Specified Design Chilled Water Flow Rate [m3/s]",
+                                                 "User-Specified Chilled Water Flow Rate [m3/s]",
                                                  this->EvapVolFlowRate);
                 }
             }
@@ -1255,13 +1255,13 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                 this->CondVolFlowRate = tmpCondVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "Chiller:Absorption:Indirect", this->Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                        state, "Chiller:Absorption:Indirect", this->Name, "Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Absorption:Indirect",
                                                  this->Name,
-                                                 "Initial Design Size Design Condenser Water Flow Rate [m3/s]",
+                                                 "Initial Design Size Condenser Water Flow Rate [m3/s]",
                                                  tmpCondVolFlowRate);
                 }
             } else {
@@ -1271,18 +1271,18 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:Absorption:Indirect",
                                                      this->Name,
-                                                     "Design Size Design Condenser Water Flow Rate [m3/s]",
+                                                     "Design Size Condenser Water Flow Rate [m3/s]",
                                                      tmpCondVolFlowRate,
-                                                     "User-Specified Design Condenser Water Flow Rate [m3/s]",
+                                                     "User-Specified Condenser Water Flow Rate [m3/s]",
                                                      CondVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state,
-                                                  format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
+                                                  format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                    state, format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1306,7 +1306,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Absorption:Indirect",
                                                  this->Name,
-                                                 "User-Specified Design Condenser Water Flow Rate [m3/s]",
+                                                 "User-Specified Condenser Water Flow Rate [m3/s]",
                                                  this->CondVolFlowRate);
                 }
             }
@@ -1345,14 +1345,14 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:Absorption:Indirect",
                                                          this->Name,
-                                                         "Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                         "Design Size Generator Fluid Flow Rate [m3/s]",
                                                          tmpGeneratorVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:Absorption:Indirect",
                                                          this->Name,
-                                                         "Initial Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                         "Initial Design Size Generator Fluid Flow Rate [m3/s]",
                                                          tmpGeneratorVolFlowRate);
                         }
                     } else {
@@ -1362,9 +1362,9 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                 BaseSizer::reportSizerOutput(state,
                                                              "Chiller:Absorption:Indirect",
                                                              this->Name,
-                                                             "Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                             "Design Size Generator Fluid Flow Rate [m3/s]",
                                                              tmpGeneratorVolFlowRate,
-                                                             "User-Specified Design Generator Fluid Flow Rate [m3/s]",
+                                                             "User-Specified Generator Fluid Flow Rate [m3/s]",
                                                              GeneratorVolFlowRateUser);
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
@@ -1372,9 +1372,9 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                         ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
                                         ShowContinueError(
                                             state,
-                                            format("User-Specified Design Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
+                                            format("User-Specified Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
                                         ShowContinueError(state,
-                                                          format("differs from Design Size Design Generator Fluid Flow Rate of {:.5R} [m3/s]",
+                                                          format("differs from Design Size Generator Fluid Flow Rate of {:.5R} [m3/s]",
                                                                  tmpGeneratorVolFlowRate));
                                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                         ShowContinueError(state,
@@ -1426,14 +1426,14 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:Absorption:Indirect",
                                                          this->Name,
-                                                         "Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                         "Design Size Generator Fluid Flow Rate [m3/s]",
                                                          tmpGeneratorVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:Absorption:Indirect",
                                                          this->Name,
-                                                         "Initial Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                         "Initial Design Size Generator Fluid Flow Rate [m3/s]",
                                                          tmpGeneratorVolFlowRate);
                         }
                     } else {
@@ -1443,9 +1443,9 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                 BaseSizer::reportSizerOutput(state,
                                                              "Chiller:Absorption:Indirect",
                                                              this->Name,
-                                                             "Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                             "Design Size Generator Fluid Flow Rate [m3/s]",
                                                              tmpGeneratorVolFlowRate,
-                                                             "User-Specified Design Generator Fluid Flow Rate [m3/s]",
+                                                             "User-Specified Generator Fluid Flow Rate [m3/s]",
                                                              GeneratorVolFlowRateUser);
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
@@ -1453,9 +1453,9 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                         ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
                                         ShowContinueError(
                                             state,
-                                            format("User-Specified Design Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
+                                            format("User-Specified Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
                                         ShowContinueError(state,
-                                                          format("differs from Design Size Design Generator Fluid Flow Rate of {:.5R} [m3/s]",
+                                                          format("differs from Design Size Generator Fluid Flow Rate of {:.5R} [m3/s]",
                                                                  tmpGeneratorVolFlowRate));
                                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                         ShowContinueError(state,
@@ -1492,7 +1492,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Absorption:Indirect",
                                                  this->Name,
-                                                 "User-Specified Design Generator Fluid Flow Rate [m3/s]",
+                                                 "User-Specified Generator Fluid Flow Rate [m3/s]",
                                                  this->GeneratorVolFlowRate);
                 }
             }

@@ -61,7 +61,7 @@ struct CoolingWaterDesAirInletTempSizer : BaseSizerWithFanHeatInputs
     CoolingWaterDesAirInletTempSizer()
     {
         this->sizingType = AutoSizingType::CoolingWaterDesAirInletTempSizing;
-        this->sizingString = "Design Inlet Air Temperature [C]";
+        this->sizingString = "Inlet Air Temperature [C]";
     }
     ~CoolingWaterDesAirInletTempSizer() = default;
 

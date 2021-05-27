@@ -2860,7 +2860,7 @@ namespace CondenserLoopTowers {
                                                "greater than {:.2T} C when autosizing the tower UA.",
                                                this->Name,
                                                this->DesInletAirWBTemp));
-                        ShowContinueError(state, format("The User-specified Design Loop Exit Temperature={:.2T}", DesTowerExitWaterTemp));
+                        ShowContinueError(state, format("The User-Specified Loop Exit Temperature={:.2T}", DesTowerExitWaterTemp));
                         ShowContinueError(
                             state,
                             format("is less than or equal to the design inlet air wet-bulb temperature of {:.2T} C.", this->DesInletAirWBTemp));
@@ -3659,13 +3659,13 @@ namespace CondenserLoopTowers {
                                                          this->Name,
                                                          "Design Water Flow Rate [m3/s]",
                                                          this->DesignWaterFlowRate,
-                                                         "User-Specified Design Water Flow Rate [m3/s]",
+                                                         "User-Specified Water Flow Rate [m3/s]",
                                                          NomDesWaterFlowUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpDesignWaterFlowRate - NomDesWaterFlowUser) / NomDesWaterFlowUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, format("User-Specified Design Water Flow Rate of {:.2R} [m3/s]", NomDesWaterFlowUser));
+                                    ShowContinueError(state, format("User-Specified Water Flow Rate of {:.2R} [m3/s]", NomDesWaterFlowUser));
                                     ShowContinueError(state, format("differs from Design Water Flow Rate of {:.2R} [m3/s]", tmpDesignWaterFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -3703,13 +3703,13 @@ namespace CondenserLoopTowers {
                                                      this->Name,
                                                      "Design Air Flow Rate [m3/s]",
                                                      tmpDesignAirFlowRate,
-                                                     "User-Specified Design Air Flow Rate [m3/s]",
+                                                     "User-Specified Air Flow Rate [m3/s]",
                                                      DesignAirFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpDesignAirFlowRate - DesignAirFlowRateUser) / DesignAirFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
-                                ShowContinueError(state, format("User-Specified Design Air Flow Rate of {:.2R} [m3/s]", DesignAirFlowRateUser));
+                                ShowContinueError(state, format("User-Specified Air Flow Rate of {:.2R} [m3/s]", DesignAirFlowRateUser));
                                 ShowContinueError(state, format("differs from Design Air Flow Rate of {:.2R} [m3/s]", tmpDesignAirFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -3744,7 +3744,7 @@ namespace CondenserLoopTowers {
                                                      this->Name,
                                                      "Design Free Convection Regime Air Flow Rate [m3/s]",
                                                      tmpFreeConvAirFlowRate,
-                                                     "User-Specified Design Free Convection Regime Air Flow Rate [m3/s]",
+                                                     "User-Specified Free Convection Regime Air Flow Rate [m3/s]",
                                                      FreeConvAirFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpFreeConvAirFlowRate - FreeConvAirFlowUser) / FreeConvAirFlowUser) >
@@ -3752,7 +3752,7 @@ namespace CondenserLoopTowers {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(
                                     state,
-                                    format("User-Specified Design Free Convection Regime Air Flow Rate of {:.2R} [m3/s]", FreeConvAirFlowUser));
+                                    format("User-Specified Free Convection Regime Air Flow Rate of {:.2R} [m3/s]", FreeConvAirFlowUser));
                                 ShowContinueError(
                                     state,
                                     format("differs from Design Free Convection Regime Air Flow Rate of {:.2R} [m3/s]", tmpFreeConvAirFlowRate));
@@ -4309,13 +4309,13 @@ namespace CondenserLoopTowers {
                                                  this->Name,
                                                  "Design Fan Power [W]",
                                                  tmpHighSpeedFanPower,
-                                                 "User-Specified Design Fan Power [W]",
+                                                 "User-Specified Fan Power [W]",
                                                  HighSpeedFanPowerUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpHighSpeedFanPower - HighSpeedFanPowerUser) / HighSpeedFanPowerUser) >
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
-                            ShowContinueError(state, format("User-Specified Design Fan Power of {:.2R} [W]", HighSpeedFanPowerUser));
+                            ShowContinueError(state, format("User-Specified Fan Power of {:.2R} [W]", HighSpeedFanPowerUser));
                             ShowContinueError(state, format("differs from Design Fan Power of {:.2R} [W]", tmpHighSpeedFanPower));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");

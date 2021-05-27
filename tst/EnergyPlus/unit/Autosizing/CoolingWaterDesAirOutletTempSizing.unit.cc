@@ -106,7 +106,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
 
     eiooutput =
         std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
-                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Outlet Air Temperature [C], 13.70000\n");
+                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Outlet Air Temperature [C], 13.70000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -141,7 +141,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     EXPECT_NEAR(12.88, sizedValue, 0.0001);
 
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Outlet Air Temperature [C], 12.88000\n");
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Outlet Air Temperature [C], 12.88000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -288,7 +288,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Outlet Air Temperature [C], 12.15000\n");
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Outlet Air Temperature [C], 12.15000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -398,8 +398,8 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Outlet Air Temperature [C], 11.44000\n"
-                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Design Outlet Air Temperature [C], 14.44000\n");
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Outlet Air Temperature [C], 11.44000\n"
+                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Outlet Air Temperature [C], 14.44000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 17 - Outdoor Air System Equipment with DOAS system, outlet temp < water temp

@@ -1230,7 +1230,7 @@ namespace SteamBaseboardRadiator {
                                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
                                                          "Design Size Maximum Steam Flow Rate [m3/s]",
                                                          SteamVolFlowRateMaxDes,
-                                                         "User-Speicified Maximum Steam Flow Rate [m3/s]",
+                                                         "User-Specified Maximum Steam Flow Rate [m3/s]",
                                                          SteamVolFlowRateMaxUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 // Report difference between design size and user-specified values

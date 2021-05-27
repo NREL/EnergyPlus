@@ -1298,14 +1298,14 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Electric:ReformulatedEIR",
                                                  this->Name,
-                                                 "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
+                                                 "Design Size Heat Recovery Fluid Flow Rate [m3/s]",
                                                  tmpHeatRecVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Electric:ReformulatedEIR",
                                                  this->Name,
-                                                 "Initial Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
+                                                 "Initial Design Size Heat Recovery Fluid Flow Rate [m3/s]",
                                                  tmpHeatRecVolFlowRate);
                 }
             } else {
@@ -1315,9 +1315,9 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:Electric:ReformulatedEIR",
                                                      this->Name,
-                                                     "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
+                                                     "Design Size Heat Recovery Fluid Flow Rate [m3/s]",
                                                      tmpHeatRecVolFlowRate,
-                                                     "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
+                                                     "User-Specified Heat Recovery Fluid Flow Rate [m3/s]",
                                                      DesignHeatRecVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
@@ -1325,10 +1325,10 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                                 ShowMessage(state, "Size:ChillerElectricReformulatedEIR: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(
                                     state,
-                                    format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
+                                    format("User-Specified Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
                                 ShowContinueError(
                                     state,
-                                    format("differs from Design Size Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
+                                    format("differs from Design Size Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

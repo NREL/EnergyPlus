@@ -2548,7 +2548,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             }
             TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate;
             CoolingAirFlowSizer sizingCoolingAirFlow2;
-            std::string stringOverride = "Design Air Flow Rate [m3/s]";
+            std::string stringOverride = "Air Flow Rate [m3/s]";
             if (state.dataGlobal->isEpJSON) stringOverride = "design_air_flow_rate [m3/s]";
             sizingCoolingAirFlow2.overrideSizingString(stringOverride);
             // sizingCoolingAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);

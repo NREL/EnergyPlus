@@ -1080,11 +1080,11 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                 this->EvapVolFlowRate = tmpEvapVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, moduleObjectType, this->Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                        state, moduleObjectType, this->Name, "Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, moduleObjectType, this->Name, "Initial Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                        state, moduleObjectType, this->Name, "Initial Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                 }
             } else {
                 if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
@@ -1094,18 +1094,18 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      moduleObjectType,
                                                      this->Name,
-                                                     "Design Size Design Chilled Water Flow Rate [m3/s]",
+                                                     "Design Size Chilled Water Flow Rate [m3/s]",
                                                      tmpEvapVolFlowRate,
-                                                     "User-Specified Design Chilled Water Flow Rate [m3/s]",
+                                                     "User-Specified Chilled Water Flow Rate [m3/s]",
                                                      EvapVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state,
-                                                  format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
+                                                  format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                    state, format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1123,7 +1123,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         }
         if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && this->EvapVolFlowRate > 0.0) {
             BaseSizer::reportSizerOutput(
-                state, moduleObjectType, this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
+                state, moduleObjectType, this->Name, "User-Specified Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
         }
     }
 
@@ -1156,11 +1156,11 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                 this->CondVolFlowRate = tmpCondVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, moduleObjectType, this->Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                        state, moduleObjectType, this->Name, "Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, moduleObjectType, this->Name, "Initial Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                        state, moduleObjectType, this->Name, "Initial Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                 }
             } else {
                 if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
@@ -1170,18 +1170,18 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      moduleObjectType,
                                                      this->Name,
-                                                     "Design Size Design Condenser Water Flow Rate [m3/s]",
+                                                     "Design Size Condenser Water Flow Rate [m3/s]",
                                                      tmpCondVolFlowRate,
-                                                     "User-Specified Design Condenser Water Flow Rate [m3/s]",
+                                                     "User-Specified Condenser Water Flow Rate [m3/s]",
                                                      CondVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state,
-                                                  format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
+                                                  format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                    state, format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1200,7 +1200,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         }
         if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize && (this->CondVolFlowRate > 0.0)) {
             BaseSizer::reportSizerOutput(
-                state, moduleObjectType, this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
+                state, moduleObjectType, this->Name, "User-Specified Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
         }
     }
 
@@ -1229,13 +1229,13 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                         this->GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
                         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(
-                                state, moduleObjectType, this->Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
+                                state, moduleObjectType, this->Name, "Design Size Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                                          moduleObjectType,
                                                          this->Name,
-                                                         "Iniital Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                         "Initial Design Size Generator Fluid Flow Rate [m3/s]",
                                                          tmpGeneratorVolFlowRate);
                         }
                     } else {
@@ -1246,9 +1246,9 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                 BaseSizer::reportSizerOutput(state,
                                                              moduleObjectType,
                                                              this->Name,
-                                                             "Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                             "Design Size Generator Fluid Flow Rate [m3/s]",
                                                              tmpGeneratorVolFlowRate,
-                                                             "User-Specified Design Generator Fluid Flow Rate [m3/s]",
+                                                             "User-Specified Generator Fluid Flow Rate [m3/s]",
                                                              GeneratorVolFlowRateUser);
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
@@ -1256,9 +1256,9 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                         ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                         ShowContinueError(
                                             state,
-                                            format("User-Specified Design Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
+                                            format("User-Specified Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
                                         ShowContinueError(state,
-                                                          format("differs from Design Size Design Generator Fluid Flow Rate of {:.5R} [m3/s]",
+                                                          format("differs from Design Size Generator Fluid Flow Rate of {:.5R} [m3/s]",
                                                                  tmpGeneratorVolFlowRate));
                                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                         ShowContinueError(state,
@@ -1301,13 +1301,13 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                         this->GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
                         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(
-                                state, moduleObjectType, this->Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
+                                state, moduleObjectType, this->Name, "Design Size Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                                          moduleObjectType,
                                                          this->Name,
-                                                         "Initial Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                         "Initial Design Size Generator Fluid Flow Rate [m3/s]",
                                                          tmpGeneratorVolFlowRate);
                         }
                     } else {
@@ -1318,9 +1318,9 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                 BaseSizer::reportSizerOutput(state,
                                                              moduleObjectType,
                                                              this->Name,
-                                                             "Design Size Design Generator Fluid Flow Rate [m3/s]",
+                                                             "Design Size Generator Fluid Flow Rate [m3/s]",
                                                              tmpGeneratorVolFlowRate,
-                                                             "User-Specified Design Generator Fluid Flow Rate [m3/s]",
+                                                             "User-Specified Generator Fluid Flow Rate [m3/s]",
                                                              GeneratorVolFlowRateUser);
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
@@ -1328,9 +1328,9 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                         ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                         ShowContinueError(
                                             state,
-                                            format("User-Specified Design Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
+                                            format("User-Specified Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
                                         ShowContinueError(state,
-                                                          format("differs from Design Size Design Generator Fluid Flow Rate of {:.5R} [m3/s]",
+                                                          format("differs from Design Size Generator Fluid Flow Rate of {:.5R} [m3/s]",
                                                                  tmpGeneratorVolFlowRate));
                                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                         ShowContinueError(state,
@@ -1362,7 +1362,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         }
         if (!this->GeneratorVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->GeneratorVolFlowRate > 0.0)) {
             BaseSizer::reportSizerOutput(
-                state, moduleObjectType, this->Name, "User-Specified Design Generator Fluid Flow Rate [m3/s]", this->GeneratorVolFlowRate);
+                state, moduleObjectType, this->Name, "User-Specified Generator Fluid Flow Rate [m3/s]", this->GeneratorVolFlowRate);
         }
     }
 

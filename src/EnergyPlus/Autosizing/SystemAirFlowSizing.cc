@@ -937,7 +937,7 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
             this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
             if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
         } else if (UtilityRoutines::SameString(this->compType, "Fan:SystemModel")) {
-            this->sizingString = "Design Maximum Air Flow Rate [m3/s]";
+            this->sizingString = "Maximum Air Flow Rate [m3/s]";
             // if (this->isEpJSON) this->sizingString = "design_maximum_air_flow_rate [m3/s]";
         } else {
             if (this->isEpJSON) this->sizingString = "supply_air_maximum_flow_rate [m3/s]";

@@ -3481,7 +3481,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
 
         "   ** Severe  ** Error when autosizing the UA value for cooling tower = CT SINGLE SPEED. Design Tower Exit Temperature must be greater than "
         "25.60 C when autosizing the tower UA.",
-        "   **   ~~~   ** The User-specified Design Loop Exit Temperature=21.00",
+        "   **   ~~~   ** The User-Specified Loop Exit Temperature=21.00",
         "   **   ~~~   ** is less than or equal to the design inlet air wet-bulb temperature of 25.60 C.",
         "   **   ~~~   ** Because you did not specify the Design Approach Temperature, and you do not have a Sizing:Plant object, it was defaulted "
         "to 21.00 C.",
