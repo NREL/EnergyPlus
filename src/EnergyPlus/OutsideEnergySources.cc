@@ -212,7 +212,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                      ErrorsFound);
         }
         state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        
+
         if (EnergySourceNum <= NumDistrictUnitsHeat + NumDistrictUnitsCool) {
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).InletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
@@ -440,17 +440,42 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
 
     int const PltSizNum = state.dataPlnt->PlantLoop(this->LoopNum).PlantSizNum;
     if (PltSizNum > 0) {
-        Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                             DataGlobalConstants::InitConvTemp,
-                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                             "SizeDistrict" + typeName);
-        Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
+        Real64 NomCapDes;
+        if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater || this->EnergyType == DataPlant::TypeOf_PurchHotWater) {
+            Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                  DataGlobalConstants::InitConvTemp,
                                                                  state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                  "SizeDistrict" + typeName);
-        Real64 const NomCapDes = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
+            Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                     state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                     DataGlobalConstants::InitConvTemp,
+                                                                     state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                     "SizeDistrict" + typeName);
+            NomCapDes = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
+        } else { // this->EnergyType == DataPlant::TypeOf_PurchSteam
+            Real64 const tempSteam(100.0);
+            Real64 const rhoSteam = FluidProperties::GetSatDensityRefrig(state,
+                                                                         state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                         tempSteam,
+                                                                         1.0,
+                                                                         state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                         "SizeDistrict" + typeName); 
+            Real64 const EnthSteamDry = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                              tempSteam,
+                                                                              1.0,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                              "SizeDistrict" + typeName);
+            Real64 const EnthSteamWet = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                              tempSteam,
+                                                                              0.0,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                              "SizeDistrict" + typeName);
+            Real64 const LatentHeatSteam = EnthSteamDry - EnthSteamWet;
+            NomCapDes = rhoSteam * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * LatentHeatSteam;
+        }
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
             if (this->NomCapWasAutoSized) {
                 this->NomCap = NomCapDes;
