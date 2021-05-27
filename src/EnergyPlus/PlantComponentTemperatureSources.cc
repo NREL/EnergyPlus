@@ -331,11 +331,8 @@ namespace PlantComponentTemperatureSources {
                             state, "PlantComponent:TemperatureSource", this->Name, "Design Size Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state,
-                                                     "PlantComponent:TemperatureSource",
-                                                     this->Name,
-                                                     "Initial Design Size Fluid Flow Rate [m3/s]",
-                                                     tmpVolFlowRate);
+                        BaseSizer::reportSizerOutput(
+                            state, "PlantComponent:TemperatureSource", this->Name, "Initial Design Size Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                 } else {
                     if (this->DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0) {
@@ -354,8 +351,7 @@ namespace PlantComponentTemperatureSources {
                                     ShowMessage(state,
                                                 "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Fluid Flow Rate of {:.5R} [m3/s]", DesVolFlowRateUser));
-                                    ShowContinueError(state,
-                                                      format("differs from Design Size Fluid Flow Rate of {:.5R} [m3/s]", tmpVolFlowRate));
+                                    ShowContinueError(state, format("differs from Design Size Fluid Flow Rate of {:.5R} [m3/s]", tmpVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

@@ -655,8 +655,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
             if (this->VolFlowRateWasAutoSized) {
                 this->VolFlowRate = tmpBoilerVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, "Boiler:HotWater", this->Name, "Design Size Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
+                    BaseSizer::reportSizerOutput(state, "Boiler:HotWater", this->Name, "Design Size Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
@@ -677,8 +676,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
                             if ((std::abs(tmpBoilerVolFlowRate - VolFlowRateUser) / VolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, format("User-Specified Water Flow Rate of {:.2R} [m3/s]", VolFlowRateUser));
-                                ShowContinueError(state,
-                                                  format("differs from Design Size Water Flow Rate of {:.2R} [m3/s]", tmpBoilerVolFlowRate));
+                                ShowContinueError(state, format("differs from Design Size Water Flow Rate of {:.2R} [m3/s]", tmpBoilerVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

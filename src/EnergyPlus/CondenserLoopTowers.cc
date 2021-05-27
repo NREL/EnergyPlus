@@ -3751,8 +3751,7 @@ namespace CondenserLoopTowers {
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(
-                                    state,
-                                    format("User-Specified Free Convection Regime Air Flow Rate of {:.2R} [m3/s]", FreeConvAirFlowUser));
+                                    state, format("User-Specified Free Convection Regime Air Flow Rate of {:.2R} [m3/s]", FreeConvAirFlowUser));
                                 ShowContinueError(
                                     state,
                                     format("differs from Design Free Convection Regime Air Flow Rate of {:.2R} [m3/s]", tmpFreeConvAirFlowRate));

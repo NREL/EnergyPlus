@@ -730,11 +730,8 @@ namespace PhotovoltaicThermalCollectors {
             if (this->DesignVolFlowRateWasAutoSized) {
                 this->DesignVolFlowRate = DesignVolFlowRateDes;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state,
-                                                 "SolarCollector:FlatPlate:PhotovoltaicThermal",
-                                                 this->Name,
-                                                 "Design Size Flow Rate [m3/s]",
-                                                 DesignVolFlowRateDes);
+                    BaseSizer::reportSizerOutput(
+                        state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Design Size Flow Rate [m3/s]", DesignVolFlowRateDes);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
@@ -807,11 +804,8 @@ namespace PhotovoltaicThermalCollectors {
                 if (!HardSizeNoDesRun) {
                     if (this->DesignVolFlowRateWasAutoSized) {
                         this->DesignVolFlowRate = DesignVolFlowRateDes;
-                        BaseSizer::reportSizerOutput(state,
-                                                     "SolarCollector:FlatPlate:PhotovoltaicThermal",
-                                                     this->Name,
-                                                     "Design Size Flow Rate [m3/s]",
-                                                     DesignVolFlowRateDes);
+                        BaseSizer::reportSizerOutput(
+                            state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Design Size Flow Rate [m3/s]", DesignVolFlowRateDes);
                         this->SizingInit = false;
                     } else {
                         if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0) {

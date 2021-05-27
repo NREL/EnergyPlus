@@ -1111,11 +1111,8 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
             if (this->EvapVolFlowRateWasAutoSized) {
                 this->EvapVolFlowRate = tmpEvapVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state,
-                                                 "ChillerHeater:Absorption:DoubleEffect",
-                                                 this->Name,
-                                                 "Design Size Chilled Water Flow Rate [m3/s]",
-                                                 tmpEvapVolFlowRate);
+                    BaseSizer::reportSizerOutput(
+                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
@@ -1139,10 +1136,9 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                             if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorptionDoubleEffect: Potential issue with equipment sizing for " + this->Name);
+                                ShowContinueError(state, format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                 ShowContinueError(state,
-                                                  format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
-                                ShowContinueError(
-                                    state, format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                                  format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1187,11 +1183,8 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
             if (this->HeatVolFlowRateWasAutoSized) {
                 this->HeatVolFlowRate = tmpHeatRecVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state,
-                                                 "ChillerHeater:Absorption:DoubleEffect",
-                                                 this->Name,
-                                                 "Design Size Hot Water Flow Rate [m3/s]",
-                                                 tmpHeatRecVolFlowRate);
+                    BaseSizer::reportSizerOutput(
+                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Design Size Hot Water Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
@@ -1216,10 +1209,9 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state,
                                             "SizeChillerHeaterAbsorptionDoubleEffect: Potential issue with equipment sizing for " + this->Name);
+                                ShowContinueError(state, format("User-Specified Hot Water Flow Rate of {:.5R} [m3/s]", HeatRecVolFlowRateUser));
                                 ShowContinueError(state,
-                                                  format("User-Specified Hot Water Flow Rate of {:.5R} [m3/s]", HeatRecVolFlowRateUser));
-                                ShowContinueError(
-                                    state, format("differs from Design Size Hot Water Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
+                                                  format("differs from Design Size Hot Water Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1303,10 +1295,9 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                             if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorptionDoubleEffect: Potential issue with equipment sizing for " + this->Name);
+                                ShowContinueError(state, format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                 ShowContinueError(state,
-                                                  format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
-                                ShowContinueError(
-                                    state, format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                                  format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

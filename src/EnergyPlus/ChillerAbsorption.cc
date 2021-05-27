@@ -1102,10 +1102,9 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                             if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
+                                ShowContinueError(state, format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                 ShowContinueError(state,
-                                                  format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
-                                ShowContinueError(
-                                    state, format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                                  format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1122,8 +1121,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
             ErrorsFound = true;
         }
         if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && this->EvapVolFlowRate > 0.0) {
-            BaseSizer::reportSizerOutput(
-                state, moduleObjectType, this->Name, "User-Specified Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
+            BaseSizer::reportSizerOutput(state, moduleObjectType, this->Name, "User-Specified Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
         }
     }
 
@@ -1178,10 +1176,9 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                             if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
+                                ShowContinueError(state, format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                 ShowContinueError(state,
-                                                  format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
-                                ShowContinueError(
-                                    state, format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                                  format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1232,11 +1229,8 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                 state, moduleObjectType, this->Name, "Design Size Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(state,
-                                                         moduleObjectType,
-                                                         this->Name,
-                                                         "Initial Design Size Generator Fluid Flow Rate [m3/s]",
-                                                         tmpGeneratorVolFlowRate);
+                            BaseSizer::reportSizerOutput(
+                                state, moduleObjectType, this->Name, "Initial Design Size Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                         }
                     } else {
                         if (this->GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0) {
@@ -1255,11 +1249,10 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                         state.dataSize->AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                         ShowContinueError(
+                                            state, format("User-Specified Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
+                                        ShowContinueError(
                                             state,
-                                            format("User-Specified Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
-                                        ShowContinueError(state,
-                                                          format("differs from Design Size Generator Fluid Flow Rate of {:.5R} [m3/s]",
-                                                                 tmpGeneratorVolFlowRate));
+                                            format("differs from Design Size Generator Fluid Flow Rate of {:.5R} [m3/s]", tmpGeneratorVolFlowRate));
                                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                         ShowContinueError(state,
                                                           "Verify that the value entered is intended and is consistent with other components.");
@@ -1304,11 +1297,8 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                 state, moduleObjectType, this->Name, "Design Size Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                            BaseSizer::reportSizerOutput(state,
-                                                         moduleObjectType,
-                                                         this->Name,
-                                                         "Initial Design Size Generator Fluid Flow Rate [m3/s]",
-                                                         tmpGeneratorVolFlowRate);
+                            BaseSizer::reportSizerOutput(
+                                state, moduleObjectType, this->Name, "Initial Design Size Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate);
                         }
                     } else {
                         if (this->GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0) {
@@ -1327,11 +1317,10 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                         state.dataSize->AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerAbsorption: Potential issue with equipment sizing for " + this->Name);
                                         ShowContinueError(
+                                            state, format("User-Specified Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
+                                        ShowContinueError(
                                             state,
-                                            format("User-Specified Generator Fluid Flow Rate of {:.5R} [m3/s]", GeneratorVolFlowRateUser));
-                                        ShowContinueError(state,
-                                                          format("differs from Design Size Generator Fluid Flow Rate of {:.5R} [m3/s]",
-                                                                 tmpGeneratorVolFlowRate));
+                                            format("differs from Design Size Generator Fluid Flow Rate of {:.5R} [m3/s]", tmpGeneratorVolFlowRate));
                                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                         ShowContinueError(state,
                                                           "Verify that the value entered is intended and is consistent with other components.");
