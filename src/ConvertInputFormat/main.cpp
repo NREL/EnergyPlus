@@ -384,9 +384,8 @@ int main(int argc, const char *argv[])
             0,                               // Number of args expected.
             0,                               // Delimiter if expecting multiple args.
             "Convert HVACTemplate objects.", // Help description.
-            "-T",                            // Flag token.
-            "-t",                            // Flag token.
-            "--HVACTemplate"                 // Flag token.
+            "-n",                            // Flag token.
+            "--noHVACTemplate"               // Flag token.
     );
 
     opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
@@ -442,9 +441,9 @@ int main(int argc, const char *argv[])
         files = parse_input_paths(input_paths_file);
     }
 
-    bool convertHVACTemplate = false;
-    if (opt.isSet("-t")) {
-        convertHVACTemplate = true;
+    bool convertHVACTemplate = true;
+    if (opt.isSet("-n")) {
+        convertHVACTemplate = false;
     }
 
     std::string outputTypeStr;
