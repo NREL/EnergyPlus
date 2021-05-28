@@ -475,12 +475,12 @@ namespace EcoRoofManager {
             if (state.dataConstruction->Construct(ConstrNum).CTFCross(0) > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
                 F1temp = state.dataConstruction->Construct(ConstrNum).CTFCross(0) /
-                         (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBal->SurfHConvInt(SurfNum));
+                         (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
                 Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
                              F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                                        state.dataHeatBal->SurfQRadThermInAbs(SurfNum) +
                                        state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
-                                       state.dataHeatBal->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
+                                       state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
                                        state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum));
             } else {
                 Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +

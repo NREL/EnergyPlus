@@ -112,7 +112,7 @@ protected:
         state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataSurface->Surface.allocate(NumOfSurfaces);
         state->dataSurface->SurfTAirRef.allocate(NumOfSurfaces);
-        state->dataHeatBal->SurfHConvInt.allocate(NumOfSurfaces);
+        state->dataHeatBalSurf->SurfHConvInt.allocate(NumOfSurfaces);
         state->dataHeatBalSurf->SurfTempInTmp.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVSurface.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVSurfaceOld.allocate(NumOfSurfaces);
@@ -286,8 +286,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01;
 
     state->dataHeatBalFanSys->MAT(1) = 20.0;
-    state->dataHeatBal->SurfHConvInt(1) = 1.0;
-    state->dataHeatBal->SurfHConvInt(2) = 1.0;
+    state->dataHeatBalSurf->SurfHConvInt(1) = 1.0;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 1.0;
     state->dataHeatBalSurf->SurfTempInTmp(1) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(2) = 30.0;
     state->dataMstBal->RhoVaporAirIn(1) =
@@ -295,13 +295,13 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataMstBal->RhoVaporAirIn(2) =
         PsyRhovFnTdbWPb(state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state->dataEnvrn->OutBaroPress);
     state->dataMstBal->HMassConvInFD(1) =
-        state->dataHeatBal->SurfHConvInt(1) /
+        state->dataHeatBalSurf->SurfHConvInt(1) /
         ((PsyRhoAirFnPbTdbW(
               *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
           state->dataMstBal->RhoVaporAirIn(1)) *
          PsyCpAirFnW(state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)));
     state->dataMstBal->HMassConvInFD(2) =
-        state->dataHeatBal->SurfHConvInt(2) /
+        state->dataHeatBalSurf->SurfHConvInt(2) /
         ((PsyRhoAirFnPbTdbW(
               *state, state->dataEnvrn->OutBaroPress, state->dataHeatBalFanSys->MAT(ZoneNum), state->dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) +
           state->dataMstBal->RhoVaporAirIn(2)) *

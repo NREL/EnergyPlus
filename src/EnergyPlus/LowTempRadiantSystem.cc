@@ -6111,20 +6111,20 @@ namespace LowTempRadiantSystem {
 
                 if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
                     // Window frame contribution
-                    sumHATsurf += state.dataHeatBal->SurfHConvInt(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) *
+                    sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) *
                                   (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) * state.dataSurface->SurfWinFramerTempIn(surfNum);
                 }
 
                 if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0 &&
                     !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    sumHATsurf += state.dataHeatBal->SurfHConvInt(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) *
+                    sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) *
                                   (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) *
                                   state.dataSurface->SurfWinDividerTempIn(surfNum);
                 }
             }
 
-            sumHATsurf += state.dataHeatBal->SurfHConvInt(surfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(surfNum);
+            sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(surfNum);
         }
 
         return sumHATsurf;

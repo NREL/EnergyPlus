@@ -95,14 +95,14 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataBSDFWindow->MaxBkSurf = 3;
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->SurfSunlitFracHR.allocate(24, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SunlitFrac.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SunlitFracWithoutReveal.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
-    state->dataSolarShading->CTHETA.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBal->CosIncAngHR.allocate(24, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->CosIncAng.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfSunlitFrac.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfSunlitFracWithoutReveal.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
+    state->dataSolarShading->SurfSunCosTheta.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfCosIncAngHR.allocate(24, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfCosIncAng.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
     state->dataSurface->SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBal->BackSurfaces.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->OverlapAreas.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfWinBackSurfaces.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfWinOverlapAreas.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
     state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
 
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
@@ -151,14 +151,14 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     // Clean up
     state->dataSurface->SurfaceWindow.deallocate();
     state->dataHeatBal->SurfSunlitFracHR.deallocate();
-    state->dataHeatBal->SunlitFrac.deallocate();
-    state->dataHeatBal->SunlitFracWithoutReveal.deallocate();
-    state->dataSolarShading->CTHETA.deallocate();
-    state->dataHeatBal->CosIncAngHR.deallocate();
-    state->dataHeatBal->CosIncAng.deallocate();
+    state->dataHeatBal->SurfSunlitFrac.deallocate();
+    state->dataHeatBal->SurfSunlitFracWithoutReveal.deallocate();
+    state->dataSolarShading->SurfSunCosTheta.deallocate();
+    state->dataHeatBal->SurfCosIncAngHR.deallocate();
+    state->dataHeatBal->SurfCosIncAng.deallocate();
     state->dataSurface->SurfOpaqAO.deallocate();
-    state->dataHeatBal->BackSurfaces.deallocate();
-    state->dataHeatBal->OverlapAreas.deallocate();
+    state->dataHeatBal->SurfWinBackSurfaces.deallocate();
+    state->dataHeatBal->SurfWinOverlapAreas.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_SurfaceScheduledSolarInc)
@@ -1076,11 +1076,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
-    EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SunlitFrac(4, 9, surfNum));
+    EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SurfSunlitFrac(4, 9, surfNum));
     surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SunlitFrac(4, 9, surfNum));
+    EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SurfSunlitFrac(4, 9, surfNum));
     surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", state->dataSurface->Surface);
-    EXPECT_DOUBLE_EQ(0.5432, state->dataHeatBal->SunlitFrac(4, 9, surfNum));
+    EXPECT_DOUBLE_EQ(0.5432, state->dataHeatBal->SurfSunlitFrac(4, 9, surfNum));
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)

@@ -593,7 +593,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
 
     MIXFLAG = false;
     FlagApertures = 1;
-    state.dataRoomAirMod->DVHcIn = state.dataHeatBal->SurfHConvInt;
+    state.dataRoomAirMod->DVHcIn = state.dataHeatBalSurf->SurfHConvInt;
     CeilingHeight = state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
     ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
 

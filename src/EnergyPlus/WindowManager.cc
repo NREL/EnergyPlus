@@ -2317,7 +2317,7 @@ namespace WindowManager {
                 state.dataWindowManager->thetas(i) = window.ThetaFace(i);
             }
             state.dataWindowManager->hcout = HextConvCoeff;
-            state.dataWindowManager->hcin = state.dataHeatBal->SurfHConvInt(SurfNum);
+            state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
             state.dataWindowManager->tin = state.dataHeatBalFanSys->MAT(surface.Zone) + state.dataWindowManager->TKelvin; // Inside air temperature
 
             // This is code repeating and it is necessary to calculate report variables.  Do not know
@@ -2403,7 +2403,7 @@ namespace WindowManager {
             state.dataWindowManager->tilt = surface.Tilt;
             state.dataWindowManager->tiltr = state.dataWindowManager->tilt * DataGlobalConstants::DegToRadians;
             SurfNumAdj = surface.ExtBoundCond;
-            state.dataWindowManager->hcin = state.dataHeatBal->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
+            state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
 
             // determine reference air temperature for this surface
             {
@@ -2464,7 +2464,7 @@ namespace WindowManager {
                     state.dataHeatBal->LowHConvLimit) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
                     //  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
                     state.dataWindowManager->hcin = state.dataHeatBal->LowHConvLimit;
-                    state.dataHeatBal->SurfHConvInt(SurfNum) = state.dataWindowManager->hcin; // store for accurate reporting.
+                    state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataWindowManager->hcin; // store for accurate reporting.
                 }
             }
 
@@ -3332,7 +3332,7 @@ namespace WindowManager {
                                                SurfNum,
                                                state.dataWindowManager->thetas(InsideFaceIndex) - DataGlobalConstants::KelvinConv,
                                                state.dataWindowManager->tin - DataGlobalConstants::KelvinConv);
-                state.dataWindowManager->hcin = state.dataHeatBal->SurfHConvInt(SurfNum);
+                state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
             }
 
             Aface = 0.0;

@@ -1431,11 +1431,11 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependen
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->Surface(1).CosTilt = 0;
 
-    state->dataHeatBal->SurfHConvInt.allocate(1);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(1);
 
     CalcASHRAESimpleIntConvCoeff(*state, 1, 20.0, 30.0);
 
-    ConvectionCoefficient = state->dataHeatBal->SurfHConvInt(1);
+    ConvectionCoefficient = state->dataHeatBalSurf->SurfHConvInt(1);
 
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }

@@ -1109,7 +1109,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     }
 
     MIXFLAG = false;
-    state.dataRoomAirMod->UFHcIn = state.dataHeatBal->SurfHConvInt;
+    state.dataRoomAirMod->UFHcIn = state.dataHeatBalSurf->SurfHConvInt;
     SumSysMCp = 0.0;
     SumSysMCpT = 0.0;
     TotSysFlow = 0.0;
@@ -1620,7 +1620,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
 
     HeightFrac = 0.0;
     MIXFLAG = false;
-    state.dataRoomAirMod->UFHcIn = state.dataHeatBal->SurfHConvInt;
+    state.dataRoomAirMod->UFHcIn = state.dataHeatBalSurf->SurfHConvInt;
     SumSysMCp = 0.0;
     SumSysMCpT = 0.0;
     TotSysFlow = 0.0;

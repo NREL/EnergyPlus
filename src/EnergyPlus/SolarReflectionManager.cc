@@ -666,7 +666,7 @@ namespace SolarReflectionManager {
 
                         // Skip rays that hit non-sunlit surface. Assume first time step of the hour.
                         state.dataSolarReflectionManager->SunLitFract =
-                            state.dataHeatBal->SunlitFrac(1, iHour, state.dataSolarReflectionManager->HitPtSurfNum);
+                            state.dataHeatBal->SurfSunlitFrac(1, iHour, state.dataSolarReflectionManager->HitPtSurfNum);
 
                         // If hit point's surface is not sunlit go to next ray
                         // TH 3/25/2010. why limit to HeatTransSurf? shading surfaces should also apply
@@ -933,7 +933,7 @@ namespace SolarReflectionManager {
                         (state.dataSurface->SurfShadowGlazingFrac(ReflSurfNum) > 0.0 && state.dataSurface->Surface(ReflSurfNum).IsShadowing)) {
                         // Skip if window and not sunlit
                         if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window &&
-                            state.dataHeatBal->SunlitFrac(1, iHour, ReflSurfNum) < 0.01)
+                            state.dataHeatBal->SurfSunlitFrac(1, iHour, ReflSurfNum) < 0.01)
                             continue;
                         // Check if sun is in front of this reflecting surface.
                         state.dataSolarReflectionManager->ReflNorm = state.dataSurface->Surface(ReflSurfNum).OutNormVec;

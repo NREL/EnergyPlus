@@ -5618,7 +5618,7 @@ namespace HeatBalanceManager {
                     }
                     for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                         constexpr const char *ShdFracFmt2("{:10.8F},");
-                        print(state.files.shade, ShdFracFmt2, state.dataHeatBal->SunlitFrac(TS, iHour, SurfNum));
+                        print(state.files.shade, ShdFracFmt2, state.dataHeatBal->SurfSunlitFrac(TS, iHour, SurfNum));
                     }
                     print(state.files.shade, "\n");
                 }

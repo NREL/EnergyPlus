@@ -100,7 +100,6 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfTempOutHist;     // TH(1,1,SurfNum)
     Array1D<Real64> SurfQSourceSinkHist; // QsrcHist(SurfNum, 1)
 
-    // todo: merge Is and IsNot and reduce the assignation at each time steps
     Array1D_int SurfIsAdiabatic;     // 0 not adiabatic, 1 is adiabatic
     Array1D_int SurfIsSourceOrSink;  // 0 no internal source/sink, 1 has internal source/sing
     Array1D_int SurfIsOperatingPool; // 0 not pool, 1 is pool
@@ -114,6 +113,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfHAirExt;         // Outside Convection Coefficient to Air
     Array1D<Real64> SurfHSkyExt;         // Outside Convection Coefficient to Sky
     Array1D<Real64> SurfHGrdExt;         // Outside Convection Coefficient to Ground
+    Array1D<Real64> SurfHConvInt;                // INSIDE CONVECTION COEFFICIENT
     Array1D<Real64> SurfTempSource;          // Temperature at the source location for each heat transfer surface
     Array1D<Real64> SurfTempUserLoc;         // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> SurfTempInRep;       // Temperature of the Inside Surface for each heat transfer surface
@@ -262,6 +262,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfHAirExt.deallocate();
         this->SurfHSkyExt.deallocate();
         this->SurfHGrdExt.deallocate();
+        this->SurfHConvInt.deallocate();
         this->SurfTempSource.deallocate();
         this->SurfTempUserLoc.deallocate();
         this->SurfTempInRep.deallocate();

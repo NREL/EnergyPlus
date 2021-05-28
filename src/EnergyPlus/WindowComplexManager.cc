@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
@@ -955,35 +956,6 @@ namespace WindowComplexManager {
         NBasis = 1;
         for (int I = 2; I <= Input.BasisMatNrows; ++I) {
             NBasis += std::floor(state.dataConstruction->Construct(IConst).BSDFInput.BasisMat(2, I) + 0.001);
-        }
-    }
-
-    void DetermineMaxBackSurfaces(EnergyPlusData &state)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Joe Klems
-        //       DATE WRITTEN   September 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Calculates the basis length for a Window6 Non-Symmetric or Axisymmetric basis
-        // from the input basis matrix
-
-        int NumSurfInZone(0); // Number of zone surfaces
-        bool ComplexFenInZone(false);
-
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            ComplexFenInZone = false;
-            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
-                 ++SurfNum) {
-                if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) ComplexFenInZone = true;
-            }
-            if (ComplexFenInZone) {
-                NumSurfInZone = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
-                if (state.dataBSDFWindow->MaxBkSurf < NumSurfInZone) state.dataBSDFWindow->MaxBkSurf = NumSurfInZone;
-            }
         }
     }
 
@@ -2915,7 +2887,7 @@ namespace WindowComplexManager {
                         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
 
-            hin = state.dataHeatBal->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
+            hin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
             ibc(2) = 0;                                // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
 
             // hcout=HextConvCoeff  ! Exterior convection coefficient is passed in from outer routine
@@ -3324,7 +3296,7 @@ namespace WindowComplexManager {
             // Window heat balance solution has converged.
 
             state.dataSurface->SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;
-            state.dataHeatBal->SurfHConvInt(SurfNum) = hcin;
+            state.dataHeatBalSurf->SurfHConvInt(SurfNum) = hcin;
 
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for

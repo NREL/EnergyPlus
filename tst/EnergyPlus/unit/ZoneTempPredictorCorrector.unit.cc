@@ -1071,7 +1071,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
     state->dataSurface->Surface.allocate(3);
-    state->dataHeatBal->SurfHConvInt.allocate(3);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(3);
     state->dataLoopNodes->Node.allocate(4);
     state->dataHeatBal->SurfTempEffBulkAir.allocate(3);
     state->dataHeatBalSurf->SurfTempInTmp.allocate(3);
@@ -1103,9 +1103,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBal->SurfHConvInt(1) = 0.5;
-    state->dataHeatBal->SurfHConvInt(2) = 0.5;
-    state->dataHeatBal->SurfHConvInt(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;

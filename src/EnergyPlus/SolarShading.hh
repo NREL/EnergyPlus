@@ -367,7 +367,7 @@ struct SolarShadingData : BaseGlobalStruct
                        // 1=No overlap; 2=NS1 completely within NS2
                        // 3=NS2 completely within NS1; 4=Partial overlap
 
-    Array1D<Real64> CTHETA;         // Cosine of angle of incidence of sun's rays on surface NS
+    Array1D<Real64> SurfSunCosTheta;         // Cosine of angle of incidence of sun's rays on surface NS
     int FBKSHC;                     // HC location of first back surface
     int FGSSHC;                     // HC location of first general shadowing surface
     int FINSHC;                     // HC location of first back surface overlap
@@ -398,7 +398,7 @@ struct SolarShadingData : BaseGlobalStruct
     Array1D<Real64> ISABSF; // For simple interior solar distribution (in which all beam
                             // radiation entering zone is assumed to strike the floor),
                             // fraction of beam radiation absorbed by each floor surface
-    Array1D<Real64> SAREA;  // Sunlit area of heat transfer surface HTS
+    Array1D<Real64> SurfSunlitArea;  // Sunlit area of heat transfer surface HTS
                             // Excludes multiplier for windows
                             // Shadowing combinations data structure...See ShadowingCombinations type
     int NumTooManyFigures = 0;
@@ -511,7 +511,7 @@ struct SolarShadingData : BaseGlobalStruct
         this->CurrentSurfaceBeingShadowed = 0;
         this->CurrentShadowingSurface = 0;
         this->OverlapStatus = 0;
-        this->CTHETA.deallocate();
+        this->SurfSunCosTheta.deallocate();
         this->FBKSHC = 0;
         this->FGSSHC = 0;
         this->FINSHC = 0;
@@ -540,7 +540,7 @@ struct SolarShadingData : BaseGlobalStruct
         this->HCAREA.deallocate();
         this->HCT.deallocate();
         this->ISABSF.deallocate();
-        this->SAREA.deallocate();
+        this->SurfSunlitArea.deallocate();
         this->NumTooManyFigures = 0;
         this->NumTooManyVertices = 0;
         this->NumBaseSubSurround = 0;
