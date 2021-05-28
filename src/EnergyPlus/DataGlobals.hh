@@ -168,7 +168,7 @@ struct DataGlobal : BaseGlobalStruct
 
     // This is a temporary hack for running unit tests with the cache
     // Do not merge to develop until an appropriate solution is implemented
-    bool RunningFromUnittest = false;
+    bool useCache = true;
 
     void clear_state() override
     {
@@ -271,7 +271,7 @@ struct DataGlobal : BaseGlobalStruct
         this->FDsimDay = 0;
         this->FDnumIterYears = 0;
         this->printConsoleOutput = true;
-        this->RunningFromUnittest = false;
+        this->useCache = true;
     }
 };
 

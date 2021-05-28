@@ -45,70 +45,91 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// EnergyPlus::Construction Unit Tests
+
+// Google Test Headers
+#include <gtest/gtest.h>
+
+// JSON Header
+#include <nlohmann/json.hpp>
+
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Cache.hh>
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/FileSystem.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 
-namespace EnergyPlus::Cache {
+using namespace EnergyPlus;
 
-void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &j)
+TEST_F(EnergyPlusFixture, Construction_getCacheKeys)
 {
-    if (!FileSystem::fileExists(filePath)) {
-        // if the file doesn't exist, there are no data to read
-        return;
-    } else {
-        std::ifstream ifs(filePath);
+    std::string const idf_objects = delimited_string({
+        "  Material,",
+        "    A1 - 1 IN STUCCO,        !- Name",
+        "    Smooth,                  !- Roughness",
+        "    2.5389841E-02,           !- Thickness {m}",
+        "    0.6918309,               !- Conductivity {W/m-K}",
+        "    1858.142,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance", /**/
 
-        // read json_in data
-        try {
-            j = nlohmann::json::from_cbor(ifs);
-            ifs.close();
-        } catch (...) {
-            if (!j.empty()) {
-                // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, filePath + " contains invalid file format");
-            }
-            ifs.close();
-            return;
-        }
-    }
+        "  Material,",
+        "    C4 - 4 IN COMMON BRICK,  !- Name",
+        "    Rough,                   !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1922.216,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7600000,               !- Solar Absorptance",
+        "    0.7600000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name",
+        "    Smooth,                  !- Roughness",
+        "    1.9050000E-02,           !- Thickness {m}",
+        "    0.7264224,               !- Conductivity {W/m-K}",
+        "    1601.846,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.9200000,               !- Solar Absorptance",
+        "    0.9200000;               !- Visible Absorptance",
+
+        "  Construction,",
+        "    EXTWALL80,               !- Name",
+        "    A1 - 1 IN STUCCO,        !- Outside Layer",
+        "    C4 - 4 IN COMMON BRICK,  !- Layer 2",
+        "    E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 3",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+
+    bool ErrorsFound = false;
+
+    EnergyPlus::HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    EnergyPlus::HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    EXPECT_EQ(state->dataConstruction->Construct.size(), 1);
+
+    state->dataConstruction->Construct(1).IsUsedCTF = true;
+
+    EnergyPlus::HeatBalanceManager::InitConductionTransferFunctions(*state);
+
+    EXPECT_EQ(state->dataConstruction->Construct(1).getCacheKey(*state), "200446872");
+
+    std::string expectedFullKey = "0.02538984,0.69183090,1858.14200000,836.80000000,0.03669949,0.10149840,0.72642240,1922.21600000,836.80000000,0."
+                                  "13972366,0.01905000,0.72642240,1601.84600000,836.80000000,0.02622441,";
+    EXPECT_EQ(state->dataConstruction->Construct(1).getCacheKeyString(*state), expectedFullKey);
 }
-
-void writeJSONfile(nlohmann::json &j, std::string &fPath)
-{
-    std::ofstream ofs(fPath, std::ofstream::out | std::ofstream::binary);
-    nlohmann::json::to_cbor(j, ofs);
-    ofs.close();
-}
-
-void loadCache(EnergyPlusData &state)
-{
-    // load cache file if it exists
-    if (FileSystem::fileExists(state.dataStrGlobals->outputCacheFileName) && state.dataGlobal->useCache) {
-        readJSONfile(state, state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
-
-        // file exists but is empty, so don't try to read data
-        if (state.dataCache->cache.empty()) return;
-
-        try {
-            // load these up one time up front
-            // nlohmann::json is loading this by default as an ordered set of data, but it needs to be unordered for the search later
-            nlohmann::json allCTFs = state.dataCache->cache.at(Cache::CTFKey);
-            allCTFs.get_to(state.dataCache->unorderedCTFObjects);
-            state.dataCache->ctfObjectsInCache = true;
-        } catch (nlohmann::json::out_of_range &e) {
-            state.dataCache->ctfObjectsInCache = false;
-        }
-    }
-}
-
-void writeCache(EnergyPlusData &state)
-{
-    writeJSONfile(state.dataCache->cache, state.dataStrGlobals->outputCacheFileName);
-}
-
-} // namespace EnergyPlus::Cache

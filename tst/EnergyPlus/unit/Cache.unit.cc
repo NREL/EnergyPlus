@@ -45,110 +45,116 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ENERGYPLUS_CACHE_HH
-#define ENERGYPLUS_CACHE_HH
+// EnergyPlus::Cache Unit Tests
 
-// EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/FileSystem.hh>
-#include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // JSON Header
 #include <nlohmann/json.hpp>
 
-namespace EnergyPlus {
+// EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Cache.hh>
 
-// Forward declarations
-struct EnergyPlusData;
+using namespace EnergyPlus;
 
-namespace Cache {
-
-    std::string const cacheName = "eplusout.cache";
-    std::string const CTFKey = "CTFs";
-
-    void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &j);
-
-    void writeJSONfile(nlohmann::json &j, std::string &fPath);
-
-    template <typename T> void jsonToArray(EnergyPlusData &state, Array1D<T> &arr, nlohmann::json &j, std::string const &key)
-    {
-        // 0-based array to JSON list
-
-        try {
-            int size = static_cast<int>(j.at(key).size());
-            arr.dimension({0, size - 1});
-            int idx = 0;
-            for (auto &v : j.at(key)) {
-                arr(idx) = v;
-                ++idx;
-            }
-        } catch (const nlohmann::json::out_of_range &e) {
-            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
-        }
-    }
-
-    template <typename T> void jsonToArray1(EnergyPlusData &state, Array1D<T> &arr, nlohmann::json &j, std::string const &key)
-    {
-        // 1-based array to JSON list
-
-        try {
-            int size = static_cast<int>(j.at(key).size());
-            arr.dimension(size);
-            int idx = 1;
-            for (auto &v : j.at(key)) {
-                arr(idx) = v;
-                ++idx;
-            }
-        } catch (const nlohmann::json::out_of_range &e) {
-            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
-        }
-    }
-
-    template <typename T> void jsonToData(EnergyPlusData &state, T &data, nlohmann::json &j, std::string const &key)
-    {
-        try {
-            data = j.at(key);
-        } catch (const nlohmann::json::out_of_range &e) {
-            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
-        }
-    }
-
-    template <typename T> void arrayToJSON(Array1D<T> const &arr, nlohmann::json &j, std::string const &key)
-    {
-        std::vector<T> vect;
-        for (auto v : arr)
-            vect.push_back(v);
-        j[key] = vect;
-    }
-
-    void loadCache(EnergyPlusData &state);
-
-    void writeCache(EnergyPlusData &state);
-
-    inline unsigned long long prepFloatForCacheKey(double const x, unsigned int const precision_bits)
-    {
-        assert(sizeof(double) == sizeof(unsigned long long));
-        return *reinterpret_cast<unsigned long long const *>(&x) >> (64 - 12 - precision_bits);
-    }
-
-} // namespace Cache
-
-struct CacheData : BaseGlobalStruct
+TEST_F(EnergyPlusFixture, Cache_TestJSONToData)
 {
+    // test jsonToData
+    nlohmann::json j;
+    j["pi"] = 3.14159;
+    j["answer"] = 42;
+    j["happy"] = true;
+    j["name"] = "energyplus";
 
-    nlohmann::json cache;
-    bool ctfObjectsInCache = false;
-    std::unordered_map<std::string, nlohmann::json> unorderedCTFObjects;
+    // test double
+    double d;
+    Cache::jsonToData(*state, d, j, "pi");
+    EXPECT_EQ(d, 3.14159);
 
-    void clear_state() override
-    {
-        this->cache.clear();
-        this->ctfObjectsInCache = false;
-        this->unorderedCTFObjects.clear();
-    }
-};
+    // test int
+    int i;
+    Cache::jsonToData(*state, i, j, "answer");
+    EXPECT_EQ(i, 42);
 
-} // namespace EnergyPlus
+    // test str
+    std::string s;
+    Cache::jsonToData(*state, s, j, "name");
+    EXPECT_EQ(s, "energyplus");
 
-#endif // ENERGYPLUS_CACHE_HH
+    // test bool
+    bool b;
+    Cache::jsonToData(*state, b, j, "happy");
+    EXPECT_EQ(b, true);
+
+    // bad key
+    EXPECT_ANY_THROW(Cache::jsonToData(*state, b, j, "bad_key"));
+}
+
+TEST_F(EnergyPlusFixture, Cache_TestJSONToArray)
+{
+    nlohmann::json j;
+    j["array"] = {0, 1, 2, 3};
+
+    Array1D<Real64> arr_double;
+    Cache::jsonToArray(*state, arr_double, j, "array");
+    EXPECT_EQ(arr_double(0), 0.0);
+    EXPECT_EQ(arr_double(1), 1.0);
+    EXPECT_EQ(arr_double(2), 2.0);
+    EXPECT_EQ(arr_double(3), 3.0);
+
+    Array1D<int> arr_int;
+    Cache::jsonToArray(*state, arr_int, j, "array");
+    EXPECT_EQ(arr_int(0), 0);
+    EXPECT_EQ(arr_int(1), 1);
+    EXPECT_EQ(arr_int(2), 2);
+    EXPECT_EQ(arr_int(3), 3);
+
+    j["bool"] = {false, true};
+    Array1D<bool> arr_bool;
+    Cache::jsonToArray(*state, arr_bool, j, "bool");
+    EXPECT_EQ(arr_bool(0), false);
+    EXPECT_EQ(arr_bool(1), true);
+
+    // bad key
+    EXPECT_ANY_THROW(Cache::jsonToArray(*state, arr_bool, j, "bad_key"));
+}
+
+TEST_F(EnergyPlusFixture, Cache_TestJSONToArray1)
+{
+    nlohmann::json j;
+    j["array"] = {0, 1, 2, 3};
+
+    Array1D<Real64> arr_double;
+    Cache::jsonToArray1(*state, arr_double, j, "array");
+    EXPECT_EQ(arr_double(1), 0.0);
+    EXPECT_EQ(arr_double(2), 1.0);
+    EXPECT_EQ(arr_double(3), 2.0);
+    EXPECT_EQ(arr_double(4), 3.0);
+
+    Array1D<int> arr_int;
+    Cache::jsonToArray1(*state, arr_int, j, "array");
+    EXPECT_EQ(arr_int(1), 0);
+    EXPECT_EQ(arr_int(2), 1);
+    EXPECT_EQ(arr_int(3), 2);
+    EXPECT_EQ(arr_int(4), 3);
+
+    j["bool"] = {false, true};
+    Array1D<bool> arr_bool;
+    Cache::jsonToArray1(*state, arr_bool, j, "bool");
+    EXPECT_EQ(arr_bool(1), false);
+    EXPECT_EQ(arr_bool(2), true);
+
+    // bad key
+    EXPECT_ANY_THROW(Cache::jsonToArray1(*state, arr_bool, j, "bad_key"));
+}
+
+TEST_F(EnergyPlusFixture, Cache_TestArrayToJSON)
+{
+    Array1D<double> arr = {0.0, 1.0, 2.0};
+    nlohmann::json j;
+    Cache::arrayToJSON(arr, j, "data");
+    auto val = j.at("data");
+    EXPECT_EQ(val[0], 0.0);
+}
