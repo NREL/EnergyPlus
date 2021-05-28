@@ -6923,7 +6923,6 @@ namespace UnitarySystems {
         }
     }
 
-
     void UnitarySys::getUnitarySystemInputData(
         EnergyPlusData &state, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
