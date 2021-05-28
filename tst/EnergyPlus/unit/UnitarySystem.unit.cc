@@ -15956,16 +15956,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(2).LineSubTotal, 1.0, 0.01);
 
     // Cost Per Output Capacity: Qty = 1; $/kW = 10; RatedCap = 34.772 kW; Total = 1 * 10 * 34.772 = 347.72
-    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(3).LineSubTotal, 347.72, 0.01);
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(3).LineSubTotal, 347.72, 0.05);
 
     // Cost Per Output Capacity Wildcard: Qty = 1; $/kW = 10; RatedCap = 34.772 kW; Total = 1 * 10 * 34.772 = 347.72
-    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(4).LineSubTotal, 347.72, 0.01);
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(4).LineSubTotal, 347.72, 0.05);
 
     // Cost Per Output Capacity per COP: Qty = 1; $/kW = 100 ; RatedCap = 34.772 kW; COP = 3; Total = 1 * 100 * 34.772 * 3 = 10431.6
-    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(5).LineSubTotal, 10431.64, 0.01);
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(5).LineSubTotal, 10431.64, 1.);
 
     // Cost Per Output Capacity per COP Wildcard: Qty = 1; $/kW = 100 ; RatedCap = 34.772 kW; COP = 3; Total = 1 * 100 * 34.772 * 3 = 10431.6
-    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(6).LineSubTotal, 10431.64, 0.01);
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(6).LineSubTotal, 10431.64, 1.);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTest)

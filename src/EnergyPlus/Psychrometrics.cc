@@ -1258,54 +1258,10 @@ namespace Psychrometrics {
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyTsatFnPb);
 #endif
-
-        // Check press in range.
-        FlagError = false;
-#ifdef EP_psych_errors
-        if (!state.dataGlobal->WarmupFlag) {
-            if (Press <= 0.0017 || Press >= 1555000.0) {
-                if (state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnPb) == 0) {
-                    ShowWarningMessage(state, "Pressure out of range (PsyTsatFnPb)");
-                    if (!CalledFrom.empty()) {
-                        ShowContinueErrorTimeStamp(state, format(" Routine={}", CalledFrom));
-                    } else {
-                        ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
-                    }
-                    ShowContinueError(state, format(" Input Pressure= {:.2T}", Press));
-                    FlagError = true;
-                }
-                ShowRecurringWarningErrorAtEnd(
-                    state, "Pressure out of range (PsyTsatFnPb)", state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnPb), Press, Press, _, "Pa", "Pa");
-            }
-        }
-#endif
-        if (Press == state.dataPsychrometrics->Press_Save) {
-            return state.dataPsychrometrics->tSat_Save;
-        }
-        state.dataPsychrometrics->Press_Save = Press;
-
-        // Uses an iterative process to determine the saturation temperature at a given
-        // pressure by correlating saturated water vapor as a function of temperature.
-
-        // Initial guess of boiling temperature
-        tSat = 100.0;
-        iter = 0;
-
-        // If above 1555000,set value of Temp corresponding to Saturation Pressure of 1555000 Pascal.
-        if (Press >= 1555000.0) {
-            tSat = 200.0;
-            // If below 0.0017,set value of Temp corresponding to Saturation Pressure of 0.0017 Pascal.
-        } else if (Press <= 0.0017) {
-            tSat = -100.0;
-
-            // Setting Value of PsyTsatFnPb= 0C, due to non-continuous function for Saturation Pressure at 0C.
-        } else if ((Press > 611.000) && (Press < 611.25)) {
-            tSat = 0.0;
-
         } else {
             ShowWarningMessage(state, "Pressure out of range (PsyTsatFnPb)");
                 if (!CalledFrom.empty()) {
-                    ShowContinueErrorTimeStamp(state, " Routine=" + CalledFrom + ',');
+                    ShowContinueErrorTimeStamp(state, format(" Routine={}", CalledFrom));
                 } else {
                     ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
                 }
