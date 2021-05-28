@@ -460,7 +460,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
                                                                          tempSteam,
                                                                          1.0,
                                                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                                         "SizeDistrict" + typeName); 
+                                                                         "SizeDistrict" + typeName);
             Real64 const EnthSteamDry = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                               state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                               tempSteam,
@@ -559,26 +559,56 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
         if (MyLoad < 0.0) MyLoad = 0.0;
     }
 
-    // determine outlet temp based on inlet temp, cp, and MyLoad
-    if ((this->MassFlowRate > 0.0) && runFlag) {
-        this->OutletTemp = (MyLoad + this->MassFlowRate * Cp * this->InletTemp) / (this->MassFlowRate * Cp);
-        // apply loop limits on temperature result to keep in check
-        if (this->OutletTemp < LoopMinTemp) {
-            this->OutletTemp = max(this->OutletTemp, LoopMinTemp);
-            MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
+    if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater || this->EnergyType == DataPlant::TypeOf_PurchHotWater) {
+        // determine outlet temp based on inlet temp, cp, and MyLoad
+        if ((this->MassFlowRate > 0.0) && runFlag) {
+            this->OutletTemp = (MyLoad + this->MassFlowRate * Cp * this->InletTemp) / (this->MassFlowRate * Cp);
+            // apply loop limits on temperature result to keep in check
+            if (this->OutletTemp < LoopMinTemp) {
+                this->OutletTemp = max(this->OutletTemp, LoopMinTemp);
+                MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
+            }
+            if (this->OutletTemp > LoopMaxTemp) {
+                this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
+                MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
+            }
+        } else {
+            this->OutletTemp = this->InletTemp;
+            MyLoad = 0.0;
         }
-        if (this->OutletTemp > LoopMaxTemp) {
-            this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
-            MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
+        int const OutletNode = this->OutletNodeNum;
+        state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
+        this->EnergyRate = std::abs(MyLoad);
+        this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    } else { // this->EnergyType == DataPlant::TypeOf_PurchSteam
+        // determine steam mass flow rate based on MyLoad
+        if ((this->MassFlowRate > 0.0) && runFlag) {
+            Real64 const tempSteam(100.0);
+            Real64 const EnthSteamDry = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                              tempSteam,
+                                                                              1.0,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                              RoutineName);
+            Real64 const EnthSteamWet = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                                              tempSteam,
+                                                                              0.0,
+                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                                              RoutineName);
+            Real64 const LatentHeatSteam = EnthSteamDry - EnthSteamWet;
+            this->MassFlowRate = MyLoad / LatentHeatSteam;
+            this->OutletTemp = tempSteam;
+            this->OutletSteamQuality = 1.0;
+        } else {
+            this->OutletTemp = this->InletTemp;
+            MyLoad = 0.0;
         }
-    } else {
-        this->OutletTemp = this->InletTemp;
-        MyLoad = 0.0;
+        int const OutletNode = this->OutletNodeNum;
+        state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(OutletNode).Quality = this->OutletSteamQuality;
+        this->EnergyRate = std::abs(MyLoad);
+        this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
-    int const OutletNode = this->OutletNodeNum;
-    state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
-    this->EnergyRate = std::abs(MyLoad);
-    this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-}
 
 } // namespace EnergyPlus::OutsideEnergySources
