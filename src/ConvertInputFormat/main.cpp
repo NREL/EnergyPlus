@@ -383,7 +383,7 @@ int main(int argc, const char *argv[])
             0,                               // Required?
             0,                               // Number of args expected.
             0,                               // Delimiter if expecting multiple args.
-            "Convert HVACTemplate objects.", // Help description.
+            "Do not convert HVACTemplate objects.", // Help description.
             "-n",                            // Flag token.
             "--noHVACTemplate"               // Flag token.
     );
