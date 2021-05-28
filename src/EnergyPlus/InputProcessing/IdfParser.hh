@@ -67,7 +67,7 @@ public:
 
     json decode(std::string const &idf, json const &schema);
 
-    json decode(std::string const &idf, json const &schema, bool &success, bool const convertHVACTemplate=false);
+    json decode(std::string const &idf, json const &schema, bool &success, bool const convertHVACTemplate = false);
 
     std::string encode(json const &root, json const &schema);
 

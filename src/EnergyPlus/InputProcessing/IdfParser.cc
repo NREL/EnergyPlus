@@ -229,11 +229,16 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                     token = next_token(idf, index);
                 continue;
             } else if (obj_name.find("Parametric:") != std::string::npos) {
-                errors_.emplace_back(fmt::format("Line: {} You must run Parametric Preprocessor for \"{}\"", cur_line_num, obj_name));
+                errors_.emplace_back(fmt::format("Line: {} You must run the Parametric Preprocessor for \"{}\"", cur_line_num, obj_name));
                 while (token != Token::SEMICOLON && token != Token::END)
                     token = next_token(idf, index);
                 continue;
-            } else if ((obj_name.find("Template") != std::string::npos) && !convertHVACTemplate) {
+            } else if (obj_name.find("GroundHeatTransfer:") != std::string::npos) {
+                errors_.emplace_back(fmt::format("Line: {} You must run the ExpandObjects program for \"{}\"", cur_line_num, obj_name));
+                while (token != Token::SEMICOLON && token != Token::END)
+                    token = next_token(idf, index);
+                continue;
+            } else if ((obj_name.find("HVACTemplate") != std::string::npos) && !convertHVACTemplate) {
                 errors_.emplace_back(fmt::format("Line: {} You must run the ExpandObjects program for \"{}\"", cur_line_num, obj_name));
                 while (token != Token::SEMICOLON && token != Token::END)
                     token = next_token(idf, index);

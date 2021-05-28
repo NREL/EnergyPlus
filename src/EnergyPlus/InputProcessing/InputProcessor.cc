@@ -1474,16 +1474,6 @@ void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
         auto const &object_type = it->objectType;
         auto const &name = it->objectName;
 
-        // there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and
-        // !DisplayAllWarnings
-        if (has_prefix(object_type, "ZoneHVAC:")) {
-            ShowSevereError(state, "Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used.");
-            ShowContinueError(state, " -- Object type: " + object_type);
-            ShowContinueError(state, " -- Object name: " + name);
-        }
-
-        if (!state.dataGlobal->DisplayUnusedObjects) continue;
-
         if (!state.dataGlobal->DisplayAllWarnings) {
             auto found_type = unused_object_types.find(object_type);
             if (found_type != unused_object_types.end()) {
@@ -1493,6 +1483,31 @@ void InputProcessor::reportOrphanRecordObjects(EnergyPlusData &state)
                 unused_object_types.emplace(object_type);
             }
         }
+
+        // there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and
+        // !DisplayAllWarnings
+        if (has_prefix(object_type, "ZoneHVAC:")) {
+            ShowSevereError(state, "Orphaned ZoneHVAC object found.  This was object never referenced in the input, and was not used.");
+            ShowContinueError(state, " -- Object type: " + object_type);
+            ShowContinueError(state, " -- Object name: " + name);
+        } else if (has_prefix(object_type, "Parametric:")) {
+            ShowSevereError(state, "Parametric:* objects found.  These objects are not supported directly by EnergyPlus.");
+            ShowContinueError(state, "You must run the Parametric Preprocessor to process these objects.");
+            ShowContinueError(state, " -- Object type: " + object_type);
+            ShowContinueError(state, " -- Object name: " + name);
+        } else if (has_prefix(object_type, "GroundHeatTransfer:")) {
+            ShowSevereError(state, "GroundHeatTransfer:* objects found.  These objects are not supported directly by EnergyPlus.");
+            ShowContinueError(state, "You must run the ExpandObjects program to process these objects.");
+            ShowContinueError(state, " -- Object type: " + object_type);
+            ShowContinueError(state, " -- Object name: " + name);
+        } else if (has_prefix(object_type, "HVACTemplate")) {
+            ShowSevereError(state, "HVACTemplate:* objects found.  These objects are not supported directly by EnergyPlus.");
+            ShowContinueError(state, "You must run the ExpandObjects program to process these objects.");
+            ShowContinueError(state, " -- Object type: " + object_type);
+            ShowContinueError(state, " -- Object name: " + name);
+        }
+
+        if (!state.dataGlobal->DisplayUnusedObjects) continue;
 
         if (first_iteration) {
             if (!name.empty()) {
