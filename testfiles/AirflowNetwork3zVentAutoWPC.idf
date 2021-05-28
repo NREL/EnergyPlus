@@ -129,7 +129,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Building,
     AirflowNetwork 3 Zone Building,  !- Name
@@ -1241,6 +1241,12 @@
   Output:Variable,*,AFN Zone Infiltration Sensible Heat Loss Energy,timestep;
 
   Output:Variable,*,AFN Zone Infiltration Sensible Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Volume,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Sensible Heat Loss Energy,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Sensible Heat Gain Energy,timestep;
 
   Output:Variable,*,AFN Zone Mixing Volume,timestep;
 

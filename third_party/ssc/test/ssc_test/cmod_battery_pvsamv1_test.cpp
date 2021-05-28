@@ -143,7 +143,7 @@ TEST_F(CMPvsamv1BatteryIntegration_cmod_pvsamv1, ResidentialACDCBatteryModelInte
     ssc_number_t expectedBatteryDischargeEnergy[2] = { 0.76, 7.6 };
 
     ssc_number_t peakKwCharge[2] = { -2.7, -2.8 };
-    ssc_number_t peakKwDischarge[2] = { 0.6, 4.0 };
+    ssc_number_t peakKwDischarge[2] = { 0.03, 0.16 };
     ssc_number_t peakCycles[2] = { 1, 1 };
     ssc_number_t avgCycles[2] = { 0.0027, 0.0027 };
 
@@ -193,8 +193,8 @@ TEST_F(CMPvsamv1BatteryIntegration_cmod_pvsamv1, ResidentialACDCBatteryModelInte
     set_array(data, "batt_custom_dispatch", custom_dispatch_residential_hourly_schedule, 8760);
 
     ssc_number_t expectedEnergy[2] = { 8708, 8672 };
-    ssc_number_t expectedBatteryChargeEnergy[2] = { 511, 538 };
-    ssc_number_t expectedBatteryDischargeEnergy[2] = { 469, 495 };
+    ssc_number_t expectedBatteryChargeEnergy[2] = { 396.1, 359.95 };
+    ssc_number_t expectedBatteryDischargeEnergy[2] = { 395.95, 419.2 };
 
     ssc_number_t peakKwCharge[2] = { -0.47, -0.46 };
     ssc_number_t peakKwDischarge[2] = { 0.39, 0.41 };
@@ -345,14 +345,14 @@ TEST_F(CMPvsamv1BatteryIntegration_cmod_pvsamv1, PPA_ACBatteryModelIntegration)
     grid_and_rate_defaults(data);
     singleowner_defaults(data);
 
-    ssc_number_t expectedEnergy[3] = { 37307927, 37306925, 37308021 };
-    ssc_number_t expectedBatteryChargeEnergy[3] = { 14779, 25275, 14779 }; // No rate model means battery use is low
-    ssc_number_t expectedBatteryDischargeEnergy[3] = { 14663, 24062, 14663 };
+    ssc_number_t expectedEnergy[3] = { 37308020, 37307080, 37308021 };
+    ssc_number_t expectedBatteryChargeEnergy[3] = { 14779, 24265, 14779 }; // No rate model means battery use is low
+    ssc_number_t expectedBatteryDischargeEnergy[3] = { 14663, 23209, 14663 };
 
     ssc_number_t peakKwCharge[3] = { -1040.2, -1051.5, -1051.5 };
     ssc_number_t peakKwDischarge[3] = { 967.5, 969.5, 969.5 };
     ssc_number_t peakCycles[3] = { 1, 1, 1 };
-    ssc_number_t avgCycles[3] = { 0.003, 0.014, 0.003 };
+    ssc_number_t avgCycles[3] = { 0.003, 0.006, 0.003 };
 
     // Test peak shaving look ahead, peak shaving look behind, and automated grid power target. Others require additional input data
     for (int i = 0; i < 3; i++) {
@@ -398,12 +398,12 @@ TEST_F(CMPvsamv1BatteryIntegration_cmod_pvsamv1, PPA_ManualDispatchBatteryModelI
     grid_and_rate_defaults(data);
     singleowner_defaults(data);
 
-    ssc_number_t expectedEnergy = 37176158;
-    ssc_number_t expectedBatteryChargeEnergy = 1297985;
-    ssc_number_t expectedBatteryDischargeEnergy = 1166100;
+    ssc_number_t expectedEnergy = 37175792;
+    ssc_number_t expectedBatteryChargeEnergy = 1298028;
+    ssc_number_t expectedBatteryDischargeEnergy = 1165681;
 
     ssc_number_t peakKwCharge = -1052.0;
-    ssc_number_t peakKwDischarge = 857.2;
+    ssc_number_t peakKwDischarge = 846.8;
     ssc_number_t peakCycles = 1;
     ssc_number_t avgCycles = 1;
 
@@ -508,7 +508,7 @@ TEST_F(CMPvsamv1BatteryIntegration_cmod_pvsamv1, PPA_CustomDispatchBatteryModelD
     ssc_number_t peakKwCharge = -948.6;
     ssc_number_t peakKwDischarge = 651.7;
     ssc_number_t peakCycles = 3;
-    ssc_number_t avgCycles = 1.1944;
+    ssc_number_t avgCycles = 1.1945;
 
     ssc_data_set_number(data, "batt_dispatch_choice", 3);
     ssc_data_set_number(data, "batt_ac_or_dc", 0);
@@ -779,7 +779,7 @@ TEST_F(CMPvsamv1BatteryIntegration_cmod_pvsamv1, ResidentialDCBatteryModelPriceS
     ssc_number_t peakKwCharge = -3.914;
     ssc_number_t peakKwDischarge = 1.99;
     ssc_number_t peakCycles = 2;
-    ssc_number_t avgCycles = 0.4136;
+    ssc_number_t avgCycles = 0.41;
 
     pairs["batt_dispatch_choice"] = 5;
 
@@ -805,7 +805,11 @@ TEST_F(CMPvsamv1BatteryIntegration_cmod_pvsamv1, ResidentialDCBatteryModelPriceS
         EXPECT_NEAR(batt_stats.peakKwCharge, peakKwCharge, m_error_tolerance_lo);
         EXPECT_NEAR(batt_stats.peakKwDischarge, peakKwDischarge, m_error_tolerance_lo);
         EXPECT_NEAR(batt_stats.peakCycles, peakCycles, m_error_tolerance_lo);
-        EXPECT_NEAR(batt_stats.avgCycles, avgCycles, 0.01); // As of 8-26-20 Linux cycles 2 more times in a year than Windows, this changes the NPV by $2 over 25 years
-    }
+        EXPECT_NEAR(batt_stats.avgCycles, avgCycles, 0.1); // As of 8-26-20 Linux cycles 2 more times in a year than Windows, this changes the NPV by $2 over 25 years
 
+        auto batt_q_rel = data_vtab->as_vector_ssc_number_t("batt_capacity_percent");
+        auto batt_cyc_avg = data_vtab->as_vector_ssc_number_t("batt_DOD_cycle_average");
+        EXPECT_NEAR(batt_q_rel.back(), 97.846, 2e-2);
+        EXPECT_NEAR(batt_cyc_avg.back(), 26.15, 0.5);
+    }
 }

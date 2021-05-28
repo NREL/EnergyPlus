@@ -56,11 +56,25 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
+#include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/SystemReports.hh>
+#include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UnitarySystem.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus::SystemReports;
 using namespace EnergyPlus::DataGlobalConstants;
@@ -71,9 +85,9 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
 {
-    DataHVACGlobals::NumPrimaryAirSys = 1;
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
 
     bool CompLoadFlag(false);
     int AirLoopNum(1);
@@ -108,8 +122,8 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).CurMeterReading = 100.0;
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("NaturalGas");
 
-    DataLoopNode::Node(1).MassFlowRate = 1.0;
-    DataLoopNode::Node(2).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
 
     state->dataSysRpts->SysHumidNaturalGas.allocate(1);
     state->dataSysRpts->SysHCCompNaturalGas.allocate(1);
@@ -122,25 +136,23 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     state->dataSysRpts->SysHCCompNaturalGas(1) = 0;
     state->dataSysRpts->SysTotNaturalGas(1) = 0;
 
-    //Calculate SysHumidNaturalGas ("Air System Humidifier NaturalGas Energy" Output Variable)
-    CalcSystemEnergyUse(
-        *state,
-        CompLoadFlag,
-        AirLoopNum,
-        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf,
-        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
-        CompLoad,
-        CompEnergyUse);
+    // Calculate SysHumidNaturalGas ("Air System Humidifier NaturalGas Energy" Output Variable)
+    CalcSystemEnergyUse(*state,
+                        CompLoadFlag,
+                        AirLoopNum,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
+                        CompLoad,
+                        CompEnergyUse);
 
     // Calculate SysHCCompNaturalGas ("Air System Heating Coil NaturalGas Energy" Output Variable)
-    CalcSystemEnergyUse(
-        *state,
-        CompLoadFlag,
-        AirLoopNum,
-        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf,
-        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
-        CompLoad,
-        CompEnergyUse);
+    CalcSystemEnergyUse(*state,
+                        CompLoadFlag,
+                        AirLoopNum,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).TypeOf,
+                        state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
+                        CompLoad,
+                        CompEnergyUse);
 
     EXPECT_EQ(state->dataSysRpts->SysHumidNaturalGas(1), 100);
     EXPECT_EQ(state->dataSysRpts->SysHCCompNaturalGas(1), 100);
@@ -211,5 +223,156 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     // Calculate SysTotPropane ("Air System Propane Energy")
     ReportSystemEnergyUse(*state);
     EXPECT_EQ(state->dataSysRpts->SysTotPropane(1), 200);
+}
+TEST_F(EnergyPlusFixture, ReportMaxVentilationLoads_ZoneEquip)
+{
+    state->dataHVACGlobal->NumPrimaryAirSys = 0;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(state->dataHVACGlobal->NumPrimaryAirSys);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZonePreDefRep.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    SystemReports::AllocateAndSetUpVentReports(*state);
+    ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state);
+    state->dataLoopNodes->Node.allocate(20);
+
+    // Set up OA requirements for one zone
+    state->dataSize->NumOARequirements = 1;
+    state->dataSize->OARequirements.allocate(state->dataSize->NumOARequirements);
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    Real64 expectedVoz = 0.0;
+    state->dataSize->OARequirements(1).OAFlowPerZone = 20;
+    expectedVoz += state->dataSize->OARequirements(1).OAFlowPerZone;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.5;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.0;
+    expectedVoz += state->dataSize->OARequirements(1).OAFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.1;
+    state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 100.0;
+    expectedVoz += state->dataSize->OARequirements(1).OAFlowPerPerson * state->dataHeatBal->ZoneIntGain(1).NOFOCC;
+    state->dataHeatBal->Zone(1).Multiplier = 2.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 10.0;
+    expectedVoz *= state->dataHeatBal->Zone(1).Multiplier;
+    expectedVoz *= state->dataHeatBal->Zone(1).ListMultiplier;
+
+    // Set up controlled zone equipment with just enough info for the ventilation report test
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneDesignSpecOAIndex = 1;
+    state->dataHeatBal->Zone(1).Volume = 10.0;
+    state->dataZoneEquip->ZoneEquipConfig(1).EquipListIndex = 1;
+
+    int NumEquip1 = 9;
+    state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = NumEquip1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num.allocate(NumEquip1);
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex.allocate(NumEquip1);
+
+    // 1: WindowAC
+    int equipNum = 1;
+    int nodeNumOA = 1;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(equipNum) = DataZoneEquipment::WindowAC_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
+    state->dataWindowAC->GetWindowACInputFlag = false;
+    state->dataWindowAC->WindAC.allocate(1);
+    state->dataWindowAC->WindAC(1).OutsideAirNode = nodeNumOA;
+    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 0.1;
+
+    // 2: VRF
+    ++equipNum;
+    ++nodeNumOA;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(equipNum) = DataZoneEquipment::VRFTerminalUnit_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
+    state->dataHVACVarRefFlow->GetVRFInputFlag = false;
+    state->dataHVACVarRefFlow->NumVRFTU = 1;
+    state->dataHVACVarRefFlow->VRFTU.allocate(1);
+    state->dataHVACVarRefFlow->VRFTU(1).VRFTUOAMixerOANodeNum = nodeNumOA;
+    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 2.0;
+
+    // 3: PTAC
+    ++equipNum;
+    ++nodeNumOA;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(equipNum) = DataZoneEquipment::PkgTermACAirToAir_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
+    state->dataPTHP->GetPTUnitInputFlag = false;
+    state->dataPTHP->NumPTUs = 1;
+    state->dataPTHP->PTUnit.allocate(1);
+    state->dataPTHP->PTUnit(1).OutsideAirNode = nodeNumOA;
+    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 30.0;
+
+    // 4: FanCoil
+    ++equipNum;
+    ++nodeNumOA;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(equipNum) = DataZoneEquipment::FanCoil4Pipe_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
+    state->dataFanCoilUnits->GetFanCoilInputFlag = false;
+    state->dataFanCoilUnits->NumFanCoils = 1;
+    state->dataFanCoilUnits->FanCoil.allocate(1);
+    state->dataFanCoilUnits->FanCoil(1).OutsideAirNode = nodeNumOA;
+    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 400.0;
+
+    // 5: Unit Ventilator
+    ++equipNum;
+    ++nodeNumOA;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(equipNum) = DataZoneEquipment::UnitVentilator_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
+    state->dataUnitVentilators->GetUnitVentilatorInputFlag = false;
+    state->dataUnitVentilators->NumOfUnitVents = 1;
+    state->dataUnitVentilators->UnitVent.allocate(1);
+    state->dataUnitVentilators->UnitVent(1).OutsideAirNode = nodeNumOA;
+    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 5000.0;
+
+    // 6: Purchased Air (Ideal Loads)
+    ++equipNum;
+    ++nodeNumOA;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(equipNum) = DataZoneEquipment::PurchasedAir_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
+    state->dataPurchasedAirMgr->GetPurchAirInputFlag = false;
+    state->dataPurchasedAirMgr->NumPurchAir = 1;
+    state->dataPurchasedAirMgr->PurchAir.allocate(1);
+    state->dataPurchasedAirMgr->PurchAir(1).OutdoorAirMassFlowRate = 60000.0;
+
+    // 7: ERV
+    ++equipNum;
+    ++nodeNumOA;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(equipNum) = DataZoneEquipment::ERVStandAlone_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
+    state->dataHVACStandAloneERV->GetERVInputFlag = false;
+    state->dataHVACStandAloneERV->NumStandAloneERVs = 1;
+    state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = nodeNumOA;
+    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 700000.0;
+
+    // 8: Outdoor air unit
+    ++equipNum;
+    ++nodeNumOA;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(equipNum) = DataZoneEquipment::OutdoorAirUnit_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
+    state->dataOutdoorAirUnit->GetOutdoorAirUnitInputFlag = false;
+    state->dataOutdoorAirUnit->NumOfOAUnits = 1;
+    state->dataOutdoorAirUnit->OutAirUnit.allocate(1);
+    state->dataOutdoorAirUnit->OutAirUnit(1).OutsideAirNode = nodeNumOA;
+    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 8000000.0;
+
+    // 9: Zone Hybrid Unitary
+    ++equipNum;
+    ++nodeNumOA;
+    state->dataZoneEquip->ZoneEquipList(1).EquipType_Num(equipNum) = DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
+    state->dataZoneEquip->ZoneEquipList(1).EquipIndex(equipNum) = 1;
+    state->dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
+    state->dataHybridUnitaryAC->NumZoneHybridEvap = 1;
+    state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner.allocate(1);
+    state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1).SecondaryInletNode = nodeNumOA;
+    state->dataLoopNodes->Node(nodeNumOA).MassFlowRate = 90000000.0;
+
+    // Call reporting function
+    state->dataSysRpts->VentReportStructureCreated = true;
+    state->dataSysRpts->VentLoadsReportEnabled = true;
+    SystemReports::ReportMaxVentilationLoads(*state);
+
+    EXPECT_NEAR(state->dataSysRpts->ZoneTargetVentilationFlowVoz(1), expectedVoz, 0.001);
+    EXPECT_NEAR(state->dataSysRpts->ZoneOAMassFlow(1), 98765432.1, 0.001);
 }
 } // namespace EnergyPlus

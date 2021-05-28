@@ -160,6 +160,56 @@ Reports the total outdoor air volume that has been supplied to a zone over the r
 
 Reports the air changes per hour in the zone due to the outside fresh air supplied by mechanical ventilation system.
 
+\paragraph{Zone Target Voz Ventilation Flow Rate {[}m3/s{]}}\label{zone-target-voz-ventilation-flow-rate}
+The target ventilation flow rate \(V_{oz-dyn}\) at standard density at the current timestep as defined by the zone Design Specification Outdoor Air Object (\hyperref[designspecificationoutdoorair]{DesignSpecification:OutdoorAir}).
+
+\paragraph{Zone Ventilation Below Target Voz Time {[}hr{]}}\label{zone-ventilation-below-target-voz-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Zone Ventilation At Target Voz Time {[}hr{]}}\label{zone-ventilation-at-target-voz-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Zone Ventilation Above Target Voz Time {[}hr{]}}\label{zone-ventilation-above-target-voz-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Zone Ventilation When Unoccupied Time {[}hr{]}}\label{zone-ventilation-when-unoccupied-time}
+The time that the zone total ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when the zone is unoccupied.
+
+\paragraph{Facility Any Zone Ventilation Below Target Voz Time {[}hr{]}}\label{facility-any-zone-ventilation-below-target-voz-time}
+The time that any zone's total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Facility All Zones Ventilation At Target Voz Time {[}hr{]}}\label{facility-all-zones-ventilation-at-target-voz-time}
+The time that every zone's total ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Facility Any Zone Ventilation Above Target Voz Time {[}hr{]}}\label{facility-any-zone-ventilation-above-target-voz-time}
+The time that any zone's total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Facility Any Zone Ventilation When Unoccupied Time {[}hr{]}}\label{facility-any-zone-ventilation-when-unoccupied-time}
+The time that any zone's total ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when the zone is unoccupied.
+
+\paragraph{Air System Mechanical Ventilation Flow Rate {[}m3/s{]}}\label{air-system-mechanical-ventilation-flow-rate}
+The current airloop mechanical ventilation flow rate at standard density.
+
+\paragraph{Air System Natural Ventilation Flow Rate {[}m3/s{]}}\label{air-system-natural-ventilation-flow-rate}
+The sum of the natural ventilation flow rate at standard density at the current timestep for each zone on the airloop. If any zone terminal unit has a Design Specification Air Terminal Sizing Object  (\hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing}) then the natural ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
+
+\paragraph{Air System Target Voz Ventilation Flow Rate {[}m3/s{]}}\label{air-system-target-voz-ventilation-flow-rate}
+The sum of the target ventilation flow rates \(V_{oz-dyn}\) at standard density at the current timestep for each zone on the airloop. If any zone terminal unit has a Design Specification Air Terminal Sizing Object  (\hyperref[designspecificationairterminalsizing]{DesignSpecification:AirTerminal:Sizing}) then the target ventilation rate for that zone is scaled by the Fraction of Minimum Outdoor Air Flow value.
+
+\paragraph{Air System Ventilation Below Target Voz Time {[}hr{]}}\label{air-system-ventilation-below-target-voz-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% below the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Air System Ventilation At Target Voz Time {[}hr{]}}\label{air-system-ventilation-at-target-voz-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is within 1\% of the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Air System Ventilation Above Target Voz Time {[}hr{]}}\label{air-system-ventilation-above-target-voz-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is more than 1\% above the \emph{Zone Target Voz Ventilation Flow Rate}.
+
+\paragraph{Air System Ventilation When Unoccupied Time {[}hr{]}}\label{air-system-ventilation-when-unoccupied-time}
+The time that the airloop total ventilation rate (mechanical ventilation plus natural ventilation) is greater than zero when all of the zones on the airloop are unoccupied.
+
+
+
 The example syntax below shows the basic ventilation flow variables reported on an hourly basis.
 
 \begin{itemize}
@@ -177,6 +227,38 @@ The example syntax below shows the basic ventilation flow variables reported on 
   Output:Variable,*,Zone Mechanical Ventilation Current Density Volume,Hourly;
 \item
   Output:Variable,*, Zone Mechanical Ventilation Air Changes per Hour,Hourly;
+\item
+  Output:Variable,*, Zone Target Voz Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation Below Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation At Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation Above Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Zone Ventilation When Unoccupied Time,Hourly;
+\item
+  Output:Variable,*, Facility Any Zone Ventilation Below Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Facility All Zones Ventilation At Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Facility Any Zone Ventilation Above Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Facility Any Zone Ventilation When Unoccupied Time,Hourly;
+\item
+  Output:Variable,*, Air System Mechanical Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Air System Natural Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Air System Target Voz Ventilation Flow Rate,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation Below Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation At Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation Above Target Voz Time,Hourly;
+\item
+  Output:Variable,*, Air System Ventilation When Unoccupied Time,Hourly;
 \end{itemize}
 
 \paragraph{Ventilation Load Reports}\label{ventilation-load-reports}

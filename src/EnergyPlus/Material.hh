@@ -281,7 +281,7 @@ namespace Material {
         }
     };
 
-}   // namespace Material
+} // namespace Material
 
 struct MaterialData : BaseGlobalStruct
 {
@@ -293,6 +293,6 @@ struct MaterialData : BaseGlobalStruct
     }
 };
 
-}   // namespace EnergyPlus
+} // namespace EnergyPlus
 
 #endif

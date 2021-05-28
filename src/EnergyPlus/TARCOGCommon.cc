@@ -50,6 +50,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGParams.hh>
@@ -69,29 +70,6 @@ namespace TARCOGCommon {
     // PURPOSE OF THIS MODULE:
     // A module which contains common TARCOG functions and subroutines
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
-    // Using/Aliasing
-    // Functions
-
-    bool IsShadingLayer(int const layertype)
-    {
-
-        // Using/Aliasing
-        using namespace TARCOGParams;
-
-        return layertype == VENETBLIND_HORIZ || layertype == VENETBLIND_VERT || layertype == WOVSHADE || layertype == PERFORATED || layertype == BSDF || layertype == DIFFSHADE;
-    }
-
     Real64 LDSumMax(Real64 const Width, Real64 const Height)
     {
         // LDSumMax function calculates sum part of equation for maximum deflection
@@ -100,7 +78,6 @@ namespace TARCOGCommon {
 
         // Using/Aliasing
         using namespace TARCOGParams;
-        // use TARCOGGassesParams
 
         // Return value
         Real64 LDSumMax;
@@ -110,13 +87,13 @@ namespace TARCOGCommon {
         int j;
 
         LDSumMax = 0.0;
-        for (i = 1; i <= mmax; i += 2) {
+        for (i = 1; i <= static_cast<int>(DeflectionParameters::mmax); i += 2) {
             Real64 const sin_i(std::sin(i * DataGlobalConstants::PiOvr2));
             Real64 const pow_i_W(pow_2(i / Width));
-            for (j = 1; j <= nmax; j += 2) {
+            for (j = 1; j <= static_cast<int>(DeflectionParameters::nmax); j += 2) {
                 LDSumMax += (sin_i * std::sin(j * DataGlobalConstants::PiOvr2)) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
-            } // do j = 1, nmax, 2
-        }     // do i = 1, mmax, 2
+            } // do j = 1, DeflectionParameters::nmax, 2
+        }     // do i = 1, DeflectionParameters::mmax, 2
 
         return LDSumMax;
     }
@@ -129,23 +106,22 @@ namespace TARCOGCommon {
 
         // Using/Aliasing
         using namespace TARCOGParams;
-        // use TARCOGGassesParams
 
         // Return value
         Real64 LDSumMean;
 
         // Locals
-        static Real64 const Pi_squared(DataGlobalConstants::Pi * DataGlobalConstants::Pi);
+        Real64 constexpr Pi_squared(DataGlobalConstants::Pi * DataGlobalConstants::Pi);
         int i;
         int j;
 
         LDSumMean = 0.0;
-        for (i = 1; i <= mmax; i += 2) {
+        for (i = 1; i <= static_cast<int>(DeflectionParameters::mmax); i += 2) {
             Real64 const pow_i_Pi_2(i * i * Pi_squared);
             Real64 const pow_i_W(pow_2(i / Width));
-            for (j = 1; j <= nmax; j += 2) {
+            for (j = 1; j <= static_cast<int>(DeflectionParameters::nmax); j += 2) {
                 LDSumMean += 4.0 / (pow_i_Pi_2 * pow_2(j) * pow_2(pow_i_W + pow_2(j / Height)));
-            } // do j = 1, nmax, 2
+            } // do j = 1, DeflectionParameters::nmax, 2
         }     // do i = 1, mmax, 2
 
         return LDSumMean;
@@ -291,7 +267,7 @@ namespace TARCOGCommon {
         }
     }
 
-    void EquationsSolver(Array2<Real64> &a, Array1D<Real64> &b, int const n, int &nperr, std::string &ErrorMessage)
+    void EquationsSolver(EnergyPlusData &state, Array2<Real64> &a, Array1D<Real64> &b, int const n, int &nperr, std::string &ErrorMessage)
     {
         //***********************************************************************
         // Purpose: solves the main system of energy balance equations
@@ -311,7 +287,7 @@ namespace TARCOGCommon {
         Array1D_int indx(n);
         Real64 d;
 
-        ludcmp(a, n, indx, d, nperr, ErrorMessage);
+        ludcmp(state, a, n, indx, d, nperr, ErrorMessage);
 
         // Exit on error
         if ((nperr > 0) && (nperr <= 1000)) return;
@@ -319,14 +295,11 @@ namespace TARCOGCommon {
         lubksb(a, n, indx, b);
     }
 
-    void ludcmp(Array2<Real64> &a, int const n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage)
+    void ludcmp(EnergyPlusData &state, Array2<Real64> &a, int const n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage)
     {
 
         // Locals
-        static int const NMAX(500);
-        static Array1D<Real64> vv(NMAX);
-
-        Real64 const TINY(1.0e-20);
+        Real64 constexpr TINY(1.0e-20);
 
         int i;
         int imax;
@@ -347,7 +320,7 @@ namespace TARCOGCommon {
                 ErrorMessage = "Singular matrix in ludcmp.";
                 return;
             }
-            vv(i) = 1.0 / aamax;
+            state.dataTARCOGCommon->vv(i) = 1.0 / aamax;
         } // i
 
         for (j = 1; j <= n; ++j) {
@@ -365,7 +338,7 @@ namespace TARCOGCommon {
                     sum -= a(k, i) * a(j, k);
                 } // k
                 a(j, i) = sum;
-                dum = vv(i) * std::abs(sum);
+                dum = state.dataTARCOGCommon->vv(i) * std::abs(sum);
                 if (dum >= aamax) {
                     imax = i;
                     aamax = dum;
@@ -378,7 +351,7 @@ namespace TARCOGCommon {
                     a(k, j) = dum;
                 } // k
                 d = -d;
-                vv(imax) = vv(j);
+                state.dataTARCOGCommon->vv(imax) = state.dataTARCOGCommon->vv(j);
             }
             indx(j) = imax;
             if (a(j, j) == 0.0) a(j, j) = TINY;
@@ -393,9 +366,6 @@ namespace TARCOGCommon {
 
     void lubksb(Array2A<Real64> const a, int const n, const Array1D_int &indx, Array1D<Real64> &b)
     {
-        //***********************************************************************
-        //***********************************************************************
-
         // Argument array dimensioning
         a.dim(n, n);
         EP_SIZE_CHECK(indx, n);
@@ -434,15 +404,7 @@ namespace TARCOGCommon {
 
     Real64 pos(Real64 const x)
     {
-        //***********************************************************************
-        //***********************************************************************
-
-        // Return value
-        Real64 pos;
-
-        pos = (x + std::abs(x)) / 2.0;
-
-        return pos;
+        return (x + std::abs(x)) / 2.0;
     }
 
 } // namespace TARCOGCommon

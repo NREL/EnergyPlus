@@ -76,25 +76,29 @@ namespace DataDaylighting {
         Overcast
     };
 
-    enum class iExtWinType {
-        NotInOrAdjZoneExtWin,   // Exterior window is not in a Daylighting:Detailed zone or in an adjacent zone with a shared interior window
-        InZoneExtWin,           // Exterior window is in a Daylighting:Detailed zone
-        AdjZoneExtWin           // Exterior window is in a zone adjacent to a Daylighting:Detailed zone with which it shares an interior window
+    enum class iExtWinType
+    {
+        NotInOrAdjZoneExtWin, // Exterior window is not in a Daylighting:Detailed zone or in an adjacent zone with a shared interior window
+        InZoneExtWin,         // Exterior window is in a Daylighting:Detailed zone
+        AdjZoneExtWin         // Exterior window is in a zone adjacent to a Daylighting:Detailed zone with which it shares an interior window
     };
 
-    enum class iCalledFor {
+    enum class iCalledFor
+    {
         RefPoint,
         MapPoint
     };
 
-    enum class iDaylightingMethod {
+    enum class iDaylightingMethod
+    {
         NoDaylighting,
         SplitFluxDaylighting,
         DElightDaylighting
     };
 
     // Parameters for "Lighting Control Type"
-    enum class iLtgCtrlType {
+    enum class iLtgCtrlType
+    {
         Continuous = 1,
         Stepped = 2,
         ContinuousOff = 3
@@ -116,19 +120,19 @@ namespace DataDaylighting {
     struct ZoneDaylightCalc
     {
         // Members
-        std::string Name;                  // Name of the daylighting:controls object
-        std::string ZoneName;              // name of the zone where the daylighting:controls object is located
-        DataDaylighting::iDaylightingMethod DaylightMethod;                // Type of Daylighting (1=SplitFlux, 2=DElight)
-        int AvailSchedNum;                 // pointer to availability schedule if present
-        int TotalDaylRefPoints;            // Number of daylighting reference points in a zone (0,1 or 2)
-        Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
-        Array2D<Real64> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
+        std::string Name;                                   // Name of the daylighting:controls object
+        std::string ZoneName;                               // name of the zone where the daylighting:controls object is located
+        DataDaylighting::iDaylightingMethod DaylightMethod; // Type of Daylighting (1=SplitFlux, 2=DElight)
+        int AvailSchedNum;                                  // pointer to availability schedule if present
+        int TotalDaylRefPoints;                             // Number of daylighting reference points in a zone (0,1 or 2)
+        Array1D_int DaylRefPtNum;                           // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
+        Array2D<Real64> DaylRefPtAbsCoord;                  // =0.0 ! X,Y,Z coordinates of all daylighting reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
         Array1D_bool DaylRefPtInBounds; // True when coordinates are in bounds of zone coordinates
         Array1D<Real64> FracZoneDaylit; // =0.0  ! Fraction of zone controlled by each reference point
         Array1D<Real64> IllumSetPoint;  // =0.0  ! Illuminance setpoint at each reference point (lux)
-        iLtgCtrlType LightControlType;           // Lighting control type (same for all reference points)
+        iLtgCtrlType LightControlType;  // Lighting control type (same for all reference points)
         // (1=continuous, 2=stepped, 3=continuous/off)
         int glareRefPtNumber;                      // from field: Glare Calculation Daylighting Reference Point Name
         Real64 ViewAzimuthForGlare;                // View direction relative to window for glare calculation (deg)
@@ -158,11 +162,11 @@ namespace DataDaylighting {
         std::vector<std::vector<int>> ShadeDeployOrderExtWins; // describes how the fenestration surfaces should deploy the shades.
         // It is a list of lists. Each sublist is a group of fenestration surfaces that should be deployed together. Many times the
         // sublists a just a single index to a fenestration surface if they are deployed one at a time.
-        Array1D_int MapShdOrdToLoopNum;  // list that maps back the original loop order when using ShadeDeployOrderExtWins for shade deployment
-        Real64 MinIntWinSolidAng;     // Minimum solid angle subtended by an interior window in a zone
-        Real64 TotInsSurfArea;        // Total inside surface area of a daylit zone (m2)
-        Real64 FloorVisRefl;          // Area-weighted visible reflectance of floor of a daylit zone
-        Real64 InterReflIllFrIntWins; // Inter-reflected illuminance due to beam and diffuse solar passing
+        Array1D_int MapShdOrdToLoopNum; // list that maps back the original loop order when using ShadeDeployOrderExtWins for shade deployment
+        Real64 MinIntWinSolidAng;       // Minimum solid angle subtended by an interior window in a zone
+        Real64 TotInsSurfArea;          // Total inside surface area of a daylit zone (m2)
+        Real64 FloorVisRefl;            // Area-weighted visible reflectance of floor of a daylit zone
+        Real64 InterReflIllFrIntWins;   // Inter-reflected illuminance due to beam and diffuse solar passing
         //  through a zone's interior windows (lux)
         Array1D<Real64> BacLum;                  // =0.0 ! Background luminance at each reference point (cd/m2)
         Array2D<Real64> SolidAngAtRefPt;         // (MaxRefPoints,50)
@@ -207,8 +211,8 @@ namespace DataDaylighting {
             : DaylightMethod(iDaylightingMethod::NoDaylighting), AvailSchedNum(0), TotalDaylRefPoints(0), LightControlType(iLtgCtrlType::Continuous),
               glareRefPtNumber(0), ViewAzimuthForGlare(0.0), MaxGlareallowed(0), MinPowerFraction(0.0), MinLightFraction(0.0), LightControlSteps(0),
               LightControlProbability(0.0), TotalExtWindows(0), AveVisDiffReflect(0.0), DElightGriddingResolution(0.0), ZonePowerReductionFactor(1.0),
-              NumOfIntWinAdjZones(0), NumOfIntWinAdjZoneExtWins(0), NumOfDayltgExtWins(0), MinIntWinSolidAng(0.0), TotInsSurfArea(0.0), FloorVisRefl(0.0),
-              InterReflIllFrIntWins(0.0), AdjZoneHasDayltgCtrl(false), MapCount(0)
+              NumOfIntWinAdjZones(0), NumOfIntWinAdjZoneExtWins(0), NumOfDayltgExtWins(0), MinIntWinSolidAng(0.0), TotInsSurfArea(0.0),
+              FloorVisRefl(0.0), InterReflIllFrIntWins(0.0), AdjZoneHasDayltgCtrl(false), MapCount(0)
         {
         }
     };
@@ -233,8 +237,8 @@ namespace DataDaylighting {
 
         // Default Constructor
         IllumMapData()
-            : Zone(0), Z(0.0), Xmin(0.0), Xmax(0.0), Xnum(0), Xinc(0.0), Ymin(0.0), Ymax(0.0), Ynum(0), Yinc(0.0),
-              HeaderXLineLengthNeeded(true), HeaderXLineLength(0)
+            : Zone(0), Z(0.0), Xmin(0.0), Xmax(0.0), Xnum(0), Xinc(0.0), Ymin(0.0), Ymax(0.0), Ynum(0), Yinc(0.0), HeaderXLineLengthNeeded(true),
+              HeaderXLineLength(0)
         {
         }
     };
@@ -313,13 +317,14 @@ namespace DataDaylighting {
 
 } // namespace DataDaylighting
 
-struct DaylightingData : BaseGlobalStruct {
+struct DaylightingData : BaseGlobalStruct
+{
 
     int TotRefPoints = 0;
     int TotIllumMaps = 0;
-    bool mapResultsToReport = false;            // used when only partial hour has "sun up"
-    bool mapResultsReported = false;            // when no map results are ever reported this will still be false
-    char MapColSep;                             // Character for separating map columns (tab, space, comma)
+    bool mapResultsToReport = false; // used when only partial hour has "sun up"
+    bool mapResultsReported = false; // when no map results are ever reported this will still be false
+    char MapColSep;                  // Character for separating map columns (tab, space, comma)
     bool DFSReportSizingDays = false;
     bool DFSReportAllShadowCalculationDays = false;
     int TotDElightCFS = 0;

@@ -90,7 +90,7 @@ bool SurfaceOctreeCube::contains(Surface const &surface) const
 }
 
 // Surfaces Outer Cube Initilization
-void SurfaceOctreeCube::init(Array1D<Surface> &surfaces)
+void SurfaceOctreeCube::init(EPVector<Surface> &surfaces)
 {
     assert(d_ == 0u);
     assert(n_ == 0u);
@@ -237,8 +237,5 @@ bool SurfaceOctreeCube::contains(Vertex const &l, Vertex const &u, Surface const
 // Static Data Member Definitions
 std::uint8_t const SurfaceOctreeCube::maxDepth_ = 255u;                   // Max tree depth
 SurfaceOctreeCube::size_type const SurfaceOctreeCube::maxSurfaces_ = 10u; // Max surfaces in a cube before subdividing
-
-// Globals
-SurfaceOctreeCube surfaceOctree;
 
 } // namespace EnergyPlus

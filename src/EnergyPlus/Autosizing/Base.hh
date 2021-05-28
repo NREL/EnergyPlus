@@ -241,20 +241,20 @@ struct BaseSizer
 
     bool printWarningFlag = false;
     std::string callingRoutine;
-    Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
-    Array1D<DataSizing::ZoneSizingInputData> zoneSizingInput;
-    Array1D<DataSizing::ZoneEqSizingData> unitarySysEqSizing;
-    Array1D<DataSizing::ZoneEqSizingData> oaSysEqSizing;
-    Array1D<DataSizing::ZoneEqSizingData> zoneEqSizing;
-    Array1D<DataAirLoop::OutsideAirSysProps> outsideAirSys;
-    Array1D<DataSizing::TermUnitSizingData> termUnitSizing;
-    Array1D<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
-    Array1D<DataSizing::ZoneSizingData> finalZoneSizing;
-    Array1D<DataSizing::SystemSizingData> finalSysSizing;
-    Array1D<DataSizing::PlantSizingData> plantSizData;
-    Array1D<DataAirSystems::DefinePrimaryAirSystem> primaryAirSystem;
+    EPVector<DataSizing::SystemSizingInputData> sysSizingInputData;
+    EPVector<DataSizing::ZoneSizingInputData> zoneSizingInput;
+    EPVector<DataSizing::ZoneEqSizingData> unitarySysEqSizing;
+    EPVector<DataSizing::ZoneEqSizingData> oaSysEqSizing;
+    EPVector<DataSizing::ZoneEqSizingData> zoneEqSizing;
+    EPVector<DataAirLoop::OutsideAirSysProps> outsideAirSys;
+    EPVector<DataSizing::TermUnitSizingData> termUnitSizing;
+    EPVector<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
+    EPVector<DataSizing::ZoneSizingData> finalZoneSizing;
+    EPVector<DataSizing::SystemSizingData> finalSysSizing;
+    EPVector<DataSizing::PlantSizingData> plantSizData;
+    EPVector<DataAirSystems::DefinePrimaryAirSystem> primaryAirSystem;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
-    Array1D<DataAirLoop::AirLoopControlData> airLoopControlInfo;
+    EPVector<DataAirLoop::AirLoopControlData> airLoopControlInfo;
 
     // public methods
 
@@ -313,18 +313,6 @@ public:
     Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
                                                  DataSizing::ZoneEqSizingData const &zoneEqSizing,
                                                  DataSizing::ZoneSizingData const &finalZoneSizing);
-};
-
-void autosizing_clear_state();
-
-extern bool oneTimeCompRptHeaderFlag;
-
-struct AutoSizingBaseData : BaseGlobalStruct {
-
-    void clear_state() override
-    {
-
-    }
 };
 
 } // namespace EnergyPlus

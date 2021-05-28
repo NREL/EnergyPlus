@@ -76,6 +76,9 @@ derivative works thereof, in binary and source code form.
 ********************************************************************
 */
 
+#ifndef utilXml_h_INCLUDED
+#define utilXml_h_INCLUDED
+
 ///////////////////////////////////////////////////////////
 /// \file    utilXml.h
 /// \brief   Methods for getting xml values
@@ -124,8 +127,6 @@ derivative works thereof, in binary and source code form.
 
 #define BUFFSIZE        8192
 
-char Buff[BUFFSIZE]; ///< Local buffer for reading in the xml file
-
 ////////////////////////////////////////////////////////////////
 ///\struct A simple stack structure to keep track of the parent elements
 ////////////////////////////////////////////////////////////////
@@ -136,27 +137,27 @@ typedef struct Stack2 {
 } Stack2;
 
 
-Stack2 expStk; ///< Variables for getxmlvalue function
+extern Stack2 expStk; ///< Variables for getxmlvalue function
 
-char * att; ///< Local global variable for function \c getxmlvalue
-char * vals;  ///< Local global variable for function \c getxmlvalue
-size_t * numVals; ///< Local global variable for function \c getxmlvalue
-int PARSEVALUE; ///< flag for parsing xml values 1 if parse, 0 if not parse
-int ERROR_STATUS; ///< flag for xml element handler error status settings
+extern char * att; ///< Local global variable for function \c getxmlvalue
+extern char * vals;  ///< Local global variable for function \c getxmlvalue
+extern size_t * numVals; ///< Local global variable for function \c getxmlvalue
+extern int PARSEVALUE; ///< flag for parsing xml values 1 if parse, 0 if not parse
+extern int ERROR_STATUS; ///< flag for xml element handler error status settings
 
 ////////////////////////////////////////////////////////////////
 /// local global variables for function \c getepvariables
 ////////////////////////////////////////////////////////////////
-char *  outputVarsName; ///< the string pointer to the parsed output variable names
-char *  outputVarsType; ///< the string pointer to the parsed output variable types
-int *   numOutputVars;  ///< the integer pointer to the number of output variables
-char *  inputVars;      ///< the string pointer to the input variables
-int *   numInputVars;   ///< the integer pointer to the number of input variables
-int *   inputVarsType;  ///< the integer array to store the types of each input variables
-char ** inputKeys;      ///< the string array to store the types of input variable types
-int     numInputKeys;   ///< the number of input variable types
-int     source;         ///< flag for function /c getepvariables 0=EnergyPlus, 1=Ptolemy
-size_t const * strLen;     ///< the length of string parsed to this function
+extern char *  outputVarsName; ///< the string pointer to the parsed output variable names
+extern char *  outputVarsType; ///< the string pointer to the parsed output variable types
+extern int *   numOutputVars;  ///< the integer pointer to the number of output variables
+extern char *  inputVars;      ///< the string pointer to the input variables
+extern int *   numInputVars;   ///< the integer pointer to the number of input variables
+extern int *   inputVarsType;  ///< the integer array to store the types of each input variables
+extern char ** inputKeys;      ///< the string array to store the types of input variable types
+extern int     numInputKeys;   ///< the number of input variable types
+extern int     source;         ///< flag for function /c getepvariables 0=EnergyPlus, 1=Ptolemy
+extern size_t const * strLen;     ///< the length of string parsed to this function
 
 
 ////////////////////////////////////////////////////////////////
@@ -369,3 +370,5 @@ getxmlvalue(
 ////////////////////////////////////////////////////////////////
 int
 check_variable_cfg_Validate(char const * const fileName);
+
+#endif // utilXml_h_INCLUDED

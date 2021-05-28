@@ -63,28 +63,14 @@ struct EnergyPlusData;
 
 namespace EarthTube {
 
-    // Using/Aliasing
-
-    // Data
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLES DECLARATIONS:
-    extern int TotEarthTube; // Total EarthTube Statements in input
     // Parameters for Ventilation
-    extern int const NaturalEarthTube;
-    extern int const IntakeEarthTube;
-    extern int const ExhaustEarthTube;
-
-    //         Subroutine Specifications for the Heat Balance Module
-    // Driver Routines
-
-    // Get Input routines for module
-
-    // Algorithms for the module
-
-    // Reporting routines for module
-
-    // Types
+    enum class EarthTubeVentilation
+    {
+        Unassigned,
+        Natural,
+        Intake,
+        Exhaust
+    };
 
     struct EarthTubeData
     {
@@ -96,7 +82,7 @@ namespace EarthTube {
         Real64 MinTemperature;
         Real64 MaxTemperature;
         Real64 DelTemperature;
-        int FanType;
+        EarthTubeVentilation FanType;
         Real64 FanPressure;
         Real64 FanEfficiency;
         Real64 FanPower;
@@ -123,9 +109,10 @@ namespace EarthTube {
 
         // Default Constructor
         EarthTubeData()
-            : ZonePtr(0), SchedPtr(0), DesignLevel(0.0), MinTemperature(0.0), MaxTemperature(0.0), DelTemperature(0.0), FanType(0), FanPressure(0.0),
-              FanEfficiency(0.0), FanPower(0.0), GroundTempz1z2t(0.0), InsideAirTemp(0.0), AirTemp(0.0), HumRat(0.0), WetBulbTemp(0.0), r1(0.0),
-              r2(0.0), r3(0.0), PipeLength(0.0), PipeThermCond(0.0), z(0.0), SoilThermDiff(0.0), SoilThermCond(0.0), ConstantTermCoef(0.0),
+            : ZonePtr(0), SchedPtr(0), DesignLevel(0.0), MinTemperature(0.0), MaxTemperature(0.0), DelTemperature(0.0),
+              FanType(EarthTubeVentilation::Unassigned), FanPressure(0.0), FanEfficiency(0.0), FanPower(0.0), GroundTempz1z2t(0.0),
+              InsideAirTemp(0.0), AirTemp(0.0), HumRat(0.0), WetBulbTemp(0.0), r1(0.0), r2(0.0), r3(0.0), PipeLength(0.0), PipeThermCond(0.0), z(0.0),
+              SoilThermDiff(0.0), SoilThermCond(0.0), AverSoilSurTemp(0.0), ApmlSoilSurTemp(0.0), SoilSurPhaseConst(0), ConstantTermCoef(0.0),
               TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0)
         {
         }
@@ -161,49 +148,41 @@ namespace EarthTube {
         }
     };
 
-    // Object Data
-    extern Array1D<EarthTubeData> EarthTubeSys;
-    extern Array1D<EarthTubeZoneReportVars> ZnRptET;
-
     // Functions
-    void clear_state();
-
     void ManageEarthTube(EnergyPlusData &state);
 
     void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void CheckEarthTubesInZones(EnergyPlusData &state,
-                                std::string const ZoneName,  // name of zone for error reporting
-                                std::string const FieldName, // name of earth tube in input
-                                bool &ErrorsFound            // Found a problem
-    );
-
-    void CheckEarthTubesInZones(EnergyPlusData &state,
-                                std::string const ZoneName,  // name of zone for error reporting
-                                std::string const FieldName, // name of earth tube in input
-                                bool &ErrorsFound            // Found a problem
+                                std::string const &ZoneName,  // name of zone for error reporting
+                                std::string const &FieldName, // name of earth tube in input
+                                bool &ErrorsFound             // Found a problem
     );
 
     void CalcEarthTube(EnergyPlusData &state);
 
     void CalcEarthTubeHumRat(EnergyPlusData &state,
-                             int const Loop, // EarthTube number (index)
-                             int const NZ    // Zone number (index)
+                             int Loop, // EarthTube number (index)
+                             int NZ    // Zone number (index)
     );
 
     void ReportEarthTube(EnergyPlusData &state);
 
-    //        End of Module Subroutines for EarthTube
-
-    //*****************************************************************************************
-
 } // namespace EarthTube
 
-struct EarthTubeData : BaseGlobalStruct {
+struct EarthTubeData : BaseGlobalStruct
+{
+    int TotEarthTube = 0; // Total EarthTube Statements in input
+    bool GetInputFlag = true;
+    EPVector<EarthTube::EarthTubeData> EarthTubeSys;
+    EPVector<EarthTube::EarthTubeZoneReportVars> ZnRptET;
 
     void clear_state() override
     {
-
+        TotEarthTube = 0;
+        GetInputFlag = true;
+        EarthTubeSys.deallocate();
+        ZnRptET.deallocate();
     }
 };
 

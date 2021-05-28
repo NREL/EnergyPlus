@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -62,9 +63,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace IntegratedHeatPump {
-
-    // Identifier is VarSpeedCoil
-    extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
 
     // operation mode
     enum class IHPOperationMode : int
@@ -237,13 +235,8 @@ namespace IntegratedHeatPump {
         }
     };
 
-    // Object Data
-    extern Array1D<IntegratedHeatPumpData> IntegratedHeatPumps;
-
-    // Functions
-    void clear_state();
-
-    void SimIHP(EnergyPlusData &state, std::string const &CompName,   // Coil Name
+    void SimIHP(EnergyPlusData &state,
+                std::string const &CompName,   // Coil Name
                 int &CompIndex,                // Index for Component name
                 int const CyclingScheme,       // Continuous fan OR cycling compressor
                 Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -268,7 +261,8 @@ namespace IntegratedHeatPump {
 
     void UpdateIHP(EnergyPlusData &state, int const DXCoilNum);
 
-    void DecideWorkMode(EnergyPlusData &state, int const DXCoilNum,
+    void DecideWorkMode(EnergyPlusData &state,
+                        int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]
                         Real64 const LatentLoad // Latent demand load [W]
     );
@@ -279,19 +273,22 @@ namespace IntegratedHeatPump {
 
     int GetMaxSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum);
 
-    Real64 GetAirVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum,
+    Real64 GetAirVolFlowRateIHP(EnergyPlusData &state,
+                                int const DXCoilNum,
                                 int const SpeedNum,
                                 Real64 const SpeedRatio,
                                 bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     );
 
-    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum,
+    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state,
+                                  int const DXCoilNum,
                                   int const SpeedNum,
                                   Real64 const SpeedRatio,
                                   bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     );
 
-    Real64 GetAirMassFlowRateIHP(EnergyPlusData &state, int const DXCoilNum,
+    Real64 GetAirMassFlowRateIHP(EnergyPlusData &state,
+                                 int const DXCoilNum,
                                  int const SpeedNum,
                                  Real64 const SpeedRatio,
                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
@@ -323,7 +320,8 @@ namespace IntegratedHeatPump {
                                 bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state,
+                                 std::string const &CoilType, // must match coil types in this module
                                  std::string const &CoilName, // must match coil names for the coil type
                                  IHPOperationMode const Mode, // mode coil type
                                  bool &ErrorsFound            // set to true if problem
@@ -341,11 +339,16 @@ namespace IntegratedHeatPump {
 
 } // namespace IntegratedHeatPump
 
-struct IntegratedHeatPumpGlobalData : BaseGlobalStruct {
+struct IntegratedHeatPumpGlobalData : BaseGlobalStruct
+{
+
+    bool GetCoilsInputFlag = true;
+    EPVector<IntegratedHeatPump::IntegratedHeatPumpData> IntegratedHeatPumps;
 
     void clear_state() override
     {
-
+        this->GetCoilsInputFlag = true;
+        this->IntegratedHeatPumps.deallocate();
     }
 };
 

@@ -88,16 +88,16 @@ namespace HVACFan {
         FanSystem(FanSystem const &) = default;
 
         void simulate(EnergyPlusData &state,
-            //		bool const firstHVACIteration,
-            Optional<Real64 const> flowFraction = _,     // Flow fraction in operating mode 1
-            Optional_bool_const zoneCompTurnFansOn = _,  // Turn fans ON signal from ZoneHVAC component
-            Optional_bool_const zoneCompTurnFansOff = _, // Turn Fans OFF signal from ZoneHVAC component
-            Optional<Real64 const> pressureRise = _,     // Pressure difference to use for DeltaPress
-            Optional<Real64 const> massFlowRate1 = _,    // Mass flow rate in operating mode 1 [kg/s]
-            Optional<Real64 const> runTimeFraction1 = _, // Run time fraction in operating mode 1
-            Optional<Real64 const> massFlowRate2 = _,    // Mass flow rate in operating mode 2 [kg/s]
-            Optional<Real64 const> runTimeFraction2 = _, // Run time fraction in operating mode 2
-            Optional<Real64 const> pressureRise2 = _     // Pressure difference to use for operating mode 2
+                      //        bool const firstHVACIteration,
+                      Optional<Real64 const> flowFraction = _,     // Flow fraction in operating mode 1
+                      Optional_bool_const zoneCompTurnFansOn = _,  // Turn fans ON signal from ZoneHVAC component
+                      Optional_bool_const zoneCompTurnFansOff = _, // Turn Fans OFF signal from ZoneHVAC component
+                      Optional<Real64 const> pressureRise = _,     // Pressure difference to use for DeltaPress
+                      Optional<Real64 const> massFlowRate1 = _,    // Mass flow rate in operating mode 1 [kg/s]
+                      Optional<Real64 const> runTimeFraction1 = _, // Run time fraction in operating mode 1
+                      Optional<Real64 const> massFlowRate2 = _,    // Mass flow rate in operating mode 2 [kg/s]
+                      Optional<Real64 const> runTimeFraction2 = _, // Run time fraction in operating mode 2
+                      Optional<Real64 const> pressureRise2 = _     // Pressure difference to use for operating mode 2
         );
 
         Real64 fanPower() const;
@@ -110,8 +110,7 @@ namespace HVACFan {
 
         Real64 getFanDesignHeatGain(EnergyPlusData &state, Real64 const FanVolFlow);
 
-        void
-        FanInputsForDesignHeatGain(EnergyPlusData &state, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac);
+        void FanInputsForDesignHeatGain(EnergyPlusData &state, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac);
 
         // void
         // fanIsSecondaryDriver();
@@ -146,7 +145,8 @@ namespace HVACFan {
         bool fanIsSecondaryDriver; // true if this fan is used to augment flow and may pass air when off.
 
         // FEI
-        static Real64 report_fei(EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
+        static Real64 report_fei(
+            EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
 
     private: // methods
         void init(EnergyPlusData &state);
@@ -165,7 +165,7 @@ namespace HVACFan {
 
         void update(EnergyPlusData &state) const;
 
-        void report();
+        void report(EnergyPlusData &state);
 
         // data
 
@@ -211,11 +211,11 @@ namespace HVACFan {
         std::vector<Real64> m_totEfficAtSpeed;
         Real64 m_inletAirMassFlowRate; // MassFlow through the Fan being Simulated [kg/Sec]
         Real64 m_outletAirMassFlowRate;
-        //	Real64 m_minAirFlowRate; // Min Specified Volume Flow Rate of Fan [m3/sec]
+        //    Real64 m_minAirFlowRate; // Min Specified Volume Flow Rate of Fan [m3/sec]
         Real64 m_maxAirMassFlowRate; // Max flow rate of fan in kg/sec
-                                     //	Real64 m_minAirMassFlowRate; // Min flow rate of fan in kg/sec
-                                     //	int fanMinAirFracMethod; // parameter for what method is used for min flow fraction
-                                     //	Real64 fanFixedMin; // Absolute minimum fan air flow [m3/s]
+                                     //    Real64 m_minAirMassFlowRate; // Min flow rate of fan in kg/sec
+                                     //    int fanMinAirFracMethod; // parameter for what method is used for min flow fraction
+                                     //    Real64 fanFixedMin; // Absolute minimum fan air flow [m3/s]
         Real64 m_inletAirTemp;
         Real64 m_outletAirTemp;
         Real64 m_inletAirHumRat;
@@ -230,7 +230,7 @@ namespace HVACFan {
         // report variables
         Real64 m_fanPower;       // Power of the Fan being Simulated [W]
         Real64 m_fanEnergy;      // Fan energy in [J]
-                                 //	Real64 fanRuntimeFraction; // Fraction of the timestep that the fan operates
+                                 //    Real64 fanRuntimeFraction; // Fraction of the timestep that the fan operates
         Real64 m_deltaTemp;      // Temp Rise across the Fan [C]
         Real64 m_powerLossToAir; // fan heat gain into process air [W]
         std::vector<Real64> m_fanRunTimeFractionAtSpeed;
@@ -250,22 +250,21 @@ namespace HVACFan {
         Real64 m_massFlowRateMaxAvail;
         Real64 m_massFlowRateMinAvail;
         Real64 m_rhoAirStdInit;
-        //	bool oneTimePowerCurveCheck_; // one time flag used for error message
+        //    bool oneTimePowerCurveCheck_; // one time flag used for error message
         Real64 m_designPointFEI; // Fan Energy Index for the fan at the design operating point
 
     }; // class FanSystem
 
-    extern std::vector<std::unique_ptr<FanSystem>> fanObjs;
-
-    void clearHVACFanObjects();
-
 } // namespace HVACFan
 
-struct HVACFanData : BaseGlobalStruct {
+struct HVACFanData : BaseGlobalStruct
+{
+
+    std::vector<std::unique_ptr<HVACFan::FanSystem>> fanObjs;
 
     void clear_state() override
     {
-
+        fanObjs.clear();
     }
 };
 

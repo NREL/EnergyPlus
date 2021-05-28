@@ -70,14 +70,12 @@ enum class OutputTypes
     BSON
 };
 
-template <typename T>
-void displayMessage(T t)
+template <typename T> void displayMessage(T t)
 {
     std::cout << t << '\n';
 }
 
-template<typename T, typename... Args>
-void displayMessage(T t, Args... args) // recursive variadic function
+template <typename T, typename... Args> void displayMessage(T t, Args... args) // recursive variadic function
 {
     std::cout << t;
     displayMessage(args...);
@@ -225,12 +223,18 @@ bool processInput(std::string const &inputFilePath,
         return false;
     }
 
+#ifdef _WIN32
+    std::string const NL("\r\n"); // Platform newline
+#else
+    std::string const NL("\n"); // Platform newline
+#endif
+
     try {
         if (!isEpJSON) {
             std::string input_file;
             std::string line;
             while (std::getline(input_stream, line)) {
-                input_file.append(line + EnergyPlus::DataStringGlobals::NL);
+                input_file.append(line + NL);
             }
             if (input_file.empty()) {
                 displayMessage("Failed to read input file: " + inputFilePath);
@@ -517,8 +521,7 @@ int main(int argc, const char *argv[])
 #endif
 
 #ifdef _OPENMP
-#pragma omp parallel default(none)                                                                                                                   \
-    shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory)
+#pragma omp parallel default(none) shared(files, number_files, fileCount, schema, outputType, outputTypeStr, output_directory)
     {
 #pragma omp for
         for (int i = 0; i < number_files; ++i) {

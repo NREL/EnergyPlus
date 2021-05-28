@@ -134,7 +134,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -3358,6 +3358,14 @@
   Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Rate,timestep;
 
   Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Energy,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Gain Rate,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Loss Rate,timestep;
+
+  Output:Variable,*,AFN Zone Ventilation Latent Heat Loss Energy,timestep;
 
   Output:Variable,*,AFN Zone Mixing Latent Heat Gain Rate,timestep;
 

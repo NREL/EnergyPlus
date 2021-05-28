@@ -48,13 +48,13 @@
 #ifndef IOFiles_hh_INCLUDED
 #define IOFiles_hh_INCLUDED
 
-#include <fstream>
+#include <cassert>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <fstream>
 #include <iostream>
 #include <ostream>
 #include <vector>
-#include <cassert>
 
 namespace EnergyPlus {
 
@@ -64,15 +64,18 @@ struct EnergyPlusData;
 class InputFile
 {
 public:
-    template<typename Type>
-    struct ReadResult {
-        ReadResult(Type data_, bool eof_, bool good_) : data{std::move(data_)}, eof{eof_}, good{good_} {}
+    template <typename Type> struct ReadResult
+    {
+        ReadResult(Type data_, bool eof_, bool good_) : data{std::move(data_)}, eof{eof_}, good{good_}
+        {
+        }
 
         // Update the current eof/good state from the incoming value
         // but only update the `data` member if the state is good
         // The idea is to keep consistency with the operator>> that was used
         // from gio
-        void update(ReadResult &&other) {
+        void update(ReadResult &&other)
+        {
             eof = other.eof;
             good = other.good;
             if (good) {
@@ -90,7 +93,7 @@ public:
 
     bool is_open() const noexcept;
 
-    void backspace () noexcept;
+    void backspace() noexcept;
 
     std::string error_state_to_string() const;
 
@@ -103,7 +106,8 @@ public:
     void open(bool = false, bool = true);
     std::fstream::pos_type position() const noexcept;
 
-    void rewind() noexcept {
+    void rewind() noexcept
+    {
         if (is) {
             is->clear(); // clear eofbit and potentially failbit
             is->seekg(0, std::ios::beg);
@@ -112,8 +116,8 @@ public:
 
     ReadResult<std::string> readLine() noexcept;
 
-    template<typename T>
-    ReadResult<T> read() noexcept {
+    template <typename T> ReadResult<T> read() noexcept
+    {
         if (is) {
             T result;
             *is >> result;
@@ -156,7 +160,7 @@ private:
     std::unique_ptr<std::iostream> os;
     bool print_to_dev_null = false;
     template <typename... Args> friend void print(InputOutputFile &of, fmt::string_view format_str, const Args &... args);
-    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char * delim);
+    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char *delim);
     template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile);
     friend class IOFiles;
 };
@@ -243,7 +247,6 @@ struct JsonOutputStreams
 class IOFiles
 {
 public:
-
     struct OutputControl
     {
         OutputControl() = default;
@@ -349,17 +352,18 @@ public:
     std::string outputErrFileName{"eplusout.err"};
     std::unique_ptr<std::ostream> err_stream;
 
-    static IOFiles &getSingleton();
-    static void setSingleton(IOFiles *newSingleton) noexcept;
-
-    static bool hasSingleton() { return getSingletonInternal() != nullptr; }
+    static bool hasSingleton()
+    {
+        return getSingletonInternal() != nullptr;
+    }
 
     JsonOutputStreams json; // Internal streams used for json outputs
+
+    void flushAll(); // For RunningEnergyPlusViaAPI only
 
 private:
     static IOFiles *&getSingletonInternal();
 };
-
 
 class SharedFileHandle
 {
@@ -432,7 +436,7 @@ template <typename... Args> void print(InputOutputFile &outputFile, fmt::string_
     EnergyPlus::vprint(*outputStream, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
-template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char * delim)
+template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char *delim)
 {
     auto *outputStream = [&]() -> std::ostream * {
         if (outputFile.os) {

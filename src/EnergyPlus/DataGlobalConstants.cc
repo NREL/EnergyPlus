@@ -52,392 +52,324 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::DataGlobalConstants {
 
-namespace DataGlobalConstants {
+ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
+{
 
-    std::map<EndUse, int> iEndUse = {{EndUse::Heating, 1},
-                                     {EndUse::Cooling, 2},
-                                     {EndUse::InteriorLights, 3},
-                                     {EndUse::ExteriorLights, 4},
-                                     {EndUse::InteriorEquipment, 5},
-                                     {EndUse::ExteriorEquipment, 6},
-                                     {EndUse::Fans, 7},
-                                     {EndUse::Pumps, 8},
-                                     {EndUse::HeatRejection, 9},
-                                     {EndUse::Humidification, 10},
-                                     {EndUse::HeatRecovery, 11},
-                                     {EndUse::WaterSystem, 12},
-                                     {EndUse::Refrigeration, 13},
-                                     {EndUse::Cogeneration, 14},
-                                    };
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   June 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-    std::vector<ResourceType> AllResourceTypes({ResourceType::None,
-                                                ResourceType::Electricity,
-                                                ResourceType::Natural_Gas,
-                                                ResourceType::Gasoline,
-                                                ResourceType::Diesel,
-                                                ResourceType::Coal,
-                                                ResourceType::FuelOil_1,
-                                                ResourceType::FuelOil_2,
-                                                ResourceType::Propane,
-                                                ResourceType::Water,
-                                                ResourceType::EnergyTransfer,
-                                                ResourceType::Steam,
-                                                ResourceType::DistrictCooling,
-                                                ResourceType::DistrictHeating,
-                                                ResourceType::ElectricityProduced,
-                                                ResourceType::ElectricityPurchased,
-                                                ResourceType::ElectricitySurplusSold,
-                                                ResourceType::ElectricityNet,
-                                                ResourceType::SolarWater,
-                                                ResourceType::SolarAir,
-                                                ResourceType::SO2,
-                                                ResourceType::NOx,
-                                                ResourceType::N2O,
-                                                ResourceType::PM,
-                                                ResourceType::PM2_5,
-                                                ResourceType::PM10,
-                                                ResourceType::CO,
-                                                ResourceType::CO2,
-                                                ResourceType::CH4,
-                                                ResourceType::NH3,
-                                                ResourceType::NMVOC,
-                                                ResourceType::Hg,
-                                                ResourceType::Pb,
-                                                ResourceType::NuclearHigh,
-                                                ResourceType::NuclearLow,
-                                                ResourceType::WaterEnvironmentalFactors,
-                                                ResourceType::CarbonEquivalent,
-                                                ResourceType::Source,
-                                                ResourceType::PlantLoopHeatingDemand,
-                                                ResourceType::PlantLoopCoolingDemand,
-                                                ResourceType::OnSiteWater,
-                                                ResourceType::MainsWater,
-                                                ResourceType::RainWater,
-                                                ResourceType::WellWater,
-                                                ResourceType::Condensate,
-                                                ResourceType::OtherFuel1,
-                                                ResourceType::OtherFuel2});
+    // PURPOSE OF THIS FUNCTION:
+    // Assists in assigning proper numeric resource types to data structures.
 
-    ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
     {
+        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(ResourceTypeChar));
 
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   June 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        if (SELECT_CASE_var == "ELECTRICITY") {
+            return ResourceType::Electricity;
 
-        // PURPOSE OF THIS FUNCTION:
-        // Assists in assigning proper numeric resource types to data structures.
+        } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS")) {
+            return ResourceType::Natural_Gas;
 
-        {
-            auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(ResourceTypeChar));
+        } else if (SELECT_CASE_var == "GASOLINE") {
+            return ResourceType::Gasoline;
 
-            if (SELECT_CASE_var == "ELECTRICITY") {
-                return ResourceType::Electricity;
+        } else if (SELECT_CASE_var == "DIESEL") {
+            return ResourceType::Diesel;
 
-            } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS")) {
-                return ResourceType::Natural_Gas;
+        } else if (SELECT_CASE_var == "COAL") {
+            return ResourceType::Coal;
 
-            } else if (SELECT_CASE_var == "GASOLINE") {
-                return ResourceType::Gasoline;
+        } else if (SELECT_CASE_var == "FUELOILNO1") {
+            return ResourceType::FuelOil_1;
 
-            } else if (SELECT_CASE_var == "DIESEL") {
-                return ResourceType::Diesel;
+        } else if (SELECT_CASE_var == "FUELOILNO2") {
+            return ResourceType::FuelOil_2;
 
-            } else if (SELECT_CASE_var == "COAL") {
-                return ResourceType::Coal;
+        } else if (SELECT_CASE_var == "PROPANE") {
+            return ResourceType::Propane;
 
-            } else if (SELECT_CASE_var == "FUELOILNO1") {
-                return ResourceType::FuelOil_1;
+        } else if (SELECT_CASE_var == "OTHERFUEL1") {
+            return ResourceType::OtherFuel1;
 
-            } else if (SELECT_CASE_var == "FUELOILNO2") {
-                return ResourceType::FuelOil_2;
+        } else if (SELECT_CASE_var == "OTHERFUEL2") {
+            return ResourceType::OtherFuel2;
 
-            } else if (SELECT_CASE_var == "PROPANE") {
-                return ResourceType::Propane;
+        } else if ((SELECT_CASE_var == "WATER") || (SELECT_CASE_var == "H2O")) {
+            return ResourceType::Water; // use record keeping
 
-            } else if (SELECT_CASE_var == "OTHERFUEL1") {
-                return ResourceType::OtherFuel1;
+        } else if ((SELECT_CASE_var == "ONSITEWATER") || (SELECT_CASE_var == "WATERPRODUCED") || (SELECT_CASE_var == "ONSITE WATER")) {
+            return ResourceType::OnSiteWater; // these are for supply record keeping
 
-            } else if (SELECT_CASE_var == "OTHERFUEL2") {
-                return ResourceType::OtherFuel2;
+        } else if ((SELECT_CASE_var == "MAINSWATER") || (SELECT_CASE_var == "WATERSUPPLY")) {
+            return ResourceType::MainsWater; // record keeping
 
-            } else if ((SELECT_CASE_var == "WATER") || (SELECT_CASE_var == "H2O")) {
-                return ResourceType::Water; // use record keeping
+        } else if ((SELECT_CASE_var == "RAINWATER") || (SELECT_CASE_var == "PRECIPITATION")) {
+            return ResourceType::RainWater; // record keeping
 
-            } else if ((SELECT_CASE_var == "ONSITEWATER") || (SELECT_CASE_var == "WATERPRODUCED") || (SELECT_CASE_var == "ONSITE WATER")) {
-                return ResourceType::OnSiteWater; // these are for supply record keeping
+        } else if ((SELECT_CASE_var == "WELLWATER") || (SELECT_CASE_var == "Groundwater")) {
+            return ResourceType::WellWater; // record keeping
 
-            } else if ((SELECT_CASE_var == "MAINSWATER") || (SELECT_CASE_var == "WATERSUPPLY")) {
-                return ResourceType::MainsWater; // record keeping
+        } else if (SELECT_CASE_var == "CONDENSATE") {
+            return ResourceType::Condensate;
 
-            } else if ((SELECT_CASE_var == "RAINWATER") || (SELECT_CASE_var == "PRECIPITATION")) {
-                return ResourceType::RainWater; // record keeping
+        } else if (SELECT_CASE_var == "ENERGYTRANSFER") {
+            return ResourceType::EnergyTransfer;
 
-            } else if ((SELECT_CASE_var == "WELLWATER") || (SELECT_CASE_var == "Groundwater")) {
-                return ResourceType::WellWater; // record keeping
+        } else if (SELECT_CASE_var == "STEAM") {
+            return ResourceType::Steam;
 
-            } else if (SELECT_CASE_var == "CONDENSATE") {
-                return ResourceType::Condensate;
+        } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
+            return ResourceType::DistrictCooling;
 
-            } else if (SELECT_CASE_var == "ENERGYTRANSFER") {
-                return ResourceType::EnergyTransfer;
+        } else if (SELECT_CASE_var == "DISTRICTHEATING") {
+            return ResourceType::DistrictHeating;
 
-            } else if (SELECT_CASE_var == "STEAM") {
-                return ResourceType::Steam;
+        } else if (SELECT_CASE_var == "ELECTRICITYPRODUCED") {
+            return ResourceType::ElectricityProduced;
 
-            } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
-                return ResourceType::DistrictCooling;
+        } else if (SELECT_CASE_var == "ELECTRICITYPURCHASED") {
+            return ResourceType::ElectricityPurchased;
 
-            } else if (SELECT_CASE_var == "DISTRICTHEATING") {
-                return ResourceType::DistrictHeating;
+        } else if (SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD") {
+            return ResourceType::ElectricitySurplusSold;
 
-            } else if (SELECT_CASE_var == "ELECTRICITYPRODUCED") {
-                return ResourceType::ElectricityProduced;
+        } else if (SELECT_CASE_var == "ELECTRICITYNET") {
+            return ResourceType::ElectricityNet;
 
-            } else if (SELECT_CASE_var == "ELECTRICITYPURCHASED") {
-                return ResourceType::ElectricityPurchased;
+        } else if (SELECT_CASE_var == "SOLARWATER") {
+            return ResourceType::SolarWater;
 
-            } else if (SELECT_CASE_var == "ELECTRICITYSURPLUSSOLD") {
-                return ResourceType::ElectricitySurplusSold;
+        } else if (SELECT_CASE_var == "SOLARAIR") {
+            return ResourceType::SolarAir;
 
-            } else if (SELECT_CASE_var == "ELECTRICITYNET") {
-                return ResourceType::ElectricityNet;
+        } else if (SELECT_CASE_var == "SO2") {
+            return ResourceType::SO2;
 
-            } else if (SELECT_CASE_var == "SOLARWATER") {
-                return ResourceType::SolarWater;
+        } else if (SELECT_CASE_var == "NOX") {
+            return ResourceType::NOx;
 
-            } else if (SELECT_CASE_var == "SOLARAIR") {
-                return ResourceType::SolarAir;
+        } else if (SELECT_CASE_var == "N2O") {
+            return ResourceType::N2O;
 
-            } else if (SELECT_CASE_var == "SO2") {
-                return ResourceType::SO2;
+        } else if (SELECT_CASE_var == "PM") {
+            return ResourceType::PM;
 
-            } else if (SELECT_CASE_var == "NOX") {
-                return ResourceType::NOx;
+        } else if (SELECT_CASE_var == "PM2.5") {
+            return ResourceType::PM2_5;
 
-            } else if (SELECT_CASE_var == "N2O") {
-                return ResourceType::N2O;
+        } else if (SELECT_CASE_var == "PM10") {
+            return ResourceType::PM10;
 
-            } else if (SELECT_CASE_var == "PM") {
-                return ResourceType::PM;
+        } else if (SELECT_CASE_var == "CO") {
+            return ResourceType::CO;
 
-            } else if (SELECT_CASE_var == "PM2.5") {
-                return ResourceType::PM2_5;
+        } else if (SELECT_CASE_var == "CO2") {
+            return ResourceType::CO2;
 
-            } else if (SELECT_CASE_var == "PM10") {
-                return ResourceType::PM10;
+        } else if (SELECT_CASE_var == "CH4") {
+            return ResourceType::CH4;
 
-            } else if (SELECT_CASE_var == "CO") {
-                return ResourceType::CO;
+        } else if (SELECT_CASE_var == "NH3") {
+            return ResourceType::NH3;
 
-            } else if (SELECT_CASE_var == "CO2") {
-                return ResourceType::CO2;
+        } else if (SELECT_CASE_var == "NMVOC") {
+            return ResourceType::NMVOC;
 
-            } else if (SELECT_CASE_var == "CH4") {
-                return ResourceType::CH4;
+        } else if (SELECT_CASE_var == "HG") {
+            return ResourceType::Hg;
 
-            } else if (SELECT_CASE_var == "NH3") {
-                return ResourceType::NH3;
+        } else if (SELECT_CASE_var == "PB") {
+            return ResourceType::Pb;
 
-            } else if (SELECT_CASE_var == "NMVOC") {
-                return ResourceType::NMVOC;
+        } else if (SELECT_CASE_var == "NUCLEAR HIGH") {
+            return ResourceType::NuclearHigh;
 
-            } else if (SELECT_CASE_var == "HG") {
-                return ResourceType::Hg;
+        } else if (SELECT_CASE_var == "NUCLEAR LOW") {
+            return ResourceType::NuclearLow;
 
-            } else if (SELECT_CASE_var == "PB") {
-                return ResourceType::Pb;
+        } else if (SELECT_CASE_var == "WATERENVIRONMENTALFACTORS") {
+            return ResourceType::WaterEnvironmentalFactors;
 
-            } else if (SELECT_CASE_var == "NUCLEAR HIGH") {
-                return ResourceType::NuclearHigh;
+        } else if (SELECT_CASE_var == "CARBON EQUIVALENT") {
+            return ResourceType::CarbonEquivalent;
 
-            } else if (SELECT_CASE_var == "NUCLEAR LOW") {
-                return ResourceType::NuclearLow;
+        } else if (SELECT_CASE_var == "SOURCE") {
+            return ResourceType::Source;
 
-            } else if (SELECT_CASE_var == "WATERENVIRONMENTALFACTORS") {
-                return ResourceType::WaterEnvironmentalFactors;
+        } else if (SELECT_CASE_var == "PLANTLOOPHEATINGDEMAND") {
+            return ResourceType::PlantLoopHeatingDemand;
 
-            } else if (SELECT_CASE_var == "CARBON EQUIVALENT") {
-                return ResourceType::CarbonEquivalent;
+        } else if (SELECT_CASE_var == "PLANTLOOPCOOLINGDEMAND") {
+            return ResourceType::PlantLoopCoolingDemand;
 
-            } else if (SELECT_CASE_var == "SOURCE") {
-                return ResourceType::Source;
-
-            } else if (SELECT_CASE_var == "PLANTLOOPHEATINGDEMAND") {
-                return ResourceType::PlantLoopHeatingDemand;
-
-            } else if (SELECT_CASE_var == "PLANTLOOPCOOLINGDEMAND") {
-                return ResourceType::PlantLoopCoolingDemand;
-
-            } else {
-                return ResourceType::None;
-            }
+        } else {
+            return ResourceType::None;
         }
     }
+}
 
-    std::string GetResourceTypeChar(ResourceType const ResourceTypeNum)
+std::string GetResourceTypeChar(ResourceType const ResourceTypeNum)
+{
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   June 2005
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // Shows the resource type character string, given the resource type numeric.
+
     {
+        auto const SELECT_CASE_var(ResourceTypeNum);
 
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   June 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
+        if (SELECT_CASE_var == ResourceType::Electricity) {
+            return "Electricity";
 
-        // PURPOSE OF THIS FUNCTION:
-        // Shows the resource type character string, given the resource type numeric.
+        } else if (SELECT_CASE_var == ResourceType::Natural_Gas) {
+            return "NaturalGas";
 
-        {
-            auto const SELECT_CASE_var(ResourceTypeNum);
+        } else if (SELECT_CASE_var == ResourceType::Gasoline) {
+            return "Gasoline";
 
-            if (SELECT_CASE_var == ResourceType::Electricity) {
-                return "Electricity";
+        } else if (SELECT_CASE_var == ResourceType::Diesel) {
+            return "Diesel";
 
-            } else if (SELECT_CASE_var == ResourceType::Natural_Gas) {
-                return "NaturalGas";
+        } else if (SELECT_CASE_var == ResourceType::Coal) {
+            return "Coal";
 
-            } else if (SELECT_CASE_var == ResourceType::Gasoline) {
-                return "Gasoline";
+        } else if (SELECT_CASE_var == ResourceType::FuelOil_1) {
+            return "FuelOilNo1";
 
-            } else if (SELECT_CASE_var == ResourceType::Diesel) {
-                return "Diesel";
+        } else if (SELECT_CASE_var == ResourceType::FuelOil_2) {
+            return "FuelOilNo2";
 
-            } else if (SELECT_CASE_var == ResourceType::Coal) {
-                return "Coal";
+        } else if (SELECT_CASE_var == ResourceType::Propane) {
+            return "Propane";
 
-            } else if (SELECT_CASE_var == ResourceType::FuelOil_1) {
-                return "FuelOilNo1";
+        } else if (SELECT_CASE_var == ResourceType::OtherFuel1) {
+            return "OtherFuel1";
 
-            } else if (SELECT_CASE_var == ResourceType::FuelOil_2) {
-                return "FuelOilNo2";
+        } else if (SELECT_CASE_var == ResourceType::OtherFuel2) {
+            return "OtherFuel2";
 
-            } else if (SELECT_CASE_var == ResourceType::Propane) {
-                return "Propane";
+        } else if (SELECT_CASE_var == ResourceType::Water) {
+            return "Water";
 
-            } else if (SELECT_CASE_var == ResourceType::OtherFuel1) {
-                return "OtherFuel1";
+        } else if (SELECT_CASE_var == ResourceType::OnSiteWater) {
+            return "OnSiteWater";
 
-            } else if (SELECT_CASE_var == ResourceType::OtherFuel2) {
-                return "OtherFuel2";
+        } else if (SELECT_CASE_var == ResourceType::MainsWater) {
+            return "MainsWater";
 
-            } else if (SELECT_CASE_var == ResourceType::Water) {
-                return "Water";
+        } else if (SELECT_CASE_var == ResourceType::RainWater) {
+            return "RainWater";
 
-            } else if (SELECT_CASE_var == ResourceType::OnSiteWater) {
-                return "OnSiteWater";
+        } else if (SELECT_CASE_var == ResourceType::Condensate) {
+            return "Condensate";
 
-            } else if (SELECT_CASE_var == ResourceType::MainsWater) {
-                return "MainsWater";
+        } else if (SELECT_CASE_var == ResourceType::WellWater) {
+            return "WellWater";
 
-            } else if (SELECT_CASE_var == ResourceType::RainWater) {
-                return "RainWater";
+        } else if (SELECT_CASE_var == ResourceType::EnergyTransfer) {
+            return "EnergyTransfer";
 
-            } else if (SELECT_CASE_var == ResourceType::Condensate) {
-                return "Condensate";
+        } else if (SELECT_CASE_var == ResourceType::Steam) {
+            return "Steam";
 
-            } else if (SELECT_CASE_var == ResourceType::WellWater) {
-                return "WellWater";
+        } else if (SELECT_CASE_var == ResourceType::DistrictCooling) {
+            return "DistrictCooling";
 
-            } else if (SELECT_CASE_var == ResourceType::EnergyTransfer) {
-                return "EnergyTransfer";
+        } else if (SELECT_CASE_var == ResourceType::DistrictHeating) {
+            return "DistrictHeating";
 
-            } else if (SELECT_CASE_var == ResourceType::Steam) {
-                return "Steam";
+        } else if (SELECT_CASE_var == ResourceType::ElectricityProduced) {
+            return "ElectricityProduced";
 
-            } else if (SELECT_CASE_var == ResourceType::DistrictCooling) {
-                return "DistrictCooling";
+        } else if (SELECT_CASE_var == ResourceType::ElectricityPurchased) {
+            return "ElectricityPurchased";
 
-            } else if (SELECT_CASE_var == ResourceType::DistrictHeating) {
-                return "DistrictHeating";
+        } else if (SELECT_CASE_var == ResourceType::ElectricitySurplusSold) {
+            return "ElectricitySurplusSold";
 
-            } else if (SELECT_CASE_var == ResourceType::ElectricityProduced) {
-                return "ElectricityProduced";
+        } else if (SELECT_CASE_var == ResourceType::ElectricityNet) {
+            return "ElectricityNet";
 
-            } else if (SELECT_CASE_var == ResourceType::ElectricityPurchased) {
-                return "ElectricityPurchased";
+        } else if (SELECT_CASE_var == ResourceType::SolarWater) {
+            return "SolarWater";
 
-            } else if (SELECT_CASE_var == ResourceType::ElectricitySurplusSold) {
-                return "ElectricitySurplusSold";
+        } else if (SELECT_CASE_var == ResourceType::SolarAir) {
+            return "SolarAir";
 
-            } else if (SELECT_CASE_var == ResourceType::ElectricityNet) {
-                return "ElectricityNet";
+        } else if (SELECT_CASE_var == ResourceType::SO2) {
+            return "SO2";
 
-            } else if (SELECT_CASE_var == ResourceType::SolarWater) {
-                return "SolarWater";
+        } else if (SELECT_CASE_var == ResourceType::NOx) {
+            return "NOx";
 
-            } else if (SELECT_CASE_var == ResourceType::SolarAir) {
-                return "SolarAir";
+        } else if (SELECT_CASE_var == ResourceType::N2O) {
+            return "N2O";
 
-            } else if (SELECT_CASE_var == ResourceType::SO2) {
-                return "SO2";
+        } else if (SELECT_CASE_var == ResourceType::PM) {
+            return "PM";
 
-            } else if (SELECT_CASE_var == ResourceType::NOx) {
-                return "NOx";
+        } else if (SELECT_CASE_var == ResourceType::PM2_5) {
+            return "PM2.5";
 
-            } else if (SELECT_CASE_var == ResourceType::N2O) {
-                return "N2O";
+        } else if (SELECT_CASE_var == ResourceType::PM10) {
+            return "PM10";
 
-            } else if (SELECT_CASE_var == ResourceType::PM) {
-                return "PM";
+        } else if (SELECT_CASE_var == ResourceType::CO) {
+            return "CO";
 
-            } else if (SELECT_CASE_var == ResourceType::PM2_5) {
-                return "PM2.5";
+        } else if (SELECT_CASE_var == ResourceType::CO2) {
+            return "CO2";
 
-            } else if (SELECT_CASE_var == ResourceType::PM10) {
-                return "PM10";
+        } else if (SELECT_CASE_var == ResourceType::CH4) {
+            return "CH4";
 
-            } else if (SELECT_CASE_var == ResourceType::CO) {
-                return "CO";
+        } else if (SELECT_CASE_var == ResourceType::NH3) {
+            return "NH3";
 
-            } else if (SELECT_CASE_var == ResourceType::CO2) {
-                return "CO2";
+        } else if (SELECT_CASE_var == ResourceType::NMVOC) {
+            return "NMVOC";
 
-            } else if (SELECT_CASE_var == ResourceType::CH4) {
-                return "CH4";
+        } else if (SELECT_CASE_var == ResourceType::Hg) {
+            return "Hg";
 
-            } else if (SELECT_CASE_var == ResourceType::NH3) {
-                return "NH3";
+        } else if (SELECT_CASE_var == ResourceType::Pb) {
+            return "Pb";
 
-            } else if (SELECT_CASE_var == ResourceType::NMVOC) {
-                return "NMVOC";
+        } else if (SELECT_CASE_var == ResourceType::NuclearHigh) {
+            return "Nuclear High";
 
-            } else if (SELECT_CASE_var == ResourceType::Hg) {
-                return "Hg";
+        } else if (SELECT_CASE_var == ResourceType::NuclearLow) {
+            return "Nuclear Low";
 
-            } else if (SELECT_CASE_var == ResourceType::Pb) {
-                return "Pb";
+        } else if (SELECT_CASE_var == ResourceType::WaterEnvironmentalFactors) {
+            return "WaterEnvironmentalFactors";
 
-            } else if (SELECT_CASE_var == ResourceType::NuclearHigh) {
-                return "Nuclear High";
+        } else if (SELECT_CASE_var == ResourceType::CarbonEquivalent) {
+            return "Carbon Equivalent";
 
-            } else if (SELECT_CASE_var == ResourceType::NuclearLow) {
-                return "Nuclear Low";
+        } else if (SELECT_CASE_var == ResourceType::Source) {
+            return "Source";
 
-            } else if (SELECT_CASE_var == ResourceType::WaterEnvironmentalFactors) {
-                return "WaterEnvironmentalFactors";
+        } else if (SELECT_CASE_var == ResourceType::PlantLoopHeatingDemand) {
+            return "PlantLoopHeatingDemand";
 
-            } else if (SELECT_CASE_var == ResourceType::CarbonEquivalent) {
-                return "Carbon Equivalent";
+        } else if (SELECT_CASE_var == ResourceType::PlantLoopCoolingDemand) {
+            return "PlantLoopCoolingDemand";
 
-            } else if (SELECT_CASE_var == ResourceType::Source) {
-                return "Source";
-
-            } else if (SELECT_CASE_var == ResourceType::PlantLoopHeatingDemand) {
-                return "PlantLoopHeatingDemand";
-
-            } else if (SELECT_CASE_var == ResourceType::PlantLoopCoolingDemand) {
-                return "PlantLoopCoolingDemand";
-
-            } else {
-                return "Unknown";
-            }
+        } else {
+            return "Unknown";
         }
     }
+}
 
-} // namespace DataGlobalConstants
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::DataGlobalConstants
