@@ -166,8 +166,6 @@ struct DataGlobal : BaseGlobalStruct
     int FDnumIterYears = 0;
     bool printConsoleOutput = true;
 
-    // This is a temporary hack for running unit tests with the cache
-    // Do not merge to develop until an appropriate solution is implemented
     bool useCache = true;
 
     void clear_state() override
