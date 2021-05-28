@@ -1237,6 +1237,13 @@ void GetAirPathData(EnergyPlusData &state)
                                             0);
                     } else if (componentType == "COILSYSTEM:COOLING:WATER") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = CoilSystemWater;
+                        UnitarySystems::UnitarySys thisSys;
+                        PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).compPointer =
+                            thisSys.factory(state,
+                                            DataHVACGlobals::UnitarySys_AnyCoilType,
+                                            PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
+                                            false,
+                                            0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
                         PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {

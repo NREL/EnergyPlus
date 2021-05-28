@@ -16678,7 +16678,8 @@ namespace UnitarySystems {
         // if (UnitarySystem), else (CoilSystem), else (otherSystems), etc., else FATAL.
         if (numAllSystemTypes == state.dataUnitarySystems->numUnitarySystems) {
             for (int sysNum = 0; sysNum < state.dataUnitarySystems->numUnitarySystems; ++sysNum) {
-                if (state.dataUnitarySystems->unitarySys[sysNum].UnitType == "AirLoopHVAC:UnitarySystem") {
+                if (state.dataUnitarySystems->unitarySys[sysNum].UnitType == "AirLoopHVAC:UnitarySystem" ||
+                    state.dataUnitarySystems->unitarySys[sysNum].UnitType == "CoilSystem:Cooling:Water") {
                     // Setup Report variables for the Unitary System that are not reported in the components themselves
                     SetupOutputVariable(state,
                                         "Unitary System Part Load Ratio",
