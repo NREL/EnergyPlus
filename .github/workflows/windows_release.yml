@@ -85,8 +85,8 @@ jobs:
       run: |
         set -x
         out_dir="C:/Qt"
-        aqt tool windows tools_ifw 4.0 qt.tools.ifw.40 --outputdir="$out_dir"
-        echo "$out_dir/Tools/QtInstallerFramework/4.0/bin" >> $GITHUB_PATH
+        aqt tool windows tools_ifw 4.1 qt.tools.ifw.41 --outputdir="$out_dir"
+        echo "$out_dir/Tools/QtInstallerFramework/4.1/bin" >> $GITHUB_PATH
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/

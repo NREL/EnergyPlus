@@ -15727,6 +15727,90 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
         "      Zone Exhaust Node,              !- Air Inlet Node Name",
         "      Furnace DX Cool Supply Fan Outlet;  !- Air Outlet Node Name",
 
+        "    ComponentCost:LineItem,",
+        "      Cost Per Each,            !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      Furnace DX Cool Cooling Coil,  !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      1,                        !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      ,                         !- Cost per Unit of Output Capacity {$/kW}",
+        "      ,                         !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Each Wildcard,   !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      *,                        !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      1,                        !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      ,                         !- Cost per Unit of Output Capacity {$/kW}",
+        "      ,                         !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Output Capacity, !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      Furnace DX Cool Cooling Coil,  !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      ,                         !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      10,                       !- Cost per Unit of Output Capacity {$/kW}",
+        "      ,                         !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Output Capacity Wildcard, !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      *,                        !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      ,                         !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      10,                       !- Cost per Unit of Output Capacity {$/kW}",
+        "      ,                         !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Output Capacity per COP, !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      Furnace DX Cool Cooling Coil,  !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      ,                         !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      ,                         !- Cost per Unit of Output Capacity {$/kW}",
+        "      100,                      !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
+        "    ComponentCost:LineItem,",
+        "      Cost Per Output Capacity per COP Wildcard, !- Name",
+        "      ,                         !- Type",
+        "      Coil:Cooling:DX,          !- Line Item Type",
+        "      *,                        !- Item Name",
+        "      ,                         !- Object End-Use Key",
+        "      ,                         !- Cost per Each {$}",
+        "      ,                         !- Cost per Area {$/m2}",
+        "      ,                         !- Cost per Unit of Output Capacity {$/kW}",
+        "      100,                      !- Cost per Unit of Output Capacity per COP {$/kW}",
+        "      ,                         !- Cost per Volume {$/m3}",
+        "      ,                         !- Cost per Volume Rate {$/(m3/s)}",
+        "      ;                         !- Cost per Energy per Temperature Difference {$/(W/K)}",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
@@ -15858,6 +15942,30 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     // EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.001);
     EXPECT_NEAR(thisSys->m_SpeedRatio, 0.12, 0.001);
     EXPECT_NEAR(sensOut, -11998.0, 210.0);
+
+    // coil cost estimates
+    CostEstimateManager::GetCostEstimateInput(*state);
+    state->dataCostEstimateManager->GetCostInput = false;
+    state->dataCostEstimateManager->DoCostEstimate = true;
+    CostEstimateManager::CalcCostEstimate(*state);
+
+    // Cost Per Each: Qty = 1; $/Ea = 1; Total = 1 * 1 = 1
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(1).LineSubTotal, 1.0, 0.01);
+
+    // Cost Per Each Wildcard: Qty = 1; $/Ea = 1; Total = 1 * 1 = 1
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(2).LineSubTotal, 1.0, 0.01);
+
+    // Cost Per Output Capacity: Qty = 1; $/kW = 10; RatedCap = 34.772 kW; Total = 1 * 10 * 34.772 = 347.72
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(3).LineSubTotal, 347.72, 0.01);
+
+    // Cost Per Output Capacity Wildcard: Qty = 1; $/kW = 10; RatedCap = 34.772 kW; Total = 1 * 10 * 34.772 = 347.72
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(4).LineSubTotal, 347.72, 0.01);
+
+    // Cost Per Output Capacity per COP: Qty = 1; $/kW = 100 ; RatedCap = 34.772 kW; COP = 3; Total = 1 * 100 * 34.772 * 3 = 10431.6
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(5).LineSubTotal, 10431.64, 0.01);
+
+    // Cost Per Output Capacity per COP Wildcard: Qty = 1; $/kW = 100 ; RatedCap = 34.772 kW; COP = 3; Total = 1 * 100 * 34.772 * 3 = 10431.6
+    EXPECT_NEAR(state->dataCostEstimateManager->CostLineItem(6).LineSubTotal, 10431.64, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTest)
