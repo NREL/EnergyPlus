@@ -4114,12 +4114,13 @@ void LEEDtariffReporting(EnergyPlusData &state)
                     distHeatTariffNames += ' ' + tariff(iTariff).tariffName;
                     distHeatUnits = tariff(iTariff).convChoice;
                     distHeatDemWindowUnits = tariff(iTariff).demandWindow;
-                } else {
+                } else if (tariff(iTariff).kindWaterMtr == kindMeterNotWater) {
                     if (tariff(iTariff).totalAnnualEnergy > otherTotalEne) otherTotalEne = tariff(iTariff).totalAnnualEnergy;
                     otherTotalCost += tariff(iTariff).totalAnnualCost;
                     othrTariffNames += ' ' + tariff(iTariff).tariffName;
                     othrUnits = tariff(iTariff).convChoice;
                     othrDemWindowUnits = tariff(iTariff).demandWindow;
+                } else {
                 }
             }
         }
