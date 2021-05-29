@@ -469,6 +469,22 @@ stripped( std::string const & s )
 	}
 }
 
+std::string_view
+stripped( std::string_view const & s )
+{
+  if ( s.empty() ) {
+    return s;
+  } else {
+    std::string::size_type const ib( s.find_first_not_of( ' ' ) );
+    std::string::size_type const ie( s.find_last_not_of( ' ' ) );
+    if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is ' '
+      return std::string(); // Return empty string
+    } else {
+      return s.substr( ib, ie - ib + 1 );
+    }
+  }
+}
+
 // Space Stripped from a string's Left Tail Copy of a string
 std::string
 lstripped( std::string const & s )

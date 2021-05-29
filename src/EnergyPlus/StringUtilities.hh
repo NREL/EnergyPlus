@@ -59,6 +59,14 @@ inline std::stringstream stringReader(std::string str)
     return result;
 }
 
+inline std::stringstream stringReader(std::string_view str)
+{
+    std::stringstream ss;
+    ss << str;
+    ss.imbue(std::locale("C")); // the forced locale is to avoid issues with parsing floating point numbers that use non-decimal formats
+    return ss;
+}
+
 template <typename Param> bool readListItem(std::istream &stream, Param &&param)
 {
     if (stream.good()) {
@@ -80,6 +88,21 @@ template <typename Param> bool readItem(std::string input, Param &&param)
 {
     auto stream = stringReader(std::move(input));
     stream >> param;
+
+    return !stream.fail() && stream.eof();
+}
+
+template <typename Param> bool readItem(std::string_view input, Param &&param)
+{
+    std::string temp_string = static_cast<std::string>(stripped(input));
+    // make FORTRAN floating point number (containing 'd' or 'D')
+    // standardized by replacing 'd' or 'D' with 'e'
+    std::replace_if(
+        std::begin(temp_string), std::end(temp_string), [](const char c) { return c == 'D' || c == 'd'; }, 'e');
+    auto stream = stringReader(temp_string);
+
+    stream >> param;
+
     return !stream.fail() && stream.eof();
 }
 
