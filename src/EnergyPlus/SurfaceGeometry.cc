@@ -2451,8 +2451,11 @@ namespace SurfaceGeometry {
                 if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
                     WinShadingControlPtr =
                         state.dataSurface->Surface(SurfNum).activeWindowShadingControl; // use first item since others should be identical
-                    if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle)
+                    if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle) {
                         state.dataSurface->SurfWinMovableSlats(SurfNum) = true;
+                        state.dataSurface->AnyMovableSlat = true;
+                        state.dataHeatBalSurf->SurfMovSlatsIndexList.push_back(SurfNum);
+                    }
                 }
 
                 ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;

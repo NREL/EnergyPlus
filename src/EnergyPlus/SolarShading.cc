@@ -9583,6 +9583,7 @@ void WindowShadingManager(EnergyPlusData &state)
                 state.dataSurface->Surface(ISurf).activeWindowShadingControl =
                     state.dataSurface->Surface(ISurf).windowShadingControlList[indexWindowShadingControl];
             }
+            state.dataSurface->Surface(ISurf).activeShadedConstructionPrev = state.dataSurface->Surface(ISurf).activeShadedConstruction;
             if (!state.dataSurface->Surface(ISurf).shadedConstructionList.empty() &&
                 indexWindowShadingControl <= state.dataSurface->Surface(ISurf).shadedConstructionList.size() - 1) {
                 state.dataSurface->Surface(ISurf).activeShadedConstruction =
@@ -10061,6 +10062,29 @@ void WindowShadingManager(EnergyPlusData &state)
                 }
             }
         } // End of surface loop
+    }
+    for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+        state.dataHeatBal->EnclRadReCalc(enclosureNum) = false;
+        if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel ||
+            (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel())) {
+            state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+            continue;
+        }
+        for (int const SurfNum : state.dataViewFactor->ZoneRadiantInfo(enclosureNum).SurfacePtr) {
+            if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TCFlag == 1 ||
+                state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
+                state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+                break;
+            }
+            bool surfShadingStatusChange =
+                state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum) != state.dataSurface->SurfWinShadingFlag(SurfNum) ||
+                state.dataSurface->Surface(SurfNum).activeShadedConstruction != state.dataSurface->Surface(SurfNum).activeShadedConstructionPrev ||
+                state.dataSurface->SurfWinMovableSlats(SurfNum);
+            if (surfShadingStatusChange) {
+                state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+                break;
+            }
+        }
     }
 }
 
@@ -11629,7 +11653,6 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
         // Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
         for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
             // Skip surfaces that are not exterior, except for TDD_Diffusers
-            // TODO: why not ExtSolar
             if (((state.dataSurface->Surface(DifTransSurfNum).ExtBoundCond != ExternalEnvironment) &&
                  (state.dataSurface->Surface(DifTransSurfNum).ExtBoundCond != OtherSideCondModeledExt)) &&
                 state.dataSurface->SurfWinOriginalClass(DifTransSurfNum) != SurfaceClass::TDD_Diffuser)
