@@ -1137,21 +1137,19 @@ namespace SolarCollectors {
             {
                 auto const SELECT_CASE_var(state.dataSolarCollectors->Parameters(ParamNum).TestType);
                 if (SELECT_CASE_var == TestTypeEnum::INLET) {
-                    FRULpTest =
-                        state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                        state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->Surface(SurfNum).OutDryBulbTemp);
+                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
                     TestTypeMod = 1.0;
 
                 } else if (SELECT_CASE_var == TestTypeEnum::AVERAGE) {
                     FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
                                 state.dataSolarCollectors->Parameters(ParamNum).eff2 *
-                                    ((inletTemp + outletTemp) * 0.5 - state.dataSurface->Surface(SurfNum).OutDryBulbTemp);
+                                    ((inletTemp + outletTemp) * 0.5 - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / (2.0 * mCpATest));
 
                 } else if (SELECT_CASE_var == TestTypeEnum::OUTLET) {
-                    FRULpTest =
-                        state.dataSolarCollectors->Parameters(ParamNum).eff1 +
-                        state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->Surface(SurfNum).OutDryBulbTemp);
+                    FRULpTest = state.dataSolarCollectors->Parameters(ParamNum).eff1 +
+                                state.dataSolarCollectors->Parameters(ParamNum).eff2 * (outletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum));
                     TestTypeMod = 1.0 / (1.0 - FRULpTest / mCpATest);
                 }
             }
@@ -1194,7 +1192,7 @@ namespace SolarCollectors {
                 // Calculate fluid heat gain (or loss)
                 // Heat loss is possible if there is no incident radiation and fluid is still flowing.
                 Q = (FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
-                     FRULpTest * (inletTemp - state.dataSurface->Surface(SurfNum).OutDryBulbTemp)) *
+                     FRULpTest * (inletTemp - state.dataSurface->SurfOutDryBulbTemp(SurfNum))) *
                     area * FlowMod;
 
                 outletTemp = inletTemp + Q / (massFlowRate * Cp);
@@ -1223,9 +1221,8 @@ namespace SolarCollectors {
 
                 // Calculate temperature of stagnant fluid in collector
                 Real64 A = -FRULT;
-                Real64 B = -FRUL + 2.0 * FRULT * state.dataSurface->Surface(SurfNum).OutDryBulbTemp;
-                Real64 C = -FRULT * pow_2(state.dataSurface->Surface(SurfNum).OutDryBulbTemp) +
-                           FRUL * state.dataSurface->Surface(SurfNum).OutDryBulbTemp -
+                Real64 B = -FRUL + 2.0 * FRULT * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+                Real64 C = -FRULT * pow_2(state.dataSurface->SurfOutDryBulbTemp(SurfNum)) + FRUL * state.dataSurface->SurfOutDryBulbTemp(SurfNum) -
                            FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
                 Real64 qEquation = (pow_2(B) - 4.0 * A * C);
                 if (qEquation < 0.0) {
@@ -1245,7 +1242,7 @@ namespace SolarCollectors {
                                                   qEquation);
                 }
                 if (FRULT == 0.0 || qEquation < 0.0) { // Linear, 1st order solution
-                    outletTemp = state.dataSurface->Surface(SurfNum).OutDryBulbTemp -
+                    outletTemp = state.dataSurface->SurfOutDryBulbTemp(SurfNum) -
                                  FRTAN * incidentAngleModifier * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) / FRUL;
                 } else { // Quadratic, 2nd order solution
                     outletTemp = (-B + std::sqrt(qEquation)) / (2.0 * A);
@@ -1363,7 +1360,7 @@ namespace SolarCollectors {
         Real64 SecInTimeStep = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         Real64 TempWater = this->SavedTempOfWater;
         Real64 TempAbsPlate = this->SavedTempOfAbsPlate;
-        Real64 TempOutdoorAir = state.dataSurface->Surface(SurfNum).OutDryBulbTemp;
+        Real64 TempOutdoorAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
 
         Real64 TempOSCM; // Otherside condition model temperature [C]
         if (this->OSCM_ON) {
@@ -1766,10 +1763,10 @@ namespace SolarCollectors {
         int NumCovers = state.dataSolarCollectors->Parameters(ParamNum).NumOfCovers;
         int SurfNum = this->Surface;
 
-        Real64 TempAbsPlate = this->SavedTempOfAbsPlate;                            // absorber plate average temperature [C]
-        Real64 TempInnerCover = this->SavedTempOfInnerCover;                        // inner cover average temperature [C]
-        Real64 TempOuterCover = this->SavedTempOfOuterCover;                        // outer cover average temperature [C]
-        Real64 TempOutdoorAir = state.dataSurface->Surface(SurfNum).OutDryBulbTemp; // outdoor air temperature [C]
+        Real64 TempAbsPlate = this->SavedTempOfAbsPlate;                        // absorber plate average temperature [C]
+        Real64 TempInnerCover = this->SavedTempOfInnerCover;                    // inner cover average temperature [C]
+        Real64 TempOuterCover = this->SavedTempOfOuterCover;                    // outer cover average temperature [C]
+        Real64 TempOutdoorAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum); // outdoor air temperature [C]
 
         Real64 EmissOfAbsPlate = state.dataSolarCollectors->Parameters(ParamNum).EmissOfAbsPlate;   // emissivity of absorber plate
         Real64 EmissOfOuterCover = state.dataSolarCollectors->Parameters(ParamNum).EmissOfCover(1); // emissivity of outer cover
@@ -1818,7 +1815,7 @@ namespace SolarCollectors {
         }
 
         // Calc collector outside surface convection heat transfer coefficient:
-        hConvCoefC2O = 2.8 + 3.0 * state.dataSurface->Surface(SurfNum).WindSpeed;
+        hConvCoefC2O = 2.8 + 3.0 * state.dataSurface->SurfOutWindSpeed(SurfNum);
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann *
@@ -1862,7 +1859,7 @@ namespace SolarCollectors {
 
         // calculate the side loss coefficient.  Adds the insulation resistance and the combined
         // convection-radiation coefficients in series.
-        Real64 hRadConvOut = 5.7 + 3.8 * state.dataSurface->Surface(SurfNum).WindSpeed;
+        Real64 hRadConvOut = 5.7 + 3.8 * state.dataSurface->SurfOutWindSpeed(SurfNum);
         this->UsLoss =
             1.0 / (1.0 / (state.dataSolarCollectors->Parameters(ParamNum).ULossSide * this->AreaRatio) + 1.0 / (hRadConvOut * this->AreaRatio));
 
