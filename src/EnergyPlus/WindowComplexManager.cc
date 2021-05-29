@@ -2768,11 +2768,11 @@ namespace WindowComplexManager {
 
             // determine reference air temperature for this surface
             {
-                auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+                auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // determine ZoneEquipConfigNum for this zone
                     //            ControlledZoneAirFlag = .FALSE.
@@ -2821,11 +2821,11 @@ namespace WindowComplexManager {
 
                 // determine reference air temperature for this surface
                 {
-                    auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNumAdj).TAirRef);
+                    auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNumAdj));
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
+                        RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNum;
@@ -2861,7 +2861,7 @@ namespace WindowComplexManager {
 
                 tout = RefAirTemp + DataGlobalConstants::KelvinConv; // outside air temperature
 
-                tsky = state.dataHeatBal->MRT(ZoneNumAdj) +
+                tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
                        DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 //  ! Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
@@ -2876,8 +2876,8 @@ namespace WindowComplexManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
-                        SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
+                    if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+                        SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             state.dataSurface->Surface(SurfNum).ViewFactorSkyIR =
                                 state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
@@ -2899,19 +2899,19 @@ namespace WindowComplexManager {
                 }
                 if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
                     if (state.dataEnvrn->IsRain) {                 // Raining: since wind exposed, outside window surface gets wet
-                        tout = state.dataSurface->Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv;
+                        tout = state.dataSurface->SurfOutWetBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
                     } else { // Dry
-                        tout = state.dataSurface->Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+                        tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
                     }
                 } else { // Window not exposed to wind
-                    tout = state.dataSurface->Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+                    tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
                 }
                 // tsky = SkyTemp + TKelvin
                 tsky = state.dataEnvrn->SkyTempKelvin;
                 Ebout = state.dataWindowComplexManager->sigma * pow_4(tout);
                 outir = state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *
-                            (state.dataSurface->AirSkyRadSplit(SurfNum) * state.dataWindowComplexManager->sigma * pow_4(tsky) +
-                             (1.0 - state.dataSurface->AirSkyRadSplit(SurfNum)) * Ebout) +
+                            (state.dataSurface->SurfAirSkyRadSplit(SurfNum) * state.dataWindowComplexManager->sigma * pow_4(tsky) +
+                             (1.0 - state.dataSurface->SurfAirSkyRadSplit(SurfNum)) * Ebout) +
                         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
 
@@ -2940,7 +2940,7 @@ namespace WindowComplexManager {
                            // WinShadingType::ExtShade) THEN
                 //  wso =  0.0  ! Assume zero wind speed at outside glass surface of window with exterior shade
             } else {
-                wso = state.dataSurface->Surface(SurfNum).WindSpeed;
+                wso = state.dataSurface->SurfOutWindSpeed(SurfNum);
             }
 
             // indoor wind speed
@@ -3102,7 +3102,7 @@ namespace WindowComplexManager {
         if (CalcCondition == DataBSDFWindow::noCondition) {
             ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
             dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) +
-                  state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex); // TODO, check , !
+                  state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex); // TODO, check , !
             //                  currently using Exterior beam plus diffuse solar incident on surface
             //                  plus zone short wave.  CHECK
             // if (dir.ne.0.0d0) then
@@ -3459,12 +3459,13 @@ namespace WindowComplexManager {
             //  TransDiff = InterpSW(SurfaceWindow(SurfNum)%SwitchingFactor,Construct(ConstrNum)%TransDiff, &
             //                             Construct(ConstrNumSh)%TransDiff)
             // END IF
-            state.dataSurface->SurfWinHeatGain(SurfNum) -=
-                state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) -=
-                state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
+            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) *
+                                                           state.dataSurface->Surface(SurfNum).Area * TransDiff;
+            state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) *
+                                                               state.dataSurface->Surface(SurfNum).Area * TransDiff;
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
-                state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
+                state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area *
+                TransDiff;
 
             if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) {
                 state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) =
