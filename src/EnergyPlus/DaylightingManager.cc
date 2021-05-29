@@ -3729,7 +3729,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             // Vector to sun that is mirrored in obstruction
                             SunVecMir = RAYCOS - 2.0 * dot(RAYCOS, ReflNorm) * ReflNorm;
                             // Skip if reflecting surface is not sunlit
-                            if (state.dataHeatBal->SurfSunlitFrac(1, iHour, ReflSurfNumX) < 0.01) continue;
+                            if (state.dataHeatBal->SurfSunlitFrac(iHour, 1, ReflSurfNumX) < 0.01) continue;
                             // Skip if altitude angle of mirrored sun is negative since reflected sun cannot
                             // reach reference point in this case
                             if (SunVecMir(3) <= 0.0) continue;

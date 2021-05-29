@@ -8214,7 +8214,7 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
     ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
     EQLNum = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr;
     if (BeamDIffFlag != SolarArrays::DIFF) {
-        if (state.dataHeatBal->SurfCosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) return;
+        if (state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum) <= 0.0) return;
 
         for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
             if (IsVBLayer(CFS(EQLNum).L(Lay))) {
@@ -8226,7 +8226,7 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
             }
         }
         // Incident angle
-        IncAng = std::acos(state.dataHeatBal->SurfCosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
+        IncAng = std::acos(state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum));
         CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
         CFSAbs(1, {1, CFSMAXNL + 1}) = Abs1(1, {1, CFSMAXNL + 1});
         CFSAbs(2, {1, CFSMAXNL + 1}) = Abs1(2, {1, CFSMAXNL + 1});
@@ -8241,7 +8241,7 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
                     }
                 }
             }
-            IncAng = std::acos(state.dataHeatBal->SurfCosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
+            IncAng = std::acos(state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum));
             CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
             CFSAbs(_, {1, CFSMAXNL + 1}) = Abs1(_, {1, CFSMAXNL + 1});
             state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});

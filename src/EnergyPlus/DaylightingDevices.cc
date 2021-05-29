@@ -1281,7 +1281,7 @@ namespace DaylightingDevices {
                          state.dataHeatBal->DifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
         }
         CircumSolarRad = state.dataHeatBal->MultCircumSolar(DomeSurf) *
-                         state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+                         state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, DomeSurf);
 
         AnisoSkyTDDMult = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso * IsoSkyRad +
                           TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam) * CircumSolarRad +
