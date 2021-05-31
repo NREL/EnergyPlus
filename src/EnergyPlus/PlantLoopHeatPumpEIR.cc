@@ -678,6 +678,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
             // now handle the auto-sizable load side flow rate
             if (this->loadSideDesignVolFlowRateWasAutoSized) {
                 this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
+                this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                 }
