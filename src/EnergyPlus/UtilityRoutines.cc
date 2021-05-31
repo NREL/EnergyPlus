@@ -188,8 +188,9 @@ namespace UtilityRoutines {
         bool parseFailed = false;
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
 
-//            std::replace_if - > moved to readItem
-            // is this not working because string_view is acting like a const variable? // Do we need to convert/cast it here? -> move this to the 'deepest' function so that the copying can be minimized
+            //            std::replace_if - > moved to readItem
+            // is this not working because string_view is acting like a const variable? // Do we need to convert/cast it here? -> move this to the
+            // 'deepest' function so that the copying can be minimized
 
             // then parse as a normal floating point value
             parseFailed = !readItem(PString, rProcessNumber);

@@ -139,8 +139,6 @@ namespace ScheduleManager {
 
     // Functions
 
-
-
     void ProcessScheduleInput(EnergyPlusData &state)
     {
 
@@ -1715,7 +1713,6 @@ namespace ScheduleManager {
             row.delimiter = state.dataScheduleMgr->columnarData[colNumToColDataIndex[vectorOfCSVColNumbers[0]]]
                                 .delimiter; // all schedules in one file will have the same delimiter
 
-
             while (file >> row)
             // find which columns of this csv map to which schedule - not needed
             //  How to do this? Make a mapOfMaps which has for each fileName, a map of scheduleNames, ColumnNumbers
@@ -1724,7 +1721,7 @@ namespace ScheduleManager {
                 for (int colNum : vectorOfCSVColNumbers) {
 
                     // skip if row needs to be skipped
-                    if (state.dataScheduleMgr->columnarData[colNumToColDataIndex[colNum]].rowsToSkip){
+                    if (state.dataScheduleMgr->columnarData[colNumToColDataIndex[colNum]].rowsToSkip) {
                         --state.dataScheduleMgr->columnarData[colNumToColDataIndex[colNum]].rowsToSkip;
                         continue;
                     } // TODO : Add check if the number of rows skipped were correct (What if the user input was wrong?)
@@ -1742,7 +1739,6 @@ namespace ScheduleManager {
                 }
             }
         }
-
 
         // schedule values have been filled into the columnarData.vals vectors.
 
