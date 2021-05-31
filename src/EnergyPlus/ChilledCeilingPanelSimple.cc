@@ -612,7 +612,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                 ThisCP.TotSurfToDistrib = MinFraction;
             }
             if (ThisCP.SurfacePtr(SurfNum) != 0) {
-                state.dataSurface->Surface(ThisCP.SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                state.dataSurface->SurfIntConvSurfGetsRadiantHeat(ThisCP.SurfacePtr(SurfNum)) = true;
             }
 
             AllFracsSummed += ThisCP.FracDistribToSurf(SurfNum);
@@ -1313,7 +1313,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
         CoolingPanelOn = false;
     }
     // Calculate the "zone" temperature for determining the output of the cooling panel
-    Tzone = Xr * state.dataHeatBal->MRT(ZoneNum) + ((1.0 - Xr) * state.dataHeatBalFanSys->MAT(ZoneNum));
+    Tzone = Xr * state.dataHeatBal->ZoneMRT(ZoneNum) + ((1.0 - Xr) * state.dataHeatBalFanSys->MAT(ZoneNum));
 
     // Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
     if (waterInletTemp >= Tzone) CoolingPanelOn = false;
@@ -1545,9 +1545,9 @@ void CoolingPanelParams::SetCoolingPanelControlTemp(EnergyPlusData &state, Real6
         if (SELECT_CASE_var == Control::MAT) {
             ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
         } else if (SELECT_CASE_var == Control::MRT) {
-            ControlTemp = state.dataHeatBal->MRT(ZoneNum);
+            ControlTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
         } else if (SELECT_CASE_var == Control::Operative) {
-            ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+            ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
         } else if (SELECT_CASE_var == Control::ODB) {
             ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
         } else if (SELECT_CASE_var == Control::OWB) {
