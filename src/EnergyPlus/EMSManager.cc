@@ -2102,15 +2102,15 @@ namespace EMSManager {
                              state.dataSurface->Surface(SurfNum).Name,
                              "Interior Surface Convection Heat Transfer Coefficient",
                              "[W/m2-K]",
-                             state.dataSurface->Surface(SurfNum).EMSOverrideIntConvCoef,
-                             state.dataSurface->Surface(SurfNum).EMSValueForIntConvCoef);
+                             state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum),
+                             state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum));
             SetupEMSActuator(state,
                              "Surface",
                              state.dataSurface->Surface(SurfNum).Name,
                              "Exterior Surface Convection Heat Transfer Coefficient",
                              "[W/m2-K]",
-                             state.dataSurface->Surface(SurfNum).EMSOverrideExtConvCoef,
-                             state.dataSurface->Surface(SurfNum).EMSValueForExtConvCoef);
+                             state.dataSurface->SurfEMSOverrideExtConvCoef(SurfNum),
+                             state.dataSurface->SurfEMSValueForExtConvCoef(SurfNum));
         }
     }
 
@@ -2138,8 +2138,8 @@ namespace EMSManager {
                              state.dataSurface->Surface(SurfNum).Name,
                              "Construction State",
                              "[ ]",
-                             state.dataSurface->Surface(SurfNum).EMSConstructionOverrideON,
-                             state.dataSurface->Surface(SurfNum).EMSConstructionOverrideValue);
+                             state.dataSurface->SurfEMSConstructionOverrideON(SurfNum),
+                             state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum));
         }
 
         // Setup error checking storage
@@ -2184,39 +2184,39 @@ namespace EMSManager {
                              state.dataSurface->Surface(SurfNum).Name,
                              "View Factor To Ground",
                              "[ ]",
-                             state.dataSurface->Surface(SurfNum).ViewFactorGroundEMSOverrideOn,
-                             state.dataSurface->Surface(SurfNum).ViewFactorGroundEMSOverrideValue);
+                             state.dataSurface->SurfViewFactorGroundEMSOverrideOn(SurfNum),
+                             state.dataSurface->SurfViewFactorGroundEMSOverrideValue(SurfNum));
 
             SetupEMSActuator(state,
                              "Surface",
                              state.dataSurface->Surface(SurfNum).Name,
                              "Outdoor Air Drybulb Temperature",
                              "[C]",
-                             state.dataSurface->Surface(SurfNum).OutDryBulbTempEMSOverrideOn,
-                             state.dataSurface->Surface(SurfNum).OutDryBulbTempEMSOverrideValue);
+                             state.dataSurface->SurfOutDryBulbTempEMSOverrideOn(SurfNum),
+                             state.dataSurface->SurfOutDryBulbTempEMSOverrideValue(SurfNum));
 
             SetupEMSActuator(state,
                              "Surface",
                              state.dataSurface->Surface(SurfNum).Name,
                              "Outdoor Air Wetbulb Temperature",
                              "[C]",
-                             state.dataSurface->Surface(SurfNum).OutWetBulbTempEMSOverrideOn,
-                             state.dataSurface->Surface(SurfNum).OutWetBulbTempEMSOverrideValue);
+                             state.dataSurface->SurfOutWetBulbTempEMSOverrideOn(SurfNum),
+                             state.dataSurface->SurfOutWetBulbTempEMSOverrideValue(SurfNum));
             if (state.dataSurface->Surface(SurfNum).ExtWind) {
                 SetupEMSActuator(state,
                                  "Surface",
                                  state.dataSurface->Surface(SurfNum).Name,
                                  "Outdoor Air Wind Speed",
                                  "[m/s]",
-                                 state.dataSurface->Surface(SurfNum).WindSpeedEMSOverrideOn,
-                                 state.dataSurface->Surface(SurfNum).WindSpeedEMSOverrideValue);
+                                 state.dataSurface->SurfWindSpeedEMSOverrideOn(SurfNum),
+                                 state.dataSurface->SurfWindSpeedEMSOverrideValue(SurfNum));
                 SetupEMSActuator(state,
                                  "Surface",
                                  state.dataSurface->Surface(SurfNum).Name,
                                  "Outdoor Air Wind Direction",
                                  "[degree]",
-                                 state.dataSurface->Surface(SurfNum).WindDirEMSOverrideOn,
-                                 state.dataSurface->Surface(SurfNum).WindDirEMSOverrideValue);
+                                 state.dataSurface->SurfWindDirEMSOverrideOn(SurfNum),
+                                 state.dataSurface->SurfWindDirEMSOverrideValue(SurfNum));
             }
         }
     }

@@ -243,7 +243,7 @@ namespace EcoRoofManager {
                                         state.dataHeatBalSurf->HAirExtSurf(SurfNum));
         }
 
-        RS = state.dataEnvrn->BeamSolarRad + state.dataHeatBal->AnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
+        RS = state.dataEnvrn->BeamSolarRad + state.dataHeatBal->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
         Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
                1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
