@@ -1691,21 +1691,13 @@ namespace ScheduleManager {
                 }
             }
 
-            // find if there is a many to one mapping
+            // find if there is a many to one mapping, throw fatal error if there is an error
             std::sort(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // sorting to use std::adjacent_find
             const auto duplicate =
                 std::adjacent_find(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // what if there are multiple last elements?
-            if (duplicate != vectorOfCSVColNumbers.end()) std::cout << "Duplicate element = " << *duplicate << "\n";
-
-            // what if there are multiple last elements? - remove last element and check if duplicate is still the same
-
-            // if vector not empty - flag to do these elements separately
-            // remove from the main map
-            // get maps for these elements
-
-            // what if rows to be skipped?
-            // find min of rows to be skipped
-            // skip em and subtract from columnarData element.rowstoskip
+            if (duplicate != vectorOfCSVColNumbers.end()) {  // TODO : what if there are multiple last elements? - remove last element and check if duplicate is still the same
+                ShowFatalError(state, format("Multiple schedules pointing to the same column number : {} in file {}. Please modify the IDF file and make sure multiple schedules do not point to the same column in the file.", *duplicate, fileNameItem));
+            }
 
             std::ifstream file(fileNameItem);
             CSVRow row;
@@ -1728,7 +1720,7 @@ namespace ScheduleManager {
 
                     columnValue = UtilityRoutines::ProcessNumber(row[colNum], errFlag);
                     if (errFlag) {
-                        ++++state.dataScheduleMgr->columnarData[colNumToColDataIndex[colNum]].numerrors;
+                        ++state.dataScheduleMgr->columnarData[colNumToColDataIndex[colNum]].numerrors;
                         columnValue = 0.0;
                     }
 
