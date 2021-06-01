@@ -58,6 +58,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -71,10 +72,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -83,6 +81,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -100,6 +99,7 @@
 #include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SurfaceOctree.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
@@ -217,12 +217,14 @@ namespace HeatBalanceManager {
         }
 
         bool anyRan;
+
         ManageEMS(state,
                   EMSManager::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance,
                   anyRan,
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
+
         InitHeatBalance(state); // Initialize all heat balance related parameters
         ManageEMS(
             state, EMSManager::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
@@ -551,7 +553,7 @@ namespace HeatBalanceManager {
         // ZoneAirContaminantBalance, Added by L. Gu, 06/10
 
         // Using/Aliasing
-        auto &HVACSystemRootFinding = state.dataHVACGlobal->HVACSystemRootFinding;
+        auto &HVACSystemRootFinding = state.dataRootFinder->HVACSystemRootFinding;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1316,17 +1318,17 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if ((SELECT_CASE_var == "REGULAFALSI")) {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
                     } else if (SELECT_CASE_var == "BISECTION") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
                     } else if (SELECT_CASE_var == "BISECTIONTHENREGULAFALSI") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
                     } else if (SELECT_CASE_var == "REGULAFALSITHENBISECTION") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsiThenBisection;
                     } else if (SELECT_CASE_var == "ALTERNATION") {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Alternation;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Alternation;
                     } else {
-                        HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+                        HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
                         ShowWarningError(state,
                                          state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
                                              state.dataIPShortCut->cAlphaFieldNames(1) + ". The default choice is assigned = " + AlphaName(1));
@@ -1340,7 +1342,7 @@ namespace HeatBalanceManager {
             }
         } else {
             HVACSystemRootFinding.Algorithm = "RegulaFalsi";
-            HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
+            HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::RegulaFalsi;
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
@@ -5550,6 +5552,7 @@ namespace HeatBalanceManager {
             HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(state);
         }
 
+        // Init storm window pointers
         if (state.dataSurface->TotStormWin > 0) {
             if (state.dataGlobal->BeginDayFlag) {
                 SetStormWindowControl(state);
@@ -5561,6 +5564,18 @@ namespace HeatBalanceManager {
                     state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = state.dataSurface->SurfWinStormWinFlag(SurfNum);
                 }
                 state.dataHeatBalMgr->ChangeSet = true;
+            }
+            for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+                int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                    if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1 &&
+                        state.dataSurface->SurfWinWindowModelType(SurfNum) == DataSurfaces::Window5DetailedModel) {
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfWinStormWinConstr(SurfNum);
+                    } else {
+                        state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->Surface(SurfNum).Construction;
+                    }
+                }
             }
         }
 
@@ -5689,6 +5704,34 @@ namespace HeatBalanceManager {
         }
     }
 
+    void AllocateZoneHeatBalArrays(EnergyPlusData &state)
+    {
+        // Allocate zone / encl hb arrays
+        state.dataHeatBal->EnclSolDB.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolDBSSG.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolDBIntWin.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQD.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclRadQThermalRad.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            state.dataHeatBal->EnclSolDB(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolDBSSG(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolDBIntWin(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQSDifSol(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQD(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQDforDaylight(zoneNum) = 0.0;
+            state.dataHeatBal->EnclRadQThermalRad(zoneNum) = 0.0;
+            state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
+        }
+        state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            state.dataHeatBal->EnclSolQSWRad(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = 0.0;
+        }
+    }
     void AllocateHeatBalArrays(EnergyPlusData &state)
     {
 
@@ -5728,6 +5771,7 @@ namespace HeatBalanceManager {
         // Allocate real Variables
         // Following used for Calculations
         //  Allocate variables in DataHeatBalSys
+        AllocateZoneHeatBalArrays(state);
         state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -5841,6 +5885,17 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
 
         state.dataHeatBalMgr->CountWarmupDayPoints = 0;
+
+        for (int loop = 1; loop <= state.dataGlobal->NumOfZones; ++loop) {
+            // CurrentModuleObject='Zone'
+            SetupOutputVariable(state,
+                                "Zone Mean Radiant Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBal->ZoneMRT(loop),
+                                "Zone",
+                                "State",
+                                state.dataHeatBal->Zone(loop).Name);
+        }
     }
 
     // End Initialization Section of the Module
@@ -5866,7 +5921,6 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
-        int SurfNum;
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -5927,8 +5981,10 @@ namespace HeatBalanceManager {
 
         // Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
         // exchange algorithm knows whether there has been a change in interior movable insulation or not.
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            state.dataSurface->Surface(SurfNum).MovInsulIntPresentPrevTS = state.dataSurface->Surface(SurfNum).MovInsulIntPresent;
+        if (state.dataSurface->AnyMovableInsulation) {
+            for (int surfNum : state.dataHeatBalSurf->SurfMovInsulIndexList) {
+                state.dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(surfNum) = state.dataHeatBalSurf->SurfMovInsulIntPresent(surfNum);
+            }
         }
 
         // For non-complex windows, update a report variable so this shows up in the output as something other than zero
@@ -6234,8 +6290,8 @@ namespace HeatBalanceManager {
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
-                    state.dataHeatBal->SurfWinFenLaySurfTempFront(1, SurfNum) = state.dataHeatBalSurf->TH(1, 1, SurfNum);
-                    state.dataHeatBal->SurfWinFenLaySurfTempBack(state.dataConstruction->Construct(thisConstruct).TotLayers, SurfNum) =
+                    state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, 1) = state.dataHeatBalSurf->TH(1, 1, SurfNum);
+                    state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, state.dataConstruction->Construct(thisConstruct).TotLayers) =
                         state.dataHeatBalSurf->TH(2, 1, SurfNum);
                 }
             }
@@ -7186,8 +7242,6 @@ namespace HeatBalanceManager {
                 state.dataConstruction->Construct(ConstrNum).AbsDiffShade = 0.0;
                 state.dataConstruction->Construct(ConstrNum).AbsDiffBackShade = 0.0;
                 state.dataConstruction->Construct(ConstrNum).ShadeAbsorpThermal = 0.0;
-                state.dataConstruction->Construct(ConstrNum).AbsBeamCoef = 0.0;
-                state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef = 0.0;
                 state.dataConstruction->Construct(ConstrNum).AbsBeamShadeCoef = 0.0;
                 state.dataConstruction->Construct(ConstrNum).AbsDiffIn = 0.0;
                 state.dataConstruction->Construct(ConstrNum).AbsDiffOut = 0.0;
@@ -7205,6 +7259,13 @@ namespace HeatBalanceManager {
                 state.dataConstruction->Construct(ConstrNum).TotLayers = NGlass(IGlSys) + NGaps(IGlSys);
                 state.dataConstruction->Construct(ConstrNum).TotGlassLayers = NGlass(IGlSys);
                 state.dataConstruction->Construct(ConstrNum).TotSolidLayers = NGlass(IGlSys);
+
+                for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+                    for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
+                        state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(Layer)(index) = 0.0;
+                        state.dataConstruction->Construct(ConstrNum).AbsBeamBackCoef(Layer)(index) = 0.0;
+                    }
+                }
 
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     state.dataConstruction->Construct(ConstrNum).LayerPoint(2 * IGlass - 1) = MaterNumSysGlass(IGlass, IGlSys);
@@ -7339,7 +7400,7 @@ namespace HeatBalanceManager {
                 W5LsqFit(CosPhiIndepVar, Tvis, 6, 1, 10, state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef);
                 W5LsqFit(CosPhiIndepVar, Rfsol, 6, 1, 10, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                    W5LsqFit(CosPhiIndepVar, AbsSol(_, IGlass), 6, 1, 10, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(_, IGlass));
+                    W5LsqFit(CosPhiIndepVar, AbsSol(_, IGlass), 6, 1, 10, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass));
                 }
 
                 // For comparing fitted vs. input distribution in incidence angle
@@ -7348,7 +7409,7 @@ namespace HeatBalanceManager {
                     tvisFit(IPhi) = POLYF(CosPhi(IPhi), state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef);
                     rfsolFit(IPhi) = POLYF(CosPhi(IPhi), state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
                     for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                        solabsFit(IGlass, IPhi) = POLYF(CosPhi(IPhi), state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass));
+                        solabsFit(IGlass, IPhi) = POLYF(CosPhi(IPhi), state.dataConstruction->Construct(ConstrNum).AbsBeamCoef(IGlass));
                     }
                 }
                 // end
@@ -8710,17 +8771,17 @@ namespace HeatBalanceManager {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
 
                 if (SELECT_CASE_var == "OTHERSHADINGTYPE") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = csOtherShadingType;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::DIFFSHADE;
                 } else if (SELECT_CASE_var == "VENETIANHORIZONTAL") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = csVenetianHorizontal;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ;
                 } else if (SELECT_CASE_var == "VENETIANVERTICAL") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = csVenetianVertical;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::VENETBLIND_VERT;
                 } else if (SELECT_CASE_var == "WOVEN") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = csWoven;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::WOVSHADE;
                 } else if (SELECT_CASE_var == "PERFORATED") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = csPerforated;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::PERFORATED;
                 } else if (SELECT_CASE_var == "BSDF") {
-                    state.dataHeatBal->ComplexShade(Loop).LayerType = csBSDF;
+                    state.dataHeatBal->ComplexShade(Loop).LayerType = TARCOGParams::TARCOGLayerType::BSDF;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -8876,8 +8937,8 @@ namespace HeatBalanceManager {
                                          state.dataIPShortCut->rNumericArgs(10)));
             }
 
-            if (state.dataHeatBal->ComplexShade(Loop).LayerType == csVenetianHorizontal ||
-                state.dataHeatBal->ComplexShade(Loop).LayerType == csVenetianVertical) {
+            if (BITF_TEST_ANY(BITF(state.dataHeatBal->ComplexShade(Loop).LayerType),
+                              BITF(TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ) | BITF(TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ))) {
                 if (state.dataIPShortCut->rNumericArgs(11) <= 0.0) {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -9064,13 +9125,13 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(3));
                 if (SELECT_CASE_var == "ISO15099") {
-                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = tmISO15099;
+                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = TARCOGParams::TARCOGThermalModel::ISO15099;
                 } else if (SELECT_CASE_var == "SCALEDCAVITYWIDTH") {
-                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = tmScaledCavityWidth;
+                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = TARCOGParams::TARCOGThermalModel::SCW;
                 } else if (SELECT_CASE_var == "CONVECTIVESCALARMODEL_NOSDTHICKNESS") {
-                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = tmConvectiveScalarModel_NoSDThickness;
+                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = TARCOGParams::TARCOGThermalModel::CSM;
                 } else if (SELECT_CASE_var == "CONVECTIVESCALARMODEL_WITHSDTHICKNESS") {
-                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = tmConvectiveScalarModel_WithSDThickness;
+                    state.dataHeatBal->WindowThermalModel(Loop).ThermalModel = TARCOGParams::TARCOGThermalModel::CSM_WithSDThickness;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -9086,11 +9147,11 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(4));
                 if (SELECT_CASE_var == "NODEFLECTION") {
-                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = dmNoDeflection;
+                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = TARCOGParams::DeflectionCalculation::NONE;
                 } else if (SELECT_CASE_var == "TEMPERATUREANDPRESSUREINPUT") {
-                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = dmTemperatureAndPressureInput;
+                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = TARCOGParams::DeflectionCalculation::TEMPERATURE;
                 } else if (SELECT_CASE_var == "MEASUREDDEFLECTION") {
-                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = dmMeasuredDeflection;
+                    state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel = TARCOGParams::DeflectionCalculation::GAP_WIDTHS;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -9102,7 +9163,7 @@ namespace HeatBalanceManager {
                 }
             }
 
-            if (state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel == dmTemperatureAndPressureInput) {
+            if (state.dataHeatBal->WindowThermalModel(Loop).DeflectionModel == TARCOGParams::DeflectionCalculation::TEMPERATURE) {
                 state.dataHeatBal->WindowThermalModel(Loop).VacuumPressureLimit = state.dataIPShortCut->rNumericArgs(2);
                 if (state.dataIPShortCut->rNumericArgs(2) <= 0.0) {
                     ErrorsFound = true;

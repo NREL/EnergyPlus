@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -293,8 +294,8 @@ struct IceThermalStorageData : BaseGlobalStruct
     int NumSimpleIceStorage = 0;
     int NumDetailedIceStorage = 0;
     int TotalNumIceStorage = 0;
-    Array1D<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
-    Array1D<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
+    EPVector<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
+    EPVector<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
 
     void clear_state() override
     {

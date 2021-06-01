@@ -4917,7 +4917,7 @@ namespace SystemAvailabilityManager {
         // on and open windows or doors.
 
         using namespace DataAirLoop;
-        using AirflowNetworkBalanceManager::GetZoneInfilAirChangeRate;
+        using AirflowNetworkBalanceManager::GetZoneOutdoorAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
         using DataHeatBalance::HybridControlTypeClose;
@@ -5037,7 +5037,7 @@ namespace SystemAvailabilityManager {
 
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
                         ManageAirflowNetworkBalance(state, true);
-                        ACH = GetZoneInfilAirChangeRate(state, ZoneNum);
+                        ACH = GetZoneOutdoorAirChangeRate(state, ZoneNum);
                     }
                     if (ACH > OASetPoint) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl =
@@ -5050,7 +5050,7 @@ namespace SystemAvailabilityManager {
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_OperT80) {
                     if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp =
-                            0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                            0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
                         minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 14.3;
                         maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 21.3;
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).minAdaTem = minAdaTem;
@@ -5071,7 +5071,7 @@ namespace SystemAvailabilityManager {
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_OperT90) {
                     if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp =
-                            0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                            0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
                         minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 15.3;
                         maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 20.3;
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).minAdaTem = minAdaTem;

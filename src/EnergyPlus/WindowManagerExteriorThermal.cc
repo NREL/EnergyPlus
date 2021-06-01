@@ -243,18 +243,18 @@ namespace WindowManager {
         }
 
         auto TransDiff = construction.TransDiff;
-        state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
-        state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area * TransDiff;
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
-            state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
+            state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
 
         for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
             state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
             state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas(2 * k);
 
             // temperatures for reporting
-            state.dataHeatBal->SurfWinFenLaySurfTempFront(k, SurfNum) = state.dataWindowManager->thetas(2 * k - 1) - DataGlobalConstants::KelvinConv;
-            state.dataHeatBal->SurfWinFenLaySurfTempBack(k, SurfNum) = state.dataWindowManager->thetas(2 * k) - DataGlobalConstants::KelvinConv;
+            state.dataHeatBal->SurfWinFenLaySurfTempFront(SurfNum, k) = state.dataWindowManager->thetas(2 * k - 1) - DataGlobalConstants::KelvinConv;
+            state.dataHeatBal->SurfWinFenLaySurfTempBack(SurfNum, k) = state.dataWindowManager->thetas(2 * k) - DataGlobalConstants::KelvinConv;
         }
     }
 
@@ -272,8 +272,7 @@ namespace WindowManager {
         m_ShadePosition = ShadePosition::NoShade;
 
         if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
-            m_ConstructionNumber = m_Surface.activeShadedConstruction;
-            if (state.dataSurface->SurfWinStormWinFlag(t_SurfNum) > 0) m_ConstructionNumber = m_Surface.activeStormWinShadedConstruction;
+            m_ConstructionNumber = state.dataSurface->SurfWinActiveShadedConstruction(t_SurfNum);
         }
 
         m_TotLay = getNumOfLayers(state);
@@ -326,8 +325,7 @@ namespace WindowManager {
         auto ConstrNum = m_Surface.Construction;
 
         if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(m_SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(m_SurfNum))) {
-            ConstrNum = m_Surface.activeShadedConstruction;
-            if (state.dataSurface->SurfWinStormWinFlag(m_SurfNum) > 0) ConstrNum = m_Surface.activeStormWinShadedConstruction;
+            ConstrNum = state.dataSurface->SurfWinActiveShadedConstruction(m_SurfNum);
         }
 
         auto &construction(state.dataConstruction->Construct(ConstrNum));
@@ -480,7 +478,7 @@ namespace WindowManager {
         auto swRadiation = surface.getSWIncident(state, t_SurfNum);
         if (swRadiation > 0) {
 
-            auto absCoeff = state.dataHeatBal->SurfWinQRadSWwinAbs(t_Index, t_SurfNum) / swRadiation;
+            auto absCoeff = state.dataHeatBal->SurfWinQRadSWwinAbs(t_SurfNum, t_Index) / swRadiation;
             if ((2 * t_Index - 1) == m_TotLay) {
                 absCoeff += state.dataHeatBal->SurfQRadThermInAbs(t_SurfNum) / swRadiation;
             }
@@ -649,7 +647,7 @@ namespace WindowManager {
         double tSky = state.dataEnvrn->SkyTempKelvin;
         double airSpeed = 0.0;
         if (m_Surface.ExtWind) {
-            airSpeed = m_Surface.WindSpeed;
+            airSpeed = state.dataSurface->SurfOutWindSpeed(m_SurfNum);
         }
         double fclr = 1 - state.dataEnvrn->CloudFraction;
         AirHorizontalDirection airDirection = AirHorizontalDirection::Windward;

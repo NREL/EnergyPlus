@@ -60,7 +60,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -6144,10 +6143,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatPressureRefrig(EnergyPlusData &state,
-                                std::string const &Refrigerant, // carries in substance name
-                                Real64 const Temperature,       // actual temperature given as input
-                                int &RefrigIndex,               // Index to Refrigerant Properties
-                                std::string const &CalledFrom   // routine this function was called from (error messages)
+                                std::string const &Refrigerant,   // carries in substance name
+                                Real64 const Temperature,         // actual temperature given as input
+                                int &RefrigIndex,                 // Index to Refrigerant Properties
+                                std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -6271,10 +6270,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatTemperatureRefrig(EnergyPlusData &state,
-                                   std::string const &Refrigerant, // carries in substance name
-                                   Real64 const Pressure,          // actual temperature given as input
-                                   int &RefrigIndex,               // Index to Refrigerant Properties
-                                   std::string const &CalledFrom   // routine this function was called from (error messages)
+                                   std::string const &Refrigerant,   // carries in substance name
+                                   Real64 const Pressure,            // actual temperature given as input
+                                   int &RefrigIndex,                 // Index to Refrigerant Properties
+                                   std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -6403,11 +6402,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatEnthalpyRefrig(EnergyPlusData &state,
-                                std::string const &Refrigerant, // carries in substance name
-                                Real64 const Temperature,       // actual temperature given as input
-                                Real64 const Quality,           // actual quality given as input
-                                int &RefrigIndex,               // Index to Refrigerant Properties
-                                std::string const &CalledFrom   // routine this function was called from (error messages)
+                                std::string const &Refrigerant,   // carries in substance name
+                                Real64 const Temperature,         // actual temperature given as input
+                                Real64 const Quality,             // actual quality given as input
+                                int &RefrigIndex,                 // Index to Refrigerant Properties
+                                std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -6461,7 +6460,7 @@ namespace FluidProperties {
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
-            ShowSevereError(state, RoutineName + ": Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom);
+            ShowSevereError(state, fmt::format("{}: Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom));
             ShowContinueError(state, format("Saturated refrigerant quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
             ShowFatalError(state, "Program terminates due to preceding condition.");
         }
@@ -6487,11 +6486,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatDensityRefrig(EnergyPlusData &state,
-                               std::string const &Refrigerant, // carries in substance name
-                               Real64 const Temperature,       // actual temperature given as input
-                               Real64 const Quality,           // actual quality given as input
-                               int &RefrigIndex,               // Index to Refrigerant Properties
-                               std::string const &CalledFrom   // routine this function was called from (error messages)
+                               std::string const &Refrigerant,   // carries in substance name
+                               Real64 const Temperature,         // actual temperature given as input
+                               Real64 const Quality,             // actual quality given as input
+                               int &RefrigIndex,                 // Index to Refrigerant Properties
+                               std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -6555,7 +6554,7 @@ namespace FluidProperties {
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
-            ShowSevereError(state, RoutineName + "Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom);
+            ShowSevereError(state, fmt::format("{}Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom));
             ShowContinueError(state, format("Saturated density quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
             ShowFatalError(state, "Program terminates due to preceding condition.");
         }
@@ -6648,11 +6647,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSatSpecificHeatRefrig(EnergyPlusData &state,
-                                    std::string const &Refrigerant, // carries in substance name
-                                    Real64 const Temperature,       // actual temperature given as input
-                                    Real64 const Quality,           // actual quality given as input
-                                    int &RefrigIndex,               // Index to Refrigerant Properties
-                                    std::string const &CalledFrom   // routine this function was called from (error messages)
+                                    std::string const &Refrigerant,   // carries in substance name
+                                    Real64 const Temperature,         // actual temperature given as input
+                                    Real64 const Quality,             // actual quality given as input
+                                    int &RefrigIndex,                 // Index to Refrigerant Properties
+                                    std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -6707,7 +6706,7 @@ namespace FluidProperties {
         }
 
         if ((Quality < 0.0) || (Quality > 1.0)) {
-            ShowSevereError(state, RoutineName + "Refrigerant \"" + Refrigerant + "\", invalid quality, called from " + CalledFrom);
+            ShowSevereError(state, fmt::format("{}Refrigerant \"{}\", invalid quality, called from {}", RoutineName, Refrigerant, CalledFrom));
             ShowContinueError(state, format("Saturated density quality must be between 0 and 1, entered value=[{:.4R}].", Quality));
             ShowFatalError(state, "Program terminates due to preceding condition.");
         }
@@ -6750,11 +6749,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatEnthalpyRefrig(EnergyPlusData &state,
-                                    std::string const &Refrigerant, // carries in substance name
-                                    Real64 const Temperature,       // actual temperature given as input
-                                    Real64 const Pressure,          // actual pressure given as input
-                                    int &RefrigIndex,               // Index to Refrigerant Properties
-                                    std::string const &CalledFrom   // routine this function was called from (error messages)
+                                    std::string const &Refrigerant,   // carries in substance name
+                                    Real64 const Temperature,         // actual temperature given as input
+                                    Real64 const Pressure,            // actual pressure given as input
+                                    int &RefrigIndex,                 // Index to Refrigerant Properties
+                                    std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -6931,7 +6930,7 @@ namespace FluidProperties {
             (refrig.HshValues(LoPressIndex, HiTempIndex) <= 0.0) && (refrig.HshValues(HiPressIndex, HiTempIndex) <= 0.0)) {
             ++state.dataFluidProps->SatErrCountGetSupHeatEnthalpyRefrig;
             // set return value
-            ReturnValue = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom);
+            ReturnValue = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
             // send warning
             if (!state.dataGlobal->WarmupFlag) {
                 state.dataFluidProps->RefrigErrorTracking(RefrigNum).SatSupEnthalpyErrCount +=
@@ -6941,7 +6940,7 @@ namespace FluidProperties {
                     ShowWarningMessage(state,
                                        RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] is saturated at the given conditions, saturated enthalpy at given temperature returned. **");
-                    ShowContinueError(state, "...Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format("...Called From:{}", CalledFrom));
                     ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                     ShowContinueError(state, format("Refrigerant pressure = {:.0R}", Pressure));
                     ShowContinueError(state, format("Returned Enthalpy value = {:.3R}", ReturnValue));
@@ -6970,7 +6969,7 @@ namespace FluidProperties {
                     ShowWarningMessage(state,
                                        RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Temperature is out of range for superheated refrigerant enthalpy: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
@@ -6992,7 +6991,7 @@ namespace FluidProperties {
                     ShowWarningMessage(state,
                                        RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
@@ -7015,11 +7014,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatPressureRefrig(EnergyPlusData &state,
-                                    std::string const &Refrigerant, // carries in substance name
-                                    Real64 const Temperature,       // actual temperature given as input
-                                    Real64 const Enthalpy,          // actual enthalpy given as input
-                                    int &RefrigIndex,               // Index to Refrigerant Properties
-                                    std::string const &CalledFrom   // routine this function was called from (error messages)
+                                    std::string const &Refrigerant,   // carries in substance name
+                                    Real64 const Temperature,         // actual temperature given as input
+                                    Real64 const Enthalpy,            // actual enthalpy given as input
+                                    int &RefrigIndex,                 // Index to Refrigerant Properties
+                                    std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -7202,7 +7201,7 @@ namespace FluidProperties {
         EnthalpyMax = max(refrig.HshValues(TempStart, LoTempIndex), refrig.HshValues(TempStart, HiTempIndex));
         EnthalpyMin = min(refrig.HshValues(TempFinish, LoTempIndex), refrig.HshValues(TempFinish, HiTempIndex));
         // get saturated enthalpy for checking
-        SatEnthalpy = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        SatEnthalpy = GetSatEnthalpyRefrig(state, Refrigerant, Temperature, 1.0, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
 
         // make some checks on the data before interpolating
         if (Enthalpy < SatEnthalpy) {
@@ -7210,7 +7209,7 @@ namespace FluidProperties {
             ++CurSatErrCount;
             ++ErrCount;
             // return sat pressure at this temperature
-            ReturnValue = GetSatPressureRefrig(state, Refrigerant, Temperature, RefrigNum, RoutineNameNoSpace + CalledFrom);
+            ReturnValue = GetSatPressureRefrig(state, Refrigerant, Temperature, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
 
         } else if (EnthalpyMax < Enthalpy || EnthalpyMin > Enthalpy) {
             // out of range error
@@ -7264,7 +7263,7 @@ namespace FluidProperties {
                         state,
                         RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                             "] is saturated at the given enthalpy and temperature, saturated enthalpy at given temperature returned. **");
-                    ShowContinueError(state, "...Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format("...Called From:{}", CalledFrom));
                     ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                     ShowContinueError(state, format("Refrigerant Enthalpy = {:.3R}", Enthalpy));
                     ShowContinueError(state, format("Returned Pressure value = {:.0R}", ReturnValue));
@@ -7289,7 +7288,7 @@ namespace FluidProperties {
                     ShowWarningMessage(state,
                                        RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Temperature is out of range for superheated refrigerant pressure: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
@@ -7311,7 +7310,7 @@ namespace FluidProperties {
                     ShowWarningMessage(state,
                                        RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Pressure is out of range for superheated refrigerant enthalpy: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurEnthalpyRangeErrCount > 0) {
@@ -7334,13 +7333,13 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatTempRefrig(EnergyPlusData &state,
-                                std::string const &Refrigerant, // carries in substance name
-                                Real64 const Pressure,          // actual pressure given as input
-                                Real64 const Enthalpy,          // actual enthalpy given as input
-                                Real64 TempLow,                 // lower bound of temperature in the iteration
-                                Real64 TempUp,                  // upper bound of temperature in the iteration
-                                int &RefrigIndex,               // Index to Refrigerant Properties
-                                std::string const &CalledFrom   // routine this function was called from (error messages)
+                                std::string const &Refrigerant,   // carries in substance name
+                                Real64 const Pressure,            // actual pressure given as input
+                                Real64 const Enthalpy,            // actual enthalpy given as input
+                                Real64 TempLow,                   // lower bound of temperature in the iteration
+                                Real64 TempUp,                    // upper bound of temperature in the iteration
+                                int &RefrigIndex,                 // Index to Refrigerant Properties
+                                std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
         // SUBROUTINE INFORMATION:
@@ -7408,13 +7407,13 @@ namespace FluidProperties {
 
         // check temperature data range and attempt to cap if necessary
         RefTHigh = refrig.PsHighTempValue;
-        RefTSat = GetSatTemperatureRefrig(state, Refrigerant, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        RefTSat = GetSatTemperatureRefrig(state, Refrigerant, Pressure, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
 
         if (TempLow < RefTSat) {
             ShowWarningMessage(state,
                                RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                    "] temperature lower bound is out of range for superheated refrigerant: values capped **");
-            ShowContinueError(state, " Called From:" + CalledFrom);
+            ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
             ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
         }
@@ -7422,7 +7421,7 @@ namespace FluidProperties {
             ShowWarningMessage(state,
                                RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                    "] temperature lower bound is out of range for superheated refrigerant: values capped **");
-            ShowContinueError(state, " Called From:" + CalledFrom);
+            ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
             ShowContinueErrorTimeStamp(state, "");
             TempUp = RefTHigh;
         }
@@ -7430,15 +7429,15 @@ namespace FluidProperties {
             ShowWarningMessage(state,
                                RoutineName + "Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                    "] temperature lower bound is out of range for superheated refrigerant: values capped **");
-            ShowContinueError(state, " Called From:" + CalledFrom);
+            ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
             ShowContinueErrorTimeStamp(state, "");
             TempLow = RefTSat;
             TempUp = RefTHigh;
         }
 
         // check enthalpy data range and attempt to cap if necessary
-        EnthalpyLow = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempLow, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
-        EnthalpyHigh = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempUp, Pressure, RefrigNum, RoutineNameNoSpace + CalledFrom);
+        EnthalpyLow = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempLow, Pressure, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
+        EnthalpyHigh = GetSupHeatEnthalpyRefrig(state, Refrigerant, TempUp, Pressure, RefrigNum, fmt::format("{}{}", RoutineNameNoSpace, CalledFrom));
         if (Enthalpy <= EnthalpyLow) {
             ReturnValue = TempLow;
             return ReturnValue;
@@ -7450,16 +7449,16 @@ namespace FluidProperties {
 
         // Perform iterations to obtain the temperature level
         {
-            Array1D<Real64> Par(6);       // Parameters passed to RegulaFalsi
+            std::array<Real64, 3> Par;    // Parameters passed to RegulaFalsi
             Real64 const ErrorTol(0.001); // tolerance for RegulaFalsi iterations
             int const MaxIte(500);        // maximum number of iterations
             int SolFla;                   // Flag of RegulaFalsi solver
 
-            Par(1) = RefrigNum;
-            Par(2) = Enthalpy;
-            Par(3) = Pressure;
+            Par[0] = RefrigNum;
+            Par[1] = Enthalpy;
+            Par[2] = Pressure;
 
-            TempSolveRoot::SolveRoot(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
+            General::SolveRoot(state, ErrorTol, MaxIte, SolFla, Temp, GetSupHeatTempRefrigResidual, TempLow, TempUp, Par);
             ReturnValue = Temp;
         }
 
@@ -7468,7 +7467,7 @@ namespace FluidProperties {
 
     Real64 GetSupHeatTempRefrigResidual(EnergyPlusData &state,
                                         Real64 const Temp, // temperature of the refrigerant
-                                        Array1D<Real64> const &Par)
+                                        std::array<Real64, 3> const &Par)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
@@ -7515,9 +7514,9 @@ namespace FluidProperties {
         Real64 Enthalpy_Req;     // enthalpy of the refrigerant to meet
         Real64 Enthalpy_Act;     // enthalpy of the refrigerant calculated
 
-        RefrigNum = int(Par(1));
-        Enthalpy_Req = Par(2);
-        Pressure = Par(3);
+        RefrigNum = int(Par[0]);
+        Enthalpy_Req = Par[1];
+        Pressure = Par[2];
         Refrigerant = state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name;
         if (std::abs(Enthalpy_Req) < 100.0) Enthalpy_Req = sign(100.0, Enthalpy_Req);
 
@@ -7531,11 +7530,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetSupHeatDensityRefrig(EnergyPlusData &state,
-                                   std::string const &Refrigerant, // carries in substance name
-                                   Real64 const Temperature,       // actual temperature given as input
-                                   Real64 const Pressure,          // actual pressure given as input
-                                   int &RefrigIndex,               // Index to Refrigerant Properties
-                                   std::string const &CalledFrom   // routine this function was called from (error messages)
+                                   std::string const &Refrigerant,   // carries in substance name
+                                   Real64 const Temperature,         // actual temperature given as input
+                                   Real64 const Pressure,            // actual pressure given as input
+                                   int &RefrigIndex,                 // Index to Refrigerant Properties
+                                   std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -7722,7 +7721,7 @@ namespace FluidProperties {
                 ShowWarningMessage(state,
                                    RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                        "] is saturated at the given conditions, saturated density at given temperature returned. **");
-                ShowContinueError(state, "...Called From:" + CalledFrom);
+                ShowContinueError(state, fmt::format("...Called From:{}", CalledFrom));
                 ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                 ShowContinueError(state, format("Refrigerant pressure = {:.0R}", Pressure));
                 ShowContinueError(state, format("Returned Density value = {:.3R}", saturated_density));
@@ -7752,7 +7751,7 @@ namespace FluidProperties {
                     ShowWarningMessage(state,
                                        RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Temperature is out of range for superheated refrigerant density: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurTempRangeErrCount > 0) {
@@ -7774,7 +7773,7 @@ namespace FluidProperties {
                     ShowWarningMessage(state,
                                        RoutineName + ": Refrigerant [" + state.dataFluidProps->RefrigErrorTracking(RefrigNum).Name +
                                            "] Pressure is out of range for superheated refrigerant density: values capped **");
-                    ShowContinueError(state, " Called From:" + CalledFrom);
+                    ShowContinueError(state, fmt::format(" Called From:{}", CalledFrom));
                     ShowContinueErrorTimeStamp(state, "");
                 }
                 if (CurPresRangeErrCount > 0) {
@@ -7797,17 +7796,17 @@ namespace FluidProperties {
     //*****************************************************************************
 #ifdef EP_cache_GlycolSpecificHeat
     Real64 GetSpecificHeatGlycol_raw(EnergyPlusData &state,
-                                     std::string const &Glycol,    // carries in substance name
-                                     Real64 const Temperature,     // actual temperature given as input
-                                     int &GlycolIndex,             // Index to Glycol Properties
-                                     std::string const &CalledFrom // routine this function was called from (error messages)
+                                     std::string const &Glycol,        // carries in substance name
+                                     Real64 const Temperature,         // actual temperature given as input
+                                     int &GlycolIndex,                 // Index to Glycol Properties
+                                     std::string_view const CalledFrom // routine this function was called from (error messages)
     )
 #else
     Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
-                                 std::string const &Glycol,    // carries in substance name
-                                 Real64 const Temperature,     // actual temperature given as input
-                                 int &GlycolIndex,             // Index to Glycol Properties
-                                 std::string const &CalledFrom // routine this function was called from (error messages)
+                                 std::string const &Glycol,        // carries in substance name
+                                 Real64 const Temperature,         // actual temperature given as input
+                                 int &GlycolIndex,                 // Index to Glycol Properties
+                                 std::string_view const CalledFrom // routine this function was called from (error messages)
     )
 #endif
     {
@@ -7959,10 +7958,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetDensityGlycol(EnergyPlusData &state,
-                            std::string const &Glycol,    // carries in substance name
-                            Real64 const Temperature,     // actual temperature given as input
-                            int &GlycolIndex,             // Index to Glycol Properties
-                            std::string const &CalledFrom // routine this function was called from (error messages)
+                            std::string const &Glycol,        // carries in substance name
+                            Real64 const Temperature,         // actual temperature given as input
+                            int &GlycolIndex,                 // Index to Glycol Properties
+                            std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -8139,10 +8138,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetConductivityGlycol(EnergyPlusData &state,
-                                 std::string const &Glycol,    // carries in substance name
-                                 Real64 const Temperature,     // actual temperature given as input
-                                 int &GlycolIndex,             // Index to Glycol Properties
-                                 std::string const &CalledFrom // routine this function was called from (error messages)
+                                 std::string const &Glycol,        // carries in substance name
+                                 Real64 const Temperature,         // actual temperature given as input
+                                 int &GlycolIndex,                 // Index to Glycol Properties
+                                 std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -8322,10 +8321,10 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetViscosityGlycol(EnergyPlusData &state,
-                              std::string const &Glycol,    // carries in substance name
-                              Real64 const Temperature,     // actual temperature given as input
-                              int &GlycolIndex,             // Index to Glycol Properties
-                              std::string const &CalledFrom // routine this function was called from (error messages)
+                              std::string const &Glycol,        // carries in substance name
+                              Real64 const Temperature,         // actual temperature given as input
+                              int &GlycolIndex,                 // Index to Glycol Properties
+                              std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -8511,11 +8510,11 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetQualityRefrig(EnergyPlusData &state,
-                            std::string const &Refrigerant, // carries in substance name
-                            Real64 const Temperature,       // actual temperature given as input
-                            Real64 const Enthalpy,          // actual enthalpy given as input
-                            int &RefrigIndex,               // Index to Refrigerant Properties
-                            std::string const &CalledFrom   // routine this function was called from (error messages)
+                            std::string const &Refrigerant,   // carries in substance name
+                            Real64 const Temperature,         // actual temperature given as input
+                            Real64 const Enthalpy,            // actual enthalpy given as input
+                            int &RefrigIndex,                 // Index to Refrigerant Properties
+                            std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
 
@@ -8897,14 +8896,14 @@ namespace FluidProperties {
     //*****************************************************************************
 
     Real64 GetInterpolatedSatProp(EnergyPlusData &state,
-                                  Real64 const Temperature,         // Saturation Temp.
-                                  Array1D<Real64> const &PropTemps, // Array of temperature at which props are available
-                                  Array1D<Real64> const &LiqProp,   // Array of saturated liquid properties
-                                  Array1D<Real64> const &VapProp,   // Array of saturatedvapour properties
-                                  Real64 const Quality,             // Quality
-                                  std::string const &CalledFrom,    // routine this function was called from (error messages)
-                                  int const LowBound,               // Valid values lower bound (set by calling program)
-                                  int const UpperBound              // Valid values upper bound (set by calling program)
+                                  Real64 const Temperature,          // Saturation Temp.
+                                  Array1D<Real64> const &PropTemps,  // Array of temperature at which props are available
+                                  Array1D<Real64> const &LiqProp,    // Array of saturated liquid properties
+                                  Array1D<Real64> const &VapProp,    // Array of saturatedvapour properties
+                                  Real64 const Quality,              // Quality
+                                  std::string_view const CalledFrom, // routine this function was called from (error messages)
+                                  int const LowBound,                // Valid values lower bound (set by calling program)
+                                  int const UpperBound               // Valid values upper bound (set by calling program)
     )
     {
 
@@ -8985,7 +8984,7 @@ namespace FluidProperties {
             // send warning
             if (state.dataFluidProps->TempRangeErrCountGetInterpolatedSatProp <= state.dataFluidProps->RefrigerantErrorLimitTest) {
                 ShowWarningError(state, "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **");
-                ShowContinueErrorTimeStamp(state, " Called from:" + CalledFrom);
+                ShowContinueErrorTimeStamp(state, fmt::format(" Called from:{}", CalledFrom));
                 ShowContinueError(state, format("Refrigerant temperature = {:.2R}", Temperature));
                 ShowContinueError(state, format("Returned saturated property value = {:.3R}", ReturnValue));
             } else {
@@ -9109,13 +9108,13 @@ namespace FluidProperties {
     }
 
     void ReportFatalGlycolErrors(EnergyPlusData &state,
-                                 int const NumGlycols,           // Number of Glycols in input/data
-                                 int const GlycolNum,            // Glycol Index
-                                 bool const DataPresent,         // data is present for this fluid.
-                                 std::string const &GlycolName,  // Name being reported
-                                 std::string const &RoutineName, // Routine name to show
-                                 std::string const &Property,    // Property being requested
-                                 std::string const &CalledFrom   // original called from (external to fluid properties)
+                                 int const NumGlycols,             // Number of Glycols in input/data
+                                 int const GlycolNum,              // Glycol Index
+                                 bool const DataPresent,           // data is present for this fluid.
+                                 std::string const &GlycolName,    // Name being reported
+                                 std::string const &RoutineName,   // Routine name to show
+                                 std::string const &Property,      // Property being requested
+                                 std::string_view const CalledFrom // original called from (external to fluid properties)
     )
     {
 
@@ -9156,15 +9155,17 @@ namespace FluidProperties {
         RefrigNo = FindRefrigerant(state, GlycolName);
 
         if (NumGlycols == 0) {
-            ShowSevereError(state,
-                            RoutineName + ": no glycols found -- cannot evaluate fluid " + Property + " for \"" + GlycolName +
-                                "\", called from: " + CalledFrom);
+            ShowSevereError(
+                state,
+                fmt::format(
+                    "{}: no glycols found -- cannot evaluate fluid {} for \"{}\", called from: {}", RoutineName, Property, GlycolName, CalledFrom));
         } else if (GlycolNum == 0) {
-            ShowSevereError(state, RoutineName + ": data not found in input for requested glycol \"" + GlycolName + "\", called from: " + CalledFrom);
+            ShowSevereError(
+                state, fmt::format("{}: data not found in input for requested glycol \"{}\", called from: {}", RoutineName, GlycolName, CalledFrom));
         } else if (!DataPresent) {
             ShowSevereError(state,
                             RoutineName + ": " + Property + " data not found in input for requested glycol \"" + GlycolName +
-                                "\", called from: " + CalledFrom);
+                                fmt::format("\", called from: {}", CalledFrom));
         }
         if (RefrigNo > 0) ShowContinueError(state, "Note: that fluid is listed as a Refrigerant from input.");
 
@@ -9178,7 +9179,7 @@ namespace FluidProperties {
                                       std::string const &RefrigerantName, // Name being reported
                                       std::string const &RoutineName,     // Routine name to show
                                       std::string const &Property,        // Property being requested
-                                      std::string const &CalledFrom       // original called from (external to fluid properties)
+                                      std::string_view const CalledFrom   // original called from (external to fluid properties)
     )
     {
 
@@ -9220,15 +9221,23 @@ namespace FluidProperties {
 
         if (NumRefrigerants == 0) {
             ShowSevereError(state,
-                            RoutineName + ": no refrigerants found -- cannot evaluate fluid " + Property + " for \"" + RefrigerantName +
-                                "\", called from: " + CalledFrom);
+                            fmt::format("{}: no refrigerants found -- cannot evaluate fluid {} for \"{}\", called from: {}",
+                                        RoutineName,
+                                        Property,
+                                        RefrigerantName,
+                                        CalledFrom));
         } else if (RefrigerantNum == 0) {
             ShowSevereError(
-                state, RoutineName + ": data not found in input for requested refrigerant \"" + RefrigerantName + "\", called from: " + CalledFrom);
+                state,
+                fmt::format(
+                    "{}: data not found in input for requested refrigerant \"{}\", called from: {}", RoutineName, RefrigerantName, CalledFrom));
         } else if (!DataPresent) {
             ShowSevereError(state,
-                            RoutineName + ": " + Property + " data not found in input for requested refrigerant \"" + RefrigerantName +
-                                "\", called from: " + CalledFrom);
+                            fmt::format("{}: {} data not found in input for requested refrigerant \"{}\", called from: {}",
+                                        RoutineName,
+                                        Property,
+                                        RefrigerantName,
+                                        CalledFrom));
         }
         if (GlycolNo > 0) ShowContinueError(state, "Note: that fluid is listed as a Glycol from input.");
 

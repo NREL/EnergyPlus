@@ -492,7 +492,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
 
     // compare_err_stream( "" ); // just for debugging
 
-    SurfaceGeometry::AllocateModuleArrays(*state);
+    SurfaceGeometry::AllocateSurfaceArrays(*state);
 
     //  Adding additional surfaces will change the index of the following based on where the surfaces are added in the array.
     //	If adding new tests, break here and look at EnergyPlus::state->dataSurface->Surface to see the order.
@@ -2498,13 +2498,13 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 6;
 
-    state->dataSurface->Surface.dimension(6);
+    state->dataSurface->Surface.allocate(6);
 
     state->dataSurface->Surface(1).Sides = 4;
     state->dataSurface->Surface(1).Vertex.dimension(4);
@@ -2569,13 +2569,13 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
     //    Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
-    state->dataSurface->Surface.dimension(5);
+    state->dataSurface->Surface.allocate(5);
 
     state->dataSurface->Surface(1).Sides = 4;
     state->dataSurface->Surface(1).Vertex.dimension(4);
@@ -2634,13 +2634,13 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
-    state->dataSurface->Surface.dimension(5);
+    state->dataSurface->Surface.allocate(5);
 
     state->dataSurface->Surface(1).Sides = 4;
     state->dataSurface->Surface(1).Vertex.dimension(4);
@@ -2699,13 +2699,13 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HasFloor = true;
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 5;
 
-    state->dataSurface->Surface.dimension(5);
+    state->dataSurface->Surface.allocate(5);
 
     state->dataSurface->Surface(1).Sides = 4;
     state->dataSurface->Surface(1).Vertex.dimension(4);
@@ -2764,12 +2764,12 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).AllSurfaceLast = 4;
 
-    state->dataSurface->Surface.dimension(4);
+    state->dataSurface->Surface.allocate(4);
 
     state->dataSurface->Surface(1).Sides = 4;
     state->dataSurface->Surface(1).Vertex.dimension(4);
