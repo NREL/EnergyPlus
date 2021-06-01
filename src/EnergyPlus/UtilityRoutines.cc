@@ -181,14 +181,14 @@ namespace UtilityRoutines {
 
         Real64 rProcessNumber = 0.0;
         //  Make sure the string has all what we think numerics should have
-        std::string_view PString((String_view)); //            stripped - > moved to readItem
+        std::string_view PString(stripped(String_view));
         std::string::size_type const StringLen(PString.length());
         ErrorFlag = false;
         if (StringLen == 0) return rProcessNumber;
         bool parseFailed = false;
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
 
-            //            std::replace_if - > moved to readItem
+            // std::replace_if - > moved to readItem
             // is this not working because string_view is acting like a const variable? // Do we need to convert/cast it here? -> move this to the
             // 'deepest' function so that the copying can be minimized
 

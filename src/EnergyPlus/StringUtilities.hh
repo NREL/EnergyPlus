@@ -94,7 +94,7 @@ template <typename Param> bool readItem(std::string input, Param &&param)
 
 template <typename Param> bool readItem(std::string_view input, Param &&param)
 {
-    std::string temp_string = static_cast<std::string>(stripped(input));
+    std::string temp_string = static_cast<std::string>(input);
     // make FORTRAN floating point number (containing 'd' or 'D')
     // standardized by replacing 'd' or 'D' with 'e'
     std::replace_if(

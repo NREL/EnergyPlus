@@ -1695,8 +1695,14 @@ namespace ScheduleManager {
             std::sort(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // sorting to use std::adjacent_find
             const auto duplicate =
                 std::adjacent_find(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // what if there are multiple last elements?
-            if (duplicate != vectorOfCSVColNumbers.end()) {  // TODO : what if there are multiple last elements? - remove last element and check if duplicate is still the same
-                ShowFatalError(state, format("Multiple schedules pointing to the same column number : {} in file {}. Please modify the IDF file and make sure multiple schedules do not point to the same column in the file.", *duplicate, fileNameItem));
+            if (duplicate !=
+                vectorOfCSVColNumbers
+                    .end()) { // TODO : what if there are multiple last elements? - remove last element and check if duplicate is still the same
+                ShowFatalError(state,
+                               format("Multiple schedules pointing to the same column number : {} in file {}. Please modify the IDF file and make "
+                                      "sure multiple schedules do not point to the same column in the file.",
+                                      *duplicate,
+                                      fileNameItem));
             }
 
             std::ifstream file(fileNameItem);
