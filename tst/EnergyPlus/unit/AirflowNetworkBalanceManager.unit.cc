@@ -23516,7 +23516,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
 
     EXPECT_EQ(state->dataAirflowNetwork->IntraZoneNodeData(1).AFNZoneNum, 1);
     EXPECT_EQ(state->dataAirflowNetwork->IntraZoneNodeData(1).ZoneNum, 3);
-
 }
 
 } // namespace EnergyPlus
