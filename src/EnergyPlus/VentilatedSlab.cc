@@ -371,7 +371,7 @@ namespace VentilatedSlab {
                     state.dataVentilatedSlab->VentSlab(Item).SlabIn(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).SlabInNodeName(SurfNum);
                     state.dataVentilatedSlab->VentSlab(Item).SlabOut(SurfNum) = state.dataSurfLists->SlabList(SurfListNum).SlabOutNodeName(SurfNum);
                     if (state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum) != 0) {
-                        state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
+                        state.dataSurface->SurfIntConvSurfHasActiveInIt(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(SurfNum)) = true;
                     }
                 }
 
@@ -392,7 +392,7 @@ namespace VentilatedSlab {
                                     CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " + cAlphaFields(4) + "=\"" +
                                         state.dataIPShortCut->cAlphaArgs(4) + "\" not found.");
                     ErrorsFound = true;
-                } else if (state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
+                } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1))) {
                     ShowSevereError(state, CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid Surface");
                     ShowContinueError(state,
                                       cAlphaFields(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) +
@@ -400,8 +400,8 @@ namespace VentilatedSlab {
                     ErrorsFound = true;
                 }
                 if (state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1) != 0) {
-                    state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
-                    state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
+                    state.dataSurface->SurfIntConvSurfHasActiveInIt(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1)) = true;
+                    state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(state.dataVentilatedSlab->VentSlab(Item).SurfacePtr(1)) = true;
                 }
             }
 
@@ -2912,9 +2912,9 @@ namespace VentilatedSlab {
             if (SELECT_CASE_var == state.dataVentilatedSlab->MATControl) {
                 SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->MRTControl) {
-                SetPointTemp = state.dataHeatBal->MRT(ZoneNum);
+                SetPointTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->OPTControl) {
-                SetPointTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                SetPointTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->ODBControl) {
                 SetPointTemp = state.dataEnvrn->OutDryBulbTemp;
             } else if (SELECT_CASE_var == state.dataVentilatedSlab->OWBControl) {
