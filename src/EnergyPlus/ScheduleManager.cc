@@ -1872,6 +1872,10 @@ namespace ScheduleManager {
             hourlyFileValues.deallocate();
         }
 
+        auto schedt2 = high_resolution_clock::now();
+        duration<double, std::micro> Schedus_double = schedt2 - schedt1;
+        ShowWarningError(state, format("We finished Sched:file operation here, it took {} microseconds. ", Schedus_double.count()));
+
         std::string curName;
         Array1D<Real64> timestepColumnValues;
         for (auto &NameValue : CSVAllColumnNames) {
@@ -1926,10 +1930,6 @@ namespace ScheduleManager {
 
         MinuteValue.deallocate();
         SetMinuteValue.deallocate();
-
-        auto schedt2 = high_resolution_clock::now();
-        duration<double, std::micro> Schedus_double = schedt2 - schedt1;
-        ShowWarningError(state, format("We finished Sched:file operation here, it took {} microseconds. ", Schedus_double.count()));
 
         // Constant Schedules
         CurrentModuleObject = "Schedule:Constant";
