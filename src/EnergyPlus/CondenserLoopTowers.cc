@@ -2047,7 +2047,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::initEachEnvironment(EnergyPlusData &state)
     {
-        static std::string const RoutineName("CoolingTower::initEachEnvironment");
+        static constexpr std::string_view RoutineName("CoolingTower::initEachEnvironment");
         Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                              DataGlobalConstants::InitConvTemp,
@@ -2471,7 +2471,7 @@ namespace CondenserLoopTowers {
 
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
-        static std::string const RoutineName("SizeTower");
+        static constexpr std::string_view RoutineName("SizeTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;                       // Flag of solver
@@ -3431,7 +3431,7 @@ namespace CondenserLoopTowers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
-        static std::string const RoutineName("SizeTower");
+        static constexpr std::string_view RoutineName("SizeTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla; // Flag of solver
@@ -4392,7 +4392,7 @@ namespace CondenserLoopTowers {
         // ASHRAE HVAC1KIT: A Toolkit for Primary HVAC System Energy Calculation. 1999.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calculateSingleSpeedTower");
+        static constexpr std::string_view RoutineName("calculateSingleSpeedTower");
         int const MaxIteration(100); // Maximum fluid bypass iteration calculations
         static std::string const MaxItChar("100");
         Real64 const BypassFractionThreshold(0.01); // Threshold to stop bypass iteration
@@ -4703,7 +4703,7 @@ namespace CondenserLoopTowers {
         // ASHRAE HVAC1KIT: A Toolkit for Primary HVAC System Energy Calculation. 1999.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calculateTwoSpeedTower");
+        static constexpr std::string_view RoutineName("calculateTwoSpeedTower");
 
         // init
         this->Qactual = 0.0;
@@ -4928,7 +4928,7 @@ namespace CondenserLoopTowers {
 
         int const MaxIte(500);    // Maximum number of iterations
         Real64 const Acc(0.0001); // Accuracy of result
-        static std::string const RoutineName("calculateVariableSpeedTower");
+        static constexpr std::string_view RoutineName("calculateVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla(0);             // Flag of solver
@@ -5245,7 +5245,7 @@ namespace CondenserLoopTowers {
         Real64 const DesignWetBulb(25.56); // tower outdoor air entering wetbulb for design [C]
         int const MaxIte(500);             // Maximum number of iterations for solver
         Real64 const Acc(1.e-3);           // Accuracy of solver result
-        static std::string const RoutineName("calculateMerkelVariableSpeedTower");
+        static constexpr std::string_view RoutineName("calculateMerkelVariableSpeedTower");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::array<Real64, 8> Par; // Parameter array passed to solver
@@ -5563,7 +5563,7 @@ namespace CondenserLoopTowers {
         // ASHRAE     1999.  HVAC1KIT: A Toolkit for Primary HVAC System Energy Calculations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calculateSimpleTowerOutletTemp");
+        static constexpr std::string_view RoutineName("calculateSimpleTowerOutletTemp");
 
         // initialize some local variables
         Real64 QactualLocal = 0.0; // Actual heat transfer rate between tower water and air [W]
@@ -6203,7 +6203,7 @@ namespace CondenserLoopTowers {
         // Code for this routine started from VariableSpeedTower
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("calculateWaterUsage");
+        static constexpr std::string_view RoutineName("calculateWaterUsage");
 
         Real64 EvapVdot(0.0);
         Real64 AverageWaterTemp = (this->InletWaterTemp + this->OutletWaterTemp) / 2.0;

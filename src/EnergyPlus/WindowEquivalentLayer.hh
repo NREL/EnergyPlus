@@ -115,7 +115,7 @@ namespace WindowEquivalentLayer {
 
     Real64 P01(EnergyPlusData &state,
                Real64 const P,         // property
-               std::string const &WHAT // identifier for err msg
+               std::string_view const WHAT // identifier for err msg
     );
 
     Real64

@@ -502,7 +502,7 @@ namespace UnitarySystems {
     void UnitarySys::initUnitarySystems(
         EnergyPlusData &state, int const &AirLoopNum, bool const &FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp)
     {
-        static std::string const routineName("InitUnitarySystems");
+        static constexpr std::string_view routineName("InitUnitarySystems");
         bool errorsFound = false; // error flag for mining functions
 
         if (state.dataUnitarySystems->myOneTimeFlag) {
@@ -1402,7 +1402,7 @@ namespace UnitarySystems {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const RunOnSensible(1); // identifier for temperature (sensible load) control
         int const RunOnLatent(2);   // identifier for humidity (latent load) control
-        static std::string const routineName("FrostControlSetPointLimit");
+        static constexpr std::string_view routineName("FrostControlSetPointLimit");
 
         Real64 AirMassFlow = state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).MassFlowRate;
         if (ControlMode == RunOnSensible && AirMassFlow > DataHVACGlobals::SmallAirVolFlow &&
@@ -1455,7 +1455,7 @@ namespace UnitarySystems {
         // heating and cooling capacities are close but not identical.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeUnitarySystem");
+        static constexpr std::string_view RoutineName("SizeUnitarySystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Iter;                  // iteration count
@@ -1652,7 +1652,7 @@ namespace UnitarySystems {
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
             } else {
                 // should never happen
-                ShowSevereError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError(state, "Illegal entry for Cooling Supply Air Flow Rate Method.");
             }
 
@@ -1783,7 +1783,7 @@ namespace UnitarySystems {
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
                 // should never happen
-                ShowSevereError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError(state, "Illegal entry for Heating Supply Air Flow Rate Method.");
             }
 
@@ -1945,7 +1945,7 @@ namespace UnitarySystems {
             this->m_DesignFanVolFlowRate = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
             if (this->m_ActualFanVolFlowRate > 0.0) this->m_DesignFanVolFlowRate = this->m_ActualFanVolFlowRate;
             if (this->m_DesignFanVolFlowRate <= 0.0) {
-                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowFatalError(state, "Unable to determine fan air flow rate.");
             }
         }
@@ -2151,7 +2151,7 @@ namespace UnitarySystems {
                                                       0.0,
                                                       0.0); // conduct the sizing operation in the VS WSHP
             if (this->m_NumOfSpeedCooling != state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                 ShowFatalError(state,
                                "Cooling coil = " + state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).VarSpeedCoilType + ": " +
@@ -2202,7 +2202,7 @@ namespace UnitarySystems {
             auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
             // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
             if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
-                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                 ShowFatalError(state, "Cooling coil = Coil:Cooling:DX: " + newCoil.name);
             }
@@ -2363,7 +2363,7 @@ namespace UnitarySystems {
                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                             if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] < 1.0 &&
                                 this->m_ControlType == ControlType::Setpoint) {
-                                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
                                 ShowContinueError(state, "Design specification object = " + state.dataUnitarySystems->designSpecMSHP[MSHPIndex].name);
                                 ShowContinueError(state,
                                                   "When control type = SetPointBased the outlet air temperature must change with coil capacity, if "
@@ -2435,7 +2435,7 @@ namespace UnitarySystems {
                                                       0.0); // conduct the sizing operation in the VS WSHP
 
             if (this->m_NumOfSpeedHeating != state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
                 ShowContinueError(state, "Number of heating speeds does not match coil object.");
                 ShowFatalError(state,
                                "Heating coil = " + state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).VarSpeedCoilType + ": " +
@@ -9571,7 +9571,7 @@ namespace UnitarySystems {
         // Initialize mass flow rates and speed ratios. Calculate loads and adjust if necessary when using constant fan.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const routineName("InitUnitarySystems");
+        static constexpr std::string_view routineName("InitUnitarySystems");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // static Array1D_bool MyEnvrnFlag; // environment flag
@@ -14735,7 +14735,7 @@ namespace UnitarySystems {
         //  Calculate the heat recovered from UnitarySystem
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const routineName("UnitarySystemHeatRecovery");
+        static constexpr std::string_view routineName("UnitarySystemHeatRecovery");
 
         Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
@@ -16720,7 +16720,7 @@ namespace UnitarySystems {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CheckUnitarySysCoilInOASysExists: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("CheckUnitarySysCoilInOASysExists: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         if (state.dataUnitarySystems->getInputOnceFlag) {
@@ -16747,10 +16747,10 @@ namespace UnitarySystems {
                 }
             }
             if (!UnitarySysFound) {
-                ShowSevereError(state, RoutineName + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
+                ShowSevereError(state, std::string{RoutineName} + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
             }
         } else {
-            ShowSevereError(state, RoutineName + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
+            ShowSevereError(state, std::string{RoutineName} + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
         }
     }
 

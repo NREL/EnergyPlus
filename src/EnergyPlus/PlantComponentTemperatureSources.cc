@@ -124,7 +124,7 @@ namespace PlantComponentTemperatureSources {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitWaterSource");
+        static constexpr std::string_view RoutineName("InitWaterSource");
 
         if (this->MyFlag) {
             // setup output variables once here
@@ -145,7 +145,7 @@ namespace PlantComponentTemperatureSources {
                                                     this->InletNodeNum,
                                                     _);
             if (errFlag) {
-                ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
+                ShowFatalError(state, std::string{RoutineName} + ": Program terminated due to previous condition(s).");
             }
             this->MyFlag = false;
         }
@@ -395,7 +395,7 @@ namespace PlantComponentTemperatureSources {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("CalcWaterSource");
+        static constexpr std::string_view RoutineName("CalcWaterSource");
 
         if (this->MassFlowRate > 0.0) {
             this->OutletTemp = this->BoundaryTemp;

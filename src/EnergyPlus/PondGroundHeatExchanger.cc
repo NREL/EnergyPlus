@@ -379,7 +379,7 @@ void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &st
     Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
     Real64 const PondHeight(0.0);     // for now
 
-    static std::string const RoutineName("InitPondGroundHeatExchanger");
+    static constexpr std::string_view RoutineName("InitPondGroundHeatExchanger");
 
     // repeated warm up days tend to drive the initial pond temperature toward the drybulb temperature
     // For each environment start the pond midway between drybulb and ground temp.
@@ -491,7 +491,7 @@ void PondGroundHeatExchangerData::CalcPondGroundHeatExchanger(EnergyPlusData &st
     //   Rejecter With Closed-Loop Ground-Source Heat Pump Systems.
     //   ASHRAE Transactions.  106(2):107-121.
 
-    static std::string const RoutineName("CalcPondGroundHeatExchanger");
+    static constexpr std::string_view RoutineName("CalcPondGroundHeatExchanger");
 
     Real64 PondMass = this->Depth * this->Area *
                       FluidProperties::GetDensityGlycol(
@@ -560,7 +560,7 @@ Real64 PondGroundHeatExchangerData::CalcTotalFLux(EnergyPlusData &state, Real64 
     Real64 const SchmidtAir(0.6);  // Schmidt number for air - assumed constant
     Real64 const PondHeight(0.0);  // for now
 
-    static std::string const RoutineName("PondGroundHeatExchanger:CalcTotalFlux");
+    static constexpr std::string_view RoutineName("PondGroundHeatExchanger:CalcTotalFlux");
 
     // make a surface heat balance and solve for temperature
     Real64 ThermalAbs = 0.9; // thermal absorptivity
@@ -862,7 +862,7 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
     // ground heat exchangers.   This routine must also set the outlet water
     // conditions.
 
-    static std::string const RoutineName("PondGroundHeatExchanger:Update");
+    static constexpr std::string_view RoutineName("PondGroundHeatExchanger:Update");
 
     // Calculate the water side outlet conditions and set the
     // appropriate conditions on the correct HVAC node.

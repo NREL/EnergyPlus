@@ -443,7 +443,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
     using Psychrometrics::PsyRhovFnTdbWPb_fast;
     using Psychrometrics::PsyWFnTdbRhPb;
 
-    static std::string const RoutineName("CalcMoistureEMPD");
+    static constexpr std::string_view RoutineName("CalcMoistureEMPD");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NOFITR;           // Number of iterations

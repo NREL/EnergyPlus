@@ -168,7 +168,7 @@ namespace SplitterComponent {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSplitterInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSplitterInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SplitterNum; // The Splitter that you are currently loading input into
@@ -310,7 +310,7 @@ namespace SplitterComponent {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting input.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
         }
     }
 

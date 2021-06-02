@@ -372,7 +372,7 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
@@ -495,7 +495,7 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;
@@ -674,7 +674,7 @@ namespace HeatRecovery {
                 state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHeatRecovery->ExchCond(ExchNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
+                                    std::string{RoutineName} + cCurrentModuleObject + ": invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
                                         " entered =" + state.dataIPShortCut->cAlphaArgs(2) + " for " + state.dataIPShortCut->cAlphaFieldNames(1) +
                                         '=' + state.dataIPShortCut->cAlphaArgs(1));
                     ErrorsFound = true;

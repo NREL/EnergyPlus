@@ -280,7 +280,7 @@ namespace WaterToAirHeatPumpSimple {
         using CurveManager::GetCurveIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSimpleWatertoAirHPInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSimpleWatertoAirHPInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HPNum;           // The Water to Air HP that you are currently loading input into
@@ -685,7 +685,7 @@ namespace WaterToAirHeatPumpSimple {
         NumArray.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found getting input. Program terminates.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found getting input. Program terminates.");
         }
 
         for (HPNum = 1; HPNum <= state.dataWaterToAirHeatPumpSimple->NumWatertoAirHPs; ++HPNum) {
@@ -942,7 +942,7 @@ namespace WaterToAirHeatPumpSimple {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitSimpleWatertoAirHP");
+        static constexpr std::string_view RoutineName("InitSimpleWatertoAirHP");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;   // Node Number of the air inlet
@@ -1285,8 +1285,8 @@ namespace WaterToAirHeatPumpSimple {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeWaterToAirCoil");
-        static std::string const RoutineNameAlt("SizeHVACWaterToAir");
+        static constexpr std::string_view RoutineName("SizeWaterToAirCoil");
+        static constexpr std::string_view RoutineNameAlt("SizeHVACWaterToAir");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 rhoair;
@@ -2030,7 +2030,7 @@ namespace WaterToAirHeatPumpSimple {
                                      "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                          ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name +
                                          "\"");
-                    ShowContinueError(state, RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
+                    ShowContinueError(state, std::string{RoutineName} + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
                     ShowContinueError(state, "Each of these capacity inputs have been autosized.");
                     ShowContinueError(state,
                                       format("Rated Sensible Cooling Capacity = {:.2T} W",
@@ -2063,7 +2063,7 @@ namespace WaterToAirHeatPumpSimple {
                                      "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                          ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name +
                                          "\"");
-                    ShowContinueError(state, RoutineName + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
+                    ShowContinueError(state, std::string{RoutineName} + ": Rated Sensible Cooling Capacity > Rated Total Cooling Capacity");
                     ShowContinueError(state, "Only the rated total capacity input is autosized, consider autosizing both inputs.");
                     ShowContinueError(state,
                                       format("Rated Sensible Cooling Capacity = {:.2T} W",
@@ -2105,7 +2105,7 @@ namespace WaterToAirHeatPumpSimple {
                                      "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                          ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name +
                                          "\"");
-                    ShowContinueError(state, RoutineName + ": Heating coil could not be autosized since cooling coil was not previously sized.");
+                    ShowContinueError(state, std::string{RoutineName} + ": Heating coil could not be autosized since cooling coil was not previously sized.");
                     ShowContinueError(state, "... Cooling coil must be upstream of heating coil.");
                     ShowContinueError(state, "... Manually sizing this heating coil will be required.");
                 }
@@ -2420,8 +2420,8 @@ namespace WaterToAirHeatPumpSimple {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr Real64 Tref(283.15); // Reference Temperature for performance curves,10C [K]
-        static std::string const RoutineName("CalcHPCoolingSimple");
-        static std::string const RoutineNameSourceSideInletTemp("CalcHPCoolingSimple:SourceSideInletTemp");
+        static constexpr std::string_view RoutineName("CalcHPCoolingSimple");
+        static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcHPCoolingSimple:SourceSideInletTemp");
 
         Real64 TotalCapRated;         // Rated Total Cooling Capacity [W]
         Real64 SensCapRated;          // Rated Sensible Cooling Capacity [W]
@@ -2778,8 +2778,8 @@ namespace WaterToAirHeatPumpSimple {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Tref(283.15); // Reference Temperature for performance curves,10C [K]
-        static std::string const RoutineName("CalcHPHeatingSimple");
-        static std::string const RoutineNameSourceSideInletTemp("CalcHPHeatingSimple:SourceSideInletTemp");
+        static constexpr std::string_view RoutineName("CalcHPHeatingSimple");
+        static constexpr std::string_view RoutineNameSourceSideInletTemp("CalcHPHeatingSimple:SourceSideInletTemp");
 
         Real64 HeatCapRated;          // Rated Heating Capacity [W]
         Real64 HeatPowerRated;        // Rated Heating Power Input[W]

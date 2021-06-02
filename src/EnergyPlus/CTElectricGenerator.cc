@@ -485,7 +485,7 @@ namespace CTElectricGenerator {
 
         Real64 const exhaustCp(1.047); // Exhaust Gas Specific Heat (J/kg-K)
         Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
-        static std::string const RoutineName("CalcCTGeneratorModel");
+        static constexpr std::string_view RoutineName("CalcCTGeneratorModel");
 
         // min allowed operating frac full load
         Real64 minPartLoadRat = this->MinPartLoadRat;

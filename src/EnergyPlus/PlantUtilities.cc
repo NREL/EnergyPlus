@@ -1010,7 +1010,7 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("UpdateChillerComponentCondenserSide");
+    static constexpr std::string_view RoutineName("UpdateChillerComponentCondenserSide");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool DidAnythingChange(false); // set to true if conditions changed
@@ -1097,7 +1097,7 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("UpdateComponentHeatRecoverySide");
+    static constexpr std::string_view RoutineName("UpdateComponentHeatRecoverySide");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool DidAnythingChange(false); // set to true if conditions changed
@@ -1768,7 +1768,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
 }
 
 void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
-                              std::string const &CallerName, // really used for error messages
+                              std::string_view const CallerName, // really used for error messages
                               int const NodeNum,             // index in Node structure of node to be scanned
                               int &LoopNum,                  // return value for plant loop
                               int &LoopSideNum,              // return value for plant loop side
@@ -1838,9 +1838,9 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
         ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
         ShowContinueError(state, "Node Name=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\"");
         if (!state.dataGlobal->DoingSizing) {
-            ShowContinueError(state, "called by " + CallerName);
+            ShowContinueError(state, "called by " + std::string{CallerName});
         } else {
-            ShowContinueError(state, "during sizing: called by " + CallerName);
+            ShowContinueError(state, "during sizing: called by " + std::string{CallerName});
         }
         if (outFoundCount > 0) ShowContinueError(state, format("Node was found as outlet node (for component) {} time(s).", outFoundCount));
         ShowContinueError(state, "Possible error in Branch inputs.  For more information, look for other error messages related to this node name.");

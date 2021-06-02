@@ -471,7 +471,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
-        static std::string const RoutineName("InitSurfaceGroundHeatExchanger");
+        static constexpr std::string_view RoutineName("InitSurfaceGroundHeatExchanger");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -1147,7 +1147,7 @@ namespace SurfaceGroundHeatExchanger {
         static Array1D<Real64> const Pr(
             NumOfPropDivisions, {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
         int const WaterIndex(1);
-        static std::string const RoutineName("SurfaceGroundHeatExchanger:CalcHXEffectTerm");
+        static constexpr std::string_view RoutineName("SurfaceGroundHeatExchanger:CalcHXEffectTerm");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Index;
@@ -1393,7 +1393,7 @@ namespace SurfaceGroundHeatExchanger {
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SurfaceGroundHeatExchanger:Update");
+        static constexpr std::string_view RoutineName("SurfaceGroundHeatExchanger:Update");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid; // Specific heat of working fluid

@@ -139,7 +139,7 @@ void PlantProfileData::simulate(EnergyPlusData &state,
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static std::string const RoutineName("SimulatePlantProfile");
+    static constexpr std::string_view RoutineName("SimulatePlantProfile");
     Real64 DeltaTemp;
 
     this->InitPlantProfile(state);
@@ -186,7 +186,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     using ScheduleManager::GetScheduleMaxValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static std::string const RoutineName("InitPlantProfile");
+    static constexpr std::string_view RoutineName("InitPlantProfile");
     Real64 FluidDensityInit;
     bool errFlag;
 

@@ -338,7 +338,7 @@ namespace WeatherManager {
         // if another environment is available in the "run list" or if the end has been
         // reached.
 
-        static std::string const RoutineName("GetNextEnvironment: ");
+        static constexpr std::string_view RoutineName("GetNextEnvironment: ");
         static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
         static constexpr auto EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
         static constexpr auto EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
@@ -637,7 +637,7 @@ namespace WeatherManager {
             if (state.dataWeatherManager->NumIntervalsPerHour != 1) {
                 if (state.dataWeatherManager->NumIntervalsPerHour != state.dataGlobal->NumOfTimeStepInHour) {
                     ShowSevereError(
-                        state, RoutineName + "Number of intervals per hour on Weather file does not match specified number of Time Steps Per Hour");
+                        state, std::string{RoutineName} + "Number of intervals per hour on Weather file does not match specified number of Time Steps Per Hour");
                     ErrorsFound = true;
                 }
             }
@@ -653,30 +653,30 @@ namespace WeatherManager {
                     CheckWeatherFileValidity(state);
                 }
                 if (ErrorsFound) {
-                    ShowSevereError(state, RoutineName + "No location specified, program will terminate.");
+                    ShowSevereError(state, std::string{RoutineName} + "No location specified, program will terminate.");
                 }
             } else {
                 ErrorsFound = true;
-                ShowSevereError(state, RoutineName + "No Design Days or Run Period(s) specified, program will terminate.");
+                ShowSevereError(state, std::string{RoutineName} + "No Design Days or Run Period(s) specified, program will terminate.");
             }
             if (state.dataSysVars->DDOnly && state.dataEnvrn->TotDesDays == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                RoutineName +
+                                std::string{RoutineName} +
                                     "Requested Design Days only (DataSystemVariables::DDOnly) but no Design Days specified, program will terminate.");
             }
             if (state.dataSysVars->ReverseDD && state.dataEnvrn->TotDesDays == 1) {
                 ErrorsFound = true;
                 ShowSevereError(
                     state,
-                    RoutineName +
+                    std::string{RoutineName} +
                         "Requested Reverse Design Days (DataSystemVariables::ReverseDD) but only 1 Design Day specified, program will terminate.");
             }
 
             // Throw a Fatal now that we have said it'll terminalte
             if (ErrorsFound) {
                 CloseWeatherFile(state); // will only close if opened.
-                ShowFatalError(state, RoutineName + "Errors found in Weather Data Input. Program terminates.");
+                ShowFatalError(state, std::string{RoutineName} + "Errors found in Weather Data Input. Program terminates.");
             }
 
             state.dataEnvrn->CurrentOverallSimDay = 0;
@@ -712,7 +712,7 @@ namespace WeatherManager {
                 if (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) {
                         if (state.dataGlobal->DoDesDaySim) {
-                            ShowWarningError(state, RoutineName + "Adaptive Comfort being reported during design day.");
+                            ShowWarningError(state, std::string{RoutineName} + "Adaptive Comfort being reported during design day.");
                             Real64 GrossApproxAvgDryBulb = (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).MaxDryBulb +
                                                             (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).MaxDryBulb -
                                                              state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).DailyDBRange)) /
@@ -816,7 +816,7 @@ namespace WeatherManager {
                                 int runEndJulian = dataperiod.DataEnJDay;
                                 if (!dataperiod.HasYearData) {
                                     ShowSevereError(state,
-                                                    RoutineName + "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
+                                                    std::string{RoutineName} + "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
                                                                   "does not have year included in start/end date.");
                                     ShowContinueError(state, "...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
                                     ShowContinueError(state, R"(...set "Treat Weather as Actual" to "No".)");
@@ -866,7 +866,7 @@ namespace WeatherManager {
                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndMonth,
                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay);
                                 ShowSevereError(state,
-                                                RoutineName + "Runperiod [mm/dd] (Start=" + StDate + ",End=" + EnDate +
+                                                std::string{RoutineName} + "Runperiod [mm/dd] (Start=" + StDate + ",End=" + EnDate +
                                                     ") requested not within Data Period(s) from Weather File");
                             } else {
                                 StDate = format(DateFormatWithYear,
@@ -878,7 +878,7 @@ namespace WeatherManager {
                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndDay,
                                                 state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).EndYear);
                                 ShowSevereError(state,
-                                                RoutineName + "Runperiod [mm/dd/yyyy] (Start=" + StDate + ",End=" + EnDate +
+                                                std::string{RoutineName} + "Runperiod [mm/dd/yyyy] (Start=" + StDate + ",End=" + EnDate +
                                                     ") requested not within Data Period(s) from Weather File");
                             }
                             StDate =
@@ -900,12 +900,12 @@ namespace WeatherManager {
                             } else {
                                 ShowContinueError(state, "Multiple Weather Data Periods 1st (Start=" + StDate + ",End=" + EnDate + ')');
                             }
-                            ShowFatalError(state, RoutineName + "Program terminates due to preceding condition.");
+                            ShowFatalError(state, std::string{RoutineName} + "Program terminates due to preceding condition.");
                         }
 
                         if (missingLeap) {
                             // Bail out now if we still need to
-                            ShowFatalError(state, RoutineName + "Program terminates due to preceding condition.");
+                            ShowFatalError(state, std::string{RoutineName} + "Program terminates due to preceding condition.");
                         }
 
                         // Following builds Environment start/end for ASHRAE 55 warnings
@@ -961,14 +961,14 @@ namespace WeatherManager {
                                 if (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251) {
                                     if (state.dataWeatherManager->WFAllowsLeapYears) {
                                         ShowSevereError(state,
-                                                        RoutineName +
+                                                        std::string{RoutineName} +
                                                             "AdaptiveComfort Reporting does not work correctly with leap years in weather files.");
                                         ErrorsFound = true;
                                     }
                                     if (state.dataWeatherManager->NumDataPeriods != 1) {
                                         ShowSevereError(
                                             state,
-                                            RoutineName +
+                                            std::string{RoutineName} +
                                                 "AdaptiveComfort Reporting does not work correctly with multiple dataperiods in weather files.");
                                         ErrorsFound = true;
                                     }
@@ -981,19 +981,19 @@ namespace WeatherManager {
                                                                             state.dataWeatherManager->LeapYearAdd);
                                         if (RunEnJDay - RunStJDay + 1 != 365) {
                                             ShowSevereError(state,
-                                                            RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files "
+                                                            std::string{RoutineName} + "AdaptiveComfort Reporting does not work correctly with weather files "
                                                                           "that do not contain 365 days.");
                                             ErrorsFound = true;
                                         }
                                     } else {
                                         ShowSevereError(state,
-                                                        RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files that "
+                                                        std::string{RoutineName} + "AdaptiveComfort Reporting does not work correctly with weather files that "
                                                                       "do not start on 1 January.");
                                         ErrorsFound = true;
                                     }
                                     if (state.dataWeatherManager->NumIntervalsPerHour != 1) {
                                         ShowSevereError(state,
-                                                        RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files that "
+                                                        std::string{RoutineName} + "AdaptiveComfort Reporting does not work correctly with weather files that "
                                                                       "have multiple interval records per hour.");
                                         ErrorsFound = true;
                                     }
@@ -1176,7 +1176,7 @@ namespace WeatherManager {
         }
 
         if (ErrorsFound && !state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
-            ShowSevereError(state, RoutineName + "Errors found in getting a new environment");
+            ShowSevereError(state, std::string{RoutineName} + "Errors found in getting a new environment");
             Available = false;
         } else if (ErrorsFound) {
             Available = false;
@@ -1511,7 +1511,7 @@ namespace WeatherManager {
         // need to set DST (Daylight Saving Time) dates at start of environment or year.
         // DST is only projected for one year.
 
-        static std::string const RoutineName("SetDSTDateRanges: ");
+        static constexpr std::string_view RoutineName("SetDSTDateRanges: ");
 
         int ActStartMonth; // Actual Start Month
         int ActStartDay;   // Actual Start Day of Month
@@ -1532,7 +1532,7 @@ namespace WeatherManager {
             }
             ThisDay += 7 * (state.dataWeatherManager->DST.StDay - 1);
             if (ThisDay > ActEndDayOfMonth(state.dataWeatherManager->DST.StMon)) {
-                ShowSevereError(state, RoutineName + "Determining DST: DST Start Date, Nth Day of Month, not enough Nths");
+                ShowSevereError(state, std::string{RoutineName} + "Determining DST: DST Start Date, Nth Day of Month, not enough Nths");
                 ErrorsFound = true;
             } else {
                 ActStartMonth = state.dataWeatherManager->DST.StMon;
@@ -1559,7 +1559,7 @@ namespace WeatherManager {
             if (ThisDay > ActEndDayOfMonth(state.dataWeatherManager->DST.EnMon)) {
                 ActEndMonth = 0; // Suppress uninitialized warning
                 ActEndDay = 0;   // Suppress uninitialized warning
-                ShowSevereError(state, RoutineName + "Determining DST: DST End Date, Nth Day of Month, not enough Nths");
+                ShowSevereError(state, std::string{RoutineName} + "Determining DST: DST End Date, Nth Day of Month, not enough Nths");
                 ErrorsFound = true;
             } else {
                 ActEndMonth = state.dataWeatherManager->DST.EnMon;
@@ -1575,7 +1575,7 @@ namespace WeatherManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Program terminates due to preceding condition(s).");
+            ShowFatalError(state, std::string{RoutineName} + "Program terminates due to preceding condition(s).");
         }
 
         if (present(DSTActStMon)) {
@@ -1610,7 +1610,7 @@ namespace WeatherManager {
         // need to set Special Day dates at start of environment or year.
         // Special Days are only projected for one year.
 
-        static std::string const RoutineName("SetSpecialDayDates: ");
+        static constexpr std::string_view RoutineName("SetSpecialDayDates: ");
 
         int JDay;
         Array1D_int ActEndDayOfMonth(12);
@@ -1650,7 +1650,7 @@ namespace WeatherManager {
                 ThisDay += 7 * (state.dataWeatherManager->SpecialDays(i).Day - 1);
                 if (ThisDay > ActEndDayOfMonth(state.dataWeatherManager->SpecialDays(i).Month)) {
                     ShowSevereError(state,
-                                    RoutineName + "Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay=" +
+                                    std::string{RoutineName} + "Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay=" +
                                         state.dataWeatherManager->SpecialDays(i).Name);
                     ErrorsFound = true;
                     continue;
@@ -1669,7 +1669,7 @@ namespace WeatherManager {
             }
             if (state.dataWeatherManager->SpecialDayTypes(JDay) != 0) {
                 ShowWarningError(state,
-                                 RoutineName + "Special Day definition (" + state.dataWeatherManager->SpecialDays(i).Name +
+                                 std::string{RoutineName} + "Special Day definition (" + state.dataWeatherManager->SpecialDays(i).Name +
                                      ") is overwriting previously entered special day period");
                 if (state.dataWeatherManager->UseSpecialDays) {
                     ShowContinueError(state, "...This could be caused by definitions on the Weather File.");
@@ -1686,7 +1686,7 @@ namespace WeatherManager {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Program terminates due to preceding condition(s).");
+            ShowFatalError(state, std::string{RoutineName} + "Program terminates due to preceding condition(s).");
         }
     }
 
@@ -2087,7 +2087,7 @@ namespace WeatherManager {
         // day boundary (current hour = 24), the next hour is hour 1 of next
         // weather data day (Tomorrow%).
 
-        static std::string const RoutineName("SetCurrentWeather");
+        static constexpr std::string_view RoutineName("SetCurrentWeather");
 
         state.dataWeatherManager->NextHour = state.dataGlobal->HourOfDay + 1;
 
@@ -3689,11 +3689,11 @@ namespace WeatherManager {
         Real64 const ZhangHuangModCoeff_C5(0.014);    // -0.0980d0
         Real64 const ZhangHuangModCoeff_D(-17.853);   // -10.8568d0
         Real64 const ZhangHuangModCoeff_K(0.843);     // 49.3112d0
-        static std::string const RoutineNamePsyWFnTdbTwbPb("SetUpDesignDay:PsyWFnTdbTwbPb");
-        static std::string const RoutineNamePsyWFnTdpPb("SetUpDesignDay:PsyWFnTdpPb");
-        static std::string const RoutineNamePsyWFnTdbH("SetUpDesignDay:PsyWFnTdbH");
+        static constexpr std::string_view RoutineNamePsyWFnTdbTwbPb("SetUpDesignDay:PsyWFnTdbTwbPb");
+        static constexpr std::string_view RoutineNamePsyWFnTdpPb("SetUpDesignDay:PsyWFnTdpPb");
+        static constexpr std::string_view RoutineNamePsyWFnTdbH("SetUpDesignDay:PsyWFnTdbH");
         static std::string const WeatherManager("WeatherManager");
-        static std::string const RoutineNameLong("WeatherManager.cc subroutine SetUpDesignDay");
+        static constexpr std::string_view RoutineNameLong("WeatherManager.cc subroutine SetUpDesignDay");
 
         std::string StringOut;
         //     For reporting purposes, set year to current system year
@@ -7313,7 +7313,7 @@ namespace WeatherManager {
         //        \object-list DayScheduleNames
         //        \object-list ScheduleNames
 
-        static std::string const RoutineName("GetWeatherProperties:");
+        static constexpr std::string_view RoutineName("GetWeatherProperties:");
 
         int Found;
         int envFound;
@@ -7347,7 +7347,7 @@ namespace WeatherManager {
                     if (state.dataWeatherManager->Environment(j).KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodWeather) continue;
                     if (state.dataWeatherManager->Environment(j).WP_Type1 != 0) {
                         ShowSevereError(state,
-                                        RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             "\", indicated Environment Name already assigned.");
                         if (!state.dataWeatherManager->Environment(j).Title.empty()) {
                             ShowContinueError(state,
@@ -7378,7 +7378,7 @@ namespace WeatherManager {
                 envFound = Found;
                 if (Found == 0) {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                         "\", invalid Environment Name referenced.");
                     ShowContinueError(state, "...remainder of object not processed.");
                     ErrorsFound = true;
@@ -7386,7 +7386,7 @@ namespace WeatherManager {
                 } else {
                     if (state.dataWeatherManager->Environment(Found).WP_Type1 != 0) {
                         ShowSevereError(state,
-                                        RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             "\", indicated Environment Name already assigned.");
                         ShowContinueError(state,
                                           "...Environment=\"" + state.dataWeatherManager->Environment(Found).Title + "\", already using " +
@@ -7438,7 +7438,7 @@ namespace WeatherManager {
                 state.dataWeatherManager->WPSkyTemperature(i).IsSchedule = false;
             } else {
                 ShowSevereError(state,
-                                RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                     "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) + '.');
                 ShowContinueError(state,
                                   "...entered value=\"" + state.dataIPShortCut->cAlphaArgs(2) +
@@ -7455,7 +7455,7 @@ namespace WeatherManager {
                     Found = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (Found == 0) {
                         ShowSevereError(state,
-                                        RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
                         ShowContinueError(state, "...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                         ShowContinueError(state,
@@ -7470,7 +7470,7 @@ namespace WeatherManager {
                     Found = ScheduleManager::GetDayScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (Found == 0) {
                         ShowSevereError(state,
-                                        RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
                         ShowContinueError(state, "...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                         ShowContinueError(
@@ -7507,7 +7507,7 @@ namespace WeatherManager {
                     state.dataWeatherManager->WPSkyTemperature(i).UseWeatherFileHorizontalIR = false;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                         "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '.');
                     ShowContinueError(state, "...entered value=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\", should be Yes or No.");
                     ErrorsFound = true;

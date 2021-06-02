@@ -2993,7 +2993,7 @@ namespace FuelCellElectricGenerator {
 
         // REFERENCES: Annex 42 model documentation
 
-        static std::string const RoutineName("CalcFuelCellGenHeatRecovery");
+        static constexpr std::string_view RoutineName("CalcFuelCellGenHeatRecovery");
 
         {
             auto const SELECT_CASE_var(this->ExhaustHX.HXmodelMode);
@@ -3295,7 +3295,7 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        static std::string const RoutineName("InitFuelCellGenerators");
+        static constexpr std::string_view RoutineName("InitFuelCellGenerators");
 
         if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;

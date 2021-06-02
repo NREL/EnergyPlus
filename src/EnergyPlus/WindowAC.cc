@@ -239,7 +239,7 @@ namespace WindowAC {
         using MixedAir::GetOAMixerNodeNumbers;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetWindowAC: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetWindowAC: "); // include trailing blank space
 
         int WindACIndex; // loop index
         int WindACNum;   // current window AC number
@@ -666,7 +666,7 @@ namespace WindowAC {
 
         if (ErrorsFound) {
             ShowFatalError(state,
-                           RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition causes termination.");
+                           std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition causes termination.");
         }
 
         for (WindACNum = 1; WindACNum <= state.dataWindowAC->NumWindAC; ++WindACNum) {
@@ -970,7 +970,7 @@ namespace WindowAC {
         using DataHVACGlobals::CoolingCapacitySizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizeWindowAC: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MaxAirVolFlowDes;  // Autosized maximum air flow for reporting

@@ -1050,7 +1050,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
 
-    std::string const RoutineName("InitMTGenerators");
+    static constexpr std::string_view RoutineName("InitMTGenerators");
     bool errFlag;
 
     if (this->myFlag) {
@@ -1228,7 +1228,7 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
     int const MaxAncPowerIter(50);       // Maximum number of iteration (subroutine ancillary power iteration loop)
     Real64 const AncPowerDiffToler(5.0); // Tolerance for Ancillary Power Difference (W)
     Real64 const RelaxFactor(0.7);       // Relaxation factor for iteration loop
-    std::string const RoutineName("CalcMTGeneratorModel");
+    static constexpr std::string_view RoutineName("CalcMTGeneratorModel");
 
     //   Load local variables from data structure (for code readability)
     // Min allowed operating fraction at full load

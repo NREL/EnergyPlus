@@ -642,7 +642,7 @@ namespace HeatBalanceHAMTManager {
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const adjdist(0.00005); // Allowable distance between two cells, also used as limit on cell length
-        static std::string const RoutineName("InitCombinedHeatAndMoistureFiniteElement: ");
+        static constexpr std::string_view RoutineName("InitCombinedHeatAndMoistureFiniteElement: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ii;
@@ -682,7 +682,7 @@ namespace HeatBalanceHAMTManager {
                 matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
                 if (state.dataMaterial->Material(matid).ROnly) {
                     ShowSevereError(state,
-                                    RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name +
+                                    std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name +
                                         " cannot contain R-only value materials.");
                     ShowContinueError(state, "Reference Material=\"" + state.dataMaterial->Material(matid).Name + "\".");
                     ++errorCount;
@@ -690,7 +690,7 @@ namespace HeatBalanceHAMTManager {
                 }
 
                 if (state.dataMaterial->Material(matid).nmu < 0) {
-                    ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(state,
                                       "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                           "\" does not have required Water Vapor Diffusion Resistance Factor (mu) data.");
@@ -698,20 +698,20 @@ namespace HeatBalanceHAMTManager {
                 }
 
                 if (state.dataMaterial->Material(matid).niso < 0) {
-                    ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(
                         state, "Reference Material=\"" + state.dataMaterial->Material(matid).Name + "\" does not have required isotherm data.");
                     ++errorCount;
                 }
                 if (state.dataMaterial->Material(matid).nsuc < 0) {
-                    ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(state,
                                       "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                           "\" does not have required liquid transport coefficient (suction) data.");
                     ++errorCount;
                 }
                 if (state.dataMaterial->Material(matid).nred < 0) {
-                    ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                    ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                     ShowContinueError(state,
                                       "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                           "\" does not have required liquid transport coefficient (redistribution) data.");
@@ -719,7 +719,7 @@ namespace HeatBalanceHAMTManager {
                 }
                 if (state.dataMaterial->Material(matid).ntc < 0) {
                     if (state.dataMaterial->Material(matid).Conductivity > 0) {
-                        ShowWarningError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                        ShowWarningError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError(state,
                                           "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                               "\" does not have thermal conductivity data. Using fixed value.");
@@ -730,7 +730,7 @@ namespace HeatBalanceHAMTManager {
                             state.dataMaterial->Material(matid).isodata(state.dataMaterial->Material(matid).niso);
                         state.dataMaterial->Material(matid).tcdata(2) = state.dataMaterial->Material(matid).Conductivity;
                     } else {
-                        ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                        ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError(state,
                                           "Reference Material=\"" + state.dataMaterial->Material(matid).Name +
                                               "\" does not have required thermal conductivity data.");
@@ -764,7 +764,7 @@ namespace HeatBalanceHAMTManager {
                     if (testlen > adjdist) break;
                     --state.dataMaterial->Material(matid).divs;
                     if (state.dataMaterial->Material(matid).divs < 1) {
-                        ShowSevereError(state, RoutineName + "Construction=" + state.dataConstruction->Construct(conid).Name);
+                        ShowSevereError(state, std::string{RoutineName} + "Construction=" + state.dataConstruction->Construct(conid).Name);
                         ShowContinueError(state, "Reference Material=\"" + state.dataMaterial->Material(matid).Name + "\" is too thin.");
                         ++errorCount;
                         break;

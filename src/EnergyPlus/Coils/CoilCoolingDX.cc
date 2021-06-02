@@ -128,7 +128,7 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state)
 
 void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data)
 {
-    static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
+    static constexpr std::string_view routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
     bool errorsFound = false;
     this->name = input_data.name;
@@ -172,7 +172,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     // Ultimately, this restriction should go away - condenser inlet node could be from anywhere
     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, this->condInletNodeIndex)) {
-        ShowWarningError(state, routineName + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
+        ShowWarningError(state, std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", may be invalid");
         ShowContinueError(state,
                           "Condenser Inlet Node Name=\"" + input_data.condenser_inlet_node_name +
                               "\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
@@ -216,7 +216,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     }
 
     if (this->availScheduleIndex == 0) {
-        ShowSevereError(state, routineName + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
+        ShowSevereError(state, std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
         errorsFound = true;
     }
@@ -235,7 +235,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
 
     if (errorsFound) {
         ShowFatalError(state,
-                       routineName + "Errors found in getting " + state.dataCoilCooingDX->coilCoolingDXObjectName +
+                       std::string{routineName} + "Errors found in getting " + state.dataCoilCooingDX->coilCoolingDXObjectName +
                            " input. Preceding condition(s) causes termination.");
     }
 }
@@ -600,7 +600,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
         this->myOneTimeInitFlag = false;
     }
 
-    std::string RoutineName = "CoilCoolingDX::simulate";
+    static constexpr std::string_view RoutineName = "CoilCoolingDX::simulate";
 
     // get node references
     auto &evapInletNode = state.dataLoopNodes->Node(this->evapInletNodeIndex);

@@ -1998,21 +1998,21 @@ namespace HeatBalanceIntRadExchange {
                                 bool &ErrorsFound                        // True when errors are found
     )
     {
-        static std::string const routineName("GetRadiantSystemSurface: "); // include trailing blank space
+        static constexpr std::string_view routineName("GetRadiantSystemSurface: "); // include trailing blank space
 
         // For radiant zone equipment, find the referenced surface and check if it is in the same zone or radiant enclosure
         int const surfNum = UtilityRoutines::FindItemInList(SurfaceName, state.dataSurface->Surface);
 
         // Trap for surfaces that do not exist
         if (surfNum == 0) {
-            ShowSevereError(state, routineName + "Invalid Surface name = " + SurfaceName);
+            ShowSevereError(state, std::string{routineName} + "Invalid Surface name = " + SurfaceName);
             ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
             return surfNum;
         }
 
         if (RadSysZoneNum == 0) {
-            ShowSevereError(state, routineName + "Invalid Zone number passed by " + cCurrentModuleObject + " = " + RadSysName);
+            ShowSevereError(state, std::string{routineName} + "Invalid Zone number passed by " + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
             return surfNum;
         }
@@ -2023,16 +2023,16 @@ namespace HeatBalanceIntRadExchange {
         if (radSysEnclNum == 0) {
             // This should never happen - but it does in some simple unit tests that are designed to throw errors
             ShowSevereError(state,
-                            routineName + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName);
+                            std::string{routineName} + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName);
             ErrorsFound = true;
         } else if (surfRadEnclNum == 0) {
             // This should never happen
             ShowSevereError(state,
-                            routineName + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName +
+                            std::string{routineName} + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName +
                                 " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
             ErrorsFound = true;                                   // LCOV_EXCL_LINE
         } else if (surfRadEnclNum != radSysEnclNum) {
-            ShowSevereError(state, routineName + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
+            ShowSevereError(state, std::string{routineName} + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
             ShowContinueError(state, "Surface zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(surfRadEnclNum).Name);
             ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(radSysEnclNum).Name);
             ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);

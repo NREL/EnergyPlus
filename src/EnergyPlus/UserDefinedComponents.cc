@@ -2383,7 +2383,7 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("InitPlantUserComponent");
+        static constexpr std::string_view RoutineName("InitPlantUserComponent");
 
         if (this->myOneTimeFlag) {
             // locate the connections to the plant loops
@@ -2461,7 +2461,7 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("InitCoilUserDefined");
+        static constexpr std::string_view RoutineName("InitCoilUserDefined");
 
         if (this->myOneTimeFlag) {
             if (this->PlantIsConnected) {
@@ -2536,7 +2536,7 @@ namespace UserDefinedComponents {
         // PURPOSE OF THIS SUBROUTINE:
         // initialize data for user-defined zone HVAC forced air component model
 
-        static std::string const RoutineName("InitZoneAirUserDefined");
+        static constexpr std::string_view RoutineName("InitZoneAirUserDefined");
 
         if (this->myOneTimeFlag) {
             if (this->NumPlantConnections > 0) {
@@ -2627,7 +2627,7 @@ namespace UserDefinedComponents {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("InitAirTerminalUserDefined");
+        static constexpr std::string_view RoutineName("InitAirTerminalUserDefined");
 
         if (this->myOneTimeFlag) {
             if (this->NumPlantConnections > 0) {

@@ -59,10 +59,10 @@
 namespace EnergyPlus {
 
 void BaseSizer::initializeWithinEP(EnergyPlusData &state,
-                                   const std::string &_compType,
-                                   const std::string &_compName,
-                                   bool const &_printWarningFlag,
-                                   std::string const &_callingRoutine)
+                                   std::string_view const _compType,
+                                   std::string_view const _compName,
+                                   bool const _printWarningFlag,
+                                   std::string_view const _callingRoutine)
 {
     this->initialized = true;
     this->compType = _compType;

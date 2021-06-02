@@ -216,7 +216,7 @@ namespace DualDuct {
         using namespace DataHeatBalance;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetDualDuctInput: "); // include trailing bla
+        static constexpr std::string_view RoutineName("GetDualDuctInput: "); // include trailing bla
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -347,7 +347,7 @@ namespace DualDuct {
                         CurrentModuleObject = "*invalid*";
                     }
                     ShowSevereError(state,
-                                    RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
+                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
                                         state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
                     ShowContinueError(
                         state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
@@ -508,7 +508,7 @@ namespace DualDuct {
                         CurrentModuleObject = "*invalid*";
                     }
                     ShowSevereError(state,
-                                    RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
+                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
                                         state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
                     ShowContinueError(
                         state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
@@ -720,7 +720,7 @@ namespace DualDuct {
                         CurrentModuleObject = "*invalid*";
                     }
                     ShowSevereError(state,
-                                    RoutineName + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
+                                    std::string{RoutineName} + "No matching List:Zone:AirTerminal for AirTerminal:DualDuct = [" + CurrentModuleObject + ',' +
                                         state.dataDualDuct->dd_airterminal(DDNum).Name + "].");
                     ShowContinueError(
                         state, "...should have outlet node=" + state.dataLoopNodes->NodeID(state.dataDualDuct->dd_airterminal(DDNum).OutletNodeNum));
@@ -855,7 +855,7 @@ namespace DualDuct {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
         }
     }
 
@@ -1947,7 +1947,7 @@ namespace DualDuct {
 
         // FUNCTION PARAMETER DEFINITIONS:
         bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
-        static std::string const RoutineName("HVACDualDuctSystem:CalcOAOnlyMassFlow");
+        static constexpr std::string_view RoutineName("HVACDualDuctSystem:CalcOAOnlyMassFlow");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

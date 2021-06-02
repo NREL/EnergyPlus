@@ -219,7 +219,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // EnergyPlus input processor
 
-    static std::string const RoutineName("GetIndirectAbsorberInput: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetIndirectAbsorberInput: "); // include trailing blank space
 
     int AbsorberNum = 0; // Absorber counter
     int NumAlphas = 0;   // Number of elements in the alpha array
@@ -453,7 +453,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
             } else {
                 ShowSevereError(state,
-                                RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -835,7 +835,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger initializations.
 
-    static std::string const RoutineName("InitIndirectAbsorpChiller");
+    static constexpr std::string_view RoutineName("InitIndirectAbsorpChiller");
 
     // Init more variables
     if (this->MyOneTimeFlag) {
@@ -981,7 +981,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     // the evaporator flow rate and the chilled water loop design delta T. The condenser flow rate
     // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
-    static std::string const RoutineName("SizeIndirectAbsorpChiller");
+    static constexpr std::string_view RoutineName("SizeIndirectAbsorpChiller");
     static std::string const SizeChillerAbsorptionIndirect("SIZE Chiller:Absorption:Indirect");
 
     bool LoopErrorsFound = false;
@@ -1557,7 +1557,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
     // 1.  BLAST User Manual
     // 2.  Absorber User Manual
 
-    static std::string const RoutineName("CalcIndirectAbsorberModel");
+    static constexpr std::string_view RoutineName("CalcIndirectAbsorberModel");
     static std::string const LoopLossesChillerAbsorptionIndirect("Loop Losses: Chiller:Absorption:Indirect");
     static std::string const LoopLossesChillerAbsorptionIndirectSpace("Loop Losses: Chiller:Absorption:Indirect ");
 

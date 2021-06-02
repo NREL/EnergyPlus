@@ -262,7 +262,7 @@ namespace OutdoorAirUnit {
         using HVACDXSystem::CheckDXCoolingCoilInOASysExists;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetOutdoorAirUnitInputs: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetOutdoorAirUnitInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -996,7 +996,7 @@ namespace OutdoorAirUnit {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + '.');
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + '.');
         }
 
         AlphArray.deallocate();
@@ -1169,7 +1169,7 @@ namespace OutdoorAirUnit {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const CurrentModuleObject("ZoneHVAC:OutdoorAirUnit");
-        static std::string const RoutineName("SizeOutdoorAirUnit");
+        static constexpr std::string_view RoutineName("SizeOutdoorAirUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -1499,7 +1499,7 @@ namespace OutdoorAirUnit {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeOutdoorAirUnit");
+        static constexpr std::string_view RoutineName("SizeOutdoorAirUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop

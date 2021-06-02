@@ -269,7 +269,7 @@ namespace HVACDXHeatPumpSystem {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static std::string const RoutineName("GetDXHeatPumpSystemInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetDXHeatPumpSystemInput: "); // include trailing blank space
         bool IsNotOK;                                                       // Flag to verify name
         int DXHeatSysNum;
         std::string CurrentModuleObject; // for ease in getting objects
@@ -323,7 +323,7 @@ namespace HVACDXHeatPumpSystem {
                 DXHeatPumpSystem(DXHeatSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (DXHeatPumpSystem(DXHeatSysNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                         cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHVACDXHeatPumpSys->ErrorsFound = true;
                 }
@@ -409,7 +409,7 @@ namespace HVACDXHeatPumpSystem {
         } // End of the DX System Loop
 
         if (state.dataHVACDXHeatPumpSys->ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
 
         for (DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum) {

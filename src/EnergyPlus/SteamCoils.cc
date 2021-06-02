@@ -222,7 +222,7 @@ namespace SteamCoils {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSteamCoilInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetSteamCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum; // The SteamCoil that you are currently loading input into
@@ -287,7 +287,7 @@ namespace SteamCoils {
             } else {
                 state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\", invalid data.");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\", invalid data.");
                     ShowContinueError(state, cAlphaFields(2) + " not found=" + AlphArray(2));
                     ErrorsFound = true;
                 }
@@ -352,7 +352,7 @@ namespace SteamCoils {
                                                                                                      1,
                                                                                                      ObjectIsNotParent);
                     if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
-                        ShowSevereError(state, RoutineName + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
+                        ShowSevereError(state, std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
                         ShowContinueError(state, "..required for Temperature Setpoint Controlled Coils.");
                         ErrorsFound = true;
                     }
@@ -361,14 +361,14 @@ namespace SteamCoils {
                     state.dataSteamCoils->SteamCoil(CoilNum).TypeOfCoil = state.dataSteamCoils->ZoneLoadControl;
 
                     if (!lAlphaBlanks(8)) {
-                        ShowWarningError(state, RoutineName + "ZoneLoad Controlled Coil, so " + cAlphaFields(8) + " not needed");
+                        ShowWarningError(state, std::string{RoutineName} + "ZoneLoad Controlled Coil, so " + cAlphaFields(8) + " not needed");
                         ShowContinueError(state, "for " + CurrentModuleObject + " = " + AlphArray(1));
                         state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum = 0;
                     }
 
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + "Invalid " + cAlphaFields(7) + " [" + AlphArray(7) + "] specified for " + CurrentModuleObject +
+                                    std::string{RoutineName} + "Invalid " + cAlphaFields(7) + " [" + AlphArray(7) + "] specified for " + CurrentModuleObject +
                                         " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
@@ -380,7 +380,7 @@ namespace SteamCoils {
             if (state.dataSteamCoils->SteamIndex == 0 && CoilNum == 1) {
                 state.dataSteamCoils->SteamIndex = FindRefrigerant(state, "Steam");
                 if (state.dataSteamCoils->SteamIndex == 0) {
-                    ShowSevereError(state, RoutineName + "Steam Properties for " + AlphArray(1) + " not found.");
+                    ShowSevereError(state, std::string{RoutineName} + "Steam Properties for " + AlphArray(1) + " not found.");
                     ShowContinueError(state, "Steam Fluid Properties should have been included in the input file.");
                     ErrorsFound = true;
                 }
@@ -443,7 +443,7 @@ namespace SteamCoils {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting input.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
         }
 
         AlphArray.deallocate();
@@ -484,7 +484,7 @@ namespace SteamCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitSteamCoil");
+        static constexpr std::string_view RoutineName("InitSteamCoil");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -690,7 +690,7 @@ namespace SteamCoils {
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeSteamCoil");
+        static constexpr std::string_view RoutineName("SizeSteamCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum;      // do loop index for plant sizing
@@ -1075,8 +1075,8 @@ namespace SteamCoils {
         using DataHVACGlobals::TempControlTol;
         using PlantUtilities::SetComponentFlowRate;
 
-        static std::string const RoutineName("CalcSteamAirCoil");
-        static std::string const RoutineNameSizeSteamCoil("SizeSteamCoil");
+        static constexpr std::string_view RoutineName("CalcSteamAirCoil");
+        static constexpr std::string_view RoutineNameSizeSteamCoil("SizeSteamCoil");
 
         Real64 SteamMassFlowRate(0.0);
         Real64 AirMassFlow(0.0); // [kg/sec]

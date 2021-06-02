@@ -208,7 +208,7 @@ namespace HVACCooledBeam {
         using WaterCoils::GetCoilWaterInletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetCoolBeams "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetCoolBeams "); // include trailing blank space
 
         int CBIndex;                     // loop index
         int CBNum;                       // current fan coil number
@@ -291,7 +291,7 @@ namespace HVACCooledBeam {
                 CoolBeam(CBNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (CoolBeam(CBNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                         cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -446,7 +446,7 @@ namespace HVACCooledBeam {
             // one assumes if there isn't one assigned, it's an error?
             if (CoolBeam(CBNum).ADUNum == 0) {
                 ShowSevereError(
-                    state, RoutineName + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' + CoolBeam(CBNum).Name + "].");
+                    state, std::string{RoutineName} + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' + CoolBeam(CBNum).Name + "].");
                 ShowContinueError(state, "...should have outlet node=" + state.dataLoopNodes->NodeID(CoolBeam(CBNum).AirOutNode));
                 ErrorsFound = true;
             } else {
@@ -485,7 +485,7 @@ namespace HVACCooledBeam {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in getting input. Preceding conditions cause termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input. Preceding conditions cause termination.");
         }
     }
 
@@ -516,7 +516,7 @@ namespace HVACCooledBeam {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitCoolBeam");
+        static constexpr std::string_view RoutineName("InitCoolBeam");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InAirNode;    // supply air inlet node number
@@ -690,7 +690,7 @@ namespace HVACCooledBeam {
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("SizeCoolBeam");
+        static constexpr std::string_view RoutineName("SizeCoolBeam");
         int PltSizCoolNum(0);          // index of plant sizing object for the cooling loop
         int NumBeams(0);               // number of beams in the zone
         int Iter(0);                   // beam length iteration index
@@ -1090,7 +1090,7 @@ namespace HVACCooledBeam {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcCoolBeam");
+        static constexpr std::string_view RoutineName("CalcCoolBeam");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

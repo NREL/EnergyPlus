@@ -329,7 +329,7 @@ namespace CurveManager {
     bool CheckCurveDims(EnergyPlusData &state,
                         int CurveIndex,
                         std::vector<int> validDims,
-                        std::string_view routineName,
+                        const std::string_view routineName,
                         const std::string &objectType,
                         const std::string &objectName,
                         const std::string &curveFieldText);

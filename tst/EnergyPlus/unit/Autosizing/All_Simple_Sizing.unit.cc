@@ -58,7 +58,7 @@ namespace EnergyPlus {
 
 TEST_F(AutoSizingFixture, AutoCalculateSizingGauntlet)
 {
-    static std::string const routineName("AutoCalculateSizingGauntlet");
+    static constexpr std::string_view routineName("AutoCalculateSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     AutoCalculateSizer sizer;
@@ -172,7 +172,7 @@ TEST_F(AutoSizingFixture, AutoCalculateSizingGauntlet)
 
 TEST_F(AutoSizingFixture, MaxHeaterOutletTempSizingGauntlet)
 {
-    static std::string const routineName("MaxHeaterOutletTempSizingGauntlet");
+    static constexpr std::string_view routineName("MaxHeaterOutletTempSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     MaxHeaterOutletTempSizer sizer;
@@ -306,7 +306,7 @@ TEST_F(AutoSizingFixture, MaxHeaterOutletTempSizingGauntlet)
 
 TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet)
 {
-    static std::string const routineName("ZoneCoolingLoadSizingGauntlet");
+    static constexpr std::string_view routineName("ZoneCoolingLoadSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     ZoneCoolingLoadSizer sizer;
@@ -440,7 +440,7 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet)
 
 TEST_F(AutoSizingFixture, ZoneHeatingLoadSizingGauntlet)
 {
-    static std::string const routineName("ZoneHeatingLoadSizingGauntlet");
+    static constexpr std::string_view routineName("ZoneHeatingLoadSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     ZoneHeatingLoadSizer sizer;
@@ -573,7 +573,7 @@ TEST_F(AutoSizingFixture, ZoneHeatingLoadSizingGauntlet)
 
 TEST_F(AutoSizingFixture, ASHRAEMinSATCoolingSizingGauntlet)
 {
-    static std::string const routineName("ASHRAEMinSATCoolingSizingGauntlet");
+    static constexpr std::string_view routineName("ASHRAEMinSATCoolingSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     ASHRAEMinSATCoolingSizer sizer;
@@ -740,7 +740,7 @@ TEST_F(AutoSizingFixture, ASHRAEMinSATCoolingSizingGauntlet)
 
 TEST_F(AutoSizingFixture, ASHRAEMaxSATHeatingSizingGauntlet)
 {
-    static std::string const routineName("ASHRAEMaxSATHeatingSizingGauntlet");
+    static constexpr std::string_view routineName("ASHRAEMaxSATHeatingSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     ASHRAEMaxSATHeatingSizer sizer;
@@ -900,7 +900,7 @@ TEST_F(AutoSizingFixture, ASHRAEMaxSATHeatingSizingGauntlet)
 
 TEST_F(AutoSizingFixture, DesiccantDehumidifierBFPerfDataFaceVelocitySizingGauntlet)
 {
-    static std::string const routineName("DesiccantDehumidifierBFPerfDataFaceVelocitySizingGauntlet");
+    static constexpr std::string_view routineName("DesiccantDehumidifierBFPerfDataFaceVelocitySizingGauntlet");
     static std::string const compType("HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1");
 
     // create the sizer and set up the flags to specify the sizing configuration
@@ -1047,7 +1047,7 @@ TEST_F(AutoSizingFixture, DesiccantDehumidifierBFPerfDataFaceVelocitySizingGaunt
 
 TEST_F(AutoSizingFixture, HeatingCoilDesAirInletTempSizingGauntlet)
 {
-    static std::string const routineName("HeatingCoilDesAirInletTempSizingGauntlet");
+    static constexpr std::string_view routineName("HeatingCoilDesAirInletTempSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     HeatingCoilDesAirInletTempSizer sizer;
@@ -1163,7 +1163,7 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirInletTempSizingGauntlet)
 
 TEST_F(AutoSizingFixture, HeatingCoilDesAirOutletTempSizingGauntlet)
 {
-    static std::string const routineName("HeatingCoilDesAirOutletTempSizingGauntlet");
+    static constexpr std::string_view routineName("HeatingCoilDesAirOutletTempSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     HeatingCoilDesAirOutletTempSizer sizer;
@@ -1268,7 +1268,7 @@ TEST_F(AutoSizingFixture, HeatingCoilDesAirOutletTempSizingGauntlet)
 
 TEST_F(AutoSizingFixture, HeatingCoilDesAirInletHumRatSizingGauntlet)
 {
-    static std::string const routineName("HeatingCoilDesAirInletHumRatSizingGauntlet");
+    static constexpr std::string_view routineName("HeatingCoilDesAirInletHumRatSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
     HeatingCoilDesAirInletHumRatSizer sizer;

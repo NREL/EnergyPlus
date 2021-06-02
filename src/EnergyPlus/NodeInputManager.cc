@@ -114,7 +114,7 @@ void GetNodeNums(EnergyPlusData &state,
     // data structure.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetNodeNums: ");
+    static constexpr std::string_view RoutineName("GetNodeNums: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ThisOne; // Indicator for this Name
@@ -130,7 +130,7 @@ void GetNodeNums(EnergyPlusData &state,
     if (NodeFluidType != DataLoopNode::NodeFluidType::Air && NodeFluidType != DataLoopNode::NodeFluidType::Water &&
         NodeFluidType != DataLoopNode::NodeFluidType::Electric && NodeFluidType != DataLoopNode::NodeFluidType::Steam &&
         NodeFluidType != DataLoopNode::NodeFluidType::blank) {
-        ShowSevereError(state, RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
+        ShowSevereError(state, std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
         ShowContinueError(state, format("..Invalid FluidType={}", NodeFluidType));
         ErrorsFound = true;
         ShowFatalError(state, "Preceding issue causes termination.");
@@ -145,7 +145,7 @@ void GetNodeNums(EnergyPlusData &state,
                 if (NodeFluidType != DataLoopNode::NodeFluidType::blank &&
                     state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != DataLoopNode::NodeFluidType::blank) {
                     if (state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != NodeFluidType) {
-                        ShowSevereError(state, RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
+                        ShowSevereError(state, std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
                         if (present(InputFieldName)) ShowContinueError(state, "...Ref field=" + InputFieldName);
                         ShowContinueError(
                             state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NodeNumbers(Loop)));
@@ -508,7 +508,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
     // Node List Data Structure.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetNodeListsInput: ");
+    static constexpr std::string_view RoutineName("GetNodeListsInput: ");
     static std::string const CurrentModuleObject("NodeList");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -549,9 +549,9 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
         state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList = NumAlphas - 1;
         if (NumAlphas <= 1) {
             if (NumAlphas == 1) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=<blank> does not have any nodes or nodelist name.");
             }
             localErrorsFound = true;
             continue;
@@ -560,10 +560,10 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
         for (Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1) {
             state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1) = cAlphas(Loop1 + 1);
             if (cAlphas(Loop1 + 1).empty()) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", blank node name in list.");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\", blank node name in list.");
                 --state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList;
                 if (state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList <= 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
                     localErrorsFound = true;
                     break;
                 }
@@ -573,7 +573,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
                 state, state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), DataLoopNode::NodeFluidType::blank, localErrorsFound);
             if (UtilityRoutines::SameString(state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1),
                                             state.dataNodeInputMgr->NodeLists(NCount).Name)) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
                 ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop1, cAlphas(Loop1 + 1)));
                 localErrorsFound = true;
             }
@@ -585,7 +585,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
                 if (state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) != state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop2))
                     continue;
                 if (flagError) { // only list nodelist name once
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
                     flagError = false;
                 }
                 ShowContinueError(state,
@@ -607,7 +607,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
                                                  state.dataNodeInputMgr->NodeLists(Loop1).Name))
                     continue;
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + "=\"" + state.dataNodeInputMgr->NodeLists(Loop1).Name +
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataNodeInputMgr->NodeLists(Loop1).Name +
                                     "\", invalid node name in list.");
                 ShowContinueError(
                     state,
@@ -623,7 +623,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
     rNumbers.deallocate();
 
     if (localErrorsFound) {
-        ShowFatalError(state, RoutineName + CurrentModuleObject + ": Error getting input - causes termination.");
+        ShowFatalError(state, std::string{RoutineName} + CurrentModuleObject + ": Error getting input - causes termination.");
         ErrorsFound = true;
     }
 }
@@ -742,7 +742,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
     int GetSingleNodeResult;
 
     // FUNCTION PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetOnlySingleNode: ");
+    static constexpr std::string_view RoutineName("GetOnlySingleNode: ");
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     int NumNodes;
@@ -777,7 +777,7 @@ int GetOnlySingleNode(EnergyPlusData &state,
                 InputFieldName);
 
     if (NumNodes > 1) {
-        ShowSevereError(state, RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
+        ShowSevereError(state, std::string{RoutineName} + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data.");
         if (present(InputFieldName)) ShowContinueError(state, "...Ref field=" + InputFieldName);
         ShowContinueError(state, "Only 1st Node used from NodeList=\"" + NodeName + "\".");
         ShowContinueError(state, "...a Nodelist may not be valid in this context.");
@@ -986,7 +986,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CalcMoreNodeInfo");
+    static constexpr std::string_view RoutineName("CalcMoreNodeInfo");
     static std::string const NodeReportingCalc("NodeReportingCalc:");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

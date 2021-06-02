@@ -186,7 +186,7 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       by Sushobhit Acharya, March 2015
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("InitAndSimGroundDomain");
+        static constexpr std::string_view RoutineName("InitAndSimGroundDomain");
 
         // Read input if necessary
         if (state.dataPlantPipingSysMgr->GetInputFlag) {
@@ -393,7 +393,7 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        static std::string const RoutineName("GetPipingSystemsAndGroundDomainsInput");
+        static constexpr std::string_view RoutineName("GetPipingSystemsAndGroundDomainsInput");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
@@ -421,7 +421,7 @@ namespace PlantPipingSystemsManager {
         ReadBasementInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements, ErrorsFound);
 
         // Report errors that are purely input problems
-        if (ErrorsFound) ShowFatalError(state, RoutineName + ": Preceding input errors cause program termination.");
+        if (ErrorsFound) ShowFatalError(state, std::string{RoutineName} + ": Preceding input errors cause program termination.");
 
         // Setup output variables
         SetupPipingSystemOutputVariables(state);
@@ -461,7 +461,7 @@ namespace PlantPipingSystemsManager {
                     if ((thisSegment->PipeLocation.X > thisDomain.Extents.xMax) || (thisSegment->PipeLocation.X < 0.0) ||
                         (thisSegment->PipeLocation.Y > thisDomain.Extents.yMax) || (thisSegment->PipeLocation.Y < 0.0)) {
                         ShowSevereError(state,
-                                        "PipingSystems::" + RoutineName +
+                                        "PipingSystems::" + std::string{RoutineName} +
                                             ": A pipe was outside of the domain extents after performing corrections for basement or burial depth.");
                         ShowContinueError(state, "Pipe segment name:" + thisSegment->Name);
                         ShowContinueError(
@@ -475,7 +475,7 @@ namespace PlantPipingSystemsManager {
 
         // If we encountered any other errors that we couldn't handle separately than stop now
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + ':' + ObjName_ug_GeneralDomain + ": Errors found in input.");
+            ShowFatalError(state, std::string{RoutineName} + ':' + ObjName_ug_GeneralDomain + ": Errors found in input.");
         }
     }
 
@@ -489,7 +489,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReadGeneralDomainInputs");
+        static constexpr std::string_view RoutineName("ReadGeneralDomainInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -532,7 +532,7 @@ namespace PlantPipingSystemsManager {
                 } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
                     thisDomain.Mesh.X.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                     if (mod(thisDomain.Mesh.X.RegionMeshCount, 2) != 0) {
-                        ShowWarningError(state, "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
+                        ShowWarningError(state, "PipingSystems:" + std::string{RoutineName} + ": Invalid mesh type-count combination.");
                         ShowContinueError(state, "Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
                         ShowContinueError(state, "An ODD-valued X mesh count was found in the input for symmetric geometric configuration.");
                         ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
@@ -562,7 +562,7 @@ namespace PlantPipingSystemsManager {
                 } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
                     thisDomain.Mesh.Y.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                     if (mod(thisDomain.Mesh.Y.RegionMeshCount, 2) != 0) {
-                        ShowWarningError(state, "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
+                        ShowWarningError(state, "PipingSystems:" + std::string{RoutineName} + ": Invalid mesh type-count combination.");
                         ShowContinueError(state, "Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
                         ShowContinueError(state, "An ODD-valued Y mesh count was found in the input for symmetric geometric configuration.");
                         ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
@@ -592,7 +592,7 @@ namespace PlantPipingSystemsManager {
                 } else if (meshDistribution == "SYMMETRICGEOMETRIC") {
                     thisDomain.Mesh.Z.thisMeshDistribution = MeshDistribution::SymmetricGeometric;
                     if (mod(thisDomain.Mesh.Z.RegionMeshCount, 2) != 0) {
-                        ShowWarningError(state, "PipingSystems:" + RoutineName + ": Invalid mesh type-count combination.");
+                        ShowWarningError(state, "PipingSystems:" + std::string{RoutineName} + ": Invalid mesh type-count combination.");
                         ShowContinueError(state, "Instance:" + ObjName_ug_GeneralDomain + '=' + thisDomain.Name);
                         ShowContinueError(state, "An ODD-valued Z mesh count was found in the input for symmetric geometric configuration.");
                         ShowContinueError(state, "This is invalid, mesh count incremented UP by one to next EVEN value.");
@@ -808,7 +808,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReadZoneCoupledDomainInputs");
+        static constexpr std::string_view RoutineName("ReadZoneCoupledDomainInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -1044,7 +1044,7 @@ namespace PlantPipingSystemsManager {
             if (!thisDomain.FullHorizInsPresent && ThisArea > 0.0) {
                 if (2 * (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) > thisDomain.SlabWidth ||
                     2 * (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) > thisDomain.SlabLength) {
-                    ShowContinueError(state, RoutineName + ": Perimeter insulation width is too large.");
+                    ShowContinueError(state, std::string{RoutineName} + ": Perimeter insulation width is too large.");
                     ShowContinueError(state, "This would cause overlapping insulation. Check inputs.");
                     ShowContinueError(state, "Defaulting to full horizontal insulation.");
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
@@ -1103,7 +1103,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReadBasementInputs");
+        static constexpr std::string_view RoutineName("ReadBasementInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -1398,7 +1398,7 @@ namespace PlantPipingSystemsManager {
             if (!thisDomain.FullHorizInsPresent && ThisArea > 0.0) {
                 if ((thisDomain.HorizInsWidth + thisDomain.VertInsThickness) > thisDomain.BasementZone.Width / 2.0 ||
                     (thisDomain.HorizInsWidth + thisDomain.VertInsThickness) > thisDomain.BasementZone.Length / 2.0) {
-                    ShowContinueError(state, RoutineName + ": Perimeter insulation width is too large.");
+                    ShowContinueError(state, std::string{RoutineName} + ": Perimeter insulation width is too large.");
                     ShowContinueError(state, "This would cause overlapping insulation. Check inputs.");
                     ShowContinueError(state, "Defaulting to full horizontal insulation.");
                     ShowContinueError(state, "Found in: " + thisDomain.Name);
@@ -1455,7 +1455,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReadPipeCircuitInputs");
+        static constexpr std::string_view RoutineName("ReadPipeCircuitInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -1637,7 +1637,7 @@ namespace PlantPipingSystemsManager {
             // Issue a severe if Inner >= Outer diameter
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
                 ShowSevereError(
-                    state, RoutineName + ": " + ObjName_HorizTrench + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid pipe diameters.");
+                    state, std::string{RoutineName} + ": " + ObjName_HorizTrench + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid pipe diameters.");
                 ShowContinueError(state,
                                   format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
                                          thisCircuit.PipeSize.OuterDia,
@@ -1741,7 +1741,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReadPipeSegmentInputs");
+        static constexpr std::string_view RoutineName("ReadPipeSegmentInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -1815,7 +1815,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReadHorizontalTrenchInputs");
+        static constexpr std::string_view RoutineName("ReadHorizontalTrenchInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -2105,7 +2105,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitPipingSystems");
+        static constexpr std::string_view RoutineName("InitPipingSystems");
 
         // Do any one-time initializations
         if (thisCircuit->NeedToFindOnPlantLoop) {
@@ -2132,7 +2132,7 @@ namespace PlantPipingSystemsManager {
                                                     _,
                                                     _);
             if (errFlag) {
-                ShowFatalError(state, "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s).");
+                ShowFatalError(state, "PipingSystems:" + std::string{RoutineName} + ": Program terminated due to previous condition(s).");
             }
 
             // Once we find ourselves on the plant loop, we can do other things
@@ -2153,7 +2153,7 @@ namespace PlantPipingSystemsManager {
             for (auto &thisDomainCircuit : this->circuits) {
                 for (auto &segment : thisDomainCircuit->pipeSegments) {
                     if (!segment->PipeCellCoordinatesSet) {
-                        ShowSevereError(state, "PipingSystems:" + RoutineName + ":Pipe segment index not set.");
+                        ShowSevereError(state, "PipingSystems:" + std::string{RoutineName} + ":Pipe segment index not set.");
                         ShowContinueError(state, "...Possibly because pipe segment was placed outside of the domain.");
                         ShowContinueError(state, "...Verify piping system domain inputs, circuits, and segments.");
                         ShowFatalError(state, "Preceding error causes program termination");
@@ -2226,7 +2226,7 @@ namespace PlantPipingSystemsManager {
     }
 
     void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string const &RoutineName,
+                                    std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
                                     std::string const &FieldName,
@@ -2242,13 +2242,13 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         ShowSevereError(state,
-                        RoutineName + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" + FieldEntry +
+                        std::string{RoutineName} + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" + FieldEntry +
                             "\", Condition: " + Condition);
         ErrorsFound = true;
     }
 
     void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string const &RoutineName,
+                                    std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
                                     std::string const &FieldName,
@@ -3054,7 +3054,7 @@ namespace PlantPipingSystemsManager {
         std::vector<GridRegion> ThesePartitionRegions;
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CreatePartitionRegionList");
+        static constexpr std::string_view RoutineName("CreatePartitionRegionList");
 
         if (!PartitionsExist) {
             return ThesePartitionRegions;
@@ -3073,7 +3073,7 @@ namespace PlantPipingSystemsManager {
 
             // check to make sure this location is valid
             if (CellLeft < 0.0 || CellRight > DirExtentMax) {
-                ShowSevereError(state, "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
+                ShowSevereError(state, "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.");
                 ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
                 ShowContinueError(state, "A pipe or basement is located outside of the domain extents.");
                 ShowFatalError(state, "Preceding error causes program termination.");
@@ -3087,7 +3087,7 @@ namespace PlantPipingSystemsManager {
                     if (IsInRange_BasementModel(CellLeft, thisPartitionRegionSubIndex.Min, thisPartitionRegionSubIndex.Max) ||
                         IsInRangeReal(CellRight, thisPartitionRegionSubIndex.Min, thisPartitionRegionSubIndex.Max)) {
 
-                        ShowSevereError(state, "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
+                        ShowSevereError(state, "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.");
                         ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
                         ShowContinueError(state, "A mesh conflict was encountered where partitions were overlapping.");
                         ShowContinueError(state, "Ensure that all pipes exactly line up or are separated to allow meshing in between them");
@@ -3100,7 +3100,7 @@ namespace PlantPipingSystemsManager {
                     if (IsInRangeReal(CellLeft, thisPartitionRegionSubIndex.Min, thisPartitionRegionSubIndex.Max) ||
                         IsInRangeReal(CellRight, thisPartitionRegionSubIndex.Min, thisPartitionRegionSubIndex.Max)) {
 
-                        ShowSevereError(state, "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain.");
+                        ShowSevereError(state, "PlantPipingSystems::" + std::string{RoutineName} + ": Invalid partition location in domain.");
                         ShowContinueError(state, "Occurs during mesh development for domain=" + this->Name);
                         ShowContinueError(state, "A mesh conflict was encountered where partitions were overlapping.");
                         ShowContinueError(state, "Ensure that all pipes exactly line up or are separated to allow meshing in between them");
@@ -5647,7 +5647,7 @@ namespace PlantPipingSystemsManager {
 
     void Domain::DoStartOfTimeStepInitializations(EnergyPlusData &state)
     {
-        static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
+        static constexpr std::string_view RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
 
         // Update environmental conditions
         this->Cur.CurAirTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -5707,7 +5707,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
+        static constexpr std::string_view RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
         Real64 CellTemp;
         Real64 CellRhoCp;
         Real64 FluidCp;
@@ -5816,7 +5816,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("DoEndOfIterationOperations");
+        static constexpr std::string_view RoutineName("DoEndOfIterationOperations");
 
         //'check if we have converged for this iteration
         Finished = this->IsConverged_CurrentToPrevIteration();
@@ -5826,17 +5826,17 @@ namespace PlantPipingSystemsManager {
         bool OutOfRange = this->CheckForOutOfRangeTemps();
         if (OutOfRange) {
             if (this->HasZoneCoupledSlab) {
-                ShowSevereError(state, "Site:GroundDomain:Slab" + RoutineName + ": Out of range temperatures detected in the ground domain.");
+                ShowSevereError(state, "Site:GroundDomain:Slab" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.");
                 ShowContinueError(state, "This could be due to the size of the loads on the domain.");
                 ShowContinueError(state, "Verify inputs are correct. If problem persists, notify EnergyPlus support.");
                 ShowFatalError(state, "Preceding error(s) cause program termination");
             } else if (this->HasZoneCoupledBasement) {
-                ShowSevereError(state, "Site:GroundDomain:Basement" + RoutineName + ": Out of range temperatures detected in the ground domain.");
+                ShowSevereError(state, "Site:GroundDomain:Basement" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.");
                 ShowContinueError(state, "This could be due to the size of the loads on the domain.");
                 ShowContinueError(state, "Verify inputs are correct. If problem persists, notify EnergyPlus support.");
                 ShowFatalError(state, "Preceding error(s) cause program termination");
             } else {
-                ShowSevereError(state, "PipingSystems:" + RoutineName + ": Out of range temperatures detected in piping system simulation.");
+                ShowSevereError(state, "PipingSystems:" + std::string{RoutineName} + ": Out of range temperatures detected in piping system simulation.");
                 ShowContinueError(state, "This could be due to the size of the pipe circuit in relation to the loads being imposed.");
                 ShowContinueError(state, "Try increasing the size of the pipe circuit and investigate sizing effects.");
                 ShowFatalError(state, "Preceding error(s) cause program termination");

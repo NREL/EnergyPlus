@@ -6969,7 +6969,7 @@ namespace WindowManager {
 
         int const MaxIterations(100);  // Maximum allowed number of iterations
         Real64 const errtemptol(0.02); // Tolerance on errtemp for convergence
-        static std::string const RoutineName("WindowTempsForNominalCond");
+        static constexpr std::string_view RoutineName("WindowTempsForNominalCond");
 
         int i;                      // Counter
         Real64 gr;                  // Grashof number of gas in a gap

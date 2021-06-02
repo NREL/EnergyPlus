@@ -263,7 +263,7 @@ namespace FanCoilUnits {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        static std::string const RoutineName("GetFanCoilUnits: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetFanCoilUnits: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanCoilIndex;                // loop index
@@ -339,7 +339,7 @@ namespace FanCoilUnits {
             } else {
                 FanCoil(FanCoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (FanCoil(FanCoilNum).SchedPtr == 0) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid");
                     ShowContinueError(state, "invalid-not found: " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                     ErrorsFound = true;
                 }
@@ -363,7 +363,7 @@ namespace FanCoilUnits {
                     FanCoil(FanCoilNum).FanOpMode = ContFanCycCoil;
                 }
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
                 ShowContinueError(state, "illegal value: " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
                 ErrorsFound = true;
             }
@@ -371,7 +371,7 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).SchedOutAir = Alphas(4);
             FanCoil(FanCoilNum).SchedOutAirPtr = GetScheduleIndex(state, Alphas(4)); // convert schedule name to pointer
             if (FanCoil(FanCoilNum).SchedOutAirPtr == 0 && (!lAlphaBlanks(4))) {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
                 ShowContinueError(state, "illegal value: " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
                 ErrorsFound = true;
             }
@@ -380,7 +380,7 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).MedSpeedRatio = Numbers(3);
             // check if low speed ratio < medium speed ratio, if not : warning & set to default values
             if (FanCoil(FanCoilNum).LowSpeedRatio > FanCoil(FanCoilNum).MedSpeedRatio) {
-                ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
+                ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                 ShowContinueError(state, "... " + cNumericFields(2) + " is greater than the medium speed supply air flow ratio.");
                 ShowContinueError(state, format("... Fan Coil Unit low speed supply air flow ratio = {:.5T} ", FanCoil(FanCoilNum).LowSpeedRatio));
                 ShowContinueError(state, format("... Fan Coit Unit medium speed supply air flow ratio = {:.5T} ", FanCoil(FanCoilNum).MedSpeedRatio));
@@ -473,7 +473,7 @@ namespace FanCoilUnits {
                     } else if (UtilityRoutines::SameString(FanCoil(FanCoilNum).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
                         FanCoil(FanCoilNum).CCoilPlantTypeOfNum = TypeOf_CoilWaterDetailedFlatCooling;
                     } else {
-                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
+                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
                         ShowContinueError(state, "For: " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
                         ShowContinueError(state,
                                           "Invalid Coil Type=" + FanCoil(FanCoilNum).CCoilPlantType + ", Name=" + FanCoil(FanCoilNum).CCoilPlantName);
@@ -510,7 +510,7 @@ namespace FanCoilUnits {
                     }
                 }
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
                 ShowContinueError(state, "illegal value: " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
                 ErrorsFound = true;
             }
@@ -556,7 +556,7 @@ namespace FanCoilUnits {
                     }
                 }
             } else {
-                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
+                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\", invalid");
                 ShowContinueError(state, "illegal value: " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                 ErrorsFound = true;
             }
@@ -606,7 +606,7 @@ namespace FanCoilUnits {
                             // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                             if (FanCoil(FanCoilNum).MaxAirVolFlow > FanCoil(FanCoilNum).FanAirVolFlow &&
                                 FanCoil(FanCoilNum).FanAirVolFlow != AutoSize) {
-                                ShowWarningError(state, RoutineName + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
+                                ShowWarningError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, "... " + cNumericFields(1) + " is greater than the maximum fan flow rate.");
                                 ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} m3/s.", FanCoil(FanCoilNum).MaxAirVolFlow));
                                 ShowContinueError(state,
@@ -624,7 +624,7 @@ namespace FanCoilUnits {
                                 (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::VarFanVarFlow && FanCoil(FanCoilNum).FanType_Num != FanType_SimpleVAV) ||
                                 (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::VarFanConsFlow &&
                                  FanCoil(FanCoilNum).FanType_Num != FanType_SimpleVAV)) {
-                                ShowSevereError(state, RoutineName + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
+                                ShowSevereError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state,
                                                   "...the fan type of the object : " + FanCoil(FanCoilNum).FanName +
                                                       " does not match with the capacity control method selected : " +
@@ -649,7 +649,7 @@ namespace FanCoilUnits {
                     FanCoil(FanCoilNum).FanAirVolFlow = state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->designAirVolFlowRate;
                     // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                     if (FanCoil(FanCoilNum).MaxAirVolFlow > FanCoil(FanCoilNum).FanAirVolFlow && FanCoil(FanCoilNum).FanAirVolFlow != AutoSize) {
-                        ShowWarningError(state, RoutineName + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
+                        ShowWarningError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
                         ShowContinueError(state, "... " + cNumericFields(1) + " is greater than the maximum fan flow rate.");
                         ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} m3/s.", FanCoil(FanCoilNum).MaxAirVolFlow));
                         ShowContinueError(state, "... Fan = " + cFanTypes(FanCoil(FanCoilNum).FanType_Num) + ": " + FanCoil(FanCoilNum).FanName);
@@ -663,7 +663,7 @@ namespace FanCoilUnits {
                         FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::ASHRAE) { // then expect continuous speed control fan
                         if (state.dataHVACFan->fanObjs[FanCoil(FanCoilNum).FanIndex]->speedControl !=
                             HVACFan::FanSystem::SpeedControlMethod::Continuous) {
-                            ShowSevereError(state, RoutineName + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
+                            ShowSevereError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
                             ShowContinueError(state,
                                               "...the fan type of the object : " + FanCoil(FanCoilNum).FanName +
                                                   " does not match with the capacity control method selected : " + FanCoil(FanCoilNum).CapCtrlMeth +
@@ -680,12 +680,12 @@ namespace FanCoilUnits {
             // check low speed fan ratio when using ASHRAE90.1 capacity control method
             if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM::ASHRAE) {
                 if (FanCoil(FanCoilNum).LowSpeedRatio > 0.5) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
+                    ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                     ShowContinueError(state, "... " + cNumericFields(2) + " is greater than the 50% of the supply air flow ratio.");
                     ShowContinueError(state,
                                       format("... Fan Coil Unit low speed supply air flow ratio = {:.5T} ", FanCoil(FanCoilNum).LowSpeedRatio));
                 } else if (FanCoil(FanCoilNum).LowSpeedRatio == 0.0) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
+                    ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                     ShowContinueError(state, "... " + cNumericFields(2) + " is equal to 0.");
                     ShowContinueError(state, "... Fan Coil Unit low speed supply air flow ratio should be greater than 0 to comply with ASHRAE90.1.");
                     ShowContinueError(state, "... Fan Coil Unit low speed supply air flow ratio set to 0.5");
@@ -832,7 +832,7 @@ namespace FanCoilUnits {
             if (!lNumericBlanks(11)) {
                 FanCoil(FanCoilNum).DesignMinOutletTemp = Numbers(11);
                 if (lNumericBlanks(12)) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
+                    ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                     ShowContinueError(state, "... " + cNumericFields(11) + " and " + cNumericFields(12) + " must be used in unison.");
                     ErrorsFound = true;
                 }
@@ -842,7 +842,7 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).DesignMaxOutletTemp = Numbers(12);
                 if (FanCoil(FanCoilNum).DesignMinOutletTemp != AutoSize && FanCoil(FanCoilNum).DesignMaxOutletTemp != AutoSize) {
                     if (FanCoil(FanCoilNum).DesignMaxOutletTemp < FanCoil(FanCoilNum).DesignMinOutletTemp) {
-                        ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
+                        ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                         ShowContinueError(state, "... " + cNumericFields(11) + " is greater than " + cNumericFields(12) + ".");
                         ShowContinueError(state, format("... {} = {:.2T} [C].", cNumericFields(11), FanCoil(FanCoilNum).DesignMinOutletTemp));
                         ShowContinueError(state, format("... {} = {:.2T} [C].", cNumericFields(12), FanCoil(FanCoilNum).DesignMaxOutletTemp));
@@ -850,7 +850,7 @@ namespace FanCoilUnits {
                     }
                 }
                 if (lNumericBlanks(11)) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
+                    ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\",");
                     ShowContinueError(state, "... " + cNumericFields(11) + " and " + cNumericFields(12) + " must be used in unison.");
                     ErrorsFound = true;
                 }
@@ -918,7 +918,7 @@ namespace FanCoilUnits {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input. Preceding condition(s) cause termination.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input. Preceding condition(s) cause termination.");
         }
 
         for (FanCoilNum = 1; FanCoilNum <= state.dataFanCoilUnits->NumFanCoils; ++FanCoilNum) {
@@ -1092,7 +1092,7 @@ namespace FanCoilUnits {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitFanCoilUnits");
+        static constexpr std::string_view RoutineName("InitFanCoilUnits");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InNode;         // inlet node number in fan coil loop
@@ -1374,8 +1374,8 @@ namespace FanCoilUnits {
         using WaterCoils::SetCoilDesFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeFanCoilUnit: "); // include trailing blank space
-        static std::string const RoutineNameNoSpace("SizeFanCoilUnit");
+        static constexpr std::string_view RoutineName("SizeFanCoilUnit: "); // include trailing blank space
+        static constexpr std::string_view RoutineNameNoSpace("SizeFanCoilUnit");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum;  // index of plant sizing object for 1st heating loop
@@ -1641,7 +1641,7 @@ namespace FanCoilUnits {
                 }
                 //     Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                 if (MaxAirVolFlowDes > FanCoil(FanCoilNum).FanAirVolFlow) {
-                    ShowWarningError(state, RoutineName + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
+                    ShowWarningError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
                     ShowContinueError(state, "... Maximum supply air flow rate is greater than the maximum fan flow rate.");
                     ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} [m3/s].", MaxAirVolFlowDes));
                     ShowContinueError(state, "... Fan = " + cFanTypes(FanCoil(FanCoilNum).FanType_Num) + ": " + FanCoil(FanCoilNum).FanName);
@@ -1681,7 +1681,7 @@ namespace FanCoilUnits {
             }
             //   Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
             if (FanCoil(FanCoilNum).MaxAirVolFlow > FanCoil(FanCoilNum).FanAirVolFlow) {
-                ShowWarningError(state, RoutineName + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
+                ShowWarningError(state, std::string{RoutineName} + FanCoil(FanCoilNum).UnitType + ": " + FanCoil(FanCoilNum).Name);
                 ShowContinueError(state, "... Maximum supply air flow rate is greater than the maximum fan flow rate.");
                 ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} m3/s.", FanCoil(FanCoilNum).MaxAirVolFlow));
                 ShowContinueError(state, "... Fan = " + cFanTypes(FanCoil(FanCoilNum).FanType_Num) + ": " + FanCoil(FanCoilNum).FanName);
@@ -3962,7 +3962,7 @@ namespace FanCoilUnits {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SimMultiStage4PipeFanCoil");
+        static constexpr std::string_view RoutineName("SimMultiStage4PipeFanCoil");
         // int const MaxIterCycl( 100 );
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -4349,7 +4349,7 @@ namespace FanCoilUnits {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMultiStage4PipeFanCoil");
+        static constexpr std::string_view RoutineName("CalcMultiStage4PipeFanCoil");
         int const MaxIterCycl(100);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

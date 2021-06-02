@@ -742,7 +742,7 @@ void FluidCoolerspecs::oneTimeInit(EnergyPlusData &state)
 
 void FluidCoolerspecs::initEachEnvironment(EnergyPlusData &state)
 {
-    static std::string const RoutineName("FluidCoolerspecs::initEachEnvironment");
+    static constexpr std::string_view RoutineName("FluidCoolerspecs::initEachEnvironment");
     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                          DataGlobalConstants::InitConvTemp,
@@ -1536,7 +1536,7 @@ void FluidCoolerspecs::calcSingleSpeed(EnergyPlusData &state)
     // Based on SingleSpeedTower subroutine by Dan Fisher ,Sept 1998.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SingleSpeedFluidCooler");
+    static constexpr std::string_view RoutineName("SingleSpeedFluidCooler");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 TempSetPoint = 0.0;
@@ -1643,7 +1643,7 @@ void FluidCoolerspecs::calcTwoSpeed(EnergyPlusData &state)
     // Based on TwoSpeedTower by Dan Fisher ,Sept. 1998.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("TwoSpeedFluidCooler");
+    static constexpr std::string_view RoutineName("TwoSpeedFluidCooler");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 TempSetPoint = 0.0;
@@ -1738,7 +1738,7 @@ void CalcFluidCoolerOutlet(
     Real64 _Qactual; // Actual heat transfer rate between fluid cooler water and air [W]
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CalcFluidCoolerOutlet");
+    static constexpr std::string_view RoutineName("CalcFluidCoolerOutlet");
 
     if (UAdesign == 0.0) return;
 

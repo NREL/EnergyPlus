@@ -1442,7 +1442,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     using HeatRecovery::SetHeatExchangerData;
     using ScheduleManager::GetScheduleMaxValue;
 
-    static std::string const RoutineName("SizeStandAloneERV: ");
+    static constexpr std::string_view RoutineName("SizeStandAloneERV: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneNum;                       // Index to zone object

@@ -340,7 +340,7 @@ namespace HVACDXSystem {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static std::string const RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
         bool ErrorsFound(false);                                           // If errors detected in input
         bool IsNotOK;                                                      // Flag to verify name
         int DXCoolSysNum;
@@ -399,7 +399,7 @@ namespace HVACDXSystem {
                 state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                         cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -675,7 +675,7 @@ namespace HVACDXSystem {
         } // End of the DX System Loop
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
 
         for (DXSystemNum = 1; DXSystemNum <= state.dataHVACDXSys->NumDXSystem; ++DXSystemNum) {
@@ -3654,7 +3654,7 @@ namespace HVACDXSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const RunOnSensible(1); // identifier for temperature (sensible load) control
         int const RunOnLatent(2);   // identifier for humidity (latent load) control
-        static std::string const RoutineName("FrostControlSetPointLimit");
+        static constexpr std::string_view RoutineName("FrostControlSetPointLimit");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

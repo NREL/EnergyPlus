@@ -465,7 +465,7 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
             } else {
                 ShowSevereError(state,
-                                RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + state.dataIPShortCut->cAlphaArgs(8));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");

@@ -1003,7 +1003,7 @@ namespace PlantPipingSystemsManager {
     void SetupPipingSystemOutputVariables(EnergyPlusData &state);
 
     void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string const &RoutineName,
+                                    std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
                                     std::string const &FieldName,
@@ -1012,7 +1012,7 @@ namespace PlantPipingSystemsManager {
                                     bool &ErrorsFound);
 
     void IssueSevereInputFieldError(EnergyPlusData &state,
-                                    std::string const &RoutineName,
+                                    std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
                                     std::string const &FieldName,

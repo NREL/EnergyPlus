@@ -477,7 +477,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     int UnitLoop;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
+    static constexpr std::string_view RoutineName("GetInputZoneHybridUnitaryAirConditioners: ");
     cCurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
     state.dataHybridUnitaryAC->NumZoneHybridEvap = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, NumFields, NumAlphas, NumNumbers);
@@ -679,7 +679,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr =
                     UtilityRoutines::FindItemInList(Alphas(19), state.dataSize->OARequirements);
                 if (state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
-                    ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
+                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
                     ShowContinueError(state, "Invalid-not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");
                     ErrorsFound = true;
                 } else {
@@ -702,7 +702,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                 ErrorsFound = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(
                     state, Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
                 if (ErrorsFound) {
-                    ShowFatalError(state, RoutineName + "Errors found parsing modes");
+                    ShowFatalError(state, std::string{RoutineName} + "Errors found parsing modes");
                     ShowContinueError(state, "... Preceding condition causes termination.");
                     break;
                 }
@@ -1310,7 +1310,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     }
     Errors = ErrorsFound;
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting input.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
         ShowContinueError(state, "... Preceding condition causes termination.");
     }
 }

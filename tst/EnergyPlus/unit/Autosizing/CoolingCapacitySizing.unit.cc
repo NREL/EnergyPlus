@@ -89,7 +89,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);
 
     // this global state is what would be set up by E+ currently
-    static std::string const routineName("CoolingCapacitySizingGauntlet");
+    static constexpr std::string_view routineName("CoolingCapacitySizingGauntlet");
 
     state->dataSize->ZoneEqSizing.allocate(1);
 

@@ -257,7 +257,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
     bool ErrorsFound(false);
     bool NodeListError; // Flag for node list error
     bool UniqueNodeError;
-    static std::string const RoutineName("GetZonePlenumInput: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetZonePlenumInput: "); // include trailing blank space
     std::string InducedNodeListName;
 
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:ReturnPlenum", NumArgs, NumAlphas, NumNums);
@@ -314,7 +314,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
             AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName, ZonePlenumNum - 1);
         if (IOStat != 0) {
             ShowSevereError(state,
-                            RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
+                            std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
             ShowContinueError(state, "..Only one " + CurrentModuleObject + " object may be connected to a given zone.");
             ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
             ErrorsFound = true;
@@ -335,7 +335,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
         ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
         if (ZoneEquipConfigLoop != 0) {
             ShowSevereError(state,
-                            RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
+                            std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
                                 CurrentModuleObject);
             ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
             ErrorsFound = true;
@@ -513,7 +513,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
             AlphArray(2), state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZoneName, ZonePlenumNum - 1);
         if (IOStat != 0) {
             ShowSevereError(state,
-                            RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
+                            std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
             ShowContinueError(state, "..Only one " + CurrentModuleObject + " object may be connected to a given zone.");
             ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
             ErrorsFound = true;
@@ -522,7 +522,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
             IOStat = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName);
             if (IOStat != 0) {
                 ShowSevereError(state,
-                                RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject +
+                                std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject +
                                     " or AirLoopHVAC:ReturnPlenum.");
                 ShowContinueError(state,
                                   "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object may be connected to a given zone.");
@@ -549,7 +549,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
             ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
             if (ZoneEquipConfigLoop != 0) {
                 ShowSevereError(state,
-                                RoutineName + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
+                                std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
                                     CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum.");
                 ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
@@ -655,7 +655,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
     NodeNums.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in input.  Preceding condition(s) cause termination.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Preceding condition(s) cause termination.");
     }
 }
 

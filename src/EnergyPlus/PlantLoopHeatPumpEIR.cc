@@ -447,13 +447,13 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 
         if (thisErrFlag) {
             ShowSevereError(state,
-                            routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                            std::string{routineName} + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                 this->name + "\"");
             ShowContinueError(state, "Could not locate component's load side connections on a plant loop");
             errFlag = true;
         } else if (this->loadSideLocation.loopSideNum != DataPlant::SupplySide) { // only check if !thisErrFlag
             ShowSevereError(state,
-                            routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                            std::string{routineName} + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                 this->name + "\"");
             ShowContinueError(state, "The load side connections are not on the Supply Side of a plant loop");
             errFlag = true;
@@ -477,13 +477,13 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 
             if (thisErrFlag) {
                 ShowSevereError(state,
-                                routineName + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                std::string{routineName} + ": Plant topology problem for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                     this->name + "\"");
                 ShowContinueError(state, "Could not locate component's source side connections on a plant loop");
                 errFlag = true;
             } else if (this->sourceSideLocation.loopSideNum != DataPlant::DemandSide) { // only check if !thisErrFlag
                 ShowSevereError(state,
-                                routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                std::string{routineName} + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                     this->name + "\"");
                 ShowContinueError(state, "The source side connections are not on the Demand Side of a plant loop");
                 errFlag = true;
@@ -492,7 +492,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
             // make sure it is not the same loop on both sides.
             if (this->loadSideLocation.loopNum == this->sourceSideLocation.loopNum) { // user is being too tricky, don't allow
                 ShowSevereError(state,
-                                routineName + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
+                                std::string{routineName} + ": Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->plantTypeOfNum) + " name = \"" +
                                     this->name + "\"");
                 ShowContinueError(state, "The load and source sides need to be on different loops.");
                 errFlag = true;
@@ -511,7 +511,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
         }
 
         if (errFlag) {
-            ShowFatalError(state, routineName + ": Program terminated due to previous condition(s).");
+            ShowFatalError(state, std::string{routineName} + ": Program terminated due to previous condition(s).");
         }
         this->oneTimeInit = false;
     } // plant setup

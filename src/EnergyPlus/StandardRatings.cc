@@ -274,7 +274,7 @@ namespace StandardRatings {
         int const NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
         int const IterMax(500);            // Maximum number of iterations
         static Array1D<Real64> const IPLVWeightingFactor(4, {0.010, 0.42, 0.45, 0.12}); // EER Weighting factors (IPLV)
-        static std::string const RoutineName("CalcChillerIPLV");
+        static constexpr std::string_view RoutineName("CalcChillerIPLV");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -672,7 +672,7 @@ namespace StandardRatings {
         Real64 const OAHighEWBTemp(24.0);    // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
         Real64 const LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
 
-        static std::string const RoutineName("CheckCurveLimitsForIPLV: "); // Include trailing blank space
+        static constexpr std::string_view RoutineName("CheckCurveLimitsForIPLV: "); // Include trailing blank space
 
         //  Minimum and Maximum independent variable limits from Total Cooling Capacity Function of Temperature Curve
         Real64 CapacityLWTempMin(0.0);           // Capacity modifier Min value (leaving water temp), from the Curve:BiQuadratic object
@@ -2713,7 +2713,7 @@ namespace StandardRatings {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
-        static std::string const RoutineName("CheckCurveLimitsForStandardRatings: "); // Include trailing blank space
+        static constexpr std::string_view RoutineName("CheckCurveLimitsForStandardRatings: "); // Include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2844,7 +2844,7 @@ namespace StandardRatings {
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
@@ -3030,7 +3030,7 @@ namespace StandardRatings {
                                       " Review the Standard Ratings calculations in the Engineering Reference for this coil type. Also, use "
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
@@ -3101,7 +3101,7 @@ namespace StandardRatings {
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }
@@ -3228,7 +3228,7 @@ namespace StandardRatings {
                                       "Output:Diagnostics, DisplayExtraWarnings for further guidance.");
 
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowContinueError(state, RoutineName + "The max and/or min limits specified in the corresponding curve objects");
+                        ShowContinueError(state, std::string{RoutineName} + "The max and/or min limits specified in the corresponding curve objects");
                         ShowContinueError(
                             state, " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values.");
                     }

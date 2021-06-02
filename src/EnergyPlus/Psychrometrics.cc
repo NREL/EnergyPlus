@@ -448,7 +448,7 @@ namespace Psychrometrics {
 
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(100); // Maximum No of Iterations
-        static std::string const RoutineName("PsyTwbFnTdbWPb");
+        static constexpr std::string_view RoutineName("PsyTwbFnTdbWPb");
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 tBoil;    // Boiling temperature of water at given pressure

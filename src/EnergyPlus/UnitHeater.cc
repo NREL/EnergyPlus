@@ -247,7 +247,7 @@ namespace UnitHeater {
         int NumNumbers;                                               // Number of Numbers for each GetObjectItem call
         int NumFields;                                                // Total number of fields in object
         int UnitHeatNum;                                              // Item to be "gotten"
-        static std::string const RoutineName("GetUnitHeaterInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetUnitHeaterInput: "); // include trailing blank space
         Real64 FanVolFlow;                                            // Fan volumetric flow rate
         std::string CurrentModuleObject;
         Array1D_string Alphas;         // Alpha items for object
@@ -309,7 +309,7 @@ namespace UnitHeater {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                         cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
@@ -376,7 +376,7 @@ namespace UnitHeater {
                                 ErrorsFound = true;
                             }
                         } else {
-                            ShowSevereError(state, RoutineName + CurrentModuleObject + " = \"" + Alphas(1) + "\"");
+                            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + Alphas(1) + "\"");
                             ShowContinueError(state, "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume");
                             ErrorsFound = true;
                         }
@@ -653,7 +653,7 @@ namespace UnitHeater {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
 
-        if (ErrorsFound) ShowFatalError(state, RoutineName + "Errors found in input");
+        if (ErrorsFound) ShowFatalError(state, std::string{RoutineName} + "Errors found in input");
 
         // Setup Report variables for the Unit Heaters, CurrentModuleObject='ZoneHVAC:UnitHeater'
         for (UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) {
@@ -760,7 +760,7 @@ namespace UnitHeater {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitUnitHeater");
+        static constexpr std::string_view RoutineName("InitUnitHeater");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -1000,7 +1000,7 @@ namespace UnitHeater {
         using SteamCoils::GetCoilSteamOutletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeUnitHeater");
+        static constexpr std::string_view RoutineName("SizeUnitHeater");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop

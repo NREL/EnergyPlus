@@ -530,7 +530,7 @@ protected:
 TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
 {
 
-    static std::string const RoutineName("VRF_SysModel_inAirloop");
+    static constexpr std::string_view RoutineName("VRF_SysModel_inAirloop");
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     int curSysNum = state->dataSize->CurSysNum = 1;
     int curZoneNum = 1;
@@ -4874,7 +4874,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 {
 
-    static std::string const RoutineName("VRFTest_WaterCooled");
+    static constexpr std::string_view RoutineName("VRFTest_WaterCooled");
     bool ErrorsFound(false);       // function returns true on error
     bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
     int VRFCond(1);                // index to VRF condenser
@@ -5924,7 +5924,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
 {
 
-    // static std::string const RoutineName( "VRFTest_NoLoadOAFlowTest" );
+    // static constexpr std::string_view RoutineName( "VRFTest_NoLoadOAFlowTest" );
     bool ErrorsFound(false);       // function returns true on error
     bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
     int VRFTUNum(1);               // index to VRF terminal unit
@@ -14477,7 +14477,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
 {
     // Test for #7651
 
-    // static std::string const RoutineName( "VRFTest_NoLoadOAFlowTest" );
+    // static constexpr std::string_view RoutineName( "VRFTest_NoLoadOAFlowTest" );
     bool ErrorsFound(false);       // function returns true on error
     bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
     int VRFTUNum(1);               // index to VRF terminal unit

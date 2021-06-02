@@ -425,7 +425,7 @@ void SizeZoneEquipment(EnergyPlusData &state)
     using DataHVACGlobals::SmallTempDiff;
 
     // Parameters
-    static std::string const RoutineName("SizeZoneEquipment");
+    static constexpr std::string_view RoutineName("SizeZoneEquipment");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ControlledZoneNum;                // controlled zone index
@@ -483,7 +483,7 @@ void SizeZoneEquipment(EnergyPlusData &state)
                 SupplyAirNode1 = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(1);
                 SupplyAirNode2 = 0;
             } else {
-                ShowSevereError(state, RoutineName + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing");
+                ShowSevereError(state, std::string{RoutineName} + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing");
                 ShowContinueError(state, "there must be at least one zone air inlet node");
                 ShowFatalError(state, "Previous severe error causes abort ");
             }
@@ -706,7 +706,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
     // Consult the "DOAS Effect On Zone Sizing" new feature proposal and design documents
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CalcDOASSupCondsForSizing");
+    static constexpr std::string_view RoutineName("CalcDOASSupCondsForSizing");
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
@@ -747,7 +747,7 @@ void CalcDOASSupCondsForSizing(EnergyPlusData &state,
             DOASSupHR = min(OutHR, W90L);
         }
     } else {
-        ShowFatalError(state, RoutineName + ":illegal DOAS design control strategy");
+        ShowFatalError(state, std::string{RoutineName} + ":illegal DOAS design control strategy");
     }
 }
 
@@ -1529,7 +1529,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
 
     // SUBROUTINE PARAMETER DEFINITIONS:
 
-    static std::string const RoutineName("UpdateZoneSizing");
+    static constexpr std::string_view RoutineName("UpdateZoneSizing");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int DesDayNum;         // design day index
@@ -2617,7 +2617,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         // issue 6006, heating coils sizing to 0 when no heating load in zone
                         if (state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).DesCoolSetPtSeq.empty()) {
                             ShowSevereError(state,
-                                            RoutineName + ":  Thermostat cooling set point temperatures are not initialized for Zone = " +
+                                            std::string{RoutineName} + ":  Thermostat cooling set point temperatures are not initialized for Zone = " +
                                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
                             ShowFatalError(state,
                                            "Please send your input file to the EnergyPlus support/development team for further investigation.");
@@ -2815,7 +2815,7 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         // issue 6006, heating coils sizing to 0 when no heating load in zone
                         if (state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).DesHeatSetPtSeq.empty()) {
                             ShowSevereError(state,
-                                            RoutineName + ":  Thermostat heating set point temperatures not initialized for Zone = " +
+                                            std::string{RoutineName} + ":  Thermostat heating set point temperatures not initialized for Zone = " +
                                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
                             ShowFatalError(state,
                                            "Please send your input file to the EnergyPlus support/development team for further investigation.");
@@ -5090,11 +5090,11 @@ void CalcAirFlowSimple(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr Real64 StdGravity(9.80665); // The acceleration of gravity at the sea level (m/s2)
-    static std::string const RoutineNameMixing("CalcAirFlowSimple:Mixing");
-    static std::string const RoutineNameCrossMixing("CalcAirFlowSimple:CrossMixing");
-    static std::string const RoutineNameRefrigerationDoorMixing("CalcAirFlowSimple:RefrigerationDoorMixing");
-    static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
-    static std::string const RoutineNameZoneAirBalance("CalcAirFlowSimple:ZoneAirBalance");
+    static constexpr std::string_view RoutineNameMixing("CalcAirFlowSimple:Mixing");
+    static constexpr std::string_view RoutineNameCrossMixing("CalcAirFlowSimple:CrossMixing");
+    static constexpr std::string_view RoutineNameRefrigerationDoorMixing("CalcAirFlowSimple:RefrigerationDoorMixing");
+    static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+    static constexpr std::string_view RoutineNameZoneAirBalance("CalcAirFlowSimple:ZoneAirBalance");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MCP;

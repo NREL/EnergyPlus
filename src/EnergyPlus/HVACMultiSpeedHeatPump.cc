@@ -480,8 +480,8 @@ namespace HVACMultiSpeedHeatPump {
 
         // Locals
         // PARAMETERS
-        static std::string const RoutineName("GetMSHeatPumpInput: "); // include trailing blank space
-        static std::string const RoutineNameNoColon("GetMSHeatPumpInput");
+        static constexpr std::string_view RoutineName("GetMSHeatPumpInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineNameNoColon("GetMSHeatPumpInput");
 
         // LOCAL VARIABLES
         int MSHPNum;                   // Engine driven heat pump count
@@ -779,7 +779,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowContinueError(state, cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
                     ShowContinueError(state, cAlphaFields(10) + " must be Coil:Heating:DX:MultiSpeed ");
                     ShowFatalError(state,
-                                   RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                                   std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                        " input. Preceding condition(s) causes termination.");
                     ErrorsFound = true;
                 }
@@ -836,7 +836,7 @@ namespace HVACMultiSpeedHeatPump {
                         ShowContinueError(state, cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
                         ShowContinueError(state, cAlphaFields(10) + " must be Coil:Heating:Electric:MultiStage ");
                         ShowFatalError(state,
-                                       RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                                       std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                            " input. Preceding condition(s) causes termination.");
                         ErrorsFound = true;
                     }
@@ -849,7 +849,7 @@ namespace HVACMultiSpeedHeatPump {
                         ShowContinueError(state, cAlphaFields(11) + " \"" + Alphas(11) + "\" not found.");
                         ShowContinueError(state, cAlphaFields(10) + " must be Coil:Heating:Gas:MultiStage ");
                         ShowFatalError(state,
-                                       RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                                       std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                            " input. Preceding condition(s) causes termination.");
                         ErrorsFound = true;
                     }
@@ -1031,7 +1031,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowContinueError(state, cAlphaFields(13) + " \"" + Alphas(13) + "\" not found.");
                     ShowContinueError(state, cAlphaFields(12) + " must be Coil:Cooling:DX:MultiSpeed ");
                     ShowFatalError(state,
-                                   RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                                   std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                        " input. Preceding condition(s) causes termination.");
                     ErrorsFound = true;
                 }
@@ -1625,7 +1625,7 @@ namespace HVACMultiSpeedHeatPump {
 
         if (ErrorsFound) {
             ShowFatalError(state,
-                           RoutineName + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
+                           std::string{RoutineName} + "Errors found in getting " + state.dataHVACMultiSpdHP->CurrentModuleObject +
                                " input.  Preceding condition(s) causes termination.");
         }
         // End of multispeed heat pump
@@ -1845,7 +1845,7 @@ namespace HVACMultiSpeedHeatPump {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static std::string const RoutineName("InitMSHeatPump");
+        static constexpr std::string_view RoutineName("InitMSHeatPump");
         int InNode;     // Inlet node number in MSHP loop
         int OutNode;    // Outlet node number in MSHP loop
         int ZoneInNode; // Zone inlet node number in the controlled zone for MSHP
@@ -4237,7 +4237,7 @@ namespace HVACMultiSpeedHeatPump {
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("MSHPHeatRecovery");
+        static constexpr std::string_view RoutineName("MSHPHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HeatRecInNode;          // Node number of heat recovery water inlet node

@@ -692,7 +692,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(thisRadSys.SurfacePtr(1))) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(state, cAlphaFields(5) + "=\"" + Alphas(5) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
@@ -993,7 +993,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(thisCFloSys.SurfacePtr(1))) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(state, cAlphaFields(5) + "=\"" + Alphas(5) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
@@ -1228,7 +1228,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(thisElecSys.SurfacePtr(1))) {
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
+                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(state, cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }

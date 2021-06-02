@@ -865,7 +865,7 @@ namespace AirLoopHVACDOAS {
         int LoopOA;
         int NodeNum;
         Real64 SchAvailValue;
-        std::string RoutineName = "AirLoopDOAS::initAirLoopDOAS";
+        static constexpr std::string_view RoutineName = "AirLoopDOAS::initAirLoopDOAS";
         bool ErrorsFound = false;
 
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {

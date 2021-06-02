@@ -296,12 +296,12 @@ The section shown below will be removed, so that no restriction of the number of
 			NumAPL = GetNumObjectsFound( "AirLoopHVAC" );
 			if ( NumAPL != 1 ) {
 				if ( NumAPL == 0 ) {
-					ShowSevereError( RoutineName + "No AirLoopHVAC is found when " + cAlphaFields( 2 ) + " = " + SimAirNetworkKey );
+					ShowSevereError( std::string{RoutineName} + "No AirLoopHVAC is found when " + cAlphaFields( 2 ) + " = " + SimAirNetworkKey );
 					ShowContinueError( "Please select a choice of MultizoneWithoutDistribution for " + cAlphaFields( 2 ) );
 				} else {
-					ShowSevereError( RoutineName + "More AirLoopHVACs are found. Currently only one (\"1\") AirLoopHVAC object per simulation is allowed when using AirflowNetwork Distribution Systems" );
+					ShowSevereError( std::string{RoutineName} + "More AirLoopHVACs are found. Currently only one (\"1\") AirLoopHVAC object per simulation is allowed when using AirflowNetwork Distribution Systems" );
 				}
-				ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
+				ShowFatalError( std::string{RoutineName} + "Errors found getting " + CurrentModuleObject + " object. Previous error(s) cause program termination." );
 			}
 		}
 		......

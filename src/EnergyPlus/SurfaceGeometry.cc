@@ -287,7 +287,7 @@ namespace SurfaceGeometry {
         using namespace DataVectorTypes;
         using namespace OutputReportPredefined;
 
-        static std::string const RoutineName("SetUpZoneGeometry: ");
+        static constexpr std::string_view RoutineName("SetUpZoneGeometry: ");
 
         Real64 AverageHeight; // Used to keep track of average height of a surface/zone
         int SurfNum;          // Surface number (DO loop counter)
@@ -549,20 +549,20 @@ namespace SurfaceGeometry {
                         0.05) {
                         if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
-                                             RoutineName +
+                                             std::string{RoutineName} +
                                                  "Entered Ceiling Height for some zone(s) significantly different from calculated Ceiling Height");
                             ShowContinueError(state,
                                               "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on each max iteration exceeded.");
                         }
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
-                                             RoutineName + "Entered Ceiling Height for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name +
+                                             std::string{RoutineName} + "Entered Ceiling Height for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                  "\" significantly different from calculated Ceiling Height");
                             static constexpr auto ValFmt("{:.2F}");
                             String1 = format(ValFmt, state.dataHeatBal->Zone(ZoneNum).CeilingHeight);
                             String2 = format(ValFmt, AverageHeight);
                             ShowContinueError(state,
-                                              RoutineName + "Entered Ceiling Height=" + String1 + ", Calculated Ceiling Height=" + String2 +
+                                              std::string{RoutineName} + "Entered Ceiling Height=" + String1 + ", Calculated Ceiling Height=" + String2 +
                                                   ", entered height will be used in calculations.");
                         }
                     }
@@ -629,7 +629,7 @@ namespace SurfaceGeometry {
             }
             if (!nonInternalMassSurfacesPresent) {
                 ShowSevereError(state,
-                                RoutineName + "Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name +
+                                std::string{RoutineName} + "Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name +
                                     "\" has only internal mass surfaces.  Need at least one other surface.");
                 ErrorsFound = true;
             }
@@ -1130,7 +1130,7 @@ namespace SurfaceGeometry {
         using ScheduleManager::GetScheduleMinValue;
         using namespace DataErrorTracking;
 
-        static std::string const RoutineName("GetSurfaceData: ");
+        static constexpr std::string_view RoutineName("GetSurfaceData: ");
 
         int ConstrNum;         // Construction number
         int Found;             // For matching interzone surfaces
@@ -1231,7 +1231,7 @@ namespace SurfaceGeometry {
             if (RelWarning && !WarningDisplayed) {
                 ShowWarningError(
                     state,
-                    RoutineName + "World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.");
+                    std::string{RoutineName} + "World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.");
                 ShowContinueError(state,
                                   "These may be used in daylighting reference point coordinate calculations but not in normal geometry inputs.");
                 WarningDisplayed = true;
@@ -1245,7 +1245,7 @@ namespace SurfaceGeometry {
             if (RelWarning && !WarningDisplayed) {
                 ShowWarningError(
                     state,
-                    RoutineName + "World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.");
+                    std::string{RoutineName} + "World Coordinate System selected.  Any non-zero Building/Zone North Axes or non-zero Zone Origins are ignored.");
                 ShowContinueError(state,
                                   "These may be used in daylighting reference point coordinate calculations but not in normal geometry inputs.");
                 WarningDisplayed = true;
@@ -1364,7 +1364,7 @@ namespace SurfaceGeometry {
         state.dataSurface->TotSurfaces = NumSurfs + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors discovered, program terminates.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors discovered, program terminates.");
         }
 
         state.dataSurface->Surface.allocate(state.dataSurface->TotSurfaces); // Allocate the Surface derived type appropriately
@@ -1507,7 +1507,7 @@ namespace SurfaceGeometry {
                     // Debug        write(outputfiledebug,*) ' subsurf, basesurf=',TRIM('iz-'//SurfaceTmp(SurfNum)%BaseSurfName)
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + "Adding unentered subsurface, could not find base surface=" + "iz-" +
+                                    std::string{RoutineName} + "Adding unentered subsurface, could not find base surface=" + "iz-" +
                                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName);
                     SurfError = true;
                 }
@@ -1537,11 +1537,11 @@ namespace SurfaceGeometry {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class > SurfaceClass::TDD_Diffuser) {
                         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::None) {
                             ShowSevereError(
-                                state, RoutineName + "Invalid SubSurface detected, Surface=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
+                                state, std::string{RoutineName} + "Invalid SubSurface detected, Surface=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
                         } else {
                             ShowSevereError(
                                 state,
-                                RoutineName + "Invalid SubSurface detected, Surface=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
+                                std::string{RoutineName} + "Invalid SubSurface detected, Surface=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                     ", class=" + state.dataSurfaceGeometry->BaseSurfCls(int(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class)) +
                                     " invalid class for subsurface");
                             SurfError = true;
@@ -1795,12 +1795,12 @@ namespace SurfaceGeometry {
             for (int Loop = 1; Loop <= state.dataSurface->TotSurfaces; ++Loop) {
                 if (!SurfaceTmpClassMoved(Loop) && state.dataSurfaceGeometry->SurfaceTmp(Loop).Class == SurfaceClass::INVALID) {
                     ShowSevereError(state,
-                                    RoutineName + "Error in Surface= \"" + state.dataSurfaceGeometry->SurfaceTmp(Loop).Name + " indicated Zone=\"" +
+                                    std::string{RoutineName} + "Error in Surface= \"" + state.dataSurfaceGeometry->SurfaceTmp(Loop).Name + " indicated Zone=\"" +
                                         state.dataSurfaceGeometry->SurfaceTmp(Loop).ZoneName + "\"");
                 }
             }
             ShowWarningError(state,
-                             RoutineName + "Remaining surface checks will use \"reordered number of surfaces\", not number of original surfaces");
+                             std::string{RoutineName} + "Remaining surface checks will use \"reordered number of surfaces\", not number of original surfaces");
         }
 
         state.dataSurfaceGeometry->SurfaceTmp.deallocate(); // DeAllocate the Temp Surface derived type
@@ -1852,7 +1852,7 @@ namespace SurfaceGeometry {
                         // Check that matching surface is also "OtherZoneSurface"
                         if (state.dataSurface->Surface(Found).ExtBoundCond <= 0 &&
                             state.dataSurface->Surface(Found).ExtBoundCond != state.dataSurfaceGeometry->UnreconciledZoneSurface) {
-                            ShowSevereError(state, RoutineName + "Potential \"OtherZoneSurface\" is not matched correctly:");
+                            ShowSevereError(state, std::string{RoutineName} + "Potential \"OtherZoneSurface\" is not matched correctly:");
 
                             ShowContinueError(state,
                                               "Surface=" + state.dataSurface->Surface(SurfNum).Name +
@@ -1868,12 +1868,12 @@ namespace SurfaceGeometry {
                             if (state.dataSurface->Surface(SurfNum).Zone == state.dataSurface->Surface(Found).Zone) {
                                 ++ErrCount2;
                                 if (ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(state, RoutineName + "CAUTION -- Interzone surfaces are occuring in the same zone(s).");
+                                    ShowWarningError(state, std::string{RoutineName} + "CAUTION -- Interzone surfaces are occuring in the same zone(s).");
                                     ShowContinueError(
                                         state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual occurrences.");
                                 }
                                 if (state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(state, RoutineName + "CAUTION -- Interzone surfaces are usually in different zones");
+                                    ShowWarningError(state, std::string{RoutineName} + "CAUTION -- Interzone surfaces are usually in different zones");
                                     ShowContinueError(state,
                                                       "Surface=" + state.dataSurface->Surface(SurfNum).Name +
                                                           ", Zone=" + state.dataSurface->Surface(SurfNum).ZoneName);
@@ -1897,7 +1897,7 @@ namespace SurfaceGeometry {
                                 // match on like Uvalues (nominal)
                                 if (std::abs(state.dataHeatBal->NominalU(ConstrNum) - state.dataHeatBal->NominalU(ConstrNumFound)) > 0.001) {
                                     ShowSevereError(state,
-                                                    RoutineName + "Construction " + state.dataConstruction->Construct(ConstrNum).Name +
+                                                    std::string{RoutineName} + "Construction " + state.dataConstruction->Construct(ConstrNum).Name +
                                                         " of interzone surface " + state.dataSurface->Surface(SurfNum).Name +
                                                         " does not have the same number of layers as the construction " +
                                                         state.dataConstruction->Construct(ConstrNumFound).Name + " of adjacent surface " +
@@ -1918,7 +1918,7 @@ namespace SurfaceGeometry {
                                 if (izConstDiff &&
                                     std::abs(state.dataHeatBal->NominalU(ConstrNum) - state.dataHeatBal->NominalU(ConstrNumFound)) > 0.001) {
                                     ShowSevereError(state,
-                                                    RoutineName + "Construction " + state.dataConstruction->Construct(ConstrNum).Name +
+                                                    std::string{RoutineName} + "Construction " + state.dataConstruction->Construct(ConstrNum).Name +
                                                         " of interzone surface " + state.dataSurface->Surface(SurfNum).Name +
                                                         " does not have the same materials in the reverse order as the construction " +
                                                         state.dataConstruction->Construct(ConstrNumFound).Name + " of adjacent surface " +
@@ -1935,7 +1935,7 @@ namespace SurfaceGeometry {
                                     SurfError = true;
                                 } else if (izConstDiff) {
                                     ShowWarningError(state,
-                                                     RoutineName + "Construction " + state.dataConstruction->Construct(ConstrNum).Name +
+                                                     std::string{RoutineName} + "Construction " + state.dataConstruction->Construct(ConstrNum).Name +
                                                          " of interzone surface " + state.dataSurface->Surface(SurfNum).Name +
                                                          " does not have the same materials in the reverse order as the construction " +
                                                          state.dataConstruction->Construct(ConstrNumFound).Name + " of adjacent surface " +
@@ -1975,7 +1975,7 @@ namespace SurfaceGeometry {
                                     if (ErrCount4 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                                         ShowWarningError(
                                             state,
-                                            RoutineName +
+                                            std::string{RoutineName} +
                                                 "InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:");
                                         ShowContinueError(
                                             state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual mismatches.");
@@ -1983,7 +1983,7 @@ namespace SurfaceGeometry {
                                     if (state.dataGlobal->DisplayExtraWarnings) {
                                         ShowWarningError(
                                             state,
-                                            RoutineName +
+                                            std::string{RoutineName} +
                                                 "InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:");
 
                                         if (MultFound == 1 && MultSurfNum == 1) {
@@ -2020,7 +2020,7 @@ namespace SurfaceGeometry {
                             // Check opposites Azimuth and Tilt
                             // Tilt
                             if (std::abs(std::abs(state.dataSurface->Surface(Found).Tilt + state.dataSurface->Surface(SurfNum).Tilt) - 180.0) > 1.0) {
-                                ShowWarningError(state, RoutineName + "InterZone Surface Tilts do not match as expected.");
+                                ShowWarningError(state, std::string{RoutineName} + "InterZone Surface Tilts do not match as expected.");
                                 ShowContinueError(state,
                                                   format("  Tilt={:.1T} in Surface={}, Zone={}",
                                                          state.dataSurface->Surface(SurfNum).Tilt,
@@ -2038,7 +2038,7 @@ namespace SurfaceGeometry {
                                  state.dataSurface->Surface(Found).Class != SurfaceClass::Wall) ||
                                 (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Wall &&
                                  state.dataSurface->Surface(Found).Class == SurfaceClass::Wall)) {
-                                ShowWarningError(state, RoutineName + "InterZone Surface Classes do not match as expected.");
+                                ShowWarningError(state, std::string{RoutineName} + "InterZone Surface Classes do not match as expected.");
                                 ShowContinueError(state,
                                                   "Surface=\"" + state.dataSurface->Surface(SurfNum).Name +
                                                       "\", surface class=" + cSurfaceClass(state.dataSurface->Surface(SurfNum).Class));
@@ -2051,7 +2051,7 @@ namespace SurfaceGeometry {
                                  state.dataSurface->Surface(Found).Class != SurfaceClass::Floor) ||
                                 (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Roof &&
                                  state.dataSurface->Surface(Found).Class == SurfaceClass::Floor)) {
-                                ShowWarningError(state, RoutineName + "InterZone Surface Classes do not match as expected.");
+                                ShowWarningError(state, std::string{RoutineName} + "InterZone Surface Classes do not match as expected.");
                                 ShowContinueError(state,
                                                   "Surface=\"" + state.dataSurface->Surface(SurfNum).Name +
                                                       "\", surface class=" + cSurfaceClass(state.dataSurface->Surface(SurfNum).Class));
@@ -2074,7 +2074,7 @@ namespace SurfaceGeometry {
                                              180.0) > 1.0) {
                                     if (std::abs(state.dataSurface->Surface(SurfNum).SinTilt) > 0.5 || state.dataGlobal->DisplayExtraWarnings) {
                                         // if horizontal surfaces, then these are windows/doors/etc in those items.
-                                        ShowWarningError(state, RoutineName + "InterZone Surface Azimuths do not match as expected.");
+                                        ShowWarningError(state, std::string{RoutineName} + "InterZone Surface Azimuths do not match as expected.");
                                         ShowContinueError(state,
                                                           format("  Azimuth={:.1T}, Tilt={:.1T}, in Surface={}, Zone={}",
                                                                  state.dataSurface->Surface(SurfNum).Azimuth,
@@ -2097,7 +2097,7 @@ namespace SurfaceGeometry {
 
                             // Make sure exposures (Sun, Wind) are the same.....and are "not"
                             if (state.dataSurface->Surface(SurfNum).ExtSolar || state.dataSurface->Surface(Found).ExtSolar) {
-                                ShowWarningError(state, RoutineName + "Interzone surfaces cannot be \"SunExposed\" -- removing SunExposed");
+                                ShowWarningError(state, std::string{RoutineName} + "Interzone surfaces cannot be \"SunExposed\" -- removing SunExposed");
                                 ShowContinueError(state,
                                                   "  Surface=" + state.dataSurface->Surface(SurfNum).Name +
                                                       ", Zone=" + state.dataSurface->Surface(SurfNum).ZoneName);
@@ -2108,7 +2108,7 @@ namespace SurfaceGeometry {
                                 state.dataSurface->Surface(Found).ExtSolar = false;
                             }
                             if (state.dataSurface->Surface(SurfNum).ExtWind || state.dataSurface->Surface(Found).ExtWind) {
-                                ShowWarningError(state, RoutineName + "Interzone surfaces cannot be \"WindExposed\" -- removing WindExposed");
+                                ShowWarningError(state, std::string{RoutineName} + "Interzone surfaces cannot be \"WindExposed\" -- removing WindExposed");
                                 ShowContinueError(state,
                                                   "  Surface=" + state.dataSurface->Surface(SurfNum).Name +
                                                       ", Zone=" + state.dataSurface->Surface(SurfNum).ZoneName);
@@ -2130,7 +2130,7 @@ namespace SurfaceGeometry {
                                     state.dataSurface->Surface(SurfNum).BaseSurf) {
                                     // base surface is not interzone surface
                                     ShowSevereError(state,
-                                                    RoutineName + "SubSurface=\"" + state.dataSurface->Surface(SurfNum).Name +
+                                                    std::string{RoutineName} + "SubSurface=\"" + state.dataSurface->Surface(SurfNum).Name +
                                                         "\" is an interzone subsurface.");
                                     ShowContinueError(state,
                                                       "..but the Base Surface is not an interzone surface, Surface=\"" +
@@ -2143,7 +2143,7 @@ namespace SurfaceGeometry {
                         //  Seems unlikely that an internal surface would be missing itself, so this message
                         //  only indicates for adjacent (interzone) surfaces.
                         ShowSevereError(state,
-                                        RoutineName + "Adjacent Surface not found: " + state.dataSurface->Surface(SurfNum).ExtBoundCondName +
+                                        std::string{RoutineName} + "Adjacent Surface not found: " + state.dataSurface->Surface(SurfNum).ExtBoundCondName +
                                             " adjacent to surface " + state.dataSurface->Surface(SurfNum).Name);
                         NonMatch = true;
                         SurfError = true;
@@ -2152,18 +2152,18 @@ namespace SurfaceGeometry {
                     if (state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).ExtBoundCond > 0 &&
                         state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).ExtBoundCond !=
                             state.dataSurface->Surface(SurfNum).BaseSurf) { // If Interzone surface, subsurface must be also.
-                        ShowSevereError(state, RoutineName + "SubSurface on Interzone Surface must be an Interzone SubSurface.");
+                        ShowSevereError(state, std::string{RoutineName} + "SubSurface on Interzone Surface must be an Interzone SubSurface.");
                         ShowContinueError(state, "...OutsideFaceEnvironment is blank, in Surface=" + state.dataSurface->Surface(SurfNum).Name);
                         SurfError = true;
                     } else {
                         ++ErrCount3;
                         if (ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state, RoutineName + "Blank name for Outside Boundary Condition Objects.");
+                            ShowWarningError(state, std::string{RoutineName} + "Blank name for Outside Boundary Condition Objects.");
                             ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                         }
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             ShowWarningError(state,
-                                             RoutineName + "Blank name for Outside Boundary Condition Object, in surface=" +
+                                             std::string{RoutineName} + "Blank name for Outside Boundary Condition Object, in surface=" +
                                                  state.dataSurface->Surface(SurfNum).Name);
                             ShowContinueError(
                                 state, "Resetting this surface to be an internal zone surface, zone=" + state.dataSurface->Surface(SurfNum).ZoneName);
@@ -2174,13 +2174,13 @@ namespace SurfaceGeometry {
                 } else {
                     ++ErrCount3;
                     if (ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                        ShowSevereError(state, RoutineName + "Blank name for Outside Boundary Condition Objects.");
+                        ShowSevereError(state, std::string{RoutineName} + "Blank name for Outside Boundary Condition Objects.");
                         ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                     }
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(
                             state,
-                            RoutineName + "Blank name for Outside Boundary Condition Object, in surface=" + state.dataSurface->Surface(SurfNum).Name);
+                            std::string{RoutineName} + "Blank name for Outside Boundary Condition Object, in surface=" + state.dataSurface->Surface(SurfNum).Name);
                         ShowContinueError(state,
                                           "Resetting this surface to be an internal zone (adiabatic) surface, zone=" +
                                               state.dataSurface->Surface(SurfNum).ZoneName);
@@ -2193,7 +2193,7 @@ namespace SurfaceGeometry {
 
         } // ...end of the Surface DO loop for finding BaseSurf
         if (NonMatch) {
-            ShowSevereError(state, RoutineName + "Non matching interzone surfaces found");
+            ShowSevereError(state, std::string{RoutineName} + "Non matching interzone surfaces found");
         }
 
         //**********************************************************************************
@@ -2209,7 +2209,7 @@ namespace SurfaceGeometry {
                     if (state.dataSurface->Surface(SurfNum).ExtBoundCond == SurfNum) {
                         ShowSevereError(
                             state,
-                            RoutineName + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name +
+                            std::string{RoutineName} + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name +
                                 "\" exterior condition [adiabatic surface] in a base surface=\"" +
                                 state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).Name + "\" with exterior condition [" +
                                 cExtBoundCondition(state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).ExtBoundCond) + ']');
@@ -2217,7 +2217,7 @@ namespace SurfaceGeometry {
                     } else if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) {
                         ShowSevereError(
                             state,
-                            RoutineName + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name +
+                            std::string{RoutineName} + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name +
                                 "\" exterior condition [interzone surface] in a base surface=\"" +
                                 state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).Name + "\" with exterior condition [" +
                                 cExtBoundCondition(state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).ExtBoundCond) + ']');
@@ -2225,7 +2225,7 @@ namespace SurfaceGeometry {
                     } else if (state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).ExtBoundCond == OtherSideCondModeledExt) {
                         ShowWarningError(
                             state,
-                            RoutineName + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name + "\" exterior condition [" +
+                            std::string{RoutineName} + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name + "\" exterior condition [" +
                                 cExtBoundCondition(state.dataSurface->Surface(SurfNum).ExtBoundCond) + "] in a base surface=\"" +
                                 state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).Name + "\" with exterior condition [" +
                                 cExtBoundCondition(state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).ExtBoundCond) + ']');
@@ -2233,7 +2233,7 @@ namespace SurfaceGeometry {
                     } else {
                         ShowSevereError(
                             state,
-                            RoutineName + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name + "\" exterior condition [" +
+                            std::string{RoutineName} + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name + "\" exterior condition [" +
                                 cExtBoundCondition(state.dataSurface->Surface(SurfNum).ExtBoundCond) + "] in a base surface=\"" +
                                 state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).Name + "\" with exterior condition [" +
                                 cExtBoundCondition(state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).ExtBoundCond) + ']');
@@ -2250,13 +2250,13 @@ namespace SurfaceGeometry {
                 if (state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) { // not adiabatic surface
                     if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) {
                         ShowSevereError(state,
-                                        RoutineName + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name +
+                                        std::string{RoutineName} + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name +
                                             "\" exterior condition [interzone surface] in a base surface=\"" +
                                             state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).Name +
                                             "\" with exterior condition [adiabatic surface]");
                     } else {
                         ShowSevereError(state,
-                                        RoutineName + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name + "\" exterior condition [" +
+                                        std::string{RoutineName} + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name + "\" exterior condition [" +
                                             cExtBoundCondition(state.dataSurface->Surface(SurfNum).ExtBoundCond) + "] in a base surface=\"" +
                                             state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).Name +
                                             "\" with exterior condition [adiabatic surface]");
@@ -2270,7 +2270,7 @@ namespace SurfaceGeometry {
             } else if (state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).ExtBoundCond > 0) { // interzone surface
                 if (state.dataSurface->Surface(SurfNum).ExtBoundCond == SurfNum) {
                     ShowSevereError(state,
-                                    RoutineName + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name +
+                                    std::string{RoutineName} + "Subsurface=\"" + state.dataSurface->Surface(SurfNum).Name +
                                         "\" is an adiabatic surface in an Interzone base surface=\"" +
                                         state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).BaseSurf).Name + "\"");
                     if (!SubSurfaceSevereDisplayed) {
@@ -2351,7 +2351,7 @@ namespace SurfaceGeometry {
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst == 0) {
-                ShowSevereError(state, RoutineName + "Zone has no surfaces, Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
+                ShowSevereError(state, std::string{RoutineName} + "Zone has no surfaces, Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
                 SurfError = true;
             }
         }
@@ -2384,14 +2384,14 @@ namespace SurfaceGeometry {
                             if (diffp > 0.05) {
                                 ++ErrCount;
                                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(state, RoutineName + "Entered Zone Floor Areas differ from calculated Zone Floor Area(s).");
+                                    ShowWarningError(state, std::string{RoutineName} + "Entered Zone Floor Areas differ from calculated Zone Floor Area(s).");
                                     ShowContinueError(state,
                                                       "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones.");
                                 }
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     // Warn user of using specified Zone Floor Area
                                     ShowWarningError(state,
-                                                     RoutineName + "Entered Floor Area entered for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name +
+                                                     std::string{RoutineName} + "Entered Floor Area entered for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                          "\" significantly different from calculated Floor Area");
                                     ShowContinueError(state,
                                                       format("Entered Zone Floor Area value={:.2R}, Calculated Zone Floor Area value={:.2R}, entered "
@@ -2521,7 +2521,7 @@ namespace SurfaceGeometry {
             if (OpaqueHTSurfsWithWin == 1 && OpaqueHTSurfs == 1 && InternalMassSurfs == 0) {
                 SurfError = true;
                 ShowSevereError(state,
-                                RoutineName + "Zone " + state.dataHeatBal->Zone(ZoneNum).Name +
+                                std::string{RoutineName} + "Zone " + state.dataHeatBal->Zone(ZoneNum).Name +
                                     " has only one floor, wall or roof, and this surface has a window.");
                 ShowContinueError(state, "Add more floors, walls or roofs, or an internal mass surface.");
             }
@@ -2548,7 +2548,7 @@ namespace SurfaceGeometry {
                 continue;
             }
             if (LayNumOutside != state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).LayerPoint(1)) {
-                ShowSevereError(state, RoutineName + "Only one EcoRoof Material is currently allowed for all constructions.");
+                ShowSevereError(state, std::string{RoutineName} + "Only one EcoRoof Material is currently allowed for all constructions.");
                 ShowContinueError(state, "... first material=" + state.dataMaterial->Material(LayNumOutside).Name);
                 ShowContinueError(
                     state,
@@ -2636,7 +2636,7 @@ namespace SurfaceGeometry {
                     ++iTmp1;
                 } else {
                     ShowWarningError(state,
-                                     RoutineName + "Surface=\"" + state.dataSurface->Surface(SurfNum).Name +
+                                     std::string{RoutineName} + "Surface=\"" + state.dataSurface->Surface(SurfNum).Name +
                                          "\" uses InfraredTransparent construction in a non-interzone surface. (illegal use)");
                 }
             }
@@ -2718,14 +2718,14 @@ namespace SurfaceGeometry {
 
         if (SurfError || ErrorsFound) {
             ErrorsFound = true;
-            ShowFatalError(state, RoutineName + "Errors discovered, program terminates.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors discovered, program terminates.");
         }
 
         int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
                           TotOverhangsProjection + TotFins + TotFinsProjection;
         int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
         if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight(state))) {
-            ShowWarningError(state, RoutineName + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
+            ShowWarningError(state, std::string{RoutineName} + "When using DElight daylighting the presence of exterior shading surfaces is ignored.");
         }
 
         // Initialize run time surface arrays
@@ -5432,7 +5432,7 @@ namespace SurfaceGeometry {
     }
 
     void CheckWindowShadingControlFrameDivider(EnergyPlusData &state,
-                                               std::string const &cRoutineName, // routine name calling this one (for error messages)
+                                               std::string_view const cRoutineName, // routine name calling this one (for error messages)
                                                bool &ErrorsFound,               // true if errors have been found or are found here
                                                int const SurfNum,               // current surface number
                                                int const FrameField             // field number for frame/divider
@@ -5578,7 +5578,7 @@ namespace SurfaceGeometry {
                     }
                     if (state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers) !=
                         state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotShLayers)) {
-                        ShowSevereError(state, cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
+                        ShowSevereError(state, std::string{cRoutineName} + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
                         ShowContinueError(state,
                                           "Unshaded construction=" + state.dataConstruction->Construct(ConstrNum).Name + ", Material=" +
                                               state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers)).Name);
@@ -5589,7 +5589,7 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     }
                     if (state.dataConstruction->Construct(ConstrNum).LayerPoint(1) != state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1)) {
-                        ShowSevereError(state, cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
+                        ShowSevereError(state, std::string{cRoutineName} + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
                         ShowContinueError(state,
                                           "Unshaded construction=" + state.dataConstruction->Construct(ConstrNum).Name + ", Material=" +
                                               state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
@@ -5608,7 +5608,7 @@ namespace SurfaceGeometry {
                                                                                                     state.dataMaterial->Material(MatGap2).Thickness));
                             if (MatGapCalc > 0.001) {
                                 ShowSevereError(state,
-                                                cRoutineName + ": The gap width(s) for the unshaded window construction " +
+                                                std::string{cRoutineName} + ": The gap width(s) for the unshaded window construction " +
                                                     state.dataConstruction->Construct(ConstrNum).Name);
                                 ShowContinueError(state,
                                                   "are inconsistent with the gap widths for shaded window construction " +
@@ -5637,7 +5637,7 @@ namespace SurfaceGeometry {
                                                    state.dataMaterial->Material(MatSh).Thickness));
                             if (MatGapCalc > 0.001) {
                                 ShowSevereError(state,
-                                                cRoutineName + ": The gap width(s) for the unshaded window construction " +
+                                                std::string{cRoutineName} + ": The gap width(s) for the unshaded window construction " +
                                                     state.dataConstruction->Construct(ConstrNum).Name);
                                 ShowContinueError(state,
                                                   "are inconsistent with the gap widths for shaded window construction " +
@@ -5754,7 +5754,7 @@ namespace SurfaceGeometry {
     }
 
     void CheckSubSurfaceMiscellaneous(EnergyPlusData &state,
-                                      std::string const &cRoutineName,           // routine name calling this one (for error messages)
+                                      std::string_view const cRoutineName,           // routine name calling this one (for error messages)
                                       bool &ErrorsFound,                         // true if errors have been found or are found here
                                       int const SurfNum,                         // current surface number
                                       std::string const &SubSurfaceName,         // name of the surface
@@ -5789,7 +5789,7 @@ namespace SurfaceGeometry {
             state.dataHeatBal->SolarDistribution > MinimalShadowing && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier > 1.0) {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state,
-                                 cRoutineName + ": A Multiplier > 1.0 for window/glass door " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
+                                 std::string{cRoutineName} + ": A Multiplier > 1.0 for window/glass door " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
                 ShowContinueError(state, "in conjunction with SolarDistribution = FullExterior or FullInteriorExterior");
                 ShowContinueError(state, "can cause inaccurate shadowing on the window and/or");
                 ShowContinueError(state, "inaccurate interior solar distribution from the window.");
@@ -5810,7 +5810,7 @@ namespace SurfaceGeometry {
                     ++NumShades;
             }
             if (NumShades != 0) {
-                ShowSevereError(state, cRoutineName + ": Window \"" + SubSurfaceName + "\" must not directly reference");
+                ShowSevereError(state, std::string{cRoutineName} + ": Window \"" + SubSurfaceName + "\" must not directly reference");
                 ShowContinueError(state, "a Construction (i.e, \"" + SubSurfaceConstruction + "\") with a shading device.");
                 ShowContinueError(state, "Use WindowShadingControl to specify a shading device for a window.");
                 ErrorsFound = true;
@@ -5828,7 +5828,7 @@ namespace SurfaceGeometry {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                     if (state.dataMaterial->Material(LayerPtr).Group == WindowGlass &&
                         state.dataMaterial->Material(LayerPtr).GlassTransDirtFactor < 1.0) {
-                        ShowSevereError(state, cRoutineName + ": Interior Window or GlassDoor " + SubSurfaceName + " has a glass layer with");
+                        ShowSevereError(state, std::string{cRoutineName} + ": Interior Window or GlassDoor " + SubSurfaceName + " has a glass layer with");
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
                         ShowContinueError(state, "A value less than 1.0 for this factor is only allowed for exterior windows and glass doors.");
                         ErrorsFound = true;
@@ -5871,7 +5871,7 @@ namespace SurfaceGeometry {
                     }
                     if (state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Area <= 0.0) {
                         ShowSevereError(state,
-                                        cRoutineName + ": Surface Openings have too much area for base surface=" +
+                                        std::string{cRoutineName} + ": Surface Openings have too much area for base surface=" +
                                             state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Name);
                         ShowContinueError(state, "Opening Surface creating error=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
                         ErrorsFound = true;
@@ -6779,7 +6779,7 @@ namespace SurfaceGeometry {
         using General::CheckCreatedZoneItemName;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetIntMassSurfaceData: ");
+        static constexpr std::string_view RoutineName("GetIntMassSurfaceData: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                // IO Status when calling get input subroutine
@@ -6852,7 +6852,7 @@ namespace SurfaceGeometry {
             }
 
             if (errFlag) {
-                ShowSevereError(state, RoutineName + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
+                ShowSevereError(state, std::string{RoutineName} + "Errors with invalid names in " + cCurrentModuleObject + " objects.");
                 ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
                 NumIntMassSurfaces = 0;
             }
@@ -7650,7 +7650,7 @@ namespace SurfaceGeometry {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSurfaceLocalEnvData: ");
+        static constexpr std::string_view RoutineName("GetSurfaceLocalEnvData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:na
         // DERIVED TYPE DEFINITIONS:na
@@ -7701,7 +7701,7 @@ namespace SurfaceGeometry {
                 SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
-                                    RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                         ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(2) + " has been found.");
                     ShowContinueError(state,
                                       state.dataIPShortCut->cAlphaFieldNames(2) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(2) +
@@ -7716,7 +7716,7 @@ namespace SurfaceGeometry {
                     ExtShadingSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (ExtShadingSchedNum == 0) {
                         ShowSevereError(state,
-                                        RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(3) + " has been found.");
                         ShowContinueError(state,
                                           state.dataIPShortCut->cAlphaFieldNames(3) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(3) +
@@ -7733,7 +7733,7 @@ namespace SurfaceGeometry {
                         UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->SurroundingSurfsProperty);
                     if (SurroundingSurfsNum == 0) {
                         ShowSevereError(state,
-                                        RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(4) + " has been found.");
                         ShowContinueError(state,
                                           state.dataIPShortCut->cAlphaFieldNames(4) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(4) +
@@ -7757,7 +7757,7 @@ namespace SurfaceGeometry {
                                                 ObjectIsParent);
                     if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                         ShowSevereError(state,
-                                        RoutineName + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                             ", object. Illegal value for " + state.dataIPShortCut->cAlphaFieldNames(5) + " has been found.");
                         ShowContinueError(state,
                                           state.dataIPShortCut->cAlphaFieldNames(5) + " entered value = \"" + state.dataIPShortCut->cAlphaArgs(5) +
@@ -7809,7 +7809,7 @@ namespace SurfaceGeometry {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetSurfaceSrdSurfsData: ");
+        static constexpr std::string_view RoutineName("GetSurfaceSrdSurfsData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:na
         // DERIVED TYPE DEFINITIONS:na
@@ -8595,7 +8595,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetVertices: ");
+        static constexpr std::string_view RoutineName("GetVertices: ");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -8738,7 +8738,7 @@ namespace SurfaceGeometry {
             if (DistanceCheck < 0.01) {
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(state,
-                                     RoutineName + "Distance between two vertices < .01, possibly coincident. for Surface=" +
+                                     std::string{RoutineName} + "Distance between two vertices < .01, possibly coincident. for Surface=" +
                                          state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                          ", in Zone=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName);
                     ShowContinueError(
@@ -8784,7 +8784,7 @@ namespace SurfaceGeometry {
                 if (DistanceCheck < 0.01) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state,
-                                         RoutineName + "Distance between two vertices < .01, possibly coincident. for Surface=" +
+                                         std::string{RoutineName} + "Distance between two vertices < .01, possibly coincident. for Surface=" +
                                              state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name +
                                              ", in Zone=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName);
                         ShowContinueError(state,
@@ -8876,7 +8876,7 @@ namespace SurfaceGeometry {
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && dotp < -0.000001) {
                 TiltString = format("{:.1R}", SurfTilt);
                 ShowWarningError(state,
-                                 RoutineName + "Roof/Ceiling is upside down! Tilt angle=[" + TiltString + "], should be near 0, Surface=\"" +
+                                 std::string{RoutineName} + "Roof/Ceiling is upside down! Tilt angle=[" + TiltString + "], should be near 0, Surface=\"" +
                                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", in Zone=\"" +
                                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName + "\".");
                 ShowContinueError(state, "Automatic fix is attempted.");
@@ -8884,14 +8884,14 @@ namespace SurfaceGeometry {
             } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && SurfTilt > 80.0) {
                 TiltString = format("{:.1R}", SurfTilt);
                 ShowWarningError(state,
-                                 RoutineName + "Roof/Ceiling is not oriented correctly! Tilt angle=[" + TiltString +
+                                 std::string{RoutineName} + "Roof/Ceiling is not oriented correctly! Tilt angle=[" + TiltString +
                                      "], should be near 0, Surface=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", in Zone=\"" +
                                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName + "\".");
             }
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && dotp > 0.000001) {
                 TiltString = format("{:.1R}", SurfTilt);
                 ShowWarningError(state,
-                                 RoutineName + "Floor is upside down! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
+                                 std::string{RoutineName} + "Floor is upside down! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
                                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", in Zone=\"" +
                                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName + "\".");
                 ShowContinueError(state, "Automatic fix is attempted.");
@@ -8899,7 +8899,7 @@ namespace SurfaceGeometry {
             } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && SurfTilt < 158.2) { // slope/grade = 40%!
                 TiltString = format("{:.1R}", SurfTilt);
                 ShowWarningError(state,
-                                 RoutineName + "Floor is not oriented correctly! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
+                                 std::string{RoutineName} + "Floor is not oriented correctly! Tilt angle=[" + TiltString + "], should be near 180, Surface=\"" +
                                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", in Zone=\"" +
                                      state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName + "\".");
             }
@@ -8942,7 +8942,7 @@ namespace SurfaceGeometry {
             TransformVertsByAspect(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
 
         } else {
-            ShowFatalError(state, RoutineName + "Called with less than 2 sides, Surface=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
+            ShowFatalError(state, std::string{RoutineName} + "Called with less than 2 sides, Surface=" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
         }
 
         // Preliminary Height/Width
@@ -8984,7 +8984,7 @@ namespace SurfaceGeometry {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ReverseAndRecalculate: ");
+        static constexpr std::string_view RoutineName("ReverseAndRecalculate: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -9034,11 +9034,11 @@ namespace SurfaceGeometry {
         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && SurfTilt > 80.0) {
             TiltString = format("{:.1R}", SurfTilt);
             ShowWarningError(
-                state, RoutineName + "Roof/Ceiling is still upside down! Tilt angle=[" + TiltString + "], should be near 0, please fix manually.");
+                state, std::string{RoutineName} + "Roof/Ceiling is still upside down! Tilt angle=[" + TiltString + "], should be near 0, please fix manually.");
         }
         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && SurfTilt < 158.2) { // 40% grade!
             ShowWarningError(state,
-                             RoutineName + "Floor is still upside down! Tilt angle=[" + TiltString + "], should be near 180, please fix manually.");
+                             std::string{RoutineName} + "Floor is still upside down! Tilt angle=[" + TiltString + "], should be near 180, please fix manually.");
         }
     }
 
@@ -10110,7 +10110,7 @@ namespace SurfaceGeometry {
         // Using/Aliasing
         using ScheduleManager::GetScheduleIndex;
 
-        std::string const RoutineName("GetWindowGapAirflowControlData");
+        static constexpr std::string_view RoutineName("GetWindowGapAirflowControlData");
         int IOStat;               // IO Status when calling get input subroutine
         int ControlNumAlpha;      // Number of control alpha names being passed
         int ControlNumProp;       // Number of control properties being passed
@@ -10272,7 +10272,7 @@ namespace SurfaceGeometry {
                         DataZoneEquipment::GetReturnAirNodeForZone(state, state.dataSurface->Surface(SurfNum).ZoneName, retNodeName, callDescription);
                     if (state.dataSurface->SurfWinAirflowReturnNodePtr(SurfNum) == 0) {
                         ShowSevereError(state,
-                                        RoutineName + cCurrentModuleObject + "=\"" + state.dataSurface->Surface(SurfNum).Name +
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataSurface->Surface(SurfNum).Name +
                                             "\", airflow window return air node not found for " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " +
                                             state.dataIPShortCut->cAlphaArgs(3));
                         if (!state.dataIPShortCut->lAlphaFieldBlanks(7))
@@ -12380,7 +12380,7 @@ namespace SurfaceGeometry {
 
         using namespace Vectors;
 
-        static std::string const RoutineName("ProcessSurfaceVertices: ");
+        static constexpr std::string_view RoutineName("ProcessSurfaceVertices: ");
 
         Real64 X1;           // Intermediate Result
         Real64 Y1;           // Intermediate Result
@@ -12561,7 +12561,7 @@ namespace SurfaceGeometry {
                                   SError);
                     if (SError) {
                         ShowSevereError(state,
-                                        RoutineName + "Degenerate surface (likely two vertices equal):\"" +
+                                        std::string{RoutineName} + "Degenerate surface (likely two vertices equal):\"" +
                                             state.dataSurface->Surface(ThisSurf).Name + "\".");
                         ErrorInSurface = true;
                     }
@@ -12588,7 +12588,7 @@ namespace SurfaceGeometry {
                         MakeEquivalentRectangle(state, ThisSurf, ErrorsFound);
 
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state, RoutineName + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:");
+                            ShowWarningError(state, std::string{RoutineName} + "Suspected 4-sided but non-rectangular Window, Door or GlassDoor:");
                             ShowContinueError(state,
                                               "Surface=" + state.dataSurface->Surface(ThisSurf).Name +
                                                   " is transformed into an equivalent rectangular surface with the same area and aspect ratio. ");
@@ -12633,7 +12633,7 @@ namespace SurfaceGeometry {
                             if ((state.dataSurface->Surface(state.dataSurface->Surface(ThisSurf).BaseSurf).Area -
                                  state.dataSurface->SurfWinFrameArea(ThisSurf)) <= 0.0) {
                                 ShowSevereError(state,
-                                                RoutineName + "Base Surface=\"" +
+                                                std::string{RoutineName} + "Base Surface=\"" +
                                                     state.dataSurface->Surface(state.dataSurface->Surface(ThisSurf).BaseSurf).Name + "\", ");
                                 ShowContinueError(state,
                                                   "Window Surface=\"" + state.dataSurface->Surface(ThisSurf).Name +
@@ -12658,7 +12658,7 @@ namespace SurfaceGeometry {
                             state.dataSurface->SurfWinDividerArea(ThisSurf) = DivArea * state.dataSurface->Surface(ThisSurf).Multiplier;
                             if ((state.dataSurface->Surface(ThisSurf).Area - state.dataSurface->SurfWinDividerArea(ThisSurf)) <= 0.0) {
                                 ShowSevereError(state,
-                                                RoutineName + "Divider area exceeds glazed opening for window " +
+                                                std::string{RoutineName} + "Divider area exceeds glazed opening for window " +
                                                     state.dataSurface->Surface(ThisSurf).Name);
                                 ShowContinueError(state,
                                                   format("Window surface area=[{:.2T}] m2, divider area=[{:.2T}] m2.",
@@ -12669,7 +12669,7 @@ namespace SurfaceGeometry {
                             state.dataSurface->Surface(ThisSurf).Area -= state.dataSurface->SurfWinDividerArea(ThisSurf); // Glazed area
                             if (DivArea <= 0.0) {
                                 ShowWarningError(
-                                    state, RoutineName + "Calculated Divider Area <= 0.0 for Window=" + state.dataSurface->Surface(ThisSurf).Name);
+                                    state, std::string{RoutineName} + "Calculated Divider Area <= 0.0 for Window=" + state.dataSurface->Surface(ThisSurf).Name);
                                 if (state.dataSurface->FrameDivider(FrDivNum).HorDividers == 0) {
                                     ShowContinueError(state, "..Number of Horizontal Dividers = 0.");
                                 }
@@ -12716,7 +12716,7 @@ namespace SurfaceGeometry {
                                   SError);
                     if (SError) {
                         ShowSevereError(state,
-                                        RoutineName + "Degenerate surface (likely two vertices equal):\"" +
+                                        std::string{RoutineName} + "Degenerate surface (likely two vertices equal):\"" +
                                             state.dataSurface->Surface(ThisSurf).Name + "\".");
                         ErrorInSurface = true;
                     }
@@ -12838,7 +12838,7 @@ namespace SurfaceGeometry {
 
                 } else {
                     // Error Condition
-                    ShowSevereError(state, RoutineName + "Incorrect surface shape number.", OptionalOutputFileRef{state.files.eso});
+                    ShowSevereError(state, std::string{RoutineName} + "Incorrect surface shape number.", OptionalOutputFileRef{state.files.eso});
                     ShowContinueError(state, "Please notify EnergyPlus support of this error and send input file.");
                     ErrorInSurface = true;
                 }
@@ -12912,11 +12912,11 @@ namespace SurfaceGeometry {
             // SHIFT RELATIVE COORDINATES FROM LOWER LEFT CORNER TO ORIGIN DEFINED
             // BY CTRAN AND SET DIRECTION COSINES SAME AS BASE SURFACE.
             if (!state.dataSurface->Surface(ThisBaseSurface).VerticesProcessed) {
-                ShowSevereError(state, RoutineName + "Developer error for Subsurface=" + state.dataSurface->Surface(ThisSurf).Name);
+                ShowSevereError(state, std::string{RoutineName} + "Developer error for Subsurface=" + state.dataSurface->Surface(ThisSurf).Name);
                 ShowContinueError(state,
                                   "Base surface=" + state.dataSurface->Surface(ThisBaseSurface).Name +
                                       " vertices must be processed before any subsurfaces.");
-                ShowFatalError(state, RoutineName);
+                ShowFatalError(state, std::string{RoutineName});
             }
 
             for (n = 1; n <= state.dataSurface->Surface(ThisSurf).Sides; ++n) {
@@ -14426,7 +14426,7 @@ namespace SurfaceGeometry {
                                          SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
                                          bool &ErrorsFound)                                                         // Set to true if errors found
     {
-        std::string RoutineName = "SetupEnclosuresAndAirBoundaries";
+        static constexpr std::string_view RoutineName = "SetupEnclosuresAndAirBoundaries";
         bool anyGroupedZones = false;
         bool radiantSetup = false;
         bool solarSetup = false;
@@ -14439,7 +14439,7 @@ namespace SurfaceGeometry {
             solarSetup = true;
             RadiantOrSolar = "Solar";
         } else {
-            ShowFatalError(state, RoutineName + ": Illegal call to this function. Second argument must be 'RadiantEnclosures' or 'SolarEnclosures'");
+            ShowFatalError(state, std::string{RoutineName} + ": Illegal call to this function. Second argument must be 'RadiantEnclosures' or 'SolarEnclosures'");
         }
         if (std::any_of(state.dataConstruction->Construct.begin(),
                         state.dataConstruction->Construct.end(),
@@ -14460,7 +14460,7 @@ namespace SurfaceGeometry {
                         ++errorCount;
                     } else {
                         ShowSevereError(state,
-                                        RoutineName + ": Surface=\"" + surf.Name + "\" uses Construction:AirBoundary in a non-interzone surface.");
+                                        std::string{RoutineName} + ": Surface=\"" + surf.Name + "\" uses Construction:AirBoundary in a non-interzone surface.");
                     }
                 } else {
                     // Process air boundary - set surface properties and set up enclosures
@@ -14583,7 +14583,7 @@ namespace SurfaceGeometry {
                         }
                     } else {
                         ErrorsFound = true;
-                        ShowSevereError(state, RoutineName + ": Surface=" + surf.Name + " uses Construction:AirBoundary with illegal option:");
+                        ShowSevereError(state, std::string{RoutineName} + ": Surface=" + surf.Name + " uses Construction:AirBoundary with illegal option:");
                         if (radiantSetup) {
                             ShowContinueError(state, "Radiant Exchange Method must be either GroupedZones or IRTSurface.");
                         } else {

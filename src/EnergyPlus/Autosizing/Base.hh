@@ -259,10 +259,10 @@ struct BaseSizer
     // public methods
 
     virtual void initializeWithinEP(EnergyPlusData &state,
-                                    std::string const &_compType,
-                                    std::string const &_compName,
-                                    bool const &_printWarningFlag,
-                                    std::string const &_callingRoutine);
+                                    std::string_view const _compType,
+                                    std::string_view const _compName,
+                                    bool const _printWarningFlag,
+                                    std::string_view const _callingRoutine);
 
     virtual Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) = 0;
 

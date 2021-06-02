@@ -3669,7 +3669,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     using NodeInputManager::GetOnlySingleNode;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
+    static constexpr std::string_view RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CurrentModuleObject; // Object type for getting and error messages
@@ -4020,7 +4020,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting input.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
         ShowContinueError(state, "... Preceding condition causes termination.");
     }
 
@@ -4301,7 +4301,7 @@ void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // 
     using DataSizing::AutoSize;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CompName;     // component name

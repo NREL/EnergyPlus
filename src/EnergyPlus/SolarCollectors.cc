@@ -864,7 +864,7 @@ namespace SolarCollectors {
         // METHODOLOGY EMPLOYED:
         // Inlet and outlet nodes are initialized.  The maximum collector flow rate is requested.
 
-        static std::string const RoutineName("InitSolarCollector");
+        static constexpr std::string_view RoutineName("InitSolarCollector");
         Real64 const BigNumber(9999.9); // Component desired mass flow rate
 
         // Do the one time initializations
@@ -1061,7 +1061,7 @@ namespace SolarCollectors {
         // components are less than zero but the net adds up to greater than zero.  The EnergyPlus subroutine, on the other
         // hand, requires each component incident angle modifier always to be greater than zero.
 
-        static std::string const RoutineName("CalcSolarCollector");
+        static constexpr std::string_view RoutineName("CalcSolarCollector");
         Real64 efficiency = 0.0; // Thermal efficiency of solar energy conversion
 
         int SurfNum = this->Surface;
@@ -1353,7 +1353,7 @@ namespace SolarCollectors {
         // New York (1991).
         // NOTES:
 
-        static std::string const RoutineName("CalcICSSolarCollector");
+        static constexpr std::string_view RoutineName("CalcICSSolarCollector");
 
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
@@ -2089,7 +2089,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Updates the node variables with local variables.
 
-        static std::string const RoutineName("UpdateSolarCollector");
+        static constexpr std::string_view RoutineName("UpdateSolarCollector");
 
         PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
         // Set outlet node variables that are possibly changed

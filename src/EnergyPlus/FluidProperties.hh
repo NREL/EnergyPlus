@@ -686,7 +686,7 @@ namespace FluidProperties {
                                  int GlycolNum,                    // Glycol Index
                                  bool DataPresent,                 // data is present for this fluid.
                                  std::string const &GlycolName,    // Name being reported
-                                 std::string const &RoutineName,   // Routine name to show
+                                 std::string_view const RoutineName,   // Routine name to show
                                  std::string const &Property,      // Property being requested
                                  std::string_view const CalledFrom // original called from (external to fluid properties)
     );
@@ -696,7 +696,7 @@ namespace FluidProperties {
                                       int RefrigerantNum,                 // Refrigerant Index
                                       bool DataPresent,                   // data is present for this fluid.
                                       std::string const &RefrigerantName, // Name being reported
-                                      std::string const &RoutineName,     // Routine name to show
+                                      std::string_view const RoutineName, // Routine name to show
                                       std::string const &Property,        // Property being requested
                                       std::string_view const CalledFrom   // original called from (external to fluid properties)
     );

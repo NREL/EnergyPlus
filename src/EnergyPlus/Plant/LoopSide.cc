@@ -659,8 +659,8 @@ namespace DataPlant {
         // Return value
         Real64 LoadToLoopSetPoint = 0.0; // function result
 
-        static std::string const RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
-        static std::string const RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
+        static constexpr std::string_view RoutineName("PlantLoopSolver::EvaluateLoopSetPointLoad");
+        static constexpr std::string_view RoutineNameAlt("PlantSupplySide:EvaluateLoopSetPointLoad");
 
         //~ General variables
         Real64 SumMdotTimesTemp = 0.0;
@@ -1925,7 +1925,7 @@ namespace DataPlant {
         using FluidProperties::GetSpecificHeatGlycol;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("PlantLoopSolver::UpdateAnyLoopDemandAlterations");
+        static constexpr std::string_view RoutineName("PlantLoopSolver::UpdateAnyLoopDemandAlterations");
 
         // Init to zero, so that if we don't find anything, we exit early
         Real64 ComponentMassFlowRate(0.0);

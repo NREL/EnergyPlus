@@ -660,7 +660,7 @@ void CalcWaterThermalTankZoneGains(EnergyPlusData &state)
 bool getDesuperHtrInput(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
-    std::string const RoutineName = "getDesuperHtrInput";
+    static constexpr std::string_view RoutineName = "getDesuperHtrInput";
 
     state.dataIPShortCut->cCurrentModuleObject = cCoilDesuperheater;
     for (int DesuperheaterNum = 1; DesuperheaterNum <= state.dataWaterThermalTanks->numWaterHeaterDesuperheater; ++DesuperheaterNum) {
@@ -2308,7 +2308,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
     state.dataIPShortCut->cCurrentModuleObject = cMixedWHModuleObj;
-    std::string const RoutineName = "getWaterHeaterMixedInputs";
+    static constexpr std::string_view RoutineName = "getWaterHeaterMixedInputs";
 
     for (int WaterThermalTankNum = 1; WaterThermalTankNum <= state.dataWaterThermalTanks->numWaterHeaterMixed; ++WaterThermalTankNum) {
         int NumAlphas;
@@ -2359,7 +2359,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             ShowSevereError(
-                state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
+                state, std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
             ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(2) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
@@ -2763,7 +2763,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
-    std::string const RoutineName = "getWaterHeaterStratifiedInput";
+    static constexpr std::string_view RoutineName = "getWaterHeaterStratifiedInput";
 
     state.dataIPShortCut->cCurrentModuleObject = cStratifiedWHModuleObj; //'WaterHeater:Stratified'
 
@@ -2871,7 +2871,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
             ShowSevereError(
-                state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
+                state, std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
             ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(5) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
@@ -2916,7 +2916,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.SetPointTempSchedule2 = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
             ShowSevereError(
-                state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
+                state, std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
             ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(6) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule2 == 0) {
@@ -3659,7 +3659,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
 bool getWaterTankStratifiedInput(EnergyPlusData &state)
 {
     bool ErrorsFound = false;
-    std::string const RoutineName = "getWaterTankStratifiedInput";
+    static constexpr std::string_view RoutineName = "getWaterTankStratifiedInput";
 
     state.dataIPShortCut->cCurrentModuleObject = cStratifiedCWTankModuleObj; // 'ThermalStorage:ChilledWater:Stratified'
 
@@ -4063,8 +4063,8 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
     bool ErrorsFound = false;
 
-    static std::string const RoutineName("GetWaterThermalTankInput: ");
-    static std::string const RoutineNameNoColon("GetWaterThermalTankInput");
+    static constexpr std::string_view RoutineName("GetWaterThermalTankInput: ");
+    static constexpr std::string_view RoutineNameNoColon("GetWaterThermalTankInput");
 
     // Make sure refrigeration input is gotten before this input
     RefrigeratedCase::CheckRefrigerationInput(state);
@@ -5473,7 +5473,7 @@ void WaterThermalTankData::SetupStratifiedNodes(EnergyPlusData &state)
     // the Newton-Raphson iterative method.  For vertical cylinders and other shapes, the node heights are calculated
     // using basic geometry.
 
-    static std::string const RoutineName("GetWaterThermalTankInput");
+    static constexpr std::string_view RoutineName("GetWaterThermalTankInput");
 
     const Real64 Tolerance(1.0e-8); // Tolerance for Newton-Raphson solution
     const Real64 FluidCond(0.6);    // Conductivity of water (W/m-K)
@@ -5693,7 +5693,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
 
     auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
-    static std::string const RoutineName("InitWaterThermalTank");
+    static constexpr std::string_view RoutineName("InitWaterThermalTank");
     static std::string const GetWaterThermalTankInput("GetWaterThermalTankInput");
     static std::string const SizeTankForDemand("SizeTankForDemandSide");
 
@@ -6529,7 +6529,7 @@ void WaterThermalTankData::CalcWaterThermalTankMixed(EnergyPlusData &state) // W
     // the timestep.  The final reported heat rates are averages based on the total energy transfer over the
     // timestep.
 
-    static std::string const RoutineName("CalcWaterThermalTankMixed");
+    static constexpr std::string_view RoutineName("CalcWaterThermalTankMixed");
 
     Real64 TimeElapsed_loc =
         state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
@@ -7406,7 +7406,7 @@ void WaterThermalTankData::CalcWaterThermalTankStratified(EnergyPlusData &state)
     // Final node temperatures are reported as final instantaneous values as well as averages over the
     // time step.  Heat transfer rates are averages over the time step.
 
-    static std::string const RoutineName("CalcWaterThermalTankStratified");
+    static constexpr std::string_view RoutineName("CalcWaterThermalTankStratified");
     const Real64 TemperatureConvergenceCriteria = 0.0001;
     const Real64 SubTimestepMax = 60.0 * 10.0; // seconds
     const Real64 SubTimestepMin = 10.0;        // seconds
@@ -10605,7 +10605,7 @@ void WaterThermalTankData::SizeSupplySidePlantConnections(EnergyPlusData &state,
     // For water heaters sides on Supply LoopSide, obtains hot water flow rate from the plant sizing array
     //  (adapted approach from boiler sizing routines)
 
-    static std::string const RoutineName("SizeSupplySidePlantConnections");
+    static constexpr std::string_view RoutineName("SizeSupplySidePlantConnections");
 
     auto &PlantSizData(state.dataSize->PlantSizData);
 
@@ -10767,7 +10767,7 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
     // BA benchmark report for residential design mode
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("SizeTankForDemandSide");
+    static constexpr std::string_view RoutineName("SizeTankForDemandSide");
     Real64 const GalTocubicMeters(0.0037854);
     Real64 const kBtuPerHrToWatts(293.1);
 
@@ -11114,7 +11114,7 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
     // REFERENCES:
     // BA benchmark report for residential design mode
 
-    static std::string const RoutineName("SizeTankForSupplySide");
+    static constexpr std::string_view RoutineName("SizeTankForSupplySide");
 
     Real64 Tstart = 14.44;
     Real64 Tfinish = 57.22;
@@ -11239,7 +11239,7 @@ void WaterThermalTankData::SizeDemandSidePlantConnections(EnergyPlusData &state)
     //  recovery rate that if continued would reheat tank in user specified amount of time.
     //  initial and final tank temperatures are 14.44 and reheat to 57.22 (values from CalcStandardRatings routine)
 
-    static std::string const RoutineName("SizeDemandSidePlantConnections");
+    static constexpr std::string_view RoutineName("SizeDemandSidePlantConnections");
 
     auto &PlantSizData(state.dataSize->PlantSizData);
 
@@ -11463,7 +11463,7 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const GalTocubicMeters(0.0037854);
     Real64 const kBtuPerHrToWatts(293.1);
-    static std::string const RoutineName("SizeStandAloneWaterHeater");
+    static constexpr std::string_view RoutineName("SizeStandAloneWaterHeater");
 
     Real64 Tstart = 14.44;
     Real64 Tfinish = 57.22;

@@ -191,7 +191,7 @@ namespace HVACDuct {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DuctNum; // duct index
-        static std::string const RoutineName("GetDuctInput:");
+        static constexpr std::string_view RoutineName("GetDuctInput:");
         int NumAlphas;           // Number of Alphas for each GetObjectItem call
         int NumNumbers;          // Number of Numbers for each GetObjectItem call
         int IOStatus;            // Used in GetObjectItem
@@ -247,7 +247,7 @@ namespace HVACDuct {
         // No output variables
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + " Errors found in input");
+            ShowFatalError(state, std::string{RoutineName} + " Errors found in input");
         }
     }
 

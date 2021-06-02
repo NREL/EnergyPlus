@@ -1444,7 +1444,7 @@ namespace HVACUnitaryBypassVAV {
         // temperatures float in the deadband, additional iterations are required to converge on mass flow rate.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitCBVAV");
+        static constexpr std::string_view RoutineName("InitCBVAV");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QSensUnitOut;          // Output of CBVAV system with coils off

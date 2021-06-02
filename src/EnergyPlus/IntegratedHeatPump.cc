@@ -1158,7 +1158,7 @@ void GetIHPInput(EnergyPlusData &state)
     using VariableSpeedCoils::GetCoilIndexVariableSpeed;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetIHPInput: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetIHPInput: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int DXCoilNum; // No of IHP DX system
@@ -1969,7 +1969,7 @@ void GetIHPInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination.");
     } else {
         // set up output variables, not reported in the individual coil models
 

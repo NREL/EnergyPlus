@@ -286,7 +286,7 @@ namespace HeatingCoils {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetHeatingCoilInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetHeatingCoilInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum; // The HeatingCoil that you are currently loading input into
@@ -395,7 +395,7 @@ namespace HeatingCoils {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                    std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                         cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
@@ -522,7 +522,7 @@ namespace HeatingCoils {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                    std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                         cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
@@ -658,7 +658,7 @@ namespace HeatingCoils {
                 coil.SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (coil.SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                    std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                         cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
@@ -679,7 +679,7 @@ namespace HeatingCoils {
                   coil.FuelType_Num == DataGlobalConstants::ResourceType::Coal) ||
                 coil.FuelType_Num == DataGlobalConstants::ResourceType::None) {
                 ShowSevereError(state,
-                                RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(3) + " entered =" + Alphas(3) + " for " +
+                                std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(3) + " entered =" + Alphas(3) + " for " +
                                     cAlphaFields(1) + '=' + Alphas(1));
                 state.dataHeatingCoils->InputErrorsFound = true;
             }
@@ -834,7 +834,7 @@ namespace HeatingCoils {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                    std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                         cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
@@ -1027,7 +1027,7 @@ namespace HeatingCoils {
                 HeatingCoil(CoilNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (HeatingCoil(CoilNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
+                                    std::string{RoutineName} + CurrentModuleObject + ": Invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
                                         cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHeatingCoils->InputErrorsFound = true;
                 }
@@ -1332,7 +1332,7 @@ namespace HeatingCoils {
         }
 
         if (state.dataHeatingCoils->InputErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, std::string{RoutineName} + "Errors found in input.  Program terminates.");
         }
 
         Alphas.deallocate();
@@ -1630,7 +1630,7 @@ namespace HeatingCoils {
         using namespace OutputReportPredefined;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeHeatingCoil: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("SizeHeatingCoil: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CompName;       // component name
@@ -2036,9 +2036,9 @@ namespace HeatingCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMultiStageElectricHeatingCoil");
-        static std::string const RoutineNameAverageLoad("CalcMultiStageElectricHeatingCoil:Averageload");
-        static std::string const RoutineNameFullLoad("CalcMultiStageElectricHeatingCoil:fullload");
+        static constexpr std::string_view RoutineName("CalcMultiStageElectricHeatingCoil");
+        static constexpr std::string_view RoutineNameAverageLoad("CalcMultiStageElectricHeatingCoil:Averageload");
+        static constexpr std::string_view RoutineNameFullLoad("CalcMultiStageElectricHeatingCoil:fullload");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -2470,9 +2470,9 @@ namespace HeatingCoils {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcMultiStageGasHeatingCoil");
-        static std::string const RoutineNameAverageLoad("CalcMultiStageGasHeatingCoil:Averageload");
-        static std::string const RoutineNameFullLoad("CalcMultiStageGasHeatingCoil:fullload");
+        static constexpr std::string_view RoutineName("CalcMultiStageGasHeatingCoil");
+        static constexpr std::string_view RoutineNameAverageLoad("CalcMultiStageGasHeatingCoil:Averageload");
+        static constexpr std::string_view RoutineNameFullLoad("CalcMultiStageGasHeatingCoil:fullload");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

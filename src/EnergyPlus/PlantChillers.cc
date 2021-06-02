@@ -167,7 +167,7 @@ namespace PlantChillers {
         // This routine will get the input
         // required by the Electric Chiller model.
 
-        static std::string const RoutineName("GetElectricChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetElectricChillerInput: "); // include trailing blank space
 
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -435,7 +435,7 @@ namespace PlantChillers {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
                     ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -517,7 +517,7 @@ namespace PlantChillers {
                         thisChiller.HeatRecInletLimitSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(11));
                         if (thisChiller.HeatRecInletLimitSchedNum == 0) {
                             ShowSevereError(
-                                state, RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
+                                state, std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
                             ShowContinueError(state,
                                               "Invalid " + state.dataIPShortCut->cAlphaFieldNames(11) + '=' + state.dataIPShortCut->cAlphaArgs(11));
                             ErrorsFound = true;
@@ -783,7 +783,7 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitElectricChiller");
+        static constexpr std::string_view RoutineName("InitElectricChiller");
 
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
@@ -1116,7 +1116,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeElectricChiller");
+        static constexpr std::string_view RoutineName("SizeElectricChiller");
 
         int PltSizCondNum(0);    // Plant Sizing index for condenser loop
         bool ErrorsFound(false); // If errors detected in input
@@ -1406,7 +1406,7 @@ namespace PlantChillers {
         // 1. BLAST Users Manual
         // 2. CHILLER User Manual
 
-        static std::string const RoutineName("CalcElectricChillerModel");
+        static constexpr std::string_view RoutineName("CalcElectricChillerModel");
         this->EvapMassFlowRate = 0.0;
         this->CondMassFlowRate = 0.0;
         this->Power = 0.0;
@@ -2000,7 +2000,7 @@ namespace PlantChillers {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the heat recovered from the chiller condenser
 
-        static std::string const RoutineName("ChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("ChillerHeatRecovery");
 
         // setup initial state
         PlantUtilities::SafeCopyPlantNode(state, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
@@ -2209,7 +2209,7 @@ namespace PlantChillers {
 
         // Locals
         // PARAMETERS
-        static std::string const RoutineName("GetEngineDrivenChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetEngineDrivenChillerInput: "); // include trailing blank space
 
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -2612,7 +2612,7 @@ namespace PlantChillers {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
                     ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(15) + '=' + state.dataIPShortCut->cAlphaArgs(15));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -2848,7 +2848,7 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitEngineDrivenChiller");
+        static constexpr std::string_view RoutineName("InitEngineDrivenChiller");
 
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
@@ -3127,7 +3127,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeEngineDrivenChiller");
+        static constexpr std::string_view RoutineName("SizeEngineDrivenChiller");
 
         int PltSizCondNum = 0;
         bool ErrorsFound = false;
@@ -3440,7 +3440,7 @@ namespace PlantChillers {
         Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
         // value is reported.  This should be subtracted
         // off of when calculated exhaust energies.
-        static std::string const RoutineName("CalcEngineDrivenChillerModel");
+        static constexpr std::string_view RoutineName("CalcEngineDrivenChillerModel");
 
         // set module level inlet and outlet nodes
         this->EvapMassFlowRate = 0.0;
@@ -4091,7 +4091,7 @@ namespace PlantChillers {
         // performs a check to verify that
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("ChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("ChillerHeatRecovery");
 
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HeatRecRatio = 1.0;
@@ -4257,7 +4257,7 @@ namespace PlantChillers {
         // METHODOLOGY EMPLOYED:
         // EnergyPlus input processor
 
-        static std::string const RoutineName("GetGTChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetGTChillerInput: "); // include trailing blank space
 
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
@@ -4602,7 +4602,7 @@ namespace PlantChillers {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
                     ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + state.dataIPShortCut->cAlphaArgs(9));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -4825,7 +4825,7 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitGTChiller");
+        static constexpr std::string_view RoutineName("InitGTChiller");
 
         // Init more variables
         if (this->MyFlag) {
@@ -5103,7 +5103,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeGTChiller");
+        static constexpr std::string_view RoutineName("SizeGTChiller");
 
         bool ErrorsFound = false;
         Real64 tmpNomCap = this->NomCap;
@@ -5453,8 +5453,8 @@ namespace PlantChillers {
         // 2. CHILLER User Manual
 
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
-        static std::string const RoutineName("CalcGTChillerModel");
-        static std::string const RoutineNameHeatRecovery("ChillerHeatRecovery");
+        static constexpr std::string_view RoutineName("CalcGTChillerModel");
+        static constexpr std::string_view RoutineNameHeatRecovery("ChillerHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempEvapOutSetPoint(0.0); // C - evaporator outlet temperature setpoint
@@ -6221,7 +6221,7 @@ namespace PlantChillers {
         // arrays associated with the type PlantLoopProps.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetConstCOPChillerInput: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("GetConstCOPChillerInput: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas; // Number of elements in the alpha array
@@ -6473,7 +6473,7 @@ namespace PlantChillers {
                     thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
                 } else {
                     ShowSevereError(state,
-                                    RoutineName + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
                     ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(7) + '=' + state.dataIPShortCut->cAlphaArgs(7));
                     ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                     ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -6626,7 +6626,7 @@ namespace PlantChillers {
         // Based on InitElectricChiller from Fred Buhl
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("InitConstCOPChiller");
+        static constexpr std::string_view RoutineName("InitConstCOPChiller");
         Real64 const TempDesCondIn(25.0); // Design condenser inlet temp. C
 
         // Init more variables
@@ -6843,7 +6843,7 @@ namespace PlantChillers {
         // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeConstCOPChiller");
+        static constexpr std::string_view RoutineName("SizeConstCOPChiller");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 tmpNomCap;           // local nominal capacity cooling power
@@ -7093,7 +7093,7 @@ namespace PlantChillers {
         //                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
         //                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 
-        static std::string const RoutineName("CalcConstCOPChillerModel");
+        static constexpr std::string_view RoutineName("CalcConstCOPChillerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 EvapDeltaTemp;

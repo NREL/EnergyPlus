@@ -2311,7 +2311,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName3("ReportAirHeatBalance:3");
+    static constexpr std::string_view RoutineName3("ReportAirHeatBalance:3");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneLoop;                                     // Counter for the # of zones (nz)

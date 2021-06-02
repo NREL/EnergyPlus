@@ -490,7 +490,7 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // init for PVT
 
-        static std::string const RoutineName("InitPVTcollectors");
+        static constexpr std::string_view RoutineName("InitPVTcollectors");
 
         // Do the one time initializations
         if (this->MyOneTimeFlag) {
@@ -920,7 +920,7 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Current model is "simple" fixed efficiency and simple night sky balance for cooling
 
-        static std::string const RoutineName("CalcPVTcollectors");
+        static constexpr std::string_view RoutineName("CalcPVTcollectors");
 
         int InletNode(0);
 
