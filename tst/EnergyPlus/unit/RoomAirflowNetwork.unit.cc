@@ -111,6 +111,7 @@ protected:
         state->dataLoopNodes->NodeID.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataLoopNodes->Node.allocate(state->dataLoopNodes->NumOfNodes);
         state->dataSurface->Surface.allocate(NumOfSurfaces);
+        state->dataSurface->SurfTAirRef.allocate(NumOfSurfaces);
         state->dataHeatBal->HConvIn.allocate(NumOfSurfaces);
         state->dataHeatBalSurf->TempSurfInTmp.allocate(NumOfSurfaces);
         state->dataMstBalEMPD->RVSurface.allocate(NumOfSurfaces);
@@ -269,6 +270,9 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     state->dataSurface->Surface(1).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
     state->dataSurface->Surface(2).HeatTransferAlgorithm = iHeatTransferModel::EMPD;
+
+    state->dataSurface->SurfTAirRef = 0;
+
     state->dataMstBalEMPD->RVSurface(1) = 0.0011;
     state->dataMstBalEMPD->RVSurface(2) = 0.0012;
 

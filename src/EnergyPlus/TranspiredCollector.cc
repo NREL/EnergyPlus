@@ -911,19 +911,22 @@ namespace TranspiredCollector {
         }
 
         // determine average ambient temperature
-        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
+        Real64 sum_area = 0.0;
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            sum_area += state.dataSurface->Surface(SurfNum).Area;
+        }
         if (!state.dataEnvrn->IsRain) {
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutDryBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea;
+            Real64 sum_produc_area_drybulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_drybulb / sum_area;
         } else { // when raining we use wet bulb not drybulb
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutWetBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea;
+            Real64 sum_produc_area_wetbulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_wetbulb / sum_area;
         }
 
         // inits for each iteration
@@ -1031,24 +1034,22 @@ namespace TranspiredCollector {
 
         // Active UTSC calculation
         // first do common things for both correlations
-        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
+        Real64 sum_area = 0.0;
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            sum_area += state.dataSurface->Surface(SurfNum).Area;
+        }
         if (!state.dataEnvrn->IsRain) {
-            //            Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
-            // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutDryBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-
+            Real64 sum_produc_area_drybulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_drybulb / sum_area;
         } else { // when raining we use wet bulb not drybulb
-            //            Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
-            // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutWetBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
+            Real64 sum_produc_area_wetbulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_wetbulb / sum_area;
         }
 
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, state.dataEnvrn->OutHumRat);
@@ -1126,7 +1127,7 @@ namespace TranspiredCollector {
             // Initializations for this surface
             HMovInsul = 0.0;
             HExt = 0.0;
-            LocalWindArr(ThisSurf) = state.dataSurface->Surface(SurfPtr).WindSpeed;
+            LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
             InitExteriorConvectionCoeff(
                 state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
@@ -1316,19 +1317,19 @@ namespace TranspiredCollector {
         Real64 Twbamb;
         Real64 OutHumRatAmb;
 
-        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
         //        Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
         // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        Tamb =
-            sum_product_sub(
-                state.dataSurface->Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-            surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-        //        Twbamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
-        // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        Twbamb =
-            sum_product_sub(
-                state.dataSurface->Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-            surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
+        Real64 sum_area = 0.0;
+        Real64 sum_produc_area_drybulb = 0.0;
+        Real64 sum_produc_area_wetbulb = 0.0;
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            sum_area += state.dataSurface->Surface(SurfNum).Area;
+            sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+            sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+        }
+        Tamb = sum_produc_area_drybulb / sum_area;
+        Twbamb = sum_produc_area_wetbulb / sum_area;
+
         OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, state.dataEnvrn->OutBaroPress);
 
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, OutHumRatAmb);
