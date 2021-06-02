@@ -536,7 +536,7 @@ int main(int argc, const char *argv[])
     }
 #else
     for (auto const &file : files) {
-        bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr);
+        bool successful = processInput(file, schema, outputType, output_directory, outputTypeStr, convertHVACTemplate);
         ++fileCount;
         if (successful) {
             displayMessage("Input file converted to ", outputTypeStr, " successfully | ", fileCount, "/", number_files, " | ", file);
