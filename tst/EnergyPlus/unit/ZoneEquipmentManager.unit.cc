@@ -4482,7 +4482,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
 
     state->dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
     SizeZoneEquipment(*state);
-    UpdateZoneSizing(*state,DataGlobalConstants::CallIndicator::BeginDay);
+    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::BeginDay);
     state->dataSize->ZoneSizThermSetPtHi.allocate(state->dataGlobal->NumOfZones);
     state->dataSize->ZoneSizThermSetPtLo.allocate(state->dataGlobal->NumOfZones);
     state->dataSize->ZoneSizThermSetPtHi(1) = 24;
@@ -4504,10 +4504,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataSize->CalcFinalZoneSizing(1).allocateMemberArrays(1);
     state->dataSize->FinalZoneSizing(1).allocateMemberArrays(1);
 
-    UpdateZoneSizing(*state,DataGlobalConstants::CallIndicator::DuringDay);
-    UpdateZoneSizing(*state,DataGlobalConstants::CallIndicator::EndDay);
+    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::DuringDay);
+    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::EndDay);
     state->dataGlobal->isPulseZoneSizing = true;
-    UpdateZoneSizing(*state,DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
+    UpdateZoneSizing(*state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
 
     // verify no heating or cooling load
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->CalcZoneSizing(1, 1).HeatLoad);
