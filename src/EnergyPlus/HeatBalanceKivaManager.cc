@@ -374,7 +374,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
                             state.dataHeatBalFanSys->QCoolingPanelSurf(floorSurface) + state.dataHeatBalFanSys->QSteamBaseboardSurf(floorSurface) +
                             state.dataHeatBalFanSys->QElecBaseboardSurf(floorSurface); // HVAC
 
-    bcs->slabConvectiveTemp = state.dataHeatBal->TempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
+    bcs->slabConvectiveTemp = state.dataHeatBal->SurfTempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
     bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface) + DataGlobalConstants::KelvinConv;
     bcs->gradeForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
     bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
@@ -395,7 +395,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
         Real64 &A = state.dataSurface->Surface(wl).Area;
 
         Real64 Trad = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, wl);
-        Real64 Tconv = state.dataHeatBal->TempEffBulkAir(wl);
+        Real64 Tconv = state.dataHeatBal->SurfTempEffBulkAir(wl);
 
         QAtotal += Q * A;
         TARadTotal += Trad * A;

@@ -2937,12 +2937,12 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             FirstSurfFlag = true;
             for (SurfNum = Zone(Loop).HTSurfaceFirst; SurfNum <= Zone(Loop).HTSurfaceLast; ++SurfNum) {
                 if (FirstSurfFlag) {
-                    TRefFlag = state.dataSurface->Surface(SurfNum).TAirRef;
+                    TRefFlag = state.dataSurface->SurfTAirRef(SurfNum);
                     FirstSurfFlag = false;
                 }
                 // for each particular zone, the reference air temperature(s) should be the same
                 // (either mean air, bulk air, or supply air temp).
-                if (state.dataSurface->Surface(SurfNum).TAirRef != TRefFlag) {
+                if (state.dataSurface->SurfTAirRef(SurfNum) != TRefFlag) {
                     ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + Zone(Loop).Name);
                 }
             }
@@ -6782,13 +6782,13 @@ void CalcZoneSums(EnergyPlusData &state,
 
         // determine reference air temperature for this surface
         {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
                 RefAirTemp = MAT(ZoneNum);
                 SumHA += HA;
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
                 SumHATref += HA * RefAirTemp;
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
@@ -7033,12 +7033,12 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
         // determine reference air temperature for this surface's convective heat transfer model
         {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature
                 RefAirTemp = MAT(ZoneNum);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
                 if (!ControlledZoneAirFlag) {
@@ -7437,7 +7437,7 @@ void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempContr
     }
 
     // get mean radiant temperature for zone
-    thisMRT = state.dataHeatBal->MRT(ActualZoneNum);
+    thisMRT = state.dataHeatBal->ZoneMRT(ActualZoneNum);
 
     // modify setpoint for operative temperature control
     //  traping for MRT fractions between 0.0 and 0.9 during get input, so shouldn't be able to divide by zero here.
