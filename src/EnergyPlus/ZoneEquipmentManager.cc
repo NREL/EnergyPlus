@@ -1985,7 +1985,8 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 }
                 // save heat peak conditions when there is no design heating load or design heating volume flow rate, i.e., when
                 // zone temperature is always greater than the zone heating thermostat temperature
-                if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad == 0 && state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow == 0) {
+                if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad == 0 &&
+                    state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow == 0) {
                     // initialize variable for below if statement
                     state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtHeatPeak = 999;
                     for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
@@ -2046,7 +2047,8 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                 }
                 // save cool peak conditions when there is no design cooling load or design cooling volume flow rate, i.e., when
                 // zone temperature is always less than the zone cooling thermostat temperature
-                if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad == 0 && state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow == 0) {
+                if (state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad == 0 &&
+                    state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow == 0) {
                     for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
                         if (state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepIndex) >
                             state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).ZoneTempAtCoolPeak) {
