@@ -47,7 +47,6 @@
 
 // C++ Headers
 #include <map>
-#include <chrono>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -162,11 +161,6 @@ namespace ScheduleManager {
         using DataStringGlobals::CharTab;
         using DataSystemVariables::CheckForActualFileName;
         using General::ProcessDateString;
-
-        using std::chrono::duration;
-        using std::chrono::duration_cast;
-        using std::chrono::high_resolution_clock;
-        using std::chrono::milliseconds;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1643,7 +1637,6 @@ namespace ScheduleManager {
             hourlyFileValues.allocate(8784 * 60); // sized to accomodate any interval for schedule file.
         }
 
-        auto schedt1 = high_resolution_clock::now();
         CurrentModuleObject = "Schedule:File";
 
         // Runs getObjectItem for Schedule:File and saves it to vector in state: allIdfSchedData
@@ -1871,10 +1864,6 @@ namespace ScheduleManager {
         if (NumCommaFileSchedules > 0) {
             hourlyFileValues.deallocate();
         }
-
-        auto schedt2 = high_resolution_clock::now();
-        duration<double, std::micro> Schedus_double = schedt2 - schedt1;
-        ShowWarningError(state, format("We finished Sched:file operation here, it took {} microseconds. ", Schedus_double.count()));
 
         std::string curName;
         Array1D<Real64> timestepColumnValues;
