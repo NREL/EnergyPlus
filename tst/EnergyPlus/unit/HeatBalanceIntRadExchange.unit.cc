@@ -300,20 +300,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     state->dataConstruction->Construct.allocate(1);
     state->dataMaterial->Material.allocate(1);
     state->dataSurface->Surface.allocate(1);
+    state->dataSurface->SurfMaterialMovInsulInt.allocate(1);
     state->dataHeatBalSurf->SurfMovInsulIntPresent.allocate(1);
     state->dataHeatBalSurf->SurfMovInsulIntPresentPrevTS.allocate(1);
     state->dataHeatBalSurf->SurfMovInsulIndexList.push_back(1);
 
     SurfNum = 1;
-    state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
     state->dataHeatBalSurf->SurfMovInsulIntPresent(1) = false;
     state->dataHeatBalSurf->SurfMovInsulIntPresentPrevTS(1) = false;
     state->dataSurface->Surface(1).Construction = 1;
-    state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
+    state->dataSurface->SurfMaterialMovInsulInt(1) = 1;
+
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     state->dataMaterial->Material(1).AbsorpThermal = 0.5;
     state->dataMaterial->Material(1).Resistance = 1.25;
-    state->dataSurface->Surface(1).SchedMovInsulInt = -1;
     state->dataMaterial->Material(1).AbsorpSolar = 0.25;
 
     // Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
