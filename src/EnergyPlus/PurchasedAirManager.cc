@@ -1926,8 +1926,8 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                                         "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName + ' ' +
                                             PurchAir(PurchAirNum).Name);
                             ShowContinueError(state, format("...User-Specified Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapUser));
-                            ShowContinueError(
-                                state, format("...differs from Autosized Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapDes));
+                            ShowContinueError(state,
+                                              format("...differs from Autosized Maximum Sensible Heating Capacity of {:.2R} [W]", MaxHeatSensCapDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -2029,8 +2029,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                                         "SizePurchasedAir: Potential issue with equipment sizing for " + PurchAir(PurchAirNum).cObjectName + ' ' +
                                             PurchAir(PurchAirNum).Name);
                             ShowContinueError(state, format("User-Specified Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapUser));
-                            ShowContinueError(state,
-                                              format("differs from Autosized Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapDes));
+                            ShowContinueError(state, format("differs from Autosized Maximum Total Cooling Capacity of {:.2R} [W]", MaxCoolTotCapDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }

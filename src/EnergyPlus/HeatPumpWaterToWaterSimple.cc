@@ -1195,11 +1195,8 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
                             state, "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "Autosized Nominal Capacity [W]", tmpCoolingCap);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state,
-                                                     "HeatPump:WaterToWater:EquationFit:Cooling",
-                                                     this->Name,
-                                                     "Initial Autosized Nominal Capacity [W]",
-                                                     tmpCoolingCap);
+                        BaseSizer::reportSizerOutput(
+                            state, "HeatPump:WaterToWater:EquationFit:Cooling", this->Name, "Initial Autosized Nominal Capacity [W]", tmpCoolingCap);
                     }
                 }
             }
@@ -1549,11 +1546,8 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
                             state, "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "Autosized Nominal Capacity [W]", tmpHeatingCap);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state,
-                                                     "HeatPump:WaterToWater:EquationFit:Heating",
-                                                     this->Name,
-                                                     "Initial Autosized Nominal Capacity [W]",
-                                                     tmpHeatingCap);
+                        BaseSizer::reportSizerOutput(
+                            state, "HeatPump:WaterToWater:EquationFit:Heating", this->Name, "Initial Autosized Nominal Capacity [W]", tmpHeatingCap);
                     }
                 }
             }

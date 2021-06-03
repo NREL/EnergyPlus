@@ -8803,8 +8803,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                                             std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             state.dataHVACVarRefFlow->VRFTU(VRFCond).Name);
                             ShowContinueError(state, format("User-Specified Rated Total Heating Capacity of {:.2R} [W]", HeatingCapacityUser));
-                            ShowContinueError(state,
-                                              format("differs from Autosized Rated Total Heating Capacity of {:.2R} [W]", HeatingCapacityDes));
+                            ShowContinueError(state, format("differs from Autosized Rated Total Heating Capacity of {:.2R} [W]", HeatingCapacityDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }

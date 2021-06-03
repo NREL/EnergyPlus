@@ -1936,8 +1936,8 @@ namespace WaterToAirHeatPumpSimple {
                                                 ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
                                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name + "\"");
                                 ShowContinueError(state, format("User-Specified Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalUser));
-                                ShowContinueError(
-                                    state, format("differs from Autosized Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalDes));
+                                ShowContinueError(state,
+                                                  format("differs from Autosized Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

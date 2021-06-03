@@ -1300,8 +1300,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                         "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
                                             ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                             ShowContinueError(state, format("User-Specified Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowUser));
-                            ShowContinueError(
-                                state, format("differs from Autosized Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowDes));
+                            ShowContinueError(state,
+                                              format("differs from Autosized Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1629,8 +1629,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                                 state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' +
                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowUser));
-                                ShowContinueError(
-                                    state, format("differs from Autosized Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
+                                ShowContinueError(state,
+                                                  format("differs from Autosized Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

@@ -682,8 +682,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state, typeName, this->name, "Autosized Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, typeName, this->name, "Initial Autosized Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                    BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Autosized Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                 }
             } else {
                 if (this->loadSideDesignVolFlowRate > 0.0 && tmpLoadVolFlow > 0.0) {

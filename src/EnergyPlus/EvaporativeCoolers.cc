@@ -1529,11 +1529,8 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         if (!HardSizeNoDesRun) {
             if (IsAutoSize) {
                 EvapCond(EvapCoolNum).PadArea = PadAreaDes;
-                BaseSizer::reportSizerOutput(state,
-                                             "EvaporativeCooler:Direct:CelDekPad",
-                                             EvapCond(EvapCoolNum).EvapCoolerName,
-                                             "Autosized Celdek Pad Area [m2]",
-                                             PadAreaDes);
+                BaseSizer::reportSizerOutput(
+                    state, "EvaporativeCooler:Direct:CelDekPad", EvapCond(EvapCoolNum).EvapCoolerName, "Autosized Celdek Pad Area [m2]", PadAreaDes);
             } else {
                 if (EvapCond(EvapCoolNum).PadArea > 0.0 && PadAreaDes > 0.0) {
                     PadAreaUser = EvapCond(EvapCoolNum).PadArea;

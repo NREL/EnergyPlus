@@ -804,8 +804,11 @@ namespace PhotovoltaicThermalCollectors {
                 if (!HardSizeNoDesRun) {
                     if (this->DesignVolFlowRateWasAutoSized) {
                         this->DesignVolFlowRate = DesignVolFlowRateDes;
-                        BaseSizer::reportSizerOutput(
-                            state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Autosized Design Flow Rate [m3/s]", DesignVolFlowRateDes);
+                        BaseSizer::reportSizerOutput(state,
+                                                     "SolarCollector:FlatPlate:PhotovoltaicThermal",
+                                                     this->Name,
+                                                     "Autosized Design Flow Rate [m3/s]",
+                                                     DesignVolFlowRateDes);
                         this->SizingInit = false;
                     } else {
                         if (this->DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0) {

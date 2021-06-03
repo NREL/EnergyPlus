@@ -3089,8 +3089,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     ShowMessage(state,
                                 "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName + "\".");
                     ShowContinueError(state, format("User-Specified Minimum Cooling Air Flow Fraction of {:.5R} [m3/s]", MinAirFlowFracUser));
-                    ShowContinueError(state,
-                                      format("differs from Autosized Minimum Cooling Air Flow Fraction of {:.5R} [m3/s]", MinAirFlowFracDes));
+                    ShowContinueError(state, format("differs from Autosized Minimum Cooling Air Flow Fraction of {:.5R} [m3/s]", MinAirFlowFracDes));
                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                 }

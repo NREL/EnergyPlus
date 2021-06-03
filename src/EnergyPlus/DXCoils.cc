@@ -7625,8 +7625,8 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                             "SizeDxCoil: Potential issue with equipment sizing for " +
                                                 state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + ' ' + state.dataDXCoils->DXCoil(DXCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowUser));
-                                ShowContinueError(
-                                    state, format("differs from Autosized Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowDes));
+                                ShowContinueError(state,
+                                                  format("differs from Autosized Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -8312,8 +8312,8 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                             "SizeDxCoil: Potential issue with equipment sizing for " +
                                                 state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + ' ' + state.dataDXCoils->DXCoil(DXCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowUser));
-                                ShowContinueError(
-                                    state, format("differs from Autosized Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowDes));
+                                ShowContinueError(state,
+                                                  format("differs from Autosized Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -8461,8 +8461,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                            "SizeDxCoil: Potential issue with equipment sizing for " +
                                                state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + ' ' + state.dataDXCoils->DXCoil(DXCoilNum).Name);
                         ShowContinueError(state, format("User-Specified Resistive Defrost Heater Capacity of {:.2R}[W]", DefrostCapacityUser));
-                        ShowContinueError(state,
-                                          format("differs from Autosized Resistive Defrost Heater Capacity of {:.2R}[W]", DefrostCapacityDes));
+                        ShowContinueError(state, format("differs from Autosized Resistive Defrost Heater Capacity of {:.2R}[W]", DefrostCapacityDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }

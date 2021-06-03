@@ -1333,11 +1333,8 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
                         state, "Chiller:Electric:EIR", this->Name, "Autosized Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state,
-                                                 "Chiller:Electric:EIR",
-                                                 this->Name,
-                                                 "Initial Autosized Reference Chilled Water Flow Rate [m3/s]",
-                                                 tmpEvapVolFlowRate);
+                    BaseSizer::reportSizerOutput(
+                        state, "Chiller:Electric:EIR", this->Name, "Initial Autosized Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                 }
             } else { // Hard-size with sizing data
                 if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
@@ -1494,8 +1491,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
                                 ShowContinueError(state,
                                                   format("User-Specified Reference Condenser Fluid Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                 ShowContinueError(
-                                    state,
-                                    format("differs from Autosized Reference Condenser Fluid Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                    state, format("differs from Autosized Reference Condenser Fluid Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
