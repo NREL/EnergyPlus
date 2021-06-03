@@ -847,7 +847,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Array1D<Real64> computedNetArea; // holds the gross wall area minus the window and door areas
 
     // the following variables are for the CalcNominalWindowCond call but only SHGCSummer is needed
-    Real64 nomCond;
+    Real64 nomCond(-1.0);
     Real64 SHGCSummer;
     Real64 TransSolNorm;
     Real64 TransVisNorm;
@@ -7934,8 +7934,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         // WindowManager USEing HeatBalanceSurfaceManager)
                         if (surface.ExtBoundCond == ExternalEnvironment) {
                             int RoughSurf = state.dataMaterial->Material(construct.LayerPoint(1)).Roughness; // Outside surface roughness
-                            Real64 Ufactor = state.dataMaterial->Material(construct.LayerPoint(1)).SimpleWindowUfactor; // Outside surface U value
-                            Real64 UfactorUpper = Real64(7.0);
                             Real64 EmisOut =
                                 state.dataMaterial->Material(construct.LayerPoint(1)).AbsorpThermalFront; // Glass outside surface emissivity
                             auto const shading_flag(state.dataSurface->SurfWinShadingFlag(surfNum));
@@ -7990,14 +7988,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                                                                     state.dataHeatBalSurf->HSkyExtSurf(surfNum),
                                                                                     state.dataHeatBalSurf->HGrdExtSurf(surfNum),
                                                                                     state.dataHeatBalSurf->HAirExtSurf(surfNum));
-                            }
-
-                            // apply the convection coefficient adjustment ratio for exterior windows
-                            if (Ufactor > UfactorUpper) {
-                                assert(Surface(surfNum).Class == SurfaceClass::Window);
-                                assert(Surface(surfNum).ExtBoundCond == ExternalEnvironment);
-                                Real64 adjRatio = Ufactor/UfactorUpper;
-                                state.dataHeatBalSurf->HcExtSurf(surfNum) = state.dataHeatBalSurf->HcExtSurf(surfNum) * adjRatio;
                             }
 
                         } else { // Interior Surface

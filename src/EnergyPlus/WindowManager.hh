@@ -461,6 +461,8 @@ struct WindowManagerData : BaseGlobalStruct
     Real64 tiltr;                    // Window tilt (radians)
     Real64 hcin;                     // Convective inside air film conductance (W/m2-K)
     Real64 hcout;                    // Convective outside air film conductance (W/m2-K)
+    Real64 coeffAdjRatioIn;          // Inside convective and radiation coefficient adjustment ratio
+    Real64 coeffAdjRatioOut;         // Outside convective and radiation coefficient adjustment ratio
     Real64 Ebout;                    // Sigma*(outside air temp)**4 (W/m2)
     Real64 Outir;                    // IR radiance of window's exterior surround (W/m2)
     Real64 Rmir;                     // IR radiance of window's interior surround (W/m2)
@@ -655,6 +657,8 @@ struct WindowManagerData : BaseGlobalStruct
         this->tiltr = 0.0;
         this->hcin = 0.0;
         this->hcout = 0.0;
+        this->coeffAdjRatioIn = 1.0;
+        this->coeffAdjRatioOut = 1.0;
         this->Ebout = 0.0;
         this->Outir = 0.0;
         this->Rmir = 0.0;
