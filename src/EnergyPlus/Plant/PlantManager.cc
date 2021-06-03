@@ -2952,9 +2952,6 @@ void SizePlantLoop(EnergyPlusData &state,
     using FluidProperties::GetDensityGlycol;
     ;
 
-    // Locals
-    bool localInitLoopEquip(true);
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("SizePlantLoop");
 
