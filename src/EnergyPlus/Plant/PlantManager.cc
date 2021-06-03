@@ -2955,7 +2955,6 @@ void SizePlantLoop(EnergyPlusData &state,
     // Using/Aliasing
     using namespace DataSizing;
     using FluidProperties::GetDensityGlycol;
-    ;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("SizePlantLoop");
