@@ -138,6 +138,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
     //       AUTHOR         Dan Fisher
     //       DATE WRITTEN   April 1998
     //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
+    //                      June 2021, Dareum Nam, Add DistrictHeatingSteam
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -310,6 +311,7 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     //       AUTHOR:          Dan Fisher
     //       DATE WRITTEN:    October 1998
     //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
+    //                      June 2021, Dareum Nam, Add DistrictHeatingSteam
     //       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -419,7 +421,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Daeho Kang
     //       DATE WRITTEN   April 2014
-    //       MODIFIED
+    //       MODIFIED       June 2021, Dareum Nam, Add DistrictHeatingSteam
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -530,6 +532,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     //       AUTHOR         Dan Fisher
     //       DATE WRITTEN   July 1998
     //       MODIFIED       May 2010; Edwin Lee; Linda Lawrie (consolidation)
+    //                      June 2021, Dareum Nam, Add DistrictHeatingSteam
     //       RE-ENGINEERED  Sept 2010, Brent Griffith, plant rewrite
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -610,5 +613,6 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
         this->EnergyRate = std::abs(MyLoad);
         this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
+}
 
 } // namespace EnergyPlus::OutsideEnergySources

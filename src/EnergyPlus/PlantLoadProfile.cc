@@ -128,7 +128,7 @@ void PlantProfileData::simulate(EnergyPlusData &state,
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   January 2004
     //       MODIFIED       Brent Griffith, generalize fluid cp
-    //                      Dareum Nam, Add PlantLoadProfile Steam version, Aug 2021
+    //                      June 2021, Dareum Nam, Add PlantLoadProfile Steam version
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -376,7 +376,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   January 2004
-    //       MODIFIED       Aug 2021, Dareum Nam; Add LoadProfile:Plant:Steam
+    //       MODIFIED       June 2021, Dareum Nam, Add LoadProfile:Plant:Steam
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
