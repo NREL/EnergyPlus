@@ -1049,11 +1049,11 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                 this->NomCoolingCap = tmpNomCap;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Design Size Nominal Cooling Capacity [W]", tmpNomCap);
+                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Autosized Nominal Cooling Capacity [W]", tmpNomCap);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Initial Design Size Nominal Cooling Capacity [W]", tmpNomCap);
+                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Initial Autosized Nominal Cooling Capacity [W]", tmpNomCap);
                 }
             } else {
                 if (this->NomCoolingCap > 0.0 && tmpNomCap > 0.0) {
@@ -1062,7 +1062,7 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeater:Absorption:DoubleEffect",
                                                      this->Name,
-                                                     "Design Size Nominal Cooling Capacity [W]",
+                                                     "Autosized Nominal Cooling Capacity [W]",
                                                      tmpNomCap,
                                                      "User-Specified Nominal Cooling Capacity [W]",
                                                      NomCapUser);
@@ -1071,7 +1071,7 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                                 ShowMessage(state,
                                             "SizeChillerHeaterAbsorptionDoubleEffect: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
-                                ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
+                                ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1112,13 +1112,13 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                 this->EvapVolFlowRate = tmpEvapVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Autosized Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeater:Absorption:DoubleEffect",
                                                  this->Name,
-                                                 "Initial Design Size Chilled Water Flow Rate [m3/s]",
+                                                 "Initial Autosized Design Chilled Water Flow Rate [m3/s]",
                                                  tmpEvapVolFlowRate);
                 }
             } else {
@@ -1128,17 +1128,17 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeater:Absorption:DoubleEffect",
                                                      this->Name,
-                                                     "Design Size Chilled Water Flow Rate [m3/s]",
+                                                     "Autosized Design Chilled Water Flow Rate [m3/s]",
                                                      tmpEvapVolFlowRate,
-                                                     "User-Specified Chilled Water Flow Rate [m3/s]",
+                                                     "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                      EvapVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorptionDoubleEffect: Potential issue with equipment sizing for " + this->Name);
-                                ShowContinueError(state, format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
+                                ShowContinueError(state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                 ShowContinueError(state,
-                                                  format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                                  format("differs from Autosized Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1162,7 +1162,7 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeater:Absorption:DoubleEffect",
                                                  this->Name,
-                                                 "User-Specified Chilled Water Flow Rate [m3/s]",
+                                                 "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                  this->EvapVolFlowRate);
                 }
             }
@@ -1184,13 +1184,13 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                 this->HeatVolFlowRate = tmpHeatRecVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Design Size Hot Water Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
+                        state, "ChillerHeater:Absorption:DoubleEffect", this->Name, "Autosized Design Hot Water Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeater:Absorption:DoubleEffect",
                                                  this->Name,
-                                                 "Initial Design Size Hot Water Flow Rate [m3/s]",
+                                                 "Initial Autosized Design Hot Water Flow Rate [m3/s]",
                                                  tmpHeatRecVolFlowRate);
                 }
             } else {
@@ -1200,18 +1200,18 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeater:Absorption:DoubleEffect",
                                                      this->Name,
-                                                     "Design Size Hot Water Flow Rate [m3/s]",
+                                                     "Autosized Design Hot Water Flow Rate [m3/s]",
                                                      tmpHeatRecVolFlowRate,
-                                                     "User-Specified Hot Water Flow Rate [m3/s]",
+                                                     "User-Specified Design Hot Water Flow Rate [m3/s]",
                                                      HeatRecVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpHeatRecVolFlowRate - HeatRecVolFlowRateUser) / HeatRecVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state,
                                             "SizeChillerHeaterAbsorptionDoubleEffect: Potential issue with equipment sizing for " + this->Name);
-                                ShowContinueError(state, format("User-Specified Hot Water Flow Rate of {:.5R} [m3/s]", HeatRecVolFlowRateUser));
+                                ShowContinueError(state, format("User-Specified Design Hot Water Flow Rate of {:.5R} [m3/s]", HeatRecVolFlowRateUser));
                                 ShowContinueError(state,
-                                                  format("differs from Design Size Hot Water Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
+                                                  format("differs from Autosized Design Hot Water Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1235,7 +1235,7 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeater:Absorption:DoubleEffect",
                                                  this->Name,
-                                                 "User-Specified Hot Water Flow Rate [m3/s]",
+                                                 "User-Specified Design Hot Water Flow Rate [m3/s]",
                                                  this->HeatVolFlowRate);
                 }
             }
@@ -1270,14 +1270,14 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeater:Absorption:DoubleEffect",
                                                  this->Name,
-                                                 "Design Size Condenser Water Flow Rate [m3/s]",
+                                                 "Autosized Design Condenser Water Flow Rate [m3/s]",
                                                  tmpCondVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeater:Absorption:DoubleEffect",
                                                  this->Name,
-                                                 "Initial Design Size Condenser Water Flow Rate [m3/s]",
+                                                 "Initial Autosized Design Condenser Water Flow Rate [m3/s]",
                                                  tmpCondVolFlowRate);
                 }
             } else {
@@ -1287,17 +1287,17 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "ChillerHeater:Absorption:DoubleEffect",
                                                      this->Name,
-                                                     "Design Size Condenser Water Flow Rate [m3/s]",
+                                                     "Autosized Design Condenser Water Flow Rate [m3/s]",
                                                      tmpCondVolFlowRate,
-                                                     "User-Specified Condenser Water Flow Rate [m3/s]",
+                                                     "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                      CondVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorptionDoubleEffect: Potential issue with equipment sizing for " + this->Name);
-                                ShowContinueError(state, format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
+                                ShowContinueError(state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                 ShowContinueError(state,
-                                                  format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                                  format("differs from Autosized Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1321,7 +1321,7 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "ChillerHeater:Absorption:DoubleEffect",
                                                  this->Name,
-                                                 "User-Specified Condenser Water Flow Rate [m3/s]",
+                                                 "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                  this->CondVolFlowRate);
                 }
             }

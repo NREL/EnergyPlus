@@ -1417,7 +1417,7 @@ namespace WaterToAirHeatPumpSimple {
                                              "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                                  ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                             "Design Size Rated Air Flow Rate [m3/s]",
+                                             "Autosized Rated Air Flow Rate [m3/s]",
                                              RatedAirVolFlowRateDes);
             } else {
                 if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate > 0.0 && RatedAirVolFlowRateDes > 0.0 &&
@@ -1427,7 +1427,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                                      ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                                  state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                 "Design Size Rated Air Flow Rate [m3/s]",
+                                                 "Autosized Rated Air Flow Rate [m3/s]",
                                                  RatedAirVolFlowRateDes,
                                                  "User-Specified Rated Air Flow Rate [m3/s]",
                                                  RatedAirVolFlowRateUser);
@@ -1441,7 +1441,7 @@ namespace WaterToAirHeatPumpSimple {
                                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name + "\"");
                             ShowContinueError(state, format("User-Specified Rated Air Volume Flow Rate of {:.5R} [m3/s]", RatedAirVolFlowRateUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Rated Air Volume Flow Rate of {:.5R} [m3/s]", RatedAirVolFlowRateDes));
+                                              format("differs from Autosized Rated Air Volume Flow Rate of {:.5R} [m3/s]", RatedAirVolFlowRateDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1883,7 +1883,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                                      ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                                  state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                 "Design Size Rated Total Cooling Capacity [W]",
+                                                 "Autosized Rated Total Cooling Capacity [W]",
                                                  RatedCapCoolTotalDes);
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchCoolCoilTotCap,
@@ -1923,7 +1923,7 @@ namespace WaterToAirHeatPumpSimple {
                                                      "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                                          ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                                      state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     "Design Size Rated Total Cooling Capacity [W]",
+                                                     "Autosized Rated Total Cooling Capacity [W]",
                                                      RatedCapCoolTotalDes,
                                                      "User-Specified Rated Total Cooling Capacity [W]",
                                                      RatedCapCoolTotalUser);
@@ -1937,7 +1937,7 @@ namespace WaterToAirHeatPumpSimple {
                                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name + "\"");
                                 ShowContinueError(state, format("User-Specified Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalDes));
+                                    state, format("differs from Autosized Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1965,7 +1965,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                                      ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                                  state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                 "Design Size Rated Sensible Cooling Capacity [W]",
+                                                 "Autosized Rated Sensible Cooling Capacity [W]",
                                                  RatedCapCoolSensDes);
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchCoolCoilSensCap,
@@ -1995,7 +1995,7 @@ namespace WaterToAirHeatPumpSimple {
                                                      "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                                          ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                                      state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                     "Design Size Rated Sensible Cooling Capacity [W]",
+                                                     "Autosized Rated Sensible Cooling Capacity [W]",
                                                      RatedCapCoolSensDes,
                                                      "User-Specified Rated Sensible Cooling Capacity [W]",
                                                      RatedCapCoolSensUser);
@@ -2010,7 +2010,7 @@ namespace WaterToAirHeatPumpSimple {
                                 ShowContinueError(state,
                                                   format("User-Specified Rated Sensible Cooling Capacity of {:.2R} [W]", RatedCapCoolSensUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Rated Sensible Cooling Capacity of {:.2R} [W]", RatedCapCoolSensDes));
+                                    state, format("differs from Autosized Rated Sensible Cooling Capacity of {:.2R} [W]", RatedCapCoolSensDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2119,7 +2119,7 @@ namespace WaterToAirHeatPumpSimple {
                                              "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                                  ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                             "Design Size Rated Heating Capacity [W]",
+                                             "Autosized Rated Heating Capacity [W]",
                                              RatedCapHeatDes);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchHeatCoilNomCap,
@@ -2144,7 +2144,7 @@ namespace WaterToAirHeatPumpSimple {
                                                  "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                                      ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                                  state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                                 "Design Size Rated Heating Capacity [W]",
+                                                 "Autosized Rated Heating Capacity [W]",
                                                  RatedCapHeatDes,
                                                  "User-Specified Rated Heating Capacity [W]",
                                                  RatedCapHeatUser);
@@ -2156,7 +2156,7 @@ namespace WaterToAirHeatPumpSimple {
                                             ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" +
                                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name + "\"");
                             ShowContinueError(state, format("User-Specified Rated Heating Capacity of {:.2R} [W]", RatedCapHeatUser));
-                            ShowContinueError(state, format("differs from Design Size Rated Heating Capacity of {:.2R} [W]", RatedCapHeatDes));
+                            ShowContinueError(state, format("differs from Autosized Rated Heating Capacity of {:.2R} [W]", RatedCapHeatDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -2322,7 +2322,7 @@ namespace WaterToAirHeatPumpSimple {
                                          "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                              ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                          state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                         "Design Size Rated Water Flow Rate [m3/s]",
+                                         "Autosized Rated Water Flow Rate [m3/s]",
                                          RatedWaterVolFlowRateDes);
         } else {
             if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate > 0.0 && RatedWaterVolFlowRateDes > 0.0) {
@@ -2331,7 +2331,7 @@ namespace WaterToAirHeatPumpSimple {
                                              "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                                  ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                              state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name,
-                                             "Design Size Rated Water Flow Rate [m3/s]",
+                                             "Autosized Rated Water Flow Rate [m3/s]",
                                              RatedWaterVolFlowRateDes,
                                              "User-Specified Rated Water Flow Rate [m3/s]",
                                              RatedWaterVolFlowRateUser);
@@ -2344,7 +2344,7 @@ namespace WaterToAirHeatPumpSimple {
                                         ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name +
                                         "\"");
                         ShowContinueError(state, format("User-Specified Rated Water Flow Rate of {:.5R} [m3/s]", RatedWaterVolFlowRateUser));
-                        ShowContinueError(state, format("differs from Design Size Rated Water Flow Rate of {:.5R} [m3/s]", RatedWaterVolFlowRateDes));
+                        ShowContinueError(state, format("differs from Autosized Rated Water Flow Rate of {:.5R} [m3/s]", RatedWaterVolFlowRateDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }

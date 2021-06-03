@@ -1361,7 +1361,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 BaseSizer::reportSizerOutput(state,
                                              CompType,
                                              EvapCond(EvapCoolNum).EvapCoolerName,
-                                             "Design Size Secondary Fan Flow Rate [m3/s]",
+                                             "Autosized Secondary Fan Flow Rate [m3/s]",
                                              EvapCond(EvapCoolNum).IndirectVolFlowRate);
             }
         } else {
@@ -1370,7 +1370,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 BaseSizer::reportSizerOutput(state,
                                              "EvaporativeCooler:Indirect:ResearchSpecial",
                                              EvapCond(EvapCoolNum).EvapCoolerName,
-                                             "Design Size Secondary Fan Flow Rate [m3/s]",
+                                             "Autosized Secondary Fan Flow Rate [m3/s]",
                                              IndirectVolFlowRateDes,
                                              "User-Specified Secondary Fan Flow Rate [m3/s]",
                                              IndirectVolFlowRateUser);
@@ -1381,7 +1381,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                                     "SizeEvaporativeCooler:Indirect:ResearchSpecial: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
                         ShowContinueError(state, format("User-Specified Secondary Fan Flow Rate of {:.5R} [m3/s]", IndirectVolFlowRateUser));
-                        ShowContinueError(state, format("differs from Design Size Secondary Fan Flow Rate of {:.5R} [m3/s]", IndirectVolFlowRateDes));
+                        ShowContinueError(state, format("differs from Autosized Secondary Fan Flow Rate of {:.5R} [m3/s]", IndirectVolFlowRateDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -1457,14 +1457,14 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             // if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 && IndirectVolFlowRateDes > 0.0 ) {
             // IndirectVolFlowRateUser = EvapCond( EvapCoolNum ).IndirectVolFlowRate;
             // BaseSizer::reportSizerOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName,
-            //"Design Size Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateDes,
+            //"Autosized Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateDes,
             //"User-Specified Secondary Fan Flow Rate [m3/s]", IndirectVolFlowRateUser );
             // if ( DisplayExtraWarnings ) {
             // if ( ( std::abs( IndirectVolFlowRateDes - IndirectVolFlowRateUser ) / IndirectVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
             // ShowMessage(state,  "SizeEvaporativeCooler:Indirect:ResearchSpecial: \nPotential issue with equipment sizing for " + EvapCond(
             // EvapCoolNum
             // ).EvapCoolerName );  ShowContinueError(state,  "User-Specified Secondary Fan Flow Rate of " +  RoundSigDigits(
-            // IndirectVolFlowRateUser, 5 ) + " [m3/s]" ); ShowContinueError(state,  format("differs from Design Size Secondary Fan Flow Rate of
+            // IndirectVolFlowRateUser, 5 ) + " [m3/s]" ); ShowContinueError(state,  format("differs from Autosized Secondary Fan Flow Rate of
             // {:.5R}", IndirectVolFlowRateDes) + " [m3/s]" ); ShowContinueError(state,  "This may, or may not, indicate mismatched component
             // sizes." ); ShowContinueError(state,  "Verify that the value entered is intended and is consistent with other components." );
             //}
@@ -1532,7 +1532,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 BaseSizer::reportSizerOutput(state,
                                              "EvaporativeCooler:Direct:CelDekPad",
                                              EvapCond(EvapCoolNum).EvapCoolerName,
-                                             "Design Size Celdek Pad Area [m2]",
+                                             "Autosized Celdek Pad Area [m2]",
                                              PadAreaDes);
             } else {
                 if (EvapCond(EvapCoolNum).PadArea > 0.0 && PadAreaDes > 0.0) {
@@ -1540,7 +1540,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                     BaseSizer::reportSizerOutput(state,
                                                  "EvaporativeCooler:Direct:CelDekPad",
                                                  EvapCond(EvapCoolNum).EvapCoolerName,
-                                                 "Design Size Celdek Pad Area [m2]",
+                                                 "Autosized Celdek Pad Area [m2]",
                                                  PadAreaDes,
                                                  "User-Specified Celdek Pad Area [m2]",
                                                  PadAreaUser);
@@ -1550,7 +1550,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                                         "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
                                             EvapCond(EvapCoolNum).EvapCoolerName);
                             ShowContinueError(state, format("User-Specified Celdek Pad Area of{:.2R} [m2]", PadAreaUser));
-                            ShowContinueError(state, format("differs from Design Size Celdek Pad Area of {:.2R} [m2]", PadAreaDes));
+                            ShowContinueError(state, format("differs from Autosized Celdek Pad Area of {:.2R} [m2]", PadAreaDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1574,14 +1574,14 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         if (IsAutoSize) {
             EvapCond(EvapCoolNum).PadDepth = PadDepthDes;
             BaseSizer::reportSizerOutput(
-                state, "EvaporativeCooler:Direct:CelDekPad", EvapCond(EvapCoolNum).EvapCoolerName, "Design Size Celdek Pad Depth [m]", PadDepthDes);
+                state, "EvaporativeCooler:Direct:CelDekPad", EvapCond(EvapCoolNum).EvapCoolerName, "Autosized Celdek Pad Depth [m]", PadDepthDes);
         } else {
             if (EvapCond(EvapCoolNum).PadDepth > 0.0 && PadDepthDes > 0.0) {
                 PadDepthUser = EvapCond(EvapCoolNum).PadDepth;
                 BaseSizer::reportSizerOutput(state,
                                              "EvaporativeCooler:Direct:CelDekPad",
                                              EvapCond(EvapCoolNum).EvapCoolerName,
-                                             "Design Size Celdek Pad Depth [m]",
+                                             "Autosized Celdek Pad Depth [m]",
                                              PadDepthDes,
                                              "User-Specified Celdek Pad Depth [m]",
                                              PadDepthUser);
@@ -1591,7 +1591,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                                     "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
                         ShowContinueError(state, format("User-Specified Celdek Pad Depth of{:.2R} [m]", PadDepthUser));
-                        ShowContinueError(state, format("differs from Design Size Celdek Pad Depth of {:.2R} [m]", PadDepthDes));
+                        ShowContinueError(state, format("differs from Autosized Celdek Pad Depth of {:.2R} [m]", PadDepthDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -1674,7 +1674,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 BaseSizer::reportSizerOutput(state,
                                              "EvaporativeCooler:Indirect:CelDekPad",
                                              EvapCond(EvapCoolNum).EvapCoolerName,
-                                             "Design Size Celdek Pad Area [m2]",
+                                             "Autosized Celdek Pad Area [m2]",
                                              PadAreaDes);
             } else {
                 if (EvapCond(EvapCoolNum).IndirectPadArea > 0.0 && PadAreaDes > 0.0) {
@@ -1682,7 +1682,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                     BaseSizer::reportSizerOutput(state,
                                                  "EvaporativeCooler:Indirect:CelDekPad",
                                                  EvapCond(EvapCoolNum).EvapCoolerName,
-                                                 "Design Size Celdek Pad Area [m2]",
+                                                 "Autosized Celdek Pad Area [m2]",
                                                  PadAreaDes,
                                                  "User-Specified Celdek Pad Area [m2]",
                                                  PadAreaUser);
@@ -1692,7 +1692,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                                         "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
                                             EvapCond(EvapCoolNum).EvapCoolerName);
                             ShowContinueError(state, format("User-Specified Celdek Pad Area {:.2R} [m2]", PadAreaUser));
-                            ShowContinueError(state, format("differs from Design Size Celdek Pad Area of {:.2R} [m2]", PadAreaDes));
+                            ShowContinueError(state, format("differs from Autosized Celdek Pad Area of {:.2R} [m2]", PadAreaDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1714,14 +1714,14 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
         if (IsAutoSize) {
             EvapCond(EvapCoolNum).IndirectPadDepth = PadDepthDes;
             BaseSizer::reportSizerOutput(
-                state, "EvaporativeCooler:Indirect:CelDekPad", EvapCond(EvapCoolNum).EvapCoolerName, "Design Size Celdek Pad Depth [m]", PadDepthDes);
+                state, "EvaporativeCooler:Indirect:CelDekPad", EvapCond(EvapCoolNum).EvapCoolerName, "Autosized Celdek Pad Depth [m]", PadDepthDes);
         } else {
             if (EvapCond(EvapCoolNum).IndirectPadDepth > 0.0 && PadDepthDes > 0.0) {
                 PadDepthUser = EvapCond(EvapCoolNum).IndirectPadDepth;
                 BaseSizer::reportSizerOutput(state,
                                              "EvaporativeCooler:Indirect:CelDekPad",
                                              EvapCond(EvapCoolNum).EvapCoolerName,
-                                             "Design Size Celdek Pad Depth [m]",
+                                             "Autosized Celdek Pad Depth [m]",
                                              PadDepthDes,
                                              "User-Specified Celdek Pad Depth [m]",
                                              PadDepthUser);
@@ -1731,7 +1731,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                                     "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
                         ShowContinueError(state, format("User-Specified Celdek Pad Depth of{:.2R} [m]", PadDepthUser));
-                        ShowContinueError(state, format("differs from Design Size Celdek Pad Depth of {:.2R} [m]", PadDepthDes));
+                        ShowContinueError(state, format("differs from Autosized Celdek Pad Depth of {:.2R} [m]", PadDepthDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }

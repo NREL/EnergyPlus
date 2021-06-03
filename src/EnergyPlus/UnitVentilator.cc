@@ -2177,7 +2177,7 @@ namespace UnitVentilator {
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataUnitVentilators->cMO_UnitVentilator,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                 "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
+                                                 "Autosized Maximum Outdoor Air Flow Rate [m3/s]",
                                                  OutAirVolFlowDes);
                 } else {
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0) {
@@ -2185,7 +2185,7 @@ namespace UnitVentilator {
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                     "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
+                                                     "Autosized Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowDes,
                                                      "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowUser);
@@ -2197,7 +2197,7 @@ namespace UnitVentilator {
                                                 state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
+                                    state, format("differs from Autosized Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2241,7 +2241,7 @@ namespace UnitVentilator {
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataUnitVentilators->cMO_UnitVentilator,
                                                  state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                 "Design Size Minimum Outdoor Air Flow Rate [m3/s]",
+                                                 "Autosized Minimum Outdoor Air Flow Rate [m3/s]",
                                                  MinOutAirVolFlowDes);
                 } else {
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow > 0.0 && MinOutAirVolFlowDes > 0.0) {
@@ -2249,7 +2249,7 @@ namespace UnitVentilator {
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                     "Design Size Minimum Outdoor Air Flow Rate [m3/s]",
+                                                     "Autosized Minimum Outdoor Air Flow Rate [m3/s]",
                                                      MinOutAirVolFlowDes,
                                                      "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
                                                      MinOutAirVolFlowUser);
@@ -2263,7 +2263,7 @@ namespace UnitVentilator {
                                 ShowContinueError(state,
                                                   format("User-Specified Minimum Outdoor Air Flow Rate of {:.5R} [m3/s]", MinOutAirVolFlowUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Minimum Outdoor Air Flow Rate of {:.5R} [m3/s]", MinOutAirVolFlowDes));
+                                    state, format("differs from Autosized Minimum Outdoor Air Flow Rate of {:.5R} [m3/s]", MinOutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2400,7 +2400,7 @@ namespace UnitVentilator {
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                     "Design Size Maximum Hot Water Flow [m3/s]",
+                                                     "Autosized Maximum Hot Water Flow [m3/s]",
                                                      MaxVolHotWaterFlowDes);
                     } else {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
@@ -2408,7 +2408,7 @@ namespace UnitVentilator {
                             BaseSizer::reportSizerOutput(state,
                                                          state.dataUnitVentilators->cMO_UnitVentilator,
                                                          state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                         "Design Size Maximum Hot Water Flow [m3/s]",
+                                                         "Autosized Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowDes,
                                                          "User-Specified Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowUser);
@@ -2422,7 +2422,7 @@ namespace UnitVentilator {
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
+                                        state, format("differs from Autosized Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -2548,7 +2548,7 @@ namespace UnitVentilator {
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                     "Design Size Maximum Steam Flow [m3/s]",
+                                                     "Autosized Maximum Steam Flow [m3/s]",
                                                      MaxVolHotSteamFlowDes);
                     } else {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0) {
@@ -2556,7 +2556,7 @@ namespace UnitVentilator {
                             BaseSizer::reportSizerOutput(state,
                                                          state.dataUnitVentilators->cMO_UnitVentilator,
                                                          state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                         "Design Size Maximum Steam Flow [m3/s]",
+                                                         "Autosized Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowDes,
                                                          "User-Specified Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowUser);
@@ -2569,7 +2569,7 @@ namespace UnitVentilator {
                                                     state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
                                     ShowContinueError(state, format("User-Specified Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowUser));
                                     ShowContinueError(state,
-                                                      format("differs from Design Size Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
+                                                      format("differs from Autosized Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -2728,7 +2728,7 @@ namespace UnitVentilator {
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataUnitVentilators->cMO_UnitVentilator,
                                                      state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                     "Design Size Maximum Cold Water Flow [m3/s]",
+                                                     "Autosized Maximum Cold Water Flow [m3/s]",
                                                      MaxVolColdWaterFlowDes);
                     } else {
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0) {
@@ -2736,7 +2736,7 @@ namespace UnitVentilator {
                             BaseSizer::reportSizerOutput(state,
                                                          state.dataUnitVentilators->cMO_UnitVentilator,
                                                          state.dataUnitVentilators->UnitVent(UnitVentNum).Name,
-                                                         "Design Size Maximum Cold Water Flow [m3/s]",
+                                                         "Autosized Maximum Cold Water Flow [m3/s]",
                                                          MaxVolColdWaterFlowDes,
                                                          "User-Specified Maximum Cold Water Flow [m3/s]",
                                                          MaxVolColdWaterFlowUser);
@@ -2750,7 +2750,7 @@ namespace UnitVentilator {
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Cold Water Flow of {:.5R} [m3/s]", MaxVolColdWaterFlowUser));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Maximum Cold Water Flow of {:.5R} [m3/s]", MaxVolColdWaterFlowDes));
+                                        state, format("differs from Autosized Maximum Cold Water Flow of {:.5R} [m3/s]", MaxVolColdWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

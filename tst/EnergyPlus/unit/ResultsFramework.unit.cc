@@ -336,14 +336,14 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_TableInfo)
               rowLabels,
               columnLabels,
               "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
-              "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+              "User-Specified values were used. Autosized values were used if no User-Specified values were provided.");
 
     json result = tbl.getJSON();
     json expectedResult = R"( {
             "Cols": [
                     "User-Specified Maximum Air Flow Rate [m3/s]"
             ],
-            "Footnote": "User-Specified values were used. Design Size values were used if no User-Specified values were provided.",
+            "Footnote": "User-Specified values were used. Autosized values were used if no User-Specified values were provided.",
             "Rows": {
             "ZONE1DIRECTAIR": [
                    "5.22"
@@ -378,7 +378,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ReportInfo)
               rowLabels,
               columnLabels,
               "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
-              "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+              "User-Specified values were used. Autosized values were used if no User-Specified values were provided.");
 
     rowLabels.deallocate();
     columnLabels.deallocate();
@@ -402,7 +402,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ReportInfo)
                rowLabels,
                columnLabels,
                "Coil:Cooling:DX:SingleSpeed",
-               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+               "User-Specified values were used. Autosized values were used if no User-Specified values were provided.");
 
     Report report;
     report.Tables.push_back(tbl);
@@ -419,7 +419,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ReportInfo)
                     "Cols": [
                         "User-Specified Maximum Air Flow Rate [m3/s]"
                     ],
-                    "Footnote": "User-Specified values were used. Design Size values were used if no User-Specified values were provided.",
+                    "Footnote": "User-Specified values were used. Autosized values were used if no User-Specified values were provided.",
                     "Rows": {
                         "ZONE1DIRECTAIR": [
                             "5.22"
@@ -436,7 +436,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ReportInfo)
                         "User-Specified gross_rated_total_cooling_capacity [W]",
                         "User-Specified gross_rated_sensible_heat_ratio"
                     ],
-                    "Footnote": "User-Specified values were used. Design Size values were used if no User-Specified values were provided.",
+                    "Footnote": "User-Specified values were used. Autosized values were used if no User-Specified values were provided.",
                     "Rows": {
                         "FURNACE ACDXCOIL 1": [
                             "5.50",

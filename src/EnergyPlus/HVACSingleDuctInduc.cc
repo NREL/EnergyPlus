@@ -867,7 +867,7 @@ namespace HVACSingleDuctInduc {
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                                                  state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                                                 "Design Size Maximum Total Air Flow Rate [m3/s]",
+                                                 "Autosized Maximum Total Air Flow Rate [m3/s]",
                                                  MaxTotAirVolFlowDes);
                 } else {
                     if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow > 0.0 && MaxTotAirVolFlowDes > 0.0) {
@@ -875,7 +875,7 @@ namespace HVACSingleDuctInduc {
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                                                     "Design Size Maximum Total Air Flow Rate [m3/s]",
+                                                     "Autosized Maximum Total Air Flow Rate [m3/s]",
                                                      MaxTotAirVolFlowDes,
                                                      "User-Specified Maximum Total Air Flow Rate [m3/s]",
                                                      MaxTotAirVolFlowUser);
@@ -888,7 +888,7 @@ namespace HVACSingleDuctInduc {
                                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name + "\".");
                                 ShowContinueError(state, format("User-Specified Maximum Total Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Maximum Total Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowDes));
+                                    state, format("differs from Autosized Maximum Total Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -978,19 +978,19 @@ namespace HVACSingleDuctInduc {
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                                                     "Design Size Maximum Hot Water Flow Rate [m3/s]",
+                                                     "Autosized Maximum Hot Water Flow Rate [m3/s]",
                                                      MaxVolHotWaterFlowDes);
                         BaseSizer::reportSizerOutput(
                             state,
                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                            "Design Size Inlet Air Temperature [C]",
+                            "Autosized Design Inlet Air Temperature [C]",
                             state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU);
                         BaseSizer::reportSizerOutput(
                             state,
                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                             state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                            "Design Size Inlet Air Humidity Ratio [kgWater/kgDryAir]",
+                            "Autosized Design Inlet Air Humidity Ratio [kgWater/kgDryAir]",
                             state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                     } else {
                         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
@@ -998,7 +998,7 @@ namespace HVACSingleDuctInduc {
                             BaseSizer::reportSizerOutput(state,
                                                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                                                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                                                         "Design Size Maximum Hot Water Flow Rate [m3/s]",
+                                                         "Autosized Maximum Hot Water Flow Rate [m3/s]",
                                                          MaxVolHotWaterFlowDes,
                                                          "User-Specified Maximum Hot Water Flow Rate [m3/s]",
                                                          MaxVolHotWaterFlowUser);
@@ -1013,7 +1013,7 @@ namespace HVACSingleDuctInduc {
                                                       format("User-Specified Maximum Hot Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
                                     ShowContinueError(
                                         state,
-                                        format("differs from Design Size Maximum Hot Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
+                                        format("differs from Autosized Maximum Hot Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1111,7 +1111,7 @@ namespace HVACSingleDuctInduc {
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                                                      state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                                                     "Design Size Maximum Cold Water Flow Rate [m3/s]",
+                                                     "Autosized Maximum Cold Water Flow Rate [m3/s]",
                                                      MaxVolColdWaterFlowDes);
                     } else {
                         if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0) {
@@ -1119,7 +1119,7 @@ namespace HVACSingleDuctInduc {
                             BaseSizer::reportSizerOutput(state,
                                                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType,
                                                          state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name,
-                                                         "Design Size Maximum Cold Water Flow Rate [m3/s]",
+                                                         "Autosized Maximum Cold Water Flow Rate [m3/s]",
                                                          MaxVolColdWaterFlowDes,
                                                          "User-Specified Maximum Cold Water Flow Rate [m3/s]",
                                                          MaxVolColdWaterFlowUser);
@@ -1134,7 +1134,7 @@ namespace HVACSingleDuctInduc {
                                         state, format("User-Specified Maximum Cold Water Flow Rate of {:.5R} [m3/s]", MaxVolColdWaterFlowUser));
                                     ShowContinueError(
                                         state,
-                                        format("differs from Design Size Maximum Cold Water Flow Rate of {:.5R} [m3/s]", MaxVolColdWaterFlowDes));
+                                        format("differs from Autosized Maximum Cold Water Flow Rate of {:.5R} [m3/s]", MaxVolColdWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

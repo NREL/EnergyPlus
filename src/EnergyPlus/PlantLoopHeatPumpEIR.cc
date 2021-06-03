@@ -638,10 +638,10 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                 // if auto-sized, we just need to store the sized value and then report out the capacity when plant is ready
                 this->referenceCapacity = tmpCapacity;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
+                    BaseSizer::reportSizerOutput(state, typeName, this->name, "Autosized Nominal Capacity [W]", tmpCapacity);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
+                    BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Autosized Nominal Capacity [W]", tmpCapacity);
                 }
             } else {
                 // this blocks means the capacity value was hard-sized
@@ -653,7 +653,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          typeName,
                                                          this->name,
-                                                         "Design Size Nominal Capacity [W]",
+                                                         "Autosized Nominal Capacity [W]",
                                                          tmpCapacity,
                                                          "User-Specified Nominal Capacity [W]",
                                                          hardSizedCapacity);
@@ -665,7 +665,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                             if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowWarningMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                                 ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", hardSizedCapacity));
-                                ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpCapacity));
+                                ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", tmpCapacity));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -679,11 +679,11 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
             if (this->loadSideDesignVolFlowRateWasAutoSized) {
                 this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                    BaseSizer::reportSizerOutput(state, typeName, this->name, "Autosized Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, typeName, this->name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                        state, typeName, this->name, "Initial Autosized Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                 }
             } else {
                 if (this->loadSideDesignVolFlowRate > 0.0 && tmpLoadVolFlow > 0.0) {
@@ -693,7 +693,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          typeName,
                                                          this->name,
-                                                         "Design Size Load Side Volume Flow Rate [m3/s]",
+                                                         "Autosized Load Side Volume Flow Rate [m3/s]",
                                                          tmpLoadVolFlow,
                                                          "User-Specified Load Side Volume Flow Rate [m3/s]",
                                                          hardSizedLoadSideFlow);
@@ -707,7 +707,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                                 ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                                 ShowContinueError(state, format("User-Specified Load Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedLoadSideFlow));
                                 ShowContinueError(state,
-                                                  format("differs from Design Size Load Side Volume Flow Rate of {:.2R} [m3/s]", tmpLoadVolFlow));
+                                                  format("differs from Autosized Load Side Volume Flow Rate of {:.2R} [m3/s]", tmpLoadVolFlow));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -725,11 +725,11 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                        BaseSizer::reportSizerOutput(state, typeName, this->name, "Autosized Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, typeName, this->name, "Initial Design Size Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
+                            state, typeName, this->name, "Initial Autosized Load Side Volume Flow Rate [m3/s]", tmpLoadVolFlow);
                     }
                 }
             }
@@ -738,10 +738,10 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     this->referenceCapacity = tmpCapacity;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Nominal Capacity [W]", tmpCapacity);
+                        BaseSizer::reportSizerOutput(state, typeName, this->name, "Autosized Nominal Capacity [W]", tmpCapacity);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Design Size Nominal Capacity [W]", tmpCapacity);
+                        BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Autosized Nominal Capacity [W]", tmpCapacity);
                     }
                 }
             }
@@ -816,10 +816,10 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
     if (this->sourceSideDesignVolFlowRateWasAutoSized) {
         this->sourceSideDesignVolFlowRate = tmpSourceVolFlow;
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state, typeName, this->name, "Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+            BaseSizer::reportSizerOutput(state, typeName, this->name, "Autosized Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
         }
         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Design Size Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
+            BaseSizer::reportSizerOutput(state, typeName, this->name, "Initial Autosized Source Side Volume Flow Rate [m3/s]", tmpSourceVolFlow);
         }
     } else {
         // source design flow was hard-sized
@@ -830,7 +830,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  typeName,
                                                  this->name,
-                                                 "Design Size Source Side Volume Flow Rate [m3/s]",
+                                                 "Autosized Source Side Volume Flow Rate [m3/s]",
                                                  tmpSourceVolFlow,
                                                  "User-Specified Source Side Volume Flow Rate [m3/s]",
                                                  hardSizedSourceSideFlow);
@@ -843,7 +843,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
                         state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                         ShowContinueError(state, format("User-Specified Source Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedSourceSideFlow));
-                        ShowContinueError(state, format("differs from Design Size Source Side Volume Flow Rate of {:.2R} [m3/s]", tmpSourceVolFlow));
+                        ShowContinueError(state, format("differs from Autosized Source Side Volume Flow Rate of {:.2R} [m3/s]", tmpSourceVolFlow));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }

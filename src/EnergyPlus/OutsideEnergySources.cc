@@ -414,10 +414,10 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
             if (this->NomCapWasAutoSized) {
                 this->NomCap = NomCapDes;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "Design Size Nominal Capacity [W]", NomCapDes);
+                    BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "Autosized Nominal Capacity [W]", NomCapDes);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "Initial Design Size Nominal Capacity [W]", NomCapDes);
+                    BaseSizer::reportSizerOutput(state, "District" + typeName, this->Name, "Initial Autosized Nominal Capacity [W]", NomCapDes);
                 }
             } else { // Hard-size with sizing data
                 if (this->NomCap > 0.0 && NomCapDes > 0.0) {
@@ -426,7 +426,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "District" + typeName,
                                                      this->Name,
-                                                     "Design Size Nominal Capacity [W]",
+                                                     "Autosized Nominal Capacity [W]",
                                                      NomCapDes,
                                                      "User-Specified Nominal Capacity [W]",
                                                      NomCapUser);
@@ -434,7 +434,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
                             if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
-                                ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NomCapDes));
+                                ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", NomCapDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

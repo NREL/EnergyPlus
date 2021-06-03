@@ -5582,7 +5582,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                              state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                             "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
+                                             "Autosized Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                              CoolOutAirVolFlowDes);
             } else {
                 if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow > 0.0 && CoolOutAirVolFlowDes > 0.0 && SizingDesRunThisZone) {
@@ -5590,7 +5590,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                  state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                 "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
+                                                 "Autosized Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                  CoolOutAirVolFlowDes,
                                                  "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                  CoolOutAirVolFlowUser);
@@ -5604,7 +5604,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                                 state,
                                 format("User-Specified Outdoor Air Flow Rate During Cooling Operation of {:.5R} [m3/s]", CoolOutAirVolFlowUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Outdoor Air Flow Rate During Cooling Operation of {:.5R} [m3/s]",
+                                              format("differs from Autosized Outdoor Air Flow Rate During Cooling Operation of {:.5R} [m3/s]",
                                                      CoolOutAirVolFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -5641,7 +5641,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                              state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                             "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
+                                             "Autosized Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                              HeatOutAirVolFlowDes);
             } else {
                 if (state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow > 0.0 && HeatOutAirVolFlowDes > 0.0 && SizingDesRunThisZone) {
@@ -5649,7 +5649,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                  state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                 "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
+                                                 "Autosized Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                  HeatOutAirVolFlowDes,
                                                  "User-Specified Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                  HeatOutAirVolFlowUser);
@@ -5663,7 +5663,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                                 state,
                                 format("User-Specified Outdoor Air Flow Rate During Heating Operation of {:.5R} [m3/s]", HeatOutAirVolFlowUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Outdoor Air Flow Rate During Heating Operation of {:.5R} [m3/s]",
+                                              format("differs from Autosized Outdoor Air Flow Rate During Heating Operation of {:.5R} [m3/s]",
                                                      HeatOutAirVolFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -5700,7 +5700,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                              state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                             "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
+                                             "Autosized Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                              NoCoolHeatOutAirVolFlowDes);
             } else {
                 if (state.dataPTHP->PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow > 0.0 && NoCoolHeatOutAirVolFlowDes > 0.0 && SizingDesRunThisZone) {
@@ -5708,7 +5708,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                  state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                 "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
+                                                 "Autosized Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                  NoCoolHeatOutAirVolFlowDes,
                                                  "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                  NoCoolHeatOutAirVolFlowUser);
@@ -5723,7 +5723,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                                                      NoCoolHeatOutAirVolFlowUser));
                             ShowContinueError(
                                 state,
-                                format("differs from Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed of {:.5R} [m3/s]",
+                                format("differs from Autosized Outdoor Air Flow Rate When No Cooling or Heating is Needed of {:.5R} [m3/s]",
                                        NoCoolHeatOutAirVolFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -5756,7 +5756,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                              state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                             "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                             "Autosized Maximum Supply Air Temperature from Supplemental Heater [C]",
                                              MaxSATSupHeatDes);
             } else {
                 if (state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat > 0.0 && MaxSATSupHeatDes > 0.0 && SizingDesRunThisZone) {
@@ -5764,7 +5764,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                                  state.dataPTHP->PTUnit(PTUnitNum).Name,
-                                                 "Design Size Maximum Supply Air Temperature from Supplemental Heater [C]",
+                                                 "Autosized Maximum Supply Air Temperature from Supplemental Heater [C]",
                                                  MaxSATSupHeatDes,
                                                  "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
                                                  MaxSATSupHeatUser);
@@ -5777,7 +5777,7 @@ void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
                                 state,
                                 format("User-Specified Maximum Supply Air Temperature from Supplemental Heater of {:.2R} [C]", MaxSATSupHeatUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Maximum Supply Air Temperature from Supplemental Heater of {:.2R} [C]",
+                                              format("differs from Autosized Maximum Supply Air Temperature from Supplemental Heater of {:.2R} [C]",
                                                      MaxSATSupHeatDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");

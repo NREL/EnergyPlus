@@ -179,10 +179,10 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
     };
 
     std::vector<TestQuery> testQueries({
-        TestQuery("Design Size Rated Evaporator Air Flow Rate", "m3/s", ratedEvapAirFlowRate),
-        TestQuery("Design Size Rated Gross Total Cooling Capacity", "W", ratedGrossTotalCap),
-        TestQuery("Design Size Rated Condenser Air Flow Rate", "m3/s", ratedCondAirFlowRate),
-        TestQuery("Design Size Nominal Evaporative Condenser Pump Power", "W", nominalEvaporativePumpPower),
+        TestQuery("Autosized Rated Evaporator Air Flow Rate", "m3/s", ratedEvapAirFlowRate),
+        TestQuery("Autosized Rated Gross Total Cooling Capacity", "W", ratedGrossTotalCap),
+        TestQuery("Autosized Rated Condenser Air Flow Rate", "m3/s", ratedCondAirFlowRate),
+        TestQuery("Autosized Nominal Evaporative Condenser Pump Power", "W", nominalEvaporativePumpPower),
     });
 
     for (auto &testQuery : testQueries) {

@@ -1149,10 +1149,10 @@ namespace PlantChillers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, "Chiller:Electric", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:Electric", this->Name, "Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, "Chiller:Electric", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:Electric", this->Name, "Initial Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
@@ -1160,7 +1160,7 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:Electric",
                                                          this->Name,
-                                                         "Design Size Nominal Capacity [W]",
+                                                         "Autosized Nominal Capacity [W]",
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
@@ -1168,7 +1168,7 @@ namespace PlantChillers {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
-                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
+                                    ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1201,11 +1201,11 @@ namespace PlantChillers {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:Electric", this->Name, "Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                            state, "Chiller:Electric", this->Name, "Autosized Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:Electric", this->Name, "Initial Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                            state, "Chiller:Electric", this->Name, "Initial Autosized Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                 } else {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
@@ -1213,18 +1213,18 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:Electric",
                                                          this->Name,
-                                                         "Design Size Chilled Water Flow Rate [m3/s]",
+                                                         "Autosized Design Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate,
-                                                         "User-Specified Chilled Water Flow Rate [m3/s]",
+                                                         "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          this->EvapVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state,
-                                                      format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
+                                                      format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                        state, format("differs from Autosized Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1242,7 +1242,7 @@ namespace PlantChillers {
             }
             if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
                 BaseSizer::reportSizerOutput(
-                    state, "Chiller:Electric", this->Name, "User-Specified Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
+                    state, "Chiller:Electric", this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
 
@@ -1270,11 +1270,11 @@ namespace PlantChillers {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:Electric", this->Name, "Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                            state, "Chiller:Electric", this->Name, "Autosized Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:Electric", this->Name, "Initial Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                            state, "Chiller:Electric", this->Name, "Initial Autosized Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                 } else {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
@@ -1282,18 +1282,18 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:Electric",
                                                          this->Name,
-                                                         "Design Size Condenser Water Flow Rate [m3/s]",
+                                                         "Autosized Design Condenser Water Flow Rate [m3/s]",
                                                          tmpCondVolFlowRate,
-                                                         "User-Specified Condenser Water Flow Rate [m3/s]",
+                                                         "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                          this->CondVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state,
-                                                      format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
+                                                      format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                        state, format("differs from Autosized Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1312,7 +1312,7 @@ namespace PlantChillers {
             }
             if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
                 BaseSizer::reportSizerOutput(
-                    state, "Chiller:Electric", this->Name, "User-Specified Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
+                    state, "Chiller:Electric", this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
             }
         }
 
@@ -1332,11 +1332,11 @@ namespace PlantChillers {
                     this->DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:Electric", this->Name, "Design Size Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
+                            state, "Chiller:Electric", this->Name, "Autosized Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:Electric", this->Name, "Initial Design Size Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
+                            state, "Chiller:Electric", this->Name, "Initial Autosized Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
                     }
                 } else {
                     if (this->DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0) {
@@ -1344,9 +1344,9 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:Electric",
                                                          this->Name,
-                                                         "Design Size Heat Recovery Fluid Flow Rate [m3/s]",
+                                                         "Autosized Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                          tmpHeatRecVolFlowRate,
-                                                         "User-Specified Heat Recovery Fluid Flow Rate [m3/s]",
+                                                         "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                          this->DesignHeatRecVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - this->DesignHeatRecVolFlowRate) / this->DesignHeatRecVolFlowRate) >
@@ -1354,10 +1354,10 @@ namespace PlantChillers {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state,
-                                        format("User-Specified Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", this->DesignHeatRecVolFlowRate));
+                                        format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", this->DesignHeatRecVolFlowRate));
                                     ShowContinueError(
                                         state,
-                                        format("differs from Design Size Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
+                                        format("differs from Autosized Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3157,11 +3157,11 @@ namespace PlantChillers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:EngineDriven", this->Name, "Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:EngineDriven", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                            state, "Chiller:EngineDriven", this->Name, "Initial Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
@@ -3169,7 +3169,7 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:EngineDriven",
                                                          this->Name,
-                                                         "Design Size Nominal Capacity [W]",
+                                                         "Autosized Nominal Capacity [W]",
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
@@ -3177,7 +3177,7 @@ namespace PlantChillers {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
-                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
+                                    ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3221,18 +3221,18 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:EngineDriven",
                                                          this->Name,
-                                                         "Design Size Chilled Water Flow Rate [m3/s]",
+                                                         "Autosized Design Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate,
-                                                         "User-Specified Chilled Water Flow Rate [m3/s]",
+                                                         "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          this->EvapVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state,
-                                                      format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
+                                                      format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                        state, format("differs from Autosized Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3250,7 +3250,7 @@ namespace PlantChillers {
             }
             if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
                 BaseSizer::reportSizerOutput(
-                    state, "Chiller:EngineDriven", this->Name, "User-Specified Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
+                    state, "Chiller:EngineDriven", this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
 
@@ -3278,11 +3278,11 @@ namespace PlantChillers {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:EngineDriven", this->Name, "Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                            state, "Chiller:EngineDriven", this->Name, "Autosized Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:EngineDriven", this->Name, "Initial Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                            state, "Chiller:EngineDriven", this->Name, "Initial Autosized Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                 } else {
                     if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
@@ -3290,18 +3290,18 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:EngineDriven",
                                                          this->Name,
-                                                         "Design Size Condenser Water Flow Rate [m3/s]",
+                                                         "Autosized Design Condenser Water Flow Rate [m3/s]",
                                                          tmpCondVolFlowRate,
-                                                         "User-Specified Condenser Water Flow Rate [m3/s]",
+                                                         "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                          this->CondVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state,
-                                                      format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
+                                                      format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                        state, format("differs from Autosized Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3320,7 +3320,7 @@ namespace PlantChillers {
             }
             if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
                 BaseSizer::reportSizerOutput(
-                    state, "Chiller:EngineDriven", this->Name, "User-Specified Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
+                    state, "Chiller:EngineDriven", this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
             }
         }
 
@@ -3337,13 +3337,13 @@ namespace PlantChillers {
                     this->DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:EngineDriven", this->Name, "Design Size Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
+                            state, "Chiller:EngineDriven", this->Name, "Autosized Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:EngineDriven",
                                                      this->Name,
-                                                     "Initial Design Size Heat Recovery Fluid Flow Rate [m3/s]",
+                                                     "Initial Autosized Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                      tmpHeatRecVolFlowRate);
                     }
                 } else {
@@ -3354,15 +3354,15 @@ namespace PlantChillers {
                                 BaseSizer::reportSizerOutput(state,
                                                              "Chiller:EngineDriven",
                                                              this->Name,
-                                                             "Design Size Heat Recovery Fluid Flow Rate [m3/s]",
+                                                             "Autosized Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              tmpHeatRecVolFlowRate,
-                                                             "User-Specified Heat Recovery Fluid Flow Rate [m3/s]",
+                                                             "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             } else {
                                 BaseSizer::reportSizerOutput(state,
                                                              "Chiller:EngineDriven",
                                                              this->Name,
-                                                             "User-Specified Heat Recovery Fluid Flow Rate [m3/s]",
+                                                             "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             }
                             if (state.dataGlobal->DisplayExtraWarnings) {
@@ -3370,10 +3370,10 @@ namespace PlantChillers {
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeEngineDrivenChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
-                                        state, format("User-Specified Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
+                                        state, format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
                                     ShowContinueError(
                                         state,
-                                        format("differs from Design Size Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
+                                        format("differs from Autosized Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -5124,11 +5124,11 @@ namespace PlantChillers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:CombustionTurbine", this->Name, "Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:CombustionTurbine", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                            state, "Chiller:CombustionTurbine", this->Name, "Initial Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                 } else {
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
@@ -5136,7 +5136,7 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:CombustionTurbine",
                                                          this->Name,
-                                                         "Design Size Nominal Capacity [W]",
+                                                         "Autosized Nominal Capacity [W]",
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
@@ -5144,7 +5144,7 @@ namespace PlantChillers {
                                 if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
-                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
+                                    ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -5162,7 +5162,7 @@ namespace PlantChillers {
             }
             if (!this->NomCapWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->NomCap > 0.0)) {
                 BaseSizer::reportSizerOutput(
-                    state, "Chiller:CombustionTurbine", this->Name, "User-Specified Size Nominal Capacity [W]", this->NomCap);
+                    state, "Chiller:CombustionTurbine", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
 
@@ -5177,11 +5177,11 @@ namespace PlantChillers {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:CombustionTurbine", this->Name, "Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                            state, "Chiller:CombustionTurbine", this->Name, "Autosized Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:CombustionTurbine", this->Name, "Initial Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                            state, "Chiller:CombustionTurbine", this->Name, "Initial Autosized Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                 } else {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
@@ -5189,18 +5189,18 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:CombustionTurbine",
                                                          this->Name,
-                                                         "Design Size Chilled Water Flow Rate [m3/s]",
+                                                         "Autosized Design Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate,
-                                                         "User-Specified Chilled Water Flow Rate [m3/s]",
+                                                         "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          this->EvapVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state,
-                                                      format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
+                                                      format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                        state, format("differs from Autosized Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -5218,7 +5218,7 @@ namespace PlantChillers {
             }
             if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
                 BaseSizer::reportSizerOutput(
-                    state, "Chiller:CombustionTurbine", this->Name, "User-Specified Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
+                    state, "Chiller:CombustionTurbine", this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
 
@@ -5245,13 +5245,13 @@ namespace PlantChillers {
                     this->CondVolFlowRate = tmpCondVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:CombustionTurbine", this->Name, "Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                            state, "Chiller:CombustionTurbine", this->Name, "Autosized Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:CombustionTurbine",
                                                      this->Name,
-                                                     "Initial Design Size Condenser Water Flow Rate [m3/s]",
+                                                     "Initial Autosized Design Condenser Water Flow Rate [m3/s]",
                                                      tmpCondVolFlowRate);
                     }
                 } else {
@@ -5260,18 +5260,18 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:CombustionTurbine",
                                                          this->Name,
-                                                         "Design Size Condenser Water Flow Rate [m3/s]",
+                                                         "Autosized Design Condenser Water Flow Rate [m3/s]",
                                                          tmpCondVolFlowRate,
-                                                         "User-Specified Condenser Water Flow Rate [m3/s]",
+                                                         "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                          this->CondVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state,
-                                                      format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
+                                                      format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                        state, format("differs from Autosized Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -5290,7 +5290,7 @@ namespace PlantChillers {
             }
             if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
                 BaseSizer::reportSizerOutput(
-                    state, "Chiller:CombustionTurbine", this->Name, "User-Specified Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
+                    state, "Chiller:CombustionTurbine", this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
             }
         }
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
@@ -5303,11 +5303,11 @@ namespace PlantChillers {
                 this->GTEngineCapacity = GTEngineCapacityDes;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "Chiller:CombustionTurbine", this->Name, "Design Size Gas Turbine Engine Capacity [W]", GTEngineCapacityDes);
+                        state, "Chiller:CombustionTurbine", this->Name, "Autosized Gas Turbine Engine Capacity [W]", GTEngineCapacityDes);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "Chiller:CombustionTurbine", this->Name, "Initial Design Size Gas Turbine Engine Capacity [W]", GTEngineCapacityDes);
+                        state, "Chiller:CombustionTurbine", this->Name, "Initial Autosized Gas Turbine Engine Capacity [W]", GTEngineCapacityDes);
                 }
             } else {
                 if (this->GTEngineCapacity > 0.0 && GTEngineCapacityDes > 0.0) {
@@ -5315,7 +5315,7 @@ namespace PlantChillers {
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:CombustionTurbine",
                                                      this->Name,
-                                                     "Design Size Gas Turbine Engine Capacity [W]",
+                                                     "Autosized Gas Turbine Engine Capacity [W]",
                                                      GTEngineCapacityDes,
                                                      "User-Specified Gas Turbine Engine Capacity [W]",
                                                      this->GTEngineCapacity);
@@ -5326,7 +5326,7 @@ namespace PlantChillers {
                             ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError(state, format("User-Specified Gas Turbine Engine Capacity of {:.2R} [W]", this->GTEngineCapacity));
                             ShowContinueError(state,
-                                              format("differs from Design Size Gas Turbine Engine Capacity of {:.2R} [W]", GTEngineCapacityDes));
+                                              format("differs from Autosized Gas Turbine Engine Capacity of {:.2R} [W]", GTEngineCapacityDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -5345,14 +5345,14 @@ namespace PlantChillers {
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:CombustionTurbine",
                                                      this->Name,
-                                                     "Design Size Heat Recovery Fluid Flow Rate [m3/s]",
+                                                     "Autosized Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                      tmpHeatRecVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:CombustionTurbine",
                                                      this->Name,
-                                                     "Initial Design Size Heat Recovery Fluid Flow Rate [m3/s]",
+                                                     "Initial Autosized Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                      tmpHeatRecVolFlowRate);
                     }
                 } else {
@@ -5363,15 +5363,15 @@ namespace PlantChillers {
                                 BaseSizer::reportSizerOutput(state,
                                                              "Chiller:CombustionTurbine",
                                                              this->Name,
-                                                             "Design Size Heat Recovery Fluid Flow Rate [m3/s]",
+                                                             "Autosized Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              tmpHeatRecVolFlowRate,
-                                                             "User-Specified Heat Recovery Fluid Flow Rate [m3/s]",
+                                                             "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             } else {
                                 BaseSizer::reportSizerOutput(state,
                                                              "Chiller:CombustionTurbine",
                                                              this->Name,
-                                                             "User-Specified Heat Recovery Fluid Flow Rate [m3/s]",
+                                                             "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                              DesignHeatRecVolFlowRateUser);
                             }
                             if (state.dataGlobal->DisplayExtraWarnings) {
@@ -5379,10 +5379,10 @@ namespace PlantChillers {
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGasTurbineChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
-                                        state, format("User-Specified Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
+                                        state, format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
                                     ShowContinueError(
                                         state,
-                                        format("differs from Design Size Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
+                                        format("differs from Autosized Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -6862,10 +6862,10 @@ namespace PlantChillers {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP", this->Name, "Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Chiller:ConstantCOP", this->Name, "Initial Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                 } else { // Hard-size with sizing data
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
@@ -6874,7 +6874,7 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:ConstantCOP",
                                                          this->Name,
-                                                         "Design Size Nominal Capacity [W]",
+                                                         "Autosized Nominal Capacity [W]",
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
@@ -6882,7 +6882,7 @@ namespace PlantChillers {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
-                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
+                                    ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -6914,11 +6914,11 @@ namespace PlantChillers {
                     this->EvapVolFlowRate = tmpEvapVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:ConstantCOP", this->Name, "Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                            state, "Chiller:ConstantCOP", this->Name, "Autosized Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "Chiller:ConstantCOP", this->Name, "Initial Design Size Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
+                            state, "Chiller:ConstantCOP", this->Name, "Initial Autosized Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate);
                     }
                 } else {
                     if (this->EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0) {
@@ -6927,17 +6927,17 @@ namespace PlantChillers {
                             BaseSizer::reportSizerOutput(state,
                                                          "Chiller:ConstantCOP",
                                                          this->Name,
-                                                         "Design Size Chilled Water Flow Rate [m3/s]",
+                                                         "Autosized Design Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate,
-                                                         "User-Specified Chilled Water Flow Rate [m3/s]",
+                                                         "User-Specified Design Chilled Water Flow Rate [m3/s]",
                                                          EvapVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
-                                    ShowContinueError(state, format("User-Specified Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
+                                    ShowContinueError(state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                        state, format("differs from Autosized Design Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -6955,7 +6955,7 @@ namespace PlantChillers {
             }
             if (!this->EvapVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->EvapVolFlowRate > 0.0)) {
                 BaseSizer::reportSizerOutput(
-                    state, "Chiller:ConstantCOP", this->Name, "User-Specified Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
+                    state, "Chiller:ConstantCOP", this->Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", this->EvapVolFlowRate);
             }
         }
 
@@ -6983,11 +6983,11 @@ namespace PlantChillers {
                         this->CondVolFlowRate = tmpCondVolFlowRate;
                         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(
-                                state, "Chiller:ConstantCOP", this->Name, "Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                                state, "Chiller:ConstantCOP", this->Name, "Autosized Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(
-                                state, "Chiller:ConstantCOP", this->Name, "Initial Design Size Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
+                                state, "Chiller:ConstantCOP", this->Name, "Initial Autosized Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate);
                         }
                     } else {
                         if (this->CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0) {
@@ -6996,18 +6996,18 @@ namespace PlantChillers {
                                 BaseSizer::reportSizerOutput(state,
                                                              "Chiller:ConstantCOP",
                                                              this->Name,
-                                                             "Design Size Condenser Water Flow Rate [m3/s]",
+                                                             "Autosized Design Condenser Water Flow Rate [m3/s]",
                                                              tmpCondVolFlowRate,
-                                                             "User-Specified Condenser Water Flow Rate [m3/s]",
+                                                             "User-Specified Design Condenser Water Flow Rate [m3/s]",
                                                              CondVolFlowRateUser);
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
                                         state.dataSize->AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
                                         ShowContinueError(state,
-                                                          format("User-Specified Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
+                                                          format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                         ShowContinueError(
-                                            state, format("differs from Design Size Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                            state, format("differs from Autosized Design Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                         ShowContinueError(state,
                                                           "Verify that the value entered is intended and is consistent with other components.");
@@ -7027,7 +7027,7 @@ namespace PlantChillers {
                 }
                 if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
                     BaseSizer::reportSizerOutput(
-                        state, "Chiller:ConstantCOP", this->Name, "User-Specified Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
+                        state, "Chiller:ConstantCOP", this->Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
                 }
             }
         }

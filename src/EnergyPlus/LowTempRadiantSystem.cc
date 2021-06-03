@@ -2996,7 +2996,7 @@ namespace LowTempRadiantSystem {
                         BaseSizer::reportSizerOutput(state,
                                                      CompType,
                                                      state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                                     "Design Size Maximum Hot Water Flow [m3/s]",
+                                                     "Autosized Maximum Hot Water Flow [m3/s]",
                                                      WaterVolFlowMaxHeatDes);
                     } else { // hard-size with sizing data
                         if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxHeat > 0.0 && WaterVolFlowMaxHeatDes > 0.0) {
@@ -3004,7 +3004,7 @@ namespace LowTempRadiantSystem {
                             BaseSizer::reportSizerOutput(state,
                                                          CompType,
                                                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                                         "Design Size Maximum Hot Water Flow [m3/s]",
+                                                         "Autosized Maximum Hot Water Flow [m3/s]",
                                                          WaterVolFlowMaxHeatDes,
                                                          "User-Specified Maximum Hot Water Flow [m3/s]",
                                                          WaterVolFlowMaxHeatUser);
@@ -3018,7 +3018,7 @@ namespace LowTempRadiantSystem {
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Hot Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxHeatUser));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Maximum Hot Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxHeatDes));
+                                        state, format("differs from Autosized Maximum Hot Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxHeatDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3177,7 +3177,7 @@ namespace LowTempRadiantSystem {
                         BaseSizer::reportSizerOutput(state,
                                                      CompType,
                                                      state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                                     "Design Size Maximum Cold Water Flow [m3/s]",
+                                                     "Autosized Maximum Cold Water Flow [m3/s]",
                                                      WaterVolFlowMaxCoolDes);
                     } else { // hard-size with sizing data
                         if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxCool > 0.0 && WaterVolFlowMaxCoolDes > 0.0) {
@@ -3185,7 +3185,7 @@ namespace LowTempRadiantSystem {
                             BaseSizer::reportSizerOutput(state,
                                                          CompType,
                                                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                                         "Design Size Maximum Cold Water Flow [m3/s]",
+                                                         "Autosized Maximum Cold Water Flow [m3/s]",
                                                          WaterVolFlowMaxCoolDes,
                                                          "User-Specified Maximum Cold Water Flow [m3/s]",
                                                          WaterVolFlowMaxCoolUser);
@@ -3199,7 +3199,7 @@ namespace LowTempRadiantSystem {
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolUser));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolDes));
+                                        state, format("differs from Autosized Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3230,7 +3230,7 @@ namespace LowTempRadiantSystem {
                         BaseSizer::reportSizerOutput(state,
                                                      CompType,
                                                      state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                                     "Design Size Hydronic Tubing Length [m]",
+                                                     "Autosized Hydronic Tubing Length [m]",
                                                      TubeLengthDes);
                     } else { // hard-size with sizing data
                         if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).TubeLength > 0.0 && TubeLengthDes > 0.0) {
@@ -3238,7 +3238,7 @@ namespace LowTempRadiantSystem {
                             BaseSizer::reportSizerOutput(state,
                                                          CompType,
                                                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name,
-                                                         "Design Size Hydronic Tubing Length [m]",
+                                                         "Autosized Hydronic Tubing Length [m]",
                                                          TubeLengthDes,
                                                          "User-Specified Hydronic Tubing Length [m]",
                                                          TubeLengthUser);
@@ -3249,7 +3249,7 @@ namespace LowTempRadiantSystem {
                                                 "ZoneHVAC:LowTemperatureRadiant:VariableFlow = \"" +
                                                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name + "\".");
                                     ShowContinueError(state, format("User-Specified Hydronic Tubing Length of {:.5R} [m]", TubeLengthUser));
-                                    ShowContinueError(state, format("differs from Design Size Hydronic Tubing Length of {:.5R} [m]", TubeLengthDes));
+                                    ShowContinueError(state, format("differs from Autosized Hydronic Tubing Length of {:.5R} [m]", TubeLengthDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3402,7 +3402,7 @@ namespace LowTempRadiantSystem {
                         BaseSizer::reportSizerOutput(state,
                                                      CompType,
                                                      state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
-                                                     "Design Size Maximum Water Flow [m3/s]",
+                                                     "Autosized Maximum Water Flow [m3/s]",
                                                      WaterVolFlowMaxDes);
                     } else { // hard-size with sizing data
                         if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).WaterVolFlowMax > 0.0 && WaterVolFlowMaxDes > 0.0) {
@@ -3410,7 +3410,7 @@ namespace LowTempRadiantSystem {
                             BaseSizer::reportSizerOutput(state,
                                                          CompType,
                                                          state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
-                                                         "Design Size Maximum Water Flow [m3/s]",
+                                                         "Autosized Maximum Water Flow [m3/s]",
                                                          WaterVolFlowMaxDes,
                                                          "User-Specified Maximum Water Flow [m3/s]",
                                                          WaterVolFlowMaxUser);
@@ -3423,7 +3423,7 @@ namespace LowTempRadiantSystem {
                                                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name + "\".");
                                     ShowContinueError(state, format("User-Specified Maximum Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxUser));
                                     ShowContinueError(state,
-                                                      format("differs from Design Size Maximum Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxDes));
+                                                      format("differs from Autosized Maximum Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3455,7 +3455,7 @@ namespace LowTempRadiantSystem {
                         BaseSizer::reportSizerOutput(state,
                                                      "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
                                                      state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
-                                                     "Design Size Hydronic Tubing Length [m]",
+                                                     "Autosized Hydronic Tubing Length [m]",
                                                      TubeLengthDes);
                     } else { // hard-size with sizing data
                         if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).TubeLength > 0.0 && TubeLengthDes > 0.0) {
@@ -3463,7 +3463,7 @@ namespace LowTempRadiantSystem {
                             BaseSizer::reportSizerOutput(state,
                                                          "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
                                                          state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
-                                                         "Design Size Hydronic Tubing Length [m]",
+                                                         "Autosized Hydronic Tubing Length [m]",
                                                          TubeLengthDes,
                                                          "User-Specified Hydronic Tubing Length [m]",
                                                          TubeLengthUser);
@@ -3474,7 +3474,7 @@ namespace LowTempRadiantSystem {
                                                 "ZoneHVAC:LowTemperatureRadiant:ConstantFlow = \" " +
                                                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name + "\".");
                                     ShowContinueError(state, format("User-Specified Hydronic Tubing Length of {:.5R} [m]", TubeLengthUser));
-                                    ShowContinueError(state, format("differs from Design Size Hydronic Tubing Length of {:.5R} [m]", TubeLengthDes));
+                                    ShowContinueError(state, format("differs from Autosized Hydronic Tubing Length of {:.5R} [m]", TubeLengthDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

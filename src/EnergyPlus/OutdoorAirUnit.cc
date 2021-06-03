@@ -1567,7 +1567,7 @@ namespace OutdoorAirUnit {
                     BaseSizer::reportSizerOutput(state,
                                                  CurrentModuleObjects(CurrentObject::OAUnit),
                                                  OutAirUnit(OAUnitNum).Name,
-                                                 "Design Size Outdoor Air Flow Rate [m3/s]",
+                                                 "Autosized Outdoor Air Flow Rate [m3/s]",
                                                  OutAirVolFlowDes);
                 } else {
                     if (OutAirUnit(OAUnitNum).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0) {
@@ -1582,13 +1582,13 @@ namespace OutdoorAirUnit {
                                 BaseSizer::reportSizerOutput(state,
                                                              CurrentModuleObjects(CurrentObject::OAUnit),
                                                              OutAirUnit(OAUnitNum).Name,
-                                                             "Design Size Outdoor Air Flow Rate [m3/s]",
+                                                             "Autosized Outdoor Air Flow Rate [m3/s]",
                                                              OutAirVolFlowDes);
                                 ShowMessage(state,
                                             "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " +
                                                 OutAirUnit(OAUnitNum).Name);
                                 ShowContinueError(state, format("User-Specified Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowUser));
-                                ShowContinueError(state, format("differs from Design Size Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
+                                ShowContinueError(state, format("differs from Autosized Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1619,7 +1619,7 @@ namespace OutdoorAirUnit {
                     BaseSizer::reportSizerOutput(state,
                                                  CurrentModuleObjects(CurrentObject::OAUnit),
                                                  OutAirUnit(OAUnitNum).Name,
-                                                 "Design Size Exhaust Air Flow Rate [m3/s]",
+                                                 "Autosized Exhaust Air Flow Rate [m3/s]",
                                                  ExtAirVolFlowDes);
                 } else {
                     if (OutAirUnit(OAUnitNum).ExtAirVolFlow > 0.0 && ExtAirVolFlowDes > 0.0) {
@@ -1634,13 +1634,13 @@ namespace OutdoorAirUnit {
                                 BaseSizer::reportSizerOutput(state,
                                                              CurrentModuleObjects(CurrentObject::OAUnit),
                                                              OutAirUnit(OAUnitNum).Name,
-                                                             "Design Size Exhaust Air Flow Rate [m3/s]",
+                                                             "Autosized Exhaust Air Flow Rate [m3/s]",
                                                              ExtAirVolFlowDes);
                                 ShowMessage(state,
                                             "SizeOutdoorAirUnit: Potential issue with equipment sizing for ZoneHVAC:OutdoorAirUnit " +
                                                 OutAirUnit(OAUnitNum).Name);
                                 ShowContinueError(state, format("User-Specified Exhaust Air Flow Rate of {:.5R} [m3/s]", ExtAirVolFlowUser));
-                                ShowContinueError(state, format("differs from Design Size Exhaust Air Flow Rate of {:.5R} [m3/s]", ExtAirVolFlowDes));
+                                ShowContinueError(state, format("differs from Autosized Exhaust Air Flow Rate of {:.5R} [m3/s]", ExtAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

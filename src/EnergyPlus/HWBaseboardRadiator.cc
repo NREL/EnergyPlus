@@ -1228,7 +1228,7 @@ namespace HWBaseboardRadiator {
                         BaseSizer::reportSizerOutput(state,
                                                      cCMO_BBRadiator_Water,
                                                      HWBaseboard(BaseboardNum).EquipID,
-                                                     "Design Size Maximum Water Flow Rate [m3/s]",
+                                                     "Autosized Maximum Water Flow Rate [m3/s]",
                                                      WaterVolFlowRateMaxDes);
                     } else { // Hard-sized with sizing data
                         if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > 0.0 && WaterVolFlowRateMaxDes > 0.0) {
@@ -1236,7 +1236,7 @@ namespace HWBaseboardRadiator {
                             BaseSizer::reportSizerOutput(state,
                                                          cCMO_BBRadiator_Water,
                                                          HWBaseboard(BaseboardNum).EquipID,
-                                                         "Design Size Maximum Water Flow Rate [m3/s]",
+                                                         "Autosized Maximum Water Flow Rate [m3/s]",
                                                          WaterVolFlowRateMaxDes,
                                                          "User-Specified Maximum Water Flow Rate [m3/s]",
                                                          WaterVolFlowRateMaxUser);
@@ -1250,7 +1250,7 @@ namespace HWBaseboardRadiator {
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxUser));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxDes));
+                                        state, format("differs from Autosized Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

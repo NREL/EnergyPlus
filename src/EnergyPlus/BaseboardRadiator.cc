@@ -827,7 +827,7 @@ namespace BaseboardRadiator {
                         BaseSizer::reportSizerOutput(state,
                                                      cCMO_BBRadiator_Water,
                                                      baseboard->Baseboard(BaseboardNum).EquipID,
-                                                     "Design Size Maximum Water Flow Rate [m3/s]",
+                                                     "Autosized Maximum Water Flow Rate [m3/s]",
                                                      WaterVolFlowRateMaxDes);
                     } else { // hard-sized with sizing data
                         if (baseboard->Baseboard(BaseboardNum).WaterVolFlowRateMax > 0.0 && WaterVolFlowRateMaxDes > 0.0) {
@@ -835,7 +835,7 @@ namespace BaseboardRadiator {
                             BaseSizer::reportSizerOutput(state,
                                                          cCMO_BBRadiator_Water,
                                                          baseboard->Baseboard(BaseboardNum).EquipID,
-                                                         "Design Size Maximum Water Flow Rate [m3/s]",
+                                                         "Autosized Maximum Water Flow Rate [m3/s]",
                                                          WaterVolFlowRateMaxDes,
                                                          "User-Specified Maximum Water Flow Rate [m3/s]",
                                                          WaterVolFlowRateMaxUser);
@@ -849,7 +849,7 @@ namespace BaseboardRadiator {
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxUser));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxDes));
+                                        state, format("differs from Autosized Maximum Water Flow Rate of {:.5R} [m3/s]", WaterVolFlowRateMaxDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1021,7 +1021,7 @@ namespace BaseboardRadiator {
                         BaseSizer::reportSizerOutput(state,
                                                      cCMO_BBRadiator_Water,
                                                      baseboard->Baseboard(BaseboardNum).EquipID,
-                                                     "Design Size U-Factor Times Area Value [W/K]",
+                                                     "Autosized U-Factor Times Area Value [W/K]",
                                                      UADes);
                     } else {                                            // Hard-sized with sizing data
                         baseboard->Baseboard(BaseboardNum).UA = UAUser; // need to put this back as HWBaseboardUAResidual will have reset it, CR9377
@@ -1029,18 +1029,18 @@ namespace BaseboardRadiator {
                             BaseSizer::reportSizerOutput(state,
                                                          cCMO_BBRadiator_Water,
                                                          baseboard->Baseboard(BaseboardNum).EquipID,
-                                                         "Design Size U-Factor Times Area Value [W/K]",
+                                                         "Autosized U-Factor Times Area Value [W/K]",
                                                          UADes,
                                                          "User-Specified U-Factor Times Area Value [W/K]",
                                                          UAUser);
-                            // Report difference between design size and hard-sized values
+                            // Report difference between Autosized and hard-sized values
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(UADes - UAUser) / UAUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state,
                                                 "SizeBaseboard: Potential issue with equipment sizing for ZoneHVAC:Baseboard:Convective:Water=\"" +
                                                     baseboard->Baseboard(BaseboardNum).EquipID + "\".");
                                     ShowContinueError(state, format("User-Specified U-Factor Times Area Value of {:.2R} [W/K]", UAUser));
-                                    ShowContinueError(state, format("differs from Design Size U-Factor Times Area Value of {:.2R} [W/K]", UADes));
+                                    ShowContinueError(state, format("differs from Autosized U-Factor Times Area Value of {:.2R} [W/K]", UADes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

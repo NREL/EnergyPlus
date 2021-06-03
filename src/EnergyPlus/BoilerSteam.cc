@@ -523,10 +523,10 @@ namespace BoilerSteam {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, "Boiler:Steam", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Boiler:Steam", this->Name, "Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, "Boiler:Steam", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput(state, "Boiler:Steam", this->Name, "Initial Autosized Nominal Capacity [W]", tmpNomCap);
                     }
                 } else { // Hard-sized with sizing data
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
@@ -535,7 +535,7 @@ namespace BoilerSteam {
                             BaseSizer::reportSizerOutput(state,
                                                          "Boiler:Steam",
                                                          this->Name,
-                                                         "Design Size Nominal Capacity [W]",
+                                                         "Autosized Nominal Capacity [W]",
                                                          tmpNomCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
@@ -543,7 +543,7 @@ namespace BoilerSteam {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePump: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
-                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
+                                    ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

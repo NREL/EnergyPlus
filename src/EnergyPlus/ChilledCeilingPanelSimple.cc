@@ -1121,14 +1121,14 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
 
             if (IsAutoSize) {
                 ThisCP.WaterVolFlowRateMax = WaterVolFlowMaxCoolDes;
-                BaseSizer::reportSizerOutput(state, CompType, ThisCP.EquipID, "Design Size Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
+                BaseSizer::reportSizerOutput(state, CompType, ThisCP.EquipID, "Autosized Maximum Cold Water Flow [m3/s]", WaterVolFlowMaxCoolDes);
             } else { // hard-size with sizing data
                 if (ThisCP.WaterVolFlowRateMax > 0.0 && WaterVolFlowMaxCoolDes > 0.0) {
                     WaterVolFlowMaxCoolUser = ThisCP.WaterVolFlowRateMax;
                     BaseSizer::reportSizerOutput(state,
                                                  CompType,
                                                  ThisCP.EquipID,
-                                                 "Design Size Maximum Cold Water Flow [m3/s]",
+                                                 "Autosized Maximum Cold Water Flow [m3/s]",
                                                  WaterVolFlowMaxCoolDes,
                                                  "User-Specified Maximum Cold Water Flow [m3/s]",
                                                  WaterVolFlowMaxCoolUser);
@@ -1141,7 +1141,7 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                                     ThisCP.EquipID + "\".");
                             ShowContinueError(state, format("User-Specified Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolDes));
+                                              format("differs from Autosized Maximum Cool Water Flow of {:.5R} [m3/s]", WaterVolFlowMaxCoolDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }

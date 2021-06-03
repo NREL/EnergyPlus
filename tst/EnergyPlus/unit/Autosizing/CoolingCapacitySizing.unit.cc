@@ -286,7 +286,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Cooling Design Capacity [W], 3500.00000\n"
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Autosized Cooling Design Capacity [W], 3500.00000\n"
                     " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Cooling Design Capacity [W], 5500.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
     eiooutput = "";
@@ -531,7 +531,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Cooling Design Capacity [W], 5634.11835\n"
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Autosized Cooling Design Capacity [W], 5634.11835\n"
                     " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Cooling Design Capacity [W], 4200.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }

@@ -903,14 +903,14 @@ namespace Humidifiers {
                 if (IsAutoSize) {
                     NomCapVol = NomCapVolDes;
                     BaseSizer::reportSizerOutput(
-                        state, format(HumidifierType[static_cast<int>(HumType)]), Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes);
+                        state, format(HumidifierType[static_cast<int>(HumType)]), Name, "Autosized Nominal Capacity Volume [m3/s]", NomCapVolDes);
                 } else {
                     if (NomCapVol > 0.0) {
                         NomCapVolUser = NomCapVol;
                         BaseSizer::reportSizerOutput(state,
                                                      format(HumidifierType[static_cast<int>(HumType)]),
                                                      Name,
-                                                     "Design Size Nominal Capacity Volume [m3/s]",
+                                                     "Autosized Nominal Capacity Volume [m3/s]",
                                                      NomCapVolDes,
                                                      "User-Specified Nominal Capacity Volume [m3/s]",
                                                      NomCapVolUser);
@@ -920,7 +920,7 @@ namespace Humidifiers {
                                             "SizeHumidifier: Potential issue with equipment sizing for " +
                                                 format(HumidifierType[static_cast<int>(HumType)]) + " = \"" + Name + "\".");
                                 ShowContinueError(state, format("User-Specified Nominal Capacity Volume of {:.2R} [Wm3/s]", NomCapVolUser));
-                                ShowContinueError(state, format("differs from Design Size Nominal Capacity Volume of {:.2R} [m3/s]", NomCapVolDes));
+                                ShowContinueError(state, format("differs from Autosized Nominal Capacity Volume of {:.2R} [m3/s]", NomCapVolDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -979,14 +979,14 @@ namespace Humidifiers {
             if (IsAutoSize) {
                 NomPower = NomPowerDes;
                 BaseSizer::reportSizerOutput(
-                    state, format(HumidifierType[static_cast<int>(HumType)]), Name, "Design Size Rated Power [W]", NomPowerDes);
+                    state, format(HumidifierType[static_cast<int>(HumType)]), Name, "Autosized Rated Power [W]", NomPowerDes);
             } else {
                 if (NomPower >= 0.0 && NomCap > 0.0) {
                     NomPowerUser = NomPower;
                     BaseSizer::reportSizerOutput(state,
                                                  format(HumidifierType[static_cast<int>(HumType)]),
                                                  Name,
-                                                 "Design Size Rated Power [W]",
+                                                 "Autosized Rated Power [W]",
                                                  NomPowerDes,
                                                  "User-Specified Rated Power [W]",
                                                  NomPowerUser);
@@ -996,7 +996,7 @@ namespace Humidifiers {
                                         "SizeHumidifier: Potential issue with equipment sizing for " +
                                             format(HumidifierType[static_cast<int>(HumType)]) + " =\"" + Name + "\".");
                             ShowContinueError(state, format("User-Specified Rated Power of {:.2R} [W]", NomPowerUser));
-                            ShowContinueError(state, format("differs from Design Size Rated Power of {:.2R} [W]", NomPowerDes));
+                            ShowContinueError(state, format("differs from Autosized Rated Power of {:.2R} [W]", NomPowerDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }

@@ -2952,14 +2952,14 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             }
             if (IsAutoSize) {
                 this->MaxAirVolFlowRate = MaxAirVolFlowRateDes;
-                BaseSizer::reportSizerOutput(state, this->SysType, this->SysName, "Design Size Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes);
+                BaseSizer::reportSizerOutput(state, this->SysType, this->SysName, "Autosized Maximum Air Flow Rate [m3/s]", MaxAirVolFlowRateDes);
             } else { // Hard-size with sizing data
                 if (this->MaxAirVolFlowRate > 0.0 && MaxAirVolFlowRateDes > 0.0) {
                     MaxAirVolFlowRateUser = this->MaxAirVolFlowRate;
                     BaseSizer::reportSizerOutput(state,
                                                  this->SysType,
                                                  this->SysName,
-                                                 "Design Size Maximum Air Flow Rate [m3/s]",
+                                                 "Autosized Maximum Air Flow Rate [m3/s]",
                                                  MaxAirVolFlowRateDes,
                                                  "User-Specified Maximum Air Flow Rate [m3/s]",
                                                  MaxAirVolFlowRateUser);
@@ -2970,7 +2970,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                         "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                             "\".");
                             ShowContinueError(state, format("User-Specified Maximum Air Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowRateUser));
-                            ShowContinueError(state, format("differs from Design Size Maximum Air Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowRateDes));
+                            ShowContinueError(state, format("differs from Autosized Maximum Air Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowRateDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -3001,7 +3001,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 this->MaxHeatAirVolFlowRate = MaxHeatAirVolFlowRateDes;
                 state.dataSingleDuct->UserInputMaxHeatAirVolFlowRateSS = 0.0;
                 BaseSizer::reportSizerOutput(
-                    state, this->SysType, this->SysName, "Design Size Maximum Heating Air Flow Rate [m3/s]", MaxHeatAirVolFlowRateDes);
+                    state, this->SysType, this->SysName, "Autosized Maximum Heating Air Flow Rate [m3/s]", MaxHeatAirVolFlowRateDes);
             } else { // Hard-size with sizing data
                 if (this->MaxHeatAirVolFlowRate > 0.0 && MaxHeatAirVolFlowRateDes > 0.0) {
                     MaxHeatAirVolFlowRateUser = this->MaxHeatAirVolFlowRate;
@@ -3009,7 +3009,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  this->SysType,
                                                  this->SysName,
-                                                 "Design Size Maximum Heating Air Flow Rate [m3/s]",
+                                                 "Autosized Maximum Heating Air Flow Rate [m3/s]",
                                                  MaxHeatAirVolFlowRateDes,
                                                  "User-Specified Maximum Heating Air Flow Rate [m3/s]",
                                                  MaxHeatAirVolFlowRateUser);
@@ -3022,7 +3022,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                             ShowContinueError(state,
                                               format("User-Specified Maximum Heating Air Flow Rate of {:.5R} [m3/s]", MaxHeatAirVolFlowRateUser));
                             ShowContinueError(
-                                state, format("differs from Design Size Maximum Heating Air Flow Rate of {:.5R} [m3/s]", MaxHeatAirVolFlowRateDes));
+                                state, format("differs from Autosized Maximum Heating Air Flow Rate of {:.5R} [m3/s]", MaxHeatAirVolFlowRateDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -3071,7 +3071,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(state,
                                          this->SysType,
                                          this->SysName,
-                                         "Design Size Constant Minimum Air Flow Fraction",
+                                         "Autosized Constant Minimum Air Flow Fraction",
                                          MinAirFlowFracDes * this->ZoneTurndownMinAirFrac);
             this->ZoneMinAirFracDes = MinAirFlowFracDes;
         } else {
@@ -3080,7 +3080,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(state,
                                          this->SysType,
                                          this->SysName,
-                                         "Design Size Constant Minimum Air Flow Fraction",
+                                         "Autosized Constant Minimum Air Flow Fraction",
                                          MinAirFlowFracDes * this->ZoneTurndownMinAirFrac,
                                          "User-Specified Constant Minimum Air Flow Fraction",
                                          MinAirFlowFracUser * this->ZoneTurndownMinAirFrac);
@@ -3090,7 +3090,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                 "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName + "\".");
                     ShowContinueError(state, format("User-Specified Minimum Cooling Air Flow Fraction of {:.5R} [m3/s]", MinAirFlowFracUser));
                     ShowContinueError(state,
-                                      format("differs from Design Size Minimum Cooling Air Flow Fraction of {:.5R} [m3/s]", MinAirFlowFracDes));
+                                      format("differs from Autosized Minimum Cooling Air Flow Fraction of {:.5R} [m3/s]", MinAirFlowFracDes));
                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                 }
@@ -3100,7 +3100,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         BaseSizer::reportSizerOutput(state,
                                      this->SysType,
                                      this->SysName,
-                                     "Design Size Minimum Air Flow Rate [m3/s]",
+                                     "Autosized Minimum Air Flow Rate [m3/s]",
                                      this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
     } else {
         if (IsAutoSize) {
@@ -3135,7 +3135,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         if (IsAutoSize) {
             // report out autosized result and save value in Sys array
             BaseSizer::reportSizerOutput(
-                state, this->SysType, this->SysName, "Design Size Fixed Minimum Air Flow Rate [m3/s]", FixedMinAirDes * this->ZoneTurndownMinAirFrac);
+                state, this->SysType, this->SysName, "Autosized Fixed Minimum Air Flow Rate [m3/s]", FixedMinAirDes * this->ZoneTurndownMinAirFrac);
             this->ZoneFixedMinAir = FixedMinAirDes;
         } else {
             // report out hard (user set) value and issue warning if appropriate
@@ -3143,7 +3143,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(state,
                                          this->SysType,
                                          this->SysName,
-                                         "Design Size Fixed Minimum Air Flow Rate [m3/s]",
+                                         "Autosized Fixed Minimum Air Flow Rate [m3/s]",
                                          FixedMinAirDes * this->ZoneTurndownMinAirFrac,
                                          "User-Specified Fixed Minimum Air Flow Rate [m3/s]",
                                          FixedMinAirUser * this->ZoneTurndownMinAirFrac);
@@ -3152,7 +3152,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     ShowMessage(state,
                                 "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName + "\".");
                     ShowContinueError(state, format("User-Specified Minimum Cooling Air Flow Rate of {:.5R} [m3/s]", FixedMinAirUser));
-                    ShowContinueError(state, format("differs from Design Size Minimum Cooling Air Flow Rate of {:.5R} [m3/s]", FixedMinAirDes));
+                    ShowContinueError(state, format("differs from Autosized Minimum Cooling Air Flow Rate of {:.5R} [m3/s]", FixedMinAirDes));
                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                 }
@@ -3163,7 +3163,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(state,
                                          this->SysType,
                                          this->SysName,
-                                         "Design Size Minimum Air Flow Fraction [m3/s]",
+                                         "Autosized Minimum Air Flow Fraction [m3/s]",
                                          this->ZoneFixedMinAir * this->ZoneTurndownMinAirFrac / this->MaxAirVolFlowRate);
         }
     } else {
@@ -3217,12 +3217,12 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             this->MaxAirVolFractionDuringReheat == DataGlobalConstants::AutoCalculate) {
             // if both inputs are autosize (the default) report both out and save in the Sys array.
             BaseSizer::reportSizerOutput(
-                state, this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes);
+                state, this->SysType, this->SysName, "Autosized Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes);
             if (this->ZoneFloorArea > 0.0) {
                 BaseSizer::reportSizerOutput(state,
                                              this->SysType,
                                              this->SysName,
-                                             "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+                                             "Autosized Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                              MaxAirVolFlowRateDuringReheatDes / this->ZoneFloorArea);
             }
             this->MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
@@ -3236,7 +3236,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(state,
                                          this->SysType,
                                          this->SysName,
-                                         "Design Size Maximum Flow Fraction during Reheat []",
+                                         "Autosized Maximum Flow Fraction during Reheat []",
                                          MaxAirVolFractionDuringReheatDes,
                                          "User-Specified Maximum Flow Fraction during Reheat []",
                                          MaxAirVolFractionDuringReheatUser);
@@ -3244,7 +3244,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 BaseSizer::reportSizerOutput(state,
                                              this->SysType,
                                              this->SysName,
-                                             "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+                                             "Autosized Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                              MaxAirVolFlowRateDuringReheatDes / this->ZoneFloorArea);
             }
             this->MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
@@ -3256,7 +3256,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("User-Specified Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatUser));
                     ShowContinueError(
-                        state, format("differs from Design Size Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatDes));
+                        state, format("differs from Autosized Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatDes));
                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                 }
@@ -3272,12 +3272,12 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             }
             MaxAirVolFlowRateDuringReheatUser = this->MaxAirVolFlowRateDuringReheat;
             BaseSizer::reportSizerOutput(
-                state, this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes);
+                state, this->SysType, this->SysName, "Autosized Maximum Flow Fraction during Reheat []", MaxAirVolFractionDuringReheatDes);
             if (this->ZoneFloorArea > 0.0) {
                 BaseSizer::reportSizerOutput(state,
                                              this->SysType,
                                              this->SysName,
-                                             "Design Size Maximum Flow per Zone Floor Area during Reheat [ m3/s-m2 ]",
+                                             "Autosized Maximum Flow per Zone Floor Area during Reheat [ m3/s-m2 ]",
                                              MaxAirVolFlowRateDuringReheatDes / this->ZoneFloorArea,
                                              "User-Specified Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                              MaxAirVolFlowRateDuringReheatUser / this->ZoneFloorArea);
@@ -3292,7 +3292,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                       format("User-Specified Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]",
                                              MaxAirVolFlowRateDuringReheatUser));
                     ShowContinueError(state,
-                                      format("differs from Design Size Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]",
+                                      format("differs from Autosized Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]",
                                              MaxAirVolFlowRateDuringReheatDes));
                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -3307,7 +3307,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(state,
                                          this->SysType,
                                          this->SysName,
-                                         "Design Size Maximum Flow Fraction during Reheat []",
+                                         "Autosized Maximum Flow Fraction during Reheat []",
                                          MaxAirVolFractionDuringReheatDes,
                                          "User-Specified Maximum Flow Fraction during Reheat []",
                                          MaxAirVolFractionDuringReheatUser);
@@ -3315,7 +3315,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 BaseSizer::reportSizerOutput(state,
                                              this->SysType,
                                              this->SysName,
-                                             "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+                                             "Autosized Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                              MaxAirVolFlowRateDuringReheatDes / this->ZoneFloorArea,
                                              "User-Specified Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                              MaxAirVolFlowRateDuringReheatUser / this->ZoneFloorArea);
@@ -3330,7 +3330,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                     ShowContinueError(state,
                                       format("User-Specified Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatUser));
                     ShowContinueError(
-                        state, format("differs from Design Size Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatDes));
+                        state, format("differs from Autosized Maximum Flow Fraction during Reheat of {:.5R} []", MaxAirVolFractionDuringReheatDes));
                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                 }
@@ -3344,7 +3344,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                       format("User-Specified Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]",
                                              MaxAirVolFlowRateDuringReheatUser));
                     ShowContinueError(state,
-                                      format("differs from Design Size Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]",
+                                      format("differs from Autosized Maximum Flow per Zone Floor Area during Reheat of {:.5R} [m3/s-m2]",
                                              MaxAirVolFlowRateDuringReheatDes));
                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -3360,11 +3360,11 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(state,
                                          this->SysType,
                                          this->SysName,
-                                         "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+                                         "Autosized Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                          (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes) / this->ZoneFloorArea);
         }
         BaseSizer::reportSizerOutput(
-            state, this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", this->ZoneMinAirFracDes);
+            state, this->SysType, this->SysName, "Autosized Maximum Flow Fraction during Reheat []", this->ZoneMinAirFracDes);
         // zero the ReverseActioWithLimits inputs
         this->MaxAirVolFlowRateDuringReheat = max(this->MaxAirVolFlowRateDuringReheat, 0.0);
         this->MaxAirVolFractionDuringReheat = max(this->MaxAirVolFractionDuringReheat, 0.0);
@@ -3374,10 +3374,10 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
             BaseSizer::reportSizerOutput(state,
                                          this->SysType,
                                          this->SysName,
-                                         "Design Size Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
+                                         "Autosized Maximum Flow per Zone Floor Area during Reheat [m3/s-m2]",
                                          this->MaxAirVolFlowRate / this->ZoneFloorArea);
         }
-        BaseSizer::reportSizerOutput(state, this->SysType, this->SysName, "Design Size Maximum Flow Fraction during Reheat []", 1.0);
+        BaseSizer::reportSizerOutput(state, this->SysType, this->SysName, "Autosized Maximum Flow Fraction during Reheat []", 1.0);
         // zero the ReverseActioWithLimits inputs
         this->MaxAirVolFlowRateDuringReheat = max(this->MaxAirVolFlowRateDuringReheat, 0.0);
         this->MaxAirVolFractionDuringReheat = max(this->MaxAirVolFractionDuringReheat, 0.0);
@@ -3527,21 +3527,21 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 if (IsAutoSize) {
                     this->MaxReheatWaterVolFlow = MaxReheatWaterVolFlowDes;
                     BaseSizer::reportSizerOutput(
-                        state, this->SysType, this->SysName, "Design Size Maximum Reheat Water Flow Rate [m3/s]", MaxReheatWaterVolFlowDes);
+                        state, this->SysType, this->SysName, "Autosized Maximum Reheat Water Flow Rate [m3/s]", MaxReheatWaterVolFlowDes);
                     BaseSizer::reportSizerOutput(state,
                                                  this->SysType,
                                                  this->SysName,
-                                                 "Design Size Reheat Coil Sizing Air Volume Flow Rate [m3/s]",
+                                                 "Autosized Reheat Coil Sizing Air Volume Flow Rate [m3/s]",
                                                  TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow);
                     BaseSizer::reportSizerOutput(state,
                                                  this->SysType,
                                                  this->SysName,
-                                                 "Design Size Reheat Coil Sizing Inlet Air Temperature [C]",
+                                                 "Autosized Reheat Coil Sizing Inlet Air Temperature [C]",
                                                  state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU);
                     BaseSizer::reportSizerOutput(state,
                                                  this->SysType,
                                                  this->SysName,
-                                                 "Design Size Reheat Coil Sizing Inlet Air Humidity Ratio [kgWater/kgDryAir]",
+                                                 "Autosized Reheat Coil Sizing Inlet Air Humidity Ratio [kgWater/kgDryAir]",
                                                  state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                 } else { // Hard-size with sizing data
                     if (this->MaxReheatWaterVolFlow > 0.0 && MaxReheatWaterVolFlowDes > 0.0) {
@@ -3549,7 +3549,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      this->SysType,
                                                      this->SysName,
-                                                     "Design Size Maximum Reheat Water Flow Rate [m3/s]",
+                                                     "Autosized Maximum Reheat Water Flow Rate [m3/s]",
                                                      MaxReheatWaterVolFlowDes,
                                                      "User-Specified Maximum Reheat Water Flow Rate [m3/s]",
                                                      MaxReheatWaterVolFlowUser);
@@ -3563,7 +3563,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                     state, format("User-Specified Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxReheatWaterVolFlowUser));
                                 ShowContinueError(
                                     state,
-                                    format("differs from Design Size Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxReheatWaterVolFlowDes));
+                                    format("differs from Autosized Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxReheatWaterVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -3643,14 +3643,14 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                 if (IsAutoSize) {
                     this->MaxReheatSteamVolFlow = MaxReheatSteamVolFlowDes;
                     BaseSizer::reportSizerOutput(
-                        state, this->SysType, this->SysName, "Design Size Maximum Reheat Steam Flow Rate [m3/s]", MaxReheatSteamVolFlowDes);
+                        state, this->SysType, this->SysName, "Autosized Maximum Reheat Steam Flow Rate [m3/s]", MaxReheatSteamVolFlowDes);
                 } else {
                     if (this->MaxReheatSteamVolFlow > 0.0 && MaxReheatSteamVolFlowDes > 0.0) {
                         MaxReheatSteamVolFlowUser = this->MaxReheatSteamVolFlow;
                         BaseSizer::reportSizerOutput(state,
                                                      this->SysType,
                                                      this->SysName,
-                                                     "Design Size Maximum Reheat Steam Flow Rate [m3/s]",
+                                                     "Autosized Maximum Reheat Steam Flow Rate [m3/s]",
                                                      MaxReheatSteamVolFlowDes,
                                                      "User-Specified Maximum Reheat Steam Flow Rate [m3/s]",
                                                      MaxReheatSteamVolFlowUser);
@@ -3664,7 +3664,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                     state, format("User-Specified Maximum Reheat Steam Flow Rate of {:.5R} [m3/s]", MaxReheatSteamVolFlowUser));
                                 ShowContinueError(
                                     state,
-                                    format("differs from Design Size Maximum Reheat Steam Flow Rate of {:.5R} [m3/s]", MaxReheatSteamVolFlowDes));
+                                    format("differs from Autosized Maximum Reheat Steam Flow Rate of {:.5R} [m3/s]", MaxReheatSteamVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

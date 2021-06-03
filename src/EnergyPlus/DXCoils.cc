@@ -7607,7 +7607,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                 "Design Size Secondary Coil Air Flow Rate [m3/s]",
+                                                 "Autosized Secondary Coil Air Flow Rate [m3/s]",
                                                  SecCoilAirFlowDes);
                 } else {
                     if (state.dataDXCoils->DXCoil(DXCoilNum).SecCoilAirFlow > 0.0 && SecCoilAirFlowDes > 0.0 && !HardSizeNoDesRun) {
@@ -7615,7 +7615,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                     "Design Size Secondary Coil Air Flow Rate [m3/s]",
+                                                     "Autosized Secondary Coil Air Flow Rate [m3/s]",
                                                      SecCoilAirFlowDes,
                                                      "User-Specified Secondary Coil Air Flow Rate [m3/s]",
                                                      SecCoilAirFlowUser);
@@ -7626,7 +7626,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                                 state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + ' ' + state.dataDXCoils->DXCoil(DXCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowDes));
+                                    state, format("differs from Autosized Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -8078,7 +8078,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                              state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                             format("Design Size Speed {} Evaporative Condenser Air Flow Rate [m3/s]", Mode),
+                                             format("Autosized Speed {} Evaporative Condenser Air Flow Rate [m3/s]", Mode),
                                              MSEvapCondAirFlowDes);
             } else {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode) > 0.0 && MSEvapCondAirFlowDes > 0.0 && !HardSizeNoDesRun) {
@@ -8086,7 +8086,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                 format("Design Size Speed {} Evaporative Condenser Air Flow Rate [m3/s]", Mode),
+                                                 format("Autosized Speed {} Evaporative Condenser Air Flow Rate [m3/s]", Mode),
                                                  MSEvapCondAirFlowDes,
                                                  format("User-Specified Speed {} Evaporative Condenser Air Flow Rate [m3/s]", Mode),
                                                  MSEvapCondAirFlowUser);
@@ -8099,7 +8099,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                             ShowContinueError(state,
                                               format("User-Specified Evaporative Condenser Air Flow Rate of {:.5R} [m3/s]", MSEvapCondAirFlowUser));
                             ShowContinueError(
-                                state, format("differs from Design Size Evaporative Condenser Air Flow Rate of {:.5R} [m3/s]", MSEvapCondAirFlowDes));
+                                state, format("differs from Autosized Evaporative Condenser Air Flow Rate of {:.5R} [m3/s]", MSEvapCondAirFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -8141,13 +8141,13 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 // this is done to duplicate any existing calc method
                 MSEvapCondPumpElecNomPowerDes = state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(Mode) * 0.004266;
             }
-            // Design Size data is always available
+            // Autosized data is always available
             if (IsAutoSize) {
                 state.dataDXCoils->DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode) = MSEvapCondPumpElecNomPowerDes;
                 BaseSizer::reportSizerOutput(state,
                                              state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                              state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                             format("Design Size Speed {} Rated Evaporative Condenser Pump Power Consumption [W]", Mode),
+                                             format("Autosized Speed {} Rated Evaporative Condenser Pump Power Consumption [W]", Mode),
                                              MSEvapCondPumpElecNomPowerDes);
             } else {
                 if (state.dataDXCoils->DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode) > 0.0 && MSEvapCondPumpElecNomPowerDes > 0.0 &&
@@ -8156,7 +8156,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                 format("Design Size Speed {} Rated Evaporative Condenser Pump Power Consumption [W]", Mode),
+                                                 format("Autosized Speed {} Rated Evaporative Condenser Pump Power Consumption [W]", Mode),
                                                  MSEvapCondPumpElecNomPowerDes,
                                                  format("User-Specified Speed {} Rated Evaporative Condenser Pump Power Consumption [W]", Mode),
                                                  MSEvapCondPumpElecNomPowerUser);
@@ -8170,7 +8170,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                               format("User-Specified Evaporative Condenser Pump Rated Power Consumption of {:.2R} [W]",
                                                      MSEvapCondPumpElecNomPowerUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Evaporative Condenser Pump Rated Power Consumption of {:.2R} [W]",
+                                              format("differs from Autosized Evaporative Condenser Pump Rated Power Consumption of {:.2R} [W]",
                                                      MSEvapCondPumpElecNomPowerDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -8294,7 +8294,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                  state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                 format("Design Size Speed {} Secondary Coil Air Flow Rate [m3/s]", Mode),
+                                                 format("Autosized Speed {} Secondary Coil Air Flow Rate [m3/s]", Mode),
                                                  SecCoilAirFlowDes);
                 } else {
                     if (state.dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode) > 0.0 && SecCoilAirFlowDes > 0.0 && !HardSizeNoDesRun) {
@@ -8302,7 +8302,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                                      state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                                     format("Design Size Speed {} Secondary Coil Air Flow Rate [m3/s]", Mode),
+                                                     format("Autosized Speed {} Secondary Coil Air Flow Rate [m3/s]", Mode),
                                                      SecCoilAirFlowDes,
                                                      format("User-Specified Speed {} Secondary Coil Air Flow Rate [m3/s]", Mode),
                                                      SecCoilAirFlowUser);
@@ -8313,7 +8313,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                                 state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + ' ' + state.dataDXCoils->DXCoil(DXCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowDes));
+                                    state, format("differs from Autosized Secondary Coil Air Flow Rate of {:.5R} [m3/s]", SecCoilAirFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -8443,7 +8443,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             BaseSizer::reportSizerOutput(state,
                                          state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                          state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                         "Design Size Resistive Defrost Heater Capacity",
+                                         "Autosized Resistive Defrost Heater Capacity",
                                          DefrostCapacityDes);
         } else {
             if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0 && !HardSizeNoDesRun) {
@@ -8451,7 +8451,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType,
                                              state.dataDXCoils->DXCoil(DXCoilNum).Name,
-                                             "Design Size Resistive Defrost Heater Capacity",
+                                             "Autosized Resistive Defrost Heater Capacity",
                                              DefrostCapacityDes,
                                              "User-Specified Resistive Defrost Heater Capacity",
                                              DefrostCapacityUser);
@@ -8462,7 +8462,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                                state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType + ' ' + state.dataDXCoils->DXCoil(DXCoilNum).Name);
                         ShowContinueError(state, format("User-Specified Resistive Defrost Heater Capacity of {:.2R}[W]", DefrostCapacityUser));
                         ShowContinueError(state,
-                                          format("differs from Design Size Resistive Defrost Heater Capacity of {:.2R}[W]", DefrostCapacityDes));
+                                          format("differs from Autosized Resistive Defrost Heater Capacity of {:.2R}[W]", DefrostCapacityDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }

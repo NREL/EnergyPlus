@@ -12623,8 +12623,8 @@ void WriteComponentSizing(EnergyPlusData &state)
                                    columnHead,
                                    columnWidth,
                                    false,
-                                   "User-Specified values were used. Design Size values were used if no User-Specified values were provided. "
-                                   "Design Size "
+                                   "User-Specified values were used. Autosized values were used if no User-Specified values were provided. "
+                                   "Autosized "
                                    "values may be derived from alternate User-Specified values.");
                     }
                 } else {
@@ -12635,7 +12635,7 @@ void WriteComponentSizing(EnergyPlusData &state)
                                    columnHead,
                                    columnWidth,
                                    false,
-                                   "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+                                   "User-Specified values were used. Autosized values were used if no User-Specified values were provided.");
                     }
                 }
 
@@ -12659,7 +12659,7 @@ void WriteComponentSizing(EnergyPlusData &state)
                             "Component Sizing Summary",
                             "Entire Facility",
                             state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField,
-                            "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+                            "User-Specified values were used. Autosized values were used if no User-Specified values were provided.");
                     }
                 }
             }

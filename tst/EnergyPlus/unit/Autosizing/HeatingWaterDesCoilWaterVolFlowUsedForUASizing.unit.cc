@@ -96,7 +96,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
     sizer.autoSizedValue = 0.0;              // reset for next test
 
     std::string eiooutput = std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
-                                        " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Water Volume Flow "
+                                        " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Design Water Volume Flow "
                                         "Rate Used for UA Sizing, 5.00000E-004\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
@@ -204,7 +204,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Water Volume Flow "
+    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Autosized Design Water Volume Flow "
                             "Rate Used for UA Sizing, 4.00000E-004\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
@@ -260,9 +260,9 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
     EXPECT_FALSE(errorsFound);
 
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Water Volume Flow "
+    eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Autosized Design Water Volume Flow "
                             "Rate Used for UA Sizing, 4.00000E-004\n"
-                            " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Water Volume Flow "
+                            " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Design Water Volume Flow "
                             "Rate Used for UA Sizing, 5.00000E-004\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
