@@ -185,7 +185,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                                         " statement not found = " + SurfList(Item).SurfName(SurfNum));
                     ErrorsFound = true;
                 } else { // Make sure that all of the surfaces are located in the same zone
-                    state.dataSurface->Surface(SurfList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
+                    state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SurfList(Item).SurfPtr(SurfNum)) = true;
                     if (SurfNum == 1) {
                         ZoneForSurface = state.dataSurface->Surface(SurfList(Item).SurfPtr(SurfNum)).Zone;
                     }
@@ -316,7 +316,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
-                state.dataSurface->Surface(SlabList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
+                state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(SlabList(Item).SurfPtr(SurfNum)) = true;
 
                 SlabList(Item).CoreDiameter(SurfNum) = Numbers(NumArray);
                 SlabList(Item).CoreLength(SurfNum) = Numbers(NumArray + 1);

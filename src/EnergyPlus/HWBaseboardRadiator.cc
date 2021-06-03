@@ -697,7 +697,7 @@ namespace HWBaseboardRadiator {
                     HWBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
                 }
                 if (HWBaseboard(BaseboardNum).SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->Surface(HWBaseboard(BaseboardNum).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(HWBaseboard(BaseboardNum).SurfacePtr(SurfNum)) = true;
                 }
 
                 AllFracsSummed += HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum);

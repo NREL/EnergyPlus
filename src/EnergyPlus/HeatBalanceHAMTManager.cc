@@ -1371,7 +1371,7 @@ namespace HeatBalanceHAMTManager {
             tempmin = minval(cells, &subcell::tempp1);
             if (tempmax > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
                 if (!state.dataGlobal->WarmupFlag) {
-                    if (state.dataSurface->Surface(sid).HighTempErrCount == 0) {
+                    if (state.dataSurface->SurfHighTempErrCount(sid) == 0) {
                         ShowSevereMessage(
                             state,
                             format("HAMT: Temperature (high) out of bounds ({:.2R}) for surface={}", tempmax, state.dataSurface->Surface(sid).Name));
@@ -1380,7 +1380,7 @@ namespace HeatBalanceHAMTManager {
                     ShowRecurringWarningErrorAtEnd(state,
                                                    "HAMT: Temperature Temperature (high) out of bounds; Surface=" +
                                                        state.dataSurface->Surface(sid).Name,
-                                                   state.dataSurface->Surface(sid).HighTempErrCount,
+                                                   state.dataSurface->SurfHighTempErrCount(sid),
                                                    tempmax,
                                                    tempmax,
                                                    _,
@@ -1400,7 +1400,7 @@ namespace HeatBalanceHAMTManager {
             }
             if (tempmin < MinSurfaceTempLimit) {
                 if (!state.dataGlobal->WarmupFlag) {
-                    if (state.dataSurface->Surface(sid).HighTempErrCount == 0) {
+                    if (state.dataSurface->SurfHighTempErrCount(sid) == 0) {
                         ShowSevereMessage(
                             state,
                             format("HAMT: Temperature (low) out of bounds ({:.2R}) for surface={}", tempmin, state.dataSurface->Surface(sid).Name));
@@ -1409,7 +1409,7 @@ namespace HeatBalanceHAMTManager {
                     ShowRecurringWarningErrorAtEnd(state,
                                                    "HAMT: Temperature Temperature (high) out of bounds; Surface=" +
                                                        state.dataSurface->Surface(sid).Name,
-                                                   state.dataSurface->Surface(sid).HighTempErrCount,
+                                                   state.dataSurface->SurfHighTempErrCount(sid),
                                                    tempmin,
                                                    tempmin,
                                                    _,
