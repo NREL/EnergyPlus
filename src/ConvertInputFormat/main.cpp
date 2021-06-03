@@ -223,18 +223,12 @@ bool processInput(std::string const &inputFilePath,
         return false;
     }
 
-#ifdef _WIN32
-    std::string const NL("\r\n"); // Platform newline
-#else
-    std::string const NL("\n"); // Platform newline
-#endif
-
     try {
         if (!isEpJSON) {
             std::string input_file;
             std::string line;
             while (std::getline(input_stream, line)) {
-                input_file.append(line + NL);
+                input_file.append(line + "\n");
             }
             if (input_file.empty()) {
                 displayMessage("Failed to read input file: " + inputFilePath);
@@ -279,14 +273,14 @@ bool processInput(std::string const &inputFilePath,
         auto const input_file = idf_parser->encode(epJSON, schema);
         std::string convertedEpJSON(outputDirectory + inputFileNameOnly + ".idf");
         EnergyPlus::FileSystem::makeNativePath(convertedEpJSON);
-        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out | std::ofstream::binary);
+        std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
         convertedFS << input_file << std::endl;
         outputTypeStr = "IDF";
     } else if ((outputType == OutputTypes::Default || outputType == OutputTypes::epJSON) && !isEpJSON) {
         auto const input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
         std::string convertedIDF(outputDirectory + inputFileNameOnly + ".epJSON");
         EnergyPlus::FileSystem::makeNativePath(convertedIDF);
-        std::ofstream convertedFS(convertedIDF, std::ofstream::out | std::ofstream::binary);
+        std::ofstream convertedFS(convertedIDF, std::ofstream::out);
         convertedFS << input_file << std::endl;
         outputTypeStr = "EPJSON";
     } else if (outputType == OutputTypes::CBOR) {
