@@ -5755,7 +5755,6 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-//    state->dataPlantMgr->InitLoopEquip = true;
     // call air-side VRF
     bool HeatingActive = false;
     bool CoolingActive = false;
