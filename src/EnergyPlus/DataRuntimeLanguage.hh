@@ -243,14 +243,14 @@ namespace DataRuntimeLanguage {
         std::string UniqueKeyName; // unique key name associated with output variable
         std::string OutputVarName; // name of output variable
         bool CheckedOkay;          // set to true once checked out okay
-        int Type;                  // type of output var, 1=integer, 2=real, 3=meter
-        int Index;                 // ref index in output processor, points to variable
-        int VariableNum;           // ref to global variable in runtime language
-        int SchedNum;              // ref index ptr to schedule service (filled if Schedule Value)
+        OutputProcessor::VariableType VariableType;
+        int Index;       // ref index in output processor, points to variable
+        int VariableNum; // ref to global variable in runtime language
+        int SchedNum;    // ref index ptr to schedule service (filled if Schedule Value)
         //  INTEGER                                 :: VarType       = 0
 
         // Default Constructor
-        OutputVarSensorType() : CheckedOkay(false), Type(0), Index(0), VariableNum(0), SchedNum(0)
+        OutputVarSensorType() : CheckedOkay(false), VariableType(OutputProcessor::VariableType::NotFound), Index(0), VariableNum(0), SchedNum(0)
         {
         }
     };

@@ -15739,7 +15739,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     state->dataLoopNodes->NodeID.allocate(1);
     state->dataLoopNodes->NodeID(1) = "ATTIC ZONE AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -15807,7 +15808,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     state->dataLoopNodes->NodeID.allocate(1);
     state->dataLoopNodes->NodeID(1) = "ATTIC ZONE AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ATTIC ZONE AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -20237,7 +20239,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneE
     state->dataLoopNodes->NodeID.allocate(5);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     // Connect zone to air node
@@ -20279,22 +20282,50 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneE
     state->dataFans->Fan(1).FanName = "SupplyFan";
     state->dataFans->Fan(1).MaxAirFlowRate = supplyFlowRate;
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataFans->Fan(2).InletNodeNum = 4;
     state->dataFans->Fan(2).OutletNodeNum = 5;
     state->dataFans->Fan(2).FanType_Num = FanType_SimpleOnOff;
     state->dataFans->Fan(2).FanName = "ExhaustFan";
     state->dataFans->Fan(2).MaxAirFlowRate = exhaustFlowRate;
     state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 4, state->dataLoopNodes->NodeID(4), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  4,
+                                                  state->dataLoopNodes->NodeID(4),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataLoopNodes->NodeID(5) = "SupplyExhaustOutletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 5, state->dataLoopNodes->NodeID(5), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Outlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  5,
+                                                  state->dataLoopNodes->NodeID(5),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
 
     // Create ERV
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
@@ -20378,7 +20409,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV
     state->dataLoopNodes->NodeID.allocate(5);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     // Connect zone to air node
@@ -20420,22 +20452,50 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV
     state->dataFans->Fan(1).FanName = "SupplyFan";
     state->dataFans->Fan(1).MaxAirFlowRate = supplyFlowRate;
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataFans->Fan(2).InletNodeNum = 4;
     state->dataFans->Fan(2).OutletNodeNum = 5;
     state->dataFans->Fan(2).FanType_Num = FanType_SimpleOnOff;
     state->dataFans->Fan(2).FanName = "ExhaustFan";
     state->dataFans->Fan(2).MaxAirFlowRate = exhaustFlowRate;
     state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 4, state->dataLoopNodes->NodeID(4), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  4,
+                                                  state->dataLoopNodes->NodeID(4),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataLoopNodes->NodeID(5) = "SupplyExhaustOutletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 5, state->dataLoopNodes->NodeID(5), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Outlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  5,
+                                                  state->dataLoopNodes->NodeID(5),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
 
     // Create ERV
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
@@ -20510,7 +20570,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalan
     state->dataLoopNodes->NodeID.allocate(5);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     // Connect zone to air node
@@ -20552,22 +20613,50 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalan
     state->dataFans->Fan(1).FanName = "SupplyFan";
     state->dataFans->Fan(1).MaxAirFlowRate = supplyFlowRate;
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataFans->Fan(2).InletNodeNum = 4;
     state->dataFans->Fan(2).OutletNodeNum = 5;
     state->dataFans->Fan(2).FanType_Num = FanType_SimpleOnOff;
     state->dataFans->Fan(2).FanName = "ExhaustFan";
     state->dataFans->Fan(2).MaxAirFlowRate = exhaustFlowRate;
     state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 4, state->dataLoopNodes->NodeID(4), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  4,
+                                                  state->dataLoopNodes->NodeID(4),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataLoopNodes->NodeID(5) = "SupplyExhaustOutletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 5, state->dataLoopNodes->NodeID(5), "Fan:OnOff", state->dataFans->Fan(2).FanName, "Outlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  5,
+                                                  state->dataLoopNodes->NodeID(5),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(2).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
 
     // Create ERV
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
@@ -20649,7 +20738,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportHPWH)
     state->dataLoopNodes->NodeID.allocate(3);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     // Connect zone to air node
@@ -20688,11 +20778,25 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportHPWH)
     state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
     state->dataFans->Fan(1).FanName = "SupplyFan";
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
 
     // Create HPWH
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
@@ -20763,7 +20867,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWH)
     state->dataLoopNodes->NodeID.allocate(3);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     // Connect zone to air node
@@ -20802,11 +20907,25 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWH)
     state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
     state->dataFans->Fan(1).FanName = "SupplyFan";
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
 
     // Create HPWH
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
@@ -20870,7 +20989,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
     state->dataLoopNodes->NodeID.allocate(3);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
-    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(
+        *state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", NodeInputManager::compFluidStream::Primary, false, errFlag);
     EXPECT_FALSE(errFlag);
 
     // Connect zone to air node
@@ -20909,11 +21029,25 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
     state->dataFans->Fan(1).FanType_Num = FanType_SimpleOnOff;
     state->dataFans->Fan(1).FanName = "SupplyFan";
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 2, state->dataLoopNodes->NodeID(2), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Inlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  2,
+                                                  state->dataLoopNodes->NodeID(2),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Inlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
     state->dataLoopNodes->NodeID(3) = "SupplyFanOutletNode";
-    BranchNodeConnections::RegisterNodeConnection(
-        *state, 3, state->dataLoopNodes->NodeID(3), "Fan:OnOff", state->dataFans->Fan(1).FanName, "Outlet", 1, false, errFlag);
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  3,
+                                                  state->dataLoopNodes->NodeID(3),
+                                                  "Fan:OnOff",
+                                                  state->dataFans->Fan(1).FanName,
+                                                  "Outlet",
+                                                  NodeInputManager::compFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
 
     // Create HPWH
     state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
