@@ -132,6 +132,8 @@ namespace HeatBalanceManager {
 
     void InitHeatBalance(EnergyPlusData &state);
 
+    void AllocateZoneHeatBalArrays(EnergyPlusData &state);
+
     void AllocateHeatBalArrays(EnergyPlusData &state);
 
     void RecKeepHeatBalance(EnergyPlusData &state);
