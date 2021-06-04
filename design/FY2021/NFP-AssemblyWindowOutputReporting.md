@@ -3,7 +3,7 @@ Assembly Window Output Reporting
 
 **Jason Glazer, GARD Analytics**
 
- - May 21, 2021
+ - June 4, 2021
  
 
 ## Justification for New Feature ##
@@ -678,8 +678,7 @@ VT and a new footnote has been added:
     <td align="right">&nbsp;</td>
   </tr>
 </table>
-<i>Note: Values shown on this table may not match results from the WINDOW program or the NFRC label.</i>
-<i>Note: Assembly calculations are not performed when using equivalent layer input objects or the Window5DataFile.dat data file.</i>
+<i>Note: Values shown on this table may not match results from the WINDOW program or the NFRC label when using simplified inputs.</i>
 
 <br><br>
 <b>Interior Fenestration</b><br><br>
@@ -713,8 +712,7 @@ VT and a new footnote has been added:
     <td align="right">&nbsp;</td>
   </tr>
 </table>
-<i>Note: Values shown on this table may not match results from the WINDOW program or the NFRC label.</i>
-<i>Note: Assembly calculations are not performed when using equivalent layer input objects or the Window5DataFile.dat data file.</i>
+<i>Note: Values shown on this table may not match results from the WINDOW program or the NFRC label when using simplified inputs.</i>
 <br>
 
 
