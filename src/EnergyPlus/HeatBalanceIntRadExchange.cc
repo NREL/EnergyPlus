@@ -1535,7 +1535,6 @@ namespace HeatBalanceIntRadExchange {
         int i;
         int j;
         bool severeErrorPresent;
-        
         // OriginalCheckValue is the first pass at a completeness check.  Even if this is zero,
         // there is no guarantee that reciprocity is satisfied.  As a result, the rest of this
         // routine is needed to correct any issues even if the user defined view factors
@@ -1549,7 +1548,6 @@ namespace HeatBalanceIntRadExchange {
         ConvrgOld = 10.0;
         LargestArea = maxval(A);
         severeErrorPresent = false;
-        
         // Check for Strange Geometry
         // When one surface has an area that exceeds the sum of all other surface areas in a zone,
         // essentially the situation is a non-complete enclosure.  As a result, the view factors
@@ -1695,25 +1693,24 @@ namespace HeatBalanceIntRadExchange {
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
                 RowSum = sum_FixedF;
                 if (CheckConvergeTolerance > 0.005) {
-                    if (CheckConvergeTolerance > 0.1) {
-                      ShowSevereError(state, "FixViewFactors: View factors convergence has failed "
-                                             "and will lead to heat balance errors in zone=\"" +
-                                                 enclName + "\".");
-                      severeErrorPresent = true;
-                    }
-                    ShowWarningError(state,
-                                     "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
-                                         enclName + "\".");
-                    ShowContinueError(state,
-                                      format("Enforced reciprocity has tolerance (ideal is 0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].",
-                                             CheckConvergeTolerance,
-                                             N,
-                                             RowSum));
-                    ShowContinueError(
-                        state, "If zone is unusual or tolerance is on the order of 0.001, view "
-                               "factors might be OK but results should be checked carefully.");
-                }
-                if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
+                  if (CheckConvergeTolerance > 0.1) {
+                    ShowSevereError(state,
+                                    "FixViewFactors: View factors convergence has failed "
+                                    "and will lead to heat balance errors in zone=\"" +
+                                        enclName + "\".");
+                    severeErrorPresent = true;
+                  }
+                  ShowWarningError(state, "FixViewFactors: View factors not complete. Check "
+                                          "for bad surface descriptions or unenclosed zone=\"" +
+                                              enclName + "\".");
+                  ShowContinueError(state,
+                                    format("Enforced reciprocity has tolerance (ideal is "
+                                           "0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].",
+                                           CheckConvergeTolerance, N, RowSum));
+                  ShowContinueError(
+                      state, "If zone is unusual or tolerance is on the order of 0.001, view "
+                             "factors might be OK but results should be checked carefully.");
+                }                if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
                     F = FixedF;
                     FinalCheckValue = FixedCheckValue;
                 }
@@ -1736,7 +1733,9 @@ namespace HeatBalanceIntRadExchange {
             }
         }
         if (severeErrorPresent) {
-            ShowFatalError(state, "FixViewFactors: View factor calculations significantly out of tolerance.  See above messages for more information." );
+          ShowFatalError(state,
+                         "FixViewFactors: View factor calculations significantly out "
+                         "of tolerance.  See above messages for more information.");
         }
     }
 
