@@ -153,7 +153,7 @@ namespace TARCOGMain {
                   Real64 &hi,                                  // Internal heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
                   Array1D<Real64> &Ra,                         // Vector of Rayleigh numbers, for each gap
                   Array1D<Real64> &Nu,                         // Vector of Nusselt numbers, for each gap
-                  int standard,                                // Calculation standard switch:
+                  TARCOGGassesParams::Stdrd standard,          // Calculation standard switch:
                   TARCOGParams::TARCOGThermalModel ThermalMod, // Thermal model:
                   int Debug_mode,                              // Switch for debug output files:
                   std::string const &Debug_dir,                // Target directory for debug files
