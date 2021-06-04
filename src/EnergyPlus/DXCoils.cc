@@ -92,7 +92,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/StandardRatings.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
 
@@ -2294,9 +2293,11 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(12), "Timed")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = Timed;
-        if (UtilityRoutines::SameString(Alphas(12), "OnDemand")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = OnDemand;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == 0) {
+        if (UtilityRoutines::SameString(Alphas(12), "Timed"))
+            state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
+        if (UtilityRoutines::SameString(Alphas(12), "OnDemand"))
+            state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, "...illegal " + cAlphaFields(12) + "=\"" + Alphas(12) + "\".");
             ShowContinueError(state, "...valid values for this field are Timed or OnDemand.");
@@ -2340,7 +2341,8 @@ void GetDXCoils(EnergyPlusData &state)
 
         // Set defrost time period
         state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime = Numbers(10);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 &&
+            state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
             ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", ");
             ShowContinueError(state, "..." + cNumericFields(10) + " = 0.0 for defrost control = TIMED.");
         }
@@ -4583,9 +4585,11 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(7), "Timed")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = Timed;
-        if (UtilityRoutines::SameString(Alphas(7), "OnDemand")) state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = OnDemand;
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == 0) {
+        if (UtilityRoutines::SameString(Alphas(7), "Timed"))
+            state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::Timed;
+        if (UtilityRoutines::SameString(Alphas(7), "OnDemand"))
+            state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Unassigned) {
             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", invalid");
             ShowContinueError(state, "...illegal " + cAlphaFields(7) + "=\"" + Alphas(7) + "\".");
             ShowContinueError(state, "...valid values for this field are Timed or OnDemand.");
@@ -4597,7 +4601,8 @@ void GetDXCoils(EnergyPlusData &state)
 
         // Set defrost time period
         state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime = Numbers(6);
-        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 && state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+        if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime == 0.0 &&
+            state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
             ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataDXCoils->DXCoil(DXCoilNum).Name + "\", ");
             ShowContinueError(state, "..." + cNumericFields(5) + " = 0.0 for defrost control = TIMED.");
         }
@@ -11056,7 +11061,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
         if (OutdoorDryBulb <= state.dataDXCoils->DXCoil(DXCoilNum).MaxOATDefrost &&
             state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) != WaterCooled) {
             // Calculate defrost adjustment factors depending on defrost control type
-            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+            if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                 FractionalDefrostTime = state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime;
                 if (FractionalDefrostTime > 0.0) {
                     HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -13730,7 +13735,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Check outdoor temperature to determine of defrost is active
             if (OutdoorDryBulb <= state.dataDXCoils->DXCoil(DXCoilNum).MaxOATDefrost) {
                 // Calculate defrost adjustment factors depending on defrost control type
-                if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+                if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                     FractionalDefrostTime = state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime;
                     if (FractionalDefrostTime > 0.0) {
                         HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -13745,7 +13750,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
                     if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle &&
-                        state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == OnDemand) {
+                        state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                         DefrostEIRTempModFac = CurveValue(
                             state, state.dataDXCoils->DXCoil(DXCoilNum).DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                         LoadDueToDefrostLS = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) *
@@ -13958,7 +13963,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             // Check outdoor temperature to determine of defrost is active
             if (OutdoorDryBulb <= state.dataDXCoils->DXCoil(DXCoilNum).MaxOATDefrost) {
                 // Calculate defrost adjustment factors depending on defrost control type
-                if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == Timed) {
+                if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::Timed) {
                     FractionalDefrostTime = state.dataDXCoils->DXCoil(DXCoilNum).DefrostTime;
                     if (FractionalDefrostTime > 0.0) {
                         HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
@@ -13973,7 +13978,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
                     if (state.dataDXCoils->DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle &&
-                        state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == OnDemand) {
+                        state.dataDXCoils->DXCoil(DXCoilNum).DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
                         LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) *
                                            (state.dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap(1) / 1.01667);
                         DefrostEIRTempModFac = CurveValue(
@@ -14383,7 +14388,6 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     // Using/Aliasing
     using CurveManager::CurveValue;
     using General::SolveRoot;
-    using TempSolveRoot::SolveRoot;
     using namespace OutputReportPredefined;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -14432,7 +14436,6 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     Real64 PartLoadAirMassFlowRate;
     Real64 AirMassFlowRatio;
     int SolverFlag;
-    Array1D<Real64> Par(12); // Parameter array passed to solver
     Real64 EIR_HighSpeed;
     Real64 EIR_LowSpeed;
     int FanInletNode;
@@ -14618,38 +14621,40 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
         }
 
         TargetNetCapacity = NetCapacityFactorPLTestPoint(PartLoadTestPoint) * NetCoolingCapRated;
-        Par(1) = double(DXCoilNum);
-        Par(2) = TempDryBulb_Leaving_Apoint;
-        Par(3) = TargetNetCapacity;
-        Par(4) = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
-        Par(5) = CoolingCoilInletAirWetBulbTempRated;
-        Par(6) = CoolingCoilInletAirDryBulbTempRated;
-        Par(7) = NetCoolingCapRated;
+        std::array<Real64, 12> Par; // Parameter array passed to solver
+
+        Par[0] = double(DXCoilNum);
+        Par[1] = TempDryBulb_Leaving_Apoint;
+        Par[2] = TargetNetCapacity;
+        Par[3] = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
+        Par[4] = CoolingCoilInletAirWetBulbTempRated;
+        Par[5] = CoolingCoilInletAirDryBulbTempRated;
+        Par[6] = NetCoolingCapRated;
         if (state.dataDXCoils->DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
-            Par(8) = 0.0;
-            Par(9) = double(FanInletNode);
-            Par(10) = double(FanOutletNode);
-            Par(11) = ExternalStatic;
-            Par(12) = double(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
+            Par[7] = 0.0;
+            Par[8] = double(FanInletNode);
+            Par[9] = double(FanOutletNode);
+            Par[10] = ExternalStatic;
+            Par[11] = double(state.dataDXCoils->DXCoil(DXCoilNum).SupplyFanIndex);
         } else {
-            Par(8) = FanPowerPerEvapAirFlowRate;
-            Par(9) = 0.0;
-            Par(10) = 0.0;
-            Par(11) = 0.0;
-            Par(12) = 0.0;
+            Par[7] = FanPowerPerEvapAirFlowRate;
+            Par[8] = 0.0;
+            Par[9] = 0.0;
+            Par[10] = 0.0;
+            Par[11] = 0.0;
         }
 
         LowerBoundMassFlowRate = 0.01 * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
-        TempSolveRoot::SolveRoot(state,
-                                 AccuracyTolerance,
-                                 MaximumIterations,
-                                 SolverFlag,
-                                 PartLoadAirMassFlowRate,
-                                 CalcTwoSpeedDXCoilIEERResidual,
-                                 LowerBoundMassFlowRate,
-                                 state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1),
-                                 Par);
+        General::SolveRoot(state,
+                           AccuracyTolerance,
+                           MaximumIterations,
+                           SolverFlag,
+                           PartLoadAirMassFlowRate,
+                           CalcTwoSpeedDXCoilIEERResidual,
+                           LowerBoundMassFlowRate,
+                           state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1),
+                           Par);
 
         if (SolverFlag == -1) {
 
@@ -14997,7 +15002,7 @@ void GetFanIndexForTwoSpeedCoil(
 
 Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
                                       Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                      Array1D<Real64> const &Par          // par(1) = DX coil number
+                                      std::array<Real64, 12> const &Par   // par(1) = DX coil number
 )
 {
     // FUNCTION INFORMATION:
@@ -15054,18 +15059,18 @@ Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
     Real64 HighSpeedNetCoolingCap;
     Real64 LowSpeedNetCoolingCap;
 
-    DXCoilNum = int(Par(1));
-    TargetCoilLeavingDryBulb = Par(2);
-    TargetNetCapacity = Par(3);
-    OutdoorUnitInletDryBulb = Par(4);
-    IndoorUnitInletWetBulb = Par(5);
-    IndoorUnitInletDryBulb = Par(6);
-    NetCoolingCapRated = Par(7);
-    FanPowerPerEvapAirFlowRate = Par(8);
-    FanInletNodeNum = int(Par(9));
-    FanOutletNodeNum = int(Par(10));
-    FanExternalStaticFull = Par(11);
-    FanIndex = int(Par(12));
+    DXCoilNum = int(Par[0]);
+    TargetCoilLeavingDryBulb = Par[1];
+    TargetNetCapacity = Par[2];
+    OutdoorUnitInletDryBulb = Par[3];
+    IndoorUnitInletWetBulb = Par[4];
+    IndoorUnitInletDryBulb = Par[5];
+    NetCoolingCapRated = Par[6];
+    FanPowerPerEvapAirFlowRate = Par[7];
+    FanInletNodeNum = int(Par[8]);
+    FanOutletNodeNum = int(Par[9]);
+    FanExternalStaticFull = Par[10];
+    FanIndex = int(Par[11]);
 
     if (state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1) > 0.0) {
         AirMassFlowRatio = SupplyAirMassFlowRate / state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
@@ -16002,7 +16007,7 @@ void SetDXCoolingCoilData(EnergyPlusData &state,
                           Optional<Real64> MaxOATHeating,         // Parameter equivalent of condenser Max OAT for compressor heating operation
                           Optional_int HeatingPerformanceOATType, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
                           Optional_int DefrostStrategy,
-                          Optional_int DefrostControl,
+                          Optional<StandardRatings::HPdefrostControl> DefrostControl,
                           Optional_int DefrostEIRPtr,
                           Optional<Real64> DefrostFraction,
                           Optional<Real64> DefrostCapacity,
@@ -17501,7 +17506,7 @@ void ControlVRFIUCoil(EnergyPlusData &state,
     using Psychrometrics::PsyHFnTdbW;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array1D<Real64> Par(11);    // Parameter array for SolveRoot
+    std::array<Real64, 5> Par;  // Parameter array for SolveRoot
     int MaxIter(500);           // Max iteration numbers (-)
     int SolFla;                 // Solving flag for SolveRoot (-)
     int const FlagCoolMode(0);  // Flag for cooling mode
@@ -17579,11 +17584,7 @@ void ControlVRFIUCoil(EnergyPlusData &state,
         if (QCoilSenCoolingLoad > QinSenMin1) {
             // Increase fan speed to meet room sensible load; SH is not updated
 
-            Par(1) = QCoilSenCoolingLoad;
-            Par(2) = Ts_1;
-            Par(3) = Tin;
-            Par(4) = Garate;
-            Par(5) = BF;
+            Par = {QCoilSenCoolingLoad, Ts_1, Tin, Garate, BF};
 
             FanSpdRatioMax = 1.0;
             SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualCool, FanSpdRatioMin, FanSpdRatioMax, Par);
@@ -17680,13 +17681,10 @@ void ControlVRFIUCoil(EnergyPlusData &state,
         if (QCoilSenHeatingLoad > QinSenMin1) {
             // Modulate fan speed to meet room sensible load; SC is not updated
 
-            Par(1) = QCoilSenHeatingLoad;
-            Par(2) = Ts_1;
-            Par(3) = Tin;
-            Par(4) = Garate;
-            Par(5) = BF;
+            Par = {QCoilSenHeatingLoad, Ts_1, Tin, Garate, BF};
 
             FanSpdRatioMax = 1.0;
+
             SolveRoot(state, 1.0e-3, MaxIter, SolFla, Ratio1, FanSpdResidualHeat, FanSpdRatioMin, FanSpdRatioMax, Par);
             // this will likely cause problems eventually, -1 and -2 mean different things
             if (SolFla < 0) Ratio1 = FanSpdRatioMax; // over capacity
@@ -17928,8 +17926,9 @@ void CalcVRFCoilCapModFac(EnergyPlusData &state,
     }
 }
 
-Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ratio
-                          Array1D<Real64> const &Par // parameters
+Real64 FanSpdResidualCool([[maybe_unused]] EnergyPlusData &state,
+                          Real64 const FanSpdRto,          // indoor unit fan speed ratio
+                          std::array<Real64, 5> const &Par // parameters
 )
 {
     // FUNCTION INFORMATION:
@@ -17953,11 +17952,11 @@ Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ra
     Real64 Tout;               // Air temperature at the indoor unit outlet (C)
     Real64 ZnSenLoad;          // Zone sensible cooling load (W)
 
-    ZnSenLoad = Par(1);
-    Th2 = Par(2);
-    TcoilIn = Par(3);
-    Garate = Par(4);
-    BF = Par(5);
+    ZnSenLoad = Par[0];
+    Th2 = Par[1];
+    TcoilIn = Par[2];
+    Garate = Par[3];
+    BF = Par[4];
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
 
@@ -17968,8 +17967,9 @@ Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ra
     return FanSpdResidualCool;
 }
 
-Real64 FanSpdResidualHeat(Real64 const FanSpdRto,    // indoor unit fan speed ratio
-                          Array1D<Real64> const &Par // parameters
+Real64 FanSpdResidualHeat([[maybe_unused]] EnergyPlusData &state,
+                          Real64 const FanSpdRto,          // indoor unit fan speed ratio
+                          std::array<Real64, 5> const &Par // parameters
 )
 {
     // FUNCTION INFORMATION:
@@ -17992,11 +17992,11 @@ Real64 FanSpdResidualHeat(Real64 const FanSpdRto,    // indoor unit fan speed ra
     Real64 Tout;               // Air temperature at the indoor unit outlet (C)
     Real64 ZnSenLoad;          // Zone sensible heating load (W)
 
-    ZnSenLoad = Par(1);
-    Th2 = Par(2);
-    TcoilIn = Par(3);
-    Garate = Par(4);
-    BF = Par(5);
+    ZnSenLoad = Par[0];
+    Th2 = Par[1];
+    TcoilIn = Par[2];
+    Garate = Par[3];
+    BF = Par[4];
     // +-100 W minimum zone load?
     if (std::abs(ZnSenLoad) < 100.0) ZnSenLoad = sign(100.0, ZnSenLoad);
 

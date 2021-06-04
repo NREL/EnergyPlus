@@ -862,7 +862,7 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Generic Air Contaminant Boundary Layer Diffusion Inside Face Concentration",
                                 OutputProcessor::Unit::ppm,
-                                state.dataSurface->Surface(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum).GenericContam,
+                                state.dataSurface->SurfGenericContam(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum),
                                 "Zone",
                                 "Average",
                                 state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfName);
@@ -1569,7 +1569,7 @@ void InitZoneContSetPoints(EnergyPlusData &state)
             state.dataContaminantBalance->ZoneGCMX = state.dataContaminantBalance->OutdoorGC;
             state.dataContaminantBalance->ZoneGCM2 = state.dataContaminantBalance->OutdoorGC;
             for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCBLDiff; ++Loop) {
-                state.dataSurface->Surface(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum).GenericContam =
+                state.dataSurface->SurfGenericContam(state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum) =
                     state.dataContaminantBalance->OutdoorGC;
             }
             if (state.dataZoneContaminantPredictorCorrector->TotGCGenDecay > 0)
@@ -1723,7 +1723,7 @@ void InitZoneContSetPoints(EnergyPlusData &state)
         for (Loop = 1; Loop <= state.dataZoneContaminantPredictorCorrector->TotGCBLDiff; ++Loop) {
             SurfNum = state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum;
             ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
-            Cs = state.dataSurface->Surface(SurfNum).GenericContam;
+            Cs = state.dataSurface->SurfGenericContam(SurfNum);
             Sch = GetCurrentScheduleValue(state, state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr);
             GCGain =
                 state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoef * Sch * state.dataSurface->Surface(SurfNum).Area *
@@ -1732,7 +1732,7 @@ void InitZoneContSetPoints(EnergyPlusData &state)
                 1.0e-6;
             state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCGenRate = GCGain;
             // Surface concentration level based on steady-state assumption
-            state.dataSurface->Surface(SurfNum).GenericContam =
+            state.dataSurface->SurfGenericContam(SurfNum) =
                 Cs - GCGain * 1.0e6 / state.dataSurface->Surface(SurfNum).Multiplier / state.dataSurface->Surface(SurfNum).Area;
         }
 

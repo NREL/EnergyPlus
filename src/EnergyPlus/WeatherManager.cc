@@ -676,7 +676,7 @@ namespace WeatherManager {
             // Throw a Fatal now that we have said it'll terminalte
             if (ErrorsFound) {
                 CloseWeatherFile(state); // will only close if opened.
-                ShowFatalError(state, RoutineName + "Errors found in Weater Data Input. Program terminates.");
+                ShowFatalError(state, RoutineName + "Errors found in Weather Data Input. Program terminates.");
             }
 
             state.dataEnvrn->CurrentOverallSimDay = 0;
@@ -2035,7 +2035,7 @@ namespace WeatherManager {
         state.dataWeatherManager->TodayDifSolarRad = state.dataWeatherManager->TomorrowDifSolarRad;
         state.dataWeatherManager->TodayLiquidPrecip = state.dataWeatherManager->TomorrowLiquidPrecip;
         state.dataWeatherManager->TodayTotalSkyCover = state.dataWeatherManager->TomorrowTotalSkyCover;
-        state.dataWeatherManager->TodayOpaqueSkyCover = state.dataWeatherManager->TomorrowTotalSkyCover;
+        state.dataWeatherManager->TodayOpaqueSkyCover = state.dataWeatherManager->TomorrowOpaqueSkyCover;
 
         // Update Global Data
 

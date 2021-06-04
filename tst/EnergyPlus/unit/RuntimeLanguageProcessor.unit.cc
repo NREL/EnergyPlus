@@ -71,7 +71,7 @@ TEST_F(EnergyPlusFixture, ERLExpression_TestExponentials)
 
     state->dataRuntimeLang->ErlExpression.allocate(1);
     auto &erlExpression = state->dataRuntimeLang->ErlExpression(1);
-    erlExpression.Operator = DataRuntimeLanguage::FuncExp;
+    erlExpression.Operator = DataRuntimeLanguage::ErlFunc::Exp;
     erlExpression.NumOperands = 1;
     erlExpression.Operand.allocate(1);
 

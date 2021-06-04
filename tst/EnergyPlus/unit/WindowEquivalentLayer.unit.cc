@@ -545,7 +545,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
         }
     }
     // get equivalent layer window optical properties
-    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
+    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::SolarArrays::BEAM, AbsSolBeam);
     // check that the slat angle control type is set to MaximizeSolar
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBPROF);
     // check the slat angle
@@ -900,7 +900,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
         }
     }
     // calc window optical property
-    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
+    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::SolarArrays::BEAM, AbsSolBeam);
     // check VB slat angle for BlockBeamSolar slat angle control
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBNOBM);
     // check the VB slat angle

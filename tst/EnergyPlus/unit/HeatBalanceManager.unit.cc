@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -1234,7 +1235,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    state->dataHeatBal->TempEffBulkAir.allocate(6);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(6);
 
     state->dataHeatBal->HConvIn.allocate(6);
     state->dataHeatBal->HConvIn(1) = 0.5;
@@ -1326,7 +1327,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
     ErrorsFound = false;
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(state->dataHVACGlobal->HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION");
+    EXPECT_EQ(state->dataRootFinder->HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION");
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInputTest)
@@ -1356,7 +1357,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
     ErrorsFound = false;
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(state->dataHVACGlobal->HVACSystemRootFinding.Algorithm, "RegulaFalsi");
+    EXPECT_EQ(state->dataRootFinder->HVACSystemRootFinding.Algorithm, "RegulaFalsi");
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
@@ -1948,7 +1949,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
     ErrorsFound = false;
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(state->dataHVACGlobal->HVACSystemRootFinding.Algorithm, "BISECTION");
+    EXPECT_EQ(state->dataRootFinder->HVACSystemRootFinding.Algorithm, "BISECTION");
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
@@ -2152,8 +2153,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
     SimulationManager::ManageSimulation(*state);
 
     int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
-    EXPECT_EQ(state->dataSurface->Surface(surfNum).Construction, state->dataSurface->Surface(surfNum).EMSConstructionOverrideValue);
-    EXPECT_TRUE(state->dataSurface->Surface(surfNum).EMSConstructionOverrideON);
+    EXPECT_EQ(state->dataSurface->Surface(surfNum).Construction, state->dataSurface->SurfEMSConstructionOverrideValue(surfNum));
+    EXPECT_TRUE(state->dataSurface->SurfEMSConstructionOverrideON(surfNum));
 }
 
 } // namespace EnergyPlus

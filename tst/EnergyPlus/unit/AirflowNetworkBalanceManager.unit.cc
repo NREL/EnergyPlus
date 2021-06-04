@@ -20938,4 +20938,106 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
+TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl)
+{
+
+    // Unit test for #5021
+
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SALA DE AULA";
+
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW AULA 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW AULA 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SALA DE AULA";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
+
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataGlobal->NumOfZones = 1;
+
+    std::string const idf_objects = delimited_string({
+        "Schedule:Constant,OnSch,,1.0;",
+        "Schedule:Constant,Aula people sched,,0.0;",
+        "Schedule:Constant,Sempre 21,,21.0;",
+        "AirflowNetwork:MultiZone:Zone,",
+        "  sala de aula, !- Zone Name",
+        "  Temperature, !- Ventilation Control Mode",
+        "  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  1, !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  Aula people sched, !- Venting Availability Schedule Name",
+        "  Standard;                !- Single Sided Wind Pressure Coefficient Algorithm",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window aula 1, !- Surface Name",
+        "  Simple Window, !- Leakage Component Name",
+        "  , !- External Node Name",
+        "  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  ZoneLevel, !- Ventilation Control Mode",
+        "  , !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  , !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  Aula people sched;       !- Venting Availability Schedule Name",
+        "AirflowNetwork:MultiZone:Surface,",
+        "  window aula 2, !- Surface Name",
+        "  Simple Window, !- Leakage Component Name",
+        "  , !- External Node Name",
+        "  1, !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
+        "  Temperature, !- Ventilation Control Mode",
+        "  Sempre 21, !- Ventilation Control Zone Temperature Setpoint Schedule Name",
+        "  1, !- Minimum Venting Open Factor{ dimensionless }",
+        "  , !- Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor{ deltaC }",
+        "  100, !- Indoor and Outdoor Temperature Difference Upper Limit for Minimum Venting Open Factor{ deltaC }",
+        "  , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
+        "  300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
+        "  Aula people sched;       !- Venting Availability Schedule Name",
+        "AirflowNetwork:MultiZone:Component:SimpleOpening,",
+        "  Simple Window, !- Name",
+        "  0.0010, !- Air Mass Flow Coefficient When Opening is Closed{ kg / s - m }",
+        "  0.65, !- Air Mass Flow Exponent When Opening is Closed{ dimensionless }",
+        "  0.01, !- Minimum Density Difference for Two - Way Flow{ kg / m3 }",
+        "  0.78;                    !- Discharge Coefficient{ dimensionless }",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    GetAirflowNetworkInput(*state);
+
+    // MultizoneZoneData has only 1 element so may be hardcoded
+    EXPECT_TRUE(state->dataAirflowNetwork->AFNDefaultControlFlag);
+
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.AirflowNetworkSimuName, "AFNDefaultControl");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.Control, "MULTIZONEWITHOUTDISTRIBUTION");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.WPCCntr, "SURFACEAVERAGECALCULATION");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.HeightOption, "OPENINGHEIGHT");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.BldgType, "LOWRISE");
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.InitType, "ZERONODEPRESSURES");
+    EXPECT_FALSE(state->dataAirflowNetwork->AirflowNetworkSimu.TExtHeightDep);
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.solver, AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU);
+    //// Use default values for numerical fields
+    EXPECT_EQ(state->dataAirflowNetwork->AirflowNetworkSimu.MaxIteration, 500);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.RelTol, 1.0E-4, 0.00001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.AbsTol, 1.E-6, 0.0000001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.ConvLimit, -0.5, 0.01);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.Azimuth, 0.0, 0.0001);
+    EXPECT_NEAR(state->dataAirflowNetwork->AirflowNetworkSimu.AspectRatio, 1.0, 0.0001);
+}
 } // namespace EnergyPlus
