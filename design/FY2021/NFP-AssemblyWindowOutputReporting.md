@@ -743,7 +743,17 @@ All example files that use WindowProperty:FrameAndDivider will have the new fiel
 
 Output changes to the tabular output files are as described above.
 
+### ERR File ###
 
+The error messages that are generated when WindowProperty:FrameAndDivider is used with 
+
+- Construction:WindowEquivalentLayer, WindowMaterial:Glazing:EquivalentLayer,
+WindowMaterial:Gap:EquivalentLayer, WindowMaterial:Shade:EquivalentLayer, 
+WindowMaterial:Screen:EquivalentLayer
+
+- Construction:WindowDataFile/ Window5DataFile.dat
+
+will be updated to specifically indicate that assembly output reporting has not been performed.
 
 ## References ##
 
