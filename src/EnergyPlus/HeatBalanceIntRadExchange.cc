@@ -1534,7 +1534,12 @@ namespace HeatBalanceIntRadExchange {
         bool Converged;
         int i;
         int j;
-
+        bool severeErrorPresent;
+        
+        // OriginalCheckValue is the first pass at a completeness check.  Even if this is zero,
+        // there is no guarantee that reciprocity is satisfied.  As a result, the rest of this
+        // routine is needed to correct any issues even if the user defined view factors
+        // satisfy completeness (OriginalCheckValue = 0).
         OriginalCheckValue = std::abs(sum(F) - N);
 
         //  Allocate and zero arrays
@@ -1543,9 +1548,21 @@ namespace HeatBalanceIntRadExchange {
         Accelerator = 1.0;
         ConvrgOld = 10.0;
         LargestArea = maxval(A);
+        severeErrorPresent = false;
 
-        //  Check for Strange Geometry
-        if (LargestArea > (sum(A) - LargestArea)) {
+        // Check for Strange Geometry
+        // When one surface has an area that exceeds the sum of all other surface areas in a zone,
+        // essentially the situation is a non-complete enclosure.  As a result, the view factors
+        // calculated using the standard procedure below will not converge and may result in invalid
+        // view factors where either reciprocity or completeness is not satisfied.  However, when
+        // the largest surface is just slightly smaller than the rest of the surface areas in the
+        // zone, it has been shown that there can still be problems.  The correction below can
+        // be helpful in avoiding these problems.  So, the criteria below (with the 0.8 term added
+        // into the comparison in the next line of code) intends to capture more cases that are
+        // "unbalanced" in surface area distribution so other strange cases can take advantage of
+        // this correction.  The use of 0.8 is simply to provide some reasonable boundary numerically
+        // and does not have some derived theoretical basis.
+        if (LargestArea > 0.8*(sum(A) - LargestArea)) {
             for (i = 1; i <= N; ++i) {
                 if (LargestArea != A(i)) continue;
                 state.dataHeatBalIntRadExchg->LargestSurf = i;
@@ -1676,7 +1693,13 @@ namespace HeatBalanceIntRadExchange {
                 }
                 Real64 const sum_FixedF(sum(FixedF));
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
+                RowSum = sum_FixedF;
                 if (CheckConvergeTolerance > 0.005) {
+                    if (CheckConvergeTolerance > 0.1) {
+                        ShowSevereError(state, "FixViewFactors: View factors convergence has failed and will lead to heat balance errors in zone=\"" +
+                                        enclName + "\".");
+                        severeErrorPresent = true;
+                    }
                     ShowWarningError(state,
                                      "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" +
                                          enclName + "\".");
@@ -1685,13 +1708,12 @@ namespace HeatBalanceIntRadExchange {
                                              CheckConvergeTolerance,
                                              N,
                                              RowSum));
-                    ShowContinueError(state, "If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK.");
+                    ShowContinueError(state, "If zone is unusual or tolerance is on the order of 0.001, view factors are might be OK but results should be checked carefully.");
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
                     F = FixedF;
                     FinalCheckValue = FixedCheckValue;
                 }
-                RowSum = sum_FixedF;
                 return;
             }
         }
@@ -1709,6 +1731,9 @@ namespace HeatBalanceIntRadExchange {
                 ShowWarningError(
                     state, "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + enclName + "\".");
             }
+        }
+        if (severeErrorPresent) {
+            ShowFatalError(state, "FixViewFactors: View factor calculations significantly out of tolerance.  See above messages for more information." );
         }
     }
 
