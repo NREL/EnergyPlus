@@ -900,7 +900,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_string Alphas(9);
-    Array1D<Real64> Numbers(4);
+    Array1D<Real64> Numbers(2);
     int NumAlphas;
     int NumNumbers;
     int Count;
