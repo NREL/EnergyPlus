@@ -289,6 +289,60 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 
     A.deallocate();
     F.deallocate();
+    
+    // Tests for correction of view factors based on GitHub Issue #8700 (when one
+    // surface is much larger than other surfaces, N > 3) The following is a new
+    // test that demonstrates the new correction when one surface is almost as large
+    // as everything else. It helps with arriving at a stable group of view factors
+    // that do not cause odd fluctuations in the results.
+    N = 4;
+
+    A.allocate(N);
+    F.allocate(N, N);
+
+    A(1) = 100.0;
+    A(2) = 50.0;
+    A(3) = 25.0;
+    A(4) = 25.0;
+    F(1, 1) = 0.0;
+    F(1, 2) = 0.5;
+    F(1, 3) = 0.25;
+    F(1, 4) = 0.25;
+    F(2, 1) = 2.0 / 3.0;
+    F(2, 2) = 0.0;
+    F(2, 3) = 1.0 / 6.0;
+    F(2, 4) = 1.0 / 6.0;
+    F(3, 1) = 4.0 / 7.0;
+    F(3, 2) = 2.0 / 7.0;
+    F(3, 3) = 0.0;
+    F(3, 4) = 1.0 / 7.0;
+    F(4, 1) = 4.0 / 7.0;
+    F(4, 2) = 2.0 / 7.0;
+    F(4, 3) = 1.0 / 7.0;
+    F(4, 4) = 0.0;
+
+    FixViewFactors(*state, N, A, F,
+                   state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Name,
+                   state->dataViewFactor->ZoneRadiantInfo(ZoneNum).ZoneNums,
+                   OriginalCheckValue, FixedCheckValue, FinalCheckValue,
+                   NumIterations, RowSum);
+
+    EXPECT_NEAR(F(1, 1), 0.31747, 0.001);
+    EXPECT_NEAR(F(1, 2), 0.71788, 0.001);
+    EXPECT_NEAR(F(1, 3), 0.64862, 0.001);
+    EXPECT_NEAR(F(1, 4), 0.64862, 0.001);
+    EXPECT_NEAR(F(2, 1), 0.35894, 0.001);
+    EXPECT_NEAR(F(2, 2), 0.00000, 0.001);
+    EXPECT_NEAR(F(2, 3), 0.28073, 0.001);
+    EXPECT_NEAR(F(2, 4), 0.28073, 0.001);
+    EXPECT_NEAR(F(3, 1), 0.16215, 0.001);
+    EXPECT_NEAR(F(3, 2), 0.14036, 0.001);
+    EXPECT_NEAR(F(3, 3), 0.00000, 0.001);
+    EXPECT_NEAR(F(3, 4), 0.07060, 0.001);
+    EXPECT_NEAR(F(4, 1), 0.16215, 0.001);
+    EXPECT_NEAR(F(4, 2), 0.14036, 0.001);
+    EXPECT_NEAR(F(4, 3), 0.07060, 0.001);
+    EXPECT_NEAR(F(4, 4), 0.00000, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagTest)
