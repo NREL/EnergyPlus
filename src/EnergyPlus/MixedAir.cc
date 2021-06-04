@@ -3780,7 +3780,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         // cycling fans allow "average" min OA to be below minimum
         if (!AirLoopCyclingFan) {
             Real64 minOASchedMassFlowRate = this->MinOAMassFlowRate * MinOASchedVal;
-            if (minOASchedMassFlowRate > (this->OAMassFlow + SmallMassFlow)) {
+            if (minOASchedMassFlowRate > this->OAMassFlow) {
                 this->OAMassFlow = minOASchedMassFlowRate;
                 this->OALimitingFactor = limitFactorLimits;
             }
@@ -3806,7 +3806,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         MaxOAflowfracVal = min(max(MaxOAflowfracVal, 0.0), 1.0);
         currentMaxOAMassFlowRate = min(this->MaxOAMassFlowRate, this->MixMassFlow * MaxOAflowfracVal);
         OutAirMinFrac = min(MaxOAflowfracVal, OutAirMinFrac);
-        if (currentMaxOAMassFlowRate < (this->OAMassFlow - SmallMassFlow)) {
+        if (currentMaxOAMassFlowRate < this->OAMassFlow) {
             this->OAMassFlow = currentMaxOAMassFlowRate;
             this->OALimitingFactor = limitFactorLimits;
         }
