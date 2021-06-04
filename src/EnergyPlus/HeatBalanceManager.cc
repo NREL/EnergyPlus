@@ -218,12 +218,14 @@ namespace HeatBalanceManager {
         }
 
         bool anyRan;
+
         ManageEMS(state,
                   EMSManager::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance,
                   anyRan,
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
+
         InitHeatBalance(state); // Initialize all heat balance related parameters
         ManageEMS(
             state, EMSManager::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
@@ -5703,6 +5705,34 @@ namespace HeatBalanceManager {
         }
     }
 
+    void AllocateZoneHeatBalArrays(EnergyPlusData &state)
+    {
+        // Allocate zone / encl hb arrays
+        state.dataHeatBal->EnclSolDB.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolDBSSG.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolDBIntWin.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQD.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclRadQThermalRad.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            state.dataHeatBal->EnclSolDB(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolDBSSG(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolDBIntWin(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQSDifSol(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQD(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQDforDaylight(zoneNum) = 0.0;
+            state.dataHeatBal->EnclRadQThermalRad(zoneNum) = 0.0;
+            state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
+        }
+        state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            state.dataHeatBal->EnclSolQSWRad(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = 0.0;
+        }
+    }
     void AllocateHeatBalArrays(EnergyPlusData &state)
     {
 
@@ -5742,6 +5772,7 @@ namespace HeatBalanceManager {
         // Allocate real Variables
         // Following used for Calculations
         //  Allocate variables in DataHeatBalSys
+        AllocateZoneHeatBalArrays(state);
         state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -5855,6 +5886,17 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
 
         state.dataHeatBalMgr->CountWarmupDayPoints = 0;
+
+        for (int loop = 1; loop <= state.dataGlobal->NumOfZones; ++loop) {
+            // CurrentModuleObject='Zone'
+            SetupOutputVariable(state,
+                                "Zone Mean Radiant Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBal->ZoneMRT(loop),
+                                "Zone",
+                                "State",
+                                state.dataHeatBal->Zone(loop).Name);
+        }
     }
 
     // End Initialization Section of the Module

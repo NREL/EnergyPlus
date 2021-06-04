@@ -2035,7 +2035,7 @@ namespace WeatherManager {
         state.dataWeatherManager->TodayDifSolarRad = state.dataWeatherManager->TomorrowDifSolarRad;
         state.dataWeatherManager->TodayLiquidPrecip = state.dataWeatherManager->TomorrowLiquidPrecip;
         state.dataWeatherManager->TodayTotalSkyCover = state.dataWeatherManager->TomorrowTotalSkyCover;
-        state.dataWeatherManager->TodayOpaqueSkyCover = state.dataWeatherManager->TomorrowTotalSkyCover;
+        state.dataWeatherManager->TodayOpaqueSkyCover = state.dataWeatherManager->TomorrowOpaqueSkyCover;
 
         // Update Global Data
 

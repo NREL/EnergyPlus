@@ -404,7 +404,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
         ShowSevereError(state, RoutineName + "Invalid " + cAlphaField2 + " = " + Alpha2);
         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alpha1);
         ErrorsFound = true;
-    } else if (state.dataSurface->Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool) {
+    } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr)) {
         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha1 + "\", Invalid Surface");
         ShowContinueError(state, cAlphaField2 + "=\"" + Alpha2 + "\" has been used in another radiant system, ventilated slab, or pool.");
         ShowContinueError(state,
@@ -423,7 +423,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
                         state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is defined as a window.  This is not allowed.  A pool must be a floor that is NOT a window.");
         ErrorsFound = true;
-    } else if (state.dataSurface->Surface(this->SurfacePtr).MaterialMovInsulInt > 0) {
+    } else if (state.dataSurface->SurfMaterialMovInsulInt(this->SurfacePtr) > 0) {
         ShowSevereError(state,
                         state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
@@ -435,8 +435,8 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
         ErrorsFound = true;
     } else { // ( Pool( Item ).SurfacePtr > 0 )
-        state.dataSurface->Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
-        state.dataSurface->Surface(this->SurfacePtr).IsPool = true;
+        state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr) = true;
+        state.dataSurface->SurfIsPool(this->SurfacePtr) = true;
         this->ZonePtr = state.dataSurface->Surface(this->SurfacePtr).Zone;
         // Check to make sure pool surface is a floor
         if (state.dataSurface->Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::Floor) {

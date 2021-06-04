@@ -86,7 +86,7 @@ namespace DataStringGlobals {
     extern std::string const VerString;        // String that represents version information
     extern std::string const MatchVersion;     // String to be matched by Version object
     extern std::string const PythonAPIVersion; // API version string to be matched when using the Python API
-
+    extern std::string const BuildPlatformString;
 } // namespace DataStringGlobals
 
 struct DataStringGlobalsData : BaseGlobalStruct

@@ -6469,11 +6469,11 @@ namespace InternalHeatGains {
         // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
             auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
-            state.dataHeatBal->QL(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclRadQThermalRad(enclosureNum) = 0.0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 Real64 zoneQL;
                 SumAllInternalRadiationGains(state, zoneNum, zoneQL);
-                state.dataHeatBal->QL(enclosureNum) += zoneQL;
+                state.dataHeatBal->EnclRadQThermalRad(enclosureNum) += zoneQL;
             }
         }
 
@@ -6490,10 +6490,10 @@ namespace InternalHeatGains {
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 int const radEnclosureNum = state.dataHeatBal->Zone(zoneNum).RadiantEnclosureNum;
                 if (!state.dataGlobal->doLoadComponentPulseNow) {
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) =
-                        state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
+                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) *
+                                                                     state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                 } else {
-                    state.dataInternalHeatGains->curQL = state.dataHeatBal->QL(radEnclosureNum);
+                    state.dataInternalHeatGains->curQL = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum);
                     // for the loads component report during the special sizing run increase the radiant portion
                     // a small amount to create a "pulse" of heat that is used for the delayed loads
                     state.dataInternalHeatGains->adjQL =
@@ -8038,12 +8038,10 @@ namespace InternalHeatGains {
         }
     }
 
-    void GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                    int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                    int const IntGainTypeOfNum,     // zone internal gain type number
-                                    std::string const &IntGainName, // Internal gain name
-                                    int &DeviceIndex,               // Device index
-                                    bool &ErrorFound)
+    int GetInternalGainDeviceIndex(EnergyPlusData &state,
+                                   int const ZoneNum,                   // zone index pointer for which zone to sum gains for
+                                   int const IntGainTypeOfNum,          // zone internal gain type number
+                                   std::string_view const &IntGainName) // Internal gain name
     {
 
         // SUBROUTINE INFORMATION:
@@ -8054,31 +8052,25 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // utility to retrieve index pointer to a specific internal gain
+        // the subroutine returns the index of matched internal gain device or -1 if no match found.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool Found;
         int DeviceNum;
-
-        Found = false;
-
+        int DeviceIndex;
         if (state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
             DeviceIndex = -1;
-            ErrorFound = true;
-            return;
+            return DeviceIndex;
         }
-
         for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
-            if (UtilityRoutines::SameString(state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectName, IntGainName)) {
-                if (state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOfNum) {
-                    ErrorFound = true;
-                } else {
-                    ErrorFound = false;
-                }
-                Found = true;
+            if ((UtilityRoutines::SameString(state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectName, IntGainName.data())) &&
+                (state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum == IntGainTypeOfNum)) {
                 DeviceIndex = DeviceNum;
                 break;
+            } else {
+                DeviceIndex = -1;
             }
         }
+        return DeviceIndex;
     }
 
     void SumInternalConvectionGainsByIndices(
