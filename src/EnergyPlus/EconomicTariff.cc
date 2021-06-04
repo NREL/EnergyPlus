@@ -4298,9 +4298,10 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                             elecTotalCost += tariff(iTariff).totalAnnualCost;
                         } else if (tariff(iTariff).kindGasMtr == kindMeterGas) {
                             gasTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else {
+                        } else if (tariff(iTariff).kindWaterMtr == kindMeterNotWater) {
                             otherTotalCost += tariff(iTariff).totalAnnualCost;
                             // removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
+                        } else {
                         }
                     }
                 }
