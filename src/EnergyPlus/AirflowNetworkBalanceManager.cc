@@ -337,8 +337,10 @@ namespace AirflowNetworkBalanceManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-
-                Real64 temperature{fields.at("reference_temperature")};
+                Real64 temperature(20.0);
+                if (fields.find("reference_temperature") != fields.end()) { // required field, has default value
+                    temperature = fields.at("reference_temperature");
+                }
                 Real64 pressure(101325.0);
                 if (fields.find("reference_barometric_pressure") != fields.end()) { // not required field, has default value
                     pressure = fields.at("reference_barometric_pressure");
@@ -358,7 +360,10 @@ namespace AirflowNetworkBalanceManager {
                         success = false;
                     }
                 }
-                Real64 humidity{fields.at("reference_humidity_ratio")};
+                Real64 humidity(0.0);
+                if (fields.find("reference_humidity_ratio") != fields.end()) { // not required field, has default value
+                    humidity = fields.at("reference_humidity_ratio");
+                }
                 // globalSolverObject.referenceConditions.emplace_back(thisObjectName, temperature, pressure, humidity);
                 referenceConditions.emplace(std::piecewise_construct,
                                             std::forward_as_tuple(thisObjectName),
