@@ -3792,7 +3792,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
         MinOAflowfracVal = min(max(MinOAflowfracVal, 0.0), 1.0);
         OutAirMinFrac = max(MinOAflowfracVal, OutAirMinFrac);
         Real64 minOAFracMassFlowRate = this->MixMassFlow * MinOAflowfracVal;
-        if (minOAFracMassFlowRate > (this->OAMassFlow + SmallMassFlow)) {
+        if (minOAFracMassFlowRate > this->OAMassFlow) {
             this->OAMassFlow = minOAFracMassFlowRate;
             this->OALimitingFactor = limitFactorLimits;
         }
