@@ -3669,9 +3669,8 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
             OutAirMinFrac = 0.0;
         }
     } else {
-        if ((this->MaxOA >= SmallAirVolFlow) && (this->MinOAMassFlowRate > 0.0)) {
+        if (this->MaxOA >= SmallAirVolFlow) {
             OutAirMinFrac = this->MinOA / this->MaxOA;
-            this->OALimitingFactor = limitFactorLimits;
         } else {
             OutAirMinFrac = 0.0;
         }
