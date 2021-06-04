@@ -965,7 +965,7 @@ namespace SystemAvailabilityManager {
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
                          state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode,
@@ -980,7 +980,7 @@ namespace SystemAvailabilityManager {
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
                          state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode,
@@ -1049,7 +1049,7 @@ namespace SystemAvailabilityManager {
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
                          state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node,
@@ -1105,7 +1105,7 @@ namespace SystemAvailabilityManager {
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
                          state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node,
@@ -1161,7 +1161,7 @@ namespace SystemAvailabilityManager {
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
                          state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node,
@@ -1228,7 +1228,7 @@ namespace SystemAvailabilityManager {
                                       cAlphaArgs(1),
                                       DataLoopNode::NodeFluidType::blank,
                                       DataLoopNode::NodeConnectionType::Sensor,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 MarkNode(state,
                          state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node,
