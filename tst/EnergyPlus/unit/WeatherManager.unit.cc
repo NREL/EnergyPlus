@@ -1195,7 +1195,7 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
     ErrorsFound = false;
 
     state->dataWeatherManager->WeatherFileExists = true;
-    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "/weather/USA_IL_University.of.Illinois-Willard.AP.725315_TMY3.epw";
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "weather/USA_IL_University.of.Illinois-Willard.AP.725315_TMY3.epw";
     state->dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(*state);
 
