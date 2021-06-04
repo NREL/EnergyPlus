@@ -1970,7 +1970,7 @@ namespace CurveManager {
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto indVar : fields.at("independent_variables")) {
-                    std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name"));
+                    std::string indVarName = UtilityRoutines::MakeUPPERCase(AsString(indVar.at("independent_variable_name")));
                     std::string contextString = "Table:IndependentVariable \"" + indVarName + "\"";
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &callbackPair);
@@ -2106,7 +2106,7 @@ namespace CurveManager {
                 state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
                 state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::BtwxtMethod;
 
-                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name"));
+                std::string indVarListName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("independent_variable_list_name")));
 
                 std::string contextString = "Table:Lookup \"" + state.dataCurveManager->PerfCurve(CurveNum).Name + "\"";
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2175,9 +2175,9 @@ namespace CurveManager {
                 };
                 NormalizationMethod normalizeMethod = NM_NONE;
                 if (fields.count("normalization_method")) {
-                    if (UtilityRoutines::SameString(fields.at("normalization_method"), "DIVISORONLY")) {
+                    if (UtilityRoutines::SameString(static_cast<const std::string &>(fields.at("normalization_method")), "DIVISORONLY")) {
                         normalizeMethod = NM_DIVISOR_ONLY;
-                    } else if (UtilityRoutines::SameString(fields.at("normalization_method"), "AUTOMATICWITHDIVISOR")) {
+                    } else if (UtilityRoutines::SameString(static_cast<const std::string &>(fields.at("normalization_method")), "AUTOMATICWITHDIVISOR")) {
                         normalizeMethod = NM_AUTO_WITH_DIVISOR;
                     }
                 }

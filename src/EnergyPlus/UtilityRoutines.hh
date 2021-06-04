@@ -87,6 +87,14 @@ void ConvertCaseToLower(std::string const &InputString, // Input string
                         std::string &OutputString       // Output string (in LowerCase)
 );
 
+
+// useful for forcing a conversion to a string reference for JSON objects
+inline const std::string &AsString(const std::string &value)
+{
+    return value;
+}
+
+
 std::string::size_type FindNonSpace(std::string const &String); // String to be scanned
 
 template <typename T> inline T pow2(T const &x)
@@ -422,14 +430,15 @@ namespace UtilityRoutines {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    std::string MakeUPPERCase(std::string const &InputString); // Input String
 
-    inline bool SameString(std::string const &s, std::string const &t)
+    std::string MakeUPPERCase(std::string_view const InputString); // Input String
+
+    inline bool SameString(std::string_view const s, std::string_view const t)
     {
         // case insensitive comparison
         return equali(s, t);
     }
-
+/*
     typedef char const *c_cstring;
 
     inline bool SameString(std::string const &s, c_cstring const &t)
@@ -449,6 +458,7 @@ namespace UtilityRoutines {
         // case insensitive comparison
         return equali(s, t);
     }
+     */
 
     template <typename InputIterator>
     inline void VerifyName(EnergyPlusData &state,

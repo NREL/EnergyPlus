@@ -1048,13 +1048,13 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 EIRPlantLoopHeatPump thisPLHP;
                 thisPLHP.plantTypeOfNum = classToInput.thisTypeNum;
                 thisPLHP.name = UtilityRoutines::MakeUPPERCase(thisObjectName);
-                std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_inlet_node_name"));
-                std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("load_side_outlet_node_name"));
-                std::string condenserType = UtilityRoutines::MakeUPPERCase(fields.at("condenser_type"));
-                std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_inlet_node_name"));
-                std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(fields.at("source_side_outlet_node_name"));
+                std::string loadSideInletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("load_side_inlet_node_name")));
+                std::string loadSideOutletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("load_side_outlet_node_name")));
+                std::string condenserType = UtilityRoutines::MakeUPPERCase(AsString(fields.at("condenser_type")));
+                std::string sourceSideInletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("source_side_inlet_node_name")));
+                std::string sourceSideOutletNodeName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("source_side_outlet_node_name")));
                 if (fields.find("companion_heat_pump_name") != fields.end()) { // optional field
-                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(fields.at("companion_heat_pump_name"));
+                    thisPLHP.companionCoilName = UtilityRoutines::MakeUPPERCase(AsString(fields.at("companion_heat_pump_name")));
                 }
                 auto tmpFlowRate = fields.at("load_side_reference_flow_rate");
                 if (tmpFlowRate == "Autosize") {
@@ -1112,21 +1112,21 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 auto &capFtName = fields.at("capacity_modifier_function_of_temperature_curve_name");
-                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(capFtName));
+                thisPLHP.capFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(AsString(capFtName)));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + capFtName.get<std::string>());
                     errorsFound = true;
                 }
                 auto &eirFtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFtName));
+                thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(AsString(eirFtName)));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + eirFtName.get<std::string>());
                     errorsFound = true;
                 }
                 auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
-                thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(eirFplrName));
+                thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(state, UtilityRoutines::MakeUPPERCase(AsString(eirFplrName)));
                 if (thisPLHP.capFuncTempCurveIndex == 0) {
                     ShowSevereError(
                         state, "Invalid curve name for EIR PLHP (name=" + thisPLHP.name + "; entered curve name: " + eirFplrName.get<std::string>());

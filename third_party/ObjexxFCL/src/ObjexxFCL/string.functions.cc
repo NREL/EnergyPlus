@@ -17,63 +17,6 @@ namespace ObjexxFCL {
 
 // Predicate /////
 
-// Has a Prefix Case-Optionally?
-bool
-has_prefix( std::string const & s, std::string const & pre, bool const exact_case )
-{
-	std::string::size_type const pre_len( pre.length() );
-	if ( pre_len == 0 ) {
-		return false;
-	} else if ( s.length() < pre_len ) {
-		return false;
-	} else if ( exact_case ) {
-		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
-			if ( s[ i ] != pre[ i ] ) return false;
-		}
-		return true;
-	} else {
-		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
-			if ( ! equali( s[ i ], pre[ i ] ) ) return false;
-		}
-		return true;
-	}
-}
-
-// Has a Prefix Case-Optionally?
-bool
-has_prefix( std::string const & s, char const * const pre, bool const exact_case )
-{
-	std::string::size_type const pre_len( std::strlen( pre ) );
-	if ( pre_len == 0 ) {
-		return false;
-	} else if ( s.length() < pre_len ) {
-		return false;
-	} else if ( exact_case ) {
-		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
-			if ( s[ i ] != pre[ i ] ) return false;
-		}
-		return true;
-	} else {
-		for ( std::string::size_type i = 0; i < pre_len; ++i ) {
-			if ( ! equali( s[ i ], pre[ i ] ) ) return false;
-		}
-		return true;
-	}
-}
-
-// Has a Prefix Case-Optionally?
-bool
-has_prefix( std::string const & s, char const pre, bool const exact_case )
-{
-	if ( s.length() == 0 ) {
-		return false;
-	} else if ( exact_case ) {
-		return ( s[ 0 ] == pre );
-	} else {
-		return equali( s[ 0 ], pre );
-	}
-}
-
 // Modifier /////
 
 // Lowercase a string
@@ -291,7 +234,7 @@ unique( std::string & s )
 
 // Substring Replaced in a string
 std::string &
-replace( std::string & s, std::string const & a, std::string const & b )
+replace( std::string & s, std::string_view const a, std::string_view const b )
 {
 	std::string::size_type const la( a.length() ), lb( b.length() );
 	std::string::size_type pos( 0u );
@@ -304,7 +247,7 @@ replace( std::string & s, std::string const & a, std::string const & b )
 
 // Overlay a string with Another string, Expanding Size as Needed
 std::string &
-overlay( std::string & s, std::string const & t, std::string::size_type const pos )
+overlay( std::string & s, std::string_view const t, std::string::size_type const pos )
 {
 	std::string::size_type const t_len( t.length() );
 	std::string::size_type const l_len( pos + t_len ); // Lower bound on new string length
@@ -317,7 +260,7 @@ overlay( std::string & s, std::string const & t, std::string::size_type const po
 
 // Lowercased Copy of a string
 std::string
-lowercased( std::string const & s )
+lowercased( std::string_view const s )
 {
 	std::string t( s );
 	std::string::size_type const t_len( t.length() );
@@ -329,7 +272,7 @@ lowercased( std::string const & s )
 
 // Uppercased Copy of a string
 std::string
-uppercased( std::string const & s )
+uppercased( std::string_view const s )
 {
 	std::string t( s );
 	std::string::size_type const t_len( t.length() );
@@ -341,231 +284,231 @@ uppercased( std::string const & s )
 
 // Left-Justified Copy of a string
 std::string
-ljustified( std::string const & s )
+ljustified( std::string_view const s )
 {
 	std::string::size_type const off( s.find_first_not_of( ' ' ) );
 	if ( ( off > 0 ) && ( off != std::string::npos ) ) {
-		return s.substr( off ).append( off, ' ' );
+		return std::string{s.substr( off )}.append( off, ' ' );
 	} else {
-		return s;
+		return std::string{s};
 	}
 }
 
 // Right-Justified Copy of a string
 std::string
-rjustified( std::string const & s )
+rjustified( std::string_view const s )
 {
 	std::string::size_type const s_len_trim( len_trim( s ) );
 	std::string::size_type const off( s.length() - s_len_trim );
 	if ( off > 0 ) {
 		return std::string( off, ' ' ).append( s.substr( 0, s_len_trim ) );
 	} else {
-		return s;
+		return std::string{s};
 	}
 }
 
 // Trailing Space Trimmed Copy of a string
 std::string
-trimmed( std::string const & s )
+trimmed( std::string_view const s )
 {
 	if ( s.empty() ) { // Empty string
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
 		if ( ie == std::string::npos ) { // Blank string: return empty string
 			return std::string();
 		} else if ( ie < s.length() - 1 ) { // Trimmed
-			return s.substr( 0, ie + 1 );
+			return std::string{s.substr( 0, ie + 1 )};
 		} else { // Unchanged
-			return s;
+			return std::string{s};
 		}
 	}
 }
 
 // Trailing Whitespace Trimmed Copy of a string
 std::string
-trimmed_whitespace( std::string const & s )
+trimmed_whitespace( std::string_view const s )
 {
 	static std::string const WHITE( " \t\0", 3 );
 	if ( s.empty() ) { // Empty string
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
 		if ( ie == std::string::npos ) { // Blank string: return empty string
 			return std::string();
 		} else if ( ie < s.length() - 1 ) { // Trimmed
-			return s.substr( 0, ie + 1 );
+			return std::string{s.substr( 0, ie + 1 )};
 		} else { // Unchanged
-			return s;
+			return std::string{s};
 		}
 	}
 }
 
 // Specified Characters Stripped from a string's Tails Copy of a string
 std::string
-stripped( std::string const & s, std::string const & chars )
+stripped( std::string_view const s, std::string_view const chars )
 {
 	if ( s.empty() ) {
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ib( s.find_first_not_of( chars ) );
 		std::string::size_type const ie( s.find_last_not_of( chars ) );
 		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is from chars
 			return std::string(); // Return empty string
 		} else {
-			return s.substr( ib, ie - ib + 1 );
+			return std::string{s.substr( ib, ie - ib + 1 )};
 		}
 	}
 }
 
 // Specified Characters Stripped from a string's Left Tail Copy of a string
 std::string
-lstripped( std::string const & s, std::string const & chars )
+lstripped( std::string_view const s, std::string_view const chars )
 {
 	if ( s.empty() ) {
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ib( s.find_first_not_of( chars ) );
 		if ( ib == std::string::npos ) { // All of string is from chars
 			return std::string(); // Return empty string
 		} else if ( ib > 0 ) {
-			return s.substr( ib );
+			return std::string{s.substr( ib )};
 		} else {
-			return s;
+			return std::string{s};
 		}
 	}
 }
 
 // Specified Characters Stripped from a string's Right Tail Copy of a string
 std::string
-rstripped( std::string const & s, std::string const & chars )
+rstripped( std::string_view const s, std::string_view const chars )
 {
 	if ( s.empty() ) {
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ie( s.find_last_not_of( chars ) );
 		if ( ie == std::string::npos ) { // All of string is from chars
 			return std::string(); // Return empty string
 		} else {
-			return s.substr( 0, ie + 1 );
+			return std::string{s.substr( 0, ie + 1 )};
 		}
 	}
 }
 
 // Space Stripped from a string's Tails Copy of a string
 std::string
-stripped( std::string const & s )
+stripped( std::string_view const s )
 {
 	if ( s.empty() ) {
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ib( s.find_first_not_of( ' ' ) );
 		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
 		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is ' '
 			return std::string(); // Return empty string
 		} else {
-			return s.substr( ib, ie - ib + 1 );
+			return std::string{s.substr( ib, ie - ib + 1 )};
 		}
 	}
 }
 
 // Space Stripped from a string's Left Tail Copy of a string
 std::string
-lstripped( std::string const & s )
+lstripped( std::string_view const s )
 {
 	if ( s.empty() ) {
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ib( s.find_first_not_of( ' ' ) );
 		if ( ib == std::string::npos ) { // All of string is ' '
 			return std::string(); // Return empty string
 		} else if ( ib > 0 ) {
-			return s.substr( ib );
+			return std::string{s.substr( ib )};
 		} else {
-			return s;
+			return std::string{s};
 		}
 	}
 }
 
 // Space Stripped from a string's Right Tail Copy of a string
 std::string
-rstripped( std::string const & s )
+rstripped( std::string_view const s )
 {
 	if ( s.empty() ) {
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ie( s.find_last_not_of( ' ' ) );
 		if ( ie == std::string::npos ) { // All of string is ' '
 			return std::string(); // Return empty string
 		} else {
-			return s.substr( 0, ie + 1 );
+			return std::string{s.substr( 0, ie + 1 )};
 		}
 	}
 }
 
 // Whitespace Stripped from a string's Tails Copy of a string
 std::string
-stripped_whitespace( std::string const & s )
+stripped_whitespace( std::string_view const s )
 {
 	static std::string const WHITE( " \t\0", 3 );
 	if ( s.empty() ) {
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ib( s.find_first_not_of( WHITE ) );
 		std::string::size_type const ie( s.find_last_not_of( WHITE ) );
 		if ( ( ib == std::string::npos ) || ( ie == std::string::npos ) ) { // All of string is WHITE
 			return std::string(); // Return empty string
 		} else {
-			return s.substr( ib, ie - ib + 1 );
+			return std::string{s.substr( ib, ie - ib + 1 )};
 		}
 	}
 }
 
 // Sized to a Specified Length Copy of a string
 std::string
-sized( std::string const & s, std::string::size_type const len )
+sized( std::string_view const s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
 	if ( s_len < len ) { // Right-padded
-		return s + std::string( len - s_len, ' ' );
+		return std::string{s} + std::string( len - s_len, ' ' );
 	} else if ( s_len == len ) { // Unchanged
-		return s;
+		return std::string{s};
 	} else { // Truncated
-		return s.substr( 0, len );
+		return std::string{s.substr( 0, len )};
 	}
 }
 
 // Left-Sized to a Specified Length Copy of a string
 std::string
-lsized( std::string const & s, std::string::size_type const len )
+lsized( std::string_view const s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
 	if ( s_len < len ) { // Left-padded
-		return std::string( len - s_len, ' ' ) + s;
+		return std::string( len - s_len, ' ' ) + std::string{s};
 	} else if ( s_len == len ) { // Unchanged
-		return s;
+		return std::string{s};
 	} else { // Truncated
-		return s.substr( s_len - len );
+		return std::string{s.substr( s_len - len )};
 	}
 }
 
 // Right-Sized to a Specified Length Copy of a string
 std::string
-rsized( std::string const & s, std::string::size_type const len )
+rsized( std::string_view const s, std::string::size_type const len )
 {
 	std::string::size_type const s_len( s.length() );
 	if ( s_len < len ) { // Right-padded
-		return s + std::string( len - s_len, ' ' );
+		return std::string{s} + std::string( len - s_len, ' ' );
 	} else if ( s_len == len ) { // Unchanged
-		return s;
+		return std::string{s};
 	} else { // Truncated
-		return s.substr( 0, len );
+		return std::string{s.substr( 0, len )};
 	}
 }
 
 // Centered String to Specified Length
 std::string
-centered( std::string const & s, std::string::size_type const len )
+centered( std::string_view const s, std::string::size_type const len )
 {
 	std::string const t( stripped_whitespace( s ) );
 	std::string::size_type const t_len( t.length() );
@@ -582,7 +525,7 @@ centered( std::string const & s, std::string::size_type const len )
 
 // Removed Repeat Characters from a Possibly Unsorted string Preserving Order Copy of a string
 std::string
-uniqued( std::string const & s )
+uniqued( std::string_view const s )
 {
 	std::string u;
 	std::string::size_type const s_len( s.length() );
@@ -596,7 +539,7 @@ uniqued( std::string const & s )
 
 // Overlayed string with Another string, Expanding Size as Needed
 std::string
-overlayed( std::string const & s, std::string const & t, std::string::size_type const pos )
+overlayed( std::string_view const s, std::string_view const t, std::string::size_type const pos )
 {
 	std::string::size_type const s_len( s.length() );
 	std::string::size_type const t_len( t.length() );
@@ -609,7 +552,7 @@ overlayed( std::string const & s, std::string const & t, std::string::size_type 
 
 // Repeated Copies
 std::string
-repeated( std::string const & s, int const n )
+repeated( std::string_view const s, int const n )
 {
 	if ( n <= 0 ) return std::string();
 	std::string::size_type const l( s.length() );
@@ -623,30 +566,23 @@ repeated( std::string const & s, int const n )
 
 // Repeated Copies
 std::string
-repeat( std::string const & s, int const n )
+repeat( std::string_view const s, int const n )
 {
-	if ( n <= 0 ) return std::string();
-	std::string::size_type const l( s.length() );
-	std::string o;
-	o.reserve( n * l );
-	for ( int i = 0; i < n; ++i ) {
-		o += s;
-	}
-	return o;
+	return repeated(s, n);
 }
 
 // Space-Free Head Copy of a string
 std::string
-head( std::string const & s )
+head( std::string_view const s )
 {
 	if ( s.empty() ) { // Empty string
-		return s;
+		return std::string{};
 	} else {
 		std::string::size_type const ie( s.find( ' ' ) );
 		if ( ie == std::string::npos ) { // Space-free string
-			return s;
+			return std::string{s};
 		} else {
-			return s.substr( 0, ie );
+			return std::string{s.substr( 0, ie )};
 		}
 	}
 }

@@ -389,7 +389,7 @@ namespace UnitarySystems {
 
                 std::string loc_m_SingleModeOp("No");
                 if (fields.find("single_mode_operation") != fields.end()) { // not required field
-                    loc_m_SingleModeOp = UtilityRoutines::MakeUPPERCase(fields.at("single_mode_operation"));
+                    loc_m_SingleModeOp = UtilityRoutines::MakeUPPERCase(AsString(fields.at("single_mode_operation")));
                 }
                 // set single mode flag
                 if (UtilityRoutines::SameString(loc_m_SingleModeOp, "Yes")) {
@@ -6846,52 +6846,52 @@ namespace UnitarySystems {
                 input_spec.control_type = fields.at("control_type");
                 if (fields.find("controlling_zone_or_thermostat_location") != fields.end()) { // not required field
                     input_spec.controlling_zone_or_thermostat_location =
-                        UtilityRoutines::MakeUPPERCase(fields.at("controlling_zone_or_thermostat_location"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("controlling_zone_or_thermostat_location")));
                 }
                 if (fields.find("dehumidification_control_type") != fields.end()) { // not required field, has default
-                    input_spec.dehumidification_control_type = UtilityRoutines::MakeUPPERCase(fields.at("dehumidification_control_type"));
+                    input_spec.dehumidification_control_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("dehumidification_control_type")));
                 } else {
                     input_spec.dehumidification_control_type = "NONE"; // default value
                 }
                 if (fields.find("availability_schedule_name") != fields.end()) { // not required field
-                    input_spec.availability_schedule_name = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
+                    input_spec.availability_schedule_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("availability_schedule_name")));
                 }
-                input_spec.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_inlet_node_name"));   // required
-                input_spec.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_outlet_node_name")); // required
+                input_spec.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_inlet_node_name")));   // required
+                input_spec.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_outlet_node_name"))); // required
                 if (fields.find("supply_fan_object_type") != fields.end()) {                                         // not required field
-                    input_spec.supply_fan_object_type = UtilityRoutines::MakeUPPERCase(fields.at("supply_fan_object_type"));
+                    input_spec.supply_fan_object_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("supply_fan_object_type")));
                 }
 
                 std::string loc_m_FanName;
                 if (fields.find("supply_fan_name") != fields.end()) { // not required field
-                    input_spec.supply_fan_name = UtilityRoutines::MakeUPPERCase(fields.at("supply_fan_name"));
+                    input_spec.supply_fan_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("supply_fan_name")));
                 }
                 if (fields.find("fan_placement") != fields.end()) { // not required field
-                    input_spec.fan_placement = UtilityRoutines::MakeUPPERCase(fields.at("fan_placement"));
+                    input_spec.fan_placement = UtilityRoutines::MakeUPPERCase(AsString(fields.at("fan_placement")));
                 }
                 if (fields.find("supply_air_fan_operating_mode_schedule_name") != fields.end()) { // not required field
                     input_spec.supply_air_fan_operating_mode_schedule_name =
-                        UtilityRoutines::MakeUPPERCase(fields.at("supply_air_fan_operating_mode_schedule_name"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("supply_air_fan_operating_mode_schedule_name")));
                 }
                 if (fields.find("heating_coil_object_type") != fields.end()) { // not required field
-                    input_spec.heating_coil_object_type = UtilityRoutines::MakeUPPERCase(fields.at("heating_coil_object_type"));
+                    input_spec.heating_coil_object_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("heating_coil_object_type")));
                     thisSys.m_HeatCoilExists = true;
                 }
                 if (fields.find("heating_coil_name") != fields.end()) { // not required field
-                    input_spec.heating_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("heating_coil_name"));
+                    input_spec.heating_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("heating_coil_name")));
                 }
                 if (fields.find("dx_heating_coil_sizing_ratio") != fields.end()) { // not required field, has default
                     input_spec.dx_heating_coil_sizing_ratio = fields.at("dx_heating_coil_sizing_ratio");
                 }
                 if (fields.find("cooling_coil_object_type") != fields.end()) { // not required field
-                    input_spec.cooling_coil_object_type = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));
+                    input_spec.cooling_coil_object_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_object_type")));
                     thisSys.m_CoolCoilExists = true;
                 }
                 if (fields.find("cooling_coil_name") != fields.end()) { // not required field
-                    input_spec.cooling_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_name"));
+                    input_spec.cooling_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_name")));
                 }
                 if (fields.find("use_doas_dx_cooling_coil") != fields.end()) { // not required field, has default
-                    input_spec.use_doas_dx_cooling_coil = UtilityRoutines::MakeUPPERCase(fields.at("use_doas_dx_cooling_coil"));
+                    input_spec.use_doas_dx_cooling_coil = UtilityRoutines::MakeUPPERCase(AsString(fields.at("use_doas_dx_cooling_coil")));
                 } else {
                     input_spec.use_doas_dx_cooling_coil = "No";
                 }
@@ -6904,19 +6904,19 @@ namespace UnitarySystems {
                     }
                 }
                 if (fields.find("latent_load_control") != fields.end()) { // not required field, has default
-                    input_spec.latent_load_control = UtilityRoutines::MakeUPPERCase(fields.at("latent_load_control"));
+                    input_spec.latent_load_control = UtilityRoutines::MakeUPPERCase(AsString(fields.at("latent_load_control")));
                 } else {
                     input_spec.latent_load_control = "SensibleOnlyLoadControl";
                 }
                 if (fields.find("supplemental_heating_coil_object_type") != fields.end()) { // not required field
                     input_spec.supplemental_heating_coil_object_type =
-                        UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_object_type"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("supplemental_heating_coil_object_type")));
                 }
                 if (fields.find("supplemental_heating_coil_name") != fields.end()) { // not required field
-                    input_spec.supplemental_heating_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_name"));
+                    input_spec.supplemental_heating_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("supplemental_heating_coil_name")));
                 }
                 if (fields.find("cooling_supply_air_flow_rate_method") != fields.end()) { // not required field
-                    input_spec.cooling_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(fields.at("cooling_supply_air_flow_rate_method"));
+                    input_spec.cooling_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_supply_air_flow_rate_method")));
                 }
                 if (fields.find("cooling_supply_air_flow_rate") != fields.end()) { // not required field, autosizable
                     auto tempFieldVal = fields.at("cooling_supply_air_flow_rate");
@@ -6937,7 +6937,7 @@ namespace UnitarySystems {
                     input_spec.cooling_supply_air_flow_rate_per_unit_of_capacity = fields.at("cooling_supply_air_flow_rate_per_unit_of_capacity");
                 }
                 if (fields.find("heating_supply_air_flow_rate_method") != fields.end()) { // not required field
-                    input_spec.heating_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(fields.at("heating_supply_air_flow_rate_method"));
+                    input_spec.heating_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(AsString(fields.at("heating_supply_air_flow_rate_method")));
                 }
                 if (fields.find("heating_supply_air_flow_rate") != fields.end()) { // not required field
                     auto tempFieldVal = fields.at("heating_supply_air_flow_rate");
@@ -6958,7 +6958,7 @@ namespace UnitarySystems {
                     input_spec.heating_supply_air_flow_rate_per_unit_of_capacity = fields.at("heating_supply_air_flow_rate_per_unit_of_capacity");
                 }
                 if (fields.find("no_load_supply_air_flow_rate_method") != fields.end()) { // not required field
-                    input_spec.no_load_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(fields.at("no_load_supply_air_flow_rate_method"));
+                    input_spec.no_load_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(AsString(fields.at("no_load_supply_air_flow_rate_method")));
                 }
                 if (fields.find("no_load_supply_air_flow_rate") != fields.end()) { // not required field
                     auto tempFieldVal = fields.at("no_load_supply_air_flow_rate");
@@ -7002,7 +7002,7 @@ namespace UnitarySystems {
                 }
                 if (fields.find("outdoor_dry_bulb_temperature_sensor_node_name") != fields.end()) { // not required field
                     input_spec.outdoor_dry_bulb_temperature_sensor_node_name =
-                        UtilityRoutines::MakeUPPERCase(fields.at("outdoor_dry_bulb_temperature_sensor_node_name"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("outdoor_dry_bulb_temperature_sensor_node_name")));
                 }
                 if (fields.find("maximum_cycling_rate") != fields.end()) { // not required field, has default
                     input_spec.maximum_cycling_rate = fields.at("maximum_cycling_rate");
@@ -7029,19 +7029,19 @@ namespace UnitarySystems {
                     input_spec.maximum_temperature_for_heat_recovery = fields.at("maximum_temperature_for_heat_recovery");
                 }
                 if (fields.find("heat_recovery_water_inlet_node_name") != fields.end()) { // not required field
-                    input_spec.heat_recovery_water_inlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("heat_recovery_water_inlet_node_name"));
+                    input_spec.heat_recovery_water_inlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("heat_recovery_water_inlet_node_name")));
                 }
                 if (fields.find("heat_recovery_water_outlet_node_name") != fields.end()) { // not required field
                     input_spec.heat_recovery_water_outlet_node_name =
-                        UtilityRoutines::MakeUPPERCase(fields.at("heat_recovery_water_outlet_node_name"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("heat_recovery_water_outlet_node_name")));
                 }
                 if (fields.find("design_specification_multispeed_object_type") != fields.end()) { // not required field
                     input_spec.design_specification_multispeed_object_type =
-                        UtilityRoutines::MakeUPPERCase(fields.at("design_specification_multispeed_object_type"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("design_specification_multispeed_object_type")));
                 }
                 if (fields.find("design_specification_multispeed_object_name") != fields.end()) { // not required field
                     input_spec.design_specification_multispeed_object_name =
-                        UtilityRoutines::MakeUPPERCase(fields.at("design_specification_multispeed_object_name"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("design_specification_multispeed_object_name")));
                 }
 
                 thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);

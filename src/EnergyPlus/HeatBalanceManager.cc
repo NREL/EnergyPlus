@@ -4647,7 +4647,7 @@ namespace HeatBalanceManager {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
 
-                std::string construction_name{UtilityRoutines::MakeUPPERCase(fields.at("construction_name"))};
+                std::string construction_name{UtilityRoutines::MakeUPPERCase(AsString(fields.at("construction_name")))};
                 int source_after_layer_number{fields.at("thermal_source_present_after_layer_number")};
                 int calculation_after_layer_number{fields.at("temperature_calculation_requested_after_layer_number")};
                 int ctf_dimensions{fields.at("dimensions_for_the_ctf_calculation")};
@@ -7888,12 +7888,12 @@ namespace HeatBalanceManager {
                         }
                     }
                     if (fields.find("simple_mixing_schedule_name") != fields.end()) {
-                        auto &schedName = fields.at("simple_mixing_schedule_name");
+                        const std::string &schedName = fields.at("simple_mixing_schedule_name");
                         thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(schedName));
                         if (thisConstruct.AirBoundaryMixingSched == 0) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + thisConstruct.Name + "\", invalid (not found) " +
-                                                "Simple Mixing Schedule Name" + "=\"" + schedName.get<std::string>() + "\".");
+                                                "Simple Mixing Schedule Name" + "=\"" + schedName + "\".");
                             errorsFound = true;
                         }
                     } else {

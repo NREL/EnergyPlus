@@ -103,10 +103,10 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 // OTHER NOTES:
 // Manufacturers performance data can be used to generate the coefficients for the model.
 
-const char *calcChillerAbsorptionIndirect("CALC Chiller:Absorption:Indirect ");
+static constexpr std::string_view calcChillerAbsorptionIndirect("CALC Chiller:Absorption:Indirect ");
 auto constexpr waterIndex(1);
-const char *fluidNameSteam = "STEAM";
-const char *fluidNameWater = "WATER";
+static constexpr std::string_view fluidNameSteam = "STEAM";
+static constexpr std::string_view fluidNameWater = "WATER";
 
 PlantComponent *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
 {
@@ -905,7 +905,7 @@ void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real
                                                                            state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                            1.0,
                                                                            this->SteamFluidIndex,
-                                                                           calcChillerAbsorptionIndirect + this->Name);
+                                                                           std::string{calcChillerAbsorptionIndirect} + this->Name);
                 this->GenMassFlowRateMax = SteamDensity * this->GeneratorVolFlowRate;
             }
 
@@ -982,7 +982,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     // is calculated from the nominal capacity, the COP, and the condenser loop design delta T.
 
     static constexpr std::string_view RoutineName("SizeIndirectAbsorpChiller");
-    static std::string const SizeChillerAbsorptionIndirect("SIZE Chiller:Absorption:Indirect");
+    static constexpr std::string_view SizeChillerAbsorptionIndirect("SIZE Chiller:Absorption:Indirect");
 
     bool LoopErrorsFound = false;
 
@@ -1392,7 +1392,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                                                            state.dataSize->PlantSizData(PltSizSteamNum).ExitTemp,
                                                                            1.0,
                                                                            this->SteamFluidIndex,
-                                                                           SizeChillerAbsorptionIndirect + this->Name);
+                                                                           std::string{SizeChillerAbsorptionIndirect} + this->Name);
                 Real64 SteamDeltaT = state.dataSize->PlantSizData(PltSizSteamNum).DeltaT;
                 Real64 GeneratorOutletTemp = state.dataSize->PlantSizData(PltSizSteamNum).ExitTemp - SteamDeltaT;
 
@@ -1402,7 +1402,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                                                                state.dataSize->PlantSizData(PltSizSteamNum).ExitTemp,
                                                                                1.0,
                                                                                this->SteamFluidIndex,
-                                                                               SizeChillerAbsorptionIndirect + this->Name);
+                                                                               std::string{SizeChillerAbsorptionIndirect} + this->Name);
 
                 // wet enthalpy of steam (quality = 0)
                 Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
@@ -1410,7 +1410,7 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                                                                state.dataSize->PlantSizData(PltSizSteamNum).ExitTemp,
                                                                                0.0,
                                                                                this->SteamFluidIndex,
-                                                                               SizeChillerAbsorptionIndirect + this->Name);
+                                                                               std::string{SizeChillerAbsorptionIndirect} + this->Name);
                 Real64 CpWater =
                     FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, GeneratorOutletTemp, const_cast<int &>(waterIndex), RoutineName);
                 Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
@@ -1558,8 +1558,8 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
     // 2.  Absorber User Manual
 
     static constexpr std::string_view RoutineName("CalcIndirectAbsorberModel");
-    static std::string const LoopLossesChillerAbsorptionIndirect("Loop Losses: Chiller:Absorption:Indirect");
-    static std::string const LoopLossesChillerAbsorptionIndirectSpace("Loop Losses: Chiller:Absorption:Indirect ");
+    static constexpr std::string_view LoopLossesChillerAbsorptionIndirect("Loop Losses: Chiller:Absorption:Indirect");
+    static constexpr std::string_view LoopLossesChillerAbsorptionIndirectSpace("Loop Losses: Chiller:Absorption:Indirect ");
 
     Real64 TempEvapOutSetPoint(0.0); // C - evaporator outlet temperature setpoint
     Real64 EvapDeltaTemp(0.0);       // C - evaporator temperature difference, water side
@@ -1991,7 +1991,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                                                                            state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                            1.0,
                                                                            this->SteamFluidIndex,
-                                                                           calcChillerAbsorptionIndirect + this->Name);
+                                                                           std::string{calcChillerAbsorptionIndirect} + this->Name);
 
             // enthalpy of wet steam at generator inlet
             Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
@@ -1999,7 +1999,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                                                                            state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                            0.0,
                                                                            this->SteamFluidIndex,
-                                                                           calcChillerAbsorptionIndirect + this->Name);
+                                                                           std::string{calcChillerAbsorptionIndirect} + this->Name);
 
             // temperature difference of fluid through generator
             Real64 SteamDeltaT = this->GeneratorSubcool;
@@ -2010,7 +2010,7 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
             // heat of vaporization of steam
             Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
             CpFluid = FluidProperties::GetSpecificHeatGlycol(
-                state, fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorptionIndirect + this->Name);
+                state, fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), std::string{calcChillerAbsorptionIndirect} + this->Name);
             this->GenMassFlowRate = this->QGenerator / (HfgSteam + CpFluid * SteamDeltaT);
             PlantUtilities::SetComponentFlowRate(state,
                                                  this->GenMassFlowRate,
@@ -2031,12 +2031,12 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                                                                                   state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                                   0.0,
                                                                                   this->SteamFluidIndex,
-                                                                                  LoopLossesChillerAbsorptionIndirect + this->Name);
+                                                                                  std::string{LoopLossesChillerAbsorptionIndirect} + this->Name);
                 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                                  fluidNameWater,
                                                                  state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp,
                                                                  const_cast<int &>(waterIndex),
-                                                                 calcChillerAbsorptionIndirect + this->Name);
+                                                                 std::string{calcChillerAbsorptionIndirect} + this->Name);
 
                 this->SteamOutletEnthalpy -= CpFluid * SteamDeltaT;
 
@@ -2044,11 +2044,11 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
 
                 // temperature of condensed steam leaving generator (after condensate trap)
                 Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(
-                    state, fluidNameSteam, state.dataEnvrn->OutBaroPress, this->SteamFluidIndex, LoopLossesChillerAbsorptionIndirect + this->Name);
+                    state, fluidNameSteam, state.dataEnvrn->OutBaroPress, this->SteamFluidIndex, std::string{LoopLossesChillerAbsorptionIndirect} + this->Name);
 
                 // enthalpy  of condensed steam leaving generator (after condensate trap)
                 Real64 EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(
-                    state, fluidNameSteam, TempWaterAtmPress, 0.0, this->SteamFluidIndex, LoopLossesChillerAbsorptionIndirectSpace + this->Name);
+                    state, fluidNameSteam, TempWaterAtmPress, 0.0, this->SteamFluidIndex, std::string{LoopLossesChillerAbsorptionIndirectSpace} + this->Name);
 
                 // Point 4 at atm - loop delta subcool during return journey back to pump
 

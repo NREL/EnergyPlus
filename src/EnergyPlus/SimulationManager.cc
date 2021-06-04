@@ -1181,11 +1181,11 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    state.dataGlobal->DoCoilDirectSolutions = UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
+                    state.dataGlobal->DoCoilDirectSolutions = UtilityRoutines::MakeUPPERCase(AsString(fields.at("use_coil_direct_solutions"))) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
-                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm")) == "CARROLLMRT";
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("zone_radiant_exchange_algorithm"))) == "CARROLLMRT";
                 }
                 bool overrideTimestep(false);
                 bool overrideZoneAirHeatBalAlg(false);
@@ -1196,7 +1196,7 @@ namespace SimulationManager {
                 bool overrideMaxAllowedDelTemp(false);
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
-                    overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
+                    overrideModeValue = UtilityRoutines::MakeUPPERCase(AsString(fields.at("override_mode")));
                     if (overrideModeValue == "NORMAL") {
                         // no overrides
                     } else if (overrideModeValue == "MODE01") {

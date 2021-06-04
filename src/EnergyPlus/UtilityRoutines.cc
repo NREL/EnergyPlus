@@ -285,7 +285,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    std::string MakeUPPERCase(std::string const &InputString)
+    std::string MakeUPPERCase(std::string_view const InputString)
     {
 
         // FUNCTION INFORMATION:

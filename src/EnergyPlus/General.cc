@@ -1684,8 +1684,8 @@ void ScanForReports(EnergyPlusData &state,
         auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(reportName));
         if (SELECT_CASE_var == "CONSTRUCTIONS") {
             if (present(ReportKey)) {
-                if (UtilityRoutines::SameString(ReportKey, "Constructions")) DoReport = state.dataGeneral->Constructions;
-                if (UtilityRoutines::SameString(ReportKey, "Materials")) DoReport = state.dataGeneral->Materials;
+                if (UtilityRoutines::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
+                if (UtilityRoutines::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
             }
         } else if (SELECT_CASE_var == "VIEWFACTORINFO") {
             DoReport = state.dataGeneral->ViewFactorInfo;
@@ -1699,7 +1699,7 @@ void ScanForReports(EnergyPlusData &state,
             //      IF (PRESENT(Option1)) Option1=SchRptOption
         } else if (SELECT_CASE_var == "SURFACES") {
             {
-                auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(ReportKey)); // Autodesk:OPTIONAL ReportKey used without PRESENT check
+                auto const SELECT_CASE_var1(UtilityRoutines::MakeUPPERCase(ReportKey())); // Autodesk:OPTIONAL ReportKey used without PRESENT check
                 if (SELECT_CASE_var1 == "COSTINFO") {
                     DoReport = state.dataGeneral->CostInfo;
                 } else if (SELECT_CASE_var1 == "DXF") {

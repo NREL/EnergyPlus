@@ -548,7 +548,7 @@ namespace AirflowNetworkBalanceManager {
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name"));
+                std::string mixer_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("outdoor_air_mixer_name")));
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent_when_no_outdoor_air_flow") != fields.end()) {
@@ -623,7 +623,7 @@ namespace AirflowNetworkBalanceManager {
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                std::string mixer_name = UtilityRoutines::MakeUPPERCase(fields.at("outdoor_air_mixer_name"));
+                std::string mixer_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("outdoor_air_mixer_name")));
                 Real64 coeff{fields.at("air_mass_flow_coefficient_when_no_outdoor_air_flow_at_reference_conditions")};
                 Real64 expnt{0.65};
                 if (fields.find("air_mass_flow_exponent_when_no_outdoor_air_flow") != fields.end()) {
@@ -1301,7 +1301,7 @@ namespace AirflowNetworkBalanceManager {
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
 
-                std::string fan_name = UtilityRoutines::MakeUPPERCase(fields.at("fan_name"));
+                std::string fan_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("fan_name")));
                 std::string fan_type = fields.at("supply_fan_object_type");
 
                 bool FanErrorFound = false;

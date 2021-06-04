@@ -2460,8 +2460,8 @@ namespace BranchInputManager {
             FoundBranchName = "";
             if (present(CompType) && present(CompName)) {
                 for (CpN = 1; CpN <= state.dataBranchInputManager->Branch(BrN).NumOfComponents; ++CpN) {
-                    if (!UtilityRoutines::SameString(CompType, state.dataBranchInputManager->Branch(BrN).Component(CpN).CType) ||
-                        !UtilityRoutines::SameString(CompName, state.dataBranchInputManager->Branch(BrN).Component(CpN).Name))
+                    if (!UtilityRoutines::SameString(CompType(), state.dataBranchInputManager->Branch(BrN).Component(CpN).CType) ||
+                        !UtilityRoutines::SameString(CompName(), state.dataBranchInputManager->Branch(BrN).Component(CpN).Name))
                         continue;
                     FoundBranchName = state.dataBranchInputManager->Branch(BrN).Name;
                     NeverFound = false;
