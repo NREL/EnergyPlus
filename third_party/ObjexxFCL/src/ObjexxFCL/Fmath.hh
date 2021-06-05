@@ -1059,22 +1059,38 @@ square( T const x )
 }
 
 // cube( x ) == x^3
+// template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+// inline
+// T
+// cube( T const x )
+// {
+// 	return x * x * x;
+// }
+
 template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
 cube( T const x )
 {
-	return x * x * x;
+	return exp(3*log(x));
 }
 
 // quad( x ) == x^4
+// template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+// inline
+// T
+// quad( T const x )
+// {
+// 	T const t( x * x );
+// 	return t * t;
+// }
+
 template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
 quad( T const x )
 {
-	T const t( x * x );
-	return t * t;
+	return exp(4*log(x));
 }
 
 // pow_2( x ) == x^2
@@ -1189,7 +1205,8 @@ inline
 T
 cube( T const & x )
 {
-	return x * x * x;
+	//return x * x * x;
+    return exp(3*log(x));
 }
 
 // quad( x ) == x^4
@@ -1198,8 +1215,9 @@ inline
 T
 quad( T const & x )
 {
-	T const t( x * x );
-	return t * t;
+	//T const t( x * x );
+	//return t * t;
+    return exp(4*log(x));
 }
 
 // pow_2( x ) == x^2
@@ -1226,8 +1244,9 @@ inline
 T
 pow_4( T const & x )
 {
-	T const t( x * x );
-	return t * t;
+	// T const t( x * x );
+	// return t * t;
+	return exp(4*log(x));
 }
 
 // pow_5( x ) == x^5
@@ -1236,8 +1255,9 @@ inline
 T
 pow_5( T const & x )
 {
-	T const t( x * x );
-	return t * t * x;
+	//T const t( x * x );
+	//return t * t * x;
+	return exp(5*log(x));
 }
 
 // pow_6( x ) == x^6
@@ -1246,8 +1266,9 @@ inline
 T
 pow_6( T const & x )
 {
-	T const t( x * x * x );
-	return t * t;
+	//T const t( x * x * x );
+	//return t * t;
+	return exp(6*log(x));
 }
 
 // pow_7( x ) == x^7
@@ -1256,8 +1277,9 @@ inline
 T
 pow_7( T const & x )
 {
-	T const t( x * x * x );
-	return t * t * x;
+	//T const t( x * x * x );
+	//return t * t * x;
+	return exp(7*log(x));
 }
 
 // pow_8( x ) == x^8
@@ -1266,9 +1288,10 @@ inline
 T
 pow_8( T const & x )
 {
-	T t( x * x );
-	t *= t;
-	return t * t;
+	//T t( x * x );
+	//t *= t;
+	//return t * t;
+	return exp(8*log(x));
 }
 
 // pow_9( x ) == x^9
@@ -1277,8 +1300,9 @@ inline
 T
 pow_9( T const & x )
 {
-	T const t( x * x * x );
-	return t * t * t;
+	//T const t( x * x * x );
+	//return t * t * t;
+	return exp(9*log(x));
 }
 
 // Tolerant Comparisons /////
