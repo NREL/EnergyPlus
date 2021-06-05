@@ -104,20 +104,20 @@ namespace FluidProperties {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    std::string const Refrig("REFRIGERANT");
-    std::string const Glycol("GLYCOL");
-    std::string const Pressure("PRESSURE");
-    std::string const Enthalpy("ENTHALPY");
-    std::string const Density("DENSITY");
-    std::string const SpecificHeat("SPECIFICHEAT");
-    std::string const Conductivity("CONDUCTIVITY");
-    std::string const Viscosity("VISCOSITY");
-    std::string const Fluid("FLUID");
-    std::string const GasFluid("FLUIDGAS");
-    std::string const Water("Water");
-    std::string const Steam("Steam");
-    std::string const EthyleneGlycol("EthyleneGlycol");
-    std::string const PropyleneGlycol("PropyleneGlycol");
+    constexpr static std::string_view Refrig("REFRIGERANT");
+    constexpr static std::string_view Glycol("GLYCOL");
+    constexpr static std::string_view Pressure("PRESSURE");
+    constexpr static std::string_view Enthalpy("ENTHALPY");
+    constexpr static std::string_view Density("DENSITY");
+    constexpr static std::string_view SpecificHeat("SPECIFICHEAT");
+    constexpr static std::string_view Conductivity("CONDUCTIVITY");
+    constexpr static std::string_view Viscosity("VISCOSITY");
+    constexpr static std::string_view Fluid("FLUID");
+    constexpr static std::string_view GasFluid("FLUIDGAS");
+    constexpr static std::string_view Water("Water");
+    constexpr static std::string_view Steam("Steam");
+    constexpr static std::string_view EthyleneGlycol("EthyleneGlycol");
+    constexpr static std::string_view PropyleneGlycol("PropyleneGlycol");
 
     // DERIVED TYPE DEFINITIONS
 
@@ -1296,9 +1296,9 @@ namespace FluidProperties {
                         if (iTemp == 0) {
                             ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state,
-                                              cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
+                                              cAlphaFieldNames(3) + "=\"" + std::string{Fluid} + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
                                                   "\" is not valid.");
-                            ShowContinueError(state, "Valid choices are \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density + "\".");
+                            ShowContinueError(state, "Valid choices are \"" + std::string{Enthalpy} + "\", \"" + std::string{SpecificHeat} + "\", \"" + std::string{Density} + "\".");
                             ShowContinueError(state, "This fluid property will not be processed mor available for the simulation.");
                         }
                         ++iTemp;
@@ -1309,10 +1309,10 @@ namespace FluidProperties {
                         if (iTemp == 0) {
                             ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                             ShowContinueError(state,
-                                              cAlphaFieldNames(3) + "=\"" + Fluid + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
+                                              cAlphaFieldNames(3) + "=\"" + std::string{Fluid} + "\", but " + cAlphaFieldNames(2) + "=\"" + Alphas(2) +
                                                   "\" is not valid.");
                             ShowContinueError(state,
-                                              "Valid choices are \"" + Pressure + "\", \"" + Enthalpy + "\", \"" + SpecificHeat + "\", \"" + Density +
+                                              "Valid choices are \"" + std::string{Pressure} + "\", \"" + std::string{Enthalpy} + "\", \"" + std::string{SpecificHeat} + "\", \"" + std::string{Density} +
                                                   "\".");
                             ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                         }
@@ -1322,7 +1322,7 @@ namespace FluidProperties {
                     if (iTemp == 0) {
                         ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                         ShowContinueError(state, cAlphaFieldNames(3) + "=\"" + Alphas(3) + "\" is not valid.");
-                        ShowContinueError(state, "Valid choices are \"" + Fluid + "\", \"" + GasFluid + "\".");
+                        ShowContinueError(state, "Valid choices are \"" + std::string{Fluid} + "\", \"" + std::string{GasFluid} + "\".");
                         ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                     }
                     ++iTemp;
@@ -1595,7 +1595,7 @@ namespace FluidProperties {
                     if (iTemp == 0) {
                         ShowWarningError(state, std::string{RoutineName} + CurrentModuleObject + " Name=" + state.dataFluidProps->RefrigData(Loop).Name);
                         ShowContinueError(state, cAlphaFieldNames(2) + "=\"" + Alphas(2) + "\" is not valid.");
-                        ShowContinueError(state, "Valid choices are \"" + Enthalpy + "\", \"" + Density + "\".");
+                        ShowContinueError(state, "Valid choices are \"" + std::string{Enthalpy} + "\", \"" + std::string{Density} + "\".");
                         ShowContinueError(state, format("Pressure value of this item=[{:.2R}].", Numbers(1)));
                         ShowContinueError(state, "This fluid property will not be processed nor available for the simulation.");
                     }
@@ -7803,7 +7803,7 @@ namespace FluidProperties {
     )
 #else
     Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
-                                 std::string const &Glycol,        // carries in substance name
+                                 std::string_view const Glycol,        // carries in substance name
                                  Real64 const Temperature,         // actual temperature given as input
                                  int &GlycolIndex,                 // Index to Glycol Properties
                                  std::string_view const CalledFrom // routine this function was called from (error messages)

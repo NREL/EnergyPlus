@@ -72,20 +72,7 @@ namespace FluidProperties {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    extern std::string const Refrig;
-    extern std::string const Glycol;
-    extern std::string const Pressure;
-    extern std::string const Enthalpy;
-    extern std::string const Density;
-    extern std::string const SpecificHeat;
-    extern std::string const Conductivity;
-    extern std::string const Viscosity;
-    extern std::string const Fluid;
-    extern std::string const GasFluid;
-    extern std::string const Water;
-    extern std::string const Steam;
-    extern std::string const EthyleneGlycol;
-    extern std::string const PropyleneGlycol;
+
     int constexpr EthyleneGlycolIndex = -2;
     int constexpr PropyleneGlycolIndex = -1;
     int constexpr iRefri = 1;
@@ -527,7 +514,7 @@ namespace FluidProperties {
     }
 #else
     Real64 GetSpecificHeatGlycol(EnergyPlusData &state,
-                                 std::string const &Glycol,        // carries in substance name
+                                 std::string_view const Glycol,    // carries in substance name
                                  Real64 const Temperature,         // actual temperature given as input
                                  int &GlycolIndex,                 // Index to Glycol Properties
                                  std::string_view const CalledFrom // routine this function was called from (error messages)
