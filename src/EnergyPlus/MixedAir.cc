@@ -236,7 +236,7 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
         SimOAComponent(state,
                        CompType,
                        CompName,
-                       static_cast<MixedAir::ComponentType>(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum)),
+                       state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
                        FirstHVACIteration,
                        state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum),
                        AirLoopNum,
@@ -257,7 +257,7 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
             SimOAComponent(state,
                            CompType,
                            CompName,
-                           static_cast<MixedAir::ComponentType>(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum)),
+                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
                            FirstHVACIteration,
                            state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum),
                            AirLoopNum,
@@ -274,7 +274,7 @@ void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const Fi
             SimOAComponent(state,
                            CompType,
                            CompName,
-                           static_cast<MixedAir::ComponentType>(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum)),
+                           state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum),
                            FirstHVACIteration,
                            state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum),
                            AirLoopNum,
@@ -388,9 +388,9 @@ void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const Firs
 }
 
 void SimOAComponent(EnergyPlusData &state,
-                    std::string const &CompType,               // the component type
-                    std::string const &CompName,               // the component Name
-                    MixedAir::ComponentType const CompTypeNum, // Component Type -- Integerized for this module
+                    std::string const &CompType,                    // the component type
+                    std::string const &CompName,                    // the component Name
+                    SimAirServingZones::CompType const CompTypeNum, // Component Type -- Integerized for this module
                     bool const FirstHVACIteration,
                     int &CompIndex,
                     int const AirLoopNum, // air loop index for economizer lockout coordination
@@ -449,35 +449,35 @@ void SimOAComponent(EnergyPlusData &state,
     Real64 AirloopPLR;
     int FanOpMode;
 
-    if (CompTypeNum == ComponentType::OAMixer_Num) { // 'OutdoorAir:Mixer'
+    if (CompTypeNum == SimAirServingZones::CompType::OAMixer_Num) { // 'OutdoorAir:Mixer'
         if (Sim) {
             SimOAMixer(state, CompName, FirstHVACIteration, CompIndex);
         }
 
         // Fan Types
-    } else if (CompTypeNum == ComponentType::Fan_Simple_CV) { // 'Fan:ConstantVolume'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_Simple_CV) { // 'Fan:ConstantVolume'
         if (Sim) {
             Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
         }
-    } else if (CompTypeNum == ComponentType::Fan_Simple_VAV) { // 'Fan:VariableVolume'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_Simple_VAV) { // 'Fan:VariableVolume'
         if (Sim) {
             Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
         }
 
-    } else if (CompTypeNum == ComponentType::Fan_System_Object) {              // 'Fan:SystemModel'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_System_Object) {              // 'Fan:SystemModel'
         if (CompIndex == 0) {                                                  // 0 means has not been filled because of 1-based arrays in old fortran
             CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
         }
         if (Sim) {
             state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
         }
-    } else if (CompTypeNum == ComponentType::Fan_ComponentModel) { // 'Fan:ComponentModel'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_ComponentModel) { // 'Fan:ComponentModel'
         if (Sim) {
             Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
         }
 
         // Coil Types
-    } else if (CompTypeNum == ComponentType::WaterCoil_Cooling) { // 'Coil:Cooling:Water'
+    } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_Cooling) { // 'Coil:Cooling:Water'
         if (Sim) {
             // get water coil and controller data if not called previously
             if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -494,7 +494,7 @@ void SimOAComponent(EnergyPlusData &state,
             state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
         }
         OACoolingCoil = true;
-    } else if (CompTypeNum == ComponentType::WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
+    } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
         if (Sim) {
             // get water coil and controller data if not called previously
             if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -511,12 +511,12 @@ void SimOAComponent(EnergyPlusData &state,
             state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
         }
         OAHeatingCoil = true;
-    } else if (CompTypeNum == ComponentType::SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
+    } else if (CompTypeNum == SimAirServingZones::CompType::SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
         if (Sim) {
             SimulateSteamCoilComponents(state, CompName, FirstHVACIteration, CompIndex, 0.0);
         }
         OAHeatingCoil = true;
-    } else if (CompTypeNum == ComponentType::WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
+    } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
         if (Sim) {
             // get water coil and controller data if not called previously
             if (CompIndex == 0) WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
@@ -533,19 +533,19 @@ void SimOAComponent(EnergyPlusData &state,
             state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
         }
         OACoolingCoil = true;
-    } else if (CompTypeNum == ComponentType::Coil_ElectricHeat) { // 'Coil:Heating:Electric'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Coil_ElectricHeat) { // 'Coil:Heating:Electric'
         if (Sim) {
             //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
             SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex);
         }
         OAHeatingCoil = true;
-    } else if (CompTypeNum == ComponentType::Coil_GasHeat) { // 'Coil:Heating:Fuel'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Coil_GasHeat) { // 'Coil:Heating:Fuel'
         if (Sim) {
             //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
             SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex);
         }
         OAHeatingCoil = true;
-    } else if (CompTypeNum == ComponentType::WaterCoil_CoolingHXAsst) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
+    } else if (CompTypeNum == SimAirServingZones::CompType::WaterCoil_CoolingHXAsst) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
         if (Sim) {
             // get water coil and controller data if not called previously
             if (CompIndex == 0) SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, On, 0.0, CompIndex, ContFanCycCoil);
@@ -563,12 +563,12 @@ void SimOAComponent(EnergyPlusData &state,
                 true;
         }
         OACoolingCoil = true;
-    } else if (CompTypeNum == ComponentType::DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
+    } else if (CompTypeNum == SimAirServingZones::CompType::DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
         if (Sim) {
             SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
         }
         OACoolingCoil = true;
-    } else if (CompTypeNum == ComponentType::UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
+    } else if (CompTypeNum == SimAirServingZones::CompType::UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
         if (Sim) {
             bool HeatingActive = false;
             bool CoolingActive = false;
@@ -594,17 +594,17 @@ void SimOAComponent(EnergyPlusData &state,
             UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
             if (Sim) state.dataMixedAir->MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
         }
-    } else if (CompTypeNum == ComponentType::DXHeatPumpSystem) {
+    } else if (CompTypeNum == SimAirServingZones::CompType::DXHeatPumpSystem) {
         if (Sim) {
             SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
         }
         OAHeatingCoil = true;
-    } else if (CompTypeNum == ComponentType::Coil_UserDefined) {
+    } else if (CompTypeNum == SimAirServingZones::CompType::CoilUserDefined) {
         if (Sim) {
             SimCoilUserDefined(state, CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil);
         }
         // Heat recovery
-    } else if (CompTypeNum == ComponentType::HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
+    } else if (CompTypeNum == SimAirServingZones::CompType::HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
         // 'HeatExchanger:Desiccant:BalancedFlow'
         if (Sim) {
             if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
@@ -645,7 +645,7 @@ void SimOAComponent(EnergyPlusData &state,
         OAHX = true;
 
         // Desiccant Dehumidifier
-    } else if (CompTypeNum == ComponentType::Desiccant) { // 'Dehumidifier:Desiccant:NoFans'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Desiccant) { // 'Dehumidifier:Desiccant:NoFans'
         // 'Dehumidifier:Desiccant:System'
         if (Sim) {
             SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
@@ -653,20 +653,20 @@ void SimOAComponent(EnergyPlusData &state,
         OAHX = true;
 
         // Humidifiers
-    } else if (CompTypeNum == ComponentType::Humidifier) { // 'Humidifier:Steam:Electric'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Humidifier) { // 'Humidifier:Steam:Electric'
         // 'Humidifier:Steam:Gas'
         if (Sim) {
             SimHumidifier(state, CompName, FirstHVACIteration, CompIndex);
         }
 
         // Unglazed Transpired Solar Collector
-    } else if (CompTypeNum == ComponentType::Unglazed_SolarCollector) { // 'SolarCollector:UnglazedTranspired'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Unglazed_SolarCollector) { // 'SolarCollector:UnglazedTranspired'
         if (Sim) {
             SimTranspiredCollector(state, CompName, CompIndex);
         }
 
         // Air-based Photovoltaic-thermal flat plate collector
-    } else if (CompTypeNum == ComponentType::PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
+    } else if (CompTypeNum == SimAirServingZones::CompType::PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
         if (Sim) {
             if (CompIndex == 0) {
                 CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(state, CompName);
@@ -675,13 +675,13 @@ void SimOAComponent(EnergyPlusData &state,
         }
 
         // Evaporative Cooler Types
-    } else if (CompTypeNum == ComponentType::EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
+    } else if (CompTypeNum == SimAirServingZones::CompType::EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
         // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
         if (Sim) {
             SimEvapCooler(state, CompName, CompIndex);
         }
 
-    } else if (CompTypeNum == ComponentType::VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+    } else if (CompTypeNum == SimAirServingZones::CompType::VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
         if (Sim) {
             int ControlledZoneNum = 0;
             bool HeatingActive = false;
@@ -1061,90 +1061,90 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType(CompNum)));
 
                 if (SELECT_CASE_var == "OUTDOORAIR:MIXER") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::OAMixer_Num);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::OAMixer_Num;
 
                     // Fan Types
                 } else if (SELECT_CASE_var == "FAN:CONSTANTVOLUME") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Fan_Simple_CV);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Fan_Simple_CV;
                 } else if (SELECT_CASE_var == "FAN:VARIABLEVOLUME") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Fan_Simple_VAV);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Fan_Simple_VAV;
                 } else if (SELECT_CASE_var == "FAN:SYSTEMMODEL") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Fan_System_Object);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Fan_System_Object;
                     // construct fan object
                     state.dataHVACFan->fanObjs.emplace_back(
                         new HVACFan::FanSystem(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum)));
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = state.dataHVACFan->fanObjs.size();
                 } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Fan_ComponentModel);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Fan_ComponentModel;
 
                     // Coil Types
                 } else if (SELECT_CASE_var == "COIL:COOLING:WATER") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::WaterCoil_Cooling);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::WaterCoil_Cooling;
                 } else if (SELECT_CASE_var == "COIL:HEATING:WATER") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::WaterCoil_SimpleHeat);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::WaterCoil_SimpleHeat;
                 } else if (SELECT_CASE_var == "COIL:HEATING:STEAM") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::SteamCoil_AirHeat);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::SteamCoil_AirHeat;
                 } else if (SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::WaterCoil_DetailedCool);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::WaterCoil_DetailedCool;
                 } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Coil_ElectricHeat);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Coil_ElectricHeat;
                 } else if (SELECT_CASE_var == "COIL:HEATING:FUEL") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Coil_GasHeat);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Coil_GasHeat;
                 } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::WaterCoil_CoolingHXAsst);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::WaterCoil_CoolingHXAsst;
                 } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::DXSystem);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::DXSystem;
                     // set the data for 100% DOAS DX cooling coil
                     CheckDXCoolingCoilInOASysExists(state, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum));
                 } else if (SELECT_CASE_var == "COILSYSTEM:HEATING:DX") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::DXHeatPumpSystem);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::DXHeatPumpSystem;
                 } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::UnitarySystemModel);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::UnitarySystemModel;
                     state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
                     UnitarySystems::UnitarySys thisSys;
                     state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = thisSys.factory(
                         state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
                 } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Coil_UserDefined);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::CoilUserDefined;
                     // Heat recovery
                 } else if (SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::HeatXchngr);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::HeatXchngr;
                 } else if (SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::HeatXchngr);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::HeatXchngr;
                 } else if (SELECT_CASE_var == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::HeatXchngr);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::HeatXchngr;
 
                     // Desiccant Dehumidifier
                 } else if (SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:NOFANS") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Desiccant);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Desiccant;
                 } else if (SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:SYSTEM") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Desiccant);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Desiccant;
                     // Humidifiers: Humidifier:Steam:Electric and Humidifier:Steam:Gas
                 } else if (SELECT_CASE_var == "HUMIDIFIER:STEAM:ELECTRIC") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Humidifier);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Humidifier;
                 } else if (SELECT_CASE_var == "HUMIDIFIER:STEAM:GAS") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Humidifier);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Humidifier;
 
                     // Unglazed Transpired Solar Collector
                 } else if (SELECT_CASE_var == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::Unglazed_SolarCollector);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::Unglazed_SolarCollector;
 
                     // PVT air heater
                 } else if (SELECT_CASE_var == "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::PVT_AirBased);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::PVT_AirBased;
                     // Evaporative Cooler Types
                 } else if (SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::EvapCooler);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::EvapCooler;
                 } else if (SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::EvapCooler);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::EvapCooler;
                 } else if (SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:WETCOIL") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::EvapCooler);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::EvapCooler;
                 } else if (SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::EvapCooler);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::EvapCooler;
                 } else if (SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::EvapCooler);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::EvapCooler;
                 } else if (SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW") {
-                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = static_cast<int>(ComponentType::VRFTerminalUnit);
+                    state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = SimAirServingZones::CompType::VRFTerminalUnit;
                 } else {
                     ShowSevereError(state,
                                     CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid Outside Air Component=\"" +
@@ -5807,7 +5807,7 @@ int GetOASysNumHeatingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
         SimOAComponent(state,
                        CompType,
                        CompName,
-                       static_cast<MixedAir::ComponentType>(state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType_Num(CompNum)),
+                       state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType_Num(CompNum),
                        FirstHVACIteration,
                        state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentIndex(CompNum),
                        AirLoopNum,
@@ -5873,8 +5873,8 @@ int GetOASysNumHXs(EnergyPlusData &state, int const OASysNumber)
 
     auto const &componentType_Num = state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType_Num;
     for (CompNum = 1, CompNum_end = state.dataAirLoop->OutsideAirSys(OASysNumber).NumComponents; CompNum <= CompNum_end; ++CompNum) {
-        int const componentTypeNum = componentType_Num(CompNum);
-        if (static_cast<int>(ComponentType::HeatXchngr) == componentTypeNum || static_cast<int>(ComponentType::Desiccant) == componentTypeNum) {
+        SimAirServingZones::CompType const componentTypeNum = componentType_Num(CompNum);
+        if (SimAirServingZones::CompType::HeatXchngr == componentTypeNum || SimAirServingZones::CompType::Desiccant == componentTypeNum) {
             ++NumHX;
         }
     }
@@ -5941,7 +5941,7 @@ int GetOASysNumCoolingCoils(EnergyPlusData &state, int const OASysNumber) // OA 
         SimOAComponent(state,
                        CompType,
                        CompName,
-                       static_cast<MixedAir::ComponentType>(state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType_Num(CompNum)),
+                       state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentType_Num(CompNum),
                        FirstHVACIteration,
                        state.dataAirLoop->OutsideAirSys(OASysNumber).ComponentIndex(CompNum),
                        AirLoopNum,
@@ -6605,9 +6605,9 @@ std::string GetOACompType(EnergyPlusData &state,
     return OACompType;
 }
 
-int GetOACompTypeNum(EnergyPlusData &state,
-                     int const OASysNum, // OA Sys Number
-                     int const InListNum // In-list Number
+SimAirServingZones::CompType GetOACompTypeNum(EnergyPlusData &state,
+                                              int const OASysNum, // OA Sys Number
+                                              int const InListNum // In-list Number
 )
 {
 
@@ -6630,7 +6630,7 @@ int GetOACompTypeNum(EnergyPlusData &state,
     // USE STATEMENTS:
 
     // Return value
-    int OACompTypeNum;
+    SimAirServingZones::CompType OACompTypeNum;
 
     // Locals
     // FUNCTION ARGUMENT DEFINITIONS:

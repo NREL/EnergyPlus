@@ -14941,10 +14941,6 @@ void GetFanIndexForTwoSpeedCoil(
     // Using/Aliasing
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    int const DXSystem(14);      // must match SimAirServingZones.cc (not public)
-    int const UnitarySystem(19); // must match SimAirServingZones.cc (not public)
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int FoundBranch;
     int FoundAirSysNum;
@@ -14963,7 +14959,8 @@ void GetFanIndexForTwoSpeedCoil(
 
             for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
 
-                if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num == DXSystem) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num ==
+                    SimAirServingZones::CompType::DXSystem) {
 
                     if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
                                                     state.dataDXCoils->DXCoil(CoolingCoilIndex).CoilSystemName)) {
@@ -14971,8 +14968,9 @@ void GetFanIndexForTwoSpeedCoil(
                         FoundAirSysNum = AirSysNum;
                         break;
                     }
-                    // these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
-                } else if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num == UnitarySystem) {
+                    // these are specified in SimAirServingZones and need to be moved to a Data* file. 
+                } else if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num ==
+                           SimAirServingZones::CompType::Furnace_UnitarySys_HeatOnly) {
                     FoundBranch = BranchNum;
                     FoundAirSysNum = AirSysNum;
                     break;
@@ -14983,20 +14981,20 @@ void GetFanIndexForTwoSpeedCoil(
                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).TotalComponents;
                      ++CompNum) {
                     if (state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
-                        SimAirServingZones::Fan_Simple_VAV) {
+                        SimAirServingZones::CompType::Fan_Simple_VAV) {
                         SupplyFanName = state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
                         Fans::GetFanIndex(state, SupplyFanName, SupplyFanIndex, ErrorsFound, ObjexxFCL::Optional_string_const());
                         SupplyFan_TypeNum = DataHVACGlobals::FanType_SimpleVAV;
                         break;
                         // these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
                     } else if (state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
-                               SimAirServingZones::Fan_System_Object) {
+                               SimAirServingZones::CompType::Fan_System_Object) {
                         SupplyFanName = state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
                         SupplyFanIndex = HVACFan::getFanObjectVectorIndex(state, SupplyFanName);
                         SupplyFan_TypeNum = DataHVACGlobals::FanType_SystemModelObject;
 
                     } else if (state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
-                               UnitarySystem) {
+                               SimAirServingZones::CompType::Furnace_UnitarySys_HeatOnly) {
                         // fan may not be specified in a unitary system object, keep looking
                         // Unitary System will "set" the fan index to the DX coil if contained within the HVAC system
                         if (state.dataDXCoils->DXCoil(CoolingCoilIndex).SupplyFanIndex > -1) break;
