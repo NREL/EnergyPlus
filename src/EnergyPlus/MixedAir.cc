@@ -977,7 +977,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents = NumInList;
                 state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName.allocate(NumInList);
                 state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType.allocate(NumInList);
-                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num.dimension(NumInList, 0);
+                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentType_Num.dimension(NumInList, SimAirServingZones::CompType::Unassigned);
                 state.dataAirLoop->OutsideAirSys(OASysNum).ComponentIndex.dimension(NumInList, 0);
                 state.dataAirLoop->OutsideAirSys(OASysNum).InletNodeNum.dimension(NumInList, 0);
                 state.dataAirLoop->OutsideAirSys(OASysNum).OutletNodeNum.dimension(NumInList, 0);
