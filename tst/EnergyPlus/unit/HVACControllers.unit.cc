@@ -438,7 +438,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater); //"Coil:Cooling:Water";
     std::string CompName = "CHILLED WATER COIL";
-    int CoilTypeNum = SimAirServingZones::WaterCoil_Cooling;
+    SimAirServingZones::CompType CoilTypeNum = SimAirServingZones::CompType::WaterCoil_Cooling;
 
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_TRUE(WaterCoilOnAirLoop);
@@ -456,7 +456,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     // now test a different water coil type
-    CoilTypeNum = DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+    CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 }
@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
     std::string CompName = state->dataWaterCoils->WaterCoil(1).Name;
-    int CoilTypeNum = SimAirServingZones::WaterCoil_SimpleHeat;
+    SimAirServingZones::CompType CoilTypeNum = SimAirServingZones::CompType::WaterCoil_SimpleHeat;
 
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
@@ -557,7 +557,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     // test a different water coil type
-    CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
+    CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
     WaterCoilOnAirLoop = true;
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
@@ -675,7 +675,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     bool WaterCoilOnAirLoop = true;
     std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
     std::string CompName = state->dataWaterCoils->WaterCoil(1).Name;
-    int CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
+    SimAirServingZones::CompType CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
 
     WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnPrimaryAirLoopBranch(*state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
