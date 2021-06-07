@@ -1026,9 +1026,9 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
     std::string Name_NEW;        // Units sting, may be blank
     std::string Name_OLD;        // Units sting, may be blank
 
-    Array1D_int keyIndexes(1);     // Array index for
-    Array1D_int varTypes(1);       // Array index for
-    Array1D_string NamesOfKeys(1); // Specific key name
+    Array1D_int keyIndexes(1);                          // Array index for
+    Array1D<OutputProcessor::VariableType> varTypes(1); // Array index for
+    Array1D_string NamesOfKeys(1);                      // Specific key name
     int retValfmiVersion;
     int retValfmiPathLib;
     Array1D_string NameListInstances(5);
@@ -2465,12 +2465,13 @@ void CalcExternalInterface(EnergyPlusData &state)
     state.dataExternalInterface->firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
 }
 
-void GetReportVariableKey(EnergyPlusData &state,
-                          const Array1D_string &varKeys,  // Standard variable name
-                          int const numberOfKeys,         // Number of keys=size(state.dataExternalInterface->varKeys)
-                          const Array1D_string &VarNames, // Standard variable name
-                          Array1D_int &keyVarIndexes,     // Array index
-                          Array1D_int &varTypes // Types of variables in state.dataExternalInterface->keystate.dataExternalInterface->varIndexes
+void GetReportVariableKey(
+    EnergyPlusData &state,
+    const Array1D_string &varKeys,                   // Standard variable name
+    int const numberOfKeys,                          // Number of keys=size(state.dataExternalInterface->varKeys)
+    const Array1D_string &VarNames,                  // Standard variable name
+    Array1D_int &keyVarIndexes,                      // Array index
+    Array1D<OutputProcessor::VariableType> &varTypes // Types of variables in state.dataExternalInterface->keystate.dataExternalInterface->varIndexes
 )
 {
     // SUBROUTINE INFORMATION:
@@ -2483,7 +2484,7 @@ void GetReportVariableKey(EnergyPlusData &state,
     // Gets the sensor key index and type for the specified variable key and name
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int varType(0);                                                                         // 0=not found, 1=integer, 2=real, 3=meter
+    OutputProcessor::VariableType varType(OutputProcessor::VariableType::NotFound);         // 0=not found, 1=integer, 2=real, 3=meter
     int numKeys(0);                                                                         // Number of keys found
     OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);             // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::TimeStepZone); // Variable time step is Zone=1 or HVAC=2
@@ -2495,7 +2496,7 @@ void GetReportVariableKey(EnergyPlusData &state,
     // Get pointers for variables to be sent to Ptolemy
     for (Loop = 1; Loop <= numberOfKeys; ++Loop) {
         GetVariableKeyCountandType(state, VarNames(Loop), numKeys, varType, varAvgSum, varStepType, varUnits);
-        if (varType != 0) {
+        if (varType != OutputProcessor::VariableType::NotFound) {
             NamesOfKeys.allocate(numKeys);
             keyIndexes.allocate(numKeys);
             GetVariableKeys(state, VarNames(Loop), varType, NamesOfKeys, keyIndexes);
@@ -2511,7 +2512,7 @@ void GetReportVariableKey(EnergyPlusData &state,
             keyIndexes.deallocate();
             NamesOfKeys.deallocate();
         }
-        if ((varType == 0) || (iKey > numKeys)) {
+        if ((varType == OutputProcessor::VariableType::NotFound) || (iKey > numKeys)) {
             ShowSevereError(state,
                             "ExternalInterface: Simulation model has no variable \"" + VarNames(Loop) + "\" with key \"" + varKeys(Loop) + "\".");
             state.dataExternalInterface->ErrorsFound = true;

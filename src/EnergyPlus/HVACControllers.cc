@@ -342,7 +342,7 @@ void ManageControllers(EnergyPlusData &state,
                 // Put the controller tolerance (offset) back to it's original value
                 RootFinder::SetupRootFinder(state,
                                             RootFinders(ControlNum),
-                                            iSlopeDecreasing,
+                                            DataRootFinder::Slope::Decreasing,
                                             DataRootFinder::iMethod::Brent,
                                             DataPrecisionGlobals::constant_zero,
                                             1.0e-6,
@@ -612,7 +612,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                 AlphArray(1),
                                                                 DataLoopNode::NodeFluidType::blank,
                                                                 DataLoopNode::NodeConnectionType::Sensor,
-                                                                1,
+                                                                NodeInputManager::compFluidStream::Primary,
                                                                 ObjectIsNotParent);
             ControllerProps(Num).ActuatedNode = GetOnlySingleNode(state,
                                                                   AlphArray(6),
@@ -621,7 +621,7 @@ void GetControllerInput(EnergyPlusData &state)
                                                                   AlphArray(1),
                                                                   DataLoopNode::NodeFluidType::blank,
                                                                   DataLoopNode::NodeConnectionType::Actuator,
-                                                                  1,
+                                                                  NodeInputManager::compFluidStream::Primary,
                                                                   ObjectIsNotParent);
             ControllerProps(Num).Offset = NumArray(1);
             ControllerProps(Num).MaxVolFlowActuated = NumArray(2);
@@ -1119,7 +1119,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
             if (SELECT_CASE_var == ControllerAction::NormalAction) {
                 SetupRootFinder(state,
                                 RootFinders(ControlNum),
-                                iSlopeIncreasing,
+                                DataRootFinder::Slope::Increasing,
                                 DataRootFinder::iMethod::Brent,
                                 DataPrecisionGlobals::constant_zero,
                                 1.0e-6,
@@ -1130,7 +1130,7 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
             } else if (SELECT_CASE_var == ControllerAction::ReverseAction) {
                 SetupRootFinder(state,
                                 RootFinders(ControlNum),
-                                iSlopeDecreasing,
+                                DataRootFinder::Slope::Decreasing,
                                 DataRootFinder::iMethod::Brent,
                                 DataPrecisionGlobals::constant_zero,
                                 1.0e-6,
@@ -2056,7 +2056,7 @@ void CheckTempAndHumRatCtrl(EnergyPlusData &state, int const ControlNum, bool &I
                             // Cooling coil controller should always be ReverseAction, but skip this if not
                             RootFinder::SetupRootFinder(state,
                                                         state.dataHVACControllers->RootFinders(ControlNum),
-                                                        iSlopeDecreasing,
+                                                        DataRootFinder::Slope::Decreasing,
                                                         DataRootFinder::iMethod::FalsePosition,
                                                         DataPrecisionGlobals::constant_zero,
                                                         1.0e-6,

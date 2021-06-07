@@ -562,7 +562,7 @@ namespace ScheduleManager {
                                 CSVAllColumnNameAndValues[colCnt - 1] = timestepColumnValues;
                             }
                         } else {
-                            columnValue = UtilityRoutines::ProcessNumber(subString, errFlag);
+                            columnValue = std::stod(subString, nullptr);
                             if (errFlag) {
                                 ++numerrors;
                                 columnValue = 0.0;

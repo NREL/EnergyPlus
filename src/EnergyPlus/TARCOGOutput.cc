@@ -96,7 +96,7 @@ void WriteInputArguments(EnergyPlusData &state,
                          const Array1D_int &ibc,
                          Real64 const hout,
                          Real64 const hin,
-                         int const standard,
+                         TARCOGGassesParams::Stdrd const standard,
                          TARCOGThermalModel const ThermalMod,
                          Real64 const SDScalar,
                          Real64 const height,
@@ -316,9 +316,9 @@ void WriteInputArguments(EnergyPlusData &state,
     print(InArgumentsFile, Format_1066, ibc(2));
     print(InArgumentsFile, Format_1068, hin);
 
-    if (standard == ISO15099) print(InArgumentsFile, Format_1070, standard);
-    if (standard == EN673) print(InArgumentsFile, Format_1071, standard);
-    if (standard == EN673Design) print(InArgumentsFile, Format_1072, standard);
+    if (standard == TARCOGGassesParams::Stdrd::ISO15099) print(InArgumentsFile, Format_1070, standard);
+    if (standard == TARCOGGassesParams::Stdrd::EN673) print(InArgumentsFile, Format_1071, standard);
+    if (standard == TARCOGGassesParams::Stdrd::EN673Design) print(InArgumentsFile, Format_1072, standard);
 
     if (ThermalMod == TARCOGThermalModel::ISO15099) {
         print(InArgumentsFile, Format_10731, ThermalMod);
@@ -886,7 +886,7 @@ void WriteTARCOGInputFile(EnergyPlusData &state,
                           const Array1D_int &ibc,
                           Real64 const hout,
                           Real64 const hin,
-                          int const standard,
+                          TARCOGGassesParams::Stdrd const standard,
                           TARCOGThermalModel const ThermalMod,
                           Real64 const SDScalar,
                           Real64 const height,

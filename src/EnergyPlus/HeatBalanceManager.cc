@@ -100,6 +100,7 @@
 #include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SurfaceOctree.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
@@ -5267,7 +5268,7 @@ namespace HeatBalanceManager {
                                             state.dataIPShortCut->cAlphaArgs(1),
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Inlet,
-                                            1,
+                                            NodeInputManager::compFluidStream::Primary,
                                             ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                     ShowSevereError(state,
@@ -9106,11 +9107,11 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                 if (SELECT_CASE_var == "ISO15099") {
-                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csISO15099;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::ISO15099;
                 } else if (SELECT_CASE_var == "EN673DECLARED") {
-                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csEN673Declared;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::EN673;
                 } else if (SELECT_CASE_var == "EN673DESIGN") {
-                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csEN673Design;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::EN673Design;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -9257,9 +9258,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(2)); // Basis Type Keyword
                 if (SELECT_CASE_var == "LBNLWINDOW") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::BasisType_WINDOW;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::Basis::WINDOW;
                 } else if (SELECT_CASE_var == "USERDEFINED") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::BasisType_Custom;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::Basis::Custom;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -9274,9 +9275,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(3)); // Basis Symmetry Keyword
                 if (SELECT_CASE_var == "AXISYMMETRIC") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_Axisymmetric;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::Axisymmetric;
                 } else if (SELECT_CASE_var == "NONE") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_None;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::None;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -9321,7 +9322,7 @@ namespace HeatBalanceManager {
             Get2DMatrix(state,
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatIndex,
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMat);
-            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::BasisType_WINDOW)
+            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::Basis::WINDOW)
                 CalculateBasisLength(state,
                                      state.dataConstruction->Construct(ConstrNum).BSDFInput,
                                      ConstrNum,
@@ -9344,7 +9345,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, locAlphaArgs(1) + " is missing some of the layers or/and gaps.");
             }
 
-            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_None) {
+            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::None) {
                 // Non-Symmetric basis
 
                 NBasis = state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis;
@@ -9376,7 +9377,7 @@ namespace HeatBalanceManager {
                                       "Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
                 }
 
-                if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::BasisType_Custom) {
+                if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::Basis::Custom) {
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis = NumRows; // For custom basis, no rows in transmittance
                                                                                              // matrix defines the basis length
                 }

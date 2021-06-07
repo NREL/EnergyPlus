@@ -56,6 +56,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
@@ -101,7 +102,7 @@ namespace TARCOGOutput {
                              const Array1D_int &ibc,
                              Real64 hout,
                              Real64 hin,
-                             int standard,
+                             TARCOGGassesParams::Stdrd standard,
                              TARCOGParams::TARCOGThermalModel ThermalMod,
                              Real64 SDScalar,
                              Real64 height,
@@ -246,7 +247,7 @@ namespace TARCOGOutput {
                               const Array1D_int &ibc,
                               Real64 hout,
                               Real64 hin,
-                              int standard,
+                              TARCOGGassesParams::Stdrd standard,
                               TARCOGParams::TARCOGThermalModel ThermalMod,
                               Real64 SDScalar,
                               Real64 height,
