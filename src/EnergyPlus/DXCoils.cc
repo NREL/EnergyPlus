@@ -14968,7 +14968,7 @@ void GetFanIndexForTwoSpeedCoil(
                         FoundAirSysNum = AirSysNum;
                         break;
                     }
-                    // these are specified in SimAirServingZones and need to be moved to a Data* file. 
+                    // these are specified in SimAirServingZones and need to be moved to a Data* file.
                 } else if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num ==
                            SimAirServingZones::CompType::Furnace_UnitarySys_HeatOnly) {
                     FoundBranch = BranchNum;
