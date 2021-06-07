@@ -4606,7 +4606,7 @@ namespace InternalHeatGains {
                                                                                            AlphaName(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Sensor,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsNotParent);
                 }
 

@@ -303,7 +303,7 @@ namespace HVACCooledBeam {
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Air,
                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                          1,
+                                                          NodeInputManager::compFluidStream::Primary,
                                                           ObjectIsNotParent,
                                                           cAlphaFields(4));
             CoolBeam(CBNum).AirOutNode = GetOnlySingleNode(state,
@@ -313,7 +313,7 @@ namespace HVACCooledBeam {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                           1,
+                                                           NodeInputManager::compFluidStream::Primary,
                                                            ObjectIsNotParent,
                                                            cAlphaFields(5));
             CoolBeam(CBNum).CWInNode = GetOnlySingleNode(state,
@@ -323,7 +323,7 @@ namespace HVACCooledBeam {
                                                          Alphas(1),
                                                          DataLoopNode::NodeFluidType::Water,
                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                         2,
+                                                         NodeInputManager::compFluidStream::Secondary,
                                                          ObjectIsNotParent,
                                                          cAlphaFields(6));
             CoolBeam(CBNum).CWOutNode = GetOnlySingleNode(state,
@@ -333,7 +333,7 @@ namespace HVACCooledBeam {
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                          2,
+                                                          NodeInputManager::compFluidStream::Secondary,
                                                           ObjectIsNotParent,
                                                           cAlphaFields(7));
             CoolBeam(CBNum).MaxAirVolFlow = Numbers(1);
