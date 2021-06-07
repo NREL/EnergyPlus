@@ -1005,8 +1005,28 @@ namespace WaterUse {
                 // There is no hot water
                 this->HotMassFlowRate = 0.0;
 
-                // Need a special case for HotTemp < ColdTemp, due to bad user input  (but could happen in a plant loop accidentally)
-
+            // Special case for HotTemp < ColdTemp, due to bad user input (could happen in a plant loop accidentally)
+            } else if (this->HotTemp < this->ColdTemp) {
+                this->HotMassFlowRate = 0;
+                // print error for variables of hot water temperature
+                ++this->HWTempErrorCount;
+                if (this->HWTempErrorCount < 2) {
+                    ShowWarningError(state, "CalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature");
+                    ShowContinueError(state, format("...hot water temperature       = {:.3R} C", this->HotTemp));
+                    ShowContinueError(state, format("...cold water temperature       = {:.3R} C", this->ColdTemp));
+                    ShowContinueError(state, "...Note: hot water temperature should be greater than cold water temperature");
+                    ShowContinueError(state,
+                                      "...Hot water temperature should be greater than cold water temperature. "
+                                      "Verify temperature setpoints and schedules.");
+                } else {
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        this->Name +
+                        "\" - Hot water temperature should be greater than cold water temperature error continues...",
+                        this->HWTempErrIndex,
+                        this->HotTemp,
+                        this->HotTemp);
+                }
             } else if (this->TargetTemp > this->HotTemp) {
                 this->HotMassFlowRate = this->TotalMassFlowRate;
 
