@@ -464,7 +464,7 @@ void SimOAComponent(EnergyPlusData &state,
             Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
         }
 
-    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_System_Object) {              // 'Fan:SystemModel'
+    } else if (CompTypeNum == SimAirServingZones::CompType::Fan_System_Object) { // 'Fan:SystemModel'
         if (CompIndex == 0) {                                                  // 0 means has not been filled because of 1-based arrays in old fortran
             CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
         }
@@ -604,7 +604,8 @@ void SimOAComponent(EnergyPlusData &state,
             SimCoilUserDefined(state, CompName, CompIndex, AirLoopNum, OAHeatingCoil, OACoolingCoil);
         }
         // Heat recovery
-    } else if (CompTypeNum == SimAirServingZones::CompType::HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
+    } else if (CompTypeNum ==
+               SimAirServingZones::CompType::HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
         // 'HeatExchanger:Desiccant:BalancedFlow'
         if (Sim) {
             if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
@@ -675,7 +676,8 @@ void SimOAComponent(EnergyPlusData &state,
         }
 
         // Evaporative Cooler Types
-    } else if (CompTypeNum == SimAirServingZones::CompType::EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
+    } else if (CompTypeNum ==
+               SimAirServingZones::CompType::EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
         // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
         if (Sim) {
             SimEvapCooler(state, CompName, CompIndex);

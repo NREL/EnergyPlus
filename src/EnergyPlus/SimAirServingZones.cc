@@ -3465,7 +3465,7 @@ void SimAirLoopComponents(EnergyPlusData &state,
 
 void SimAirLoopComponent(EnergyPlusData &state,
                          std::string const &CompName,   // the component Name
-                         CompType const CompType_Num,  // numeric equivalent for component type
+                         CompType const CompType_Num,   // numeric equivalent for component type
                          bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                          int const AirLoopNum,          // Primary air loop number
                          int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
@@ -3530,7 +3530,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
             Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
 
         } else if (SELECT_CASE_var == CompType::Fan_System_Object) { // "Fan:SystemModel" new for V8.6
-            if (CompIndex == 0) {                          // 0 means has not been filled because of 1-based arrays in old fortran
+            if (CompIndex == 0) {                                    // 0 means has not been filled because of 1-based arrays in old fortran
                 CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
             }
             // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
@@ -4031,8 +4031,8 @@ void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const 
     std::string CompName; // Component name
     std::string CoilName;
     std::string CoilType;
-    std::string ScalableSM; // scalable sizing methods label for reporting
-    int CompType_Num;       // Numeric equivalent for CompType
+    std::string ScalableSM;                    // scalable sizing methods label for reporting
+    SimAirServingZones::CompType CompType_Num; // Numeric equivalent for CompType
     int CompNum;
     bool ErrorsFound;
 
@@ -4096,8 +4096,9 @@ void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const 
         CompType = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
         CompName = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
         CompType_Num = PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
-        if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_CoolingHXAsst) {
-            if (CompType_Num == WaterCoil_CoolingHXAsst) {
+        if (CompType_Num == CompType::WaterCoil_DetailedCool || CompType_Num == CompType::WaterCoil_SimpleHeat ||
+            CompType_Num == CompType::WaterCoil_CoolingHXAsst) {
+            if (CompType_Num == CompType::WaterCoil_CoolingHXAsst) {
                 CoilName = GetHXDXCoilName(state, CompType, CompName, ErrorsFound);
                 CoilType = GetHXCoilType(state, CompType, CompName, ErrorsFound);
             } else {

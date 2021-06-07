@@ -155,7 +155,7 @@ namespace SimAirServingZones {
 
     void SimAirLoopComponent(EnergyPlusData &state,
                              std::string const &CompName, // the component Name
-                             CompType CompType_Num,      // numeric equivalent for component type
+                             CompType CompType_Num,       // numeric equivalent for component type
                              bool FirstHVACIteration,     // TRUE if first full HVAC iteration in an HVAC timestep
                              int AirLoopNum,              // Primary air loop number
                              int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
