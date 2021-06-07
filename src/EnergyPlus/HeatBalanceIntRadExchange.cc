@@ -1693,24 +1693,28 @@ namespace HeatBalanceIntRadExchange {
                 FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs(sum_FixedF - N);
                 RowSum = sum_FixedF;
                 if (CheckConvergeTolerance > 0.005) {
-                  if (CheckConvergeTolerance > 0.1) {
-                    ShowSevereError(state,
-                                    "FixViewFactors: View factors convergence has failed "
-                                    "and will lead to heat balance errors in zone=\"" +
-                                        enclName + "\".");
-                    severeErrorPresent = true;
-                  }
-                  ShowWarningError(state, "FixViewFactors: View factors not complete. Check "
-                                          "for bad surface descriptions or unenclosed zone=\"" +
-                                              enclName + "\".");
-                  ShowContinueError(state,
-                                    format("Enforced reciprocity has tolerance (ideal is "
-                                           "0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].",
-                                           CheckConvergeTolerance, N, RowSum));
-                  ShowContinueError(
-                      state, "If zone is unusual or tolerance is on the order of 0.001, view "
-                             "factors might be OK but results should be checked carefully.");
-                }                if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
+                    if (CheckConvergeTolerance > 0.1) {
+                        ShowSevereError(state,
+                                        "FixViewFactors: View factors convergence has failed "
+                                        "and will lead to heat balance errors in zone=\"" +
+                                            enclName + "\".");
+                        severeErrorPresent = true;
+                    }
+                    ShowWarningError(state,
+                                     "FixViewFactors: View factors not complete. Check "
+                                     "for bad surface descriptions or unenclosed zone=\"" +
+                                         enclName + "\".");
+                    ShowContinueError(state,
+                                      format("Enforced reciprocity has tolerance (ideal is "
+                                             "0)=[{:.6R}], Row Sum (ideal is {})=[{:.2R}].",
+                                             CheckConvergeTolerance,
+                                             N,
+                                             RowSum));
+                    ShowContinueError(state,
+                                      "If zone is unusual or tolerance is on the order of 0.001, view "
+                                      "factors might be OK but results should be checked carefully.");
+                }
+                if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
                     F = FixedF;
                     FinalCheckValue = FixedCheckValue;
                 }
@@ -1733,9 +1737,9 @@ namespace HeatBalanceIntRadExchange {
             }
         }
         if (severeErrorPresent) {
-          ShowFatalError(state,
-                         "FixViewFactors: View factor calculations significantly out "
-                         "of tolerance.  See above messages for more information.");
+            ShowFatalError(state,
+                           "FixViewFactors: View factor calculations significantly out "
+                           "of tolerance.  See above messages for more information.");
         }
     }
 

@@ -320,12 +320,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     F(4, 3) = 1.0 / 7.0;
     F(4, 4) = 0.0;
 
-    FixViewFactors(*state,N,A,F,
+    FixViewFactors(*state,
+                   N,
+                   A,
+                   F,
                    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).Name,
                    state->dataViewFactor->ZoneRadiantInfo(ZoneNum).ZoneNums,
-                   OriginalCheckValue,FixedCheckValue,FinalCheckValue,
-                   NumIterations,RowSum);
-    
+                   OriginalCheckValue,
+                   FixedCheckValue,
+                   FinalCheckValue,
+                   NumIterations,
+                   RowSum);
+
     EXPECT_NEAR(F(1, 1), 0.31747, 0.001);
     EXPECT_NEAR(F(1, 2), 0.71788, 0.001);
     EXPECT_NEAR(F(1, 3), 0.64862, 0.001);
