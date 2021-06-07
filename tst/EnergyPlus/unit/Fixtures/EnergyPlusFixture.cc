@@ -361,6 +361,8 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
         EXPECT_TRUE(compare_err_stream(""));
     }
 
+    state->dataGlobal->useCache = false;
+
     return successful_processing;
 }
 

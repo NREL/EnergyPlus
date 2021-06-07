@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Cache.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataConversions.hh>
@@ -108,7 +109,7 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     //  Calculation Code in BEST", BSO internal document,
     //  May/June 1996.
     // Strand, R.K. "Heat Source Transfer Functions and Their
-    //  Applicatoin to Low Temperature Radiant Heating System",
+    //  Application to Low Temperature Radiant Heating System",
     //  Ph.D. Dissertation, Department of Mechanical and
     //  Industrial Engineering, University of Illinois at
     //  Urbana-Champaign, 1995.
@@ -864,17 +865,13 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                 // be computed in TransFuncCoeffs.
                 DisplayString(state, "Calculating CTFs for \"" + this->Name + "\"");
 
-                //          CALL DisplayNumberAndString(ConstrNum,'Matrix exponential for Construction #')
                 this->calculateExponentialMatrix(); // Compute exponential of AMat
 
-                //          CALL DisplayNumberAndString(ConstrNum,'Invert Matrix for Construction #')
                 this->calculateInverseMatrix(); // Compute inverse of AMat
 
-                //          CALL DisplayNumberAndString(ConstrNum,'Gamma calculation for Construction #')
                 this->calculateGammas();
                 // Compute "gamma"s from AMat, AExp, and AInv
 
-                //          CALL DisplayNumberAndString(ConstrNum,'Compute CTFs for Construction #')
                 this->calculateFinalCoefficients(); // Compute CTFs
 
                 // Now check to see if the number of transfer functions
@@ -957,7 +954,6 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
                     DoCTFErrorReport = true;
                     ErrorsFound = true;
                     break;
-                    //            CALL ShowFatalError(state, 'Program terminated for reasons listed (InitConductionTransferFunctions) ')
                 }
 
             } // ... end of CTF calculation loop.
@@ -1064,6 +1060,9 @@ void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool &E
     if (allocated(this->Gamma1)) this->Gamma1.deallocate();
     if (allocated(this->Gamma2)) this->Gamma2.deallocate();
     if (allocated(this->s)) this->s.deallocate();
+
+    // write cache data
+    this->writeCacheData(state);
 }
 
 void ConstructionProps::calculateExponentialMatrix()
@@ -1091,8 +1090,8 @@ void ConstructionProps::calculateExponentialMatrix()
     // new cut-off criteria based on the significant figures of double-
     // precision variables has been added.  The main loop for higher powers
     // of AMat is now stopped whenever these powers of AMat will no longer
-    // add to the summation (AExp) instead ofstopping potentially at the
-    // artifical limit of AMat**100.
+    // add to the summation (AExp) instead of stopping potentially at the
+    // artificial limit of AMat**100.
 
     // REFERENCES:
     // Seem, J.E.  "Modeling of Heat Transfer in Buildings",
@@ -2061,6 +2060,115 @@ void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
             this->abBareSolCoef(Layer)(Index) = 0.0;
         }
     }
+}
+
+void ConstructionProps::writeCacheData(EnergyPlusData &state)
+{
+    // empty cache for this construction
+    nlohmann::json cacheData;
+
+    // construction name
+    cacheData["name"] = this->Name;
+
+    // CTF data
+    Cache::arrayToJSON(this->CTFCross, cacheData, "ctf_cross");
+    Cache::arrayToJSON(this->CTFFlux, cacheData, "ctf_flux");
+    Cache::arrayToJSON(this->CTFInside, cacheData, "ctf_inside");
+    Cache::arrayToJSON(this->CTFOutside, cacheData, "ctf_outside");
+
+    // other necessary data
+    cacheData["num_histories"] = this->NumHistories;
+    cacheData["num_ctf_terms"] = this->NumCTFTerms;
+    cacheData["ctf_timestep"] = this->CTFTimeStep;
+    cacheData["u_value"] = this->UValue;
+
+    // long verification key
+    cacheData["full_data_key"] = this->getCacheKeyString(state);
+
+    // write to cache
+    std::string key = this->getCacheKey(state);
+    state.dataCache->cache[Cache::CTFKey][key] = cacheData;
+}
+
+void ConstructionProps::loadFromCache(EnergyPlusData &state)
+{
+    try {
+        // load cached data
+        std::string key = this->getCacheKey(state);
+
+        // get the cached data if it exists. if it doesn't nlohmann::json throws out_of_range
+        nlohmann::json thisConstrData = state.dataCache->unorderedCTFObjects.at(key);
+
+        // nlohmann::json does some weird things when directly accessing strings
+        // explicitly setting these as string objects here so we can do a proper comparison
+        std::string a = thisConstrData.at("full_data_key");
+        std::string b = this->getCacheKeyString(state);
+
+        // final confirmation that the object we found matches exactly with the current construction
+        if (a != b) {
+            // show warning message here?
+            this->CTFLoadedFromCache = false;
+            return;
+        }
+
+        // we can load the data if if we've made it this far
+
+        // CTF arrays
+        Cache::jsonToArray(state, this->CTFCross, thisConstrData, "ctf_cross");
+        Cache::jsonToArray1(state, this->CTFFlux, thisConstrData, "ctf_flux");
+        Cache::jsonToArray(state, this->CTFInside, thisConstrData, "ctf_inside");
+        Cache::jsonToArray(state, this->CTFOutside, thisConstrData, "ctf_outside");
+
+        // other necessary data
+        Cache::jsonToData(state, this->NumHistories, thisConstrData, "num_histories");
+        Cache::jsonToData(state, this->NumCTFTerms, thisConstrData, "num_ctf_terms");
+        Cache::jsonToData(state, this->CTFTimeStep, thisConstrData, "ctf_timestep");
+        Cache::jsonToData(state, this->UValue, thisConstrData, "u_value");
+
+        this->CTFLoadedFromCache = true;
+    } catch (const nlohmann::json::out_of_range &e) {
+        // should already be defaulted to false, but this makes sure
+        this->CTFLoadedFromCache = false;
+    }
+}
+
+std::string ConstructionProps::getCacheKey(EnergyPlusData &state)
+{
+    unsigned long long key = 0;
+
+    constexpr int precision_bits(15);
+
+    // data from material layers
+    // adding the layer num to get a unique key for objects with reversed layers
+    for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
+        int CurrentLayer = this->LayerPoint(Layer);
+        auto &mat = state.dataMaterial->Material(CurrentLayer);
+        key ^= Cache::prepFloatForCacheKey(mat.Thickness, precision_bits) << Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Conductivity, precision_bits) << Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Density, precision_bits) << Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.SpecHeat, precision_bits) << Layer;
+        key ^= Cache::prepFloatForCacheKey(mat.Resistance, precision_bits) << Layer;
+    }
+
+    return format("{}", key);
+}
+
+std::string ConstructionProps::getCacheKeyString(EnergyPlusData &state)
+{
+    std::string key;
+
+    // Data from material layers
+    for (int Layer = 1; Layer <= this->TotLayers; ++Layer) {
+        int CurrentLayer = this->LayerPoint(Layer);
+        auto &mat = state.dataMaterial->Material(CurrentLayer);
+        key.append(format("{:.{}f},", mat.Thickness, 8));
+        key.append(format("{:.{}f},", mat.Conductivity, 8));
+        key.append(format("{:.{}f},", mat.Density, 8));
+        key.append(format("{:.{}f},", mat.SpecHeat, 8));
+        key.append(format("{:.{}f},", mat.Resistance, 8));
+    }
+
+    return key;
 }
 
 } // namespace EnergyPlus::Construction

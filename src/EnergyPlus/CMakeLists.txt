@@ -114,6 +114,8 @@ set(SRC
     BranchNodeConnections.hh
     CTElectricGenerator.cc
     CTElectricGenerator.hh
+    Cache.cc
+    Cache.hh
     ChilledCeilingPanelSimple.cc
     ChilledCeilingPanelSimple.hh
     ChillerAbsorption.cc

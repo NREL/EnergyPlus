@@ -166,6 +166,8 @@ struct DataGlobal : BaseGlobalStruct
     int FDnumIterYears = 0;
     bool printConsoleOutput = true;
 
+    bool useCache = true;
+
     void clear_state() override
     {
         this->BeginDayFlag = false;
@@ -267,6 +269,7 @@ struct DataGlobal : BaseGlobalStruct
         this->FDsimDay = 0;
         this->FDnumIterYears = 0;
         this->printConsoleOutput = true;
+        this->useCache = true;
     }
 };
 

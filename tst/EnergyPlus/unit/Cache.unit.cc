@@ -45,51 +45,116 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef FileSystem_hh_INCLUDED
-#define FileSystem_hh_INCLUDED
+// EnergyPlus::Cache Unit Tests
 
-#include <algorithm>
-#include <string>
+// Google Test Headers
+#include <gtest/gtest.h>
 
-namespace EnergyPlus {
+// JSON Header
+#include <nlohmann/json.hpp>
 
-namespace FileSystem {
+// EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Cache.hh>
 
-    extern std::string const exeExtension;
+using namespace EnergyPlus;
 
-    void makeNativePath(std::string &path);
+TEST_F(EnergyPlusFixture, Cache_TestJSONToData)
+{
+    // test jsonToData
+    nlohmann::json j;
+    j["pi"] = 3.14159;
+    j["answer"] = 42;
+    j["happy"] = true;
+    j["name"] = "energyplus";
 
-    std::string getFileName(std::string const &filePath);
+    // test double
+    double d;
+    Cache::jsonToData(*state, d, j, "pi");
+    EXPECT_EQ(d, 3.14159);
 
-    // Returns the parent directory of a path, with the trailing pathChar included
-    std::string getParentDirectoryPath(std::string const &filePath);
+    // test int
+    int i;
+    Cache::jsonToData(*state, i, j, "answer");
+    EXPECT_EQ(i, 42);
 
-    std::string getAbsolutePath(std::string const &filePath);
+    // test str
+    std::string s;
+    Cache::jsonToData(*state, s, j, "name");
+    EXPECT_EQ(s, "energyplus");
 
-    std::string getProgramPath();
+    // test bool
+    bool b;
+    Cache::jsonToData(*state, b, j, "happy");
+    EXPECT_EQ(b, true);
 
-    // For `a/b/c.txt.idf` it returns `idf` (anything after last dot, not including the dot)
-    std::string getFileExtension(std::string const &fileName);
+    // bad key
+    EXPECT_ANY_THROW(Cache::jsonToData(*state, b, j, "bad_key"));
+}
 
-    // Turns a/b/c.txt.idf into a/b/c.txt
-    std::string removeFileExtension(std::string const &fileName);
+TEST_F(EnergyPlusFixture, Cache_TestJSONToArray)
+{
+    nlohmann::json j;
+    j["array"] = {0, 1, 2, 3};
 
-    void makeDirectory(std::string const &directoryPath);
+    Array1D<Real64> arr_double;
+    Cache::jsonToArray(*state, arr_double, j, "array");
+    EXPECT_EQ(arr_double(0), 0.0);
+    EXPECT_EQ(arr_double(1), 1.0);
+    EXPECT_EQ(arr_double(2), 2.0);
+    EXPECT_EQ(arr_double(3), 3.0);
 
-    bool pathExists(std::string const &path);
+    Array1D<int> arr_int;
+    Cache::jsonToArray(*state, arr_int, j, "array");
+    EXPECT_EQ(arr_int(0), 0);
+    EXPECT_EQ(arr_int(1), 1);
+    EXPECT_EQ(arr_int(2), 2);
+    EXPECT_EQ(arr_int(3), 3);
 
-    bool directoryExists(std::string const &directoryPath);
+    j["bool"] = {false, true};
+    Array1D<bool> arr_bool;
+    Cache::jsonToArray(*state, arr_bool, j, "bool");
+    EXPECT_EQ(arr_bool(0), false);
+    EXPECT_EQ(arr_bool(1), true);
 
-    bool fileExists(std::string const &filePath);
+    // bad key
+    EXPECT_ANY_THROW(Cache::jsonToArray(*state, arr_bool, j, "bad_key"));
+}
 
-    void moveFile(std::string const &filePath, std::string const &destination);
+TEST_F(EnergyPlusFixture, Cache_TestJSONToArray1)
+{
+    nlohmann::json j;
+    j["array"] = {0, 1, 2, 3};
 
-    int systemCall(std::string const &command);
+    Array1D<Real64> arr_double;
+    Cache::jsonToArray1(*state, arr_double, j, "array");
+    EXPECT_EQ(arr_double(1), 0.0);
+    EXPECT_EQ(arr_double(2), 1.0);
+    EXPECT_EQ(arr_double(3), 2.0);
+    EXPECT_EQ(arr_double(4), 3.0);
 
-    void removeFile(std::string const &fileName);
+    Array1D<int> arr_int;
+    Cache::jsonToArray1(*state, arr_int, j, "array");
+    EXPECT_EQ(arr_int(1), 0);
+    EXPECT_EQ(arr_int(2), 1);
+    EXPECT_EQ(arr_int(3), 2);
+    EXPECT_EQ(arr_int(4), 3);
 
-    void linkFile(std::string const &fileName, std::string const &link);
+    j["bool"] = {false, true};
+    Array1D<bool> arr_bool;
+    Cache::jsonToArray1(*state, arr_bool, j, "bool");
+    EXPECT_EQ(arr_bool(1), false);
+    EXPECT_EQ(arr_bool(2), true);
 
-} // namespace FileSystem
-} // namespace EnergyPlus
-#endif
+    // bad key
+    EXPECT_ANY_THROW(Cache::jsonToArray1(*state, arr_bool, j, "bad_key"));
+}
+
+TEST_F(EnergyPlusFixture, Cache_TestArrayToJSON)
+{
+    Array1D<double> arr = {0.0, 1.0, 2.0};
+    nlohmann::json j;
+    Cache::arrayToJSON(arr, j, "data");
+    auto val = j.at("data");
+    EXPECT_EQ(val[0], 0.0);
+}

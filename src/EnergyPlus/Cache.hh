@@ -45,51 +45,110 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef FileSystem_hh_INCLUDED
-#define FileSystem_hh_INCLUDED
+#ifndef ENERGYPLUS_CACHE_HH
+#define ENERGYPLUS_CACHE_HH
 
-#include <algorithm>
-#include <string>
+// EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+
+// JSON Header
+#include <nlohmann/json.hpp>
 
 namespace EnergyPlus {
 
-namespace FileSystem {
+// Forward declarations
+struct EnergyPlusData;
 
-    extern std::string const exeExtension;
+namespace Cache {
 
-    void makeNativePath(std::string &path);
+    std::string const cacheName = "eplusout.cache";
+    std::string const CTFKey = "CTFs";
 
-    std::string getFileName(std::string const &filePath);
+    void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &j);
 
-    // Returns the parent directory of a path, with the trailing pathChar included
-    std::string getParentDirectoryPath(std::string const &filePath);
+    void writeJSONfile(nlohmann::json &j, std::string &fPath);
 
-    std::string getAbsolutePath(std::string const &filePath);
+    template <typename T> void jsonToArray(EnergyPlusData &state, Array1D<T> &arr, nlohmann::json &j, std::string const &key)
+    {
+        // 0-based array to JSON list
 
-    std::string getProgramPath();
+        try {
+            int size = static_cast<int>(j.at(key).size());
+            arr.dimension({0, size - 1});
+            int idx = 0;
+            for (auto &v : j.at(key)) {
+                arr(idx) = v;
+                ++idx;
+            }
+        } catch (const nlohmann::json::out_of_range &e) {
+            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
+        }
+    }
 
-    // For `a/b/c.txt.idf` it returns `idf` (anything after last dot, not including the dot)
-    std::string getFileExtension(std::string const &fileName);
+    template <typename T> void jsonToArray1(EnergyPlusData &state, Array1D<T> &arr, nlohmann::json &j, std::string const &key)
+    {
+        // 1-based array to JSON list
 
-    // Turns a/b/c.txt.idf into a/b/c.txt
-    std::string removeFileExtension(std::string const &fileName);
+        try {
+            int size = static_cast<int>(j.at(key).size());
+            arr.dimension(size);
+            int idx = 1;
+            for (auto &v : j.at(key)) {
+                arr(idx) = v;
+                ++idx;
+            }
+        } catch (const nlohmann::json::out_of_range &e) {
+            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
+        }
+    }
 
-    void makeDirectory(std::string const &directoryPath);
+    template <typename T> void jsonToData(EnergyPlusData &state, T &data, nlohmann::json &j, std::string const &key)
+    {
+        try {
+            data = j.at(key);
+        } catch (const nlohmann::json::out_of_range &e) {
+            ShowFatalError(state, format("From eplusout.cache, key: \"{}\" not found", key));
+        }
+    }
 
-    bool pathExists(std::string const &path);
+    template <typename T> void arrayToJSON(Array1D<T> const &arr, nlohmann::json &j, std::string const &key)
+    {
+        std::vector<T> vect;
+        for (auto v : arr)
+            vect.push_back(v);
+        j[key] = vect;
+    }
 
-    bool directoryExists(std::string const &directoryPath);
+    void loadCache(EnergyPlusData &state);
 
-    bool fileExists(std::string const &filePath);
+    void writeCache(EnergyPlusData &state);
 
-    void moveFile(std::string const &filePath, std::string const &destination);
+    inline unsigned long long prepFloatForCacheKey(double const x, unsigned int const precision_bits)
+    {
+        assert(sizeof(double) == sizeof(unsigned long long));
+        return *reinterpret_cast<unsigned long long const *>(&x) >> (64 - 12 - precision_bits);
+    }
 
-    int systemCall(std::string const &command);
+} // namespace Cache
 
-    void removeFile(std::string const &fileName);
+struct CacheData : BaseGlobalStruct
+{
 
-    void linkFile(std::string const &fileName, std::string const &link);
+    nlohmann::json cache;
+    bool ctfObjectsInCache = false;
+    std::unordered_map<std::string, nlohmann::json> unorderedCTFObjects;
 
-} // namespace FileSystem
+    void clear_state() override
+    {
+        this->cache.clear();
+        this->ctfObjectsInCache = false;
+        this->unorderedCTFObjects.clear();
+    }
+};
+
 } // namespace EnergyPlus
-#endif
+
+#endif // ENERGYPLUS_CACHE_HH

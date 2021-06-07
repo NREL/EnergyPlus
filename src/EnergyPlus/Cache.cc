@@ -45,51 +45,70 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef FileSystem_hh_INCLUDED
-#define FileSystem_hh_INCLUDED
+// EnergyPlus Headers
+#include <EnergyPlus/Cache.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
-#include <algorithm>
-#include <string>
+namespace EnergyPlus::Cache {
 
-namespace EnergyPlus {
+void readJSONfile(EnergyPlusData &state, std::string &filePath, nlohmann::json &j)
+{
+    if (!FileSystem::fileExists(filePath)) {
+        // if the file doesn't exist, there are no data to read
+        return;
+    } else {
+        std::ifstream ifs(filePath);
 
-namespace FileSystem {
+        // read json_in data
+        try {
+            j = nlohmann::json::from_cbor(ifs);
+            ifs.close();
+        } catch (...) {
+            if (!j.empty()) {
+                // file exists, is not empty, but failed for some other reason
+                ShowWarningError(state, filePath + " contains invalid file format");
+            }
+            ifs.close();
+            return;
+        }
+    }
+}
 
-    extern std::string const exeExtension;
+void writeJSONfile(nlohmann::json &j, std::string &fPath)
+{
+    std::ofstream ofs(fPath, std::ofstream::out | std::ofstream::binary);
+    nlohmann::json::to_cbor(j, ofs);
+    ofs.close();
+}
 
-    void makeNativePath(std::string &path);
+void loadCache(EnergyPlusData &state)
+{
+    // load cache file if it exists
+    if (FileSystem::fileExists(state.dataStrGlobals->outputCacheFileName) && state.dataGlobal->useCache) {
+        readJSONfile(state, state.dataStrGlobals->outputCacheFileName, state.dataCache->cache);
 
-    std::string getFileName(std::string const &filePath);
+        // file exists but is empty, so don't try to read data
+        if (state.dataCache->cache.empty()) return;
 
-    // Returns the parent directory of a path, with the trailing pathChar included
-    std::string getParentDirectoryPath(std::string const &filePath);
+        try {
+            // load these up one time up front
+            // nlohmann::json is loading this by default as an ordered set of data, but it needs to be unordered for the search later
+            nlohmann::json allCTFs = state.dataCache->cache.at(Cache::CTFKey);
+            allCTFs.get_to(state.dataCache->unorderedCTFObjects);
+            state.dataCache->ctfObjectsInCache = true;
+        } catch (nlohmann::json::out_of_range &e) {
+            state.dataCache->ctfObjectsInCache = false;
+        }
+    }
+}
 
-    std::string getAbsolutePath(std::string const &filePath);
+void writeCache(EnergyPlusData &state)
+{
+    writeJSONfile(state.dataCache->cache, state.dataStrGlobals->outputCacheFileName);
+}
 
-    std::string getProgramPath();
-
-    // For `a/b/c.txt.idf` it returns `idf` (anything after last dot, not including the dot)
-    std::string getFileExtension(std::string const &fileName);
-
-    // Turns a/b/c.txt.idf into a/b/c.txt
-    std::string removeFileExtension(std::string const &fileName);
-
-    void makeDirectory(std::string const &directoryPath);
-
-    bool pathExists(std::string const &path);
-
-    bool directoryExists(std::string const &directoryPath);
-
-    bool fileExists(std::string const &filePath);
-
-    void moveFile(std::string const &filePath, std::string const &destination);
-
-    int systemCall(std::string const &command);
-
-    void removeFile(std::string const &fileName);
-
-    void linkFile(std::string const &fileName, std::string const &link);
-
-} // namespace FileSystem
-} // namespace EnergyPlus
-#endif
+} // namespace EnergyPlus::Cache

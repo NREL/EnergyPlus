@@ -64,25 +64,19 @@ extern "C" {
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Cache.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataConvergParams.hh>
-#include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
@@ -237,6 +231,9 @@ namespace SimulationManager {
 
         state.files.outputControl.getInput(state);
         state.dataResultsFramework->resultsFramework->setupOutputOptions(state);
+
+        // Load cache file
+        Cache::loadCache(state);
 
         state.files.debug.ensure_open(state, "OpenOutputFiles", state.files.outputControl.dbg);
 
@@ -2001,6 +1998,9 @@ namespace SimulationManager {
 
         // Close the External Shading Output File
         state.files.shade.close();
+
+        // Write cache file
+        Cache::writeCache(state);
     }
 
     void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound)

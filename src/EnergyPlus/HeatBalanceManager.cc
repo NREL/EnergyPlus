@@ -59,6 +59,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BITF.hh>
+#include <EnergyPlus/Cache.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -2044,7 +2045,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, state.dataIPShortCut->cNumericFieldNames(14) + " not > 0.0 and < 1.0");
             }
 
-            if (MaterialNames(4) == "") {
+            if (MaterialNames(4).empty()) {
                 state.dataMaterial->Material(MaterNum).SolarDiffusing = false;
             } else if (MaterialNames(4) == "YES") {
                 state.dataMaterial->Material(MaterNum).SolarDiffusing = true;
@@ -2361,7 +2362,7 @@ namespace HeatBalanceManager {
                                   state.dataIPShortCut->cNumericFieldNames(6) + " + " + state.dataIPShortCut->cNumericFieldNames(7) + " not < 1.0");
             }
 
-            if (MaterialNames(2) == "") {
+            if (MaterialNames(2).empty()) {
                 state.dataMaterial->Material(MaterNum).SolarDiffusing = false;
             } else if (MaterialNames(2) == "YES") {
                 state.dataMaterial->Material(MaterNum).SolarDiffusing = true;
@@ -3930,7 +3931,7 @@ namespace HeatBalanceManager {
             } else {
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value");
                 ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + MaterialNames(4) + "\".");
-                ShowContinueError(state, "...Valid values are \"Simple\" or \"Advanced\".");
+                ShowContinueError(state, R"(...Valid values are "Simple" or "Advanced".)");
                 ErrorsFound = true;
             }
 
@@ -4841,7 +4842,7 @@ namespace HeatBalanceManager {
             // frame or divider.)
 
             std::string window5DataFileName;
-            if (ConstructAlphas(1) == "") {
+            if (ConstructAlphas(1).empty()) {
                 window5DataFileName = state.dataStrGlobals->CurrentWorkingFolder + "Window5DataFile.dat";
             } else {
                 window5DataFileName = ConstructAlphas(1);
@@ -5497,7 +5498,6 @@ namespace HeatBalanceManager {
         using namespace SolarShading;
         using DaylightingDevices::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
-        //  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 
         int StormWinNum; // Number of StormWindow object
@@ -5513,7 +5513,6 @@ namespace HeatBalanceManager {
 
             DisplayString(state, "Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(state); // Initialize the EQL window optical properties
-            // InitGlassOpticalCalculations(); // Initialize the window optical properties
             InitWindowOpticalCalculations(state);
             InitDaylightingDevices(state); // Initialize any daylighting devices
             DisplayString(state, "Initializing Solar Calculations");
@@ -6017,7 +6016,7 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const MinLoad(100.0); // Minimum laods for convergence check
+        constexpr Real64 MinLoad(100.0); // Minimum loads for convergence check
         // To avoid big percentage difference in low load situations
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -7595,9 +7594,9 @@ namespace HeatBalanceManager {
 
         // ASHRAE Handbook Fundamental 2005
         // Thermal resistance of the inside air film, m2.K/W. Average of 0.14 (heat flow up) and 0.11 (heat flow down)
-        Real64 const Rfilm_in(0.125);
+        constexpr Real64 Rfilm_in(0.125);
         // Thermal resistance of the outside air film used in calculating the Ffactor, m2.K/W. 0.17/5.678
-        Real64 const Rfilm_out(0.03);
+        constexpr Real64 Rfilm_out(0.03);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -9940,7 +9939,7 @@ namespace HeatBalanceManager {
             state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF = true;
         }
 
-        // Do not forget to deallocate localy allocated variables
+        // Do not forget to deallocate locally allocated variables
         if (allocated(locAlphaFieldNames)) locAlphaFieldNames.deallocate();
         if (allocated(locNumericFieldNames)) locNumericFieldNames.deallocate();
         if (allocated(locNumericFieldBlanks)) locNumericFieldBlanks.deallocate();
@@ -9955,8 +9954,29 @@ namespace HeatBalanceManager {
     {
         bool ErrorsFound(false); // Flag for input error condition
         bool DoCTFErrorReport(false);
-        for (auto &construction : state.dataConstruction->Construct) {
-            construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
+
+        if (state.dataCache->ctfObjectsInCache) {
+
+            // cache exists, check each construction for cached CTF values
+            for (auto &construction : state.dataConstruction->Construct) {
+
+                if (!construction.IsUsedCTF) continue;
+
+                // try loading from cache
+                construction.loadFromCache(state);
+
+                // if they were not found, compute the CTF values and write to a file
+                if (!construction.CTFLoadedFromCache) {
+                    construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
+                }
+            }
+        } else {
+
+            // cache doesn't exist, so we must compute the CTFs and write them to the cache file
+            for (auto &construction : state.dataConstruction->Construct) {
+                if (!construction.IsUsedCTF) continue;
+                construction.calculateTransferFunction(state, ErrorsFound, DoCTFErrorReport);
+            }
         }
 
         bool InitCTFDoReport;
