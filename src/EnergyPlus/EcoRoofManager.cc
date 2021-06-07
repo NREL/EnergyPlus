@@ -64,6 +64,7 @@
 #include <EnergyPlus/EcoRoofManager.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -243,7 +244,7 @@ namespace EcoRoofManager {
                                         state.dataHeatBalSurf->SurfHAirExt(SurfNum));
         }
 
-        RS = state.dataEnvrn->BeamSolarRad + state.dataHeatBal->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
+        RS = state.dataEnvrn->BeamSolarRad + state.dataSolarShading->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
         Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
                1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);

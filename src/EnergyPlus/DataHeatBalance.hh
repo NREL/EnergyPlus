@@ -2144,21 +2144,6 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
 
-    Array1D<Real64> SurfAnisoSkyMult;       // Multiplier on exterior-surface sky view factor to account for
-                                            // anisotropy of sky radiance; = 1.0 for for isotropic sky
-    Array1D<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array3D<Real64> DifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array1D<Real64> curDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array1D<Real64> DifShdgRatioHoriz;      // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-    Array3D<Real64> DifShdgRatioHorizHRTS;  // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-    Array1D<Real64> WithShdgIsoSky;         // Diffuse solar irradiance from sky on surface, with shading
-    Array1D<Real64> WoShdgIsoSky;           // Diffuse solar from sky on surface, without shading
-    Array1D<Real64> WithShdgHoriz;          // Diffuse solar irradiance from horizon portion of sky on surface, with shading
-    Array1D<Real64> WoShdgHoriz;            // Diffuse solar irradiance from horizon portion of sky on surface, without shading
-    Array1D<Real64> MultIsoSky;             // Contribution to eff sky view factor from isotropic sky
-    Array1D<Real64> MultCircumSolar;        // Contribution to eff sky view factor from circumsolar brightening
-    Array1D<Real64> MultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
-
     Array1D<Real64>
         EnclSolQSWRad; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
     Array1D<Real64> EnclSolQSWRadLights; // Like QS, but Lights short-wave only.
@@ -2440,20 +2425,6 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NominalR.deallocate();
         this->NominalRforNominalUCalculation.deallocate();
         this->NominalU.deallocate();
-        this->SurfAnisoSkyMult.deallocate();
-        this->DifShdgRatioIsoSky.deallocate();
-        this->DifShdgRatioIsoSkyHRTS.deallocate();
-        this->curDifShdgRatioIsoSky.deallocate();
-        this->DifShdgRatioHoriz.deallocate();
-        this->DifShdgRatioHorizHRTS.deallocate();
-        this->WithShdgIsoSky.deallocate();
-        this->WoShdgIsoSky.deallocate();
-        this->WithShdgHoriz.deallocate();
-        this->WoShdgHoriz.deallocate();
-        this->MultIsoSky.deallocate();
-        this->MultCircumSolar.deallocate();
-        this->MultHorizonZenith.deallocate();
-
         this->EnclSolQSWRad.deallocate();
         this->EnclSolQSWRadLights.deallocate();
         this->EnclSolDB.deallocate();

@@ -367,7 +367,22 @@ struct SolarShadingData : BaseGlobalStruct
                        // 1=No overlap; 2=NS1 completely within NS2
                        // 3=NS2 completely within NS1; 4=Partial overlap
 
-    Array1D<Real64> SurfSunCosTheta;         // Cosine of angle of incidence of sun's rays on surface NS
+    Array1D<Real64> SurfSunCosTheta;            // Cosine of angle of incidence of sun's rays on surface NS
+    Array1D<Real64> SurfAnisoSkyMult;           // Multiplier on exterior-surface sky view factor to account for
+                                                // anisotropy of sky radiance; = 1.0 for for isotropic sky
+    Array1D<Real64> SurfDifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+    Array3D<Real64> SurfDifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+    Array1D<Real64> SurfCurDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+    Array1D<Real64> SurfDifShdgRatioHoriz;      // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
+    Array3D<Real64> SurfDifShdgRatioHorizHRTS;  // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
+    Array1D<Real64> SurfWithShdgIsoSky;         // Diffuse solar irradiance from sky on surface, with shading
+    Array1D<Real64> SurfWoShdgIsoSky;           // Diffuse solar from sky on surface, without shading
+    Array1D<Real64> SurfWithShdgHoriz;          // Diffuse solar irradiance from horizon portion of sky on surface, with shading
+    Array1D<Real64> SurfWoShdgHoriz;            // Diffuse solar irradiance from horizon portion of sky on surface, without shading
+    Array1D<Real64> SurfMultIsoSky;             // Contribution to eff sky view factor from isotropic sky
+    Array1D<Real64> SurfMultCircumSolar;        // Contribution to eff sky view factor from circumsolar brightening
+    Array1D<Real64> SurfMultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
+
     int FBKSHC;                     // HC location of first back surface
     int FGSSHC;                     // HC location of first general shadowing surface
     int FINSHC;                     // HC location of first back surface overlap
@@ -391,16 +406,16 @@ struct SolarShadingData : BaseGlobalStruct
     Array2D<Int64> HCX; // 'X' homogeneous coordinates of vertices of figure.
     Array2D<Int64> HCY; // 'Y' homogeneous coordinates of vertices of figure.
     Array3D_int WindowRevealStatus;
-    Array1D<Real64> HCAREA; // Area of each HC figure.  Sign Convention:  Base Surface
-                            // - Positive, Shadow - Negative, Overlap between two shadows
-                            // - positive, etc., so that sum of HC areas=base sunlit area
-    Array1D<Real64> HCT;    // Transmittance of each HC figure
-    Array1D<Real64> ISABSF; // For simple interior solar distribution (in which all beam
-                            // radiation entering zone is assumed to strike the floor),
-                            // fraction of beam radiation absorbed by each floor surface
-    Array1D<Real64> SurfSunlitArea;  // Sunlit area of heat transfer surface HTS
-                            // Excludes multiplier for windows
-                            // Shadowing combinations data structure...See ShadowingCombinations type
+    Array1D<Real64> HCAREA;         // Area of each HC figure.  Sign Convention:  Base Surface
+                                    // - Positive, Shadow - Negative, Overlap between two shadows
+                                    // - positive, etc., so that sum of HC areas=base sunlit area
+    Array1D<Real64> HCT;            // Transmittance of each HC figure
+    Array1D<Real64> ISABSF;         // For simple interior solar distribution (in which all beam
+                                    // radiation entering zone is assumed to strike the floor),
+                                    // fraction of beam radiation absorbed by each floor surface
+    Array1D<Real64> SurfSunlitArea; // Sunlit area of heat transfer surface HTS
+                                    // Excludes multiplier for windows
+                                    // Shadowing combinations data structure...See ShadowingCombinations type
     int NumTooManyFigures = 0;
     int NumTooManyVertices = 0;
     int NumBaseSubSurround = 0;
@@ -512,6 +527,19 @@ struct SolarShadingData : BaseGlobalStruct
         this->CurrentShadowingSurface = 0;
         this->OverlapStatus = 0;
         this->SurfSunCosTheta.deallocate();
+        this->SurfAnisoSkyMult.deallocate();
+        this->SurfDifShdgRatioIsoSky.deallocate();
+        this->SurfDifShdgRatioIsoSkyHRTS.deallocate();
+        this->SurfCurDifShdgRatioIsoSky.deallocate();
+        this->SurfDifShdgRatioHoriz.deallocate();
+        this->SurfDifShdgRatioHorizHRTS.deallocate();
+        this->SurfWithShdgIsoSky.deallocate();
+        this->SurfWoShdgIsoSky.deallocate();
+        this->SurfWithShdgHoriz.deallocate();
+        this->SurfWoShdgHoriz.deallocate();
+        this->SurfMultIsoSky.deallocate();
+        this->SurfMultCircumSolar.deallocate();
+        this->SurfMultHorizonZenith.deallocate();
         this->FBKSHC = 0;
         this->FGSSHC = 0;
         this->FINSHC = 0;
