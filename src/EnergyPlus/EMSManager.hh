@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -120,7 +121,8 @@ namespace EMSManager {
 
     void ProcessEMSInput(EnergyPlusData &state, bool reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
-    void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
+    void GetVariableTypeAndIndex(
+        EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, OutputProcessor::VariableType &VarType, int &VarIndex);
 
     void EchoOutActuatorKeyChoices(EnergyPlusData &state);
 

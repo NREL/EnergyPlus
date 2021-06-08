@@ -828,36 +828,37 @@ namespace SetPointManager {
         Real64 MaxCondEntTemp; // maximum condenser entering water temp
         int NumCtrlNodes;      // number of nodes whose temperature is being set
         std::string CtrlNodeListName;
-        Array1D_int CtrlNodes;           // nodes where temperature is being set
-        Real64 SetPt;                    // the temperature set point [C]
-        int ChillerIndexPlantSide;       // plant side chiller index
-        int BranchIndexPlantSide;        // plant side branch index
-        int LoopIndexPlantSide;          // plant side loop index
-        int ChllrVarType;                // report variable type
-        int ChllrVarIndex;               // report variable index
-        int ChlPumpVarType;              // report variable type
-        int ChlPumpVarIndex;             // report variable index
-        Array1D_int ClTowerVarType;      // report variable type
-        Array1D_int ClTowerVarIndex;     // report variable index
-        int CndPumpVarType;              // report variable type
-        int CndPumpVarIndex;             // report variable index
-        int TypeNum;                     // chiller type number
-        Array1D_int TowerNum;            // cooling tower number
-        int CondLoopNum;                 // condenser loop number
-        Array1D_int CondTowerBranchNum;  // condenser branch number
-        int numTowers;                   // number of towers to query
-        int CondPumpNum;                 // condenser pump number
-        int CondPumpBranchNum;           // condenser branch number for pump
-        int ChilledPumpNum;              // chilled water pump number
-        int ChilledPumpBranchNum;        // chilled water branch number for pump
-        bool SetupIdealCondEntSetPtVars; // flag for initialization of meters and such
+        Array1D_int CtrlNodes;                                 // nodes where temperature is being set
+        Real64 SetPt;                                          // the temperature set point [C]
+        int ChillerIndexPlantSide;                             // plant side chiller index
+        int BranchIndexPlantSide;                              // plant side branch index
+        int LoopIndexPlantSide;                                // plant side loop index
+        OutputProcessor::VariableType ChllrVarType;            // report variable type
+        int ChllrVarIndex;                                     // report variable index
+        OutputProcessor::VariableType ChlPumpVarType;          // report variable type
+        int ChlPumpVarIndex;                                   // report variable index
+        Array1D<OutputProcessor::VariableType> ClTowerVarType; // report variable type
+        Array1D_int ClTowerVarIndex;                           // report variable index
+        OutputProcessor::VariableType CndPumpVarType;          // report variable type
+        int CndPumpVarIndex;                                   // report variable index
+        int TypeNum;                                           // chiller type number
+        Array1D_int TowerNum;                                  // cooling tower number
+        int CondLoopNum;                                       // condenser loop number
+        Array1D_int CondTowerBranchNum;                        // condenser branch number
+        int numTowers;                                         // number of towers to query
+        int CondPumpNum;                                       // condenser pump number
+        int CondPumpBranchNum;                                 // condenser branch number for pump
+        int ChilledPumpNum;                                    // chilled water pump number
+        int ChilledPumpBranchNum;                              // chilled water branch number for pump
+        bool SetupIdealCondEntSetPtVars;                       // flag for initialization of meters and such
 
         // Default Constructor
         DefineIdealCondEntSetPointManager()
             : MinimumLiftTD(0.0), MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), BranchIndexPlantSide(0),
-              LoopIndexPlantSide(0), ChllrVarType(0), ChllrVarIndex(0), ChlPumpVarType(0), ChlPumpVarIndex(0), CndPumpVarType(0), CndPumpVarIndex(0),
-              TypeNum(0), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0), ChilledPumpNum(0), ChilledPumpBranchNum(0),
-              SetupIdealCondEntSetPtVars(true)
+              LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VariableType::NotFound), ChllrVarIndex(0),
+              ChlPumpVarType(OutputProcessor::VariableType::NotFound), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VariableType::NotFound),
+              CndPumpVarIndex(0), TypeNum(0), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0), ChilledPumpNum(0),
+              ChilledPumpBranchNum(0), SetupIdealCondEntSetPtVars(true)
         {
         }
 
