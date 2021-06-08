@@ -100,10 +100,10 @@ namespace WaterUse {
         Real64 TargetTemp;      // Target (mixed) water temperature (C)
         Real64 MixedTemp;       // Actual outlet (mixed) water temperature (C)
         Real64 DrainTemp;
-        int HWTempErrorCount;    // - counter if hot water temp is less than cold water temp
-        int HWTempErrIndex;      // - index to recurring error structure for hot water temp
-        int TargetTempErrorCount;    // - counter if target water temp is less than cold water temp
-        int TargetTempErrIndex;      // - index to recurring error structure for target water temp
+        int HWTempErrorCount;     // - counter if hot water temp is less than cold water temp
+        int HWTempErrIndex;       // - index to recurring error structure for hot water temp
+        int TargetTempErrorCount; // - counter if target water temp is less than cold water temp
+        int TargetTempErrIndex;   // - index to recurring error structure for target water temp
         int Zone;                 // Index for zone object
         int SensibleFracSchedule; // Pointer to schedule object
         Real64 SensibleRate;

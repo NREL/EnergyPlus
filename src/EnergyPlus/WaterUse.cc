@@ -1005,8 +1005,8 @@ namespace WaterUse {
                 // There is no hot water
                 this->HotMassFlowRate = 0.0;
 
-            // Special case for HotTemp < ColdTemp, due to bad user input (could happen in a plant loop accidentally)
             } else if (this->HotTemp < this->ColdTemp) {
+                // Special case for HotTemp < ColdTemp, due to bad user input (could happen in a plant loop accidentally)
                 this->HotMassFlowRate = 0;
                 // print error for variables of hot water temperature
                 ++this->HWTempErrorCount;
@@ -1021,8 +1021,7 @@ namespace WaterUse {
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         state,
-                        this->Name +
-                        "\" - Hot water temperature should be greater than or equal to the cold water temperature error continues...",
+                        this->Name + "\" - Hot water temperature should be greater than or equal to the cold water temperature error continues...",
                         this->HWTempErrIndex,
                         this->HotTemp,
                         this->HotTemp);
@@ -1043,8 +1042,7 @@ namespace WaterUse {
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         state,
-                        this->Name +
-                        "\" - Target water temperature should be less than or equal to the hot water temperature error continues...",
+                        this->Name + "\" - Target water temperature should be less than or equal to the hot water temperature error continues...",
                         this->TargetTempErrIndex,
                         this->HotTemp,
                         this->ColdTemp);
@@ -1069,8 +1067,7 @@ namespace WaterUse {
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         state,
-                        this->Name +
-                        "\" - Target water temperature should be greater than or equal to the cold water temperature error continues...",
+                        this->Name + "\" - Target water temperature should be greater than or equal to the cold water temperature error continues...",
                         this->TargetTempErrIndex,
                         this->HotTemp,
                         this->ColdTemp);
