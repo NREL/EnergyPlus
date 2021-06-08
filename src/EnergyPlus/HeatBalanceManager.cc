@@ -78,6 +78,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
@@ -4840,21 +4841,21 @@ namespace HeatBalanceManager {
             // A FrameAndDivider object will also be created if window on data file has a
             // frame or divider.)
 
-            std::string window5DataFileName;
+            fs::path window5DataFilePath;
             if (ConstructAlphas(1) == "") {
-                window5DataFileName = state.dataStrGlobals->CurrentWorkingFolder + "Window5DataFile.dat";
+                window5DataFilePath = state.dataStrGlobals->CurrentWorkingFolder / "Window5DataFile.dat";
             } else {
-                window5DataFileName = ConstructAlphas(1);
+                window5DataFilePath = ConstructAlphas(1);
             }
             DisplayString(state, "Searching Window5 data file for Construction=" + ConstructAlphas(0));
 
-            SearchWindow5DataFile(state, window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
+            SearchWindow5DataFile(state, window5DataFilePath, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
 
             if (EOFonW5File || !ConstructionFound) {
                 DisplayString(state, "--Construction not found");
                 ErrorsFound = true;
                 ShowSevereError(state, "No match on WINDOW5 data file for Construction=" + ConstructAlphas(0) + ", or error in data file.");
-                ShowContinueError(state, "...Looking on file=" + window5DataFileName);
+                ShowContinueError(state, "...Looking on file=" + window5DataFilePath.string()); // TODO: call getAbsolutePath maybe?
                 continue;
             }
 
@@ -6558,7 +6559,7 @@ namespace HeatBalanceManager {
     }
 
     void SearchWindow5DataFile(EnergyPlusData &state,
-                               std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
+                               fs::path const &DesiredFilePath,            // File path that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
                                bool &EOFonFile,                            // True if EOF during file read
@@ -6599,7 +6600,7 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace DataStringGlobals;
-        using DataSystemVariables::CheckForActualFileName;
+        using DataSystemVariables::CheckForActualFilePath;
         using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -6634,7 +6635,6 @@ namespace HeatBalanceManager {
         int MaterNum; // Material number
         int MatNum;
         int FrDivNum;                 // FrameDivider number
-        bool exists;                  // True if Window5 data file exists
         Array1D<Real64> WinHeight(2); // Height, width for glazing system (m)
         Array1D<Real64> WinWidth(2);
         Array1D<Real64> UValCenter(2);      // Center of glass U-value (W/m2-K) for glazing system
@@ -6691,20 +6691,20 @@ namespace HeatBalanceManager {
         EOFonFile = false;
         std::string contextString = "HeatBalanceManager::SearchWindow5DataFile: ";
 
-        CheckForActualFileName(state, DesiredFileName, exists, state.files.TempFullFileName.fileName, contextString);
+        state.files.TempFullFilePath.filePath = CheckForActualFilePath(state, DesiredFilePath, contextString);
 
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
-        if (!exists) {
+        if (state.files.TempFullFilePath.filePath.empty()) {
             ShowFatalError(state, "Program terminates due to these conditions.");
         }
 
-        auto W5DataFile = state.files.TempFullFileName.open(state, "SearchWindow5DataFile");
+        auto W5DataFile = state.files.TempFullFilePath.open(state, "SearchWindow5DataFile");
         auto NextLine = W5DataFile.readLine();
         endcol = len(NextLine.data);
         if (endcol > 0) {
             if (int(NextLine.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
                 ShowSevereError(state,
-                                "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFileName +
+                                "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFilePath.string() +
                                     " fiile, appears to be a Unicode or binary file.");
                 ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                 ShowFatalError(state, "Program terminates due to previous condition.");
@@ -6717,7 +6717,7 @@ namespace HeatBalanceManager {
         if (NextLine.eof) goto Label1000;
         ++FileLineCount;
         if (!has_prefixi(NextLine.data, "WINDOW5")) {
-            ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFileName);
+            ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFilePath.string());
             ShowFatalError(
                 state, "Error reading Window5 Data File: first word of window entry is \"" + NextLine.data.substr(0, 7) + "\", should be Window5.");
         }

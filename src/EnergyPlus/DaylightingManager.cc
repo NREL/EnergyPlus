@@ -4432,7 +4432,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
         DisplayString(state, "ReturnFrom DElight DaylightCoefficients Calc");
         if (iErrorFlag != 0) {
             // Open DElight Daylight Factors Error File for reading
-            auto iDElightErrorFile = state.files.outputDelightDfdmpFileName.try_open(state.files.outputControl.delightdfdmp);
+            auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp);
 
             // Sequentially read lines in DElight Daylight Factors Error File
             // and process them using standard EPlus warning/error handling calls
@@ -4463,7 +4463,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
             // Close and Delete DElight Error File
             if (iDElightErrorFile.is_open()) {
                 iDElightErrorFile.close();
-                FileSystem::removeFile(iDElightErrorFile.fileName);
+                FileSystem::removeFile(iDElightErrorFile.filePath);
             }
 
             // If any DElight Error occurred then ShowFatalError to terminate
@@ -4471,8 +4471,8 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         } else {
-            if (FileSystem::fileExists(state.files.outputDelightDfdmpFileName.fileName)) {
-                FileSystem::removeFile(state.files.outputDelightDfdmpFileName.fileName);
+            if (FileSystem::fileExists(state.files.outputDelightDfdmpFilePath.filePath)) {
+                FileSystem::removeFile(state.files.outputDelightDfdmpFilePath.filePath);
             }
         }
     }
@@ -9962,20 +9962,20 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
 
         FirstTimeMaps(MapNum) = false;
 
-        auto openMapFile = [&](const std::string &fileName) -> InputOutputFile & {
+        auto openMapFile = [&](const fs::path &filePath) -> InputOutputFile & {
             auto &outputFile = *state.dataDaylightingData->IllumMap(MapNum).mapFile;
-            outputFile.fileName = fileName + fmt::to_string(MapNum);
+            outputFile.filePath = fs::path(filePath.string() + fmt::to_string(MapNum));
             outputFile.ensure_open(state, "ReportIllumMap");
             return outputFile;
         };
         if (state.dataDaylightingData->MapColSep == CharTab) {
-            if (!openMapFile(state.files.outputMapTabFileName).good()) return;
+            if (!openMapFile(state.files.outputMapTabFilePath).good()) return;
             //                CommaDelimited = false; //Unused Set but never used
         } else if (state.dataDaylightingData->MapColSep == CharComma) {
-            if (!openMapFile(state.files.outputMapCsvFileName).good()) return;
+            if (!openMapFile(state.files.outputMapCsvFilePath).good()) return;
             //                CommaDelimited = true; //Unused Set but never used
         } else {
-            if (!openMapFile(state.files.outputMapTxtFileName).good()) return;
+            if (!openMapFile(state.files.outputMapTxtFilePath).good()) return;
             //                CommaDelimited = false; //Unused Set but never used
         }
 
@@ -10131,11 +10131,11 @@ void CloseReportIllumMaps(EnergyPlusData &state)
     if (state.dataDaylightingData->TotIllumMaps > 0) {
         // Write map header
         if (state.dataDaylightingData->MapColSep == CharTab) {
-            state.files.map.fileName = state.files.outputMapTabFileName;
+            state.files.map.filePath = state.files.outputMapTabFilePath;
         } else if (state.dataDaylightingData->MapColSep == CharComma) {
-            state.files.map.fileName = state.files.outputMapCsvFileName;
+            state.files.map.filePath = state.files.outputMapCsvFilePath;
         } else {
-            state.files.map.fileName = state.files.outputMapTxtFileName;
+            state.files.map.filePath = state.files.outputMapTxtFilePath;
         }
 
         state.files.map.ensure_open(state, "CloseReportIllumMaps");

@@ -170,13 +170,13 @@ using namespace OutputReportPredefined;
 using namespace DataHeatBalance;
 using namespace HybridModel;
 
-std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const &filename, bool output_to_file)
+std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const &filePath, bool output_to_file)
 {
     std::ofstream &tbl_stream(*state.dataOutRptTab->TabularOutputFile(iStyle));
     if (output_to_file) {
-        tbl_stream.open(filename);
+        tbl_stream.open(filePath);
         if (!tbl_stream) {
-            ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filename + "\" for output (write).");
+            ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filePath.string() + "\" for output (write).");
         }
     } else {
         tbl_stream.setstate(std::ios_base::badbit);
@@ -3019,7 +3019,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             if (ort->TableStyle(iStyle) == iTableStyle::Comma) {
                 DisplayString(state, "Writing tabular output file results using comma format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFilePath, state.files.outputControl.tabular);
                 tbl_stream << "Program Version:" << curDel << state.dataStrGlobals->VerStringVar << '\n';
                 tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                 tbl_stream << '\n';
@@ -3034,7 +3034,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else if (ort->TableStyle(iStyle) == iTableStyle::Tab) {
                 DisplayString(state, "Writing tabular output file results using tab format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFilePath, state.files.outputControl.tabular);
                 tbl_stream << "Program Version" << curDel << state.dataStrGlobals->VerStringVar << '\n';
                 tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                 tbl_stream << '\n';
@@ -3049,7 +3049,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else if (ort->TableStyle(iStyle) == iTableStyle::HTML) {
                 DisplayString(state, "Writing tabular output file results using HTML format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFilePath, state.files.outputControl.tabular);
                 tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                 tbl_stream << "<html>\n";
                 tbl_stream << "<head>\n";
@@ -3085,7 +3085,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else if (ort->TableStyle(iStyle) == iTableStyle::XML) {
                 DisplayString(state, "Writing tabular output file results using XML format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFilePath, state.files.outputControl.tabular);
                 tbl_stream << "<?xml version=\"1.0\"?>\n";
                 tbl_stream << "<EnergyPlusTabularReports>\n";
                 tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
@@ -3106,7 +3106,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else {
                 DisplayString(state, "Writing tabular output file results using text format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFilePath, state.files.outputControl.tabular);
                 tbl_stream << "Program Version: " << state.dataStrGlobals->VerStringVar << '\n';
                 tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                 tbl_stream << '\n';
@@ -5447,8 +5447,8 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
     storeASHRAEHDD = "";
     storeASHRAECDD = "";
     lineTypeinterim = StatLineType::Initialized;
-    if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
-        auto statFile = state.files.inStatFileName.open(state, "FillWeatherPredefinedEntries");
+    if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
+        auto statFile = state.files.inStatFilePath.open(state, "FillWeatherPredefinedEntries");
         while (statFile.good()) { // end of file, or error
             lineType = lineTypeinterim;
             auto lineIn = statFile.readLine().data;
