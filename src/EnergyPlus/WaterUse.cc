@@ -948,6 +948,8 @@ namespace WaterUse {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate desired hot and cold water flow rates
 
+        Real64 const EPSILON(1.e-3);
+
         if (this->setupMyOutputVars) {
             this->setupOutputVars(state);
             this->setupMyOutputVars = false;
@@ -1005,7 +1007,7 @@ namespace WaterUse {
                 // There is no hot water
                 this->HotMassFlowRate = 0.0;
 
-            } else if (this->HotTemp < this->ColdTemp) {
+            } else if ((this->ColdTemp - this->HotTemp) > EPSILON) {
                 // Special case for HotTemp < ColdTemp, due to bad user input (could happen in a plant loop accidentally)
                 this->HotMassFlowRate = 0;
                 // print error for variables of hot water temperature
@@ -1026,7 +1028,7 @@ namespace WaterUse {
                         this->HotTemp,
                         this->HotTemp);
                 }
-            } else if (this->TargetTemp > this->HotTemp) {
+            } else if ((this->TargetTemp - this->HotTemp) > EPSILON) {
                 // Target temp is hotter than the hot water temp; can't meet target temperature
                 this->HotMassFlowRate = this->TotalMassFlowRate;
                 // print error for variables of target water temperature
