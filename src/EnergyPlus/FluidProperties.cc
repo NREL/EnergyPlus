@@ -104,20 +104,6 @@ namespace FluidProperties {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    constexpr static std::string_view Refrig("REFRIGERANT");
-    constexpr static std::string_view Glycol("GLYCOL");
-    constexpr static std::string_view Pressure("PRESSURE");
-    constexpr static std::string_view Enthalpy("ENTHALPY");
-    constexpr static std::string_view Density("DENSITY");
-    constexpr static std::string_view SpecificHeat("SPECIFICHEAT");
-    constexpr static std::string_view Conductivity("CONDUCTIVITY");
-    constexpr static std::string_view Viscosity("VISCOSITY");
-    constexpr static std::string_view Fluid("FLUID");
-    constexpr static std::string_view GasFluid("FLUIDGAS");
-    constexpr static std::string_view Water("Water");
-    constexpr static std::string_view Steam("Steam");
-    constexpr static std::string_view EthyleneGlycol("EthyleneGlycol");
-    constexpr static std::string_view PropyleneGlycol("PropyleneGlycol");
 
     // DERIVED TYPE DEFINITIONS
 
