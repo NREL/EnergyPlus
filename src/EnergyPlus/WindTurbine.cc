@@ -762,8 +762,8 @@ namespace WindTurbine {
         if (state.dataWindTurbine->MyOneTimeFlag) {
             wsStatFound = false;
 
-            if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
-                auto statFile = state.files.inStatFileName.open(state, "InitWindTurbine");
+            if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
+                auto statFile = state.files.inStatFilePath.open(state, "InitWindTurbine");
                 while (statFile.good()) { // end of file
                     auto lineIn = statFile.readLine();
                     // reconcile line with different versions of stat file
@@ -791,7 +791,7 @@ namespace WindTurbine {
                                     if (!warningShown) {
                                         ShowWarningError(
                                             state,
-                                            "InitWindTurbine: read from " + state.files.inStatFileName.fileName +
+                                            "InitWindTurbine: read from " + state.files.inStatFilePath.filePath.string() +
                                                 " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
                                         lineIn.data.erase(0, lnPtr + 1);
                                         warningShown = true;
@@ -800,7 +800,7 @@ namespace WindTurbine {
                             } else { // two tabs in succession
                                 if (!warningShown) {
                                     ShowWarningError(state,
-                                                     "InitWindTurbine: read from " + state.files.inStatFileName.fileName +
+                                                     "InitWindTurbine: read from " + state.files.inStatFilePath.filePath.string() +
                                                          " file shows <365 days in weather file. Annual average wind speed used will be inaccurate.");
                                     lineIn.data.erase(0, lnPtr + 1);
                                     warningShown = true;

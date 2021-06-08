@@ -2657,9 +2657,9 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     Array1D<Real64> dailyDryTemp(state.dataWeatherManager->NumDaysInYear, 0.0);
 
     readStat = 0;
-    if (FileSystem::fileExists(state.files.inputWeatherFileName.fileName)) {
+    if (FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
         // Read hourly dry bulb temperature first
-        auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptive");
+        auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptive");
         for (i = 1; i <= 9; ++i) { // Headers
             epwFile.readLine();
         }
@@ -2727,7 +2727,7 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
         }
     } else {
         ShowFatalError(state,
-                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFileName.fileName +
+                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
                            " for input (read). (File does not exist)");
     }
 }
