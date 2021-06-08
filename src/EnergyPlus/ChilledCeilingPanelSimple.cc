@@ -242,16 +242,16 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     Real64 const WaterMassFlowDefault(0.063); // Default water mass flow rate in kg/s
     int const MinDistribSurfaces(1);          // Minimum number of surfaces that a baseboard heater can radiate to
     Real64 const MinThrottlingRange(0.5);     // Smallest throttling range allowed in degrees Celsius
-    static std::string const MeanAirTemperature("MeanAirTemperature");
-    static std::string const MeanRadiantTemperature("MeanRadiantTemperature");
-    static std::string const OperativeTemperature("OperativeTemperature");
-    static std::string const OutsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
-    static std::string const OutsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
-    static std::string const ZoneTotalLoad("ZoneTotalLoad");
-    static std::string const ZoneConvectiveLoad("ZoneConvectiveLoad");
-    static std::string const Off("Off");
-    static std::string const SimpleOff("SimpleOff");
-    static std::string const VariableOff("VariableOff");
+    static constexpr std::string_view MeanAirTemperature("MeanAirTemperature");
+    static constexpr std::string_view MeanRadiantTemperature("MeanRadiantTemperature");
+    static constexpr std::string_view OperativeTemperature("OperativeTemperature");
+    static constexpr std::string_view OutsideAirDryBulbTemperature("OutdoorDryBulbTemperature");
+    static constexpr std::string_view OutsideAirWetBulbTemperature("OutdoorWetBulbTemperature");
+    static constexpr std::string_view ZoneTotalLoad("ZoneTotalLoad");
+    static constexpr std::string_view ZoneConvectiveLoad("ZoneConvectiveLoad");
+    static constexpr std::string_view Off("Off");
+    static constexpr std::string_view SimpleOff("SimpleOff");
+    static constexpr std::string_view VariableOff("VariableOff");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 AllFracsSummed; // Sum of the fractions radiant
