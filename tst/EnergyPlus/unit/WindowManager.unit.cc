@@ -2838,6 +2838,270 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->QHeatEmiReport(surfNum2), 3);
 }
+
+TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest) {
+
+    std::string const idf_objects =
+        delimited_string({
+            "WindowMaterial:SimpleGlazingSystem,",
+            "NonRes Fixed Assembly Window,  !- Name",
+            "9.0000,                  !- U-Factor {W/m2-K}",
+            "0.39;                    !- Solar Heat Gain Coefficient",
+            "Material:NoMass,",
+            "R13LAYER,                !- Name",
+            "Rough,                   !- Roughness",
+            "2.290965,                !- Thermal Resistance {m2-K/W}",
+            "0.9000000,               !- Thermal Absorptance",
+            "0.7500000,               !- Solar Absorptance",
+            "0.7500000;               !- Visible Absorptance",
+            "Material:NoMass,",
+            "R31LAYER,                !- Name",
+            "Rough,                   !- Roughness",
+            "5.456,                   !- Thermal Resistance {m2-K/W}",
+            "0.9000000,               !- Thermal Absorptance",
+            "0.7500000,               !- Solar Absorptance",
+            "0.7500000;               !- Visible Absorptance",
+            "Material,",
+            "C5 - 4 IN HW CONCRETE,   !- Name",
+            "MediumRough,             !- Roughness",
+            "0.1014984,               !- Thickness {m}",
+            "1.729577,                !- Conductivity {W/m-K}",
+            "2242.585,                !- Density {kg/m3}",
+            "836.8000,                !- Specific Heat {J/kg-K}",
+            "0.9000000,               !- Thermal Absorptance",
+            "0.6500000,               !- Solar Absorptance",
+            "0.6500000;               !- Visible Absorptance",
+            "Construction,",
+            "R13WALL,                 !- Name",
+            "R13LAYER;                !- Outside Layer",
+            "Construction,",
+            "FLOOR,                   !- Name",
+            "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+            "Construction,",
+            "ROOF31,                  !- Name",
+            "R31LAYER;                !- Outside Layer",
+            "Construction,",
+            "Window Non-res Fixed,    !- Name",
+            "NonRes Fixed Assembly Window;  !- Outside Layer",
+            "Zone,",
+            "ZONE ONE,                !- Name",
+            "0,                       !- Direction of Relative North {deg}",
+            "0,                       !- X Origin {m}",
+            "0,                       !- Y Origin {m}",
+            "0,                       !- Z Origin {m}",
+            "1,                       !- Type",
+            "1,                       !- Multiplier",
+            "autocalculate,           !- Ceiling Height {m}",
+            "autocalculate;           !- Volume {m3}",
+            "ScheduleTypeLimits,",
+            "Fraction,                !- Name",
+            "0.0,                     !- Lower Limit Value",
+            "1.0,                     !- Upper Limit Value",
+            "CONTINUOUS;              !- Numeric Type",
+            "GlobalGeometryRules,",
+            "UpperLeftCorner,         !- Starting Vertex Position",
+            "CounterClockWise,        !- Vertex Entry Direction",
+            "World;                   !- Coordinate System",
+            "FenestrationSurface:Detailed,",
+            "Zn001:Wall001:Win001,    !- Name",
+            "Window,                  !- Surface Type",
+            "Window Non-res Fixed,    !- Construction Name",
+            "Zn001:Wall001,           !- Building Surface Name",
+            ",                        !- Outside Boundary Condition Object",
+            "0.5000000,               !- View Factor to Ground",
+            ",                        !- Frame and Divider Name",
+            "1.0,                     !- Multiplier",
+            "4,                       !- Number of Vertices",
+            "0.548000,0,2.5000,  !- X,Y,Z ==> Vertex 1 {m}",
+            "0.548000,0,0.5000,  !- X,Y,Z ==> Vertex 2 {m}",
+            "5.548000,0,0.5000,  !- X,Y,Z ==> Vertex 3 {m}",
+            "5.548000,0,2.5000;  !- X,Y,Z ==> Vertex 4 {m}",
+            "BuildingSurface:Detailed,",
+            "Zn001:Wall001,           !- Name",
+            "Wall,                    !- Surface Type",
+            "R13WALL,                 !- Construction Name",
+            "ZONE ONE,                !- Zone Name",
+            "Outdoors,                !- Outside Boundary Condition",
+            ",                        !- Outside Boundary Condition Object",
+            "SunExposed,              !- Sun Exposure",
+            "WindExposed,             !- Wind Exposure",
+            "0.5000000,               !- View Factor to Ground",
+            "4,                       !- Number of Vertices",
+            "0,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+            "0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "15.24000,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "15.24000,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+            "BuildingSurface:Detailed,",
+            "Zn001:Wall002,           !- Name",
+            "Wall,                    !- Surface Type",
+            "R13WALL,                 !- Construction Name",
+            "ZONE ONE,                !- Zone Name",
+            "Outdoors,                !- Outside Boundary Condition",
+            ",                        !- Outside Boundary Condition Object",
+            "SunExposed,              !- Sun Exposure",
+            "WindExposed,             !- Wind Exposure",
+            "0.5000000,               !- View Factor to Ground",
+            "4,                       !- Number of Vertices",
+            "15.24000,0,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+            "15.24000,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+            "BuildingSurface:Detailed,",
+            "Zn001:Wall003,           !- Name",
+            "Wall,                    !- Surface Type",
+            "R13WALL,                 !- Construction Name",
+            "ZONE ONE,                !- Zone Name",
+            "Outdoors,                !- Outside Boundary Condition",
+            ",                        !- Outside Boundary Condition Object",
+            "SunExposed,              !- Sun Exposure",
+            "WindExposed,             !- Wind Exposure",
+            "0.5000000,               !- View Factor to Ground",
+            "4,                       !- Number of Vertices",
+            "15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+            "15.24000,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "0,15.24000,0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "0,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+            "BuildingSurface:Detailed,",
+            "Zn001:Wall004,           !- Name",
+            "Wall,                    !- Surface Type",
+            "R13WALL,                 !- Construction Name",
+            "ZONE ONE,                !- Zone Name",
+            "Outdoors,                !- Outside Boundary Condition",
+            ",                        !- Outside Boundary Condition Object",
+            "SunExposed,              !- Sun Exposure",
+            "WindExposed,             !- Wind Exposure",
+            "0.5000000,               !- View Factor to Ground",
+            "4,                       !- Number of Vertices",
+            "0,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+            "0,15.24000,0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "0,0,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+            "BuildingSurface:Detailed,",
+            "Zn001:Flr001,            !- Name",
+            "Floor,                   !- Surface Type",
+            "FLOOR,                   !- Construction Name",
+            "ZONE ONE,                !- Zone Name",
+            "Adiabatic,               !- Outside Boundary Condition",
+            ",                        !- Outside Boundary Condition Object",
+            "NoSun,                   !- Sun Exposure",
+            "NoWind,                  !- Wind Exposure",
+            "1.000000,                !- View Factor to Ground",
+            "4,                       !- Number of Vertices",
+            "15.24000,0.000000,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+            "0.000000,0.000000,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+            "0.000000,15.24000,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+            "15.24000,15.24000,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+            "BuildingSurface:Detailed,",
+            "Zn001:Roof001,           !- Name",
+            "Roof,                    !- Surface Type",
+            "ROOF31,                  !- Construction Name",
+            "ZONE ONE,                !- Zone Name",
+            "Outdoors,                !- Outside Boundary Condition",
+            ",                        !- Outside Boundary Condition Object",
+            "SunExposed,              !- Sun Exposure",
+            "WindExposed,             !- Wind Exposure",
+            "0,                       !- View Factor to Ground",
+            "4,                       !- Number of Vertices",
+            "0.000000,15.24000,4.572,  !- X,Y,Z ==> Vertex 1 {m}",
+            "0.000000,0.000000,4.572,  !- X,Y,Z ==> Vertex 2 {m}",
+            "15.24000,0.000000,4.572,  !- X,Y,Z ==> Vertex 3 {m}",
+            "15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}",
+            });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+
+    Real64 SHGC; // Center-of-glass solar heat gain coefficient for ASHRAE
+    Real64 TransSolNorm;        // Window construction solar transmittance at normal incidence
+    Real64 TransVisNorm;        // Window construction visible transmittance at normal incidence
+    int errFlag(0);                // Error flag
+    int ThisNum(4);
+    Real64 inputU(1.0);
+
+    // testing branches start
+    // winter, with illegal NominalConductanceWinter input, initialize the adjustment ratio to 1
+    Real64 NominalConductanceWinter(-1.0); // Nominal center-of-glass conductance of a window construction
+    state->dataWindowManager->coeffAdjRatioIn = Real64(0.0);
+    state->dataWindowManager->coeffAdjRatioOut = Real64(0.0);
+    CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+    // initialization, adjustment ratio equal to 1
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(1.0));
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(1.0));
+    // expect nominal conductance be non-negative initialization, adjustment ratio equal to 1
+    EXPECT_GE(NominalConductanceWinter, 0);
+
+    // winter with positive input, compute the real adj ratio
+    NominalConductanceWinter = Real64(5.0); // Nominal center-of-glass conductance of a window construction
+    state->dataWindowManager->coeffAdjRatioIn = Real64(1.0);
+    state->dataWindowManager->coeffAdjRatioOut = Real64(1.0);
+    inputU = Real64(7.0);
+    state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = inputU;
+    CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(7.0/5.0));
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(7.0/5.0));
+
+    // summer with -1 input -> adj ratio stay the same
+    Real64 NominalConductanceSummer(-1.0); // Nominal center-of-glass conductance of a window construction
+    state->dataWindowManager->coeffAdjRatioIn = Real64(1.5);
+    state->dataWindowManager->coeffAdjRatioOut = Real64(1.5);
+    inputU = Real64(7.0);
+    state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = inputU;
+    CalcNominalWindowCond(*state, ThisNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(1.5));
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(1.5));
+
+    // summer with positive input -> adj ratio stay the same
+    NominalConductanceSummer = Real64(5.0); // Nominal center-of-glass conductance of a window construction
+    state->dataWindowManager->coeffAdjRatioIn = Real64(1.5);
+    state->dataWindowManager->coeffAdjRatioOut = Real64(1.5);
+    inputU = Real64(7.0);
+    state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = inputU;
+    CalcNominalWindowCond(*state, ThisNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(1.5));
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(1.5));
+    // testing branch end
+
+    // testing adj ratio for different input U
+    inputU = Real64(7.0);
+    state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = inputU;
+    NominalConductanceWinter = Real64(-1.0); // Nominal center-of-glass conductance of a window construction
+    state->dataWindowManager->coeffAdjRatioIn = Real64(0.0);
+    state->dataWindowManager->coeffAdjRatioOut = Real64(0.0);
+    // first time execution, initialize the adjustment ratio, compute the nominal conductance
+    CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+    // initialization, adjustment ratio equal to 1
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(1.0));
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(1.0));
+    EXPECT_NE(NominalConductanceWinter, Real64(-1.0));
+    Real64 oldNominalConductance = NominalConductanceWinter;
+    // not first time execution, compute the adjustment ratio, and update the nominal U
+    CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+    EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(inputU / oldNominalConductance));
+    // expect nominal conductance be non-negative initialization, adjustment ratio equal to 1
+    EXPECT_NEAR(NominalConductanceWinter, Real64(inputU), Real64(0.1));
+
+    std::array<Real64, 4> inputUs = {Real64(3.0), Real64(5.0), Real64(7.0), Real64(9.0)};
+    // fixme: replace with size
+    for (auto varyInputU : inputUs) {
+        state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = varyInputU;
+        NominalConductanceWinter = Real64(-1.0); // Nominal center-of-glass conductance of a window construction
+        CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+        oldNominalConductance = NominalConductanceWinter;
+        CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+        EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(varyInputU / oldNominalConductance));
+        EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(varyInputU / oldNominalConductance));
+        EXPECT_NEAR(NominalConductanceWinter, varyInputU, Real64(0.1));
+    }
+}
+
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 {
 
