@@ -333,7 +333,7 @@ namespace ScheduleManager {
 
     struct CSVRow
     {
-        std::string_view operator[](std::size_t index) const;
+        std::string operator[](std::size_t index) const;
         std::size_t rowEnd();
         std::string delimiter{'*'}; // eg. comma in CSV
         void readNextRow(std::istream &str);
