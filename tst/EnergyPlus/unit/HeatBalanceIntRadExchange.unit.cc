@@ -143,7 +143,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     Real64 FinalCheckValue;    // the one to go with
     int NumIterations;         // number of iterations to fixed
     Real64 RowSum;             // RowSum of Fixed
+    bool anyIntMassInZone;
 
+    anyIntMassInZone = false;
     N = 3;
 
     A.allocate(N);
@@ -181,7 +183,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    FixedCheckValue,
                    FinalCheckValue,
                    NumIterations,
-                   RowSum);
+                   RowSum,
+                   anyIntMassInZone);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** Surfaces in Zone/Enclosure=\"Test\" do not define an enclosure.",
@@ -220,7 +223,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    FixedCheckValue,
                    FinalCheckValue,
                    NumIterations,
-                   RowSum);
+                   RowSum,
+                   anyIntMassInZone);
 
     EXPECT_NEAR(F(1, 2), 0.07986, 0.001);
     EXPECT_NEAR(F(2, 1), 0.71875, 0.001);
@@ -249,7 +253,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    FixedCheckValue,
                    FinalCheckValue,
                    NumIterations,
-                   RowSum);
+                   RowSum,
+                   anyIntMassInZone);
 
     EXPECT_NEAR(F(1, 2), 0.181818, 0.001);
     EXPECT_NEAR(F(2, 3), 0.25, 0.001);
@@ -278,7 +283,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    FixedCheckValue,
                    FinalCheckValue,
                    NumIterations,
-                   RowSum);
+                   RowSum,
+                   anyIntMassInZone);
 
     EXPECT_NEAR(F(1, 2), 0.21466, 0.001);
     EXPECT_NEAR(F(1, 3), 0.25445, 0.001);
@@ -330,7 +336,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
                    FixedCheckValue,
                    FinalCheckValue,
                    NumIterations,
-                   RowSum);
+                   RowSum,
+                   anyIntMassInZone);
 
     EXPECT_NEAR(F(1, 1), 0.31747, 0.001);
     EXPECT_NEAR(F(1, 2), 0.71788, 0.001);
@@ -348,6 +355,32 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     EXPECT_NEAR(F(4, 2), 0.14036, 0.001);
     EXPECT_NEAR(F(4, 3), 0.07060, 0.001);
     EXPECT_NEAR(F(4, 4), 0.00000, 0.001);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_DoesZoneHaveInternalMassTest)
+{
+
+    int numOfZoneSurfaces;
+    Array1D_int surfPointers;
+    bool functionReturnValue;
+
+    numOfZoneSurfaces = 7;
+    surfPointers.allocate(numOfZoneSurfaces);
+    state->dataSurface->Surface.allocate(numOfZoneSurfaces);
+
+    for (int i = 1; i <= numOfZoneSurfaces; ++i) {
+        surfPointers(i) = i;
+        state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
+    }
+
+    // Test 1: Nothing is an internal mass--function should return "false"
+    functionReturnValue = DoesZoneHaveInternalMass(*state, numOfZoneSurfaces, surfPointers);
+    EXPECT_FALSE(functionReturnValue);
+
+    // Test 2: Set one of the surfaces to internal mass--function should return "true"
+    state->dataSurface->Surface(7).Class = DataSurfaces::SurfaceClass::IntMass;
+    functionReturnValue = DoesZoneHaveInternalMass(*state, numOfZoneSurfaces, surfPointers);
+    EXPECT_TRUE(functionReturnValue);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagTest)

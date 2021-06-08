@@ -613,6 +613,7 @@ namespace HeatBalanceIntRadExchange {
                     SaveApproximateViewFactors = thisEnclosure.F;
                 }
 
+                bool anyIntMassInZone = DoesZoneHaveInternalMass(state, thisEnclosure.NumOfSurfaces, thisEnclosure.SurfacePtr);
                 FixViewFactors(state,
                                thisEnclosure.NumOfSurfaces,
                                thisEnclosure.Area,
@@ -623,7 +624,8 @@ namespace HeatBalanceIntRadExchange {
                                CheckValue2,
                                FinalCheckValue,
                                NumIterations,
-                               FixedRowSum);
+                               FixedRowSum,
+                               anyIntMassInZone);
 
                 // Calculate the script F factors
                 CalcScriptF(state, thisEnclosure.NumOfSurfaces, thisEnclosure.Area, thisEnclosure.F, thisEnclosure.Emissivity, thisEnclosure.ScriptF);
@@ -915,6 +917,7 @@ namespace HeatBalanceIntRadExchange {
             Real64 FixedRowSum = 0.0;
             int NumIterations = 0;
 
+            bool anyIntMassInZone = DoesZoneHaveInternalMass(state, thisEnclosure.NumOfSurfaces, thisEnclosure.SurfacePtr);
             FixViewFactors(state,
                            thisEnclosure.NumOfSurfaces,
                            thisEnclosure.Area,
@@ -925,7 +928,8 @@ namespace HeatBalanceIntRadExchange {
                            CheckValue2,
                            FinalCheckValue,
                            NumIterations,
-                           FixedRowSum);
+                           FixedRowSum,
+                           anyIntMassInZone);
 
             if (ViewFactorReport) { // Write to SurfInfo File
                 // Zone Surface Information Output
@@ -1474,7 +1478,8 @@ namespace HeatBalanceIntRadExchange {
                         Real64 &FixedCheckValue,         // check after fixed of SUM(F) - N
                         Real64 &FinalCheckValue,         // the one to go with
                         int &NumIterations,              // number of iterations to fixed
-                        Real64 &RowSum                   // RowSum of Fixed
+                        Real64 &RowSum,                  // RowSum of Fixed
+                        bool const anyIntMassInZone      // are there any internal mass surfaces in the zone
     )
     {
 
@@ -1713,6 +1718,12 @@ namespace HeatBalanceIntRadExchange {
                     ShowContinueError(state,
                                       "If zone is unusual or tolerance is on the order of 0.001, view "
                                       "factors might be OK but results should be checked carefully.");
+                    if (anyIntMassInZone) {
+                        ShowContinueError(state,
+                                          "For zones with internal mass like this one, this"
+                                          "can happen when the internal mass has an area that"
+                                          "is much larger than the other surfaces in the zone.");
+                    }
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
                     F = FixedF;
@@ -1741,6 +1752,14 @@ namespace HeatBalanceIntRadExchange {
                            "FixViewFactors: View factor calculations significantly out "
                            "of tolerance.  See above messages for more information.");
         }
+    }
+
+    bool DoesZoneHaveInternalMass(EnergyPlusData &state, int const numZoneSurfaces, const Array1D_int &surfPointer)
+    {
+        for (int i = 1; i <= numZoneSurfaces; ++i) {
+            if (state.dataSurface->Surface(surfPointer(i)).Class == SurfaceClass::IntMass) return true;
+        }
+        return false;
     }
 
     void CalcScriptF(EnergyPlusData &state,
