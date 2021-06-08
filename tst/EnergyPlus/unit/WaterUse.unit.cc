@@ -65,7 +65,7 @@ using namespace WaterUse;
 
 TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 {
-// This unit test checks that a hot water temperature less than the cold water temperature generates an warning/error
+    // This unit test checks checks warnings/errors associated with unreasonable temperatures in WaterUse:Equipment
     bool ErrorsFound(false);
 
     std::string const idf_objects = R"IDF(
@@ -444,13 +444,14 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     Real64 WaterEquipNum = 1;
     state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
-    std::string const error_string1 =
-        delimited_string({"   ** Warning ** CalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature",
+    std::string const error_string1 = delimited_string({
+        "   ** Warning ** CalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature",
         "   **   ~~~   ** ...hot water temperature       = 10.000 C",
         "   **   ~~~   ** ...cold water temperature       = 15.000 C",
         "   **   ~~~   ** ...Note: hot water temperature should be greater than or equal to the cold water temperature",
-        "   **   ~~~   ** ...Hot water temperature should be greater than or equal to the cold water temperature. Verify temperature setpoints and schedules.",
-        });
+        "   **   ~~~   ** ...Hot water temperature should be greater than or equal to the cold water temperature. Verify temperature setpoints and "
+        "schedules.",
+    });
 
     EXPECT_TRUE(compare_err_stream(error_string1, true));
 
@@ -463,13 +464,14 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     WaterEquipNum = 1;
     state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
-    std::string const error_string2 =
-        delimited_string({"   ** Warning ** CalcEquipmentFlowRates: Target water temperature is greater than the hot water temperature",
-                          "   **   ~~~   ** ...target water temperature       = 50.000 C",
-                          "   **   ~~~   ** ...hot water temperature       = 43.300 C",
-                          "   **   ~~~   ** ...Note: target water temperature should be less than or equal to the hot water temperature",
-                          "   **   ~~~   ** ...Target water temperature should be less than or equal to the hot water temperature. Verify temperature setpoints and schedules.",
-                         });
+    std::string const error_string2 = delimited_string({
+        "   ** Warning ** CalcEquipmentFlowRates: Target water temperature is greater than the hot water temperature",
+        "   **   ~~~   ** ...target water temperature       = 50.000 C",
+        "   **   ~~~   ** ...hot water temperature       = 43.300 C",
+        "   **   ~~~   ** ...Note: target water temperature should be less than or equal to the hot water temperature",
+        "   **   ~~~   ** ...Target water temperature should be less than or equal to the hot water temperature. Verify temperature setpoints and "
+        "schedules.",
+    });
 
     EXPECT_TRUE(compare_err_stream(error_string2, true));
 }
