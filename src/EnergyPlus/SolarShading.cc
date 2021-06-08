@@ -10037,18 +10037,25 @@ void CheckGlazingShadingStatusChange(EnergyPlusData &state)
                 }
             }
         }
+        if (state.dataHeatBal->EnclRadAlwaysReCalc) {
+            for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+                state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+            }
+        }
     }
+    if (state.dataHeatBal->EnclRadAlwaysReCalc) return;
 
-    if (state.dataHeatBal->EnclRadAlwaysReCalc || state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel ||
-        state.dataGlobal->AnySurfPropOverridesInModel) {
+    if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel || state.dataGlobal->AnySurfPropOverridesInModel) {
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
             state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
         }
         return;
     }
-    if (!state.dataGlobal->AndShadingControlInModel) return;
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
         state.dataHeatBal->EnclRadReCalc(enclosureNum) = false;
+    }
+    if (!state.dataGlobal->AndShadingControlInModel) return;
+    for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
         for (int const SurfNum : state.dataViewFactor->ZoneRadiantInfo(enclosureNum).SurfacePtr) {
             bool surfShadingStatusChange =
                 state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum) != state.dataSurface->SurfWinShadingFlag(SurfNum) ||
