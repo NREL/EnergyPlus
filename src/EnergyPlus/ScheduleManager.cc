@@ -1690,36 +1690,15 @@ namespace ScheduleManager {
             for (const schedInputIdfPreprocessObject &item : state.dataScheduleMgr->allIdfSchedData) {
                 if (item.fileName == fileNameItem) {
                     // if item not in set, add to set: if not, add to other container and remove from set
-                    if (setCSVColNums.find(item.columnOfInterest) == setCSVColNums.end()){  // if not in present
+                    if (setCSVColNums.find(item.columnOfInterest) == setCSVColNums.end()) { // if not in present
                         setCSVColNums.insert(item.columnOfInterest);
-                        colNumToColDataIndex.insert(std::pair<int,int>(item.columnOfInterest, item.columnarDataIndex));
-                    }
-                    else {
+                        colNumToColDataIndex.insert(std::pair<int, int>(item.columnOfInterest, item.columnarDataIndex));
+                    } else {
                         setOfDuplicateCSVColNumbers.insert(item.columnOfInterest);
-                        colNumToColDataIndex.insert(std::pair<int,int>(item.columnOfInterest, item.columnarDataIndex));
-
+                        colNumToColDataIndex.insert(std::pair<int, int>(item.columnOfInterest, item.columnarDataIndex));
                     }
                 }
             }
-
-//            // find if there is a many to one mapping, throw fatal error if there is an error
-//            std::sort(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // sorting to use std::adjacent_find
-//            const auto duplicate =
-//                std::adjacent_find(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end());
-//            if (duplicate !=
-//                vectorOfCSVColNumbers
-//                    .end()) { // TODO : what if there are multiple last elements? - remove last element and check if duplicate is still the same
-//                std::vector<int> duplicates;
-//                duplicates.push_back(*duplicate);
-//
-//                ShowFatalError(state,
-//                               format("Multiple schedules pointing to the same column number : {} in file {}. Please modify the IDF file and make "
-//                                      "sure multiple schedules do not point to the same column in the file.",
-//                                      *duplicate,
-//                                      fileNameItem));
-//            }
-
-
 
             std::ifstream file(fileNameItem);
             CSVRow row;
@@ -1727,11 +1706,8 @@ namespace ScheduleManager {
             row.delimiter = state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(*setCSVColNums.begin())->second]
                                 .delimiter; // all schedules in one file will have the same delimiter
 
-            while (file >> row)
-
-            {
-                for (int colNum : setCSVColNums ) {
-
+            while (file >> row) {
+                for (int colNum : setCSVColNums) {
                     // skip if row needs to be skipped
                     if (state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].rowsToSkip) {
                         --state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].rowsToSkip;
@@ -1744,7 +1720,7 @@ namespace ScheduleManager {
                         columnValue = 0.0;
                     }
 
-                    state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].vals.emplace_back(columnValue); // row[colNum]
+                    state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].vals.emplace_back(columnValue);
                     ++state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].rowCnt;
                 }
 
@@ -1755,38 +1731,26 @@ namespace ScheduleManager {
 
                     for (auto iterator = range.first++; // skip the first value since it is already in the earlier loop
                          iterator != range.second;
-                         ++ iterator
-                         )
-                    {
+                         ++iterator) {
 
-                    // skip if row needs to be skipped
-                    if (state.dataScheduleMgr->columnarData[iterator->second].rowsToSkip) {
-                        --state.dataScheduleMgr->columnarData[iterator->second].rowsToSkip;
-                        continue;
-                    } // TODO : Add check if the number of rows skipped were correct (What if the user input was wrong?)
+                        // skip if row needs to be skipped
+                        if (state.dataScheduleMgr->columnarData[iterator->second].rowsToSkip) {
+                            --state.dataScheduleMgr->columnarData[iterator->second].rowsToSkip;
+                            continue;
+                        } // TODO : Add check if the number of rows skipped were correct (What if the user input was wrong?)
 
-                    columnValue = UtilityRoutines::ProcessNumber(row[colNum], errFlag);
-                    if (errFlag) {
-                        ++state.dataScheduleMgr->columnarData[iterator->second].numerrors;
-                        columnValue = 0.0;
+                        columnValue = UtilityRoutines::ProcessNumber(row[colNum], errFlag);
+                        if (errFlag) {
+                            ++state.dataScheduleMgr->columnarData[iterator->second].numerrors;
+                            columnValue = 0.0;
+                        }
+
+                        state.dataScheduleMgr->columnarData[iterator->second].vals.emplace_back(columnValue); // row[colNum]
+                        ++state.dataScheduleMgr->columnarData[iterator->second].rowCnt;
                     }
-
-                    state.dataScheduleMgr->columnarData[iterator->second].vals.emplace_back(columnValue); // row[colNum]
-                    ++state.dataScheduleMgr->columnarData[iterator->second].rowCnt;
                 }
-                }
-
             }
         }
-
-        // schedule values have been filled into the columnarData.vals vectors.
-
-//        // skip rows when needed - potentially unnecessary, since
-//        for (auto &schedule : state.dataScheduleMgr->columnarData) {
-//            if (schedule.rowsToSkip != -1) {
-//                schedule.vals.erase(schedule.vals.begin(), schedule.vals.begin() + schedule.rowsToSkip);
-//            }
-//        }
 
         for (const PreProcessedColumn &schedule : state.dataScheduleMgr->columnarData) {
             rowLimitCount = (schedule.numHourlyValues * 60) / schedule.MinutesPerItem;
