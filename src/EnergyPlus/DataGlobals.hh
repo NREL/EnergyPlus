@@ -142,7 +142,8 @@ struct DataGlobal : BaseGlobalStruct
     bool FinalSizingHVACSizingSimIteration = false; // when doing HVAC sizing Simulation
     bool AnyEnergyManagementSystemInModel = false;  // true if there is any EMS or Erl in model.  otherwise false
     bool AnySurfPropOverridesInModel = false;       // true if there is any EMS or Erl overriding the surface properties for any surface.
-    bool AnyConstrOverridesInModel = false;         // true if there is any EMS or Erl overriding the surface properties for any surface.
+    bool AnyConstrOverridesInModel = false;         // true if there is any EMS or Erl overriding the constructions for any surface.
+    bool AndShadingControlInModel = false;          // true if there is any window shading control for any fenestration surface
     bool AnyLocalEnvironmentsInModel = false;       // true if there is any local environmental data objected defined in model, otherwise false
     bool AnyPlantInModel = false;                   // true if there are any plant or condenser loops in model, otherwise false
     bool AnyIdealCondEntSetPointInModel = false;    // true if there is any ideal condenser entering set point manager in model.
@@ -246,6 +247,7 @@ struct DataGlobal : BaseGlobalStruct
         this->AnyEnergyManagementSystemInModel = false;
         this->AnyConstrOverridesInModel = false;
         this->AnySurfPropOverridesInModel = false;
+        this->AndShadingControlInModel = false;
         this->AnyLocalEnvironmentsInModel = false;
         this->AnyPlantInModel = false;
         this->AnyIdealCondEntSetPointInModel = false;

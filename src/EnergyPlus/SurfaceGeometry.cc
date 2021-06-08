@@ -9776,6 +9776,7 @@ namespace SurfaceGeometry {
             for (int jFeneRef = 1; jFeneRef <= state.dataSurface->WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 if (UtilityRoutines::SameString(state.dataSurface->WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef),
                                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name)) {
+                    state.dataGlobal->AndShadingControlInModel = true;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HasShadeControl = true;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList.push_back(iShadeCtrl);
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeWindowShadingControl = iShadeCtrl;

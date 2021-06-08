@@ -10019,19 +10019,36 @@ void WindowShadingManager(EnergyPlusData &state)
             }
         } // End of surface loop
     }
+}
+
+void CheckGlazingShadingStatusChange(EnergyPlusData &state)
+{
+    if (state.dataGlobal->BeginSimFlag) {
+        if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
+            state.dataHeatBal->EnclRadAlwaysReCalc = true;
+        }
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            for (int const SurfNum : state.dataViewFactor->ZoneRadiantInfo(enclosureNum).SurfacePtr) {
+                if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TCFlag == 1 ||
+                    state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
+                    state.dataHeatBal->EnclRadAlwaysReCalc = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (state.dataHeatBal->EnclRadAlwaysReCalc || state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel ||
+        state.dataGlobal->AnySurfPropOverridesInModel) {
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
+        }
+        return;
+    }
+    if (!state.dataGlobal->AndShadingControlInModel) return;
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
         state.dataHeatBal->EnclRadReCalc(enclosureNum) = false;
-        if (state.dataGlobal->BeginEnvrnFlag || state.dataGlobal->AnyConstrOverridesInModel ||
-            (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel())) {
-            state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
-            continue;
-        }
         for (int const SurfNum : state.dataViewFactor->ZoneRadiantInfo(enclosureNum).SurfacePtr) {
-            if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TCFlag == 1 ||
-                state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) {
-                state.dataHeatBal->EnclRadReCalc(enclosureNum) = true;
-                break;
-            }
             bool surfShadingStatusChange =
                 state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum) != state.dataSurface->SurfWinShadingFlag(SurfNum) ||
                 state.dataSurface->Surface(SurfNum).activeShadedConstruction != state.dataSurface->Surface(SurfNum).activeShadedConstructionPrev ||
