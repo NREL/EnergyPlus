@@ -1014,15 +1014,15 @@ namespace WaterUse {
                     ShowWarningError(state, "CalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature");
                     ShowContinueError(state, format("...hot water temperature       = {:.3R} C", this->HotTemp));
                     ShowContinueError(state, format("...cold water temperature       = {:.3R} C", this->ColdTemp));
-                    ShowContinueError(state, "...Note: hot water temperature should be greater than cold water temperature");
+                    ShowContinueError(state, "...Note: hot water temperature should be greater than or equal to the cold water temperature");
                     ShowContinueError(state,
-                                      "...Hot water temperature should be greater than cold water temperature. "
+                                      "...Hot water temperature should be greater than or equal to the cold water temperature. "
                                       "Verify temperature setpoints and schedules.");
                 } else {
                     ShowRecurringWarningErrorAtEnd(
                         state,
                         this->Name +
-                        "\" - Hot water temperature should be greater than cold water temperature error continues...",
+                        "\" - Hot water temperature should be greater than or equal to the cold water temperature error continues...",
                         this->HWTempErrIndex,
                         this->HotTemp,
                         this->HotTemp);

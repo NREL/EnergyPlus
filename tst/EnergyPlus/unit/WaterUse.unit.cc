@@ -52,16 +52,18 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WaterUse.hh>
 
 using namespace EnergyPlus;
 using namespace WaterUse;
 
-TEST_F(EnergyPlusFixture, WaterUse_HotWaterTempWarning)
+TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
 {
 // This unit test checks that a hot water temperature less than the cold water temperature generates an warning/error
     bool ErrorsFound(false);
@@ -319,14 +321,14 @@ TEST_F(EnergyPlusFixture, WaterUse_HotWaterTempWarning)
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,10.0;       !- Field 3
+    Until: 24:00,43.3;       !- Field 3
 
   Schedule:Compact,
     SWHSys1-Loop-Temp-Schedule,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,10.0;       !- Field 3
+    Until: 24:00,43.3;       !- Field 3
 
   PlantEquipmentList,
     SWHSys1 Equipment List,  !- Name
@@ -414,8 +416,22 @@ TEST_F(EnergyPlusFixture, WaterUse_HotWaterTempWarning)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
+    state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
+    ScheduleManager::UpdateScheduleValues(*state);
+
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
-    ScheduleManager::ProcessScheduleInput(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     Real64 WaterConnNum = 1;
     GetWaterUseInput(*state);
@@ -428,13 +444,32 @@ TEST_F(EnergyPlusFixture, WaterUse_HotWaterTempWarning)
     Real64 WaterEquipNum = 1;
     state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
 
-    std::string const error_string =
+    std::string const error_string1 =
         delimited_string({"   ** Warning ** CalcEquipmentFlowRates: Hot water temperature is less than the cold water temperature",
         "   **   ~~~   ** ...hot water temperature       = 10.000 C",
         "   **   ~~~   ** ...cold water temperature       = 15.000 C",
-        "   **   ~~~   ** ...Note: hot water temperature should be greater than cold water temperature",
-        "   **   ~~~   ** ...Hot water temperature should be greater than cold water temperature. Verify temperature setpoints and schedules.",
+        "   **   ~~~   ** ...Note: hot water temperature should be greater than or equal to the cold water temperature",
+        "   **   ~~~   ** ...Hot water temperature should be greater than or equal to the cold water temperature. Verify temperature setpoints and schedules.",
         });
 
-    EXPECT_TRUE(compare_err_stream(error_string, true));
+    EXPECT_TRUE(compare_err_stream(error_string1, true));
+
+    // Reset hot water temperature to 43.3C
+    state->dataLoopNodes->Node(1).Temp = 43.3;
+    state->dataWaterUse->WaterConnections(WaterConnNum).InitConnections(*state);
+
+    // Set target temperature to 50C, above hot water temperature to trigger warning
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 50;
+    WaterEquipNum = 1;
+    state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
+
+    std::string const error_string2 =
+        delimited_string({"   ** Warning ** CalcEquipmentFlowRates: Target water temperature is greater than the hot water temperature",
+                          "   **   ~~~   ** ...target water temperature       = 50.000 C",
+                          "   **   ~~~   ** ...hot water temperature       = 43.300 C",
+                          "   **   ~~~   ** ...Note: target water temperature should be less than or equal to the hot water temperature",
+                          "   **   ~~~   ** ...Target water temperature should be less than or equal to the hot water temperature. Verify temperature setpoints and schedules.",
+                         });
+
+    EXPECT_TRUE(compare_err_stream(error_string2, true));
 }
