@@ -6929,7 +6929,8 @@ namespace WindowManager {
             }
         }
 
-        NominalConductance = 1.0 / (rOut + Rbare + rIn); // Autodesk:Uninit Rbare was uninitialized if ngllayer > 4
+        NominalConductance = 1.0 / (rOut * 1 / state.dataWindowManager->coeffAdjRatioOut + Rbare +
+                                    rIn * 1 / state.dataWindowManager->coeffAdjRatioIn); // Autodesk:Uninit Rbare was uninitialized if ngllayer > 4
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
     }
 
