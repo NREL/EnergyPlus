@@ -474,4 +474,21 @@ TEST_F(EnergyPlusFixture, WaterUse_WaterTempWarnings)
     });
 
     EXPECT_TRUE(compare_err_stream(error_string2, true));
+
+    // Set target temperature to 0C, below cold water temperature to trigger warning
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 0;
+    WaterEquipNum = 1;
+    state->dataWaterUse->WaterEquipment(WaterEquipNum).TargetTempErrorCount = 0;
+    state->dataWaterUse->WaterEquipment(WaterEquipNum).WaterEquipmentType::CalcEquipmentFlowRates(*state);
+
+    std::string const error_string3 = delimited_string({
+        "   ** Warning ** CalcEquipmentFlowRates: Target water temperature is less than the cold water temperature",
+        "   **   ~~~   ** ...target water temperature       = 0.000 C",
+        "   **   ~~~   ** ...cold water temperature       = 15.000 C",
+        "   **   ~~~   ** ...Note: target water temperature should be greater than or equal to the cold water temperature",
+        "   **   ~~~   ** ...Target water temperature should be greater than or equal to the cold water temperature. Verify temperature setpoints "
+        "and schedules.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string3, true));
 }
