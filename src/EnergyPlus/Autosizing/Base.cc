@@ -312,8 +312,8 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
                                   Optional<Real64 const> UsrValue)
 {
 
-    static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
-    static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
+    static constexpr fmt::string_view Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
+    static constexpr fmt::string_view Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
 
     // to do, make this a parameter. Unfortunately this function is used in MANY
     // places so it involves touching most of E+

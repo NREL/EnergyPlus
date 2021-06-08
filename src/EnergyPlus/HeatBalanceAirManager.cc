@@ -198,7 +198,7 @@ void GetAirFlowFlag(EnergyPlusData &state, bool &ErrorsFound) // Set to true if 
     if (state.dataHeatBal->TotInfiltration + state.dataHeatBal->TotVentilation + state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing +
             state.dataHeatBal->TotRefDoorMixing >
         0) {
-        static constexpr auto Format_720("! <AirFlow Model>, Simple\n AirFlow Model, {}\n");
+        static constexpr fmt::string_view Format_720("! <AirFlow Model>, Simple\n AirFlow Model, {}\n");
         print(state.files.eio, Format_720, "Simple");
     }
 }
@@ -318,9 +318,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     int IsSourceZone;
 
     // Formats
-    static constexpr auto Format_720(" {} Airflow Stats Nominal, {},{},{},{:.2R},{:.1R},");
-    static constexpr auto Format_721("! <{} Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {{m2}}, # Zone Occupants,{}\n");
-    static constexpr auto Format_722(" {}, {}\n");
+    static constexpr fmt::string_view Format_720(" {} Airflow Stats Nominal, {},{},{},{:.2R},{:.1R},");
+    static constexpr fmt::string_view Format_721("! <{} Airflow Stats Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {{m2}}, # Zone Occupants,{}\n");
+    static constexpr fmt::string_view Format_722(" {}, {}\n");
 
     RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
 
@@ -4147,7 +4147,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     }
 
     if (state.dataHeatBal->TotRefDoorMixing > 0) {
-        static constexpr auto Format_724("! <{} Airflow Stats Nominal>, {}\n");
+        static constexpr fmt::string_view Format_724("! <{} Airflow Stats Nominal>, {}\n");
         print(state.files.eio,
               Format_724,
               "RefrigerationDoorMixing ",
@@ -4157,7 +4157,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             for (ConnectionNumber = 1; ConnectionNumber <= state.dataHeatBal->RefDoorMixing(ZoneNumA).NumRefDoorConnections; ++ConnectionNumber) {
                 ZoneNumB = state.dataHeatBal->RefDoorMixing(ZoneNumA).MateZonePtr(ConnectionNumber);
                 // TotMixingFlow(ZoneNum)=TotMixingFlow(ZoneNum)+RefDoorMixing(Loop)%!DesignLevel
-                static constexpr auto Format_723(" {} Airflow Stats Nominal, {},{},{},{},{:.3R},{:.3R},{}\n");
+                static constexpr fmt::string_view Format_723(" {} Airflow Stats Nominal, {},{},{},{},{:.3R},{:.3R},{}\n");
                 print(state.files.eio,
                       Format_723,
                       "RefrigerationDoorMixing",
@@ -4464,11 +4464,11 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
     }
 
     // Write RoomAir Model details onto EIO file
-    static constexpr auto RoomAirHeader("! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined\n");
+    static constexpr fmt::string_view RoomAirHeader("! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined\n");
     print(state.files.eio, RoomAirHeader);
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         {
-            static constexpr auto RoomAirZoneFmt("RoomAir Model,{},{}\n");
+            static constexpr fmt::string_view RoomAirZoneFmt("RoomAir Model,{},{}\n");
 
             auto const SELECT_CASE_var(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType);
             if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) {

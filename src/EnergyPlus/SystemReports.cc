@@ -5370,18 +5370,18 @@ void ReportAirLoopConnections(EnergyPlusData &state)
     // na
 
     // Formats
-    static constexpr auto Format_706("! <#AirLoopHVACs>,<Number of AirLoopHVACs>");
-    static constexpr auto Format_708(
+    static constexpr fmt::string_view Format_706("! <#AirLoopHVACs>,<Number of AirLoopHVACs>");
+    static constexpr fmt::string_view Format_708(
         "! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>");
-    static constexpr auto Format_709("! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Return Node #>,<Zn Eqp Return "
+    static constexpr fmt::string_view Format_709("! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Return Node #>,<Zn Eqp Return "
                                      "Node Name>,<AirLoop Return Node #>,<Air Loop Return Node Name>");
-    static constexpr auto Format_710("! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Supply Node #>,<Zn Eqp Supply "
+    static constexpr fmt::string_view Format_710("! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Supply Node #>,<Zn Eqp Supply "
                                      "Node Name>,<AirLoop Supply Node #>,<Air Loop Supply Node Name>");
-    static constexpr auto Format_711("! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,<Cooled Zone Inlet Node #>,<Cooled Zone Inlet "
+    static constexpr fmt::string_view Format_711("! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,<Cooled Zone Inlet Node #>,<Cooled Zone Inlet "
                                      "Node Name>,<AirLoopHVAC Name>");
-    static constexpr auto Format_712("! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,<Heated Zone Inlet Node #>,<Heated Zone Inlet "
+    static constexpr fmt::string_view Format_712("! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,<Heated Zone Inlet Node #>,<Heated Zone Inlet "
                                      "Node Name>,<AirLoopHVAC Name>");
-    static constexpr auto Format_714("! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
+    static constexpr fmt::string_view Format_714("! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed "
                                      "Air Outlet Node Name>,<AirLoopHVAC Name>");
 
     auto &NodeID(state.dataLoopNodes->NodeID);

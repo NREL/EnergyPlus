@@ -1637,9 +1637,9 @@ namespace AirflowNetworkBalanceManager {
         auto &Node(state.dataLoopNodes->Node);
 
         // Formats
-        static constexpr auto Format_110("! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/Multizone "
+        static constexpr fmt::string_view Format_110("! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/Multizone "
                                          "without Distribution/Multizone with Distribution only during Fan Operation\n");
-        static constexpr auto Format_120("AirflowNetwork Model:Control,{}\n");
+        static constexpr fmt::string_view Format_120("AirflowNetwork Model:Control,{}\n");
 
         // Set the maximum numbers of input fields
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirflowNetwork:SimulationControl", TotalArgs, NumAlphas, NumNumbers);

@@ -339,11 +339,11 @@ namespace WeatherManager {
         // reached.
 
         static constexpr std::string_view RoutineName("GetNextEnvironment: ");
-        static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
-        static constexpr auto EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
-        static constexpr auto EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
-        static constexpr auto DateFormat("{:02}/{:02}");
-        static constexpr auto DateFormatWithYear("{:02}/{:02}/{:04}");
+        static constexpr fmt::string_view EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
+        static constexpr fmt::string_view EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
+        static constexpr fmt::string_view EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
+        static constexpr fmt::string_view DateFormat("{:02}/{:02}");
+        static constexpr fmt::string_view DateFormatWithYear("{:02}/{:02}/{:04}");
         static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
         static Array1D_string const ValidDayNames(12,
                                                   {"Sunday",
@@ -760,7 +760,7 @@ namespace WeatherManager {
                 if ((state.dataGlobal->DoDesDaySim && (state.dataGlobal->KindOfSim != DataGlobalConstants::KindOfSim::RunPeriodWeather)) ||
                     ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) && state.dataGlobal->DoWeathSim)) {
                     if (state.dataWeatherManager->PrntEnvHeaders && state.dataReportFlag->DoWeatherInitReporting) {
-                        static constexpr auto EnvironFormat(
+                        static constexpr fmt::string_view EnvironFormat(
                             "! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, "
                             "Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule,  Use Rain Values, Use Snow "
                             "Values, Sky Temperature Model\n! <Environment:Special Days>, Special Day Name, Special Day Type, Source, Start Date, "
@@ -1082,7 +1082,7 @@ namespace WeatherManager {
                                 print(state.files.eio, EnvDSTNFormat, Source);
                             }
                             for (int i = 1; i <= state.dataWeatherManager->NumSpecialDays; ++i) {
-                                static constexpr auto EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
+                                static constexpr fmt::string_view EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
                                 if (state.dataWeatherManager->SpecialDays(i).WthrFile && state.dataWeatherManager->UseSpecialDays &&
                                     state.dataReportFlag->DoWeatherInitReporting) {
                                     StDate = format(DateFormat,
@@ -3729,7 +3729,7 @@ namespace WeatherManager {
         state.dataWeatherManager->DesignDay(EnvrnNum).DayOfMonth = state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth;
         state.dataWeatherManager->DesignDay(EnvrnNum).DayOfYear =
             General::OrdinalDay(state.dataWeatherManager->DesignDay(EnvrnNum).Month, state.dataWeatherManager->DesignDay(EnvrnNum).DayOfMonth, 0);
-        static constexpr auto MnDyFmt("{:02}/{:02}");
+        static constexpr fmt::string_view MnDyFmt("{:02}/{:02}");
         state.dataEnvrn->CurMnDy =
             format(MnDyFmt, state.dataWeatherManager->DesDayInput(EnvrnNum).Month, state.dataWeatherManager->DesDayInput(EnvrnNum).DayOfMonth);
         // EnvironmentName = DesDayInput( EnvrnNum ).Title;
@@ -3792,12 +3792,12 @@ namespace WeatherManager {
                                   state.dataWeatherManager->DesignDay(EnvrnNum).CosSolarDeclinAngle);
 
         if (state.dataWeatherManager->PrintDDHeader && state.dataReportFlag->DoWeatherInitReporting) {
-            static constexpr auto EnvDDHdFormat(
+            static constexpr fmt::string_view EnvDDHdFormat(
                 "! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, "
                 "Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind "
                 "Speed {m/s}, Clearness, Rain, Snow");
             print(state.files.eio, "{}\n", EnvDDHdFormat);
-            static constexpr auto DDayMiscHdFormat("! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar "
+            static constexpr fmt::string_view DDayMiscHdFormat("! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar "
                                                    "Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model");
             print(state.files.eio, "{}\n", DDayMiscHdFormat);
             state.dataWeatherManager->PrintDDHeader = false;
@@ -3848,7 +3848,7 @@ namespace WeatherManager {
 
             print(state.files.eio, "{},{}\n", AlpUseRain, AlpUseSnow);
 
-            static constexpr auto DDayMiscFormat("Environment:Design Day Misc,{:3},");
+            static constexpr fmt::string_view DDayMiscFormat("Environment:Design Day Misc,{:3},");
             print(state.files.eio, DDayMiscFormat, state.dataWeatherManager->DesignDay(EnvrnNum).DayOfYear);
             print(state.files.eio, "{:.1R},", A);
             print(state.files.eio, "{:.4R},", B);
@@ -4787,11 +4787,11 @@ namespace WeatherManager {
             state.dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->StdBaroPress, DataPrecisionGlobals::constant_twenty, DataPrecisionGlobals::constant_zero);
             // Write Final Location Information to the initialization output file
-            static constexpr auto LocHdFormat("! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number "
+            static constexpr fmt::string_view LocHdFormat("! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number "
                                               "{GMT+/-}, Elevation {m},  Standard Pressure at Elevation {Pa}, Standard RhoAir at Elevation\n");
             print(state.files.eio, "{}", LocHdFormat);
 
-            static constexpr auto LocFormat("Site:Location,{},{:.2R},{:.2R},{:.2R},{:.2R},{:.0R},{:.4R}\n");
+            static constexpr fmt::string_view LocFormat("Site:Location,{},{:.2R},{:.2R},{:.2R},{:.2R},{:.0R},{:.4R}\n");
             print(state.files.eio,
                   LocFormat,
                   state.dataWeatherManager->LocationTitle,
@@ -5026,14 +5026,14 @@ namespace WeatherManager {
             if (printEnvrnStamp) {
 
                 if (state.dataReportFlag->PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
-                    static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
+                    static constexpr fmt::string_view EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
                     print(state.files.mtr, "{}\n", EndOfHeaderString);
                     state.dataReportFlag->PrintEndDataDictionary = false;
                 }
                 if (state.dataGlobal->DoOutputReporting) {
                     std::string const &Title(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title);
-                    static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+                    static constexpr fmt::string_view EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           state.dataWeatherManager->EnvironmentReportChr,
@@ -7662,7 +7662,7 @@ namespace WeatherManager {
 
         // Write Final Ground Reflectance Modifier Information to the initialization output file
         print(state.files.eio, "{}\n", "! <Site:GroundReflectance:SnowModifier>, Normal, Daylighting {dimensionless}");
-        static constexpr auto Format_720(" Site:GroundReflectance:SnowModifier, {:7.3F}, {:7.3F}\n");
+        static constexpr fmt::string_view Format_720(" Site:GroundReflectance:SnowModifier, {:7.3F}, {:7.3F}\n");
         print(state.files.eio, Format_720, state.dataWeatherManager->SnowGndRefModifier, state.dataWeatherManager->SnowGndRefModifierForDayltg);
 
         print(state.files.eio,
@@ -7902,7 +7902,7 @@ namespace WeatherManager {
               "Speed Modifier Coefficient-Internal,Temperature Modifier Coefficient-Internal");
 
         // Formats
-        static constexpr auto Format_720("Environment:Weather Station,{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+        static constexpr fmt::string_view Format_720("Environment:Weather Station,{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
         print(state.files.eio,
               Format_720,
               WeatherFileWindSensorHeight,
@@ -8896,11 +8896,11 @@ namespace WeatherManager {
         // for weather file environments.
 
         static std::string const MissString("Missing Data Found on Weather Data File");
-        static constexpr auto msFmt("Missing {}, Number of items={:5}");
+        static constexpr fmt::string_view msFmt("Missing {}, Number of items={:5}");
         static std::string const InvString("Invalid Data Found on Weather Data File");
-        static constexpr auto ivFmt("Invalid {}, Number of items={:5}");
+        static constexpr fmt::string_view ivFmt("Invalid {}, Number of items={:5}");
         static std::string const RangeString("Out of Range Data Found on Weather Data File");
-        static constexpr auto rgFmt("Out of Range {} [{},{}], Number of items={:5}");
+        static constexpr fmt::string_view rgFmt("Out of Range {} [{},{}], Number of items={:5}");
 
         if (!state.dataEnvrn->DisplayWeatherMissingDataWarnings) return;
 
@@ -8943,7 +8943,7 @@ namespace WeatherManager {
                     ShowWarningError(state, RangeString);
                     OutOfRangeHeader = true;
                 }
-                ShowMessage(state, format(rgFmt, description, rangeLow, rangeHigh, value));
+                ShowMessage(state, EnergyPlus::format(rgFmt, description, rangeLow, rangeHigh, value));
                 if (!extraMsg.empty()) ShowMessage(state, extraMsg);
             }
         }};

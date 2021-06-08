@@ -614,14 +614,14 @@ namespace StandardRatings {
         // Formats
 
         if (StandardRatingsMyOneTimeFlag) {
-            static constexpr auto Format_990(
+            static constexpr fmt::string_view Format_990(
                 "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
             print(state.files.eio, "{}\n", Format_990);
             StandardRatingsMyOneTimeFlag = false;
         }
 
         {
-            static constexpr auto Format_991(" Chiller Standard Rating Information, {}, {}, {:.2R}, {:.2R}\n");
+            static constexpr fmt::string_view Format_991(" Chiller Standard Rating Information, {}, {}, {:.2R}, {:.2R}\n");
             auto const SELECT_CASE_var(ChillerType);
             if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
 
@@ -2482,7 +2482,7 @@ namespace StandardRatings {
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    static constexpr auto Format_990(
+                    static constexpr fmt::string_view Format_990(
                         "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                         "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
                         "{Btu/W-h}\n");
@@ -2490,7 +2490,7 @@ namespace StandardRatings {
                     MyCoolOneTimeFlag = false;
                 }
 
-                static constexpr auto Format_991(
+                static constexpr fmt::string_view Format_991(
                     " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
                 print(state.files.eio, Format_991, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
 
@@ -2511,7 +2511,7 @@ namespace StandardRatings {
 
             } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
                 if (MyHeatOneTimeFlag) {
-                    static constexpr auto Format_992(
+                    static constexpr fmt::string_view Format_992(
                         "! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating "
                         "(net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region "
                         "Number\n");
@@ -2519,7 +2519,7 @@ namespace StandardRatings {
                     MyHeatOneTimeFlag = false;
                 }
 
-                static constexpr auto Format_993(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
+                static constexpr fmt::string_view Format_993(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
                 print(state.files.eio, Format_993, CompType, CompName, HighHeatingCapVal, LowHeatingCapVal, HSPFValueIP, RegionNum);
 
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXHeatCoilType, CompName, CompType);
@@ -2533,7 +2533,7 @@ namespace StandardRatings {
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
                 if (MyCoolOneTimeFlag) {
-                    static constexpr auto Format_994(
+                    static constexpr fmt::string_view Format_994(
                         "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                         "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER "
                         "{Btu/W-h}");
@@ -2541,7 +2541,7 @@ namespace StandardRatings {
                     MyCoolOneTimeFlag = false;
                 }
 
-                static constexpr auto Format_995(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
+                static constexpr fmt::string_view Format_995(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
                 print(state.files.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERUserIP, SEERStandardIP, ' ');
 
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
@@ -2616,7 +2616,7 @@ namespace StandardRatings {
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
                 if (MyCoolOneTimeFlag) {
-                    static constexpr auto Format_101(
+                    static constexpr fmt::string_view Format_101(
                         "! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 "
                         "Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net "
                         "Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, "
@@ -2629,7 +2629,7 @@ namespace StandardRatings {
                     Num = (ClassNum - 1) * 4;
                     std::string ClassName = format("Class {}", ClassNum);
                     std::string CompNameNew = fmt::format("{}({})", CompName, ClassName);
-                    static constexpr auto Format_102(" DX Cooling Coil ASHRAE 127 Standard Ratings Information, {}, {}, {}, {:.1R}, {:.1R}, {:.1R}, "
+                    static constexpr fmt::string_view Format_102(" DX Cooling Coil ASHRAE 127 Standard Ratings Information, {}, {}, {}, {:.1R}, {:.1R}, {:.1R}, "
                                                      "{:.1R}, {:.1R}, {:.1R}, {:.1R}, {:.1R}\n");
                     print(state.files.eio,
                           Format_102,

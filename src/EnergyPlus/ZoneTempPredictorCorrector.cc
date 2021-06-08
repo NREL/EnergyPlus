@@ -332,9 +332,9 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     Array1D<NeededComfortControlTypes> TComfortControlTypes;
 
     // Formats
-    static constexpr auto Header("! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon "
+    static constexpr fmt::string_view Header("! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon "
                                  "Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
-    static constexpr auto Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
+    static constexpr fmt::string_view Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
 
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     auto &TStatObjects = state.dataZoneCtrls->TStatObjects;

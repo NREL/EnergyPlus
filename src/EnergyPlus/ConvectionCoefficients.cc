@@ -4068,7 +4068,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
     // now send to EIO if surface reporting selected
     ScanForReports(state, "Surfaces", DoReport, "Details");
     if (DoReport) { // echo out static geometry data related to convection models
-        static constexpr auto Format_900(
+        static constexpr fmt::string_view Format_900(
             "! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], Outside Perimeter [m], Outside Height "
             "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, "
             "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
@@ -4085,7 +4085,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
             } else {
                 YesNo2 = "No";
             }
-            static constexpr auto Format_901("Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
+            static constexpr fmt::string_view Format_901("Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
             print(state.files.eio,
                   Format_901,
                   Surface(SurfLoop).Name,
@@ -4109,10 +4109,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
 
         // if display advanced reports also dump meta group data used for convection geometry
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
-            static constexpr auto Format_8000(
+            static constexpr fmt::string_view Format_8000(
                 "! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8000); // header for north facade
-            static constexpr auto Format_8001(
+            static constexpr fmt::string_view Format_8001(
                 "Building Convection Parameters:North Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8001,
@@ -4124,10 +4124,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthFacade.Ymax,
                   NorthFacade.Zmin,
                   NorthFacade.Zmax);
-            static constexpr auto Format_8100(
+            static constexpr fmt::string_view Format_8100(
                 "! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8100); // header for northeast facade
-            static constexpr auto Format_8101(
+            static constexpr fmt::string_view Format_8101(
                 "Building Convection Parameters:Northeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8101,
@@ -4139,10 +4139,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthEastFacade.Ymax,
                   NorthEastFacade.Zmin,
                   NorthEastFacade.Zmax);
-            static constexpr auto Format_8200(
+            static constexpr fmt::string_view Format_8200(
                 "! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8200); // header for east facade
-            static constexpr auto Format_8201(
+            static constexpr fmt::string_view Format_8201(
                 "Building Convection Parameters:East Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8201,
@@ -4155,10 +4155,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   EastFacade.Zmin,
                   EastFacade.Zmax);
 
-            static constexpr auto Format_8300(
+            static constexpr fmt::string_view Format_8300(
                 "! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8300); // header for southeast facade
-            static constexpr auto Format_8301(
+            static constexpr fmt::string_view Format_8301(
                 "Building Convection Parameters:Southeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8301,
@@ -4171,10 +4171,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   SouthEastFacade.Zmin,
                   SouthEastFacade.Zmax);
 
-            static constexpr auto Format_8400(
+            static constexpr fmt::string_view Format_8400(
                 "! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8400); // header for south facade
-            static constexpr auto Format_8401(
+            static constexpr fmt::string_view Format_8401(
                 "Building Convection Parameters:South Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8401,
@@ -4186,10 +4186,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   SouthFacade.Ymax,
                   SouthFacade.Zmin,
                   SouthFacade.Zmax);
-            static constexpr auto Format_8500(
+            static constexpr fmt::string_view Format_8500(
                 "! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8500); // header for southwest facade
-            static constexpr auto Format_8501(
+            static constexpr fmt::string_view Format_8501(
                 "Building Convection Parameters:Southwest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8501,
@@ -4201,10 +4201,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   SouthWestFacade.Ymax,
                   SouthWestFacade.Zmin,
                   SouthWestFacade.Zmax);
-            static constexpr auto Format_8600(
+            static constexpr fmt::string_view Format_8600(
                 "! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8600); // header for west facade
-            static constexpr auto Format_8601(
+            static constexpr fmt::string_view Format_8601(
                 "Building Convection Parameters:West Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8601,
@@ -4216,10 +4216,10 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   WestFacade.Ymax,
                   WestFacade.Zmin,
                   WestFacade.Zmax);
-            static constexpr auto Format_8700(
+            static constexpr fmt::string_view Format_8700(
                 "! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
             print(state.files.eio, Format_8700); // header for northwest facade
-            static constexpr auto Format_8701(
+            static constexpr fmt::string_view Format_8701(
                 "Building Convection Parameters:NorthwWest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
             print(state.files.eio,
                   Format_8701,
@@ -4231,12 +4231,12 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   NorthWestFacade.Ymax,
                   NorthWestFacade.Zmin,
                   NorthWestFacade.Zmax);
-            static constexpr auto Format_8800(
+            static constexpr fmt::string_view Format_8800(
                 "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], XdYdZd:X, XdYdZd:Y, XdYdZd:Z,XdYdZu:X, XdYdZu:Y, "
                 "XdYdZu:Z,XdYuZd:X, XdYuZd:Y, XdYuZd:Z,XdYuZu:X, XdYuZu:Y, XdYuZu:Z,XuYdZd:X, XuYdZd:Y, XuYdZd:Z,XuYuZd:X, XuYuZd:Y, "
                 "XuYuZd:Z,XuYdZu:X, XuYdZu:Y, XuYdZu:Z,XuYuZu:X, XuYuZu:Y, XuYuZu:Z\n");
             print(state.files.eio, Format_8800); // header for roof
-            static constexpr auto Format_8801(
+            static constexpr fmt::string_view Format_8801(
                 "Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
             print(state.files.eio,
                   Format_8801,
@@ -4250,7 +4250,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex.y,
                   state.dataConvectionCoefficient->RoofGeo.XdYdZu.Vertex.z,
                   state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex.x);
-            static constexpr auto Format_88012("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
+            static constexpr fmt::string_view Format_88012("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
             print(state.files.eio,
                   Format_88012,
                   state.dataConvectionCoefficient->RoofGeo.XdYuZd.Vertex.y,
@@ -4263,7 +4263,7 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
                   state.dataConvectionCoefficient->RoofGeo.XuYdZd.Vertex.z,
                   state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex.x,
                   state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex.y);
-            static constexpr auto Format_88013("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+            static constexpr fmt::string_view Format_88013("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
             print(state.files.eio,
                   Format_88013,
                   state.dataConvectionCoefficient->RoofGeo.XuYuZd.Vertex.z,

@@ -558,7 +558,7 @@ namespace SurfaceGeometry {
                             ShowWarningError(state,
                                              std::string{RoutineName} + "Entered Ceiling Height for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                  "\" significantly different from calculated Ceiling Height");
-                            static constexpr auto ValFmt("{:.2F}");
+                            static constexpr fmt::string_view ValFmt("{:.2F}");
                             String1 = format(ValFmt, state.dataHeatBal->Zone(ZoneNum).CeilingHeight);
                             String2 = format(ValFmt, AverageHeight);
                             ShowContinueError(state,
@@ -735,7 +735,7 @@ namespace SurfaceGeometry {
               sum(state.dataHeatBal->Zone, &ZoneData::NumSubSurfaces));
 
         // Write Zone Information header to the initialization output file
-        static constexpr auto Format_721(
+        static constexpr fmt::string_view Format_721(
             "! <Zone Information>,Zone Name,North Axis {deg},Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate "
             "{m},Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},Type,Zone Multiplier,Zone List "
             "Multiplier,Minimum X {m},Maximum X {m},Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume "
@@ -789,7 +789,7 @@ namespace SurfaceGeometry {
                 String3 = "No";
             }
 
-            static constexpr auto Format_720(" Zone Information, "
+            static constexpr fmt::string_view Format_720(" Zone Information, "
                                              "{},{:.1R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},"
                                              "{:.2R},{:.2R},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{},{}\n");
 
@@ -8439,7 +8439,7 @@ namespace SurfaceGeometry {
 
         int numberOfHeatTransferAlgosUsed = 0;
         // Formats
-        static constexpr auto Format_725("Surface Heat Transfer Algorithm, {},{:.0R},{:.2R},{:.1R}\n");
+        static constexpr fmt::string_view Format_725("Surface Heat Transfer Algorithm, {},{:.0R},{:.2R},{:.1R}\n");
 
         if (state.dataHeatBal->AnyCTF) {
             const auto AlgoName = "CTF - ConductionTransferFunction";
@@ -11095,7 +11095,7 @@ namespace SurfaceGeometry {
 
         for (Loop = 1; Loop <= state.dataSurface->TotOSC; ++Loop) {
             if (Loop == 1) {
-                static constexpr auto OSCFormat1(
+                static constexpr fmt::string_view OSCFormat1(
                     "! <Other Side Coefficients>,Name,Combined convective/radiative film coefficient {W/m2-K},User selected "
                     "Constant Temperature {C},Coefficient modifying the constant temperature term,Coefficient modifying the external "
                     "dry bulb temperature term,Coefficient modifying the ground temperature term,Coefficient modifying the wind speed "
@@ -11283,7 +11283,7 @@ namespace SurfaceGeometry {
 
         for (Loop = 1; Loop <= state.dataSurface->TotOSCM; ++Loop) {
             if (Loop == 1) {
-                static constexpr auto OSCMFormat1("! <Other Side Conditions Model>,Name,Class\n");
+                static constexpr fmt::string_view OSCMFormat1("! <Other Side Conditions Model>,Name,Class\n");
                 print(state.files.eio, OSCMFormat1);
             }
             print(state.files.eio, "Other Side Conditions Model,{},{}\n", state.dataSurface->OSCM(Loop).Name, state.dataSurface->OSCM(Loop).Class);
@@ -14808,8 +14808,8 @@ namespace SurfaceGeometry {
                     ShowContinueError(state, "Coincident Vertices will be removed as possible.");
                     for (n = 1; n <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++n) {
                         auto const &point(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n));
-                        static constexpr auto ErrFmt(" ({:8.3F},{:8.3F},{:8.3F})");
-                        ShowContinueError(state, format(ErrFmt, point.x, point.y, point.z));
+                        static constexpr fmt::string_view ErrFmt(" ({:8.3F},{:8.3F},{:8.3F})");
+                        ShowContinueError(state, EnergyPlus::format(ErrFmt, point.x, point.y, point.z));
                     }
                 }
             }

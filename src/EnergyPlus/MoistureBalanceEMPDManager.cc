@@ -727,7 +727,7 @@ void ReportMoistureBalanceEMPD(EnergyPlusData &state)
         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
         MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
         if (state.dataMaterial->Material(MatNum).EMPDMaterialProps) {
-            static constexpr auto Format_700(
+            static constexpr fmt::string_view Format_700(
                 " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
             print(state.files.eio,
                   Format_700,
