@@ -16996,7 +16996,7 @@ namespace UnitarySystems {
 
                     if (state.dataUnitarySystems->unitarySys[sysNum].m_waterSideEconomizerFlag) {
                         SetupOutputVariable(state,
-                                            "Water Side Economizer Status",
+                                            "Coil System Water Control Status",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].WaterSideEconomizerStatus,
                                             "System",
