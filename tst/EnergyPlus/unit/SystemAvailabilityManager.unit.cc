@@ -455,7 +455,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBal->MRT.allocate(1);
+    state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
@@ -490,24 +490,24 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 5; // 80% acceptance
     state->dataThermalComforts->runningAverageASH = 20.0;
     state->dataHeatBalFanSys->MAT(1) = 23.0;
-    state->dataHeatBal->MRT(1) = 27.0;
+    state->dataHeatBal->ZoneMRT(1) = 27.0;
 
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     state->dataHeatBalFanSys->MAT(1) = 26.0;
-    state->dataHeatBal->MRT(1) = 30.0;
+    state->dataHeatBal->ZoneMRT(1) = 30.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
 
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 6; // 90% acceptance
     state->dataHeatBalFanSys->MAT(1) = 23.0;
-    state->dataHeatBal->MRT(1) = 27.0;
+    state->dataHeatBal->ZoneMRT(1) = 27.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     state->dataHeatBalFanSys->MAT(1) = 26.0;
-    state->dataHeatBal->MRT(1) = 30.0;
+    state->dataHeatBal->ZoneMRT(1) = 30.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
 
@@ -576,7 +576,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataAirLoop->PriAirSysAvailMgr.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBalFanSys->MAT.deallocate();
-    state->dataHeatBal->MRT.deallocate();
+    state->dataHeatBal->ZoneMRT.deallocate();
     state->dataContaminantBalance->ZoneAirCO2.deallocate();
     state->dataContaminantBalance->ZoneCO2SetPoint.deallocate();
     state->dataAirLoop->PriAirSysAvailMgr.deallocate();

@@ -492,7 +492,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
 
     // compare_err_stream( "" ); // just for debugging
 
-    SurfaceGeometry::AllocateModuleArrays(*state);
+    SurfaceGeometry::AllocateSurfaceArrays(*state);
 
     //  Adding additional surfaces will change the index of the following based on where the surfaces are added in the array.
     //	If adding new tests, break here and look at EnergyPlus::state->dataSurface->Surface to see the order.

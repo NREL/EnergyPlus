@@ -223,7 +223,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
@@ -233,7 +233,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         } else {
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).InletNodeNum =
@@ -244,7 +244,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Steam,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
@@ -254,7 +254,7 @@ void GetOutsideEnergySourcesInput(EnergyPlusData &state)
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Steam,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 

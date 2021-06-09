@@ -645,7 +645,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
                                  Real64 &SurfInsideTemp,  // Inside window surface temperature (innermost face) [C]
                                  Real64 &SurfOutsideTemp, // Outside surface temperature (C)
                                  Real64 &SurfOutsideEmiss,
-                                 int const CalcCondition // Calucation condition (summer, winter or no condition)
+                                 DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
 )
 {
     // SUBROUTINE INFORMATION:
@@ -661,7 +661,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // uses the solar-thermal routine developed for ASHRAE RP-1311 (ASHWAT Model).
 
-    using DataBSDFWindow::noCondition;
     using General::InterpSw;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyTdpFnWPb;
@@ -719,7 +718,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     Real64 SrdSurfViewFac; // View factor of a surrounding surface
     Real64 OutSrdIR;
 
-    if (CalcCondition != DataBSDFWindow::noCondition) return;
+    if (CalcCondition != DataBSDFWindow::Condition::Unassigned) return;
 
     ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
     QXConv = 0.0;
@@ -728,17 +727,17 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
     HcIn = state.dataHeatBal->HConvIn(SurfNum); // windows inside surface convective film conductance
 
-    if (CalcCondition == DataBSDFWindow::noCondition) {
+    if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
         ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
         SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
 
         // determine reference air temperature for this surface
         {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 ZoneEquipConfigNum = ZoneNum;
                 // check whether this zone is a controlled zone or not
@@ -778,11 +777,11 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
 
             // determine reference air temperature for this surface
             {
-                auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNumAdj).TAirRef);
+                auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNumAdj));
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
+                    RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNumAdj);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // determine ZoneEquipConfigNum for this zone
                     ZoneEquipConfigNum = ZoneNum;
@@ -814,7 +813,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             }
 
             Tout = RefAirTemp + DataGlobalConstants::KelvinConv; // outside air temperature
-            tsky = state.dataHeatBal->MRT(ZoneNumAdj) +
+            tsky = state.dataHeatBal->ZoneMRT(ZoneNumAdj) +
                    DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
             // The IR radiance of this window's "exterior" surround is the IR radiance
@@ -828,8 +827,8 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
                  // Calculate LWR from surrounding surfaces if defined for an exterior window
             OutSrdIR = 0;
             if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
-                    SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
+                if (state.dataSurface->SurfHasSurroundingSurfProperties(SurfNum)) {
+                    SrdSurfsNum = state.dataSurface->SurfSurroundingSurfacesNum(SurfNum);
                     if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                         state.dataSurface->Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                     }
@@ -849,19 +848,19 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
             }
             if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
                 if (state.dataEnvrn->IsRain) {                 // Raining: since wind exposed, outside window surface gets wet
-                    Tout = state.dataSurface->Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv;
+                    Tout = state.dataSurface->SurfOutWetBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
                 } else { // Dry
-                    Tout = state.dataSurface->Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+                    Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
                 }
             } else { // Window not exposed to wind
-                Tout = state.dataSurface->Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+                Tout = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + DataGlobalConstants::KelvinConv;
             }
             tsky = state.dataEnvrn->SkyTempKelvin;
             Ebout = DataGlobalConstants::StefanBoltzmann * pow_4(Tout);
             // ASHWAT model may be slightly different
             outir = state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *
-                        (state.dataSurface->AirSkyRadSplit(SurfNum) * DataGlobalConstants::StefanBoltzmann * pow_4(tsky) +
-                         (1.0 - state.dataSurface->AirSkyRadSplit(SurfNum)) * Ebout) +
+                        (state.dataSurface->SurfAirSkyRadSplit(SurfNum) * DataGlobalConstants::StefanBoltzmann * pow_4(tsky) +
+                         (1.0 - state.dataSurface->SurfAirSkyRadSplit(SurfNum)) * Ebout) +
                     state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
         }
     }

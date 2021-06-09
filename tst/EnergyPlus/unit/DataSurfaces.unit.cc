@@ -185,12 +185,11 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     ErrorsFound = false;
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);           // expect no errors
-
     SetSurfaceOutBulbTempAt(*state);
     EXPECT_EQ("T3-RF1 - FLOOR:N", state->dataSurface->Surface(1).Name);
-    EXPECT_GT(state->dataSurface->Surface(1).Centroid.z, 20000.0);    // this condition is fatal
-    EXPECT_LT(state->dataSurface->Surface(1).OutDryBulbTemp, -100.0); // this condition is fatal
-    EXPECT_LT(state->dataSurface->Surface(1).OutWetBulbTemp, -100.0); // this condition is fatal
+    EXPECT_GT(state->dataSurface->Surface(1).Centroid.z, 20000.0); // this condition is fatal
+    EXPECT_LT(state->dataSurface->SurfOutDryBulbTemp(1), -100.0);  // this condition is fatal
+    EXPECT_LT(state->dataSurface->SurfOutWetBulbTemp(1), -100.0);  // this condition is fatal
 }
 
 TEST_F(EnergyPlusFixture, SurfaceTest_Plane)
