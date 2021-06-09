@@ -77,6 +77,7 @@ namespace MixedAir {
 
     enum class iLockoutType
     {
+        Unassigned = -1,
         NoLockoutPossible,
         LockoutWithHeatingPossible,
         LockoutWithCompressorPossible,
@@ -84,6 +85,7 @@ namespace MixedAir {
 
     enum class iEconoOp
     {
+        Unassigned = -1,
         NoEconomizer,
         FixedDryBulb,
         FixedEnthalpy,
@@ -99,30 +101,35 @@ namespace MixedAir {
     constexpr int Off(0); // signal coil shouldn't run
 
     // component types addressed by this module
-    constexpr int OAMixer_Num(1);
-    constexpr int Fan_Simple_CV(2);
-    constexpr int Fan_Simple_VAV(3);
-    constexpr int WaterCoil_SimpleCool(4);
-    constexpr int WaterCoil_Cooling(5);
-    constexpr int WaterCoil_SimpleHeat(6);
-    constexpr int SteamCoil_AirHeat(7);
-    constexpr int WaterCoil_DetailedCool(8);
-    constexpr int Coil_ElectricHeat(9);
-    constexpr int Coil_GasHeat(10);
-    constexpr int WaterCoil_CoolingHXAsst(11);
-    constexpr int DXSystem(12);
-    constexpr int HeatXchngr(13);
-    constexpr int Desiccant(14);
-    constexpr int Unglazed_SolarCollector(15);
-    constexpr int EvapCooler(16);
-    constexpr int PVT_AirBased(17);
-    constexpr int Fan_ComponentModel(18);
-    constexpr int DXHeatPumpSystem(19);
-    constexpr int Coil_UserDefined(20);
-    constexpr int Humidifier(21);
-    constexpr int Fan_System_Object(22);
-    constexpr int UnitarySystemModel(23);
-    constexpr int VRFTerminalUnit(24);
+    enum class ComponentType
+    {
+        Unassigned = -1,
+        None,
+        OAMixer_Num,
+        Fan_Simple_CV,
+        Fan_Simple_VAV,
+        WaterCoil_SimpleCool,
+        WaterCoil_Cooling,
+        WaterCoil_SimpleHeat,
+        SteamCoil_AirHeat,
+        WaterCoil_DetailedCool,
+        Coil_ElectricHeat,
+        Coil_GasHeat,
+        WaterCoil_CoolingHXAsst,
+        DXSystem,
+        HeatXchngr,
+        Desiccant,
+        Unglazed_SolarCollector,
+        EvapCooler,
+        PVT_AirBased,
+        Fan_ComponentModel,
+        DXHeatPumpSystem,
+        Coil_UserDefined,
+        Humidifier,
+        Fan_System_Object,
+        UnitarySystemModel,
+        VRFTerminalUnit
+    };
     constexpr int CoilSystemWater(25);
 
     enum class iControllerType
@@ -135,14 +142,19 @@ namespace MixedAir {
 
     // Parameters below (CMO - Current Module Object.  used primarily in Get Inputs)
     // Multiple Get Input routines in this module or these would be in individual routines.
-    constexpr int CMO_OASystem(1);
-    constexpr int CMO_AirLoopEqList(2);
-    constexpr int CMO_ControllerList(3);
-    constexpr int CMO_SysAvailMgrList(4);
-    constexpr int CMO_OAController(5);
-    constexpr int CMO_ERVController(6);
-    constexpr int CMO_MechVentilation(7);
-    constexpr int CMO_OAMixer(8);
+    enum class CMO
+    {
+        Unassigned = -1,
+        None,
+        OASystem,
+        AirLoopEqList,
+        ControllerList,
+        SysAvailMgrList,
+        OAController,
+        ERVController,
+        MechVentilation,
+        OAMixer
+    };
 
     // OA Controller Limiting Factor (used for integer output variable values for OAControllerProps::OALimitingFactor
     constexpr int limitFactorNone = 0;        // No limit other than fixed OA amount
@@ -424,9 +436,9 @@ namespace MixedAir {
     void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void SimOAComponent(EnergyPlusData &state,
-                        std::string const &CompType, // the component type
-                        std::string const &CompName, // the component Name
-                        int const CompTypeNum,       // Component Type -- Integerized for this module
+                        std::string const &CompType,               // the component type
+                        std::string const &CompName,               // the component Name
+                        MixedAir::ComponentType const CompTypeNum, // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
                         int &CompIndex,
                         int const AirLoopNum, // air loop index for economizer lockout coordination

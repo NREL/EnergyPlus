@@ -158,7 +158,7 @@ void InitEnergyReports(EnergyPlusData &state)
     int MainBranchNum;
     int SupplyCoolBranchNum;
     int SupplyHeatBranchNum;
-    int VarType;
+    OutputProcessor::VariableType VarType;
     int VarIndex;
     int OutNum;
     int NodeCount;
@@ -2451,17 +2451,17 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     Array1D_string SubCompNames;
     Array1D_string InletNodeNames;
     Array1D_int InletNodeNumbers;
-    Array1D_int InletFluidStreams;
+    Array1D<NodeInputManager::compFluidStream> InletFluidStreams;
     Array1D_string OutletNodeNames;
     Array1D_int OutletNodeNumbers;
-    Array1D_int OutletFluidStreams;
+    Array1D<NodeInputManager::compFluidStream> OutletFluidStreams;
     int NumChildren;
     int NumGrandChildren;
     bool IsParent;
 
     // Dimension GetMeteredVariables arrays
     Array1D_int VarIndexes;                                         // Variable Numbers
-    Array1D_int VarTypes;                                           // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::VariableType> VarTypes;                // Variable Types (1=integer, 2=real, 3=meter)
     Array1D_string UnitsStrings;                                    // UnitsStrings for each variable
     Array1D<OutputProcessor::TimeStepType> IndexTypes;              // Variable Idx Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar;                     // units from enum for each variable
