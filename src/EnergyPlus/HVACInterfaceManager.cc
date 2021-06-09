@@ -880,7 +880,7 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     int NodeNumSecOut(0);
     int NodeNumPriIn(0);
     int NodeNumSecIn(0);
-    int CPFlowDir; // flow direction in single common pipe
+    FlowDirection CPFlowDir; // flow direction in single common pipe
     Real64 CommonPipeTemp;
 
     auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
@@ -902,7 +902,7 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     if (MyEnvrnFlag(LoopNum) && state.dataGlobal->BeginEnvrnFlag) {
         PlantCommonPipe(LoopNum).Flow = 0.0;
         PlantCommonPipe(LoopNum).Temp = 0.0;
-        PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
+        PlantCommonPipe(LoopNum).FlowDir = FlowDirection::NoRecircFlow;
         MyEnvrnFlag(LoopNum) = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
@@ -926,9 +926,9 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
         MdotPriRCLeg = MdotPri - MdotSec;
         if (MdotPriRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) {
             MdotPriRCLeg = 0.0;
-            CPFlowDir = NoRecircFlow;
+            CPFlowDir = FlowDirection::NoRecircFlow;
         } else {
-            CPFlowDir = PrimaryRecirc;
+            CPFlowDir = FlowDirection::PrimaryRecirc;
         }
         MdotSecRCLeg = 0.0;
         CommonPipeTemp = TempPriOutTankOut;
@@ -936,16 +936,16 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
         MdotSecRCLeg = MdotSec - MdotPri;
         if (MdotSecRCLeg < DataBranchAirLoopPlant::MassFlowTolerance) {
             MdotSecRCLeg = 0.0;
-            CPFlowDir = NoRecircFlow;
+            CPFlowDir = FlowDirection::NoRecircFlow;
         } else {
-            CPFlowDir = SecondaryRecirc;
+            CPFlowDir = FlowDirection::SecondaryRecirc;
         }
         MdotPriRCLeg = 0.0;
         CommonPipeTemp = TempSecOutTankOut;
     } else { // equal
         MdotPriRCLeg = 0.0;
         MdotSecRCLeg = 0.0;
-        CPFlowDir = NoRecircFlow;
+        CPFlowDir = FlowDirection::NoRecircFlow;
         CommonPipeTemp = (TempPriOutTankOut + TempSecOutTankOut) / 2.0;
     }
 
