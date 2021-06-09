@@ -91,6 +91,7 @@ template <typename T> struct EPVector : private std::vector<T>
 
     void deallocate() noexcept
     {
+        m_allocated = false;
         this->clear();
     }
 
@@ -163,6 +164,7 @@ template <> struct EPVector<bool> : private std::vector<std::uint8_t>
 
     void deallocate() noexcept
     {
+        m_allocated = false;
         this->clear();
     }
 

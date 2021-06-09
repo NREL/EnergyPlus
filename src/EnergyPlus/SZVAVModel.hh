@@ -62,7 +62,6 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
@@ -78,7 +77,6 @@ namespace SZVAVModel {
     // parts of the simulation.
 
     // MODULE PARAMETER DEFINITIONS
-    extern int const HCoil_Water;
 
     // DERIVED TYPE DEFINITIONS
     // na

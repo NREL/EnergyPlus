@@ -96,16 +96,22 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     ConstrNum = 1;
     // allocate surface variable data
     state->dataSurface->Surface.allocate(NumOfSurf);
+    state->dataSurface->SurfOutDryBulbTemp.allocate(NumOfSurf);
+    state->dataSurface->SurfOutWetBulbTemp.allocate(NumOfSurf);
+    state->dataSurface->SurfOutWindSpeed.allocate(NumOfSurf);
+    state->dataSurface->SurfOutWindDir.allocate(NumOfSurf);
     state->dataSurface->Surface(SurfNum).Area = 10.0;
-    state->dataSurface->Surface(SurfNum).OutDryBulbTemp = 20.0;
-    state->dataSurface->Surface(SurfNum).OutWetBulbTemp = 15.0;
-    state->dataSurface->Surface(SurfNum).WindSpeed = 3.0;
+    state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 20.0;
+    state->dataSurface->SurfOutWetBulbTemp(SurfNum) = 15.0;
+    state->dataSurface->SurfOutWindSpeed(SurfNum) = 3.0;
     state->dataSurface->Surface(SurfNum).Construction = ConstrNum;
     state->dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
     state->dataSurface->Surface(SurfNum).Zone = ZoneNum;
-    state->dataSurface->Surface(SurfNum).IsICS = true;
-    state->dataSurface->Surface(SurfNum).ExtConvCoeff = 0;
     state->dataSurface->Surface(SurfNum).ExtWind = false;
+    state->dataSurface->SurfIsICS.allocate(NumOfSurf);
+    state->dataSurface->SurfICSPtr.allocate(NumOfSurf);
+    state->dataSurface->SurfIsICS(SurfNum) = true;
+
     // allocate construction variable data
     state->dataConstruction->Construct.allocate(ConstrNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);
@@ -127,6 +133,12 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataHeatBal->SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
     state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
+    state->dataSurface->SurfExtConvCoeffIndex.allocate(NumOfSurf);
+    state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = 0;
+    state->dataSurface->SurfHasSurroundingSurfProperties.allocate(NumOfSurf);
+    state->dataSurface->SurfHasSurroundingSurfProperties(SurfNum) = false;
+    state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(NumOfSurf);
+    state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 const VentArea(0.1);  // Area available for venting the gap [m2]

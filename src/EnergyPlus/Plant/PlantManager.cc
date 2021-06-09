@@ -455,7 +455,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                        Alpha(1),
                                                        this_loop.FluidType,
                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                       1,
+                                                       NodeInputManager::compFluidStream::Primary,
                                                        ObjectIsParent);
         this_supply_side.NodeNumOut = GetOnlySingleNode(state,
                                                         Alpha(7),
@@ -464,7 +464,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                         Alpha(1),
                                                         this_loop.FluidType,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         ObjectIsParent);
         this_demand_side.NodeNumIn = GetOnlySingleNode(state,
                                                        Alpha(10),
@@ -473,7 +473,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                        Alpha(1),
                                                        this_loop.FluidType,
                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                       1,
+                                                       NodeInputManager::compFluidStream::Primary,
                                                        ObjectIsParent);
         this_demand_side.NodeNumOut = GetOnlySingleNode(state,
                                                         Alpha(11),
@@ -482,7 +482,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                         Alpha(1),
                                                         this_loop.FluidType,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         ObjectIsParent);
 
         this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.NodeNumIn, localTempSetPt);
@@ -496,7 +496,7 @@ void GetPlantLoopData(EnergyPlusData &state)
                                                           Alpha(1),
                                                           this_loop.FluidType,
                                                           DataLoopNode::NodeConnectionType::Sensor,
-                                                          1,
+                                                          NodeInputManager::compFluidStream::Primary,
                                                           ObjectIsParent);
 
         // Load the load distribution scheme.
@@ -902,14 +902,19 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (has_prefixi(this_comp_type, "Pump") || has_prefixi(this_comp_type, "HeaderedPumps")) {
                         if (has_prefixi(this_comp_type, "Pump:VariableSpeed:Condensate")) {
                             this_comp.TypeOf_Num = TypeOf_PumpCondensate;
+                            this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         } else if (has_prefixi(this_comp_type, "Pump:ConstantSpeed")) {
                             this_comp.TypeOf_Num = TypeOf_PumpConstantSpeed;
+                            this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         } else if (has_prefixi(this_comp_type, "Pump:VariableSpeed")) {
                             this_comp.TypeOf_Num = TypeOf_PumpVariableSpeed;
+                            this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         } else if (has_prefixi(this_comp_type, "HeaderedPumps:ConstantSpeed")) {
                             this_comp.TypeOf_Num = TypeOf_PumpBankConstantSpeed;
+                            this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         } else if (has_prefixi(this_comp_type, "HeaderedPumps:VariableSpeed")) {
                             this_comp.TypeOf_Num = TypeOf_PumpBankVariableSpeed;
+                            this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                         } else {
                             // discover unsupported equipment on branches.
                             ShowSevereError(state, "GetPlantInput: trying to process a pump type that is not supported, dev note");
@@ -974,15 +979,19 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water")) {
                         this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water:DetailedGeometry")) {
                         this_comp.TypeOf_Num = TypeOf_CoilWaterDetailedFlatCooling;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Heating:Water")) {
                         this_comp.TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Heating:Steam")) {
                         this_comp.TypeOf_Num = TypeOf_CoilSteamAirHeating;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "SolarCollector:FlatPlate:Water")) {
                         this_comp.TypeOf_Num = TypeOf_SolarCollectorFlatPlate;
                         if (LoopSideNum == DemandSide) {
@@ -1274,51 +1283,67 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (UtilityRoutines::SameString(this_comp_type, "ZoneHVAC:Baseboard:RadiantConvective:Water")) {
                         this_comp.TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Water;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "ZoneHVAC:Baseboard:Convective:Water")) {
                         this_comp.TypeOf_Num = TypeOf_Baseboard_Conv_Water;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "ZoneHVAC:Baseboard:RadiantConvective:Steam")) {
                         this_comp.TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Steam;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "ZoneHVAC:CoolingPanel:RadiantConvective:Water")) {
                         this_comp.TypeOf_Num = TypeOf_CoolingPanel_Simple;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "ZoneHVAC:LowTemperatureRadiant:VariableFlow")) {
                         this_comp.TypeOf_Num = TypeOf_LowTempRadiant_VarFlow;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "ZoneHVAC:LowTemperatureRadiant:ConstantFlow")) {
                         this_comp.TypeOf_Num = TypeOf_LowTempRadiant_ConstFlow;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "AirTerminal:SingleDuct:ConstantVolume:CooledBeam")) {
                         this_comp.TypeOf_Num = TypeOf_CooledBeamAirTerminal;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam")) {
                         this_comp.TypeOf_Num = TypeOf_FourPipeBeamAirTerminal;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed")) {
                         this_comp.TypeOf_Num = TypeOf_MultiSpeedHeatPumpRecovery;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "AirLoopHVAC:UnitarySystem")) {
                         this_comp.TypeOf_Num = TypeOf_UnitarySysRecovery;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Heating:WaterToAirHeatPump:EquationFit")) {
                         this_comp.TypeOf_Num = TypeOf_CoilWAHPHeatingEquationFit;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
                         this_comp.TypeOf_Num = TypeOf_CoilWAHPCoolingEquationFit;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit")) {
                         this_comp.TypeOf_Num = TypeOf_CoilVSWAHPHeatingEquationFit;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit")) {
                         this_comp.TypeOf_Num = TypeOf_CoilVSWAHPCoolingEquationFit;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation")) {
                         this_comp.TypeOf_Num = TypeOf_CoilWAHPHeatingParamEst;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation")) {
                         this_comp.TypeOf_Num = TypeOf_CoilWAHPCoolingParamEst;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "Refrigeration:Condenser:WaterCooled")) {
                         this_comp.TypeOf_Num = TypeOf_RefrigSystemWaterCondenser;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1334,12 +1359,15 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:UserDefined")) {
                         this_comp.TypeOf_Num = TypeOf_CoilUserDefined;
                         this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "ZoneHVAC:ForcedAir:UserDefined")) {
                         this_comp.TypeOf_Num = TypeOf_ZoneHVACAirUserDefined;
                         this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "AirTerminal:SingleDuct:UserDefined")) {
                         this_comp.TypeOf_Num = TypeOf_AirTerminalUserDefined;
                         this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "PlantComponent:TemperatureSource")) {
                         this_comp.TypeOf_Num = TypeOf_WaterSource;
                         this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
@@ -1351,15 +1379,19 @@ void GetPlantInput(EnergyPlusData &state)
                     } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
                         this_comp.TypeOf_Num = TypeOf_PackagedTESCoolingCoil;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else if (UtilityRoutines::SameString(this_comp_type, "SwimmingPool:Indoor")) {
                         this_comp.TypeOf_Num = TypeOf_SwimmingPool_Indoor;
                         this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        this_comp.compPtr = &state.dataPlantMgr->dummyPlantComponent;
                     } else {
                         // discover unsupported equipment on branches.
                         ShowSevereError(state, "GetPlantInput: Branch=\"" + BranchNames(BranchNum) + "\", invalid component on branch.");
                         ShowContinueError(state, "...invalid component type=\"" + this_comp_type + "\", name=\"" + CompNames(CompNum) + "\".");
                         //            ErrorsFound=.TRUE.
                     }
+
+                    if (!this_comp.compPtr) ShowFatalError(state, format(" Plant component \"{}\" was not assigned a pointer.", this_comp_type));
 
                     this_comp.Name = CompNames(CompNum);
                     this_comp.NodeNameIn = InletNodeNames(CompNum);
@@ -2131,7 +2163,6 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
         state.dataPlnt->PlantFinalSizesOkayToReport = false;
         state.dataPlantMgr->GetCompSizFac = true;
         for (passNum = 1; passNum <= 4; ++passNum) { // begin while loop to iterate over the next calls sequentially
-            state.dataPlantMgr->InitLoopEquip = true;
 
             // Step 2, call component models it  using PlantCallingOrderInfo for sizing
             for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
@@ -2146,7 +2177,8 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                             .LoopSide(LoopSideNum)
                             .Branch(BranchNum)
                             .Comp(CompNum)
-                            .simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                            .initLoopEquip(state, state.dataPlantMgr->GetCompSizFac);
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration);
                     } //-CompNum
                 }     //-BranchNum
             }
@@ -2197,7 +2229,8 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         .LoopSide(LoopSideNum)
                         .Branch(BranchNum)
                         .Comp(CompNum)
-                        .simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        .initLoopEquip(state, state.dataPlantMgr->GetCompSizFac);
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration);
                 } //-CompNum
             }     //-BranchNum
             //                if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
@@ -2216,7 +2249,6 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
     if (state.dataGlobal->RedoSizesHVACSimulation && !state.dataPlnt->PlantReSizingCompleted) {
 
         // cycle through plant equipment calling with InitLoopEquip true
-        state.dataPlantMgr->InitLoopEquip = true;
         state.dataPlantMgr->GetCompSizFac = false;
         for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
             LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
@@ -2229,7 +2261,9 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         .LoopSide(LoopSideNum)
                         .Branch(BranchNum)
                         .Comp(CompNum)
-                        .simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        .initLoopEquip(state, state.dataPlantMgr->GetCompSizFac);
+
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration);
                 } //-CompNum
             }     //-BranchNum
         }
@@ -2239,8 +2273,6 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
         for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             ResizePlantLoopLevelSizes(state, LoopNum);
         }
-
-        state.dataPlantMgr->InitLoopEquip = true;
 
         // now call everything again to reporting turned on
         for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
@@ -2254,7 +2286,8 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         .LoopSide(LoopSideNum)
                         .Branch(BranchNum)
                         .Comp(CompNum)
-                        .simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                        .initLoopEquip(state, state.dataPlantMgr->GetCompSizFac);
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration);
                 } //-CompNum
             }     //-BranchNum
             // pumps are special so call them directly
@@ -2922,10 +2955,6 @@ void SizePlantLoop(EnergyPlusData &state,
     // Using/Aliasing
     using namespace DataSizing;
     using FluidProperties::GetDensityGlycol;
-    ;
-
-    // Locals
-    bool localInitLoopEquip(true);
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("SizePlantLoop");
@@ -2970,11 +2999,7 @@ void SizePlantLoop(EnergyPlusData &state,
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumOut)
                     continue;
                 for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).TotalComponents; ++CompNum) {
-                    state.dataPlnt->PlantLoop(LoopNum)
-                        .LoopSide(SupplySide)
-                        .Branch(BranchNum)
-                        .Comp(CompNum)
-                        .simulate(state, true, localInitLoopEquip, state.dataPlantMgr->GetCompSizFac);
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).simulate(state, true);
                     BranchSizFac = max(BranchSizFac, state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).SizFac);
                 }
                 LoopSizFac += BranchSizFac;

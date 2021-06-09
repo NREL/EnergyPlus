@@ -355,40 +355,43 @@ namespace TranspiredCollector {
                     state.dataTranspiredCollector->UTSC(Item).ZoneNode = 0;
                     for (NumOASys = 1; NumOASys <= state.dataTranspiredCollector->UTSC(Item).NumOASysAttached; ++NumOASys) {
                         ACountBase = (NumOASys - 1) * 4 + 2;
-                        state.dataTranspiredCollector->UTSC(Item).InletNode(NumOASys) = GetOnlySingleNode(state,
-                                                                                                          AlphasSplit(ACountBase),
-                                                                                                          ErrorsFound,
-                                                                                                          CurrentModuleObject,
-                                                                                                          AlphasSplit(1),
-                                                                                                          DataLoopNode::NodeFluidType::Air,
-                                                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                          NumOASys,
-                                                                                                          ObjectIsNotParent);
+                        state.dataTranspiredCollector->UTSC(Item).InletNode(NumOASys) =
+                            GetOnlySingleNode(state,
+                                              AlphasSplit(ACountBase),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              AlphasSplit(1),
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::NodeConnectionType::Inlet,
+                                              static_cast<NodeInputManager::compFluidStream>(NumOASys),
+                                              ObjectIsNotParent);
 
-                        state.dataTranspiredCollector->UTSC(Item).OutletNode(NumOASys) = GetOnlySingleNode(state,
-                                                                                                           AlphasSplit(ACountBase + 1),
-                                                                                                           ErrorsFound,
-                                                                                                           CurrentModuleObject,
-                                                                                                           AlphasSplit(1),
-                                                                                                           DataLoopNode::NodeFluidType::Air,
-                                                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                           NumOASys,
-                                                                                                           ObjectIsNotParent);
+                        state.dataTranspiredCollector->UTSC(Item).OutletNode(NumOASys) =
+                            GetOnlySingleNode(state,
+                                              AlphasSplit(ACountBase + 1),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              AlphasSplit(1),
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::NodeConnectionType::Outlet,
+                                              static_cast<NodeInputManager::compFluidStream>(NumOASys),
+                                              ObjectIsNotParent);
                         TestCompSet(state,
                                     CurrentModuleObject,
                                     AlphasSplit(1),
                                     AlphasSplit(ACountBase),
                                     AlphasSplit(ACountBase + 1),
                                     "Transpired Collector Air Nodes"); // appears that test fails by design??
-                        state.dataTranspiredCollector->UTSC(Item).ControlNode(NumOASys) = GetOnlySingleNode(state,
-                                                                                                            AlphasSplit(ACountBase + 2),
-                                                                                                            ErrorsFound,
-                                                                                                            CurrentModuleObject,
-                                                                                                            AlphasSplit(1),
-                                                                                                            DataLoopNode::NodeFluidType::Air,
-                                                                                                            DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                            1,
-                                                                                                            ObjectIsNotParent);
+                        state.dataTranspiredCollector->UTSC(Item).ControlNode(NumOASys) =
+                            GetOnlySingleNode(state,
+                                              AlphasSplit(ACountBase + 2),
+                                              ErrorsFound,
+                                              CurrentModuleObject,
+                                              AlphasSplit(1),
+                                              DataLoopNode::NodeFluidType::Air,
+                                              DataLoopNode::NodeConnectionType::Sensor,
+                                              NodeInputManager::compFluidStream::Primary,
+                                              ObjectIsNotParent);
 
                         state.dataTranspiredCollector->UTSC(Item).ZoneNode(NumOASys) = GetOnlySingleNode(state,
                                                                                                          AlphasSplit(ACountBase + 3),
@@ -397,7 +400,7 @@ namespace TranspiredCollector {
                                                                                                          AlphasSplit(1),
                                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                                          DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                         1,
+                                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                                          ObjectIsNotParent);
 
                     } // Each OA System in a Multisystem
@@ -446,7 +449,7 @@ namespace TranspiredCollector {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).OutletNode(1) = GetOnlySingleNode(state,
                                                                                             Alphas(5),
@@ -455,7 +458,7 @@ namespace TranspiredCollector {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            1,
+                                                                                            NodeInputManager::compFluidStream::Primary,
                                                                                             ObjectIsNotParent);
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Transpired Collector Air Nodes");
 
@@ -466,7 +469,7 @@ namespace TranspiredCollector {
                                                                                              Alphas(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::Sensor,
-                                                                                             1,
+                                                                                             NodeInputManager::compFluidStream::Primary,
                                                                                              ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).ZoneNode(1) = GetOnlySingleNode(state,
                                                                                           Alphas(7),
@@ -475,7 +478,7 @@ namespace TranspiredCollector {
                                                                                           Alphas(1),
                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                           DataLoopNode::NodeConnectionType::Sensor,
-                                                                                          1,
+                                                                                          NodeInputManager::compFluidStream::Primary,
                                                                                           ObjectIsNotParent);
             } // no splitter
 
@@ -911,19 +914,22 @@ namespace TranspiredCollector {
         }
 
         // determine average ambient temperature
-        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
+        Real64 sum_area = 0.0;
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            sum_area += state.dataSurface->Surface(SurfNum).Area;
+        }
         if (!state.dataEnvrn->IsRain) {
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutDryBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea;
+            Real64 sum_produc_area_drybulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_drybulb / sum_area;
         } else { // when raining we use wet bulb not drybulb
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutWetBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea;
+            Real64 sum_produc_area_wetbulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_wetbulb / sum_area;
         }
 
         // inits for each iteration
@@ -1031,24 +1037,22 @@ namespace TranspiredCollector {
 
         // Active UTSC calculation
         // first do common things for both correlations
-        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
+        Real64 sum_area = 0.0;
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            sum_area += state.dataSurface->Surface(SurfNum).Area;
+        }
         if (!state.dataEnvrn->IsRain) {
-            //            Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
-            // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutDryBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-
+            Real64 sum_produc_area_drybulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_drybulb / sum_area;
         } else { // when raining we use wet bulb not drybulb
-            //            Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
-            // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            Tamb = sum_product_sub(state.dataSurface->Surface,
-                                   &SurfaceData::OutWetBulbTemp,
-                                   &SurfaceData::Area,
-                                   state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-                   surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
+            Real64 sum_produc_area_wetbulb = 0.0;
+            for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+                sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+            }
+            Tamb = sum_produc_area_wetbulb / sum_area;
         }
 
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, state.dataEnvrn->OutHumRat);
@@ -1126,7 +1130,7 @@ namespace TranspiredCollector {
             // Initializations for this surface
             HMovInsul = 0.0;
             HExt = 0.0;
-            LocalWindArr(ThisSurf) = state.dataSurface->Surface(SurfPtr).WindSpeed;
+            LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
             InitExteriorConvectionCoeff(
                 state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
@@ -1316,19 +1320,19 @@ namespace TranspiredCollector {
         Real64 Twbamb;
         Real64 OutHumRatAmb;
 
-        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
         //        Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
         // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        Tamb =
-            sum_product_sub(
-                state.dataSurface->Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-            surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-        //        Twbamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
-        // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        Twbamb =
-            sum_product_sub(
-                state.dataSurface->Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-            surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
+        Real64 sum_area = 0.0;
+        Real64 sum_produc_area_drybulb = 0.0;
+        Real64 sum_produc_area_wetbulb = 0.0;
+        for (int SurfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            sum_area += state.dataSurface->Surface(SurfNum).Area;
+            sum_produc_area_wetbulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutWetBulbTemp(SurfNum);
+            sum_produc_area_drybulb += state.dataSurface->Surface(SurfNum).Area * state.dataSurface->SurfOutDryBulbTemp(SurfNum);
+        }
+        Tamb = sum_produc_area_drybulb / sum_area;
+        Twbamb = sum_produc_area_wetbulb / sum_area;
+
         OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, state.dataEnvrn->OutBaroPress);
 
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Tamb, OutHumRatAmb);

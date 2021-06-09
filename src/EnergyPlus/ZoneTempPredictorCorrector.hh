@@ -60,6 +60,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -178,8 +179,8 @@ namespace ZoneTempPredictorCorrector {
     // Functions
 
     void ManageZoneAirUpdates(EnergyPlusData &state,
-                              int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-                              Real64 &ZoneTempChange, // Temp change in zone air btw previous and current timestep
+                              DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                              Real64 &ZoneTempChange,                                     // Temp change in zone air btw previous and current timestep
                               bool const ShortenTimeStepSys,
                               bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                               Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
@@ -349,15 +350,6 @@ namespace ZoneTempPredictorCorrector {
 
 struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
 {
-
-    // Controls for PredictorCorrector
-    // INTEGER, PUBLIC, PARAMETER :: iGetZoneSetPoints             = 1
-    // INTEGER, PUBLIC, PARAMETER :: iPredictStep                  = 2
-    // INTEGER, PUBLIC, PARAMETER :: iCorrectStep                  = 3
-    // INTEGER, PUBLIC, PARAMETER :: iRevertZoneTimestepHistories  = 4
-    // INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
-    // INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
-
     Array1D_string const ValidControlTypes;
 
     Array1D_string const ValidComfortControlTypes;

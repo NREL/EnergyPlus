@@ -70,14 +70,15 @@ namespace DataRoomAirModel {
     // Parameters to indicate room air model selected
     enum class RoomAirModel : int
     {
-        UserDefined = 1,   // user defined patterns
-        Mixing = 2,        // mixing air model
-        Mundt = 3,         // Mundt nodal model
-        UCSDDV = 4,        // UCSD Displacement Ventilation model
-        UCSDCV = 5,        // UCSD-CV
-        UCSDUFI = 6,       // UCSD UFAD interior zone model
-        UCSDUFE = 7,       // UCSD UFAD exterior zone model
-        AirflowNetwork = 8 // RoomAirModel_AirflowNetwork interior zone model
+        Unassigned = -1,
+        UserDefined,   // user defined patterns
+        Mixing,        // mixing air model
+        Mundt,         // Mundt nodal model
+        UCSDDV,        // UCSD Displacement Ventilation model
+        UCSDCV,        // UCSD-CV
+        UCSDUFI,       // UCSD UFAD interior zone model
+        UCSDUFE,       // UCSD UFAD exterior zone model
+        AirflowNetwork // RoomAirModel_AirflowNetwork interior zone model
     };
     constexpr const char *ChAirModel[] = {
         "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
@@ -85,26 +86,25 @@ namespace DataRoomAirModel {
     // Parameters to indicate air temperature coupling scheme
     enum class CouplingScheme : int
     {
-        Direct = 1,
-        Indirect = 2
+        Unassigned = -1,
+        Direct,
+        Indirect
     };
 
     // Parameters to indicate type of air node, which is dependent on air models
-    int constexpr InletAirNode = 0;               // air node at inlet (for Mundt and Rees&Haves Models)
-    int constexpr FloorAirNode = 1;               // air node at floor (for Mundt and Rees&Haves Models)
-    int constexpr ControlAirNode = 2;             // air node at control point (for Mundt Model)
-    int constexpr CeilingAirNode = 3;             // air node at ceiling (for Mundt Model)
-    int constexpr MundtRoomAirNode = 4;           // air node for vertical walls (for Mundt Model)
-    int constexpr ReturnAirNode = 10;             // air node for return (for Mundt and Rees&Haves Models)
-    int constexpr AirflowNetworkRoomAirNode = 11; // air node for airflow network based room air model
-    int constexpr PlumeAirNode1 = 2;              // air node for plume load (for Rees&Haves Model)
-    int constexpr PlumeAirNode2 = 3;              // air node for plume load (for Rees&Haves Model)
-    int constexpr PlumeAirNode3 = 4;              // air node for plume load (for Rees&Haves Model)
-    int constexpr PlumeAirNode4 = 5;              // air node for plume load (for Rees&Haves Model)
-    int constexpr RoomAirNode1 = 6;               // air node for vertical walls (for Rees&Haves Model)
-    int constexpr RoomAirNode2 = 7;               // air node for vertical walls (for Rees&Haves Model)
-    int constexpr RoomAirNode3 = 8;               // air node for vertical walls (for Rees&Haves Model)
-    int constexpr RoomAirNode4 = 9;               // air node for vertical walls (for Rees&Haves Model)
+    enum class AirNodeType
+    {
+        Unassigned = -1,
+        InletAirNode,              // air node at inlet (for Mundt and Rees&Haves Models)
+        FloorAirNode,              // air node at floor (for Mundt and Rees&Haves Models)
+        ControlAirNode,            // air node at control point (for Mundt Model)
+        CeilingAirNode,            // air node at ceiling (for Mundt Model)
+        MundtRoomAirNode,          // air node for vertical walls (for Mundt Model)
+        ReturnAirNode,             // air node for return (for Mundt and Rees&Haves Models)
+        AirflowNetworkRoomAirNode, // air node for airflow network based room air model
+        PlumeAirNode,              // air node for plume load (for Rees&Haves Model)
+        RoomAirNode                // air node for vertical walls (for Rees&Haves Model)
+    };
 
     // user-defined pattern two gradient interpolation modes
     enum class UserDefinedPatternMode
@@ -171,14 +171,14 @@ namespace DataRoomAirModel {
         std::string Name; // name
         std::string ZoneName;
         int ZonePtr;               // Pointer to the zone number for this statement
-        int ClassType;             // depending on type of model
+        AirNodeType ClassType;     // depending on type of model
         Real64 Height;             // height
         Real64 ZoneVolumeFraction; // portion of zone air volume associated with this node
         Array1D_bool SurfMask;     // limit of 60 surfaces at current sizing
         bool IsZone;               // TRUE if this node is zone node
 
         // Default Constructor
-        AirNodeData() : ZonePtr(0), ClassType(0), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
+        AirNodeData() : ZonePtr(0), ClassType(AirNodeType::Unassigned), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
         {
         }
     };
