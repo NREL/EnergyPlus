@@ -6,6 +6,7 @@ New Feature Proposal Draft
 **Jeffrey D. Spitler and Jack C. Cook, OSU**
 
 - Original Date 2021-04-09
+- Design added 2021-06-08
 
 ## Justification for New Feature
 In order for EnergyPlus to simulate a ground heat exchanger (GHE) used with a
@@ -279,3 +280,105 @@ Spitler, J. D., J. C. Cook and X. Liu (2020). A Preliminary Investigation on the
 Cost Reduction Potential of Optimizing Bore Fields for Commercial Ground Source
 Heat Pump Systems. Proceedings, 45th Workshop on Geothermal Reservoir
 Engineering. Stanford, California, Stanford University.
+
+## Design
+
+
+
+### Current design
+
+
+
+EnergyPlus currently generates vertical borehole g-functions internally using a simple, non-optimized line-source model which uses the uniform heat flux boundary condition. For the vertical borehole and slinky ground heat exchanger model classes, ```GLHEVert``` and ```GLHESlinky```, respectively, the access point into these methods is the member function, ```calcGFunctions```. Inside of the
+
+vertical borehole GHE ```calcGFunctions``` function, three different functions are called to generate the g-function values.
+
+
+
+- ```calcShortTimestepGFunctions``` - which uses a 1D, radial finite volume borehole model to compute the g-functions from a time of 500 seconds (~ ln(t/ts) = -13) to when ln(t/ts) = -9.0, which is likely on the order of 1-2 days.
+
+- ```calcLongTimestepGFunctions```  - which uses the non-optimized line-source model mentioned above to compute the g-functions from ln(t/ts) = -8.5 up to the maximum simulation time as defined in the EnergyPlus input.
+
+- ```combineShortAndLongTimestepGFunctions``` - which combines the g-functions generated from the short and long time-step routines into the vector objects the rest of the EnergyPlus GHE code requires for computations.
+
+
+
+### Updated design
+
+
+
+The updated design in ```GLHEVert::calcGFunctions``` will wrap the calls to these existing functions in an IF block, so that when the new input option "UHFcalc" is selected the existing g-function generation code is called. However, when the "UBWTcalc" option is selected, cpgfunction will be called to generate the g-function values with the uniform borehole wall temperature boundary condition.
+
+
+
+```C++
+
+if (UHF) {
+
+    calcShortTimestepGFunctions(state);
+
+    calcLongTimestepGFunctions(state);
+
+    combineShortAndLongTimestepGFunctions();
+
+} else if (UBHWT) {
+
+    gt::gfunction::uniform_borehole_wall_temperature(...);
+
+}
+
+```
+
+
+
+### Optional Build
+
+
+
+This can be an optional feature built based on new or existing CMake flags.
+
+
+
+### Dependencies
+
+Currently the tool is relying on nlohmann json, boost, BLAS and LAPACK. The following sections aim to communicate the reasoning behind the use of each dependency and give the current outlook on future dependency. There are also requests for input based on the information provided. These outlooks are not yet set in stone, though a decisive "code freeze" and a path forward for the August deadline needs to occur in the near future.
+
+
+
+#### Nlohmann json
+
+The [single include](https://github.com/nlohmann/json#integration), [json.hpp](https://github.com/nlohmann/json/blob/develop/single_include/nlohmann/json.hpp), is made use of. The file sits inside of a `third_party/` folder. The location of the file and the linking of it in cpgfunction is still up for discussion. Beyond that, the input structure in the input JSON files, containing borefield coordinates, is no more complicated than this: `{"x": [1, 2, 3, 4], "y": [1, 2, 3, 4]}`. This is basically just csv data. In the foreseeable future, there will be nothing more input that these coordinates. This dependency could be eliminated.  
+
+
+
+#### Boost functions
+
+The boost functions made use of are [Gauss-Kronrod Quadrature](https://www.boost.org/doc/libs/1_71_0/libs/math/doc/html/math_toolkit/gauss_kronrod.html) and [thread pool](https://www.boost.org/doc/libs/1_76_0/doc/html/boost_asio/reference/thread_pool.html). The quadrature integration is performed to compute the integration of the finite line source. The thread pool is used in many locations, though is being removed in many due to `cpgfunction` becoming based more on linear algebra routines via `BLAS`, rather than simply multi-threading. After a complete transition to linear algebra in the applicable locations, the goal is to use `OpenMP` to try to match the multi-threading speed occurring in the calculation of finite line source segment responses. Following the removal of boost's thread pool, a Gauss-Kronrod Quadrature integration could be developed. We would like input as to whether or not this development, the removal of the boost dependency, should be made a priority to be accomplished by August.
+
+
+
+#### BLAS and LAPACK routines
+
+BLAS and LAPACK are Fortran libraries. In the current version, these are expected to be installed as system libraries. Last summer, during the initial development of cpgfunction, it was found that [OpenBLAS](https://github.com/xianyi/OpenBLAS) performed LU factorization for solving systems of linear equations ([gesv](https://icl.bitbucket.io/lapackpp/group__gesv.html#ga8f2d5c8af99b6aee06f0650d723f8e2f)) 5x faster than [netlib](http://www.netlib.org/blas/)'s. The speed of OpenBLAS was nearly identical to the solution solved in Python's [numpy.linalg.solve](https://numpy.org/doc/stable/reference/generated/numpy.linalg.solve.html), which makes use of the same LAPACK routine. More recently, it has been found that linear algebra with BLAS is both significantly faster than multi-threading, and that BLAS has low level functionality that helps with the goals of cpgfunction. (cpgfunction was developed due to the need to compute g-functions faster and with lower memory on high performance computers for the development of g-function databases (Cook and Spitler 2021).) BLAS provides for "fast slicing" of vectors or matrices represented in 1D format. The functions take in pointers to a starting location, and a number of elements to be operated on. Additionally, the BLAS routine function [symv](https://icl.bitbucket.io/blaspp/group__symv.html#ga496ee8fe24db5f3dd003b09cc2bec5a4) gives tremendous speed improvement for performing linear algebra on the packed symmetric matrix discussed in Cook and Spitler (2021). The packed symmetric response matrix can remain packed at each point in time, where inputs to the function instruct whether or not it is the upper or lower triangle. The consumption of memory is also minimized by storing the results in the input vector `y`. This allocation of memory can occur once, and that vector can be re-used across functions. This results in significant speed improvements when compared to multi-threading, with minimal to no additional memory consumption. However, while many of these things are good, and a 2x speed improvement has already been made by initial transfer of computation from boost's thread pool to BLAS, the dependency is programmed in Fortran. Therefore, if the dependency is to continue to be made use of for the August release, there will likely need to be optional build flags for this third party tool. We are currently considering making use of the CMake find package functionality to locate BLAS and LAPACK libraries already installed on the system. Mac (brew install) and Linux (apt-get) both have seamless access to OpenBLAS, and we are investigating ease of access on Windows (choco install).
+
+
+
+
+
+Beyond August 2021, we would like input from the development team on how to handle these dependencies. If anyone on the development team has experience in solving a problem similar to this, feedback and experience would be appreciated. Specifically, should they continue to be expected to be installed as system libraries, incorporated into the E+ repo, or move away from Fortran dependencies entirely for a pure C++ project.
+
+
+
+### Git
+
+
+
+The code is currently maintained in a private repository on [Jack Cook](https://github.com/j-c-cook)'s account. The plan is to make the code public and open source following further documentation and development. The library can be incorporated into the `third_party` folder as a git subtree or however the development team prefers.
+
+
+
+--------------------
+
+Cook, J. C. and J. D. Spitler (2021). Faster computation of g-functions used for modeling of ground heat exchangers with reduced memory consumption. Accepted for publication in Proceedings of Building Simulation 2021. September 1-3, 2021. Bruges, Belgium.
+
+
