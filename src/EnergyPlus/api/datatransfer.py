@@ -293,7 +293,8 @@ class DataExchange:
         """
         self.api.resetErrorFlag(state)
 
-    def get_num_nodes_in_cond_fd_surf_layer(self, state: c_void_p, surface_name: Union[str, bytes], material_name: Union[str, bytes]) -> None:
+    def get_num_nodes_in_cond_fd_surf_layer(self, state: c_void_p, surface_name: Union[str, bytes],
+                                            material_name: Union[str, bytes]) -> None:
         """
         Get the number of nodes in CondFD surface layer.
 
@@ -318,7 +319,8 @@ class DataExchange:
                 "'{}'".format(material_name))
         return self.api.getNumNodesInCondFDSurfaceLayer(state, surface_name, material_name)
 
-    def request_variable(self, state: c_void_p, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
+    def request_variable(self, state: c_void_p, variable_name: Union[str, bytes],
+                         variable_key: Union[str, bytes]) -> None:
         """
         Request output variables so they can be accessed during a simulation.
 
@@ -350,7 +352,8 @@ class DataExchange:
                 "'{}'".format(variable_key))
         self.api.requestVariable(state, variable_name, variable_key)
 
-    def get_variable_handle(self, state: c_void_p, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
+    def get_variable_handle(self, state: c_void_p, variable_name: Union[str, bytes],
+                            variable_key: Union[str, bytes]) -> int:
         """
         Get a handle to an output variable in a running simulation.
 
@@ -541,7 +544,8 @@ class DataExchange:
                 "'{}'".format(actuator_handle))
         return self.api.getActuatorValue(state, actuator_handle)
 
-    def get_internal_variable_handle(self, state: c_void_p, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
+    def get_internal_variable_handle(self, state: c_void_p, variable_type: Union[str, bytes],
+                                     variable_key: Union[str, bytes]) -> int:
         """
         Get a handle to an internal variable in a running simulation.
 
@@ -1156,7 +1160,8 @@ class DataExchange:
         """
         return self.api.todayWeatherOutDewPointAtTime(state, hour, time_step_number)
 
-    def today_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+    def today_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int,
+                                                          time_step_number: int) -> float:
         """
         Gets the specified weather data at the specified hour and time step index within that hour
 
@@ -1167,7 +1172,8 @@ class DataExchange:
         """
         return self.api.todayWeatherOutBarometricPressureAtTime(state, hour, time_step_number)
 
-    def today_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+    def today_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int,
+                                                        time_step_number: int) -> float:
         """
         Gets the specified weather data at the specified hour and time step index within that hour
 
@@ -1310,7 +1316,8 @@ class DataExchange:
         """
         return self.api.tomorrowWeatherOutDewPointAtTime(state, hour, time_step_number)
 
-    def tomorrow_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+    def tomorrow_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int,
+                                                             time_step_number: int) -> float:
         """
         Gets the specified weather data at the specified hour and time step index within that hour
 
@@ -1321,7 +1328,8 @@ class DataExchange:
         """
         return self.api.tomorrowWeatherOutBarometricPressureAtTime(state, hour, time_step_number)
 
-    def tomorrow_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+    def tomorrow_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int,
+                                                           time_step_number: int) -> float:
         """
         Gets the specified weather data at the specified hour and time step index within that hour
 
