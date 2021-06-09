@@ -1562,19 +1562,19 @@ namespace HeatBalanceManager {
         MaterNum = 0;
 
         // Regular Materials
+        auto &IP(state.dataInputProcessing->inputProcessor);
 
         state.dataHeatBalMgr->CurrentModuleObject = "Material";
-        auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(state.dataHeatBalMgr->CurrentModuleObject);
-        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
-            InputProcessor::json objectSchemaProps; // Object schema properties
-            objectSchemaProps = state.dataInputProcessing->inputProcessor->getObjectSchemaProps(state, state.dataHeatBalMgr->CurrentModuleObject);
+        auto const instances = IP->epJSON.find(state.dataHeatBalMgr->CurrentModuleObject);
+        if (instances != IP->epJSON.end()) {
+            auto const &objectSchemaProps = IP->getObjectSchemaProps(state, state.dataHeatBalMgr->CurrentModuleObject);
 
             int counter = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
+                IP->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
                 std::string materialName = thisObjectName;
 
                 if (GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1587,40 +1587,32 @@ namespace HeatBalanceManager {
                 }
                 // For incoming idf, maintain object order
                 ++counter;
-                MaterNum = state.dataInputProcessing->inputProcessor->getIDFObjNum(state, state.dataHeatBalMgr->CurrentModuleObject, counter);
+                MaterNum = IP->getIDFObjNum(state, state.dataHeatBalMgr->CurrentModuleObject, counter);
 
                 // Load the material derived type from the input data.
-                state.dataMaterial->Material(MaterNum).Group = RegularMaterial;
-                state.dataMaterial->Material(MaterNum).Name = materialName;
+                auto &thisMaterial = state.dataMaterial->Material(MaterNum);
+                thisMaterial.Group = RegularMaterial;
+                thisMaterial.Name = materialName;
 
-                std::string roughness = state.dataInputProcessing->inputProcessor->getAlphaFieldValue(
-                    state, state.dataHeatBalMgr->CurrentModuleObject, objectFields, objectSchemaProps, "roughness");
+                std::string roughness = IP->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
                 ValidateMaterialRoughness(state, MaterNum, roughness, ErrorsFound);
 
-                state.dataMaterial->Material(MaterNum).Thickness = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, state.dataHeatBalMgr->CurrentModuleObject, objectFields, objectSchemaProps, "thickness");
-                state.dataMaterial->Material(MaterNum).Conductivity = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, state.dataHeatBalMgr->CurrentModuleObject, objectFields, objectSchemaProps, "conductivity");
-                state.dataMaterial->Material(MaterNum).Density = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, state.dataHeatBalMgr->CurrentModuleObject, objectFields, objectSchemaProps, "density");
-                state.dataMaterial->Material(MaterNum).SpecHeat = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, state.dataHeatBalMgr->CurrentModuleObject, objectFields, objectSchemaProps, "specific_heat");
-                state.dataMaterial->Material(MaterNum).AbsorpThermal = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, state.dataHeatBalMgr->CurrentModuleObject, objectFields, objectSchemaProps, "thermal_absorptance");
-                state.dataMaterial->Material(MaterNum).AbsorpThermalInput = state.dataMaterial->Material(MaterNum).AbsorpThermal;
-                state.dataMaterial->Material(MaterNum).AbsorpSolar = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, state.dataHeatBalMgr->CurrentModuleObject, objectFields, objectSchemaProps, "solar_absorptance");
-                state.dataMaterial->Material(MaterNum).AbsorpSolarInput = state.dataMaterial->Material(MaterNum).AbsorpSolar;
-                state.dataMaterial->Material(MaterNum).AbsorpVisible = state.dataInputProcessing->inputProcessor->getRealFieldValue(
-                    state, state.dataHeatBalMgr->CurrentModuleObject, objectFields, objectSchemaProps, "visible_absorptance");
-                state.dataMaterial->Material(MaterNum).AbsorpVisibleInput = state.dataMaterial->Material(MaterNum).AbsorpVisible;
+                thisMaterial.Thickness = IP->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
+                thisMaterial.Conductivity = IP->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
+                thisMaterial.Density = IP->getRealFieldValue(objectFields, objectSchemaProps, "density");
+                thisMaterial.SpecHeat = IP->getRealFieldValue(objectFields, objectSchemaProps, "specific_heat");
+                thisMaterial.AbsorpThermal = IP->getRealFieldValue(objectFields, objectSchemaProps, "thermal_absorptance");
+                thisMaterial.AbsorpThermalInput = thisMaterial.AbsorpThermal;
+                thisMaterial.AbsorpSolar = IP->getRealFieldValue(objectFields, objectSchemaProps, "solar_absorptance");
+                thisMaterial.AbsorpSolarInput = thisMaterial.AbsorpSolar;
+                thisMaterial.AbsorpVisible = IP->getRealFieldValue(objectFields, objectSchemaProps, "visible_absorptance");
+                thisMaterial.AbsorpVisibleInput = thisMaterial.AbsorpVisible;
 
-                if (state.dataMaterial->Material(MaterNum).Conductivity > 0.0) {
-                    state.dataHeatBal->NominalR(MaterNum) =
-                        state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
-                    state.dataMaterial->Material(MaterNum).Resistance = state.dataHeatBal->NominalR(MaterNum);
+                if (thisMaterial.Conductivity > 0.0) {
+                    state.dataHeatBal->NominalR(MaterNum) = thisMaterial.Thickness / thisMaterial.Conductivity;
+                    thisMaterial.Resistance = state.dataHeatBal->NominalR(MaterNum);
                 } else {
-                    ShowSevereError(state, "Positive thermal conductivity required for material " + state.dataMaterial->Material(MaterNum).Name);
+                    ShowSevereError(state, "Positive thermal conductivity required for material " + thisMaterial.Name);
                     ErrorsFound = true;
                 }
             }

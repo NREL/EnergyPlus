@@ -542,13 +542,10 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
     return defaultFound;
 }
 
-std::string InputProcessor::getAlphaFieldValue(
-    EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     auto const &schema_field_obj = schema_obj_props[fieldName];
-    if (schema_field_obj.empty()) {
-        ShowFatalError(state, "InputProcessor::fieldValue: Invalid field name = " + fieldName + "for object type = " + objectWord);
-    }
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
     bool isDefaulted = false;
     std::string value;
     auto it = ep_object.find(fieldName);
@@ -559,8 +556,7 @@ std::string InputProcessor::getAlphaFieldValue(
             value = valuePair.first;
             isDefaulted = valuePair.second;
         } else {
-            ShowSevereError(state, "InputProcessor::fieldValue: Invalid field type = " + fieldName + "for object type = " + objectWord);
-            ShowFatalError(state, "String value requested but field type is numeric");
+            assert(false); // String value requested but field type in numeric
         }
     } else {
         isDefaulted = findDefault(value, schema_field_obj);
@@ -571,13 +567,10 @@ std::string InputProcessor::getAlphaFieldValue(
     return value;
 }
 
-Real64 InputProcessor::getRealFieldValue(
-    EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
 {
     auto const &schema_field_obj = schema_obj_props[fieldName];
-    if (schema_field_obj.empty()) {
-        ShowFatalError(state, "InputProcessor::fieldValue: Invalid field name = " + fieldName + "for object type = " + objectWord);
-    }
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
     bool isDefaulted = false;
     Real64 value = 0.0;
     auto it = ep_object.find(fieldName);
@@ -606,15 +599,13 @@ Real64 InputProcessor::getRealFieldValue(
     return value;
 }
 
-json InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
+const json &InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
 {
     auto const &schema_properties = schema.at("properties");
     const json &object_schema = schema_properties.at(objectWord);
-    if (object_schema.empty()) {
-        ShowFatalError(state, "InputProcessor::fieldValue: Invalid object type = " + objectWord);
-    }
+    assert(!object_schema.empty()); // If this fails, the object type does not exist in the schema
 
-    json schema_obj_props = getPatternProperties(state, object_schema);
+    auto const &schema_obj_props = getPatternProperties(state, object_schema);
     return schema_obj_props;
 }
 

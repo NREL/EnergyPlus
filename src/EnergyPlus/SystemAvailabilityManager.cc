@@ -1351,16 +1351,15 @@ namespace SystemAvailabilityManager {
 
         bool ErrorsFound = false;
         std::string cCurrentModuleObject = "AvailabilityManagerAssignmentList";
+        auto &IP(state.dataInputProcessing->inputProcessor);
 
-        state.dataSystemAvailabilityManager->NumAvailManagerLists =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumAvailManagerLists = IP->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumAvailManagerLists > 0) {
 
             state.dataSystemAvailabilityManager->SysAvailMgrListData.allocate(state.dataSystemAvailabilityManager->NumAvailManagerLists);
-            auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
-            InputProcessor::json objectSchemaProps; // Object schema properties
-            objectSchemaProps = state.dataInputProcessing->inputProcessor->getObjectSchemaProps(state, cCurrentModuleObject);
+            auto const instances = IP->epJSON.find(cCurrentModuleObject);
+            auto const &objectSchemaProps = IP->getObjectSchemaProps(state, cCurrentModuleObject);
 
             auto &instancesValue = instances.value();
             int Item = 0;
@@ -1368,7 +1367,7 @@ namespace SystemAvailabilityManager {
                 ++Item;
                 auto const &objectFields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, instance.key());
+                IP->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).Name = thisObjectName;
 
                 auto extensibles = objectFields.find("managers");
@@ -1390,10 +1389,9 @@ namespace SystemAvailabilityManager {
                     for (auto extensibleInstance : extensiblesArray) {
                         ++listItem;
                         state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName(listItem) =
-                            state.dataInputProcessing->inputProcessor->getAlphaFieldValue(
-                                state, cCurrentModuleObject, extensibleInstance, extensionSchemaProps, "availability_manager_name");
-                        std::string availManagerObjType = state.dataInputProcessing->inputProcessor->getAlphaFieldValue(
-                            state, cCurrentModuleObject, extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
+                            IP->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_name");
+                        std::string availManagerObjType =
+                            IP->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
                         state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType(listItem) = availManagerObjType;
                         state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem) =
                             ValidateAndSetSysAvailabilityManagerType(state, availManagerObjType);

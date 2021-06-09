@@ -127,13 +127,11 @@ public:
 
     bool getDefaultValue(EnergyPlusData &state, std::string const &objectWord, std::string const &fieldName, std::string &value);
 
-    std::string getAlphaFieldValue(
-        EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json const &schema_obj_props, std::string const &fieldName);
+    std::string getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName);
 
-    Real64 getRealFieldValue(
-        EnergyPlusData &state, std::string const &objectWord, json const &ep_object, json const &schema_obj_props, std::string const &fieldName);
+    Real64 getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName);
 
-    json getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord);
+    const json &getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord);
 
     std::pair<std::string, bool> getObjectItemValue(std::string const &field_value, json const &schema_field_obj);
 
