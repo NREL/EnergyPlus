@@ -272,7 +272,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather)
 
     // Set an actual weather file to Chicago EPW
     state->dataWeatherManager->WeatherFileExists = true;
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+    state->files.inputWeatherFilePath.filePath = fs::path(configured_source_directory()) / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     // Read the project data, such as Timestep
     state->dataGlobal->BeginSimFlag = true;

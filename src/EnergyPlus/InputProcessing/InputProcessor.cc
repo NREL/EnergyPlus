@@ -252,9 +252,9 @@ void cleanEPJSON(json &epjson)
 
 void InputProcessor::processInput(EnergyPlusData &state)
 {
-    std::ifstream input_stream(state.dataStrGlobals->inputFileName, std::ifstream::in | std::ifstream::binary);
+    std::ifstream input_stream(state.dataStrGlobals->inputFilePath, std::ifstream::in | std::ifstream::binary);
     if (!input_stream.is_open()) {
-        ShowFatalError(state, "Input file path " + state.dataStrGlobals->inputFileName + " not found");
+        ShowFatalError(state, "Input file path " + state.dataStrGlobals->inputFilePath.string() + " not found");
         return;
     }
 
@@ -286,7 +286,7 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 input_file.append(line + '\n');
             }
             if (input_file.empty()) {
-                ShowFatalError(state, "Failed to read input file: " + state.dataStrGlobals->inputFileName);
+                ShowFatalError(state, "Failed to read input file: " + state.dataStrGlobals->inputFilePath.string());
                 return;
             }
 
@@ -298,8 +298,8 @@ void InputProcessor::processInput(EnergyPlusData &state)
                 cleanEPJSON(epJSONClean);
                 input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
                 // input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
-                std::string convertedIDF(state.dataStrGlobals->outputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".epJSON");
-                FileSystem::makeNativePath(convertedIDF);
+                fs::path convertedIDF = FileSystem::makeNativePath(
+                    FileSystem::replaceFileExtension(state.dataStrGlobals->outputDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".epJSON"));
                 std::ofstream convertedFS(convertedIDF, std::ofstream::out);
                 convertedFS << input_file << std::endl;
             }
@@ -330,8 +330,8 @@ void InputProcessor::processInput(EnergyPlusData &state)
     if (state.dataGlobal->isEpJSON && (state.dataGlobal->outputEpJSONConversion || state.dataGlobal->outputEpJSONConversionOnly)) {
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
-            std::string convertedEpJSON(state.dataStrGlobals->outputDirPathName + state.dataStrGlobals->inputFileNameOnly + ".idf");
-            FileSystem::makeNativePath(convertedEpJSON);
+            fs::path convertedEpJSON = FileSystem::makeNativePath(
+                FileSystem::replaceFileExtension(state.dataStrGlobals->outputDirPath / state.dataStrGlobals->inputFilePathNameOnly, ".idf"));
             std::ofstream convertedFS(convertedEpJSON, std::ofstream::out);
             convertedFS << encoded << std::endl;
         } else {

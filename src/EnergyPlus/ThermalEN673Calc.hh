@@ -62,7 +62,7 @@ namespace ThermalEN673Calc {
 
     void Calc_EN673(EnergyPlusData &state,
                     TARCOGOutput::Files &files,
-                    int const standard,
+                    TARCOGGassesParams::Stdrd const standard,
                     int const nlayer,
                     Real64 const tout,
                     Real64 const tind,
@@ -115,7 +115,7 @@ namespace ThermalEN673Calc {
                        const Array1D<Real64> &presure,
                        const Array1D_int &nmix,
                        Array1D<Real64> &theta,
-                       int const standard,
+                       TARCOGGassesParams::Stdrd const standard,
                        Array1D<Real64> &hg,
                        Array1D<Real64> &hr,
                        Array1D<Real64> &hs,
@@ -139,7 +139,7 @@ namespace ThermalEN673Calc {
                      int const nlayer,
                      const Array1D<Real64> &absol,
                      Real64 &sf,
-                     int const standard,
+                     TARCOGGassesParams::Stdrd const standard,
                      int &nperr,
                      std::string &ErrorMessage);
 

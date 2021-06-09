@@ -91,16 +91,14 @@ namespace PluginManagement {
 
     struct PluginInstance
     {
-        PluginInstance(const std::string &_moduleName, const std::string &_className, std::string emsName, bool runPluginDuringWarmup)
-            : emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup)
+        PluginInstance(const fs::path &_modulePath, const std::string &_className, std::string emsName, bool runPluginDuringWarmup)
+            : modulePath(_modulePath), className(_className), emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup),
+              stringIdentifier(_modulePath.string() + "." + _className)
         {
-            this->moduleName = _moduleName;
-            this->className = _className;
-            this->stringIdentifier = _moduleName + "." + _className;
         }
 
         // members
-        std::string moduleName;
+        fs::path modulePath;
         std::string className;
         std::string emsAlias;
         bool runDuringWarmup;
@@ -186,8 +184,8 @@ namespace PluginManagement {
         ~PluginManager();
 
         static int numActiveCallbacks(EnergyPlusData &state);
-        static void addToPythonPath(EnergyPlusData &state, const std::string &path, bool userDefinedPath);
-        static std::string sanitizedPath(std::string path); // intentionally not a const& string
+        static void addToPythonPath(EnergyPlusData &state, const fs::path &path, bool userDefinedPath);
+        static fs::path sanitizedPath(fs::path const &path);
         static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;

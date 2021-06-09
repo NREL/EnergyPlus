@@ -460,7 +460,7 @@ namespace ElectricBaseboardRadiator {
                     ElecBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
                 }
                 if (ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->Surface(ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum)) = true;
                 }
 
                 AllFracsSummed += ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum);
