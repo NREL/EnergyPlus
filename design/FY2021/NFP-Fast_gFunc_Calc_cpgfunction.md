@@ -208,7 +208,7 @@ GroundHeatExchanger:System,
     2.5,                     !- Ground Thermal Conductivity {W/m-K}
     2.5E+06,                 !- Ground Thermal Heat Capacity {J/m3-K}
     ,                        !- GHE:Vertical:ResponseFactors Object Name
-  + UHFcalc,                 !- g-function Calculation Model Name
++   UHFcalc,                 !- g-function Calculation Model Name
     ,                        !- GHE:Vertical:Array Object Name
     BH1,                     !- GHE:Vertical:Single Object Name 1
     BH2;                     !- GHE:Vertical:Single Object Name 2
@@ -221,8 +221,8 @@ GroundHeatExchanger:System,
 GroundHeatExchanger:System,
     \memo Models vertical ground heat exchangers systems using the response factor approach
     \memo developed by Eskilson. Response factors are calculated using a finite line source
-  + \memo model assuming uniform heat flux at the borehole wall if UHFcalc is specified,
-  + \memo or uniform borehole wall temperature if UBHWTcalc is specified.
++   \memo model assuming uniform heat flux at the borehole wall if UHFcalc is specified,
++   \memo or uniform borehole wall temperature if UBHWTcalc is specified.
     \extensible:1
     \min-fields 9
     A1,   \field Name
@@ -232,10 +232,10 @@ GroundHeatExchanger:System,
     A6, \field GHE:Vertical:ResponseFactors Object Name
         \type object-list
         \object-list GroundHeatExchangerVerticalResponseFactorNames
-  + A7, \field g-function Calculation Model Name
-  +     \type choice
-  +     \key UHFcalc
-  +     \key UBHWTcalc
++   A7, \field g-function Calculation Model Name
++       \type choice
++       \key UHFcalc
++       \key UBHWTcalc
     A8, \field GHE:Vertical:Array Object Name
         \type object-list
         \object-list GroundHeatExchangerVerticalArrayNames
