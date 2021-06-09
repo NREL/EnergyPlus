@@ -6830,7 +6830,7 @@ namespace UnitarySystems {
         EnergyPlusData &state, std::string const &CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
 
-        std::string cCurrentModuleObject("CoilSystem:Cooling:Water");
+        std::string cCurrentModuleObject(state.dataUnitarySystems->coilSysCoolingWaterObjectName);
         static const std::string routineName("getCoilWaterSystemInputData: ");
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
         if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
@@ -6842,9 +6842,16 @@ namespace UnitarySystems {
 
                 if (!UtilityRoutines::SameString(CoilSysName, thisObjectName) && !state.dataUnitarySystems->getCoilWaterSysInputOnceFlag) continue;
 
-                state.dataInputProcessing->inputProcessor->markObjectAsUsed(state.dataUnitarySystems->coilSysCoolingWaterObjectName, thisObjectName);
-                ++state.dataUnitarySystems->numCoilWaterSystems;
-                ++state.dataUnitarySystems->numUnitarySystems;
+                int sysNum = getUnitarySystemIndex(state, thisObjectName);
+                UnitarySys thisSys;
+                if (sysNum == -1) {
+                    ++state.dataUnitarySystems->numCoilWaterSystems;
+                    ++state.dataUnitarySystems->numUnitarySystems;
+                    auto const &thisObjName = instance.key();
+                    state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjName);
+                } else {
+                    thisSys = state.dataUnitarySystems->unitarySys[sysNum];
+                }
 
                 UnitarySysInputSpec input_specs;
                 input_specs.name = thisObjectName;
@@ -6889,8 +6896,6 @@ namespace UnitarySystems {
                 }
 
                 // now translate to UnitarySystem
-                UnitarySys thisSys;
-
                 thisSys.UnitType = cCurrentModuleObject;
                 thisSys.m_unitarySystemType_Num = DataHVACGlobals::UnitarySys_AnyCoilType;
                 input_specs.control_type = "Setpoint";
@@ -6901,11 +6906,9 @@ namespace UnitarySystems {
                 // set water-side economizer flag
                 thisSys.m_waterSideEconomizerFlag = true;
 
-                int sysNum = state.dataUnitarySystems->numUnitarySystems;
                 thisSys.processInputSpec(state, input_specs, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
 
                 sysNum = getUnitarySystemIndex(state, thisObjectName);
-
                 if (sysNum == -1) {
                     state.dataUnitarySystems->unitarySys.push_back(thisSys);
                 } else {
