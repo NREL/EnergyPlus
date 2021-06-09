@@ -235,7 +235,7 @@ namespace HVACUnitaryBypassVAV {
         // set the on/off flags
         if (CBVAV(CBVAVNum).OpMode == DataHVACGlobals::CycFanCycCoil) {
             // cycling unit only runs if there is a cooling or heating load.
-            if (CBVAV(CBVAVNum).HeatCoolMode == 0 || AirMassFlow < DataHVACGlobals::SmallMassFlow) {
+            if (CBVAV(CBVAVNum).HeatCoolMode == OperMode::Unassigned || AirMassFlow < DataHVACGlobals::SmallMassFlow) {
                 UnitOn = false;
             }
         } else if (CBVAV(CBVAVNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
@@ -1103,7 +1103,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             //   Initialize last mode of compressor operation
-            CBVAV(CBVAVNum).LastMode = HeatingMode;
+            CBVAV(CBVAVNum).LastMode = OperMode::HeatingMode;
 
             if (CBVAV(CBVAVNum).FanType_Num != DataHVACGlobals::FanType_SimpleOnOff &&
                 CBVAV(CBVAVNum).FanType_Num != DataHVACGlobals::FanType_SimpleConstVolume &&
@@ -1605,7 +1605,7 @@ namespace HVACUnitaryBypassVAV {
             state.dataLoopNodes->Node(OutNode).Enthalpy = state.dataLoopNodes->Node(InNode).Enthalpy;
             state.dataLoopNodes->Node(CBVAV(CBVAVNum).MixerReliefAirNode) = state.dataLoopNodes->Node(MixerOutsideAirNode);
             state.dataHVACUnitaryBypassVAV->MyEnvrnFlag(CBVAVNum) = false;
-            CBVAV(CBVAVNum).LastMode = HeatingMode;
+            CBVAV(CBVAVNum).LastMode = OperMode::HeatingMode;
             CBVAV(CBVAVNum).changeOverTimer = -1.0;
             //   set fluid-side hardware limits
             if (CBVAV(CBVAVNum).CoilControlNode > 0) {
@@ -1808,11 +1808,11 @@ namespace HVACUnitaryBypassVAV {
         // Set the inlet node mass flow rate
         if (CBVAV(CBVAVNum).OpMode == DataHVACGlobals::ContFanCycCoil) {
             // constant fan mode
-            if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
+            if (CBVAV(CBVAVNum).HeatCoolMode == OperMode::HeatingMode) {
                 state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
                 state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
                 state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
-            } else if (CBVAV(CBVAVNum).HeatCoolMode == CoolingMode) {
+            } else if (CBVAV(CBVAVNum).HeatCoolMode == OperMode::CoolingMode) {
                 state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
                 state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
                 state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
@@ -1823,7 +1823,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             if (CBVAV(CBVAVNum).AirFlowControl == AirFlowCtrlMode::UseCompressorOnFlow) {
-                if (CBVAV(CBVAVNum).LastMode == HeatingMode) {
+                if (CBVAV(CBVAVNum).LastMode == OperMode::HeatingMode) {
                     state.dataHVACUnitaryBypassVAV->CompOffMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
                     state.dataHVACUnitaryBypassVAV->CompOffFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
                     state.dataHVACUnitaryBypassVAV->OACompOffMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
@@ -1839,11 +1839,11 @@ namespace HVACUnitaryBypassVAV {
             }
         } else {
             // cycling fan mode
-            if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
+            if (CBVAV(CBVAVNum).HeatCoolMode == OperMode::HeatingMode) {
                 state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxHeatAirMassFlow;
                 state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).HeatingSpeedRatio;
                 state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).HeatOutAirMassFlow * OutsideAirMultiplier;
-            } else if (CBVAV(CBVAVNum).HeatCoolMode == CoolingMode) {
+            } else if (CBVAV(CBVAVNum).HeatCoolMode == OperMode::CoolingMode) {
                 state.dataHVACUnitaryBypassVAV->CompOnMassFlow = CBVAV(CBVAVNum).MaxCoolAirMassFlow;
                 state.dataHVACUnitaryBypassVAV->CompOnFlowRatio = CBVAV(CBVAVNum).CoolingSpeedRatio;
                 state.dataHVACUnitaryBypassVAV->OACompOnMassFlow = CBVAV(CBVAVNum).CoolOutAirMassFlow * OutsideAirMultiplier;
@@ -1921,7 +1921,7 @@ namespace HVACUnitaryBypassVAV {
                 state.dataHVACUnitaryBypassVAV->BypassDuctFlowFraction = 0.0;
                 state.dataHVACUnitaryBypassVAV->PartLoadFrac = 0.0;
             } else {
-                if (CBVAV(CBVAVNum).HeatCoolMode != 0) {
+                if (CBVAV(CBVAVNum).HeatCoolMode != OperMode::Unassigned) {
                     state.dataHVACUnitaryBypassVAV->PartLoadFrac = 1.0;
                 } else {
                     state.dataHVACUnitaryBypassVAV->PartLoadFrac = 0.0;
@@ -2020,7 +2020,7 @@ namespace HVACUnitaryBypassVAV {
             } // from IF(CBVAV(CBVAVNum)%HeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) THEN
         }     // from IF( FirstHVACIteration ) THEN
 
-        if ((CBVAV(CBVAVNum).HeatCoolMode == 0 && CBVAV(CBVAVNum).OpMode == DataHVACGlobals::CycFanCycCoil) ||
+        if ((CBVAV(CBVAVNum).HeatCoolMode == OperMode::Unassigned && CBVAV(CBVAVNum).OpMode == DataHVACGlobals::CycFanCycCoil) ||
             state.dataHVACUnitaryBypassVAV->CompOnMassFlow == 0.0) {
             state.dataHVACUnitaryBypassVAV->PartLoadFrac = 0.0;
             state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirInNode).MassFlowRate = 0.0;
@@ -2248,7 +2248,7 @@ namespace HVACUnitaryBypassVAV {
         CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
 
         if ((state.dataLoopNodes->Node(CBVAV(CBVAVNum).AirOutNode).Temp - CBVAV(CBVAVNum).OutletTempSetPoint) > DataHVACGlobals::SmallTempDiff &&
-            CBVAV(CBVAVNum).HeatCoolMode > 0 && PartLoadFrac < 1.0) {
+            CBVAV(CBVAVNum).HeatCoolMode != OperMode::Unassigned && PartLoadFrac < 1.0) {
             CalcCBVAV(state, CBVAVNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
         }
     }
@@ -2330,7 +2330,7 @@ namespace HVACUnitaryBypassVAV {
             }
         }
         // Simulate cooling coil if zone load is negative (cooling load)
-        if (CBVAV(CBVAVNum).HeatCoolMode == CoolingMode) {
+        if (CBVAV(CBVAVNum).HeatCoolMode == OperMode::CoolingMode) {
             if (OutdoorDryBulbTemp >= CBVAV(CBVAVNum).MinOATCompressor) {
 
                 {
@@ -3188,7 +3188,7 @@ namespace HVACUnitaryBypassVAV {
 
             if (SELECT_CASE_var == DataHVACGlobals::CoilDX_HeatingEmpirical) {
                 //   Simulate DX heating coil if zone load is positive (heating load)
-                if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
+                if (CBVAV(CBVAVNum).HeatCoolMode == OperMode::HeatingMode) {
                     if (OutdoorDryBulbTemp > CBVAV(CBVAVNum).MinOATCompressor) {
                         //       simulate the DX heating coil
                         // vs coil issue
@@ -3571,7 +3571,7 @@ namespace HVACUnitaryBypassVAV {
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam)) { // not a DX heating coil
-                if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
+                if (CBVAV(CBVAVNum).HeatCoolMode == OperMode::HeatingMode) {
                     CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat);
                     QHeater = state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate * CpAir *
                               (CBVAV(CBVAVNum).CoilTempSetPoint - state.dataLoopNodes->Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp);
@@ -3667,7 +3667,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 QZoneReqHeat = 0.0; // Total heating load in all controlled zones [W]
         CBVAV(CBVAVNum).NumZonesCooled = 0;
         CBVAV(CBVAVNum).NumZonesHeated = 0;
-        CBVAV(CBVAVNum).HeatCoolMode = 0;
+        CBVAV(CBVAVNum).HeatCoolMode = OperMode::Unassigned;
 
         for (int ZoneNum = 1; ZoneNum <= CBVAV(CBVAVNum).NumControlledZones; ++ZoneNum) {
             int actualZoneNum = CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum);
@@ -3704,60 +3704,60 @@ namespace HVACUnitaryBypassVAV {
             auto const SELECT_CASE_var(CBVAV(CBVAVNum).PriorityControl);
             if (SELECT_CASE_var == PriorityCtrlMode::CoolingPriority) {
                 if (QZoneReqCool < 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                    CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                 } else if (QZoneReqHeat > 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                    CBVAV(CBVAVNum).HeatCoolMode = OperMode::HeatingMode;
                 }
             } else if (SELECT_CASE_var == PriorityCtrlMode::HeatingPriority) {
                 if (QZoneReqHeat > 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                    CBVAV(CBVAVNum).HeatCoolMode = OperMode::HeatingMode;
                 } else if (QZoneReqCool < 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                    CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                 }
             } else if (SELECT_CASE_var == PriorityCtrlMode::ZonePriority) {
                 if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
                     if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::HeatingMode;
                     } else if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                     }
                 } else if (CBVAV(CBVAVNum).NumZonesCooled > CBVAV(CBVAVNum).NumZonesHeated) {
                     if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                     } else if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::HeatingMode;
                     }
                 } else {
                     if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                     } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::HeatingMode;
                     } else if (std::abs(QZoneReqCool) == std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                     }
                 }
             } else if (SELECT_CASE_var == PriorityCtrlMode::LoadPriority) {
                 if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                    CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                 } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
-                    CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                    CBVAV(CBVAVNum).HeatCoolMode = OperMode::HeatingMode;
                 } else if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
                     if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::HeatingMode;
                     } else if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                     }
                 } else if (CBVAV(CBVAVNum).NumZonesHeated < CBVAV(CBVAVNum).NumZonesCooled) {
                     if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                     } else if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::HeatingMode;
                     }
                 } else {
                     if (QZoneReqCool < 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::CoolingMode;
                     } else if (QZoneReqHeat > 0.0) {
-                        CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
+                        CBVAV(CBVAVNum).HeatCoolMode = OperMode::HeatingMode;
                     }
                 }
             }
@@ -3801,9 +3801,9 @@ namespace HVACUnitaryBypassVAV {
         Real64 OutAirTemp = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).AirOutNode).Temp;
         Real64 OutAirHumRat = state.dataLoopNodes->Node(CBVAV(CBVAVNumber).AirOutNode).HumRat;
 
-        if (CBVAV(CBVAVNumber).HeatCoolMode == CoolingMode) { // Cooling required
+        if (CBVAV(CBVAVNumber).HeatCoolMode == OperMode::CoolingMode) { // Cooling required
             CalcSetPointTempTarget = 99999.0;
-        } else if (CBVAV(CBVAVNumber).HeatCoolMode == HeatingMode) { // Heating required
+        } else if (CBVAV(CBVAVNumber).HeatCoolMode == OperMode::HeatingMode) { // Heating required
             CalcSetPointTempTarget = -99999.0;
         }
         Real64 TSupplyToHeatSetPtMax = -99999.0; // Maximum of the supply air temperatures required to reach the heating setpoint [C]
@@ -3849,9 +3849,9 @@ namespace HVACUnitaryBypassVAV {
 
             //     Save the MIN (cooling) or MAX (heating) temperature for coil control
             //     One box will always operate at maximum damper position minimizing overall system energy use
-            if (CBVAV(CBVAVNumber).HeatCoolMode == CoolingMode) {
+            if (CBVAV(CBVAVNumber).HeatCoolMode == OperMode::CoolingMode) {
                 CalcSetPointTempTarget = min(SupplyAirTemp, CalcSetPointTempTarget);
-            } else if (CBVAV(CBVAVNumber).HeatCoolMode == HeatingMode) {
+            } else if (CBVAV(CBVAVNumber).HeatCoolMode == OperMode::HeatingMode) {
                 CalcSetPointTempTarget = max(SupplyAirTemp, CalcSetPointTempTarget);
             } else {
                 //       Should use CpAirAtCoolSetPoint or CpAirAtHeatSetPoint here?
@@ -3872,7 +3872,7 @@ namespace HVACUnitaryBypassVAV {
         }
 
         //   Account for floating condition where cooling/heating is required to avoid overshooting setpoint
-        if (CBVAV(CBVAVNumber).HeatCoolMode == 0) {
+        if (CBVAV(CBVAVNumber).HeatCoolMode == OperMode::Unassigned) {
             if (CBVAV(CBVAVNumber).OpMode == DataHVACGlobals::ContFanCycCoil) {
                 if (OutAirTemp > TSupplyToCoolSetPtMin) {
                     CalcSetPointTempTarget = TSupplyToCoolSetPtMin;
@@ -3886,9 +3886,9 @@ namespace HVACUnitaryBypassVAV {
             }
             //   Reset cooling/heating mode to OFF if mixed air inlet temperature is below/above setpoint temperature.
             //   HeatCoolMode = 0 for OFF, 1 for cooling, 2 for heating
-        } else if (CBVAV(CBVAVNumber).HeatCoolMode == CoolingMode) {
+        } else if (CBVAV(CBVAVNumber).HeatCoolMode == OperMode::CoolingMode) {
             if (DXCoolCoilInletTemp < CalcSetPointTempTarget) CalcSetPointTempTarget = DXCoolCoilInletTemp;
-        } else if (CBVAV(CBVAVNumber).HeatCoolMode == HeatingMode) {
+        } else if (CBVAV(CBVAVNumber).HeatCoolMode == OperMode::HeatingMode) {
             if (DXCoolCoilInletTemp > CalcSetPointTempTarget) CalcSetPointTempTarget = DXCoolCoilInletTemp;
         }
 

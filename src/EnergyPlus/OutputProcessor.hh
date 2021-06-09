@@ -962,7 +962,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_int_const indexGroupKey = _)
 {
     int *holder = (int *)(&ActualVariable);
-    SetupOutputVariable(state, VariableName, VariableUnit, holder, TimeStepTypeKey, VariableTypeKey, KeyedValue);
+    SetupOutputVariable(state, VariableName, VariableUnit, holder, TimeStepTypeKey, VariableTypeKey, KeyedValue, ReportFreq, indexGroupKey);
 };
 
 void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const TimeStepTypeKey); // What kind of data to update (Zone, HVAC)

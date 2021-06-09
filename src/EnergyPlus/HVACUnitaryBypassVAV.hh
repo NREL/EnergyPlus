@@ -72,7 +72,13 @@ namespace HVACUnitaryBypassVAV {
     constexpr int Off(0); // Signal DXCoil that compressor should not run
 
     // Mode of operation
-    int constexpr CoolingMode(1); // System operating mode is cooling
+    enum class OperMode
+    {
+        Unassigned = -1,
+        CoolingMode, // System operating mode is cooling
+        HeatingMode  // System operating mode is heating
+    };
+
     int constexpr HeatingMode(2); // System operating mode is heating
 
     enum class DehumidControl // Dehumidification control modes (DehumidControlMode) for Multimode units only
@@ -190,7 +196,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 ElecConsumption;         // Electricity consumed [J]
         Real64 FanPartLoadRatio;        // Fan part-load ratio for time step
         Real64 CompPartLoadRatio;       // Compressor part-load ratio for time step
-        int LastMode;                   // Last mode of operation, coolingmode or heatingmode
+        OperMode LastMode;              // Last mode of operation, coolingmode or heatingmode
         AirFlowCtrlMode AirFlowControl; // Fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
         Real64 CompPartLoadFrac;        // Compressor part load ratio
         int AirLoopNumber;              // Air loop served by the CBVAV system
@@ -213,7 +219,7 @@ namespace HVACUnitaryBypassVAV {
         int FanInletNodeNum;                     // fan inlet node number
         Real64 OutletTempSetPoint;               // Oulet node temperature setpoint [C]
         Real64 CoilTempSetPoint;                 // Coil oulet node temperature setpoint (inc. fan heat) [C]
-        int HeatCoolMode;                        // System operating mode (0 = floating, 1 = cooling, 2 = heating)
+        OperMode HeatCoolMode;                   // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         Real64 BypassMassFlowRate;               // Bypass mass flow rate report variable [m3/s]
         int DehumidificationMode;                // Dehumidification mode (0=normal, 1=enhanced)
         DehumidControl DehumidControlType;       // Dehumidification control type (currently only for multimode coil)
@@ -272,20 +278,20 @@ namespace HVACUnitaryBypassVAV {
               MinOATCompressor(0.0), MinLATCooling(0.0), MaxLATHeating(0.0), TotHeatEnergyRate(0.0), TotHeatEnergy(0.0), TotCoolEnergyRate(0.0),
               TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatHeatEnergyRate(0.0),
               LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0),
-              CompPartLoadRatio(0.0), LastMode(0), AirFlowControl(AirFlowCtrlMode::Unassigned), CompPartLoadFrac(0.0), AirLoopNumber(0),
-              NumControlledZones(0), PriorityControl(PriorityCtrlMode::Unassigned), NumZonesCooled(0), NumZonesHeated(0), PLRMaxIter(0),
-              PLRMaxIterIndex(0), DXCoilInletNode(0), DXCoilOutletNode(0), HeatingCoilInletNode(0), HeatingCoilOutletNode(0), FanInletNodeNum(0),
-              OutletTempSetPoint(0.0), CoilTempSetPoint(0.0), HeatCoolMode(0), BypassMassFlowRate(0.0), DehumidificationMode(0),
-              DehumidControlType(DehumidControl::None), HumRatMaxCheck(true), DXIterationExceeded(0), DXIterationExceededIndex(0),
-              DXIterationFailed(0), DXIterationFailedIndex(0), DXCyclingIterationExceeded(0), DXCyclingIterationExceededIndex(0),
-              DXCyclingIterationFailed(0), DXCyclingIterationFailedIndex(0), DXHeatIterationExceeded(0), DXHeatIterationExceededIndex(0),
-              DXHeatIterationFailed(0), DXHeatIterationFailedIndex(0), DXHeatCyclingIterationExceeded(0), DXHeatCyclingIterationExceededIndex(0),
-              DXHeatCyclingIterationFailed(0), DXHeatCyclingIterationFailedIndex(0), HXDXIterationExceeded(0), HXDXIterationExceededIndex(0),
-              HXDXIterationFailed(0), HXDXIterationFailedIndex(0), MMDXIterationExceeded(0), MMDXIterationExceededIndex(0), MMDXIterationFailed(0),
-              MMDXIterationFailedIndex(0), DMDXIterationExceeded(0), DMDXIterationExceededIndex(0), DMDXIterationFailed(0),
-              DMDXIterationFailedIndex(0), CRDXIterationExceeded(0), CRDXIterationExceededIndex(0), CRDXIterationFailed(0),
-              CRDXIterationFailedIndex(0), FirstPass(true), plenumIndex(0), mixerIndex(0), changeOverTimer(-1.0), minModeChangeTime(-1.0),
-              OutNodeSPMIndex(0), modeChanged(false)
+              CompPartLoadRatio(0.0), LastMode(OperMode::Unassigned), AirFlowControl(AirFlowCtrlMode::Unassigned), CompPartLoadFrac(0.0),
+              AirLoopNumber(0), NumControlledZones(0), PriorityControl(PriorityCtrlMode::Unassigned), NumZonesCooled(0), NumZonesHeated(0),
+              PLRMaxIter(0), PLRMaxIterIndex(0), DXCoilInletNode(0), DXCoilOutletNode(0), HeatingCoilInletNode(0), HeatingCoilOutletNode(0),
+              FanInletNodeNum(0), OutletTempSetPoint(0.0), CoilTempSetPoint(0.0), HeatCoolMode(OperMode::Unassigned), BypassMassFlowRate(0.0),
+              DehumidificationMode(0), DehumidControlType(DehumidControl::None), HumRatMaxCheck(true), DXIterationExceeded(0),
+              DXIterationExceededIndex(0), DXIterationFailed(0), DXIterationFailedIndex(0), DXCyclingIterationExceeded(0),
+              DXCyclingIterationExceededIndex(0), DXCyclingIterationFailed(0), DXCyclingIterationFailedIndex(0), DXHeatIterationExceeded(0),
+              DXHeatIterationExceededIndex(0), DXHeatIterationFailed(0), DXHeatIterationFailedIndex(0), DXHeatCyclingIterationExceeded(0),
+              DXHeatCyclingIterationExceededIndex(0), DXHeatCyclingIterationFailed(0), DXHeatCyclingIterationFailedIndex(0), HXDXIterationExceeded(0),
+              HXDXIterationExceededIndex(0), HXDXIterationFailed(0), HXDXIterationFailedIndex(0), MMDXIterationExceeded(0),
+              MMDXIterationExceededIndex(0), MMDXIterationFailed(0), MMDXIterationFailedIndex(0), DMDXIterationExceeded(0),
+              DMDXIterationExceededIndex(0), DMDXIterationFailed(0), DMDXIterationFailedIndex(0), CRDXIterationExceeded(0),
+              CRDXIterationExceededIndex(0), CRDXIterationFailed(0), CRDXIterationFailedIndex(0), FirstPass(true), plenumIndex(0), mixerIndex(0),
+              changeOverTimer(-1.0), minModeChangeTime(-1.0), OutNodeSPMIndex(0), modeChanged(false)
         {
         }
     };
