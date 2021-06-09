@@ -245,6 +245,8 @@ class DataExchange:
         self.api.tomorrowWeatherAlbedoAtTime.restype = RealEP
         self.api.tomorrowWeatherLiquidPrecipitationAtTime.argtypes = [c_void_p, c_int, c_int]
         self.api.tomorrowWeatherLiquidPrecipitationAtTime.restype = RealEP
+        self.api.currentSimTime.argtypes = [c_void_p]
+        self.api.currentSimTime.restype = RealEP
 
     def list_available_api_data_csv(self, state: c_void_p) -> bytes:
         """
@@ -1417,3 +1419,12 @@ class DataExchange:
         :return: Value of the weather condition at the specified time
         """
         return self.api.tomorrowWeatherLiquidPrecipitationAtTime(state, hour, time_step_number)
+
+    def current_sim_time(self, state: c_void_p) -> float:
+        """
+        Returns the cumulative simulation time from the start of the environment, in hours
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: Value of the simulation time from the start of the environment in fractional hours
+        """
+        return self.api.currentSimTime(state)
