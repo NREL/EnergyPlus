@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
@@ -141,10 +142,10 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
 
 TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 {
-    state->dataStrGlobals->outputPerfLogFileName = "eplusout_1_perflog.csv";
+    state->dataStrGlobals->outputPerfLogFilePath = "eplusout_1_perflog.csv";
 
     // start with no file
-    std::remove(state->dataStrGlobals->outputPerfLogFileName.c_str());
+    fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
 
     // make sure the static variables are cleared
     UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
@@ -157,7 +158,7 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
 
-    perfLogFile.open(state->dataStrGlobals->outputPerfLogFileName);
+    perfLogFile.open(state->dataStrGlobals->outputPerfLogFilePath);
     perfLogStrSteam << perfLogFile.rdbuf();
     perfLogFile.close();
     std::string perfLogContents = perfLogStrSteam.str();
@@ -168,7 +169,7 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
     EXPECT_EQ(perfLogContents, expectedContents);
 
     // clean up the file
-    std::remove(state->dataStrGlobals->outputPerfLogFileName.c_str());
+    fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
 }
 
 TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
@@ -176,11 +177,11 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     // make sure the static variables are cleared
     UtilityRoutines::appendPerfLog(*state, "RESET", "RESET");
 
-    state->dataStrGlobals->outputPerfLogFileName = "eplusout_2_perflog.csv";
+    state->dataStrGlobals->outputPerfLogFilePath = "eplusout_2_perflog.csv";
 
     // create a file for the equivalent of the previous run
     std::ofstream initPerfLogFile;
-    initPerfLogFile.open(state->dataStrGlobals->outputPerfLogFileName);
+    initPerfLogFile.open(state->dataStrGlobals->outputPerfLogFilePath);
     initPerfLogFile << "header1,header2,header3,\n";
     initPerfLogFile << "value1-1,value1-2,value1-3,\n";
     initPerfLogFile.close();
@@ -193,7 +194,7 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
 
-    perfLogFile.open(state->dataStrGlobals->outputPerfLogFileName);
+    perfLogFile.open(state->dataStrGlobals->outputPerfLogFilePath);
     perfLogStrSteam << perfLogFile.rdbuf();
     perfLogFile.close();
     std::string perfLogContents = perfLogStrSteam.str();
@@ -205,5 +206,5 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     EXPECT_EQ(perfLogContents, expectedContents);
 
     // clean up the file
-    std::remove(state->dataStrGlobals->outputPerfLogFileName.c_str());
+    fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
 }
