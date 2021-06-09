@@ -177,7 +177,7 @@ temperature boundary conditions.
 Sample IDF and IDD follow, new lines are marked with "+" at the beginning of 
 the line (this makes use of the `diff` language marker):
 
-```
+```diff
 ! IDF example using GHE:Vertical:Array input 
 
 GroundHeatExchanger:System,
@@ -195,7 +195,7 @@ GroundHeatExchanger:System,
 ```
 
 
-```
+```diff
 ! IDF example using GHE:Vertical:Single input
 
   GroundHeatExchanger:System,
@@ -215,7 +215,7 @@ GroundHeatExchanger:System,
 ```
 
 
-```
+```diff
 ! IDD Modifications
 
 GroundHeatExchanger:System,
