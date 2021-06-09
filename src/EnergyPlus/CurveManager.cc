@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -290,8 +291,6 @@ namespace CurveManager {
         std::string CurrentModuleObject; // for ease in renaming.
         int MaxTableNums(0);             // Maximum number of numeric input fields in Tables
         //   certain object in the input file
-
-        std::string FileName; // name of external table data file
 
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
@@ -1991,13 +1990,15 @@ namespace CurveManager {
                         std::vector<double> axis;
 
                         if (indVarInstance.count("external_file_name")) {
-                            std::string filePath = indVarInstance.at("external_file_name");
+                            std::string tmp = indVarInstance.at("external_file_name");
+                            fs::path filePath(tmp);
                             if (!indVarInstance.count("external_file_column_number")) {
-                                ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
                                 ErrorsFound = true;
                             }
                             if (!indVarInstance.count("external_file_starting_row_number")) {
-                                ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(state,
+                                                contextString + ": No starting row number defined for external file \"" + filePath.string() + "\"");
                                 ErrorsFound = true;
                             }
 
@@ -2188,14 +2189,15 @@ namespace CurveManager {
 
                 std::vector<double> lookupValues;
                 if (fields.count("external_file_name")) {
-                    std::string filePath = fields.at("external_file_name");
+                    std::string tmp = fields.at("external_file_name");
+                    fs::path filePath(tmp);
 
                     if (!fields.count("external_file_column_number")) {
-                        ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
                         ErrorsFound = true;
                     }
                     if (!fields.count("external_file_starting_row_number")) {
-                        ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath.string() + "\"");
                         ErrorsFound = true;
                     }
 
@@ -2320,14 +2322,13 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    bool TableFile::load(EnergyPlusData &state, std::string path)
+    bool TableFile::load(EnergyPlusData &state, fs::path const &path)
     {
-        filePath = path;
-        bool fileFound;
-        std::string fullPath;
+        this->filePath = path;
         std::string contextString = "CurveManager::TableFile::load: ";
-        DataSystemVariables::CheckForActualFileName(state, path, fileFound, fullPath, contextString);
-        if (!fileFound) {
+        fs::path fullPath = DataSystemVariables::CheckForActualFilePath(state, path, contextString);
+        if (fullPath.empty()) {
+            // Note: we return 'ErrorsFound' apparently
             return true;
         }
         std::ifstream file(fullPath);
@@ -2373,12 +2374,12 @@ namespace CurveManager {
             std::size_t row = colAndRow.second; // 0 indexed
             auto &content = contents[col];
             if (col >= numColumns) {
-                ShowFatalError(state,
-                               format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath, col + 1, numColumns));
+                ShowFatalError(
+                    state, format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath.string(), col + 1, numColumns));
             }
             if (row >= numRows) {
-                ShowFatalError(state,
-                               format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath, row + 1, numRows));
+                ShowFatalError(
+                    state, format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath.string(), row + 1, numRows));
             }
             std::vector<double> array(numRows - row);
             std::transform(content.begin() + row, content.end(), array.begin(), [](const std::string &str) {

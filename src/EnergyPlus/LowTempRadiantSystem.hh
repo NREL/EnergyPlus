@@ -116,12 +116,12 @@ namespace LowTempRadiantSystem {
     };
 
     // Number of Circuits per Surface Calculation Method
-    int constexpr OneCircuit = 1;          // there is 1 circuit per surface
-    int constexpr CalculateFromLength = 2; // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
-
-    // Types
+    enum class CircuitCalc
+    {
+        Unassigned = -1,
+        OneCircuit,         // there is 1 circuit per surface
+        CalculateFromLength // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
+    };
 
     struct RadiantSystemBaseData
     {
@@ -203,11 +203,12 @@ namespace LowTempRadiantSystem {
         int CWLoopSide = 0;
         int CWBranchNum = 0;
         int CWCompNum = 0;
-        int GlycolIndex = 0;                  // Index to Glycol (Water) Properties
-        int CondErrIndex = 0;                 // Error index for recurring warning messages
-        Real64 CondCausedTimeOff = 0.0;       // Amount of time condensation did or could have turned system off
-        bool CondCausedShutDown = false;      // .TRUE. when condensation predicted at surface
-        int NumCircCalcMethod = 0;            // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
+        int GlycolIndex = 0;             // Index to Glycol (Water) Properties
+        int CondErrIndex = 0;            // Error index for recurring warning messages
+        Real64 CondCausedTimeOff = 0.0;  // Amount of time condensation did or could have turned system off
+        bool CondCausedShutDown = false; // .TRUE. when condensation predicted at surface
+        CircuitCalc NumCircCalcMethod =
+            CircuitCalc::Unassigned;          // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength = 0.0;              // Circuit length {m}
         std::string schedNameChangeoverDelay; // changeover delay schedule
         int schedPtrChangeoverDelay = 0;      // Pointer to the schedule for the changeover delay in hours

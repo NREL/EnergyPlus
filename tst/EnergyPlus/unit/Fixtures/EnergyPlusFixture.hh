@@ -55,6 +55,7 @@
 //#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
@@ -147,7 +148,7 @@ protected:
     std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n");
 
     // This function reads all the lines in the supplied filePath. It puts each line into the vector.
-    std::vector<std::string> read_lines_in_file(std::string const &filePath);
+    std::vector<std::string> read_lines_in_file(fs::path const &filePath);
 
     // Compare an expected string against the ESO stream. The default is to reset the ESO stream after every call.
     // It is easier to test successive functions if the ESO stream is 'empty' before the next call.
