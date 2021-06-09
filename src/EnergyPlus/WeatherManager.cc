@@ -4644,7 +4644,7 @@ namespace WeatherManager {
         // exists in the working directory and calls appropriate routines to
         // open the files and set up for use.
 
-        state.dataWeatherManager->WeatherFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
+        state.dataWeatherManager->WeatherFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
         if (state.dataWeatherManager->WeatherFileExists) {
             OpenEPlusWeatherFile(state, ErrorsFound, true);
         }
@@ -4680,7 +4680,7 @@ namespace WeatherManager {
                                             "DATA PERIODS"});
 
         state.files.inputWeatherFile.close();
-        state.files.inputWeatherFile.fileName = state.files.inputWeatherFileName.fileName;
+        state.files.inputWeatherFile.filePath = state.files.inputWeatherFilePath.filePath;
         state.files.inputWeatherFile.open();
         if (!state.files.inputWeatherFile.good()) {
             ShowFatalError(state, "OpenWeatherFile: Could not OPEN EPW Weather File", OptionalOutputFileRef(state.files.eso));
@@ -9339,15 +9339,15 @@ namespace WeatherManager {
         Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
 
         if (!this->OADryBulbWeatherDataProcessed) {
-            const auto statFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
-            const auto epwFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
+            const auto statFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
+            const auto epwFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
             if (statFileExists) {
-                auto statFile = state.files.inputWeatherFileName.try_open();
+                auto statFile = state.files.inputWeatherFilePath.try_open();
                 if (!statFile.good()) {
                     ShowSevereError(state,
-                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFileName.fileName +
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
                                         " for input (read).");
-                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
 
@@ -9375,11 +9375,12 @@ namespace WeatherManager {
                 this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
                 this->OADryBulbWeatherDataProcessed = true;
             } else if (epwFileExists) {
-                auto epwFile = state.files.inputWeatherFileName.try_open();
+                auto epwFile = state.files.inputWeatherFilePath.try_open();
                 bool epwHasLeapYear(false);
                 if (!epwFile.good()) {
-                    ShowSevereError(state, "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + epwFile.fileName + " for input (read).");
-                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
+                    ShowSevereError(state,
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + epwFile.filePath.string() + " for input (read).");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
                 for (int i = 1; i <= 8; ++i) { // Headers
@@ -9437,8 +9438,8 @@ namespace WeatherManager {
                 this->OADryBulbWeatherDataProcessed = true;
             } else {
                 ShowSevereError(state, "CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exist.");
-                ShowContinueError(state, "Weather file: " + state.files.inputWeatherFileName.fileName + ".");
-                ShowContinueError(state, "Stat file: " + state.files.inStatFileName.fileName + ".");
+                ShowContinueError(state, "Weather file: " + state.files.inputWeatherFilePath.filePath.string() + ".");
+                ShowContinueError(state, "Stat file: " + state.files.inStatFilePath.filePath.string() + ".");
                 ShowContinueError(state, "Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
                 ShowContinueError(state, "Instead a fixed default value of 10.0 C will be used.");
             }

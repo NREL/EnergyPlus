@@ -48,13 +48,14 @@
 #ifndef CONFIGURED_FUNCTIONS_HH
 #define CONFIGURED_FUNCTIONS_HH
 
+#include <EnergyPlus/FileSystem.hh>
 #include <string>
 
 namespace EnergyPlus {
 
-std::string configured_source_directory();
+fs::path configured_source_directory();
 
-std::string configured_build_directory();
+fs::path configured_build_directory();
 
 } // namespace EnergyPlus
 
