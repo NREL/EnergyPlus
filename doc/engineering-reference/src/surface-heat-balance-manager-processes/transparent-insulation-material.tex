@@ -133,9 +133,8 @@ Following is the C++ code in the current version of EnergyPlus used in the HeatB
 
 \begin{lstlisting}
 // Calculate absorbed solar on outside if movable exterior insulation in place
-HMovInsul = 0.0;
-if (Surface(SurfNum).MaterialMovInsulExt > 0) EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
-if (HMovInsul > 0) { // Movable outside insulation in place
+if (AnyMovableInsulation) EvalOutsideMovableInsulation();
+if (SurfMovInsulHExt(SurfNum)) { // Movable outside insulation in place
     QRadSWOutMvIns(SurfNum) = QRadSWOutAbs(SurfNum) * AbsExt / Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
     QRadSWOutAbs(SurfNum) = Material(Surface(SurfNum).MaterialMovInsulExt).Trans * QRadSWOutMvIns(SurfNum) *
                             ((Material(Construct(ConstrNum).LayerPoint(1)).AbsorpSolar / AbsExt) +

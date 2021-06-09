@@ -109,9 +109,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     state->dataEnvrn->OutDryBulbTemp = 15.0;
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBal->MRT.allocate(1);
+    state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 22.0;
-    state->dataHeatBal->MRT(1) = 22.0;
+    state->dataHeatBal->ZoneMRT(1) = 22.0;
 
     TimeOpenElapsed = 5.0;
     TimeCloseElapsed = 0.0;
@@ -159,7 +159,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     EXPECT_EQ(1, CloseProbStatus);
 
     state->dataHeatBalFanSys->MAT(1) = 26.0;
-    state->dataHeatBal->MRT(1) = 26.0;
+    state->dataHeatBal->ZoneMRT(1) = 26.0;
     state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(
         *state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenProbStatus);

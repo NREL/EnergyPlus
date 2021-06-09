@@ -1133,7 +1133,6 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     errorsFound = true;
                 }
 
-                int const flowPath1 = 1, flowPath2 = 2;
                 bool nodeErrorsFound = false;
                 thisPLHP.loadSideNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                    loadSideInletNodeName,
@@ -1142,7 +1141,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                    thisPLHP.name,
                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                    DataLoopNode::NodeConnectionType::Inlet,
-                                                                                   flowPath1,
+                                                                                   NodeInputManager::compFluidStream::Primary,
                                                                                    DataLoopNode::ObjectIsNotParent);
                 thisPLHP.loadSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                     loadSideOutletNodeName,
@@ -1151,7 +1150,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                     thisPLHP.name,
                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    flowPath1,
+                                                                                    NodeInputManager::compFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsNotParent);
                 DataLoopNode::NodeFluidType condenserNodeType = DataLoopNode::NodeFluidType::blank;
                 DataLoopNode::NodeConnectionType condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType::blank;
@@ -1180,7 +1179,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                      thisPLHP.name,
                                                                                      condenserNodeType,
                                                                                      condenserNodeConnectionType_Inlet,
-                                                                                     flowPath2,
+                                                                                     NodeInputManager::compFluidStream::Secondary,
                                                                                      DataLoopNode::ObjectIsNotParent);
                 thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                       sourceSideOutletNodeName,
@@ -1189,7 +1188,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                       thisPLHP.name,
                                                                                       condenserNodeType,
                                                                                       condenserNodeConnectionType_Outlet,
-                                                                                      flowPath2,
+                                                                                      NodeInputManager::compFluidStream::Secondary,
                                                                                       DataLoopNode::ObjectIsNotParent);
                 if (nodeErrorsFound) errorsFound = true;
                 BranchNodeConnections::TestCompSet(

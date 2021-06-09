@@ -71,14 +71,6 @@ namespace DXCoils {
     using DataHVACGlobals::AirCooled;
     using DataHVACGlobals::DryBulbIndicator;
 
-    // Defrost strategy (heat pump only)
-    constexpr int ReverseCycle(1); // uses reverse cycle defrost strategy
-    constexpr int Resistive(2);    // uses electric resistance heater for defrost
-
-    // Defrost control  (heat pump only)
-    constexpr int Timed(1);    // defrost cycle is timed
-    constexpr int OnDemand(2); // defrost cycle occurs only when required
-
     // Compressor operation
     constexpr int On(1);  // normal compressor operation
     constexpr int Off(0); // signal DXCoil that compressor shouldn't run
@@ -225,7 +217,7 @@ namespace DXCoils {
         Real64 ElecHeatingConsumption;
         Real64 ElecHeatingPower;
         Real64 HeatingCoilRuntimeFraction;                // Run time fraction of the DX heating unit
-        int DefrostStrategy;                              // defrost strategy; 1=reverse-cycle, 2=resistive
+        StandardRatings::DefrostStrat DefrostStrategy;    // defrost strategy; 1=reverse-cycle, 2=resistive
         StandardRatings::HPdefrostControl DefrostControl; // defrost control; 1=timed, 2=on-demand
         int EIRFPLR;                                      // index of energy input ratio vs part-load ratio curve
         int DefrostEIRFT;                                 // index of defrost mode total cooling capacity for reverse cycle heat pump
@@ -474,7 +466,7 @@ namespace DXCoils {
               PartLoadRatio(0.0), TotalCoolingEnergy(0.0), SensCoolingEnergy(0.0), LatCoolingEnergy(0.0), TotalCoolingEnergyRate(0.0),
               SensCoolingEnergyRate(0.0), LatCoolingEnergyRate(0.0), ElecCoolingConsumption(0.0), ElecCoolingPower(0.0),
               CoolingCoilRuntimeFraction(0.0), TotalHeatingEnergy(0.0), TotalHeatingEnergyRate(0.0), ElecHeatingConsumption(0.0),
-              ElecHeatingPower(0.0), HeatingCoilRuntimeFraction(0.0), DefrostStrategy(0),
+              ElecHeatingPower(0.0), HeatingCoilRuntimeFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Unassigned),
               DefrostControl(StandardRatings::HPdefrostControl::Unassigned), EIRFPLR(0), DefrostEIRFT(0), RegionNum(0), MinOATCompressor(0.0),
               OATempCompressorOn(0.0), MaxOATCompressor(0.0), MaxOATDefrost(0.0), DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0),
               HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
@@ -712,7 +704,7 @@ namespace DXCoils {
 
     Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state,
                                           Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          Array1D<Real64> const &Par          // par(1) = DX coil number
+                                          std::array<Real64, 12> const &Par   // par(1) = DX coil number
     );
 
     // ======================  Utility routines ======================================
@@ -833,7 +825,7 @@ namespace DXCoils {
                               Optional<Real64> MinOATHeating = _, // Parameter equivalent of condenser Min OAT for compressor heating operation
                               Optional<Real64> MaxOATHeating = _, // Parameter equivalent of condenser Max OAT for compressor heating operation
                               Optional_int HeatingPerformanceOATType = _, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
-                              Optional_int DefrostStrategy = _,
+                              Optional<StandardRatings::DefrostStrat> DefrostStrategy = _,
                               Optional<StandardRatings::HPdefrostControl> DefrostControl = _,
                               Optional_int DefrostEIRPtr = _,
                               Optional<Real64> DefrostFraction = _,
@@ -943,12 +935,14 @@ namespace DXCoils {
                               Real64 &CapModFac               // Coil capacity modification factor
     );
 
-    Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ratio
-                              Array1D<Real64> const &Par // array of parameters
+    Real64 FanSpdResidualCool(EnergyPlusData &state,
+                              Real64 FanSpdRto,                // indoor unit fan speed ratio
+                              std::array<Real64, 5> const &Par // array of parameters
     );
 
-    Real64 FanSpdResidualHeat(Real64 FanSpdRto,          // indoor unit fan speed ratio
-                              Array1D<Real64> const &Par // array of parameters
+    Real64 FanSpdResidualHeat(EnergyPlusData &state,
+                              Real64 FanSpdRto,                // indoor unit fan speed ratio
+                              std::array<Real64, 5> const &Par // array of parameters
     );
     // End of Methods for New VRF Model: Fluid Temperature Control
     // *****************************************************************************

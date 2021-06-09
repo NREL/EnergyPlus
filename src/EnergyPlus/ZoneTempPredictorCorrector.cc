@@ -88,7 +88,6 @@
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -127,16 +126,6 @@ using namespace DataZoneControls;
 using namespace FaultsManager;
 using namespace HybridModel;
 using ScheduleManager::GetCurrentScheduleValue;
-
-// Data
-// MODULE PARAMETER DEFINITIONS:
-// Controls for PredictorCorrector
-// INTEGER, PUBLIC, PARAMETER :: iGetZoneSetPoints             = 1
-// INTEGER, PUBLIC, PARAMETER :: iPredictStep                  = 2
-// INTEGER, PUBLIC, PARAMETER :: iCorrectStep                  = 3
-// INTEGER, PUBLIC, PARAMETER :: iRevertZoneTimestepHistories  = 4
-// INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
-// INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
 Array1D_string const ValidControlTypes(4,
                                        {"ThermostatSetpoint:SingleHeating",
@@ -178,8 +167,8 @@ Array1D_string const AdaptiveComfortModelTypes(8,
 
 // Functions
 void ManageZoneAirUpdates(EnergyPlusData &state,
-                          int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-                          Real64 &ZoneTempChange, // Temp change in zone air btw previous and current timestep
+                          DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                          Real64 &ZoneTempChange,                                     // Temp change in zone air btw previous and current timestep
                           bool const ShortenTimeStepSys,
                           bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                           Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
@@ -207,22 +196,22 @@ void ManageZoneAirUpdates(EnergyPlusData &state,
     {
         auto const SELECT_CASE_var(UpdateType);
 
-        if (SELECT_CASE_var == iGetZoneSetPoints) {
+        if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints) {
             CalcZoneAirTempSetPoints(state);
 
-        } else if (SELECT_CASE_var == iPredictStep) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep) {
             PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        } else if (SELECT_CASE_var == iCorrectStep) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep) {
             CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        } else if (SELECT_CASE_var == iRevertZoneTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories) {
             RevertZoneTimestepHistories(state);
 
-        } else if (SELECT_CASE_var == iPushZoneTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories) {
             PushZoneTimestepHistories(state);
 
-        } else if (SELECT_CASE_var == iPushSystemTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories) {
             PushSystemTimestepHistories(state);
         }
     }
@@ -254,7 +243,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
     using ScheduleManager::GetScheduleMinValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName("GetZoneAirSetpoints: ");
+    static constexpr std::string_view RoutineName("GetZoneAirSetpoints: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int TempControlledZoneNum; // The Splitter that you are currently loading input into
@@ -2668,9 +2657,9 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     Array1D<Real64> dailyDryTemp(state.dataWeatherManager->NumDaysInYear, 0.0);
 
     readStat = 0;
-    if (FileSystem::fileExists(state.files.inputWeatherFileName.fileName)) {
+    if (FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
         // Read hourly dry bulb temperature first
-        auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptive");
+        auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptive");
         for (i = 1; i <= 9; ++i) { // Headers
             epwFile.readLine();
         }
@@ -2738,7 +2727,7 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
         }
     } else {
         ShowFatalError(state,
-                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFileName.fileName +
+                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
                            " for input (read). (File does not exist)");
     }
 }
@@ -2835,7 +2824,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
     // Uses the status flags to trigger events.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName("InitZoneAirSetpoints: ");
+    static constexpr std::string_view RoutineName("InitZoneAirSetpoints: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
@@ -2938,12 +2927,12 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             FirstSurfFlag = true;
             for (SurfNum = Zone(Loop).HTSurfaceFirst; SurfNum <= Zone(Loop).HTSurfaceLast; ++SurfNum) {
                 if (FirstSurfFlag) {
-                    TRefFlag = state.dataSurface->Surface(SurfNum).TAirRef;
+                    TRefFlag = state.dataSurface->SurfTAirRef(SurfNum);
                     FirstSurfFlag = false;
                 }
                 // for each particular zone, the reference air temperature(s) should be the same
                 // (either mean air, bulk air, or supply air temp).
-                if (state.dataSurface->Surface(SurfNum).TAirRef != TRefFlag) {
+                if (state.dataSurface->SurfTAirRef(SurfNum) != TRefFlag) {
                     ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + Zone(Loop).Name);
                 }
             }
@@ -4689,7 +4678,7 @@ void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName("CalcPredictedHumidityRatio");
+    static constexpr std::string_view RoutineName("CalcPredictedHumidityRatio");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 LatentGain; // Zone latent load
@@ -5084,7 +5073,7 @@ void CorrectZoneAirTemp(EnergyPlusData &state,
     using ScheduleManager::GetScheduleMinValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName("CorrectZoneAirTemp");
+    static constexpr std::string_view RoutineName("CorrectZoneAirTemp");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 CpAir;                       // specific heat of air
@@ -5792,7 +5781,7 @@ void CorrectZoneHumRat(EnergyPlusData &state, int const ZoneNum)
     using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName("CorrectZoneHumRat");
+    static constexpr std::string_view RoutineName("CorrectZoneHumRat");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NodeNum;
@@ -6144,7 +6133,7 @@ void InverseModelTemperature(EnergyPlusData &state,
                                                              // Air Temperature Averaged over
                                                              // the System Time Increment
         if (HybridModelZone(ZoneNum).InfiltrationCalc_T && state.dataHVACGlobal->UseZoneTimeStepHistory) {
-            constexpr auto RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+            static constexpr std::string_view RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
 
             if (HybridModelZone(ZoneNum).IncludeSystemSupplyParameters) {
                 Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature =
@@ -6364,7 +6353,7 @@ void InverseModelHumidity(EnergyPlusData &state,
     // This subroutine inversely solve infiltration airflow rate or people count with zone air humidity measurements.
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr auto RoutineName("InverseModelHumidity");
+    static constexpr std::string_view RoutineName("InverseModelHumidity");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 AA(0.0);
@@ -6783,13 +6772,13 @@ void CalcZoneSums(EnergyPlusData &state,
 
         // determine reference air temperature for this surface
         {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
                 RefAirTemp = MAT(ZoneNum);
                 SumHA += HA;
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
                 SumHATref += HA * RefAirTemp;
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
@@ -7034,12 +7023,12 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
         // determine reference air temperature for this surface's convective heat transfer model
         {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature
                 RefAirTemp = MAT(ZoneNum);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
                 if (!ControlledZoneAirFlag) {
@@ -7438,7 +7427,7 @@ void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempContr
     }
 
     // get mean radiant temperature for zone
-    thisMRT = state.dataHeatBal->MRT(ActualZoneNum);
+    thisMRT = state.dataHeatBal->ZoneMRT(ActualZoneNum);
 
     // modify setpoint for operative temperature control
     //  traping for MRT fractions between 0.0 and 0.9 during get input, so shouldn't be able to divide by zero here.
@@ -7938,7 +7927,7 @@ void GetComfortSetPoints(EnergyPlusData &state,
     if (PMVSet > PMVMin && PMVSet < PMVMax) {
         Par(1) = PMVSet;
         Par(2) = double(PeopleNum);
-        TempSolveRoot::SolveRoot(state, Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
+        General::SolveRoot(state, Acc, MaxIter, SolFla, Tset, PMVResidual, Tmin, Tmax, Par);
         if (SolFla == -1) {
             if (!state.dataGlobal->WarmupFlag) {
                 ++state.dataZoneTempPredictorCorrector->IterLimitExceededNum1;

@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -74,7 +75,6 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
@@ -274,13 +274,13 @@ namespace HVACCooledBeam {
             CoolBeam(CBNum).Name = Alphas(1);
             CoolBeam(CBNum).UnitType = CurrentModuleObject;
             CoolBeam(CBNum).UnitType_Num = 1;
-            CoolBeam(CBNum).CBType = Alphas(3);
-            if (UtilityRoutines::SameString(CoolBeam(CBNum).CBType, "Passive")) {
-                CoolBeam(CBNum).CBType_Num = Passive_Cooled_Beam;
-            } else if (UtilityRoutines::SameString(CoolBeam(CBNum).CBType, "Active")) {
-                CoolBeam(CBNum).CBType_Num = Active_Cooled_Beam;
+            CoolBeam(CBNum).CBTypeString = Alphas(3);
+            if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Passive")) {
+                CoolBeam(CBNum).CBType = CooledBeamType::Passive;
+            } else if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Active")) {
+                CoolBeam(CBNum).CBType = CooledBeamType::Active;
             } else {
-                ShowSevereError(state, "Illegal " + cAlphaFields(3) + " = " + CoolBeam(CBNum).CBType + '.');
+                ShowSevereError(state, "Illegal " + cAlphaFields(3) + " = " + CoolBeam(CBNum).CBTypeString + '.');
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + CoolBeam(CBNum).Name);
                 ErrorsFound = true;
             }
@@ -303,7 +303,7 @@ namespace HVACCooledBeam {
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Air,
                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                          1,
+                                                          NodeInputManager::compFluidStream::Primary,
                                                           ObjectIsNotParent,
                                                           cAlphaFields(4));
             CoolBeam(CBNum).AirOutNode = GetOnlySingleNode(state,
@@ -313,7 +313,7 @@ namespace HVACCooledBeam {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                           1,
+                                                           NodeInputManager::compFluidStream::Primary,
                                                            ObjectIsNotParent,
                                                            cAlphaFields(5));
             CoolBeam(CBNum).CWInNode = GetOnlySingleNode(state,
@@ -323,7 +323,7 @@ namespace HVACCooledBeam {
                                                          Alphas(1),
                                                          DataLoopNode::NodeFluidType::Water,
                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                         2,
+                                                         NodeInputManager::compFluidStream::Secondary,
                                                          ObjectIsNotParent,
                                                          cAlphaFields(6));
             CoolBeam(CBNum).CWOutNode = GetOnlySingleNode(state,
@@ -333,7 +333,7 @@ namespace HVACCooledBeam {
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                          2,
+                                                          NodeInputManager::compFluidStream::Secondary,
                                                           ObjectIsNotParent,
                                                           cAlphaFields(7));
             CoolBeam(CBNum).MaxAirVolFlow = Numbers(1);
@@ -727,7 +727,7 @@ namespace HVACCooledBeam {
         }
 
         if (CoolBeam(CBNum).Kin == DataGlobalConstants::AutoCalculate) {
-            if (CoolBeam(CBNum).CBType_Num == Passive_Cooled_Beam) {
+            if (CoolBeam(CBNum).CBType == CooledBeamType::Passive) {
                 CoolBeam(CBNum).Kin = 0.0;
             } else {
                 CoolBeam(CBNum).Kin = 2.0;
@@ -1021,7 +1021,7 @@ namespace HVACCooledBeam {
                     Par(4) = QMin;
                     Par(5) = QMax;
                     ErrTolerance = 0.01;
-                    TempSolveRoot::SolveRoot(state, ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
+                    General::SolveRoot(state, ErrTolerance, 50, SolFlag, CWFlow, CoolBeamResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
                     if (SolFlag == -1) {
                         ShowWarningError(state, "Cold water control failed in cooled beam unit " + CoolBeam(CBNum).Name);
                         ShowContinueError(state, "  Iteration limit exceeded in calculating cold water mass flow rate");

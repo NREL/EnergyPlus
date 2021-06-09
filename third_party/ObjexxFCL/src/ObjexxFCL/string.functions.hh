@@ -63,29 +63,6 @@ is_whitespace( std::string const & s )
 	return ( s.empty() ? true : s.find_last_not_of( " \t\000" ) == std::string::npos );
 }
 
-// string is Not Whitespace?
-inline
-bool
-not_whitespace( std::string const & s )
-{
-	return ! is_whitespace( s );
-}
-
-// string is Alphabetic?
-inline
-bool
-is_alpha( std::string const & s )
-{
-	if ( s.empty() ) {
-		return false;
-	} else {
-		for ( char const c : s ) {
-			if ( std::isalpha( c ) == 0 ) return false;
-		}
-		return true;
-	}
-}
-
 // string is Consonants?
 inline
 bool
@@ -98,37 +75,6 @@ is_consonant( std::string const & s )
 		for ( char const c : s ) {
 			if ( std::isalpha( c ) == 0 ) return false;
 			if ( vowels.find( std::tolower( c ) ) != std::string::npos ) return false;
-		}
-		return true;
-	}
-}
-
-// string is Vowels?
-inline
-bool
-is_vowel( std::string const & s )
-{
-	static std::string const vowels( "aeiou" );
-	if ( s.empty() ) {
-		return false;
-	} else {
-		for ( char const c : s ) {
-			if ( vowels.find( std::tolower( c ) ) == std::string::npos ) return false;
-		}
-		return true;
-	}
-}
-
-// string is Alphanumeric?
-inline
-bool
-is_alpha_numeric( std::string const & s )
-{
-	if ( s.empty() ) {
-		return false;
-	} else {
-		for ( char const c : s ) {
-			if ( std::isalnum( c ) == 0 ) return false;
 		}
 		return true;
 	}
@@ -246,38 +192,6 @@ has_any_of( std::string const & s, char const * const t )
 	return ( s.find_first_of( t ) != std::string::npos );
 }
 
-// string has a Character?
-inline
-bool
-has_any_of( std::string const & s, char const c )
-{
-	return ( s.find_first_of( c ) != std::string::npos );
-}
-
-// string has any Character of a string?
-inline
-bool
-has_any_not_of( std::string const & s, std::string const & t )
-{
-	return ( s.find_first_not_of( t ) != std::string::npos );
-}
-
-// string has any Character of a cstring?
-inline
-bool
-has_any_not_of( std::string const & s, char const * const t )
-{
-	return ( s.find_first_not_of( t ) != std::string::npos );
-}
-
-// string has a Character?
-inline
-bool
-has_any_not_of( std::string const & s, char const c )
-{
-	return ( s.find_first_not_of( c ) != std::string::npos );
-}
-
 // Has a Prefix Case-Optionally?
 bool
 has_prefix( std::string const & s, std::string const & pre, bool const exact_case = true );
@@ -297,27 +211,6 @@ bool
 has_prefixi( std::string const & s, S const & pre )
 {
 	return has_prefix( s, pre, false );
-}
-
-// Has a Suffix Case-Optionally?
-bool
-has_suffix( std::string const & s, std::string const & suf, bool const exact_case = true );
-
-// Has a Suffix Case-Optionally?
-bool
-has_suffix( std::string const & s, char const * const suf, bool const exact_case = true );
-
-// Has a Suffix Case-Optionally?
-bool
-has_suffix( std::string const & s, char const suf, bool const exact_case = true );
-
-// Has a Suffix Case-Insensitively?
-template< typename S >
-inline
-bool
-has_suffixi( std::string const & s, S const & suf )
-{
-	return has_suffix( s, suf, false );
 }
 
 // Trailing Whitespace Trimmed Copy of a string
@@ -545,14 +438,6 @@ is_int( std::string const & s )
 	return is_type< int >( s );
 }
 
-// string is Readable as a long int?
-inline
-bool
-is_long( std::string const & s )
-{
-	return is_type< long int >( s );
-}
-
 // string is Readable as a long long int?
 inline
 bool
@@ -569,30 +454,6 @@ is_ushort( std::string const & s )
 	return is_type< unsigned short int >( s );
 }
 
-// string is Readable as an unsigned int?
-inline
-bool
-is_uint( std::string const & s )
-{
-	return is_type< unsigned int >( s );
-}
-
-// string is Readable as an unsigned long int?
-inline
-bool
-is_ulong( std::string const & s )
-{
-	return is_type< unsigned long int >( s );
-}
-
-// string is Readable as an unsigned long long int?
-inline
-bool
-is_ulonglong( std::string const & s )
-{
-	return is_type< unsigned long long int >( s );
-}
-
 // string is Readable as a float?
 inline
 bool
@@ -607,14 +468,6 @@ bool
 is_double( std::string const & s )
 {
 	return is_type< double >( s );
-}
-
-// string is Readable as a long double?
-inline
-bool
-is_longdouble( std::string const & s )
-{
-	return is_type< long double >( s );
 }
 
 // string is Readable as a char?
@@ -647,39 +500,6 @@ is_binary( std::string const & s, bool const allow_sign = true )
 	return ( ( end != str ) && is_tail( end ) && ( allow_sign || ( i >= 0 ) ) );
 }
 
-// string is Readable as an Octal Integer?
-inline
-bool
-is_octal( std::string const & s, bool const allow_sign = true )
-{
-	char const * str( s.c_str() );
-	char * end;
-	long int const i( std::strtol( str, &end, 8 ) );
-	return ( ( end != str ) && is_tail( end ) && ( allow_sign || ( i >= 0 ) ) );
-}
-
-// string is Readable as a Hexidecimal Integer?
-inline
-bool
-is_hexadecimal( std::string const & s, bool const allow_sign = true )
-{
-	char const * str( s.c_str() );
-	char * end;
-	long int const i( std::strtol( str, &end, 16 ) );
-	return ( ( end != str ) && is_tail( end ) && ( allow_sign || ( i >= 0 ) ) );
-}
-
-// string is Readable as a Hexidecimal Integer?
-inline
-bool
-is_hex( std::string const & s, bool const allow_sign = true )
-{
-	char const * str( s.c_str() );
-	char * end;
-	long int const i( std::strtol( str, &end, 16 ) );
-	return ( ( end != str ) && is_tail( end ) && ( allow_sign || ( i >= 0 ) ) );
-}
-
 // string is Readable as a bool?
 inline
 bool
@@ -704,14 +524,6 @@ is_int( char const * const s )
 	return is_type< int >( s );
 }
 
-// string is Readable as a long int?
-inline
-bool
-is_long( char const * const s )
-{
-	return is_type< long int >( s );
-}
-
 // string is Readable as a long long int?
 inline
 bool
@@ -728,30 +540,6 @@ is_ushort( char const * const s )
 	return is_type< unsigned short int >( s );
 }
 
-// string is Readable as an unsigned int?
-inline
-bool
-is_uint( char const * const s )
-{
-	return is_type< unsigned int >( s );
-}
-
-// string is Readable as an unsigned long int?
-inline
-bool
-is_ulong( char const * const s )
-{
-	return is_type< unsigned long int >( s );
-}
-
-// string is Readable as an unsigned long long int?
-inline
-bool
-is_ulonglong( char const * const s )
-{
-	return is_type< unsigned long long int >( s );
-}
-
 // string is Readable as a float?
 inline
 bool
@@ -766,14 +554,6 @@ bool
 is_double( char const * const s )
 {
 	return is_type< double >( s );
-}
-
-// string is Readable as a long double?
-inline
-bool
-is_longdouble( char const * const s )
-{
-	return is_type< long double >( s );
 }
 
 // string is Readable as a char?
@@ -801,36 +581,6 @@ is_binary( char const * const s, bool const allow_sign = true )
 {
 	char * end;
 	long int const i( std::strtol( s, &end, 2 ) );
-	return ( ( end != s ) && is_tail( end ) && ( allow_sign || ( i >= 0 ) ) );
-}
-
-// string is Readable as an Octal Integer?
-inline
-bool
-is_octal( char const * const s, bool const allow_sign = true )
-{
-	char * end;
-	long int const i( std::strtol( s, &end, 8 ) );
-	return ( ( end != s ) && is_tail( end ) && ( allow_sign || ( i >= 0 ) ) );
-}
-
-// string is Readable as a Hexidecimal Integer?
-inline
-bool
-is_hexadecimal( char const * const s, bool const allow_sign = true )
-{
-	char * end;
-	long int const i( std::strtol( s, &end, 16 ) );
-	return ( ( end != s ) && is_tail( end ) && ( allow_sign || ( i >= 0 ) ) );
-}
-
-// string is Readable as a Hexidecimal Integer?
-inline
-bool
-is_hex( char const * const s, bool const allow_sign = true )
-{
-	char * end;
-	long int const i( std::strtol( s, &end, 16 ) );
 	return ( ( end != s ) && is_tail( end ) && ( allow_sign || ( i >= 0 ) ) );
 }
 
@@ -1048,25 +798,6 @@ lessthani( std::string const & s, char const * const t )
 	return std::lexicographical_compare( s.begin(), s.end(), t, t + t_len, lessthani_char );
 }
 
-// cstring < string Case-Insensitively?
-inline
-bool
-lessthani( char const * const t, std::string const & s )
-{
-	std::string::size_type const t_len( std::strlen( t ) );
-	return std::lexicographical_compare( t, t + t_len, s.begin(), s.end(), lessthani_char );
-}
-
-// cstring < cstring Case-Insensitively?
-inline
-bool
-lessthani( char const * const s, char const * const t )
-{
-	std::string::size_type const s_len( std::strlen( s ) );
-	std::string::size_type const t_len( std::strlen( t ) );
-	return std::lexicographical_compare( s, s + s_len, t, t + t_len, lessthani_char );
-}
-
 // ASCII Lexical < Comparison
 inline
 bool
@@ -1155,30 +886,6 @@ std::string::size_type
 len_trim( std::string const & s )
 {
 	return s.find_last_not_of( ' ' ) + 1; // Works if npos returned: npos + 1 == 0
-}
-
-// Length Space-Trimmed
-inline
-std::string::size_type
-len_trim( char const * const s )
-{
-	return len_trim( std::string( s ) );
-}
-
-// Length Whitespace-Trimmed
-inline
-std::string::size_type
-len_trim_whitespace( std::string const & s )
-{
-	return s.find_last_not_of( " \t\000" ) + 1; // Works if npos returned: npos + 1 == 0
-}
-
-// Length Whitespace-Trimmed
-inline
-std::string::size_type
-len_trim_whitespace( char const * const s )
-{
-	return len_trim_whitespace( std::string( s ) );
 }
 
 // Index of a Substring
@@ -1399,22 +1106,6 @@ ichar( char const * const s )
 	return ( strlen( s ) > 0u ? static_cast< int >( s[ 0 ] ) : 0 );
 }
 
-// ASCII Integer Value of a string
-inline
-int
-iachar( std::string const & s )
-{
-	return ( ! s.empty() ? static_cast< int >( s[ 0 ] ) : 0 );
-}
-
-// ASCII Integer Value of a string
-inline
-int
-iachar( char const * const s )
-{
-	return ( strlen( s ) > 0u ? static_cast< int >( s[ 0 ] ) : 0 );
-}
-
 // One-Character string of a Given ASCII Integer Value
 inline
 std::string
@@ -1579,14 +1270,6 @@ type_of< char >( std::string const & s )
 	return ( s.length() == 1 ? s[ 0 ] : char() );
 }
 
-// bool of a string
-inline
-bool
-bool_of( std::string const & s )
-{
-	return type_of< bool >( s );
-}
-
 // short int of a string
 inline
 short int
@@ -1603,22 +1286,6 @@ int_of( std::string const & s )
 	return type_of< int >( s );
 }
 
-// long int of a string
-inline
-long int
-long_of( std::string const & s )
-{
-	return type_of< long int >( s );
-}
-
-// unsigned short int of a string
-inline
-unsigned short int
-ushort_of( std::string const & s )
-{
-	return type_of< unsigned short int >( s );
-}
-
 // unsigned int of a string
 inline
 unsigned int
@@ -1627,60 +1294,12 @@ uint_of( std::string const & s )
 	return type_of< unsigned int >( s );
 }
 
-// unsigned long int of a string
-inline
-unsigned long int
-ulong_of( std::string const & s )
-{
-	return type_of< unsigned long int >( s );
-}
-
-// float of a string
-inline
-float
-float_of( std::string const & s )
-{
-	return type_of< float >( s );
-}
-
-// double of a string
-inline
-double
-double_of( std::string const & s )
-{
-	return type_of< double >( s );
-}
-
-// long double of a string
-inline
-long double
-longdouble_of( std::string const & s )
-{
-	return type_of< long double >( s );
-}
-
-// long double of a string
-inline
-long double
-long_double_of( std::string const & s )
-{
-	return type_of< long double >( s );
-}
-
 // char of a string
 inline
 char
 char_of( std::string const & s )
 {
 	return type_of< char >( s );
-}
-
-// long int of a Decimal string
-inline
-long int
-decimal_of( std::string const & s )
-{
-	return std::strtol( s.c_str(), nullptr, 10 );
 }
 
 // long int of a Binary string
@@ -1699,30 +1318,6 @@ octal_of( std::string const & s )
 	return std::strtol( s.c_str(), nullptr, 8 );
 }
 
-// long int of a Hexidecimal string
-inline
-long int
-hexadecimal_of( std::string const & s )
-{
-	return std::strtol( s.c_str(), nullptr, 16 );
-}
-
-// long int of a Hexidecimal string
-inline
-long int
-hex_of( std::string const & s )
-{
-	return std::strtol( s.c_str(), nullptr, 16 );
-}
-
-// bool of a string
-inline
-bool
-bool_of( char const * const s )
-{
-	return type_of< bool >( s );
-}
-
 // short int of a string
 inline
 short int
@@ -1739,22 +1334,6 @@ int_of( char const * const s )
 	return type_of< int >( s );
 }
 
-// long int of a string
-inline
-long int
-long_of( char const * const s )
-{
-	return type_of< long int >( s );
-}
-
-// unsigned short int of a string
-inline
-unsigned short int
-ushort_of( char const * const s )
-{
-	return type_of< unsigned short int >( s );
-}
-
 // unsigned int of a string
 inline
 unsigned int
@@ -1763,60 +1342,12 @@ uint_of( char const * const s )
 	return type_of< unsigned int >( s );
 }
 
-// unsigned long int of a string
-inline
-unsigned long int
-ulong_of( char const * const s )
-{
-	return type_of< unsigned long int >( s );
-}
-
-// float of a string
-inline
-float
-float_of( char const * const s )
-{
-	return type_of< float >( s );
-}
-
-// double of a string
-inline
-double
-double_of( char const * const s )
-{
-	return type_of< double >( s );
-}
-
-// long double of a string
-inline
-long double
-longdouble_of( char const * const s )
-{
-	return type_of< long double >( s );
-}
-
-// long double of a string
-inline
-long double
-long_double_of( char const * const s )
-{
-	return type_of< long double >( s );
-}
-
 // char of a string
 inline
 char
 char_of( char const * const s )
 {
 	return type_of< char >( s );
-}
-
-// long int of a Decimal string
-inline
-long int
-decimal_of( char const * const s )
-{
-	return std::strtol( s, nullptr, 10 );
 }
 
 // long int of a Binary string
@@ -1835,22 +1366,6 @@ octal_of( char const * const s )
 	return std::strtol( s, nullptr, 8 );
 }
 
-// long int of a Hexidecimal string
-inline
-long int
-hexadecimal_of( char const * const s )
-{
-	return std::strtol( s, nullptr, 16 );
-}
-
-// long int of a Hexidecimal string
-inline
-long int
-hex_of( char const * const s )
-{
-	return std::strtol( s, nullptr, 16 );
-}
-
 // Modifier /////
 
 // Lowercase a string
@@ -1861,10 +1376,6 @@ lowercase( std::string & s );
 std::string &
 uppercase( std::string & s );
 
-// Left Justify a string
-std::string &
-ljustify( std::string & s );
-
 // Right Justify a string
 std::string &
 rjustify( std::string & s );
@@ -1872,10 +1383,6 @@ rjustify( std::string & s );
 // Trim Trailing Space from a string
 std::string &
 trim( std::string & s );
-
-// Trim Trailing Whitespace from a string
-std::string &
-trim_whitespace( std::string & s );
 
 // Strip Specified Characters from a string's Tails
 std::string &
@@ -1900,18 +1407,6 @@ lstrip( std::string & s );
 // Strip Space from a string's Right Tail
 std::string &
 rstrip( std::string & s );
-
-// Strip Whitespace from a string's Tails
-std::string &
-strip_whitespace( std::string & s );
-
-// Strip Whitespace from a string's Left Tail
-std::string &
-lstrip_whitespace( std::string & s );
-
-// Strip Whitespace from a string's Right Tail
-std::string &
-rstrip_whitespace( std::string & s );
 
 // Pad a string to a Specified Length
 inline
@@ -2022,14 +1517,6 @@ blank( std::string::size_type const len )
 	return std::string( len, ' ' );
 }
 
-// New Line Character String
-inline
-std::string
-new_line()
-{
-	return std::string( "\n" );
-}
-
 // Lowercased Copy of a string
 std::string
 lowercased( std::string const & s );
@@ -2081,14 +1568,6 @@ rstripped( std::string const & s );
 // Whitespace Stripped from a string's Tails Copy of a string
 std::string
 stripped_whitespace( std::string const & s );
-
-// Whitespace Stripped from a string's Left Tail Copy of a string
-std::string
-lstripped_whitespace( std::string const & s );
-
-// Whitespace Stripped from a string's Right Tail Copy of a string
-std::string
-rstripped_whitespace( std::string const & s );
 
 // Padded to a Specified Length Copy of a string
 inline
@@ -2178,14 +1657,6 @@ replaced( std::string const & s, std::string const & a, std::string const & b )
 	std::string r( s );
 	replace( r, a, b );
 	return r;
-}
-
-// Wrapped in Double Quotes Copy of a String
-inline
-std::string
-quoted_( std::string const & s )
-{
-	return std::string( '"' + s + '"' );
 }
 
 // Overlayed string with Another string, Expanding Size as Needed
@@ -2279,38 +1750,6 @@ lstring_of(
 	return t_stream.str();
 }
 
-// Right-Justified string of a Template Argument Type Supporting Stream Output
-template< typename T >
-inline
-std::string
-rstring_of(
- T const & t,
- int const w, // Minimum width
- char const f = ' ' // Fill character
-)
-{
-	std::ostringstream t_stream;
-	t_stream << std::right << std::uppercase
-	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision ) << t;
-	return t_stream.str();
-}
-
-// Leading-Zero Right-Justified string of a Template Argument Type Supporting Stream Output
-// Negative numbers appear with the minus sign on the left of the filled zeros
-template< typename T >
-inline
-std::string
-lead_zero_string_of(
- T const & t,
- int const w // Minimum width
-)
-{
-	std::ostringstream t_stream;
-	t_stream << std::internal << std::uppercase
-	 << std::setw( w ) << std::setfill( '0' ) << std::setprecision( TypeTraits< T >::precision ) << t;
-	return t_stream.str();
-}
-
 // Right-Justified General Format string of a Template Argument Type Supporting Stream Output
 template< typename T >
 inline
@@ -2339,22 +1778,6 @@ fixed_string_of(
 {
 	std::ostringstream t_stream;
 	t_stream << std::right << std::uppercase << std::fixed << std::showpoint
-	 << std::setw( w ) << std::setprecision( p ) << t;
-	return t_stream.str();
-}
-
-// Right-Justified Scientific Format string of a Template Argument Type Supporting Stream Output
-template< typename T >
-inline
-std::string
-scientific_string_of(
- T const & t,
- int const w = TypeTraits< T >::iwidth, // Minimum width
- std::streamsize const p = TypeTraits< T >::precision // Precision
-)
-{
-	std::ostringstream t_stream;
-	t_stream << std::right << std::uppercase << std::scientific << std::showpoint
 	 << std::setw( w ) << std::setprecision( p ) << t;
 	return t_stream.str();
 }

@@ -93,6 +93,8 @@ class Runtime:
         self.api.issueText.restype = c_void_p
         self.api.stopSimulation.argtypes = [c_void_p]
         self.api.stopSimulation.restype = c_void_p
+        self.api.setConsoleOutputState.argtypes = [c_void_p, c_int]
+        self.api.setConsoleOutputState.restype = c_void_p
         self.py_progress_callback_type = CFUNCTYPE(c_void_p, c_int)
         self.api.registerProgressCallback.argtypes = [c_void_p, self.py_progress_callback_type]
         self.api.registerProgressCallback.restype = c_void_p
@@ -188,6 +190,18 @@ class Runtime:
 
     # def stop_simulation(self, state: c_void_p) -> None:
     #     pass
+
+    def set_console_output_status(self, state, print_output: bool) -> None:
+        """
+        Allows disabling (and enabling) of console output (stdout and stderr) when calling EnergyPlus as a library.
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param print_output: A boolean flag for whether we should mute console output
+        :return: Nothing
+        """
+        if print_output:
+            self.api.setConsoleOutputState(state, 1)
+        else:
+            self.api.setConsoleOutputState(state, 0)
 
     def issue_warning(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """

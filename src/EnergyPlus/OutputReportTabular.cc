@@ -170,13 +170,13 @@ using namespace OutputReportPredefined;
 using namespace DataHeatBalance;
 using namespace HybridModel;
 
-std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, std::string const &filename, bool output_to_file)
+std::ofstream &open_tbl_stream(EnergyPlusData &state, int const iStyle, fs::path const &filePath, bool output_to_file)
 {
     std::ofstream &tbl_stream(*state.dataOutRptTab->TabularOutputFile(iStyle));
     if (output_to_file) {
-        tbl_stream.open(filename);
+        tbl_stream.open(filePath);
         if (!tbl_stream) {
-            ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filename + "\" for output (write).");
+            ShowFatalError(state, "OpenOutputTabularFile: Could not open file \"" + filePath.string() + "\" for output (write).");
         }
     } else {
         tbl_stream.setstate(std::ios_base::badbit);
@@ -541,7 +541,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
     std::string curVariMeter; // current variable or meter
     int colNum;               // loop index for columns
     int KeyCount;
-    int TypeVar;
+    OutputProcessor::VariableType TypeVar;
     OutputProcessor::StoreType AvgSumVar;
     OutputProcessor::TimeStepType StepTypeVar;
     OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units enum
@@ -594,7 +594,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             curVariMeter = UtilityRoutines::MakeUPPERCase(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
             // call the key count function but only need count during this pass
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
-            if (TypeVar == OutputProcessor::VarType_NotFound) {
+            if (TypeVar == OutputProcessor::VariableType::NotFound) {
                 ShowWarningError(
                     state, "In Output:Table:Monthly '" + ort->MonthlyInput(TabNum).name + "' invalid Variable or Meter Name '" + curVariMeter + "'");
             }
@@ -686,7 +686,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
     for (auto &e : ort->MonthlyColumns) {
         e.varName.clear();
         e.varNum = 0;
-        e.typeOfVar = 0;
+        e.typeOfVar = OutputProcessor::VariableType::NotFound;
         e.avgSum = OutputProcessor::StoreType::Averaged;
         e.stepType = OutputProcessor::TimeStepType::TimeStepZone;
         e.units = OutputProcessor::Unit::None;
@@ -904,7 +904,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     }
                     ort->MonthlyColumns(mColumn).varName = curVariMeter;
                     ort->MonthlyColumns(mColumn).varNum = 0;
-                    ort->MonthlyColumns(mColumn).typeOfVar = 0;
+                    ort->MonthlyColumns(mColumn).typeOfVar = OutputProcessor::VariableType::NotFound;
                     ort->MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Averaged;
                     ort->MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::TimeStepZone;
                     ort->MonthlyColumns(mColumn).units = OutputProcessor::Unit::None;
@@ -1119,7 +1119,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
                                    ort->OutputTableBinned(iInObj).avgSum,
                                    ort->OutputTableBinned(iInObj).stepType,
                                    ort->OutputTableBinned(iInObj).units);
-        if (ort->OutputTableBinned(iInObj).typeOfVar == 0) {
+        if (ort->OutputTableBinned(iInObj).typeOfVar == OutputProcessor::VariableType::NotFound) {
             ShowWarningError(state,
                              CurrentModuleObject + ": User specified meter or variable not found: " + ort->OutputTableBinned(iInObj).varOrMeter);
         }
@@ -3019,7 +3019,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             if (ort->TableStyle(iStyle) == iTableStyle::Comma) {
                 DisplayString(state, "Writing tabular output file results using comma format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblCsvFilePath, state.files.outputControl.tabular);
                 tbl_stream << "Program Version:" << curDel << state.dataStrGlobals->VerStringVar << '\n';
                 tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
                 tbl_stream << '\n';
@@ -3034,7 +3034,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else if (ort->TableStyle(iStyle) == iTableStyle::Tab) {
                 DisplayString(state, "Writing tabular output file results using tab format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTabFilePath, state.files.outputControl.tabular);
                 tbl_stream << "Program Version" << curDel << state.dataStrGlobals->VerStringVar << '\n';
                 tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
                 tbl_stream << '\n';
@@ -3049,7 +3049,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else if (ort->TableStyle(iStyle) == iTableStyle::HTML) {
                 DisplayString(state, "Writing tabular output file results using HTML format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblHtmFilePath, state.files.outputControl.tabular);
                 tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
                 tbl_stream << "<html>\n";
                 tbl_stream << "<head>\n";
@@ -3085,7 +3085,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else if (ort->TableStyle(iStyle) == iTableStyle::XML) {
                 DisplayString(state, "Writing tabular output file results using XML format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFilePath, state.files.outputControl.tabular);
                 tbl_stream << "<?xml version=\"1.0\"?>\n";
                 tbl_stream << "<EnergyPlusTabularReports>\n";
                 tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
@@ -3106,7 +3106,7 @@ void OpenOutputTabularFile(EnergyPlusData &state)
             } else {
                 DisplayString(state, "Writing tabular output file results using text format.");
                 std::ofstream &tbl_stream =
-                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFileName, state.files.outputControl.tabular);
+                    open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblTxtFilePath, state.files.outputControl.tabular);
                 tbl_stream << "Program Version: " << state.dataStrGlobals->VerStringVar << '\n';
                 tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
                 tbl_stream << '\n';
@@ -3402,7 +3402,7 @@ void GatherBinResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     int curIntervalCount;
     int curResIndex;
     int curNumTables;
-    int curTypeOfVar;
+    OutputProcessor::VariableType curTypeOfVar;
     int curScheduleIndex;
     Real64 elapsedTime;
     bool gatherThisTime;
@@ -3526,7 +3526,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
     int jColumn; // loop variable for monthlyColumns
     int curCol;
     Real64 curValue;
-    int curTypeOfVar;
+    OutputProcessor::VariableType curTypeOfVar;
     int curVarNum;
     Real64 elapsedTime;
     Real64 oldResultValue;
@@ -3545,7 +3545,7 @@ void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::Tim
     int kOtherColumn; // variable used in loop to scan through additional columns
     int scanColumn;
     Real64 scanValue;
-    int scanTypeOfVar;
+    OutputProcessor::VariableType scanTypeOfVar;
     int scanVarNum;
     Real64 oldScanValue;
     // local copies of some of the MonthlyColumns array references since
@@ -5447,8 +5447,8 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
     storeASHRAEHDD = "";
     storeASHRAECDD = "";
     lineTypeinterim = StatLineType::Initialized;
-    if (FileSystem::fileExists(state.files.inStatFileName.fileName)) {
-        auto statFile = state.files.inStatFileName.open(state, "FillWeatherPredefinedEntries");
+    if (FileSystem::fileExists(state.files.inStatFilePath.filePath)) {
+        auto statFile = state.files.inStatFilePath.open(state, "FillWeatherPredefinedEntries");
         while (statFile.good()) { // end of file, or error
             lineType = lineTypeinterim;
             auto lineIn = statFile.readLine().data;
