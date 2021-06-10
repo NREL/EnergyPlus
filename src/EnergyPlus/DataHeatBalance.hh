@@ -2179,13 +2179,12 @@ struct HeatBalanceData : BaseGlobalStruct
     // from interior surfaces, and beam entering through interior windows
     // (considered diffuse)
     // Originally QD, now used only for EnclSolQSDifSol calc for daylighting
-    Array1D<Real64> EnclSolVMULT;       // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
-    Array1D<Real64> EnclRadQThermalRad; // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
-
-    // todo - the following in absorptance branch
-    Array1D<Real64> ITABSF; // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
-    Array1D<Real64> TMULT;  // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
-
+    Array1D<Real64> EnclSolVMULT;        // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
+    Array1D<Real64> EnclRadQThermalRad;  // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
+    Array1D<Real64> EnclRadThermAbsMult; // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
+    Array1D<bool> ZoneSolAbsFirstCalc;   // for error message
+    Array1D<bool> EnclRadReCalc;         // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
+    bool EnclRadAlwaysReCalc = false;    // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
     // todo - the following in absorptance branch
     Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
@@ -2361,6 +2360,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NoFfactorConstructionsUsed = true;
         this->NoCfactorConstructionsUsed = true;
         this->NoRegularMaterialsUsed = true;
+        this->EnclRadAlwaysReCalc = false;
         this->SNLoadHeatEnergy.deallocate();
         this->SNLoadCoolEnergy.deallocate();
         this->SNLoadHeatRate.deallocate();
@@ -2468,10 +2468,9 @@ struct HeatBalanceData : BaseGlobalStruct
         this->EnclSolQDforDaylight.deallocate();
         this->EnclSolVMULT.deallocate();
         this->EnclRadQThermalRad.deallocate();
-
-        this->ITABSF.deallocate();
-        this->TMULT.deallocate();
-
+        this->EnclRadThermAbsMult.deallocate();
+        this->ZoneSolAbsFirstCalc.deallocate();
+        this->EnclRadReCalc.deallocate();
         this->SunlitFracHR.deallocate();
         this->CosIncAngHR.deallocate();
         this->SunlitFrac.deallocate();
