@@ -21180,7 +21180,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceConditionsLe
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-
         "SurfaceConvectionAlgorithm:Inside,TARP;",
         "SurfaceConvectionAlgorithm:Outside,DOE-2;",
         "HeatBalanceAlgorithm,ConductionTransferFunction;",
@@ -21253,7 +21252,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceConditionsLe
         "   0.0001, !- Absolute Airflow Convergence Tolerance{ kg / s }",
         "   -0.5, !- Convergence Acceleration Limit{ dimensionless }",
         "   90, !- Azimuth Angle of Long Axis of Building{ deg }",
-        "   0.36;                    !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
+        "   0.36; !- Ratio of Building Width Along Short Axis to Width Along Long Axis",
         "AirflowNetwork:MultiZone:Zone,",
         "   WEST_ZONE, !- Zone Name",
         "   Temperature, !- Ventilation Control Mode",
@@ -21264,12 +21263,17 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceConditionsLe
         "   , !- Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor{ deltaJ / kg }",
         "   300000, !- Indoor and Outdoor Enthalpy Difference Upper Limit for Minimum Venting Open Factor{ deltaJ / kg }",
         "   OnSch, !- Venting Availability Schedule Name",
-        "   Standard;                !- Single Sided Wind Pressure Coefficient Algorithm",
+        "   Standard;  !- Single Sided Wind Pressure Coefficient Algorithm",
         "AirflowNetwork:MultiZone:ReferenceCrackConditions,",
-        "   ReferenceCrackConditions, !- Name",
-        "   , !- Reference Temperature{ C }",
+        "   ReferenceCrackConditions1, !- Name",
+        "   20, !- Reference Temperature{ C }",
         "   , !- Reference Barometric Pressure{ Pa }",
-        "   ;                   !- Reference Humidity Ratio{ kgWater / kgDryAir }",
+        "   ; !- Reference Humidity Ratio{ kgWater / kgDryAir }",
+        "AirflowNetwork:MultiZone:ReferenceCrackConditions,",
+        "   ReferenceCrackConditions2, !- Name",
+        "   30, !- Reference Temperature{ C }",
+        "   50000, !- Reference Barometric Pressure{ Pa }",
+        "   0.002; !- Reference Humidity Ratio{ kgWater / kgDryAir }",
         "AirflowNetwork:MultiZone:Surface,",
         "   Surface_1, !- Surface Name",
         "   CR-1, !- Leakage Component Name",
@@ -21277,14 +21281,19 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceConditionsLe
         "   1; !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
         "AirflowNetwork:MultiZone:Surface,",
         "   Surface_2, !- Surface Name",
-        "   CR-1, !- Leakage Component Name",
+        "   CR-2, !- Leakage Component Name",
         "   , !- External Node Name",
         "   1; !- Window / Door Opening Factor, or Crack Factor{ dimensionless }",
         "AirflowNetwork:MultiZone:Surface:Crack,",
         "   CR-1, !- Name",
         "   0.01, !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
         "   0.667, !- Air Mass Flow Exponent{ dimensionless }",
-        "   ReferenceCrackConditions; !- Reference Crack Conditions",
+        "   ReferenceCrackConditions1; !- Reference Crack Conditions",
+        "AirflowNetwork:MultiZone:Surface:Crack,",
+        "   CR-2, !- Name",
+        "   0.01, !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
+        "   0.667, !- Air Mass Flow Exponent{ dimensionless }",
+        "   ReferenceCrackConditions2; !- Reference Crack Conditions",
 
     });
 
@@ -21321,5 +21330,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestReferenceConditionsLe
     EXPECT_EQ(20, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardT);
     EXPECT_EQ(101325, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardP);
     EXPECT_EQ(0, state->dataAirflowNetwork->MultizoneSurfaceCrackData(1).StandardW);
+    EXPECT_EQ(30, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardT);
+    EXPECT_EQ(50000, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardP);
+    EXPECT_EQ(0.002, state->dataAirflowNetwork->MultizoneSurfaceCrackData(2).StandardW);
 }
 } // namespace EnergyPlus
