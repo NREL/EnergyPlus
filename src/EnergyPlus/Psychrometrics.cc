@@ -375,7 +375,7 @@ namespace Psychrometrics {
         Real64 Pb_tag_r;
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
+        ++state.dataPsychCache->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
 
         Tdb_tag = bit_transfer(Tdb, Tdb_tag);
@@ -940,6 +940,7 @@ namespace Psychrometrics {
             }
         }
     }
+
 #endif
 
 #ifdef EP_cache_PsyTsatFnHPb
@@ -1374,86 +1375,107 @@ namespace Psychrometrics {
             return state.dataPsychrometrics->tSat_Save;
         }
         state.dataPsychrometrics->Press_Save = Press;
+        //Real64 x_sample[] = {100,  200,  300,  400,  500,  600,  700,  800,  900,  1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+        //                     2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800,
+        //                     3900, 4000, 4100, 4200, 4300, 4400, 4500, 4600, 4700, 4800, 4900, 5000, 5100, 5200, 5300, 5400, 5500, 5600, 5700,
+        //                     5800, 5900, 6000, 6100, 6200, 6300, 6400, 6500, 6600, 6700, 6800, 6900, 7000, 7100, 7200, 7300, 7400, 7500, 7600, 
+        //                     7700, 7800, 7900, 8000, 8100, 8200,  8300,  8400,  8500,  8600,  8700, 8800, 8900, 9000, 9100, 9200, 9300, 9400, 
+        //                     9500, 9600, 9700, 9800, 9900, 10000, 10100, 10200, 10300, 10400, 10500}; //(pressure)
+        //Real64 y_sample[] = {-20.3339, -12.9181, -8.37385, -5.05147, -2.41598, -0.223487, 1.88153, 3.76257, 5.44597, 6.97148,  8.36777,  9.65627,  
+        //                     10.8534,  11.972,   13.0223,   14.0128, 14.9503, 15.8406,   16.6885, 17.4981, 18.2729, 19.0161, 19.7302, 20.4176,
+        //                     21.0805,  21.7205,  22.3394,  22.9385,  23.5193,  24.0828,   24.6301, 25.1622, 25.6801, 26.1844, 26.676,  27.1554,
+        //                     27.6234,  28.0806,  28.5273,  28.9642,  29.3917,  29.8103,   30.2202, 30.622,  31.0158, 31.4022, 31.7813, 32.1535,
+        //                     32.519,   32.8781,  33.231,   33.578,   33.9192,  34.2549,   34.5853, 34.9104, 35.2306, 35.546,  35.8567, 36.1628,
+        //                     36.4646,  36.7621,  37.0555,  37.3449,  37.6304,  37.9121,   38.1902, 38.4647, 38.7357, 39.0033, 39.2677, 39.5289,
+        //                     39.787,   40.042,   40.294,   40.5432,  40.7896,  41.0332,   41.2742, 41.5125, 41.7483, 41.9815, 42.2124, 42.4408,
+        //                     42.6669,  42.8907,  43.1123,  43.3318,  43.549,   43.7642,   43.9774, 44.1885, 44.3977, 44.6049, 44.8102, 45.0137,
+        //                     45.2154,  45.4153,  45.6135,  45.8099,  46.0047,  46.1978,   46.3892, 46.5791, 46.7675}; //(tsat)
+        int n_sample = 105;
+        //linear interpolation
+        linearint(state, n_sample, Press, tSat); // linear interpolation for y
+       
+       //CSpline interpolation
+       //CSplineint(state, n_sample, Press, tSat); // Cubic spline interpolation for y
 
         // Uses an iterative process to determine the saturation temperature at a given
         // pressure by correlating saturated water vapor as a function of temperature.
 
         // Initial guess of boiling temperature
-        tSat = 100.0;
-        iter = 0;
+        //tSat = 100.0;
+        //iter = 0;
 
         // If above 1555000,set value of Temp corresponding to Saturation Pressure of 1555000 Pascal.
-        if (Press >= 1555000.0) {
-            tSat = 200.0;
+        //if (Press >= 1555000.0) {
+        //    tSat = 200.0;
             // If below 0.0017,set value of Temp corresponding to Saturation Pressure of 0.0017 Pascal.
-        } else if (Press <= 0.0017) {
-            tSat = -100.0;
+        //} else if (Press <= 0.0017) {
+         //   tSat = -100.0;
 
             // Setting Value of PsyTsatFnPb= 0C, due to non-continuous function for Saturation Pressure at 0C.
-        } else if ((Press > 611.000) && (Press < 611.25)) {
-            tSat = 0.0;
+       // } else if ((Press > 611.000) && (Press < 611.25)) {
+        //    tSat = 0.0;
 
-        } else {
+       // } else {
             // Iterate to find the saturation temperature
             // of water given the total pressure
 
             // Set iteration loop parameters
             // make sure these are initialized
-            Real64 pSat;    // Pressure corresponding to temp. guess
-            Real64 error;   // Deviation of dependent variable in iteration
-            Real64 X1;      // Previous value of independent variable in ITERATE
-            Real64 Y1;      // Previous value of dependent variable in ITERATE
-            Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
-            bool const CalledFrom_empty(CalledFrom.empty());
-            int icvg; // Iteration convergence flag
-            for (iter = 1; iter <= itmax; ++iter) {
+            //Real64 pSat;    // Pressure corresponding to temp. guess
+            //Real64 error;   // Deviation of dependent variable in iteration
+            //Real64 X1;      // Previous value of independent variable in ITERATE
+            //Real64 Y1;      // Previous value of dependent variable in ITERATE
+            //Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
+            ///bool const CalledFrom_empty(CalledFrom.empty());
+            //int icvg; // Iteration convergence flag
+            //for (iter = 1; iter <= itmax; ++iter) {
 
                 // Calculate saturation pressure for estimated boiling temperature
-                pSat = PsyPsatFnTemp(state, tSat, (CalledFrom_empty ? RoutineName : CalledFrom));
+                //pSat = PsyPsatFnTemp(state, tSat, (CalledFrom_empty ? RoutineName : CalledFrom));
 
                 // Compare with specified pressure and update estimate of temperature
-                error = Press - pSat;
-                Iterate(ResultX, convTol, tSat, error, X1, Y1, iter, icvg);
-                tSat = ResultX;
+                //error = Press - pSat;
+                //Iterate(ResultX, convTol, tSat, error, X1, Y1, iter, icvg);
+                //tSat = ResultX;
                 // If converged leave loop iteration
-                if (icvg == 1) break;
+                //if (icvg == 1) break;
 
                 // Water temperature not converged, repeat calculations with new
                 // estimate of water temperature
-            }
+          //  }
 
             // Saturation temperature has not converged after maximum specified
             // iterations. Print error message, set return error flag, and RETURN
 
-        } // End If for the Pressure Range Checking
+       // } // End If for the Pressure Range Checking
 
 #ifdef EP_psych_stats
-        state.dataPsychCache->NumIterations(iPsyTsatFnPb) += iter;
+    //    state.dataPsychCache->NumIterations(iPsyTsatFnPb) += iter;
 #endif
 
 #ifdef EP_psych_errors
-        if (iter > itmax) {
-            if (!state.dataGlobal->WarmupFlag) {
-                if (state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnPb2) == 0) {
-                    ShowWarningMessage(state, format("Saturation Temperature not converged after {} iterations (PsyTsatFnPb)", iter));
-                    if (!CalledFrom.empty()) {
-                        ShowContinueErrorTimeStamp(state, format(" Routine={}", CalledFrom));
-                    } else {
-                        ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
-                    }
-                    ShowContinueError(state, format(" Input Pressure= {:.2T}", Press));
-                    FlagError = true;
-                }
-                ShowRecurringWarningErrorAtEnd(state,
-                                               "Saturation Temperature not converged after max iterations (PsyTsatFnPb)",
-                                               state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnPb2),
-                                               tSat,
-                                               tSat,
-                                               _,
-                                               "C",
-                                               "C");
-            }
-        }
+      //  if (iter > itmax) {
+      //       if (!state.dataGlobal->WarmupFlag) {
+      //          if (state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnPb2) == 0) {
+      //              ShowWarningMessage(state, format("Saturation Temperature not converged after {} iterations (PsyTsatFnPb)", iter));
+      //              if (!CalledFrom.empty()) {
+      //                  ShowContinueErrorTimeStamp(state, format(" Routine={}", CalledFrom));
+      //              } else {
+      //                  ShowContinueErrorTimeStamp(state, " Routine=Unknown,");
+      //              }
+      //              ShowContinueError(state, format(" Input Pressure= {:.2T}", Press));
+      //              FlagError = true;
+      //          }
+      //          ShowRecurringWarningErrorAtEnd(state,
+      //                                         "Saturation Temperature not converged after max iterations (PsyTsatFnPb)",
+      //                                         state.dataPsychrometrics->iPsyErrIndex(iPsyTsatFnPb2),
+      //                                         tSat,
+      //                                         tSat,
+      //                                         _,
+      //                                         "C",
+      //                                         "C");
+      //      }
+      //  }
 #endif
 
         // Result is SatTemperature
@@ -1467,6 +1489,45 @@ namespace Psychrometrics {
 
         return Temp;
     }
+
+void linearint(EnergyPlusData &state,
+                   int const n,      // sample data size
+                   const Real64 &x,        // given value of x
+                   Real64 &y)        // linear interpolation for y
+    {                                // Linear interpolation
+                                     // Reference: Numerical Recipies in C (pp.94)
+        Real64 A, B;
+        //locate(samplex, n, x, j);
+        //replace locate function
+        int x_int = static_cast<int>(x);
+        int j = x_int / 100 -1;
+        if (j <= 0) j = 0;
+        if (j >= (n - 2)) j = n - 2;
+        A = (state.dataPsychrometrics->x_sample[j + 1] - x) / (state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j]);
+        B = 1 - A;
+        y = A * state.dataPsychrometrics->y_sample[j] + B * state.dataPsychrometrics->y_sample[j + 1]; // y=A*y[j]+B*y[j+1]
+    }
+
+    void CSplineint(EnergyPlusData &state,
+                    int const n,      // sample data size
+                    const Real64 &x,        // given value of x
+                    Real64 &y)        // linear interpolation for y
+    {                                 // Cubic Spline interpolation
+        // Reference: Numerical Recipies in C (pp.97)
+        int k;
+        Real64 h, A, B;
+        //replace locate function
+        int x_int = static_cast<int>(x);
+        int j = x_int / 100 - 1;
+        if (j <= 0) j = 0;
+        if (j >= (n - 2)) j = n - 2;
+        h = state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        A = (state.dataPsychrometrics->x_sample[j + 1] - x) / h;
+        B = 1 - A;
+        y = A * state.dataPsychrometrics->y_sample[j] + B * state.dataPsychrometrics->y_sample[j + 1] +
+            ((A * A * A - A) * (state.dataPsychrometrics->d2y[j]) + (B * B * B - B) * (state.dataPsychrometrics->d2y[j + 1])) * (h * h) / 6.0;
+    }
+
 
 } // namespace Psychrometrics
 
