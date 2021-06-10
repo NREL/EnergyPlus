@@ -78,7 +78,7 @@ using namespace TARCOGParams;
 
 void WriteInputArguments(EnergyPlusData &state,
                          InputOutputFile &InArgumentsFile,
-                         const std::string &DBGD,
+                         const fs::path &DBGD,
                          Real64 const tout,
                          Real64 const tind,
                          Real64 const trmin,
@@ -290,7 +290,7 @@ void WriteInputArguments(EnergyPlusData &state,
         print(InArgumentsFile, Format_1007, state.dataTARCOGOutputs->iguID);
     }
 
-    print(InArgumentsFile, "     Debug dir:     {}\n", DBGD);
+    print(InArgumentsFile, "     Debug dir:     {}\n", DBGD.string());
 
     print(InArgumentsFile, "\n");
     print(InArgumentsFile, Format_1000);
@@ -436,7 +436,7 @@ void WriteInputArguments(EnergyPlusData &state,
 }
 
 void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
-                            [[maybe_unused]] std::string const &DBGD,
+                            [[maybe_unused]] fs::path const &DBGD,
                             Real64 const esky,
                             Real64 const trmout,
                             Real64 const trmin,
@@ -539,7 +539,7 @@ void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
 }
 
 void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
-                          [[maybe_unused]] std::string const &DBGD,
+                          [[maybe_unused]] fs::path const &DBGD,
                           int const nlayer,
                           Real64 const tamb,
                           const Array1D<Real64> &q,
@@ -808,7 +808,7 @@ void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
 }
 
 void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
-                      [[maybe_unused]] std::string const &DBGD,
+                      [[maybe_unused]] fs::path const &DBGD,
                       int const nlayer,
                       Real64 const ufactor,
                       Real64 const hout,
@@ -1237,33 +1237,22 @@ void FinishDebugOutputFiles(Files &files, int const nperr)
 
 void PrepDebugFilesAndVariables(EnergyPlusData &state,
                                 Files &files,
-                                std::string const &Debug_dir,
-                                std::string const &Debug_file,
+                                fs::path const &Debug_dir,
+                                fs::path const &Debug_file,
                                 [[maybe_unused]] int const Debug_mode,
                                 int const win_ID,
                                 int const igu_ID)
 {
 
-    // Locals
-    char LastPathChar;
-    std::string::size_type LastPathCharIndex;
-
     files.DBGD = Debug_dir;
-
-    LastPathCharIndex = len(Debug_dir);
-    if (LastPathCharIndex > 0) {
-        LastPathChar = Debug_dir[LastPathCharIndex - 1];
-        if (LastPathChar != '/') files.DBGD = Debug_dir + '/';
-        if ((LastPathChar == '/') && (LastPathCharIndex == 1)) files.DBGD = "";
-    }
 
     state.dataTARCOGOutputs->winID = win_ID;
     state.dataTARCOGOutputs->iguID = igu_ID;
 
     // setup file names if file name is provided, otherwise keep default
     if (!Debug_file.empty()) {
-        files.WINCogFileName = Debug_file + ".w7";
-        files.DebugOutputFileName = Debug_file + ".dbg";
+        files.WINCogFilePath = fs::path(Debug_file.string() + ".w7");
+        files.DebugOutputFilePath = fs::path(Debug_file.string() + ".dbg");
     }
 
     files.WriteDebugOutput = false;
