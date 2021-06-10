@@ -961,7 +961,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey = _)
 {
-    int *holder = (int *)(&ActualVariable);
+    int holder = static_cast<int>(ActualVariable);
     SetupOutputVariable(state, VariableName, VariableUnit, holder, TimeStepTypeKey, VariableTypeKey, KeyedValue, ReportFreq, indexGroupKey);
 };
 
