@@ -950,6 +950,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                          Optional_int_const indexGroupKey = _       // Group identifier for SQL output
 );
 
+// to take an enum class instance variable 
 template <typename T>
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable
@@ -961,9 +962,9 @@ void SetupOutputVariable(EnergyPlusData &state,
                          Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey = _)
 {
-    int holder = static_cast<int>(ActualVariable);
-    SetupOutputVariable(state, VariableName, VariableUnit, holder, TimeStepTypeKey, VariableTypeKey, KeyedValue, ReportFreq, indexGroupKey);
-};
+    int *holder = (int *)(&ActualVariable);
+    SetupOutputVariable(state, VariableName, VariableUnit, *holder, TimeStepTypeKey, VariableTypeKey, KeyedValue, ReportFreq, indexGroupKey);
+}
 
 void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
 
