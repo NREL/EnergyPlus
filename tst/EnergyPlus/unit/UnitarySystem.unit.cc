@@ -17241,9 +17241,11 @@ TEST_F(EnergyPlusFixture, getCoilWaterSystemInputDataTest)
     int unitarySysIndex(0);
     bool ErrorsFound(false);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    // re-run to fill in additional inputs
+    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
     auto &thisSys = unitSys[unitarySysIndex];
-
+    // check object inputs
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
