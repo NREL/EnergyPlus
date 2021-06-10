@@ -3147,6 +3147,9 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
     this->QGLHE = 0.0;
     this->prevHour = 1;
 }
+void GLHEVert::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 //******************************************************************************
 
@@ -3225,6 +3228,9 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
     state.dataGroundHeatExchanger->currentSimTime = 0.0;
     this->QGLHE = 0.0;
     this->prevHour = 1;
+}
+void GLHESlinky::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 //******************************************************************************

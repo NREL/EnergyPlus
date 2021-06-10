@@ -1522,6 +1522,9 @@ namespace WaterUse {
         this->Energy = this->Power * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->RecoveryEnergy = this->RecoveryRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     }
+    void WaterConnectionsType::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     void CalcWaterUseZoneGains(EnergyPlusData &state)
     {

@@ -1121,6 +1121,9 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
     }
+    void PVTCollectorStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     void GetPVTThermalPowerProduction(EnergyPlusData &state, int const PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy)
     {

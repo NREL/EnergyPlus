@@ -1484,6 +1484,9 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
     }
 }
+void oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 void WrapperSpecs::initialize(EnergyPlusData &state,
                               Real64 MyLoad, // Demand Load
@@ -3526,6 +3529,9 @@ void WrapperSpecs::UpdateChillerHeaterRecords(EnergyPlusData &state) // Wrapper 
         this->ChillerHeater(ChillerHeaterNum).Report.EvapEnergy = this->ChillerHeater(ChillerHeaterNum).Report.QEvap * SecInTimeStep;
         this->ChillerHeater(ChillerHeaterNum).Report.CondEnergy = this->ChillerHeater(ChillerHeaterNum).Report.QCond * SecInTimeStep;
     }
+}
+void WrapperSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::PlantCentralGSHP

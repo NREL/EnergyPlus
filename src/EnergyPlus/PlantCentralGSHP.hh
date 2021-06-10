@@ -421,6 +421,8 @@ namespace PlantCentralGSHP {
         void UpdateChillerRecords(EnergyPlusData &state);
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetWrapperInput(EnergyPlusData &state);

@@ -449,6 +449,9 @@ namespace PlantComponentTemperatureSources {
         this->initialize(state, myLoad);
         this->autosize(state);
     }
+    void WaterSourceSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     void GetWaterSourceInput(EnergyPlusData &state)
     {

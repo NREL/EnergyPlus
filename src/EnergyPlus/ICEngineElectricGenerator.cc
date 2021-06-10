@@ -878,6 +878,9 @@ namespace ICEngineElectricGenerator {
             state.dataLoopNodes->Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
         }
     }
+    void ICEngineGeneratorSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
 } // namespace ICEngineElectricGenerator
 

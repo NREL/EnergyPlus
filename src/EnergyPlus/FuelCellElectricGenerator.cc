@@ -3654,6 +3654,9 @@ namespace FuelCellElectricGenerator {
         this->Report.SkinLossConvect = this->QconvZone;
         this->Report.SkinLossRadiat = this->QradZone;
     }
+    void FCDataStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
 } // namespace FuelCellElectricGenerator
 

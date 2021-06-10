@@ -994,5 +994,8 @@ void GshpPeCoolingSpecs::update(EnergyPlusData &state)
         this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
     }
 }
+void GshpPeCoolingSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 } // namespace EnergyPlus::HeatPumpWaterToWaterCOOLING

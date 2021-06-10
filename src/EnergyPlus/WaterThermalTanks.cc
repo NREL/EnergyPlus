@@ -444,6 +444,9 @@ void HeatPumpWaterHeaterData::simulate(
     // reset caller loop num to 0 to mimic what plantloopequip was doing
     Tank.callerLoopNum = 0;
 }
+void HeatPumpWaterHeaterData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int const WaterHeaterNum, bool const FirstHVACIteration)
 {
@@ -12356,6 +12359,9 @@ Real64 WaterThermalTankData::getDeadBandTemp()
     } else {
         return (this->SetPointTemp - this->DeadBandDeltaTemp);
     }
+}
+void WaterThermalTankData::oneTimeInit([[maybe_unused]]EnergyPlusData &state)
+{
 }
 
 bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumber)

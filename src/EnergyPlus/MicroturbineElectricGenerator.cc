@@ -1948,5 +1948,8 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
     this->AncillaryEnergy = this->AncillaryPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
     this->StandbyEnergy = this->StandbyPowerRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 }
+void MTGeneratorSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 } // namespace EnergyPlus::MicroturbineElectricGenerator

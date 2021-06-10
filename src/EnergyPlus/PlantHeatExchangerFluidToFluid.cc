@@ -2397,5 +2397,8 @@ Real64 HeatExchangerStruct::demandSideFlowResidual(EnergyPlusData &state,
 
     return Residuum;
 }
+void HeatExchangerStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 } // namespace EnergyPlus::PlantHeatExchangerFluidToFluid

@@ -959,7 +959,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
     }
 
     if ((this->isWaterCooled) && ((this->InHeatingMode) || (this->InCoolingMode)) &&
-        (!this->oneTimeFlag)) { // combining oneTimeInit and plantScanInit could cause a diff here
+        (!this->oneTimeFlag)) { // combining oneTimeInitFlag and plantScanInit could cause a diff here
         mdot = this->DesCondMassFlowRate;
 
         PlantUtilities::SetComponentFlowRate(

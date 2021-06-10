@@ -2773,6 +2773,9 @@ namespace UserDefinedComponents {
                 .MaxOutletTemp = this->Loop(LoopNum).HiOutTempLimit;
         }
     }
+    void UserPlantComponentStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     void UserCoilComponentStruct::report(EnergyPlusData &state)
     {

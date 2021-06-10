@@ -1433,4 +1433,7 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
         state.dataLoopNodes->Node(this->AirOutletNodeID).Temp = this->A42Model.Teng;
     }
 }
+void MicroCHPDataStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 } // namespace EnergyPlus::MicroCHPElectricGenerator

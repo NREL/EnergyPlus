@@ -1878,6 +1878,9 @@ namespace IceThermalStorage {
             this->ITSmdot = this->ITSMassFlowRate;
         }
     }
+    void SimpleIceStorageData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     void UpdateIceFractions(EnergyPlusData &state)
     {
@@ -2001,6 +2004,9 @@ namespace IceThermalStorage {
                 this->ParasiticElecEnergy = this->DischargeParaElecLoad * this->ChargingEnergy;
             }
         }
+    }
+    void DetailedIceStorageData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
 } // namespace IceThermalStorage

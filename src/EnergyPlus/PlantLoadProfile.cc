@@ -318,6 +318,9 @@ void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
         this->CoolingEnergy = std::abs(this->Energy);
     }
 }
+void PlantProfileData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 // Functions
 void GetPlantProfileInput(EnergyPlusData &state)

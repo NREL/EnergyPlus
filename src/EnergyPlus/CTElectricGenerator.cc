@@ -816,6 +816,9 @@ namespace CTElectricGenerator {
             }
         }
     }
+    void CTGeneratorData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
 } // namespace CTElectricGenerator
 

@@ -356,7 +356,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 {
     // This function does all one-time and begin-environment initialization
     std::string static const routineName = std::string("EIRPlantLoopHeatPump :") + __FUNCTION__;
-    if (this->oneTimeInit) {
+    if (this->oneTimeInitFlag) {
         bool errFlag = false;
 
         // setup output variables
@@ -513,7 +513,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
         if (errFlag) {
             ShowFatalError(state, routineName + ": Program terminated due to previous condition(s).");
         }
-        this->oneTimeInit = false;
+        this->oneTimeInitFlag = false;
     } // plant setup
 
     if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
@@ -1238,5 +1238,8 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
                                            thisPLHP.recurringConcurrentOperationWarningIndex);
         }
     }
+}
+void EIRPlantLoopHeatPump::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 } // namespace EnergyPlus::EIRPlantLoopHeatPumps

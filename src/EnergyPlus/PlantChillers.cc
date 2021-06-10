@@ -2146,6 +2146,9 @@ namespace PlantChillers {
             }
         }
     }
+    void ElectricChillerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     EngineDrivenChillerSpecs *EngineDrivenChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
@@ -4192,6 +4195,9 @@ namespace PlantChillers {
             state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
         }
     }
+    void EngineDrivenChillerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     GTChillerSpecs *GTChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
@@ -6166,6 +6172,9 @@ namespace PlantChillers {
             }
         }
     }
+    void GTChillerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     ConstCOPChillerSpecs *ConstCOPChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
@@ -7623,6 +7632,9 @@ namespace PlantChillers {
             state.dataLoopNodes->Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
             state.dataLoopNodes->Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
         }
+    }
+    void ConstCOPChillerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
     }
 
 } // namespace PlantChillers

@@ -75,7 +75,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     this->maxOutdoorDrybulbForBasin = input_data.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
     this->crankcaseHeaterCap = input_data.crankcase_heater_capacity;
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.base_operating_mode_name);
-    this->normalMode.oneTimeInit(state); // oneTimeInit does not need to be delayed in this use case
+    this->normalMode.oneTimeInit(state); // oneTimeInitFlag does not need to be delayed in this use case
     if (UtilityRoutines::SameString(input_data.capacity_control, "CONTINUOUS")) {
         this->capControlMethod = CapControlMethod::CONTINUOUS;
     } else if (UtilityRoutines::SameString(input_data.capacity_control, "DISCRETE")) {
@@ -103,7 +103,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     if (!input_data.alternate_operating_mode_name.empty() && input_data.alternate_operating_mode2_name.empty()) {
         this->hasAlternateMode = DataHVACGlobals::coilEnhancedMode;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
-        this->alternateMode.oneTimeInit(state); // oneTimeInit does not need to be delayed in this use case
+        this->alternateMode.oneTimeInit(state); // oneTimeInitFlag does not need to be delayed in this use case
     }
     // Validate fuel type input
     bool fuelTypeError(false);

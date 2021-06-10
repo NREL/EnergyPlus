@@ -463,7 +463,7 @@ TEST_F(EnergyPlusFixture, Initialization)
     PLHPPlantLoadSourceComp.Name = thisCoolingPLHP->name;
     PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
 
-    // call for initialization, oneTimeInit only first
+    // call for initialization, oneTimeInitFlag only first
     state->dataGlobal->BeginEnvrnFlag = false;
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 

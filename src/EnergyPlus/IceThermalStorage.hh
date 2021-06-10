@@ -174,6 +174,8 @@ namespace IceThermalStorage {
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
         void setupOutputVars(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct DetailedIceStorageData : PlantComponent
@@ -262,6 +264,8 @@ namespace IceThermalStorage {
         void ReportDetailedIceStorage(EnergyPlusData &state);
 
         void setupOutputVars(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetIceStorageInput(EnergyPlusData &state);

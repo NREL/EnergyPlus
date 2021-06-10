@@ -936,6 +936,9 @@ void SwimmingPoolData::update(EnergyPlusData &state)
     Real64 WaterMassFlow = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
     if (WaterMassFlow > 0.0) state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
 }
+void SwimmingPoolData::oneTimeInit([[maybe_unused]]EnergyPlusData &state)
+{
+}
 
 void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
 {
@@ -1122,7 +1125,10 @@ void ReportSwimmingPool(EnergyPlusData &state)
 Real64 MakeUpWaterVolFlowFunct(Real64 MakeUpWaterMassFlowRate, Real64 Density)
 {
     return MakeUpWaterMassFlowRate / Density;
+}void oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
+
 
 Real64 MakeUpWaterVolFunct(Real64 MakeUpWaterMass, Real64 Density)
 {

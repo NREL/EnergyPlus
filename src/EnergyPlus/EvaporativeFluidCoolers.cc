@@ -2717,6 +2717,9 @@ namespace EvaporativeFluidCoolers {
             this->WaterAmountUsed = this->WaterUsage * ReportingConstant;
         }
     }
+    void EvapFluidCoolerSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
 } // namespace EvaporativeFluidCoolers
 
