@@ -3018,14 +3018,17 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest) {
     HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    WindowManager::InitGlassOpticalCalculations(*state);
 
     Real64 SHGC; // Center-of-glass solar heat gain coefficient for ASHRAE
     Real64 TransSolNorm;        // Window construction solar transmittance at normal incidence
     Real64 TransVisNorm;        // Window construction visible transmittance at normal incidence
     int errFlag(0);                // Error flag
     int ThisNum(4);
+    int MaterNum;
     Real64 inputU(1.0);
 
+    MaterNum = state->dataConstruction->Construct(ThisNum).LayerPoint(1);
     // testing branches start
     // winter, with illegal NominalConductanceWinter input, initialize the adjustment ratio to 1
     Real64 NominalConductanceWinter(-1.0); // Nominal center-of-glass conductance of a window construction
@@ -3043,7 +3046,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest) {
     state->dataWindowManager->coeffAdjRatioIn = Real64(1.0);
     state->dataWindowManager->coeffAdjRatioOut = Real64(1.0);
     inputU = Real64(7.0);
-    state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = inputU;
+    state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = inputU;
     CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
     EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(7.0/5.0));
     EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(7.0/5.0));
@@ -3053,7 +3056,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest) {
     state->dataWindowManager->coeffAdjRatioIn = Real64(1.5);
     state->dataWindowManager->coeffAdjRatioOut = Real64(1.5);
     inputU = Real64(7.0);
-    state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = inputU;
+    state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = inputU;
     CalcNominalWindowCond(*state, ThisNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);
     EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(1.5));
     EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(1.5));
@@ -3063,7 +3066,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest) {
     state->dataWindowManager->coeffAdjRatioIn = Real64(1.5);
     state->dataWindowManager->coeffAdjRatioOut = Real64(1.5);
     inputU = Real64(7.0);
-    state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = inputU;
+    state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = inputU;
     CalcNominalWindowCond(*state, ThisNum, 2, NominalConductanceSummer, SHGC, TransSolNorm, TransVisNorm, errFlag);
     EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(1.5));
     EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(1.5));
@@ -3071,7 +3074,7 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest) {
 
     // testing adj ratio for different input U
     inputU = Real64(7.0);
-    state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = inputU;
+    state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = inputU;
     NominalConductanceWinter = Real64(-1.0); // Nominal center-of-glass conductance of a window construction
     state->dataWindowManager->coeffAdjRatioIn = Real64(0.0);
     state->dataWindowManager->coeffAdjRatioOut = Real64(0.0);
@@ -3088,10 +3091,11 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest) {
     // expect nominal conductance be non-negative initialization, adjustment ratio equal to 1
     EXPECT_NEAR(NominalConductanceWinter, Real64(inputU), Real64(0.1));
 
-    std::array<Real64, 4> inputUs = {Real64(3.0), Real64(5.0), Real64(7.0), Real64(9.0)};
-    // fixme: replace with size
-    for (auto varyInputU : inputUs) {
-        state->dataMaterial->Material(state->dataConstruction->Construct(ThisNum).LayerPoint(1)).SimpleWindowUfactor = varyInputU;
+    std::array<Real64, 4> legalInputUs = {Real64(3.0), Real64(5.0), Real64(7.0), Real64(9.0)};
+    for (auto varyInputU : legalInputUs) {
+        state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
+        HeatBalanceManager::SetupSimpleWindowGlazingSystem(*state, MaterNum);
+        state->dataWindowManager->scon(1) = state->dataMaterial->Material(MaterNum).Conductivity / state->dataMaterial->Material(MaterNum).Thickness;
         NominalConductanceWinter = Real64(-1.0); // Nominal center-of-glass conductance of a window construction
         CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
         oldNominalConductance = NominalConductanceWinter;
@@ -3099,6 +3103,17 @@ TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest) {
         EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(varyInputU / oldNominalConductance));
         EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(varyInputU / oldNominalConductance));
         EXPECT_NEAR(NominalConductanceWinter, varyInputU, Real64(0.1));
+    }
+
+    // in real execution, it would have aborted at SetupSimpleWindowGlazingSystem
+    std::array<Real64, 2> illegalInputUs = {Real64(0.0), Real64(-2.0)};
+    for (auto varyInputU : illegalInputUs) {
+        state->dataMaterial->Material(MaterNum).SimpleWindowUfactor = varyInputU;
+        NominalConductanceWinter = Real64(-1.0); // Nominal center-of-glass conductance of a window construction
+        CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+        CalcNominalWindowCond(*state, ThisNum, 1, NominalConductanceWinter, SHGC, TransSolNorm, TransVisNorm, errFlag);
+        EXPECT_EQ(state->dataWindowManager->coeffAdjRatioIn, Real64(1.0));
+        EXPECT_EQ(state->dataWindowManager->coeffAdjRatioOut, Real64(1.0));
     }
 }
 
