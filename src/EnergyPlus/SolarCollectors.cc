@@ -2164,7 +2164,7 @@ namespace SolarCollectors {
             VentCavIndex = CavNum;
         }
     }
-    void CollectorData::oneTimeInit([[maybe_unused]]EnergyPlusData &state)
+    void CollectorData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
     {
     }
 

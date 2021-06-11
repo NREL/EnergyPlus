@@ -891,7 +891,7 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
     // keep track of the bulk temperature
     this->BulkTemperature = this->PondTemp;
 }
-void PondGroundHeatExchangerData::oneTimeInit([[maybe_unused]]EnergyPlusData &state)
+void PondGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 

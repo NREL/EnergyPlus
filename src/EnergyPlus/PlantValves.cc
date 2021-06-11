@@ -502,7 +502,7 @@ namespace PlantValves {
         if (this->FlowDivFract < 0.0) this->FlowDivFract = 0.0;
         if (this->FlowDivFract > 1.0) this->FlowDivFract = 1.0;
     }
-    void TemperValveData::oneTimeInit([[maybe_unused]]EnergyPlusData &state)
+    void TemperValveData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
     {
     }
 

@@ -1477,7 +1477,7 @@ namespace SurfaceGroundHeatExchanger {
         this->SurfEnergy = SurfaceArea * (state.dataSurfaceGroundHeatExchangers->TopSurfFlux + state.dataSurfaceGroundHeatExchangers->BtmSurfFlux) *
                            TimeStepSys * DataGlobalConstants::SecInHour;
     }
-    void SurfaceGroundHeatExchangerData::oneTimeInit([[maybe_unused]]EnergyPlusData &state)
+    void SurfaceGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
     {
     }
 

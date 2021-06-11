@@ -282,10 +282,7 @@ void WaterThermalTankData::simulate(
     // set the caller loop num to mimic what was happening in plant loop equip
     this->callerLoopNum = calledFromLocation.loopNum;
 
-    if (this->myOneTimeInitFlag) {
-        this->setupOutputVars(state);
-        this->myOneTimeInitFlag = false;
-    }
+    oneTimeInit(state);
 
     if (this->MyOneTimeFlagWH) {
         this->MyOneTimeFlagWH = false;
@@ -12360,8 +12357,12 @@ Real64 WaterThermalTankData::getDeadBandTemp()
         return (this->SetPointTemp - this->DeadBandDeltaTemp);
     }
 }
-void WaterThermalTankData::oneTimeInit([[maybe_unused]]EnergyPlusData &state)
+void WaterThermalTankData::oneTimeInit(EnergyPlusData &state)
 {
+    if (this->myOneTimeInitFlag) {
+        this->setupOutputVars(state);
+        this->myOneTimeInitFlag = false;
+    }
 }
 
 bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumber)

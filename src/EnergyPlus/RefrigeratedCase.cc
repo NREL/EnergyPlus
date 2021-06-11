@@ -11038,7 +11038,7 @@ void RefrigCondenserData::UpdateCondenser(EnergyPlusData &state)
     // Set outlet node variables that are possibly changed
     state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
 }
-void RefrigCondenserData::oneTimeInit([[maybe_unused]]EnergyPlusData &state)
+void RefrigCondenserData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 
@@ -11060,7 +11060,7 @@ void RefrigRackData::UpdateCondenser(EnergyPlusData &state)
     // Set outlet node variables that are possibly changed
     state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
 }
-void RefrigRackData::oneTimeInit([[maybe_unused]]EnergyPlusData &state)
+void RefrigRackData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
 {
 }
 
