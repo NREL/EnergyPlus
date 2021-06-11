@@ -4421,53 +4421,53 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromJSON)
     EXPECT_TRUE(mat1.is_object());
     root[obj_type2][name2] = mat1;
 
-    auto &IP(state->dataInputProcessing->inputProcessor);
-    IP->epJSON = root;
+    auto &ip(state->dataInputProcessing->inputProcessor);
+    ip->epJSON = root;
 
     state->dataGlobal->isEpJSON = true;
-    IP->initializeMaps();
+    ip->initializeMaps();
     std::string alphaFieldValue;
     Real64 numericFieldValue = 0.0;
     json objectSchemaProps;
 
     // Building object
-    objectSchemaProps = IP->getObjectSchemaProps(*state, obj_type1);
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type1);
     // User inputs from above
     // Note even though choice keys are case-sensitive during epJSON processing, getFieldValue pushes Alphas to UPPERcase
-    alphaFieldValue = IP->getAlphaFieldValue(bldg1, objectSchemaProps, "terrain");
+    alphaFieldValue = ip->getAlphaFieldValue(bldg1, objectSchemaProps, "terrain");
     EXPECT_EQ(alphaFieldValue, "OCEAN");
-    numericFieldValue = IP->getRealFieldValue(bldg1, objectSchemaProps, "loads_convergence_tolerance_value");
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "loads_convergence_tolerance_value");
     EXPECT_NEAR(numericFieldValue, 0.1, 0.0001);
     // Defaults from schema
-    alphaFieldValue = IP->getAlphaFieldValue(bldg1, objectSchemaProps, "solar_distribution");
+    alphaFieldValue = ip->getAlphaFieldValue(bldg1, objectSchemaProps, "solar_distribution");
     EXPECT_EQ(alphaFieldValue, "FULLEXTERIOR");
-    numericFieldValue = IP->getRealFieldValue(bldg1, objectSchemaProps, "north_axis");
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "north_axis");
     EXPECT_NEAR(numericFieldValue, 0.0, 0.0001);
-    numericFieldValue = IP->getRealFieldValue(bldg1, objectSchemaProps, "temperature_convergence_tolerance_value");
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "temperature_convergence_tolerance_value");
     EXPECT_NEAR(numericFieldValue, 0.4, 0.0001);
-    numericFieldValue = IP->getRealFieldValue(bldg1, objectSchemaProps, "maximum_number_of_warmup_days");
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "maximum_number_of_warmup_days");
     EXPECT_NEAR(numericFieldValue, 25.0, 0.0001);
-    numericFieldValue = IP->getRealFieldValue(bldg1, objectSchemaProps, "minimum_number_of_warmup_days");
+    numericFieldValue = ip->getRealFieldValue(bldg1, objectSchemaProps, "minimum_number_of_warmup_days");
     EXPECT_NEAR(numericFieldValue, 1.0, 0.0001);
 
     // Material object
-    objectSchemaProps = IP->getObjectSchemaProps(*state, obj_type2);
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type2);
     // User inputs from above
     // Note even though choice keys are case-sensitive during epJSON processing, getObjectItem pushes Alphas to UPPERcase
-    alphaFieldValue = IP->getAlphaFieldValue(mat1, objectSchemaProps, "roughness");
+    alphaFieldValue = ip->getAlphaFieldValue(mat1, objectSchemaProps, "roughness");
     EXPECT_EQ(alphaFieldValue, "MEDIUMROUGH");
-    numericFieldValue = IP->getRealFieldValue(mat1, objectSchemaProps, "thickness");
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "thickness");
     EXPECT_NEAR(numericFieldValue, 0.2, 0.0001);
-    numericFieldValue = IP->getRealFieldValue(mat1, objectSchemaProps, "solar_absorptance");
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "solar_absorptance");
     EXPECT_NEAR(numericFieldValue, 0.5, 0.0001);
     // Defaults from schema
-    numericFieldValue = IP->getRealFieldValue(mat1, objectSchemaProps, "thermal_absorptance");
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "thermal_absorptance");
     EXPECT_NEAR(numericFieldValue, 0.9, 0.0001);
     // Fields beyond min-fields also return their default if they have one (unlike getObjectItem)
-    numericFieldValue = IP->getRealFieldValue(mat1, objectSchemaProps, "visible_absorptance");
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "visible_absorptance");
     EXPECT_NEAR(numericFieldValue, 0.7, 0.0001);
     // or zero if they don't have a default (in this case it's a required field, so it would have failed before now)
-    numericFieldValue = IP->getRealFieldValue(mat1, objectSchemaProps, "specific_heat");
+    numericFieldValue = ip->getRealFieldValue(mat1, objectSchemaProps, "specific_heat");
     EXPECT_NEAR(numericFieldValue, 0.0, 0.0001);
 }
 
@@ -4481,27 +4481,27 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_AutosizefromJSON)
     EXPECT_TRUE(wh1.is_object());
     root[obj_type1][name1] = wh1;
 
-    auto &IP(state->dataInputProcessing->inputProcessor);
-    IP->epJSON = root;
+    auto &ip(state->dataInputProcessing->inputProcessor);
+    ip->epJSON = root;
     state->dataGlobal->isEpJSON = true;
-    IP->initializeMaps();
+    ip->initializeMaps();
     std::string alphaFieldValue;
     Real64 numericFieldValue = 0.0;
     json objectSchemaProps;
 
     // Water heater object
-    objectSchemaProps = IP->getObjectSchemaProps(*state, obj_type1);
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type1);
     // User inputs from above
     // If the field is autosizable and alpha input will return -99999
-    numericFieldValue = IP->getRealFieldValue(wh1, objectSchemaProps, "tank_volume");
+    numericFieldValue = ip->getRealFieldValue(wh1, objectSchemaProps, "tank_volume");
     EXPECT_EQ(numericFieldValue, -99999);
-    numericFieldValue = IP->getRealFieldValue(wh1, objectSchemaProps, "heater_maximum_capacity");
+    numericFieldValue = ip->getRealFieldValue(wh1, objectSchemaProps, "heater_maximum_capacity");
     EXPECT_EQ(numericFieldValue, -99999);
     // Even a field that is not autoszable will return -99999 here (assuming that gets checked upon epJSON input processing)
-    numericFieldValue = IP->getRealFieldValue(wh1, objectSchemaProps, "source_side_effectiveness");
+    numericFieldValue = ip->getRealFieldValue(wh1, objectSchemaProps, "source_side_effectiveness");
     EXPECT_EQ(numericFieldValue, -99999);
     // Also check a field that defaults to autosize (not input above)
-    numericFieldValue = IP->getRealFieldValue(wh1, objectSchemaProps, "use_side_design_flow_rate");
+    numericFieldValue = ip->getRealFieldValue(wh1, objectSchemaProps, "use_side_design_flow_rate");
     EXPECT_EQ(numericFieldValue, -99999);
 }
 TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromIDF)
@@ -4555,32 +4555,32 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromIDF)
     json objectSchemaProps;
 
     // Water heater object
-    auto &IP(state->dataInputProcessing->inputProcessor);
+    auto &ip(state->dataInputProcessing->inputProcessor);
     std::string obj_type1 = "WaterHeater:Mixed";
-    objectSchemaProps = IP->getObjectSchemaProps(*state, obj_type1);
-    auto instances = IP->epJSON.find(obj_type1);
-    if (instances != IP->epJSON.end()) {
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type1);
+    auto instances = ip->epJSON.find(obj_type1);
+    if (instances != ip->epJSON.end()) {
         // globalSolverObject.referenceConditions.clear();
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
             // User inputs from above
             // An autosized field will return -99999
-            numericFieldValue = IP->getRealFieldValue(fields, objectSchemaProps, "tank_volume");
+            numericFieldValue = ip->getRealFieldValue(fields, objectSchemaProps, "tank_volume");
             EXPECT_EQ(numericFieldValue, -99999);
-            numericFieldValue = IP->getRealFieldValue(fields, objectSchemaProps, "heater_maximum_capacity");
+            numericFieldValue = ip->getRealFieldValue(fields, objectSchemaProps, "heater_maximum_capacity");
             EXPECT_EQ(numericFieldValue, -99999);
             // Check a numeric field that's not autosized
-            numericFieldValue = IP->getRealFieldValue(fields, objectSchemaProps, "source_side_effectiveness");
+            numericFieldValue = ip->getRealFieldValue(fields, objectSchemaProps, "source_side_effectiveness");
             EXPECT_EQ(numericFieldValue, 0.9);
             // Also check a field that defaults to autosize (not input above)
-            numericFieldValue = IP->getRealFieldValue(fields, objectSchemaProps, "use_side_design_flow_rate");
+            numericFieldValue = ip->getRealFieldValue(fields, objectSchemaProps, "use_side_design_flow_rate");
             EXPECT_EQ(numericFieldValue, -99999);
             // Check an alpha field
-            alphaFieldValue = IP->getAlphaFieldValue(fields, objectSchemaProps, "on_cycle_parasitic_fuel_type");
+            alphaFieldValue = ip->getAlphaFieldValue(fields, objectSchemaProps, "on_cycle_parasitic_fuel_type");
             EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Electricity"));
             // Check a defaulted alpha field
-            alphaFieldValue = IP->getAlphaFieldValue(fields, objectSchemaProps, "heater_control_type");
+            alphaFieldValue = ip->getAlphaFieldValue(fields, objectSchemaProps, "heater_control_type");
             EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Cycle"));
         }
     }
@@ -4601,8 +4601,8 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
         " ,                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction Schedule Name",
         " ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
         " Air Terminal ADU,         !- Zone Equipment 2 Name",
-        " 2,                        !- Zone Equipment 2 Cooling Sequence",
-        " 2,                        !- Zone Equipment 2 Heating or No-Load Sequence",
+        " 2.1,                        !- Zone Equipment 2 Cooling Sequence",
+        " 1.9,                        !- Zone Equipment 2 Heating or No-Load Sequence",
         " ADU Cooling Fraction Schedule, !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name",
         " ADU Heating Fraction Schedule, !- Zone Equipment 2 Sequential Heating or No-Load Fraction Schedule Name",
         " Fan:ZoneExhaust,          !- Zone Equipment 2 Object Type",
@@ -4620,11 +4620,11 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
     json objectSchemaProps;
 
     // Water heater object
-    auto &IP(state->dataInputProcessing->inputProcessor);
+    auto &ip(state->dataInputProcessing->inputProcessor);
     std::string obj_type1 = "ZoneHVAC:EquipmentList";
-    objectSchemaProps = IP->getObjectSchemaProps(*state, obj_type1);
-    auto instances = IP->epJSON.find(obj_type1);
-    if (instances != IP->epJSON.end()) {
+    objectSchemaProps = ip->getObjectSchemaProps(*state, obj_type1);
+    auto instances = ip->epJSON.find(obj_type1);
+    if (instances != ip->epJSON.end()) {
         // globalSolverObject.referenceConditions.clear();
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -4632,7 +4632,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
             auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
             EXPECT_EQ(thisObjectName, "SPACE EQUIPMENT");
             // Fields before extensibles
-            alphaFieldValue = IP->getAlphaFieldValue(objectFields, objectSchemaProps, "load_distribution_scheme");
+            alphaFieldValue = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "load_distribution_scheme");
             EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "UniformPLR"));
 
             // Extensibles
@@ -4659,15 +4659,15 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
 
                 int counter = 0;
                 for (auto extensibleInstance : extensiblesArray) {
-                    equipmentNames[counter] = IP->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_name");
-                    equipmentTypes[counter] = IP->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_object_type");
+                    equipmentNames[counter] = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_name");
+                    equipmentTypes[counter] = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_object_type");
                     coolFracSchedNames[counter] =
-                        IP->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_cooling_fraction_schedule_name");
+                        ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_cooling_fraction_schedule_name");
                     heatFracSchedNames[counter] =
-                        IP->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_heating_fraction_schedule_name");
-                    coolSeqNums[counter] = int(IP->getRealFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_cooling_sequence"));
+                        ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_heating_fraction_schedule_name");
+                    coolSeqNums[counter] = ip->getIntFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_cooling_sequence");
                     heatSeqNums[counter] =
-                        int(IP->getRealFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_heating_or_no_load_sequence"));
+                        ip->getIntFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_heating_or_no_load_sequence");
                     ++counter;
                 }
                 EXPECT_EQ(counter, 3);
@@ -4683,6 +4683,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
             EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[1], "ZoneHVAC:AirDistributionUnit"));
             EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[1], "ADU Cooling Fraction Schedule"));
             EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[1], "ADU Heating Fraction Schedule"));
+            // Not the input values above are 1.9 and 2.1, the should round to the nearest integer
             EXPECT_EQ(coolSeqNums[1], 2);
             EXPECT_EQ(heatSeqNums[1], 2);
 

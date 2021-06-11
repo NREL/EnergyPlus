@@ -1562,19 +1562,19 @@ namespace HeatBalanceManager {
         MaterNum = 0;
 
         // Regular Materials
-        auto &IP(state.dataInputProcessing->inputProcessor);
+        auto &ip = state.dataInputProcessing->inputProcessor;
 
         state.dataHeatBalMgr->CurrentModuleObject = "Material";
-        auto const instances = IP->epJSON.find(state.dataHeatBalMgr->CurrentModuleObject);
-        if (instances != IP->epJSON.end()) {
-            auto const &objectSchemaProps = IP->getObjectSchemaProps(state, state.dataHeatBalMgr->CurrentModuleObject);
+        auto const instances = ip->epJSON.find(state.dataHeatBalMgr->CurrentModuleObject);
+        if (instances != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, state.dataHeatBalMgr->CurrentModuleObject);
 
             int counter = 0;
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                IP->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
+                ip->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
                 std::string materialName = thisObjectName;
 
                 if (GlobalNames::VerifyUniqueInterObjectName(state,
@@ -1587,25 +1587,25 @@ namespace HeatBalanceManager {
                 }
                 // For incoming idf, maintain object order
                 ++counter;
-                MaterNum = IP->getIDFObjNum(state, state.dataHeatBalMgr->CurrentModuleObject, counter);
+                MaterNum = ip->getIDFObjNum(state, state.dataHeatBalMgr->CurrentModuleObject, counter);
 
                 // Load the material derived type from the input data.
                 auto &thisMaterial = state.dataMaterial->Material(MaterNum);
                 thisMaterial.Group = RegularMaterial;
                 thisMaterial.Name = materialName;
 
-                std::string roughness = IP->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
+                std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
                 ValidateMaterialRoughness(state, MaterNum, roughness, ErrorsFound);
 
-                thisMaterial.Thickness = IP->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
-                thisMaterial.Conductivity = IP->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
-                thisMaterial.Density = IP->getRealFieldValue(objectFields, objectSchemaProps, "density");
-                thisMaterial.SpecHeat = IP->getRealFieldValue(objectFields, objectSchemaProps, "specific_heat");
-                thisMaterial.AbsorpThermal = IP->getRealFieldValue(objectFields, objectSchemaProps, "thermal_absorptance");
+                thisMaterial.Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
+                thisMaterial.Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
+                thisMaterial.Density = ip->getRealFieldValue(objectFields, objectSchemaProps, "density");
+                thisMaterial.SpecHeat = ip->getRealFieldValue(objectFields, objectSchemaProps, "specific_heat");
+                thisMaterial.AbsorpThermal = ip->getRealFieldValue(objectFields, objectSchemaProps, "thermal_absorptance");
                 thisMaterial.AbsorpThermalInput = thisMaterial.AbsorpThermal;
-                thisMaterial.AbsorpSolar = IP->getRealFieldValue(objectFields, objectSchemaProps, "solar_absorptance");
+                thisMaterial.AbsorpSolar = ip->getRealFieldValue(objectFields, objectSchemaProps, "solar_absorptance");
                 thisMaterial.AbsorpSolarInput = thisMaterial.AbsorpSolar;
-                thisMaterial.AbsorpVisible = IP->getRealFieldValue(objectFields, objectSchemaProps, "visible_absorptance");
+                thisMaterial.AbsorpVisible = ip->getRealFieldValue(objectFields, objectSchemaProps, "visible_absorptance");
                 thisMaterial.AbsorpVisibleInput = thisMaterial.AbsorpVisible;
 
                 if (thisMaterial.Conductivity > 0.0) {
