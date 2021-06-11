@@ -6558,9 +6558,12 @@ namespace WindowManager {
                 state.dataWindowManager->coeffAdjRatioOut = Real64(1.0);
             } else {
                 Real64 inputU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
-                Real64 adjRatio = inputU / NominalConductance;
-                state.dataWindowManager->coeffAdjRatioIn = adjRatio;
-                state.dataWindowManager->coeffAdjRatioOut = adjRatio;
+                // only compute adjustment ratio when there is valid user input U
+                if (inputU > 0) {
+                    Real64 adjRatio = inputU / NominalConductance;
+                    state.dataWindowManager->coeffAdjRatioIn = adjRatio;
+                    state.dataWindowManager->coeffAdjRatioOut = adjRatio;
+                }
             }
             // (the value used in Window 5)
             //  tin = 294.26   ! Inside air temperature (70F, 21.1C)
