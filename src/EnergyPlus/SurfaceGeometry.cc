@@ -2451,8 +2451,11 @@ namespace SurfaceGeometry {
                 if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
                     WinShadingControlPtr =
                         state.dataSurface->Surface(SurfNum).activeWindowShadingControl; // use first item since others should be identical
-                    if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle)
+                    if (state.dataSurface->WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle) {
                         state.dataSurface->SurfWinMovableSlats(SurfNum) = true;
+                        state.dataSurface->AnyMovableSlat = true;
+                        state.dataHeatBalSurf->SurfMovSlatsIndexList.push_back(SurfNum);
+                    }
                 }
 
                 ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
@@ -7753,7 +7756,7 @@ namespace SurfaceGeometry {
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Air,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 ObjectIsParent);
                     if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                         ShowSevereError(state,
@@ -9773,6 +9776,7 @@ namespace SurfaceGeometry {
             for (int jFeneRef = 1; jFeneRef <= state.dataSurface->WindowShadingControl(iShadeCtrl).FenestrationCount; ++jFeneRef) {
                 if (UtilityRoutines::SameString(state.dataSurface->WindowShadingControl(iShadeCtrl).FenestrationName(jFeneRef),
                                                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name)) {
+                    state.dataGlobal->AndShadingControlInModel = true;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HasShadeControl = true;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList.push_back(iShadeCtrl);
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeWindowShadingControl = iShadeCtrl;
