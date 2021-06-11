@@ -4027,8 +4027,6 @@ void LEEDtariffReporting(EnergyPlusData &state)
 
     using namespace OutputReportPredefined;
 
-    int elecFacilMeter;
-    int gasFacilMeter;
     int distCoolFacilMeter;
     int distHeatFacilMeter;
     Real64 elecTotalEne;
@@ -4061,8 +4059,6 @@ void LEEDtariffReporting(EnergyPlusData &state)
     auto &tariff(state.dataEconTariff->tariff);
 
     if (state.dataEconTariff->numTariff > 0) {
-        elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
-        gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
         distCoolFacilMeter = GetMeterIndex(state, "DISTRICTCOOLING:FACILITY");
         distHeatFacilMeter = GetMeterIndex(state, "DISTRICTHEATING:FACILITY");
         elecTotalEne = 0.0;
@@ -4096,7 +4092,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
                     elecTotalCost += tariff(iTariff).totalAnnualCost;
                     elecTariffNames += ' ' + tariff(iTariff).tariffName;
                     elecUnits = tariff(iTariff).convChoice;
-                } else if (tariff(iTariff).reportMeterIndx == gasFacilMeter) {
+                } else if (tariff(iTariff).kindGasMtr == kindMeterGas) {
                     if (tariff(iTariff).totalAnnualEnergy > gasTotalEne) gasTotalEne = tariff(iTariff).totalAnnualEnergy;
                     gasTotalCost += tariff(iTariff).totalAnnualCost;
                     gasTariffNames += ' ' + tariff(iTariff).tariffName;
@@ -4114,12 +4110,13 @@ void LEEDtariffReporting(EnergyPlusData &state)
                     distHeatTariffNames += ' ' + tariff(iTariff).tariffName;
                     distHeatUnits = tariff(iTariff).convChoice;
                     distHeatDemWindowUnits = tariff(iTariff).demandWindow;
-                } else {
+                } else if (tariff(iTariff).kindWaterMtr == kindMeterNotWater) {
                     if (tariff(iTariff).totalAnnualEnergy > otherTotalEne) otherTotalEne = tariff(iTariff).totalAnnualEnergy;
                     otherTotalCost += tariff(iTariff).totalAnnualCost;
                     othrTariffNames += ' ' + tariff(iTariff).tariffName;
                     othrUnits = tariff(iTariff).convChoice;
                     othrDemWindowUnits = tariff(iTariff).demandWindow;
+                } else {
                 }
             }
         }
@@ -4203,8 +4200,6 @@ void WriteTabularTariffReports(EnergyPlusData &state)
     Array1D_string rowHead;
     Array2D_string tableBody;
     // other local variables
-    int elecFacilMeter;
-    int gasFacilMeter;
     Real64 elecTotalCost;
     Real64 gasTotalCost;
     Real64 otherTotalCost;
@@ -4248,8 +4243,6 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             // Economics Results Summary Report
             //---------------------------------
             WriteReportHeaders(state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
-            gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
@@ -4295,11 +4288,12 @@ void WriteTabularTariffReports(EnergyPlusData &state)
                         allTotalCost += tariff(iTariff).totalAnnualCost;
                         if (tariff(iTariff).kindElectricMtr >= kindMeterElecSimple) {
                             elecTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else if (tariff(iTariff).reportMeterIndx == gasFacilMeter) {
+                        } else if (tariff(iTariff).kindGasMtr == kindMeterGas) {
                             gasTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else {
+                        } else if (tariff(iTariff).kindWaterMtr == kindMeterNotWater) {
                             otherTotalCost += tariff(iTariff).totalAnnualCost;
                             // removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
+                        } else {
                         }
                     }
                 }
