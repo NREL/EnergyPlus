@@ -141,9 +141,10 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
     int NumNums(0);
     int NumAlphas(0);
     int IOStat(0);
-    std::string const CurrentModuleObject = CurrentModuleObjects(CMO_OAController);
+    std::string const CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::OAController));
 
-    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        *state, CurrentModuleObjects(static_cast<int>(CMO::OAController)), NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
     Array1D_string AlphArray(NumAlphas);
@@ -1489,9 +1490,10 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     int NumNums(0);
     int NumAlphas(0);
     int IOStat(0);
-    std::string const CurrentModuleObject = CurrentModuleObjects(CMO_OAController);
+    std::string const CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::OAController));
 
-    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        *state, CurrentModuleObjects(static_cast<int>(CMO::OAController)), NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
     Array1D_string AlphArray(NumAlphas);
@@ -1622,9 +1624,10 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     int NumNums(0);
     int NumAlphas(0);
     int IOStat(0);
-    std::string const CurrentModuleObject = CurrentModuleObjects(CMO_OAController);
+    std::string const CurrentModuleObject = CurrentModuleObjects(static_cast<int>(CMO::OAController));
 
-    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        *state, CurrentModuleObjects(static_cast<int>(CMO::OAController)), NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
     Array1D_string AlphArray(NumAlphas);

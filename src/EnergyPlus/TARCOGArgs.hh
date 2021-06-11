@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
 
 namespace EnergyPlus::TARCOGArgs {
@@ -125,7 +126,7 @@ int ArgCheck(EnergyPlusData &state,
              const Array1D<Real64> &LaminateA,
              const Array1D<Real64> &LaminateB,
              const Array1D<Real64> &sumsol,
-             int standard,
+             TARCOGGassesParams::Stdrd standard,
              TARCOGParams::TARCOGThermalModel ThermalMod,
              Real64 SDScalar,
              std::string &ErrorMessage);

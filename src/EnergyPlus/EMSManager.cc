@@ -450,10 +450,10 @@ namespace EMSManager {
             if ((ErlVariableNum > 0) && (state.dataRuntimeLang->Sensor(SensorNum).Index > 0)) {
                 if (state.dataRuntimeLang->Sensor(SensorNum).SchedNum == 0) { // not a schedule so get from output processor
 
-                    state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value =
-                        SetErlValueNumber(GetInternalVariableValue(
-                                              state, state.dataRuntimeLang->Sensor(SensorNum).Type, state.dataRuntimeLang->Sensor(SensorNum).Index),
-                                          state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value);
+                    state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value = SetErlValueNumber(
+                        GetInternalVariableValue(
+                            state, state.dataRuntimeLang->Sensor(SensorNum).VariableType, state.dataRuntimeLang->Sensor(SensorNum).Index),
+                        state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value);
                 } else { // schedule so use schedule service
 
                     state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value =
@@ -522,7 +522,7 @@ namespace EMSManager {
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
-        int VarType;
+        OutputProcessor::VariableType VarType;
         int VarIndex;
         bool FoundObjectType;
         bool FoundObjectName;
@@ -650,15 +650,15 @@ namespace EMSManager {
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                         ShowContinueError(state, "Meter Name found; Key Name will be ignored"); // why meters have no keys..
                     } else {
-                        state.dataRuntimeLang->Sensor(SensorNum).Type = 3;
+                        state.dataRuntimeLang->Sensor(SensorNum).VariableType = OutputProcessor::VariableType::Meter;
                         state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
                         state.dataRuntimeLang->Sensor(SensorNum).CheckedOkay = true;
                     }
                 } else {
                     // Search for variable names
                     GetVariableTypeAndIndex(state, cAlphaArgs(3), cAlphaArgs(2), VarType, VarIndex);
-                    if (VarType != 0) {
-                        state.dataRuntimeLang->Sensor(SensorNum).Type = VarType;
+                    if (VarType != OutputProcessor::VariableType::NotFound) {
+                        state.dataRuntimeLang->Sensor(SensorNum).VariableType = VarType;
                         if (VarIndex != 0) {
                             state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
                             state.dataRuntimeLang->Sensor(SensorNum).CheckedOkay = true;
@@ -1039,7 +1039,7 @@ namespace EMSManager {
         int SensorNum; // local loop
         //  INTEGER :: VariableNum  ! local do loop index
         int VarIndex;
-        int VarType;
+        OutputProcessor::VariableType VarType;
         bool ErrorsFound(false);
         int ActuatorNum;
         bool FoundObjectType;
@@ -1058,7 +1058,7 @@ namespace EMSManager {
             VarIndex = GetMeterIndex(state, state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
             if (VarIndex > 0) {
 
-                state.dataRuntimeLang->Sensor(SensorNum).Type = 3;
+                state.dataRuntimeLang->Sensor(SensorNum).VariableType = OutputProcessor::VariableType::Meter;
                 state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
 
             } else {
@@ -1068,7 +1068,7 @@ namespace EMSManager {
                                         state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName,
                                         VarType,
                                         VarIndex);
-                if (VarType == 0) {
+                if (VarType == OutputProcessor::VariableType::NotFound) {
                     if (reportErrors) {
                         ShowSevereError(state,
                                         "Invalid Output:Variable or Output:Meter Name =" + state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
@@ -1087,7 +1087,7 @@ namespace EMSManager {
                         ErrorsFound = true;
                     }
                 } else {
-                    state.dataRuntimeLang->Sensor(SensorNum).Type = VarType;
+                    state.dataRuntimeLang->Sensor(SensorNum).VariableType = VarType;
                     state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
                     state.dataRuntimeLang->Sensor(SensorNum).CheckedOkay = true;
                     // If variable is Schedule Value, then get the schedule id to register it as being used
@@ -1288,7 +1288,8 @@ namespace EMSManager {
         }
     }
 
-    void GetVariableTypeAndIndex(EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex)
+    void GetVariableTypeAndIndex(
+        EnergyPlusData &state, std::string const &VarName, std::string const &VarKeyName, OutputProcessor::VariableType &VarType, int &VarIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1322,7 +1323,7 @@ namespace EMSManager {
         Array1D_int KeyIndex;
         bool Found;
 
-        VarType = 0;
+        VarType = OutputProcessor::VariableType::NotFound;
         VarIndex = 0;
         Found = false;
         GetVariableKeyCountandType(state, VarName, NumKeys, VarType, AvgOrSum, StepType, Units);
@@ -2102,15 +2103,15 @@ namespace EMSManager {
                              state.dataSurface->Surface(SurfNum).Name,
                              "Interior Surface Convection Heat Transfer Coefficient",
                              "[W/m2-K]",
-                             state.dataSurface->Surface(SurfNum).EMSOverrideIntConvCoef,
-                             state.dataSurface->Surface(SurfNum).EMSValueForIntConvCoef);
+                             state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum),
+                             state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum));
             SetupEMSActuator(state,
                              "Surface",
                              state.dataSurface->Surface(SurfNum).Name,
                              "Exterior Surface Convection Heat Transfer Coefficient",
                              "[W/m2-K]",
-                             state.dataSurface->Surface(SurfNum).EMSOverrideExtConvCoef,
-                             state.dataSurface->Surface(SurfNum).EMSValueForExtConvCoef);
+                             state.dataSurface->SurfEMSOverrideExtConvCoef(SurfNum),
+                             state.dataSurface->SurfEMSValueForExtConvCoef(SurfNum));
         }
     }
 
@@ -2138,8 +2139,8 @@ namespace EMSManager {
                              state.dataSurface->Surface(SurfNum).Name,
                              "Construction State",
                              "[ ]",
-                             state.dataSurface->Surface(SurfNum).EMSConstructionOverrideON,
-                             state.dataSurface->Surface(SurfNum).EMSConstructionOverrideValue);
+                             state.dataSurface->SurfEMSConstructionOverrideON(SurfNum),
+                             state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum));
         }
 
         // Setup error checking storage
@@ -2184,39 +2185,39 @@ namespace EMSManager {
                              state.dataSurface->Surface(SurfNum).Name,
                              "View Factor To Ground",
                              "[ ]",
-                             state.dataSurface->Surface(SurfNum).ViewFactorGroundEMSOverrideOn,
-                             state.dataSurface->Surface(SurfNum).ViewFactorGroundEMSOverrideValue);
+                             state.dataSurface->SurfViewFactorGroundEMSOverrideOn(SurfNum),
+                             state.dataSurface->SurfViewFactorGroundEMSOverrideValue(SurfNum));
 
             SetupEMSActuator(state,
                              "Surface",
                              state.dataSurface->Surface(SurfNum).Name,
                              "Outdoor Air Drybulb Temperature",
                              "[C]",
-                             state.dataSurface->Surface(SurfNum).OutDryBulbTempEMSOverrideOn,
-                             state.dataSurface->Surface(SurfNum).OutDryBulbTempEMSOverrideValue);
+                             state.dataSurface->SurfOutDryBulbTempEMSOverrideOn(SurfNum),
+                             state.dataSurface->SurfOutDryBulbTempEMSOverrideValue(SurfNum));
 
             SetupEMSActuator(state,
                              "Surface",
                              state.dataSurface->Surface(SurfNum).Name,
                              "Outdoor Air Wetbulb Temperature",
                              "[C]",
-                             state.dataSurface->Surface(SurfNum).OutWetBulbTempEMSOverrideOn,
-                             state.dataSurface->Surface(SurfNum).OutWetBulbTempEMSOverrideValue);
+                             state.dataSurface->SurfOutWetBulbTempEMSOverrideOn(SurfNum),
+                             state.dataSurface->SurfOutWetBulbTempEMSOverrideValue(SurfNum));
             if (state.dataSurface->Surface(SurfNum).ExtWind) {
                 SetupEMSActuator(state,
                                  "Surface",
                                  state.dataSurface->Surface(SurfNum).Name,
                                  "Outdoor Air Wind Speed",
                                  "[m/s]",
-                                 state.dataSurface->Surface(SurfNum).WindSpeedEMSOverrideOn,
-                                 state.dataSurface->Surface(SurfNum).WindSpeedEMSOverrideValue);
+                                 state.dataSurface->SurfWindSpeedEMSOverrideOn(SurfNum),
+                                 state.dataSurface->SurfWindSpeedEMSOverrideValue(SurfNum));
                 SetupEMSActuator(state,
                                  "Surface",
                                  state.dataSurface->Surface(SurfNum).Name,
                                  "Outdoor Air Wind Direction",
                                  "[degree]",
-                                 state.dataSurface->Surface(SurfNum).WindDirEMSOverrideOn,
-                                 state.dataSurface->Surface(SurfNum).WindDirEMSOverrideValue);
+                                 state.dataSurface->SurfWindDirEMSOverrideOn(SurfNum),
+                                 state.dataSurface->SurfWindDirEMSOverrideValue(SurfNum));
             }
         }
     }

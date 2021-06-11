@@ -2715,7 +2715,7 @@
     Gap_1_Layer,             !- Gap 2 Name
     ,                        !- Gap 2 Directional Front Absoptance Matrix Name
     ,                        !- Gap 2 Directional Back Absoptance Matrix Name
-    Glass_5012_Layer,        !- Layer 3 Material
+    Glass_5012_Layer,        !- Layer 3 Name
     CFS_Glz_2035_Layer_3_fAbs,  !- Layer 3 Directional Front Absoptance Matrix Name
     CFS_Glz_2035_Layer_3_bAbs;  !- Layer 3 Directional Back Absoptance Matrix Name
 
@@ -9885,7 +9885,7 @@
     Gap_1_Layer,             !- Gap 2 Name
     ,                        !- Gap 2 Directional Front Absoptance Matrix Name
     ,                        !- Gap 2 Directional Back Absoptance Matrix Name
-    Shade_46_Layer,          !- Layer 3 Material
+    Shade_46_Layer,          !- Layer 3 Name
     CFS_Glz_2046_Layer_3_fAbs,  !- Layer 3 Directional Front Absoptance Matrix Name
     CFS_Glz_2046_Layer_3_bAbs;  !- Layer 3 Directional Back Absoptance Matrix Name
 
