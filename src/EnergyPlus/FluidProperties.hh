@@ -102,7 +102,7 @@ namespace FluidProperties {
     int const t_sh_precision_bits = 24;
     Int64 const t_sh_cache_mask = (t_sh_cache_size - 1);
 #endif
-    // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
+    // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTIONS:
 
     // Types
 
