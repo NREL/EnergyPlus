@@ -59,31 +59,35 @@ In subroutine InitSolReflRecSurf, the following is determined for each ray, \emp
 The factor for reflection of sky radiation from obstructions onto a receiving surface is calculated in subroutine CalcSkySolDiffuseReflFactors. It is given by:
 
 \begin{equation}
-\begin{array}{l}{\rm{ReflFacSkySolObs(RecSurfNum)}} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{obs,i}}ViewFacSk{y_{obs,i}}DifShdgRatioIsoSk{y_{obs,i}}{\rho_{obs,i}}\cos {\alpha_i}/\pi } } \end{array}
+\begin{array}{l}
+{SurfReflFacSkySolObs(RecSurfNum)} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{obs,i}}ViewFacSk{y_{obs,i}}DifShdgRatioIsoSk{y_{obs,i}}{\rho_{obs,i}}\cos {\alpha_i}/\pi } }
+\end{array}
 \end{equation}
 
 where
 
-RecSurfNum is the receiving surface number,
+\({RecSurfNum}\) is the receiving surface number,
 
 \({N_{rec}}\) is the number of receiving points,
 
 \({N_{ray}}\) is the number of rays,
 
-``\emph{obs,i}'' denotes the obstruction hit by ray \emph{i},
+\({obs,i}\) denotes the obstruction hit by ray \emph{i},
 
-\emph{Hit\(_{obs,i}\)} = 1 if ray \emph{i} hits an obstruction, = 0 otherwise,
+\({Hit\(_{obs,i}}\) = 1 if ray \emph{i} hits an obstruction, = 0 otherwise,
 
-\emph{ViewFacSky\(_{obs,i}\)} = unobstructed sky view factor of the obstruction = \((1 + \cos til{t_{obs}})/2\) ,
+\({ViewFacSky\(_{obs,i}}\) = unobstructed sky view factor of the obstruction = \((1 + \cos til{t_{obs}})/2\) ,
 
-\emph{DifShdgRatioIsoSky\(_{obs,i}\)} = (obstructed sky irradiance on obstruction)/(unobstructed sky irradiance on obstruction)
+\({DifShdgRatioIsoSky\(_{obs,i}}\) = (obstructed sky irradiance on obstruction)/(unobstructed sky irradiance on obstruction)
 
 In this equation, the product \emph{ViewFacSky*DifShdgRatioIsoSky} is the sky irradiance at the hit point divided by the horizontal sky irradiance taking into account shadowing of sky diffuse radiation on the obstruction by other obstructions, and assuming that the radiance of the sky is uniform. Note that we ignore secondary reflections here and in the following sections. In the present case this means that the irradiance at the hit point due to reflection of sky radiation from the ground or from other obstructions is not considered.
 
 The above reflection factor is used in the timestep calculation to find the irradiance on a receiving surface due to sky radiation reflected from obstructions:
 
 \begin{equation}
-QRadSWOutIncSkyDiffReflObs(RecSurfNum) = DifSolarRad * ReflFacSkySolObs(RecSurfNum) (W/m^{2})
+\begin{array}{l}
+{QRadSWOutIncSkyDiffReflObs(RecSurfNum)} = \\{DifSolarRad * SurfReflFacSkySolObs(RecSurfNum) (W/m^{2})}
+\end{array}
 \end{equation}
 
 where \emph{DifSolarRad} is the horizontal sky irradiance on an unobstructed horizontal plane (W/m\(^{2}\)).
@@ -102,7 +106,7 @@ The factor for reflection of sky radiation from the ground onto a receiving surf
 
 \begin{equation}
 \begin{array}{l}
-{\rm{ReflFacSkySolGnd(RecSurfNum)}} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {\left[ {(Hi{t_{gnd,i}}d{\Omega_i}\cos {\alpha_i}/\pi )\sum\limits_{j(i)}^{{N_{ray}}} {Hi{t_{sky,j(i)}}\cos {\alpha_{j(i)}}d{\Omega_{j(i)}}/\pi } } \right]} }
+{SurfReflFacSkySolGnd(RecSurfNum)} = \\\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {\left[ {(Hi{t_{gnd,i}}d{\Omega_i}\cos {\alpha_i}/\pi )\sum\limits_{j(i)}^{{N_{ray}}} {Hi{t_{sky,j(i)}}\cos {\alpha_{j(i)}}d{\Omega_{j(i)}}/\pi } } \right]} }
 \end{array}
 \end{equation}
 
@@ -119,7 +123,9 @@ where
 This factor is used in the timestep calculation to find the irradiance on a receiving surface due to sky radiation reflected from the ground:
 
 \begin{equation}
-QRadSWOutIncSkyDiffReflGnd(RecSurfNum) = DifSolarRad * {\rho_{gnd}} * ReflFacSkySolGnd(RecSurfNum)~ (W/m^{2})
+\begin{array}{l}
+{QRadSWOutIncSkyDiffReflGnd(RecSurfNum)} = \\{DifSolarRad * {\rho_{gnd}} * SurfReflFacSkySolGnd(RecSurfNum)~ (W/m^{2})}
+\end{array}
 \end{equation}
 
 where \({\rho_{gnd}}\) is the solar reflectance of the ground, which is assumed to be uniform over the ground plane but may vary monthly (because of snow cover, for example).
@@ -134,7 +140,7 @@ The factor for diffuse reflection of beam solar radiation from obstructions onto
 
 {\scriptsize
 \begin{equation}
-{\rm{ReflFacBmToDiffSolObs(RecSurfNum,IHr)}} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{obs,i}}Hi{t_{obs,i,sun}}d{\Omega_i}\cos {\alpha_i}{\rho_{obs,i}}\cos {\alpha_{sun,obs,i}}} }
+{SurfReflFacBmToDiffSolObs(RecSurfNum,IHr)} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{obs,i}}Hi{t_{obs,i,sun}}d{\Omega_i}\cos {\alpha_i}{\rho_{obs,i}}\cos {\alpha_{sun,obs,i}}} }
 \end{equation}}
 
 where
@@ -152,8 +158,8 @@ This factor is used in the timestep calculation to find the diffuse irradiance o
 \begin{equation}
 \begin{split}
 QRadSWOutIncBmToDiffReflObs(RecSurfNum) = BeamSolarRad \\
-* (WeightNow * ReflFacBmToDiffSolObs(RecSurfNum,HourOfDay) \\
-+ WeightPreviousHour * ReflFacBmToDiffSolObs(RecSurfNum,PreviousHour))
+* (WeightNow * SurfReflFacBmToDiffSolObs(RecSurfNum,HourOfDay) \\
++ WeightPreviousHour * SurfReflFacBmToDiffSolObs(RecSurfNum,PreviousHour))
 \end{split}
 \end{equation}
 
@@ -165,7 +171,7 @@ This calculation is the same as that for beam solar diffusely reflected from obs
 
 {\scriptsize
 \begin{equation}
-{\rm{ReflFacBmToDiffSolGnd(RecSurfNum,IHr)}} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{gnd,i}}Hi{t_{gnd,i,sun}}d{\Omega_i}\cos {\alpha_{gnd,i}}\cos {\alpha_{sun,gnd}}} }
+{SurfReflFacBmToDiffSolGnd(RecSurfNum,IHr)} = \frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {\sum\limits_{i = 1}^{{N_{ray}}} {Hi{t_{gnd,i}}Hi{t_{gnd,i,sun}}d{\Omega_i}\cos {\alpha_{gnd,i}}\cos {\alpha_{sun,gnd}}} }
 \end{equation}}
 
 where
@@ -179,7 +185,11 @@ where
 This factor is used in the timestep calculation to find the diffuse irradiance on a receiving surface due to beam solar diffusely reflected from the ground:
 
 \begin{equation}
-QRadSWOutIncBmToDiffReflGnd(RecSurfNum) = BeamSolarRad * {\rho_{gnd}} * (WeightNow * ReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay) + WeightPreviousHour * ReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
+\begin{split}
+QRadSWOutIncBmToDiffReflGnd(RecSurfNum) = 
+\\BeamSolarRad * {\rho_{gnd}} * (WeightNow * SurfReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay)
+\\+ WeightPreviousHour * SurfReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
+\end{split}
 \end{equation}
 
 \subsection{Beam Solar Radiation Specularly Reflected from Obstructions}\label{beam-solar-radiation-specularly-reflected-from-obstructions}
@@ -223,7 +233,10 @@ where
 The factor for specular reflection of beam solar from obstruction onto a receiving surface is calculated in subroutine CalcBeamSolSpecularReflFactors. It is given by:
 
 \begin{equation}
-{\rm{ReflFacBmToBmSolObs(RecSurfNum,IHr) }} = \sum\limits_{\scriptstyle \substack{specularly \, reflecting \, surfaces}} \left[ {\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {{f_{C,glazed}}{\rho_{spec}}({\alpha_C})\cos {\alpha_D}} } \right]
+\begin{split}
+{{SurfReflFacBmToBmSolObs(RecSurfNum,IHr) } = 
+\\\sum\limits_{\scriptstyle \substack{specularly \, reflecting \, surfaces}} \left[ {\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {{f_{C,glazed}}{\rho_{spec}}({\alpha_C})\cos {\alpha_D}} } \right]
+\end{split}
 \end{equation}
 
 The program assumes that specular reflection from a surface is due to glazing. If the reflecting surface is a window belonging to the building itself (as in Figure~\ref{fig:solar-reflection-from-building-surfaces-onto}), then \({f_{C,glazed}}\) is the fraction of the window that is glazed (which is 1.0 unless the window has dividers).
@@ -243,5 +256,9 @@ In this case \({f_{C,glazed}}\) is ``Fraction of shading surface that is glazed'
 The above specular reflection factor is used in the timestep calculation to find the beam irradiance on a receiving surface due to beam-beam reflection from obstructions:
 
 \begin{equation}
-QRadSWOutIncBmToBmReflObsRecSurfNum) = BeamSolarRad * (WeightNow * ReflFacBmToBmSolObs(RecSurfNum,HourOfDay) + WeightPreviousHour * ReflFacBmToBmSolObs(RecSurfNum,PreviousHour))
+\begin{split}
+QRadSWOutIncBmToBmReflObsRecSurfNum) = 
+\\BeamSolarRad * (WeightNow * SurfReflFacBmToBmSolObs(RecSurfNum,HourOfDay) 
+\\+ WeightPreviousHour * SurfReflFacBmToBmSolObs(RecSurfNum,PreviousHour))
+\end{split}
 \end{equation}

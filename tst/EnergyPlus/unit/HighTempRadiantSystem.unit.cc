@@ -103,6 +103,8 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->Surface(1).Name = "WALL1";
     state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->SurfIntConvSurfGetsRadiantHeat.allocate(1);
+    state->dataSurface->SurfIntConvSurfGetsRadiantHeat = 0.0;
 
     ErrorsFound = false;
 

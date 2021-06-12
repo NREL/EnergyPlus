@@ -141,7 +141,7 @@ int ArgCheck(EnergyPlusData &state,
              const Array1D<Real64> &LaminateA,
              const Array1D<Real64> &LaminateB,
              const Array1D<Real64> &sumsol,
-             int const standard,
+             TARCOGGassesParams::Stdrd const standard,
              TARCOGThermalModel const ThermalMod,
              Real64 const SDScalar,
              std::string &ErrorMessage)
@@ -341,7 +341,7 @@ int ArgCheck(EnergyPlusData &state,
         return ArgCheck;
     }
 
-    if ((standard < MinStandard) || (standard > MaxStandard)) {
+    if ((static_cast<int>(standard) < MinStandard) || (static_cast<int>(standard) > MaxStandard)) {
         ArgCheck = 28;
         ErrorMessage = "Invalid code for standard.";
         return ArgCheck;

@@ -103,6 +103,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataSurface->SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->BackSurfaces.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
     state->dataHeatBal->OverlapAreas.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
 
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
@@ -1456,9 +1457,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
         if (state->dataSurface->Surface(SurfNum).ExtBoundCond == 0 && state->dataSurface->Surface(SurfNum).Zone != 0) {
-            int ZoneSize = state->dataSurface->Surface(SurfNum).DisabledShadowingZoneList.size();
+            int ZoneSize = state->dataSurface->SurfShadowDisabledZoneList(SurfNum).size();
             EXPECT_EQ(1, ZoneSize);
-            std::vector<int> DisabledZones = state->dataSurface->Surface(SurfNum).DisabledShadowingZoneList;
+            std::vector<int> DisabledZones = state->dataSurface->SurfShadowDisabledZoneList(SurfNum);
             for (int i : DisabledZones) {
                 EXPECT_EQ(1, i);
             }
