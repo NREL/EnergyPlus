@@ -513,7 +513,9 @@ namespace FluidProperties {
         Int64 const Grid_Shift(28);
         assert(Grid_Shift == 64 - 12 - t_sh_precision_bits);
 
-        Int64 const T_tag(bit_shift(bit_transfer(Temperature + 1000 * GlycolIndex, Grid_Shift), -Grid_Shift));
+        double const t(Temperature + 1000 * GlycolIndex);
+        unsigned long long const &u(*reinterpret_cast<unsigned long long const *>(&t) >> Grid_Shift);
+        Int64 const T_tag(*reinterpret_cast<Int64 const *>(&u));
 
         Int64 const hash(T_tag & t_sh_cache_mask);
         auto &cTsh(cached_t_sh(hash));
