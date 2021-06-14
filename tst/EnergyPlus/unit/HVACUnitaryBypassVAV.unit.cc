@@ -791,7 +791,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     // There is no load here and CBVAV.HeatCoolMode did not change so cbvav.changeOverTimer also did not get set (change) in previous call
     // so there is no need to reset cbvav.changeOverTimer here but it wouldn't hurt if it was reset to -1.0
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::OperMode::Unassigned);
+    EXPECT_EQ(cbvav.HeatCoolMode, 0);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
     EXPECT_NEAR(state->dataLoopNodes->Node(cbvav.AirInNode).Temp, state->dataLoopNodes->Node(cbvav.AirOutNode).Temp, 0.0001);
@@ -883,7 +883,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     state->dataAirLoop->AirLoopFlow.allocate(cbvav.AirLoopNumber);
 
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::OperMode::Unassigned);
+    EXPECT_EQ(cbvav.HeatCoolMode, 0);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
     // coil off outlet condition is affected by outdoor air therefore inlet/outlet conditions are different
@@ -971,7 +971,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     cbvav.OpMode = DataHVACGlobals::CycFanCycCoil; // set fan operating mode
 
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::OperMode::Unassigned);
+    EXPECT_EQ(cbvav.HeatCoolMode, 0);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
     EXPECT_NEAR(state->dataLoopNodes->Node(cbvav.AirInNode).Temp, state->dataLoopNodes->Node(cbvav.AirOutNode).Temp, 0.0001);
