@@ -98,9 +98,9 @@ namespace FluidProperties {
     // MODULE VARIABLE DECLARATIONS
 
 #ifdef EP_cache_GlycolSpecificHeat
-    int const t_sh_cache_size = 1024 * 1024;
-    int const t_sh_precision_bits = 24;
-    Int64 const t_sh_cache_mask = (t_sh_cache_size - 1);
+    int constexpr t_sh_cache_size = 1024 * 1024;
+    int constexpr t_sh_precision_bits = 24;
+    std::uint64_t constexpr t_sh_cache_mask = (t_sh_cache_size - 1);
 #endif
     // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTIONS:
 
@@ -342,11 +342,11 @@ namespace FluidProperties {
     struct cached_tsh
     {
         // Members
-        Int64 iT;
+        std::uint64_t iT;
         Real64 sh;
 
         // Default Constructor
-        cached_tsh() : iT(-1000), sh(0.0)
+        cached_tsh() : iT(1000), sh(0.0)
         {
         }
     };
@@ -510,14 +510,13 @@ namespace FluidProperties {
                                         std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-        Int64 const Grid_Shift(28);
+        std::uint64_t constexpr Grid_Shift(28);
         assert(Grid_Shift == 64 - 12 - t_sh_precision_bits);
 
         double const t(Temperature + 1000 * GlycolIndex);
-        unsigned long long const &u(*reinterpret_cast<unsigned long long const *>(&t) >> Grid_Shift);
-        Int64 const T_tag(*reinterpret_cast<Int64 const *>(&u));
+        std::uint64_t const T_tag(*reinterpret_cast<std::uint64_t const *>(&t) >> Grid_Shift);
 
-        Int64 const hash(T_tag & t_sh_cache_mask);
+        std::uint64_t const hash(T_tag & t_sh_cache_mask);
         auto &cTsh(cached_t_sh(hash));
 
         if (cTsh.iT != T_tag) {
@@ -600,7 +599,7 @@ namespace FluidProperties {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Real64 const TempToler(0.001); // Some reasonable value for comparisons
+        Real64 constexpr TempToler(0.001); // Some reasonable value for comparisons
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -751,9 +750,6 @@ struct FluidPropertiesData : BaseGlobalStruct
     int RefrigerantErrorLimitTest = 1; // how many times error is printed with details before recurring called
     Array1D_bool RefrigUsed;
     Array1D_bool GlycolUsed;
-    int FluidIndex_Water = 0;
-    int FluidIndex_EthyleneGlycol = 0;
-    int FluidIndex_PropoleneGlycol = 0;
 
     Array1D<FluidProperties::FluidPropsRefrigerantData> RefrigData;
     Array1D<FluidProperties::FluidPropsRefrigErrors> RefrigErrorTracking;
@@ -787,9 +783,6 @@ struct FluidPropertiesData : BaseGlobalStruct
         this->RefrigerantErrorLimitTest = 1;
         this->RefrigUsed.deallocate();
         this->GlycolUsed.deallocate();
-        this->FluidIndex_Water = 0;
-        this->FluidIndex_EthyleneGlycol = 0;
-        this->FluidIndex_PropoleneGlycol = 0;
 
         this->RefrigData.deallocate();
         this->RefrigErrorTracking.deallocate();

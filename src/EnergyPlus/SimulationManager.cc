@@ -3034,11 +3034,6 @@ namespace SimulationManager {
             ShowFatalError(state, "Preprocessor condition(s) cause termination.");
         }
 
-        // Set up more globals - process fluid input.
-        state.dataFluidProps->FluidIndex_Water = FindGlycol(state, "Water");
-        state.dataFluidProps->FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
-        state.dataFluidProps->FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
-
         state.dataInputProcessing->inputProcessor->preScanReportingVariables(state);
     }
 
