@@ -62,7 +62,6 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {

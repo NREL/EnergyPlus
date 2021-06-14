@@ -65,14 +65,6 @@ namespace DataHVACGlobals {
     // Data
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
-    enum class HVACSystemRootSolverAlgorithm : int
-    {
-        RegulaFalsi = 0,
-        Bisection,
-        RegulaFalsiThenBisection,
-        BisectionThenRegulaFalsi,
-        Alternation
-    };
 
     // MODULE PARAMETER DEFINITIONS:
 
@@ -380,18 +372,6 @@ namespace DataHVACGlobals {
         OptStartDataType() = default;
     };
 
-    struct HVACSystemRootFindingAlgorithm
-    {
-        // Members
-        std::string Algorithm;                              // Choice of algorithm
-        int NumOfIter;                                      // Number of Iteration Before Algorith Switch
-        HVACSystemRootSolverAlgorithm HVACSystemRootSolver; // 1 RegulaFalsi; 2 Bisection; 3 BisectionThenRegulaFalsi; 4 RegulaFalsiThenBisection; 5
-                                                            // Alternation Default Constructor
-        HVACSystemRootFindingAlgorithm() : NumOfIter(5), HVACSystemRootSolver(HVACSystemRootSolverAlgorithm::RegulaFalsi)
-        {
-        }
-    };
-
 } // namespace DataHVACGlobals
 
 struct HVACGlobalsData : BaseGlobalStruct
@@ -400,7 +380,6 @@ struct HVACGlobalsData : BaseGlobalStruct
     Array1D<DataHVACGlobals::ZoneCompTypeData> ZoneComp;
     DataHVACGlobals::OptStartDataType OptStartData; // For optimum start
     Array1D<DataHVACGlobals::ComponentSetPtData> CompSetPtEquip;
-    DataHVACGlobals::HVACSystemRootFindingAlgorithm HVACSystemRootFinding;
 
     // Hybrid ventilation control part
     int NumHybridVentSysAvailMgrs = 0;              // Number of hybrid ventilation control

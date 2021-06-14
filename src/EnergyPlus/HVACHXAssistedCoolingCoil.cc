@@ -558,7 +558,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsParent);
             CoolingCoilInletNodeNum = GetOnlySingleNode(state,
                                                         state.dataLoopNodes->NodeID(SupplyAirOutletNode),
@@ -567,7 +567,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Internal,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         ObjectIsParent);
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum =
                 GetOnlySingleNode(state,
@@ -577,7 +577,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Internal,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsParent);
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -587,7 +587,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsParent);
 
             // Add cooling coil to component sets array
@@ -798,7 +798,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Inlet,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsParent);
             CoolingCoilInletNodeNum = GetOnlySingleNode(state,
                                                         state.dataLoopNodes->NodeID(SupplyAirOutletNode),
@@ -807,7 +807,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Internal,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         ObjectIsParent);
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum =
                 GetOnlySingleNode(state,
@@ -817,7 +817,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Internal,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsParent);
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum =
                 GetOnlySingleNode(state,
@@ -827,7 +827,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsParent);
 
             // Add cooling coil to component sets array

@@ -79,7 +79,6 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -324,7 +323,7 @@ namespace UnitHeater {
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       1,
+                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                        ObjectIsParent);
 
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode = GetOnlySingleNode(state,
@@ -334,7 +333,7 @@ namespace UnitHeater {
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         ObjectIsParent);
 
             // Fan information:
@@ -1501,18 +1500,9 @@ namespace UnitHeater {
         using DataZoneEquipment::UnitHeater_Num;
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
-        using TempSolveRoot::SolveRoot;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIter(100); // maximum number of iterations
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControlNode;        // the hot water inlet node

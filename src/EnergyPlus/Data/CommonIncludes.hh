@@ -174,6 +174,7 @@
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>

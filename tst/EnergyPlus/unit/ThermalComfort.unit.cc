@@ -711,7 +711,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     //	compare_err_stream( "" );
 
     state->dataHeatBalFanSys->ZTAVComf(1) = 25.0;
-    state->dataHeatBal->MRT(1) = 26.0;
+    state->dataHeatBal->ZoneMRT(1) = 26.0;
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -720,7 +720,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 38.3, 0.1);
 
     state->dataHeatBalFanSys->ZTAVComf(1) = 26.0;
-    state->dataHeatBal->MRT(1) = 27.0;
+    state->dataHeatBal->ZoneMRT(1) = 27.0;
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -729,7 +729,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 20.6, 0.1);
 
     state->dataHeatBalFanSys->ZTAVComf(1) = 27.0;
-    state->dataHeatBal->MRT(1) = 28.0;
+    state->dataHeatBal->ZoneMRT(1) = 28.0;
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -738,7 +738,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 9.4, 0.1);
 
     state->dataHeatBalFanSys->ZTAVComf(1) = 25.0;
-    state->dataHeatBal->MRT(1) = 26.0;
+    state->dataHeatBal->ZoneMRT(1) = 26.0;
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00629; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -952,7 +952,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZTAVComf.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->MRT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZoneMRT.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
@@ -1017,7 +1017,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     Real64 CloUnit = 0.5;
 
     state->dataHeatBalFanSys->ZTAVComf(1) = AirTemp;
-    state->dataHeatBal->MRT(1) = RadTemp;
+    state->dataHeatBal->ZoneMRT(1) = RadTemp;
     state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) =
         Psychrometrics::PsyWFnTdbRhPb(*state, state->dataHeatBalFanSys->ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
     state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;

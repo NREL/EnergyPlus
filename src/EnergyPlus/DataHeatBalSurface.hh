@@ -97,14 +97,16 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> CTFSourceIn0;  // Construct.CTFSourceIn(0)
     Array1D<Real64> TH11Surf;      // TH(1,1,SurfNum)
     Array1D<Real64> QsrcHistSurf1; // QsrcHist(SurfNum, 1)
-    Array1D_int IsAdiabatic;       // 0 not adiabatic, 1 is adiabatic
-    Array1D_int IsNotAdiabatic;    // 1 not adiabatic, 0 is adiabatic
-    Array1D_int IsSource;          // 0 no internal source/sink, 1 has internal source/sing
-    Array1D_int IsNotSource;       // 1 no internal source/sink, 0 has internal source/sing
-    Array1D_int IsPoolSurf;        // 0 not pool, 1 is pool
-    Array1D_int IsNotPoolSurf;     // 1 not pool, 0 is pool
-    Array1D<Real64> TempTermSurf;  // TempTerm for heatbalance equation
-    Array1D<Real64> TempDivSurf;   // Divisor for heatbalance equation
+
+    // todo: merge Is and IsNot and reduce the assignation at each time steps
+    Array1D_int IsAdiabatic;      // 0 not adiabatic, 1 is adiabatic
+    Array1D_int IsNotAdiabatic;   // 1 not adiabatic, 0 is adiabatic
+    Array1D_int IsSource;         // 0 no internal source/sink, 1 has internal source/sing
+    Array1D_int IsNotSource;      // 1 no internal source/sink, 0 has internal source/sing
+    Array1D_int IsPoolSurf;       // 0 not pool, 1 is pool
+    Array1D_int IsNotPoolSurf;    // 1 not pool, 0 is pool
+    Array1D<Real64> TempTermSurf; // TempTerm for heatbalance equation
+    Array1D<Real64> TempDivSurf;  // Divisor for heatbalance equation
     // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
     Array1D<Real64> TempSurfIn;          // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempInsOld;          // TempSurfIn from previous iteration for convergence check
@@ -117,6 +119,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> TempUserLoc;         // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> TempSurfInRep;       // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> TempSurfInMovInsRep; // Temperature of interior movable insulation on the side facing the zone
+
+    // todo: to SurfRep arrays
     // (report)
     Array1D<Real64> QConvInReport; // Surface convection heat gain at inside face [J]
     Array1D<Real64> QdotConvInRep; // Surface convection heat transfer rate at inside face surface [W]
@@ -217,18 +221,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     // unusedREAL(r64), ALLOCATABLE, DIMENSION(:) :: QBV                 !Beam solar absorbed by interior shades in a zone, plus
     // diffuse from beam not absorbed in zone, plus
     // beam absorbed at inside surfaces
-    Array1D<Real64> EnclSolQD; // Diffuse solar radiation in a zone from sky and ground diffuse entering
-    // through exterior windows and reflecting from interior surfaces,
-    // beam from exterior windows reflecting from interior surfaces,
-    // and beam entering through interior windows (considered diffuse)
-    Array1D<Real64> EnclSolQDforDaylight; // Diffuse solar radiation in a zone from sky and ground diffuse entering
-    // through exterior windows, beam from exterior windows reflecting
-    // from interior surfaces, and beam entering through interior windows
-    // (considered diffuse)
-    // Originally QD, now used only for QSDifSol calc for daylighting
-    Array1D<Real64> EnclSolVMULT;              // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
+
     Array1D<Real64> SurfNetLWRadToSurf;        // Net interior long wavelength radiation to a surface from other surfaces
-    Array1D<Real64> ZoneMRT;                   // Zone Mean Radiant Temperature
     Array1D<Real64> SurfOpaqQRadSWLightsInAbs; // Short wave from Lights radiation absorbed on inside of opaque surface
     // Variables that are used in both the Surface Heat Balance and the Moisture Balance
     Array1D<Real64> SurfOpaqQRadSWOutAbs;  // Short wave radiation absorbed on outside of opaque surface
@@ -261,6 +255,20 @@ struct HeatBalSurfData : BaseGlobalStruct
     bool InterZoneWindow = false;        // True if there is an interzone window
     Real64 SumSurfaceHeatEmission = 0.0; // Heat emission from all surfaces
 
+    // Surface Heat Balance
+    Array1D<bool> SurfMovInsulExtPresent;       // True when interior movable insulation is present
+    Array1D<bool> SurfMovInsulIntPresent;       // True when interior movable insulation is present
+    Array1D<bool> SurfMovInsulIntPresentPrevTS; // True when interior movable insulation was present during the previous time step
+
+    Array1D<Real64> SurfMovInsulHExt;  // Resistance or "h" value of exterior movable insulation
+    Array1D<Real64> SurfMovInsulHInt;  // Resistance or "h" value of interior movable insulation
+    Array1D<Real64> SurfAbsSolarExt;   // Solar Absorptivity of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsThermalExt; // Thermal Absorptivity of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsSolarInt;   // Solar absorptivity of surface outside face or exterior movable insulation if present
+    Array1D<Real64> SurfRoughnessExt;  // Roughness of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsThermalInt; // Thermal absorptivity of surface outside face or exterior movable insulation if present
+    std::vector<int> SurfMovInsulIndexList;
+    std::vector<int> SurfMovSlatsIndexList;
     void clear_state() override
     {
         this->Zone_has_mixed_HT_models.clear();
@@ -341,11 +349,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfOpaqInsFaceBeamSolAbsorbed.deallocate();
         this->SurfTempOut.deallocate();
         this->SurfQRadSWOutMvIns.deallocate();
-        this->EnclSolQD.deallocate();
-        this->EnclSolQDforDaylight.deallocate();
-        this->EnclSolVMULT.deallocate();
         this->SurfNetLWRadToSurf.deallocate();
-        this->ZoneMRT.deallocate();
         this->SurfOpaqQRadSWLightsInAbs.deallocate();
         this->SurfOpaqQRadSWOutAbs.deallocate();
         this->SurfOpaqQRadSWInAbs.deallocate();
@@ -366,6 +370,18 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->RecDifShortFromZ.deallocate();
         this->InterZoneWindow = false;
         this->SumSurfaceHeatEmission = 0;
+        this->SurfMovInsulExtPresent.deallocate();
+        this->SurfMovInsulIntPresent.deallocate();
+        this->SurfMovInsulIntPresentPrevTS.deallocate();
+        this->SurfMovInsulHExt.deallocate();
+        this->SurfMovInsulHInt.deallocate();
+        this->SurfAbsSolarExt.deallocate();
+        this->SurfAbsThermalExt.deallocate();
+        this->SurfAbsSolarInt.deallocate();
+        this->SurfAbsThermalInt.deallocate();
+        this->SurfRoughnessExt.deallocate();
+        this->SurfMovInsulIndexList.clear();
+        this->SurfMovSlatsIndexList.clear();
     }
 };
 

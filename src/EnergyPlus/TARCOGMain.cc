@@ -436,7 +436,7 @@ void TARCOG90(EnergyPlusData &state,
               Real64 &hi,                                 // Internal heat transfer coefficient [W/m2 K] - EN673 and ISO 10292 procedure
               Array1D<Real64> &Ra,                        // Vector of Rayleigh numbers, for each gap
               Array1D<Real64> &Nu,                        // Vector of Nusselt numbers, for each gap
-              int const standard,                         // Calculation standard switch:
+              TARCOGGassesParams::Stdrd const standard,   // Calculation standard switch:
               TARCOGThermalModel const ThermalMod,        // Thermal model:
               int const Debug_mode,                       // Switch for debug output files:
               std::string const &Debug_dir,               // Target directory for debug files
@@ -771,7 +771,7 @@ void TARCOG90(EnergyPlusData &state,
 
     if (GoAhead(nperr)) {
 
-        if (standard == ISO15099) {
+        if (standard == TARCOGGassesParams::Stdrd::ISO15099) {
             Calc_ISO15099(state,
                           files,
                           nlayer,
@@ -867,7 +867,7 @@ void TARCOG90(EnergyPlusData &state,
                           SHGCCalc,
                           NumOfIterations,
                           edgeGlCorrFac);
-        } else if ((standard == EN673) || (standard == EN673Design)) {
+        } else if ((standard == TARCOGGassesParams::Stdrd::EN673) || (standard == TARCOGGassesParams::Stdrd::EN673Design)) {
             Calc_EN673(state,
                        files,
                        standard,
@@ -953,7 +953,7 @@ void TARCOG90(EnergyPlusData &state,
                 thick = state.dataTARCOGMain->thickTemp;
 
                 // after performed deflection recalculate temperatures with new gap widths
-                if (standard == ISO15099) {
+                if (standard == TARCOGGassesParams::Stdrd::ISO15099) {
                     Calc_ISO15099(state,
                                   files,
                                   nlayer,
@@ -1049,7 +1049,7 @@ void TARCOG90(EnergyPlusData &state,
                                   SHGCCalc,
                                   NumOfIterations,
                                   edgeGlCorrFac);
-                } else if ((standard == EN673) || (standard == EN673Design)) {
+                } else if ((standard == TARCOGGassesParams::Stdrd::EN673) || (standard == TARCOGGassesParams::Stdrd::EN673Design)) {
                     Calc_EN673(state,
                                files,
                                standard,

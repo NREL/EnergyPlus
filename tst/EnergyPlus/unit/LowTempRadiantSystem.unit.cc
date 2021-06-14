@@ -240,7 +240,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     ExpectedResult2 = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
     ExpectedResult2 = ExpectedResult2 / (state->dataSize->PlantSizData(2).DeltaT * RhoWater * CpWater);
 
-    state->dataLowTempRadSys->HydrRadSys(RadSysNum).NumCircCalcMethod = 0;
+    state->dataLowTempRadSys->HydrRadSys(RadSysNum).NumCircCalcMethod = CircuitCalc::Unassigned;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).NumOfSurfaces = 1;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).TubeLength = AutoSize;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).TotalSurfaceArea = 1500.0;
@@ -430,7 +430,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterOutNode = 4;
 
     // Hydronic - embeded tube length autosize
-    state->dataLowTempRadSys->CFloRadSys(RadSysNum).NumCircCalcMethod = 0;
+    state->dataLowTempRadSys->CFloRadSys(RadSysNum).NumCircCalcMethod = CircuitCalc::Unassigned;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).NumOfSurfaces = 1;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).TubeLength = AutoSize;
     state->dataLowTempRadSys->CFloRadSys(RadSysNum).TotalSurfaceArea = 150.0;
@@ -2356,6 +2356,10 @@ TEST_F(LowTempRadiantSystemTest, LowTempElecRadSurfaceGroupTest)
     state->dataSurface->Surface(4).Construction = 1;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
+    state->dataSurface->SurfIntConvSurfHasActiveInIt.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfIntConvSurfHasActiveInIt = false;
+    state->dataSurface->SurfIsRadSurfOrVentSlabOrPool = false;
 
     GetLowTempRadiantSystem(*state);
     EXPECT_EQ(2, state->dataLowTempRadSys->NumOfElecLowTempRadSys);
@@ -2925,7 +2929,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     Real64 acceptibleError = 0.001;
 
     state->dataHeatBalFanSys->MAT.allocate(1);
-    state->dataHeatBal->MRT.allocate(1);
+    state->dataHeatBal->ZoneMRT.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBalSurf->TempSurfIn.allocate(1);
     state->dataHeatBalSurf->TempUserLoc.allocate(1);
@@ -2935,7 +2939,7 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test Data
     state->dataHeatBalFanSys->MAT(1) = 23.456;
-    state->dataHeatBal->MRT(1) = 12.345;
+    state->dataHeatBal->ZoneMRT(1) = 12.345;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 34.567;
     state->dataHeatBal->Zone(1).OutWetBulbTemp = 1.234;
     state->dataHeatBalSurf->TempSurfIn(1) = 5.678;
@@ -2972,19 +2976,19 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 2: MRT Control
     state->dataLowTempRadSys->HydrRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = state->dataHeatBal->MRT(1);
+    expectedResult = state->dataHeatBal->ZoneMRT(1);
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = state->dataHeatBal->MRT(1);
+    expectedResult = state->dataHeatBal->ZoneMRT(1);
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = state->dataHeatBal->MRT(1);
+    expectedResult = state->dataHeatBal->ZoneMRT(1);
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).ControlType);
@@ -2992,19 +2996,19 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 3: Operative Temperature Control
     state->dataLowTempRadSys->HydrRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (state->dataHeatBalFanSys->MAT(1) + state->dataHeatBal->MRT(1)) / 2.0;
+    expectedResult = (state->dataHeatBalFanSys->MAT(1) + state->dataHeatBal->ZoneMRT(1)) / 2.0;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (state->dataHeatBalFanSys->MAT(1) + state->dataHeatBal->MRT(1)) / 2.0;
+    expectedResult = (state->dataHeatBalFanSys->MAT(1) + state->dataHeatBal->ZoneMRT(1)) / 2.0;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (state->dataHeatBalFanSys->MAT(1) + state->dataHeatBal->MRT(1)) / 2.0;
+    expectedResult = (state->dataHeatBalFanSys->MAT(1) + state->dataHeatBal->ZoneMRT(1)) / 2.0;
     actualResult = 0.0; // reset
     actualResult =
         state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).ControlType);
@@ -3836,6 +3840,10 @@ TEST_F(LowTempRadiantSystemTest, GetLowTempRadiantSystem_MultipleTypes)
     state->dataSurface->Surface(6).Construction = 1;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
+    state->dataSurface->SurfIntConvSurfHasActiveInIt.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfIntConvSurfHasActiveInIt = false;
+    state->dataSurface->SurfIsRadSurfOrVentSlabOrPool = false;
 
     GetLowTempRadiantSystem(*state);
 

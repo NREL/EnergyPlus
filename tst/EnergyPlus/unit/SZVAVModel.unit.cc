@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                         "PTUnit",
                                         DataLoopNode::NodeFluidType::Air,
                                         DataLoopNode::NodeConnectionType::Inlet,
-                                        1,
+                                        NodeInputManager::compFluidStream::Primary,
                                         DataLoopNode::ObjectIsNotParent);
 
     state->dataLoopNodes->Node(5).Temp = 24.0;

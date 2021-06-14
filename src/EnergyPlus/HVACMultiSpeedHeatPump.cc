@@ -82,7 +82,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
@@ -600,7 +599,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                     Alphas(1),
                                                                     DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                    1,
+                                                                    NodeInputManager::compFluidStream::Primary,
                                                                     ObjectIsParent);
 
             MSHeatPump(MSHPNum).AirOutletNodeNum = GetOnlySingleNode(state,
@@ -610,7 +609,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                      Alphas(1),
                                                                      DataLoopNode::NodeFluidType::Air,
                                                                      DataLoopNode::NodeConnectionType::Outlet,
-                                                                     1,
+                                                                     NodeInputManager::compFluidStream::Primary,
                                                                      ObjectIsParent);
 
             TestCompSet(state, state.dataHVACMultiSpdHP->CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -1339,7 +1338,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                             Alphas(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                            3,
+                                                                            NodeInputManager::compFluidStream::Tertiary,
                                                                             ObjectIsNotParent);
                 if (MSHeatPump(MSHPNum).HeatRecInletNodeNum == 0) {
                     ShowSevereError(state,
@@ -1354,7 +1353,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                              Alphas(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                             3,
+                                                                             NodeInputManager::compFluidStream::Tertiary,
                                                                              ObjectIsNotParent);
                 if (MSHeatPump(MSHPNum).HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state,
@@ -2986,19 +2985,9 @@ namespace HVACMultiSpeedHeatPump {
 
         using General::SolveRoot;
         using Psychrometrics::PsyCpAirFnW;
-        using TempSolveRoot::SolveRoot;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500); // maximum number of iterations
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FullOutput;         // unit full output when compressor is operating [W]
@@ -4456,7 +4445,6 @@ namespace HVACMultiSpeedHeatPump {
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
-        using TempSolveRoot::SolveRoot;
         using WaterCoils::SimulateWaterCoilComponents;
 
         // Locals
