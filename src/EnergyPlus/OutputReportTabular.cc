@@ -6465,43 +6465,43 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctNoLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNone]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::None)]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorLimits]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::Limits)]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctEcono,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEconomizer]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::Economizer)]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctExhaust,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorExhaust]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::Exhaust)]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctMixedLimit,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorMixedAir]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::MixedAir)]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctHiHumid,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorHighHum]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::HighHum)]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctDCV,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDCV]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::DCV)]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctNiteVent,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorNightVent]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::NightVent)]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctDemand,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorDemandLimit]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::DemandLimit)]);
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchOaTmFctEMS,
                          state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[MixedAir::limitFactorEMS]);
+                         state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtOALimit[static_cast<int>(MixedAir::limitFactor::EMS)]);
 
         if (state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal > 0.0) {
             // Average Outdoor Air During Occupancy by Airloop
@@ -6555,52 +6555,52 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctNoLimit,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorNone),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::None)),
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctLimit,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorLimits),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::Limits)),
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctEcono,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorEconomizer),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::Economizer)),
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctExhaust,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorExhaust),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::Exhaust)),
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctMixedLimit,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorMixedAir),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::MixedAir)),
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctHiHumid,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorHighHum),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::HighHum)),
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctDCV,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorDCV),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::DCV)),
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctNiteVent,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorNightVent),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::NightVent)),
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctDemand,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorDemandLimit),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::DemandLimit)),
                              4);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchOaAvFctEMS,
                              state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                             avgFlowRate(iSys, MixedAir::limitFactorEMS),
+                             avgFlowRate(iSys, static_cast<int>(MixedAir::limitFactor::EMS)),
                              4);
         }
     }
