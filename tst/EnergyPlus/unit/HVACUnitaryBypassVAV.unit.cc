@@ -712,7 +712,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     HVACUnitaryBypassVAV::GetZoneLoads(*state, CBVAVNum);
     // only 1 conditioned zone
     EXPECT_EQ(1, cbvav.NumZonesCooled);
-    EXPECT_EQ(HVACUnitaryBypassVAV::OperMode::CoolingMode, cbvav.HeatCoolMode);
+    EXPECT_EQ(HVACUnitaryBypassVAV::CoolingMode, cbvav.HeatCoolMode);
 }
 
 TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
@@ -809,7 +809,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     // Now changeOverTimer = 0 and GetZoneLoads will not execute again unless changeOverTimer is reset, but only needs to occur when load changes
     EXPECT_EQ(cbvav.changeOverTimer, 0.0); // expect timer now set to current time (0.0) plus minModeChangeTime(0.0), so = 0.0
-    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::OperMode::CoolingMode);
+    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::CoolingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 1);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
     EXPECT_GE(cbvav.OutletTempSetPoint, cbvav.MinLATCooling);
@@ -839,7 +839,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     cbvav.minModeChangeTime = 2.0;
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.changeOverTimer, 2.0); // expect timer now set to current time (0.0) plus minModeChangeTime(2.0), so = 2.0
-    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::OperMode::HeatingMode);
+    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::HeatingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 1);
     EXPECT_GE(cbvav.OutletTempSetPoint, cbvav.MinLATCooling);
@@ -898,7 +898,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -9000.0;  // load to cooling set point
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::OperMode::CoolingMode);
+    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::CoolingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 1);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
     EXPECT_GE(cbvav.OutletTempSetPoint, cbvav.MinLATCooling);
@@ -926,7 +926,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 7000.0; // load to heating set point
     cbvav.changeOverTimer = -1.0;                                                                       // reset timer so GetZoneLoads executes
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::OperMode::HeatingMode);
+    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::HeatingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 1);
     EXPECT_GE(cbvav.OutletTempSetPoint, cbvav.MinLATCooling);
@@ -986,7 +986,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
     cbvav.changeOverTimer = -1.0;                                                                         // reset timer so GetZoneLoads executes
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::OperMode::CoolingMode);
+    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::CoolingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 1);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
     EXPECT_GE(cbvav.OutletTempSetPoint, cbvav.MinLATCooling);
@@ -1044,7 +1044,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 7000.0; // load to heating set point
     cbvav.changeOverTimer = -1.0;                                                                       // reset timer so GetZoneLoads executes
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::OperMode::HeatingMode);
+    EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::HeatingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 1);
     EXPECT_GE(cbvav.OutletTempSetPoint, cbvav.MinLATCooling);
