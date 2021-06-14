@@ -502,7 +502,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         state.dataHVACVarRefFlow->VRF(VRFCond).QCondenser = 0.0;
         state.dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity = 0.0;
         state.dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity = 0.0;
-        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = OperMode::Unassigned;
+        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = 0.0;
         state.dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive = false;
         state.dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive = false;
         state.dataHVACVarRefFlow->CurrentEndTimeLast = double((state.dataGlobal->DayOfSim - 1) * 24) + state.dataGlobal->CurrentTime -
@@ -1156,12 +1156,12 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
     state.dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity = TotalCondCoolingCapacity * CoolingPLR * CyclingRatio;
     state.dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity = TotalCondHeatingCapacity * HeatingPLR * CyclingRatio;
 
-    state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = OperMode::Unassigned; // report variable for heating or cooling mode
+    state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = 0; // report variable for heating or cooling mode
     EIRFPLRModFac = 1.0;
     VRFRTF = 0.0;
     // cooling and heating is optional (only one may exist), if so then performance curve for missing coil are not required
     if (state.dataHVACVarRefFlow->CoolingLoad(VRFCond) && CoolingPLR > 0.0) {
-        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = OperMode::CoolingOnly;
+        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = ModeCoolingOnly;
         if (CoolingPLR > 1.0) {
             if (state.dataHVACVarRefFlow->VRF(VRFCond).CoolEIRFPLR2 > 0)
                 EIRFPLRModFac = CurveValue(
@@ -1183,7 +1183,7 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                                                                   TotCoolEIRTempModFac * EIRFPLRModFac * HREIRAdjustment * VRFRTF;
     }
     if (state.dataHVACVarRefFlow->HeatingLoad(VRFCond) && HeatingPLR > 0.0) {
-        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = OperMode::HeatingOnly;
+        state.dataHVACVarRefFlow->VRF(VRFCond).OperatingMode = ModeHeatingOnly;
         if (HeatingPLR > 1.0) {
             if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatEIRFPLR2 > 0)
                 EIRFPLRModFac = CurveValue(
@@ -11551,13 +11551,13 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     NumOfCompSpdInput = this->CompressorSpeed.size();
     CompEvaporatingPWRSpd.dimension(NumOfCompSpdInput);
     CompEvaporatingCAPSpd.dimension(NumOfCompSpdInput);
-    this->OperatingMode = OperMode::Unassigned; // report variable for heating or cooling mode
+    this->OperatingMode = 0; // report variable for heating or cooling mode
 
     // 1. VRF-HP Cooling Mode .OR. VRF-HR Mode_1
     if ((!this->HeatRecoveryUsed && state.dataHVACVarRefFlow->CoolingLoad(VRFCond)) ||
         (this->HeatRecoveryUsed && !HRHeatRequestFlag && HRCoolRequestFlag)) {
 
-        this->OperatingMode = OperMode::CoolingOnly;
+        this->OperatingMode = ModeCoolingOnly;
         this->VRFOperationSimPath = 10;
 
         // Initialization of VRF-FluidTCtrl Model
@@ -11789,7 +11789,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     } else if ((!this->HeatRecoveryUsed && state.dataHVACVarRefFlow->HeatingLoad(VRFCond)) ||
                (this->HeatRecoveryUsed && !HRCoolRequestFlag && HRHeatRequestFlag)) {
 
-        this->OperatingMode = OperMode::HeatingOnly;
+        this->OperatingMode = ModeHeatingOnly;
         this->VRFOperationSimPath = 60;
 
         // Initialization of VRF-FluidTCtrl Model
@@ -12006,7 +12006,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         // 3. VRF-HR Mode_2-5, Simultaneous Heating and Cooling
     } else if (this->HeatRecoveryUsed && HRCoolRequestFlag && HRHeatRequestFlag) {
 
-        this->OperatingMode = OperMode::CoolingAndHeating;
+        this->OperatingMode = ModeCoolingAndHeating;
 
         // Initialization of VRF-FluidTCtrl Model
         Q_c_TU_PL = TU_CoolingLoad;
@@ -12235,7 +12235,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         // 4. Stop running
     } else {
 
-        this->OperatingMode = OperMode::Unassigned;
+        this->OperatingMode = 0;
         this->VRFOperationSimPath = 0;
 
         this->Ncomp = 0.0;
@@ -12500,21 +12500,21 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
     VRFRTF = 0.0;
     // VRF Cooling and Heating Electric Power (output variables)
-    if (this->OperatingMode == OperMode::CoolingOnly) {
+    if (this->OperatingMode == ModeCoolingOnly) {
         PartLoadFraction = 1.0;
         VRFRTF = min(1.0, (CyclingRatio / PartLoadFraction));
 
         this->ElecCoolingPower = state.dataHVACVarRefFlow->VRF(VRFCond).Ncomp + this->OUFanPower;
         this->ElecHeatingPower = 0;
 
-    } else if (this->OperatingMode == OperMode::HeatingOnly) {
+    } else if (this->OperatingMode == ModeHeatingOnly) {
         PartLoadFraction = 1.0;
         VRFRTF = min(1.0, (CyclingRatio / PartLoadFraction));
 
         this->ElecCoolingPower = 0;
         this->ElecHeatingPower = this->Ncomp + this->OUFanPower;
 
-    } else if (this->OperatingMode == OperMode::CoolingAndHeating) {
+    } else if (this->OperatingMode == ModeCoolingAndHeating) {
         PartLoadFraction = 1.0;
         VRFRTF = min(1.0, (CyclingRatio / PartLoadFraction));
 

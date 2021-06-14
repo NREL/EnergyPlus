@@ -6804,7 +6804,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).QCondEnergy, 0.0);
     EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.0);
     EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalHeatingCapacity, 0.0);
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingMode, OperMode::Unassigned);
+    EXPECT_DOUBLE_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingMode, 0.0);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
 
@@ -13381,7 +13381,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     CalcVRFCondenser(*state, VRFCond);
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).ModeChange);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRModeChange);
-    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingMode, OperMode::HeatingOnly); // ModeHeatingOnly
+    EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).OperatingMode, 2); // ModeHeatingOnly
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).TotalCoolingCapacity, 0.0);

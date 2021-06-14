@@ -85,6 +85,7 @@ namespace LowTempRadiantSystem {
         CoolingMode        // Parameter for use with OperatingMode variable, set for cooling
     };
 
+
     int constexpr CoolingMode = -1; // Parameter for use with OperatingMode variable, set for cooling
 
     // Control types:
