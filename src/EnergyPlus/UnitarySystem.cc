@@ -16682,6 +16682,8 @@ namespace UnitarySystems {
             for (int sysNum = 0; sysNum < state.dataUnitarySystems->numUnitarySystems; ++sysNum) {
                 if (state.dataUnitarySystems->unitarySys[sysNum].UnitType == "AirLoopHVAC:UnitarySystem") {
                     // Setup Report variables for the Unitary System that are not reported in the components themselves
+                    //                if (GetUnitarySystemDoOnlyOnceFlag) {
+                    //                    for (UnitarySysNum = 1; UnitarySysNum <= NumUnitarySystem; ++UnitarySysNum) {
                     SetupOutputVariable(state,
                                         "Unitary System Part Load Ratio",
                                         OutputProcessor::Unit::None,
@@ -16901,26 +16903,22 @@ namespace UnitarySystems {
                         } else {
                         }
                     }
-
-                    if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilIndex >= 0) {
-                        if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
-                            state.dataCoilCooingDX->coilCoolingDXs[state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilIndex]
-                                .SubcoolReheatFlag) {
-                            SetupOutputVariable(state,
-                                                "Unitary System Zone Load Sensible Heat Ratio",
-                                                OutputProcessor::Unit::None,
-                                                state.dataUnitarySystems->unitarySys[sysNum].LoadSHR,
-                                                "System",
-                                                "Average",
-                                                state.dataUnitarySystems->unitarySys[sysNum].Name);
-                            SetupOutputVariable(state,
-                                                "Unitary System Cooling Coil Load Sensible Heat Ratio",
-                                                OutputProcessor::Unit::None,
-                                                state.dataUnitarySystems->unitarySys[sysNum].CoilSHR,
-                                                "System",
-                                                "Average",
-                                                state.dataUnitarySystems->unitarySys[sysNum].Name);
-                        }
+                    if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
+                        state.dataCoilCooingDX->coilCoolingDXs[state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilIndex].SubcoolReheatFlag) {
+                        SetupOutputVariable(state,
+                                            "Unitary System Zone Load Sensible Heat Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].LoadSHR,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
+                        SetupOutputVariable(state,
+                                            "Unitary System Cooling Coil Load Sensible Heat Ratio",
+                                            OutputProcessor::Unit::None,
+                                            state.dataUnitarySystems->unitarySys[sysNum].CoilSHR,
+                                            "System",
+                                            "Average",
+                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
 
                     {
@@ -17025,6 +17023,8 @@ namespace UnitarySystems {
                                          "[m3/s]",
                                          state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideOn,
                                          state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideValue);
+                    }
+                    if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         SetupEMSInternalVariable(state,
                                                  "Unitary System Control Zone Mass Flow Fraction",
                                                  state.dataUnitarySystems->unitarySys[sysNum].Name,
@@ -17055,65 +17055,9 @@ namespace UnitarySystems {
                                          state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideMoistZoneLoadRequest,
                                          state.dataUnitarySystems->unitarySys[sysNum].m_EMSMoistureZoneLoadValue);
                     }
+                    // can this be called each time a system is gotten?
                     bool anyEMSRan;
                     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
-                } else if (state.dataUnitarySystems->unitarySys[sysNum].UnitType == "CoilSystem:Cooling:DX") {
-                    // Setup Report variables for the DXCoolingSystem that is not reported in the components themselves
-                    if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
-                        SetupOutputVariable(state,
-                                            "Coil System Cycling Ratio",
-                                            OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
-                                            "System",
-                                            "Average",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                        SetupOutputVariable(state,
-                                            "Coil System Compressor Speed Ratio",
-                                            OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
-                                            "System",
-                                            "Average",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    } else if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num ==
-                               DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                        SetupOutputVariable(state,
-                                            "Coil System Cycling Ratio",
-                                            OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCycRatio,
-                                            "System",
-                                            "Average",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                        SetupOutputVariable(state,
-                                            "Coil System Compressor Speed Ratio",
-                                            OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingSpeedRatio,
-                                            "System",
-                                            "Average",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                        SetupOutputVariable(state,
-                                            "Coil System Compressor Speed Number",
-                                            OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingSpeedNum,
-                                            "System",
-                                            "Average",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    } else {
-                        SetupOutputVariable(state,
-                                            "Coil System Part Load Ratio",
-                                            OutputProcessor::Unit::None,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingPartLoadFrac,
-                                            "System",
-                                            "Average",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    }
-                    SetupOutputVariable(state,
-                                        "Coil System Frost Control Status",
-                                        OutputProcessor::Unit::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_FrostControlStatus,
-                                        "System",
-                                        "Average",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name);
-
                 } else if (state.dataUnitarySystems->unitarySys[sysNum].UnitType == "CoilSystem:Cooling:Water") {
                     // Setup Report variables for the CoilSystemWater
                     SetupOutputVariable(state,
