@@ -290,6 +290,8 @@ namespace SolarShading {
 
     void WindowShadingManager(EnergyPlusData &state);
 
+    void CheckGlazingShadingStatusChange(EnergyPlusData &state);
+
     DataSurfaces::WinShadingType findValueInEnumeration(Real64 controlValue);
 
     int selectActiveWindowShadingControlIndex(EnergyPlusData &state, int curSurface);

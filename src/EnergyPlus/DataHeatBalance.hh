@@ -2168,16 +2168,18 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> EnclRadThermAbsMult; // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
     Array1D<bool> ZoneSolAbsFirstCalc;   // for error message
     Array1D<bool> EnclRadReCalc;         // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
-    
+
+    bool EnclRadAlwaysReCalc = false;    // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
+    // todo - the following in absorptance branch
     Array2D<Real64> SurfSunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     Array2D<Real64> SurfCosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
     Array3D<Real64> SurfSunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
     Array3D<Real64> SurfSunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction  without shadowing by the reveal
     Array3D<Real64> SurfCosIncAng;               // TimeStep cosine of beam radiation incidence angle on surface
-    Array4D_int SurfWinBackSurfaces; // For a given hour and timestep, a list of up to 20 surfaces receiving  beam solar radiation from a given exterior window
+    Array4D_int
+        SurfWinBackSurfaces; // For a given hour and timestep, a list of up to 20 surfaces receiving  beam solar radiation from a given exterior window
     Array4D<Real64> SurfWinOverlapAreas; // For a given hour and timestep, the areas of the exterior window sending beam solar radiation to the surfaces
-                                  // listed in ->SurfWinBackSurfaces
-
+                                  // listed in BackSurfaces
     Real64 zeroPointerVal = 0.0;
     int NumAirBoundaryMixing = 0;             // Number of air boundary simple mixing objects needed
     std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
@@ -2343,6 +2345,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NoFfactorConstructionsUsed = true;
         this->NoCfactorConstructionsUsed = true;
         this->NoRegularMaterialsUsed = true;
+        this->EnclRadAlwaysReCalc = false;
         this->SNLoadHeatEnergy.deallocate();
         this->SNLoadCoolEnergy.deallocate();
         this->SNLoadHeatRate.deallocate();

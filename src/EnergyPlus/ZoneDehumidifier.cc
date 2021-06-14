@@ -281,7 +281,7 @@ namespace ZoneDehumidifier {
                                                                                                           Alphas(1),
                                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                          1,
+                                                                                                          NodeInputManager::compFluidStream::Primary,
                                                                                                           ObjectIsNotParent);
 
             // A4 , \field Air Outlet Node Name
@@ -292,7 +292,7 @@ namespace ZoneDehumidifier {
                                                                                                            Alphas(1),
                                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                           1,
+                                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                                            ObjectIsNotParent);
 
             // N1,  \field Rated Water Removal

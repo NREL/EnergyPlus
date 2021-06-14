@@ -646,7 +646,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
                                  Real64 &SurfInsideTemp,  // Inside window surface temperature (innermost face) [C]
                                  Real64 &SurfOutsideTemp, // Outside surface temperature (C)
                                  Real64 &SurfOutsideEmiss,
-                                 int const CalcCondition // Calucation condition (summer, winter or no condition)
+                                 DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
 )
 {
     // SUBROUTINE INFORMATION:
@@ -662,7 +662,6 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // uses the solar-thermal routine developed for ASHRAE RP-1311 (ASHWAT Model).
 
-    using DataBSDFWindow::noCondition;
     using General::InterpSw;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyTdpFnWPb;
@@ -720,7 +719,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     Real64 SrdSurfViewFac; // View factor of a surrounding surface
     Real64 OutSrdIR;
 
-    if (CalcCondition != DataBSDFWindow::noCondition) return;
+    if (CalcCondition != DataBSDFWindow::Condition::Unassigned) return;
 
     ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
     QXConv = 0.0;
@@ -729,7 +728,7 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
     HcIn = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // windows inside surface convective film conductance
 
-    if (CalcCondition == DataBSDFWindow::noCondition) {
+    if (CalcCondition == DataBSDFWindow::Condition::Unassigned) {
         ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
         SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
 

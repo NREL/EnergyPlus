@@ -444,6 +444,8 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     WindowShadingManager(state);
 
+    CheckGlazingShadingStatusChange(state);
+
     // Calculate factors that are used to determine how much long-wave radiation from internal
     // gains is absorbed by interior surfaces
     if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Computing Interior Absorption Factors");
@@ -534,7 +536,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             // RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
             if (iErrorFlag != 0) {
                 // Open DElight Electric Lighting Error File for reading
-                auto iDElightErrorFile = state.files.outputDelightDfdmpFileName.try_open(state.files.outputControl.delightdfdmp);
+                auto iDElightErrorFile = state.files.outputDelightDfdmpFilePath.try_open(state.files.outputControl.delightdfdmp);
                 if (iDElightErrorFile.good()) {
                     elOpened = true;
                 } else {
@@ -574,7 +576,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
                 if (elOpened) {
                     iDElightErrorFile.close();
-                    FileSystem::removeFile(iDElightErrorFile.fileName);
+                    FileSystem::removeFile(iDElightErrorFile.filePath);
                 }
                 // If any DElight Error occurred then ShowFatalError to terminate
                 if (iErrorFlag > 0) {
@@ -583,7 +585,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
             } else { // RJH 2008-03-07: No errors
                 // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
                 // Open DElight Electric Lighting Dump File for reading
-                auto iDElightErrorFile = state.files.outputDelightEldmpFileName.try_open(state.files.outputControl.delighteldmp);
+                auto iDElightErrorFile = state.files.outputDelightEldmpFilePath.try_open(state.files.outputControl.delighteldmp);
                 if (iDElightErrorFile.is_open()) {
                     elOpened = true;
                 } else {
@@ -613,7 +615,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                 // Close DElight Electric Lighting Dump File and delete
                 if (elOpened) {
                     iDElightErrorFile.close();
-                    FileSystem::removeFile(iDElightErrorFile.fileName);
+                    FileSystem::removeFile(iDElightErrorFile.filePath);
                 };
             }
             // Store the calculated total zone Power Reduction Factor due to DElight daylighting
@@ -4020,6 +4022,7 @@ void ComputeIntThermalAbsorpFactors(EnergyPlusData &state)
 
     auto &Surface(state.dataSurface->Surface);
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        if (!state.dataHeatBal->EnclRadReCalc(zoneNum)) continue;
         int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
         int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
         for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -4165,7 +4168,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
 
     auto &Surface(state.dataSurface->Surface);
     // Avoid a division by zero of the user has entered a bunch of surfaces with zero absorptivity on the inside
-    Real64 const SmallestAreaAbsProductAllowed(0.01);
+    Real64 constexpr SmallestAreaAbsProductAllowed(0.01);
 
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
         if (!state.dataHeatBal->EnclRadReCalc(enclosureNum)) continue;
@@ -4477,6 +4480,7 @@ void InitEMSControlledSurfaceProperties(EnergyPlusData &state)
     int InsideMaterNum;  // integer pointer for inside face's material layer
     int OutsideMaterNum; // integer pointer for outside face's material layer
 
+    state.dataGlobal->AnySurfPropOverridesInModel = false;
     // first determine if anything needs to be done, once yes, then always init
     for (auto const &mat : state.dataMaterial->Material) {
         if ((mat.AbsorpSolarEMSOverrideOn) || (mat.AbsorpThermalEMSOverrideOn) || (mat.AbsorpVisibleEMSOverrideOn)) {
@@ -4544,6 +4548,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
 
     auto &Surface(state.dataSurface->Surface);
 
+    state.dataGlobal->AnyConstrOverridesInModel = false;
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (state.dataSurface->SurfEMSConstructionOverrideON(SurfNum)) {
             state.dataGlobal->AnyConstrOverridesInModel = true;
@@ -4568,7 +4573,6 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
                 Surface(SurfNum).Construction = state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum);
                 state.dataConstruction->Construct(Surface(SurfNum).Construction).IsUsed = true;
                 state.dataSurface->SurfActiveConstruction(SurfNum) = state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum);
-                ;
 
             } else { // have not checked yet or is not okay, so see if we need to warn about incompatible
                 if (!state.dataRuntimeLang->EMSConstructActuatorChecked(state.dataSurface->SurfEMSConstructionOverrideValue(SurfNum), SurfNum)) {
@@ -4732,6 +4736,7 @@ void InitEMSControlledConstructions(EnergyPlusData &state)
             }
         } else {
             Surface(SurfNum).Construction = Surface(SurfNum).ConstructionStoredInputValue;
+            state.dataSurface->SurfActiveConstruction(SurfNum) = Surface(SurfNum).ConstructionStoredInputValue;
         }
     }
 }

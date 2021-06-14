@@ -114,7 +114,16 @@ namespace DataPlant {
         {
         }
 
-        void simulate(EnergyPlusData &state, bool FirstHVACIteration, bool &InitLoopEquip, bool GetCompSizFac);
+        void initLoopEquip(EnergyPlusData &state, bool const GetCompSizFac);
+        //                This function is called before the main simulation calls for component models when the plant sizing is being conducted. The
+        //                component model needs to be set up such that when this function is called, the getInput, initialization and sizing routines
+        //                are run, but the calculation routine does not. When called, most supply side component models need to return values for the
+        //                minimum, maximum, and optimal capacities (in terms of loop loads that the device can meet). For plant components with more
+        //                than one connection to a plant loop, a leading loop connection must be determined and the component sizing routine called
+        //                with initLoopEquip is called for only that plant loop. For a example, a chiller only calls its sizing routine when called
+        //                from a the chilled water loop and does not call it sizing routine when called from the condenser loop.
+
+        void simulate(EnergyPlusData &state, bool FirstHVACIteration);
 
         bool isPump();
     };
