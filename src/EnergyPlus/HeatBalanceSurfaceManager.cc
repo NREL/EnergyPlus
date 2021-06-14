@@ -8113,7 +8113,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-            if (Surface(surfNum).Class == SurfaceClass::Window & (Surface(surfNum).ExtBoundCond == ExternalEnvironment)) {
+            if (Surface(surfNum).Class == SurfaceClass::Window && (Surface(surfNum).ExtBoundCond == ExternalEnvironment)) {
                 HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataWindowManager->coeffAdjRatioIn;
             } else {
                 HConvIn = state.dataHeatBal->HConvIn(surfNum);

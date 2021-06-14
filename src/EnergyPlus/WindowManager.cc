@@ -2941,7 +2941,8 @@ namespace WindowManager {
         // Radiation emission to air rate
         state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
         state.dataHeatBalSurf->QHeatEmiReport(SurfNum) =
-            surface.Area * state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * (Tsout - state.dataWindowManager->tout) + state.dataHeatBalSurf->QAirExtReport(SurfNum);
+            surface.Area * state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * (Tsout - state.dataWindowManager->tout) +
+            state.dataHeatBalSurf->QAirExtReport(SurfNum);
     }
 
     //****************************************************************************
@@ -5083,7 +5084,8 @@ namespace WindowManager {
             // Interaction with shade or blind, if one of these is present, is ignored. See below for
             // separate calculation of shade/blind temperature.
 
-            if ((state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) && state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+            if ((state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) &&
+                state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
                 rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataWindowManager->coeffAdjRatioOut;
                 rguess(state.dataWindowManager->nglface + 1) =
                     1.0 / (state.dataWindowManager->hcin + hrad) * state.dataWindowManager->coeffAdjRatioOut;
