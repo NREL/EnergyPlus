@@ -4229,9 +4229,13 @@ The following control types can be used to reduce zone cooling load. They are ap
 
 \emph{OnNightAndOnDayIfCoolingAndHighSolarOnWindow}: Shading is on at night. Shading is on during the day if the solar radiation incident on the window exceeds SetPoint (W/m\(^{2}\)) and if the zone cooling rate in the previous timestep is non-zero. Day and night shading is subject to schedule, if specified. (This Shading Control Type is the same as the previous one, except the shading is on at night rather than off.)
 
-\emph{OnIfHighOutdoorAirTempAndHighSolarOnWindow:} Shading is on if the outside air temperature exceeds the Setpoint (C) and if if the solar radiation incident on the window exceeds SetPoint 2 (W/m\(^{2}\)).
+\emph{OnIfHighOutdoorAirTempAndHighSolarOnWindow:} Shading is on if the outside air temperature exceeds the Setpoint (C) and if the solar radiation incident on the window exceeds SetPoint 2 (W/m\(^{2}\)).
 
-\emph{OnIfHighOutdoorAirTempAndHighHorizontalSolar:} Shading is on if the outside air temperature exceeds the Setpoint (C) and if if the horizontal solar radiation exceeds SetPoint 2 (W/m\(^{2}\)).
+\emph{OnIfHighOutdoorAirTempAndHighHorizontalSolar:} Shading is on if the outside air temperature exceeds the Setpoint (C) and if the horizontal solar radiation exceeds SetPoint 2 (W/m\(^{2}\)).
+
+\emph{OnIfHighZoneAirTempAndHighSolarOnWindow:} Shading is on if the zone air temperature exceeds the Setpoint (C) and if the solar radiation incident on the window exceeds SetPoint 2 (W/m\(^{2}\)).
+
+\emph{OnIfHighZoneAirTempAndHighHorizontalSolar:} Shading is on if the zone air temperature exceeds the Setpoint (C) and if the horizontal solar radiation exceeds SetPoint 2 (W/m\(^{2}\)).
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-007}
 
@@ -4292,7 +4296,7 @@ This is the name of a schedule of slat angles that is used when Type of Slat Ang
 
 \paragraph{Field: Setpoint 2}\label{field-setpoint-2}
 
-Used only as the second setpoint for the following two-setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar
+Used only as the second setpoint for the following setpoint control types: OnIfHighOutdoorAirTempAndHighSolarOnWindow, OnIfHighOutdoorAirTempAndHighHorizontalSolar, OnIfHighZoneAirTempAndHighSolarOnWindow, and OnIfHighZoneAirTempAndHighHorizontalSolar
 
 \paragraph{Field: Daylighting Controls Object Name}\label{field-daylighting-controls-object-name}
 
