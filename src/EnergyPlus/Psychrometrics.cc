@@ -366,23 +366,16 @@ namespace Psychrometrics {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::uint64_t Tdb_tag;
-        std::uint64_t W_tag;
-        std::uint64_t Pb_tag;
-        std::uint64_t hash;
-        Real64 Tdb_tag_r;
-        Real64 W_tag_r;
-        Real64 Pb_tag_r;
 
 #ifdef EP_psych_stats
         ++state.dataPsychrometrics->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
 
-        Tdb_tag = *reinterpret_cast<std::uint64_t const *>(&Tdb) >> Grid_Shift;
-        W_tag = *reinterpret_cast<std::uint64_t const *>(&W) >> Grid_Shift;
-        Pb_tag = *reinterpret_cast<std::uint64_t const *>(&Pb) >> Grid_Shift;
+        std::uint64_t Tdb_tag = *reinterpret_cast<std::uint64_t const *>(&Tdb) >> Grid_Shift;
+        std::uint64_t W_tag = *reinterpret_cast<std::uint64_t const *>(&W) >> Grid_Shift;
+        std::uint64_t Pb_tag = *reinterpret_cast<std::uint64_t const *>(&Pb) >> Grid_Shift;
 
-        hash = (Tdb_tag ^ (W_tag ^ Pb_tag)) & std::uint64_t(twbcache_size - 1);
+        std::uint64_t hash = (Tdb_tag ^ (W_tag ^ Pb_tag)) & std::uint64_t(twbcache_size - 1);
 
         auto &cached_Twb = state.dataPsychCache->cached_Twb;
 
@@ -392,11 +385,13 @@ namespace Psychrometrics {
             cached_Twb(hash).iPb = Pb_tag;
 
             Tdb_tag <<= Grid_Shift;
-            Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
+            Real64 Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
+
             W_tag <<= Grid_Shift;
-            W_tag_r = *reinterpret_cast<Real64 const *>(&W_tag);
+            Real64 W_tag_r = *reinterpret_cast<Real64 const *>(&W_tag);
+
             Pb_tag <<= Grid_Shift;
-            Pb_tag_r = *reinterpret_cast<Real64 const *>(&Pb_tag);
+            Real64 Pb_tag_r = *reinterpret_cast<Real64 const *>(&Pb_tag);
 
             cached_Twb(hash).Twb = PsyTwbFnTdbWPb_raw(state, Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom);
         }

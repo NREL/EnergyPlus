@@ -55,7 +55,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/bit.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -644,21 +643,21 @@ namespace Psychrometrics {
 
         // FUNCTION PARAMETER DEFINITIONS:
         //  integer(i64), parameter :: Grid_Mask=NOT(ISHFT(1_i64, Grid_Shift)-1)
-        Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
+        Int64 constexpr Grid_Shift(28);                     // Tuned This is a hot spot
         assert(Grid_Shift == 64 - 12 - psatprecision_bits); // Force Grid_Shift updates when precision bits changes
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyPsatFnTemp_cache);
 #endif
 
-        Int64 const Tdb_tag(bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
+        Int64 Tdb_tag(*reinterpret_cast<Int64 const *>(&T) >> Grid_Shift); // Note that 2nd arg to TRANSFER is not used: Only type matters
         Int64 const hash(Tdb_tag & psatcache_mask);
         auto &cPsat(state.dataPsychCache->cached_Psat(hash));
 
         if (cPsat.iTdb != Tdb_tag) {
             cPsat.iTdb = Tdb_tag;
-            Real64 Tdb_tag_r;
-            Tdb_tag_r = bit_transfer(bit_shift(Tdb_tag, Grid_Shift), Tdb_tag_r);
+            Tdb_tag <<= Grid_Shift;
+            Real64 Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
             cPsat.Psat = PsyPsatFnTemp_raw(state, Tdb_tag_r, CalledFrom);
         }
 
@@ -689,7 +688,7 @@ namespace Psychrometrics {
 
         Real64 Tsat_result; // result=> Sat-Temp {C}
 
-        Int64 const Grid_Shift(64 - 12 - tsat_hbp_precision_bits);
+        Int64 constexpr Grid_Shift(64 - 12 - tsat_hbp_precision_bits);
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -698,19 +697,14 @@ namespace Psychrometrics {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Int64 H_tag;
-        Int64 Pb_tag;
-        Int64 hash;
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
 
-        H_tag = bit_transfer(H, H_tag);
-        H_tag = bit_shift(H_tag, -Grid_Shift);
-        Pb_tag = bit_transfer(Pb, Pb_tag);
-        Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
-        hash = (H_tag ^ Pb_tag) & Int64(tsat_hbp_cache_size - 1);
+        Int64 H_tag = *reinterpret_cast<Int64 const *>(&H) >> Grid_Shift;
+        Int64 Pb_tag = *reinterpret_cast<Int64 const *>(&Pb) >> Grid_Shift;
+        Int64 hash = (H_tag ^ Pb_tag) & Int64(tsat_hbp_cache_size - 1);
         auto &cached_Tsat_HPb = state.dataPsychCache->cached_Tsat_HPb;
         if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
             cached_Tsat_HPb(hash).iH = H_tag;
@@ -1107,9 +1101,9 @@ namespace Psychrometrics {
     )
     {
 
-        Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
+        Int64 constexpr Grid_Shift(28);                         // Tuned This is a hot spot
         assert(Grid_Shift == 64 - 12 - tsatprecision_bits); // Force Grid_Shift updates when precision bits changes
-        Int64 const Pb_tag(bit_shift(bit_transfer(Press, Grid_Shift), -Grid_Shift));
+        Int64 const Pb_tag(*reinterpret_cast<Int64 const *>(&Press) >> Grid_Shift);
 
         Int64 const hash(Pb_tag & tsatcache_mask);
         auto &cTsat(state.dataPsychCache->cached_Tsat(hash));
