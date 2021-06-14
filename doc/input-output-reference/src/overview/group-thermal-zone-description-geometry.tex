@@ -2522,7 +2522,7 @@ Zone,Average, Surface Inside Face Beam Solar Radiation Heat Gain Rate [W]
 
 \subsection{Window Output Variables}\label{window-output-variables}
 
-Output variables applicable only to exterior windows and glass doors:
+Output variables applicable to exterior windows and glass doors:
 
 \begin{lstlisting}
 Zone,Average,Zone Windows Total Transmitted Solar Radiation Rate [W]
@@ -2614,11 +2614,21 @@ Zone,Average,Surface Window Inside Face Shade Zone Convection Heat Gain Rate [W]
 Zone,Average,Surface Window Inside Face Shade Net Infrared Heat Transfer Rate [W]
 \end{lstlisting}
 
-Output variables applicable only to interior windows and glass doors:
+Output variables applicable to interior windows and glass doors:
 
 \begin{lstlisting}
-Zone,Average, Surface Window Transmitted Beam Solar Radiation Rate [W]
+Zone,Average,Surface Window Transmitted Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Solar Radiation Energy [J]
+Zone,Average,Surface Window Transmitted Beam Solar Radiation Rate [W]
 Zone,Sum,Surface Window Transmitted Beam Solar Radiation Energy [J]
+Zone,Average,Surface Window Transmitted Beam to Beam Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Beam to Beam Solar Radiation Energy [J]
+Zone,Average,Surface Window Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Sum,Surface Window Transmitted Diffuse Solar Radiation Energy [J]
+Zone,Average,Surface Window Heat Gain Rate [W]
+Zone,Sum,Surface Window Heat Gain Energy [J]
+Zone,Average,Surface Window Heat Loss Rate [W]
+Zone,Sum,Surface Window Heat Loss Energy [J]
 \end{lstlisting}
 
 If the user requests to display advanced report/output variables (e.g.~see \hyperref[outputdiagnostics]{Output:Diagnostics} keyword DisplayAdvancedReportVariables) the the following additional output variable is available for Equivalent Layer Window;
