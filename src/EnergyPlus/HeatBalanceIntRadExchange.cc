@@ -261,7 +261,7 @@ namespace HeatBalanceIntRadExchange {
                         zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow &&
                             ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
-                            zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBal->ITABSF(SurfNum);
+                            zone_info.Emissivity(ZoneSurfNum) = state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                         }
                         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
                             state.dataWindowEquivLayer->CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
@@ -310,7 +310,7 @@ namespace HeatBalanceIntRadExchange {
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
                     } else if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                         SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
-                        SurfaceEmiss[ZoneSurfNum] = state.dataHeatBal->ITABSF(SurfNum);
+                        SurfaceEmiss[ZoneSurfNum] = state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                     } else {
                         SurfaceTempRad[ZoneSurfNum] = SurfaceTemp(SurfNum);
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
