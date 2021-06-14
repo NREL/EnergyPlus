@@ -6921,7 +6921,7 @@ namespace WindowManager {
             }
         }
 
-        NominalConductance = 1.0 / (rOut  + Rbare + rIn);
+        NominalConductance = 1.0 / (rOut + Rbare + rIn);
         Real64 inputU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
         // only compute adjustment ratio when there is valid user input U
         if ((WinterSummerFlag == 1)) {
@@ -6929,7 +6929,8 @@ namespace WindowManager {
                 Real64 adjRatio = inputU / NominalConductance;
                 state.dataWindowManager->coeffAdjRatioIn = adjRatio;
                 state.dataWindowManager->coeffAdjRatioOut = adjRatio;
-                NominalConductance = 1.0 / (rOut * 1 / state.dataWindowManager->coeffAdjRatioOut + Rbare + rIn * 1 / state.dataWindowManager->coeffAdjRatioIn);
+                NominalConductance =
+                    1.0 / (rOut * 1 / state.dataWindowManager->coeffAdjRatioOut + Rbare + rIn * 1 / state.dataWindowManager->coeffAdjRatioIn);
             } else {
                 state.dataWindowManager->coeffAdjRatioIn = 1.0;
                 state.dataWindowManager->coeffAdjRatioOut = 1.0;
