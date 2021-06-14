@@ -5103,11 +5103,11 @@ void ReportMaxVentilationLoads(EnergyPlusData &state)
         if (mechVentFlow > SmallAirVolFlow) {
             int thisOAControlNum = state.dataAirLoop->AirLoopControlInfo(sysNum).OACtrlNum;
             if (thisOAControlNum > 0) {
-                MixedAir::limitFactor limitFactorIndex = state.dataMixedAir->OAController(thisOAControlNum).OALimitingFactor;
-                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimit[static_cast<int>(limitFactorIndex)] += TimeStepSys;
+                int limitFactorIndex = state.dataMixedAir->OAController(thisOAControlNum).OALimitingFactor;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimit[limitFactorIndex] += TimeStepSys;
                 if (state.dataSysRpts->SysAnyZoneOccupied(sysNum)) {
-                    state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimitOcc[static_cast<int>(limitFactorIndex)] += TimeStepSys;
-                    state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotAtLimitOcc[static_cast<int>(limitFactorIndex)] +=
+                    state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtOALimitOcc[limitFactorIndex] += TimeStepSys;
+                    state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotAtLimitOcc[limitFactorIndex] +=
                         mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
                 }
             }
