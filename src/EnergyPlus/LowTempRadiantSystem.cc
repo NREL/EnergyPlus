@@ -2283,13 +2283,13 @@ namespace LowTempRadiantSystem {
             (!state.dataGlobal->WarmupFlag && state.dataGlobal->BeginDayFlag && FirstHVACIteration && state.dataGlobal->DayOfSim == 1)) {
             // Reset values related to changeover
             if (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
-                state.dataLowTempRadSys->HydrRadSys(RadSysNum).lastOperatingMode = NotOperating;
+                state.dataLowTempRadSys->HydrRadSys(RadSysNum).lastOperatingMode = OperMode::NotOperating;
                 state.dataLowTempRadSys->HydrRadSys(RadSysNum).lastDayOfSim = 0;
                 state.dataLowTempRadSys->HydrRadSys(RadSysNum).lastHourOfDay = 0;
                 state.dataLowTempRadSys->HydrRadSys(RadSysNum).lastTimeStep = 0;
             }
             if (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
-                state.dataLowTempRadSys->CFloRadSys(RadSysNum).lastOperatingMode = NotOperating;
+                state.dataLowTempRadSys->CFloRadSys(RadSysNum).lastOperatingMode = OperMode::NotOperating;
                 state.dataLowTempRadSys->CFloRadSys(RadSysNum).lastDayOfSim = 0;
                 state.dataLowTempRadSys->CFloRadSys(RadSysNum).lastHourOfDay = 0;
                 state.dataLowTempRadSys->CFloRadSys(RadSysNum).lastTimeStep = 0;
@@ -2521,7 +2521,7 @@ namespace LowTempRadiantSystem {
                                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWBranchNum,
                                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWCompNum);
                 }
-                if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).OperatingMode != NotOperating && FirstHVACIteration)
+                if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).OperatingMode != OperMode::NotOperating && FirstHVACIteration)
                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).updateOperatingModeHistory(state);
 
             } else if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
@@ -2578,12 +2578,12 @@ namespace LowTempRadiantSystem {
                                              state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWBranchNum,
                                              state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWCompNum);
                 }
-                if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).OperatingMode != NotOperating && FirstHVACIteration)
+                if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).OperatingMode != OperMode::NotOperating && FirstHVACIteration)
                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).updateOperatingModeHistory(state);
 
             } else if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::ElectricSystem) {
 
-                state.dataLowTempRadSys->ElecRadSys(RadSysNum).OperatingMode = NotOperating;
+                state.dataLowTempRadSys->ElecRadSys(RadSysNum).OperatingMode = OperMode::NotOperating;
             }
         }
     }
@@ -2630,16 +2630,16 @@ namespace LowTempRadiantSystem {
         }
 
         // Now go ahead and reset the operating mode (this will be set to something else if the system is running)
-        this->OperatingMode = NotOperating;
+        this->OperatingMode = OperMode::NotOperating;
     }
 
     void HydronicSystemBaseData::setOperatingModeBasedOnChangeoverDelay(EnergyPlusData &state)
     {
-        if (this->lastOperatingMode == NotOperating)
+        if (this->lastOperatingMode == OperMode::NotOperating)
             return; // this should only happen at the beginning of a simulation (at the start of warmup and the actual simulation)
                     // so let things proceed with whatever the system wants to do
 
-        if (this->OperatingMode == NotOperating) return; // always let it turn off
+        if (this->OperatingMode == OperMode::NotOperating) return; // always let it turn off
 
         if (this->OperatingMode == this->lastOperatingMode) return; // always let it continue to operating in the same mode
 
@@ -2657,7 +2657,7 @@ namespace LowTempRadiantSystem {
         Real64 actualTimeDifference = timeCurrent - timeLast;
 
         // If the time difference is not longer than the user delay, then the system should not switch modes and needs to be turned off.
-        if (actualTimeDifference <= currentChangeoverDelay) this->OperatingMode = NotOperating;
+        if (actualTimeDifference <= currentChangeoverDelay) this->OperatingMode = OperMode::NotOperating;
 
         // Note: if the time difference is greater than the user delay request, then go ahead and keep the operating mode needed (don't do anything).
     }
@@ -3603,7 +3603,7 @@ namespace LowTempRadiantSystem {
         MaxWaterFlow = 0.0;
         ActWaterFlow = 0.0;
         ZoneNum = this->ZonePtr;
-        this->OperatingMode = NotOperating;
+        this->OperatingMode = OperMode::NotOperating;
         SysRunning = true;
 
         if (GetCurrentScheduleValue(state, this->SchedPtr) <= 0) {
@@ -3668,18 +3668,18 @@ namespace LowTempRadiantSystem {
             } else { // Temperatures for heating and cooling do not overlap--calculate the mass flow fraction
 
                 if (ControlTemp < OffTempHeat && this->HeatingSystem) { // Heating mode
-                    this->OperatingMode = HeatingMode;
+                    this->OperatingMode = OperMode::HeatingMode;
                 } else if (ControlTemp > OffTempCool && this->CoolingSystem) { // Cooling mode
-                    this->OperatingMode = CoolingMode;
+                    this->OperatingMode = OperMode::CoolingMode;
                 }
 
                 this->setOperatingModeBasedOnChangeoverDelay(state);
 
-                if (this->OperatingMode == HeatingMode) {
+                if (this->OperatingMode == OperMode::HeatingMode) {
                     ControlNode = this->HotWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxHeat;
                     MassFlowFrac = this->calculateOperationalFraction(OffTempHeat, ControlTemp, variableFlowDesignDataObject.HotThrottlRange);
-                } else if (this->OperatingMode == CoolingMode) {
+                } else if (this->OperatingMode == OperMode::CoolingMode) {
                     ControlNode = this->ColdWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxCool;
                     MassFlowFrac = this->calculateOperationalFraction(OffTempCool, ControlTemp, variableFlowDesignDataObject.ColdThrottlRange);
@@ -3693,7 +3693,7 @@ namespace LowTempRadiantSystem {
             if (ActWaterFlow < DataBranchAirLoopPlant::MassFlowTolerance) ActWaterFlow = 0.0;
             if (this->EMSOverrideOnWaterMdot) ActWaterFlow = this->EMSWaterMdotOverrideValue;
 
-            if (this->OperatingMode == HeatingMode) {
+            if (this->OperatingMode == OperMode::HeatingMode) {
                 if (this->HeatingSystem) {
                     SetComponentFlowRate(state,
                                          ActWaterFlow,
@@ -3706,7 +3706,7 @@ namespace LowTempRadiantSystem {
                 } else { // not heating system
                     SysRunning = false;
                 }
-            } else if (this->OperatingMode == CoolingMode) {
+            } else if (this->OperatingMode == OperMode::CoolingMode) {
                 if (this->CoolingSystem) {
                     SetComponentFlowRate(state,
                                          ActWaterFlow,
@@ -3722,7 +3722,7 @@ namespace LowTempRadiantSystem {
             }
 
             // Now simulate the system...
-            if (((this->OperatingMode == HeatingMode) || (this->OperatingMode == CoolingMode)) && SysRunning)
+            if (((this->OperatingMode == OperMode::HeatingMode) || (this->OperatingMode == OperMode::CoolingMode)) && SysRunning)
                 this->calculateLowTemperatureRadiantSystemComponents(state, LoadMet, SystemType::HydronicSystem);
         }
     }
@@ -3809,9 +3809,9 @@ namespace LowTempRadiantSystem {
         // Set the conditions on the water side inlet
         {
             auto const SELECT_CASE_var(this->OperatingMode);
-            if (SELECT_CASE_var == HeatingMode) {
+            if (SELECT_CASE_var == OperMode::HeatingMode) {
                 WaterNodeIn = this->HotWaterInNode;
-            } else if (SELECT_CASE_var == CoolingMode) {
+            } else if (SELECT_CASE_var == OperMode::CoolingMode) {
                 WaterNodeIn = this->ColdWaterInNode;
             } else {
                 WaterNodeIn = 0; // Suppress uninitialized warning
@@ -3954,10 +3954,10 @@ namespace LowTempRadiantSystem {
                 // mode.
                 SurfNum = this->SurfacePtr(RadSurfNum);
 
-                if (((this->OperatingMode == HeatingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) <= 0.0)) ||
-                    ((this->OperatingMode == CoolingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) >= 0.0))) {
+                if (((this->OperatingMode == OperMode::HeatingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) <= 0.0)) ||
+                    ((this->OperatingMode == OperMode::CoolingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) >= 0.0))) {
                     WaterMassFlow = 0.0;
-                    if (this->OperatingMode == HeatingMode) {
+                    if (this->OperatingMode == OperMode::HeatingMode) {
                         SetComponentFlowRate(state,
                                              WaterMassFlow,
                                              this->HotWaterInNode,
@@ -3967,7 +3967,7 @@ namespace LowTempRadiantSystem {
                                              this->HWBranchNum,
                                              this->HWCompNum);
 
-                    } else if (this->OperatingMode == CoolingMode) {
+                    } else if (this->OperatingMode == OperMode::CoolingMode) {
                         SetComponentFlowRate(state,
                                              WaterMassFlow,
                                              this->ColdWaterInNode,
@@ -3978,7 +3978,7 @@ namespace LowTempRadiantSystem {
                                              this->CWCompNum);
                     }
                     this->WaterMassFlowRate = WaterMassFlow;
-                    this->OperatingMode = NotOperating;
+                    this->OperatingMode = OperMode::NotOperating;
 
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                         SurfNum2 = this->SurfacePtr(RadSurfNum2);
@@ -3998,7 +3998,7 @@ namespace LowTempRadiantSystem {
             this->CondCausedShutDown = false;
             DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
 
-            if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
+            if ((this->OperatingMode == OperMode::CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
@@ -4006,7 +4006,7 @@ namespace LowTempRadiantSystem {
                         // Condensation warning--must shut off radiant system
                         this->CondCausedShutDown = true;
                         WaterMassFlow = 0.0;
-                        this->OperatingMode = NotOperating;
+                        this->OperatingMode = OperMode::NotOperating;
                         SetComponentFlowRate(state,
                                              WaterMassFlow,
                                              this->ColdWaterInNode,
@@ -4056,7 +4056,8 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlNone)) {
+            } else if ((this->OperatingMode == OperMode::CoolingMode) &&
+                       (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlNone)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
@@ -4065,7 +4066,8 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlVariedOff)) {
+            } else if ((this->OperatingMode == OperMode::CoolingMode) &&
+                       (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlVariedOff)) {
 
                 LowestRadSurfTemp = 999.9;
                 CondSurfNum = 0;
@@ -4186,7 +4188,7 @@ namespace LowTempRadiantSystem {
                                 // Condensation still present--must shut off radiant system
                                 this->CondCausedShutDown = true;
                                 WaterMassFlow = 0.0;
-                                this->OperatingMode = NotOperating;
+                                this->OperatingMode = OperMode::NotOperating;
                                 RadSurfNum = RadSurfNum2;
                                 SetComponentFlowRate(state,
                                                      WaterMassFlow,
@@ -4350,15 +4352,15 @@ namespace LowTempRadiantSystem {
             }
 
             if (SetPointTemp < OffTempHeat && this->HeatingSystem) { // Heating mode
-                this->OperatingMode = HeatingMode;
+                this->OperatingMode = OperMode::HeatingMode;
             } else if (SetPointTemp > OffTempCool && this->CoolingSystem) { // Cooling mode
-                this->OperatingMode = CoolingMode;
+                this->OperatingMode = OperMode::CoolingMode;
             }
 
             this->setOperatingModeBasedOnChangeoverDelay(state);
 
             // Now actually decide what to do based on the setpoint temperature in relation to the control temperatures
-            if (this->OperatingMode == HeatingMode) { // HEATING MODE
+            if (this->OperatingMode == OperMode::HeatingMode) { // HEATING MODE
 
                 this->WaterMassFlowRate = this->HotWaterMassFlowRate;
 
@@ -4397,7 +4399,7 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if (this->OperatingMode == CoolingMode) { // COOLING MODE
+            } else if (this->OperatingMode == OperMode::CoolingMode) { // COOLING MODE
 
                 this->WaterMassFlowRate = this->ChWaterMassFlowRate;
 
@@ -4451,7 +4453,7 @@ namespace LowTempRadiantSystem {
             // Unit is off or has no load upon it OR CpFluid value is "zero" so
             // set the flow rates to zero and then simulate the components with
             // the no flow conditions
-            this->OperatingMode = NotOperating;
+            this->OperatingMode = OperMode::NotOperating;
             this->WaterMassFlowRate = 0.0;
             this->WaterInjectionRate = 0.0;
             this->WaterRecircRate = 0.0;
@@ -4508,7 +4510,7 @@ namespace LowTempRadiantSystem {
             state.dataLowTempRadSys->LoopReqTemp =
                 RadInTemp - PumpTempRise; // Temperature required at the inlet of the pump to meet the temperature request
 
-            if (this->OperatingMode == HeatingMode) {
+            if (this->OperatingMode == OperMode::HeatingMode) {
 
                 // in heating mode so shut down cold water flow request
                 if (this->CWLoopNum > 0) {
@@ -4620,7 +4622,7 @@ namespace LowTempRadiantSystem {
                     this->calculateLowTemperatureRadiantSystemComponents(state, LoopInNode, Iteration, LoadMet, SystemType::ConstantFlowSystem);
                 }
 
-            } else if (this->OperatingMode == CoolingMode) {
+            } else if (this->OperatingMode == OperMode::CoolingMode) {
 
                 // in cooling mode so shut down heating water flow request
                 if (this->HWLoopNum > 0) {
@@ -4761,7 +4763,7 @@ namespace LowTempRadiantSystem {
                 this->WaterInjectionRate = 0.0;
                 this->WaterRecircRate = 0.0;
                 this->PumpMassFlowRate = 0.0;
-                this->OperatingMode = NotOperating;
+                this->OperatingMode = OperMode::NotOperating;
             }
 
             // There are some cases when the pump heat is actually enough to provide all the heating that the system needs.
@@ -4887,9 +4889,9 @@ namespace LowTempRadiantSystem {
         // Set the conditions on the water side inlet
         {
             auto const SELECT_CASE_var(this->OperatingMode);
-            if (SELECT_CASE_var == HeatingMode) {
+            if (SELECT_CASE_var == OperMode::HeatingMode) {
                 WaterNodeIn = this->HotWaterInNode;
-            } else if (SELECT_CASE_var == CoolingMode) {
+            } else if (SELECT_CASE_var == OperMode::CoolingMode) {
                 WaterNodeIn = this->ColdWaterInNode;
             } else {
                 ShowSevereError(state, "Illegal low temperature radiant system operating mode");
@@ -5112,10 +5114,10 @@ namespace LowTempRadiantSystem {
                 // be doing the opposite of its intention.  In this case, the flow rate
                 // is set to zero to avoid heating in cooling mode or cooling in heating
                 // mode.
-                if (((this->OperatingMode == HeatingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) <= 0.0)) ||
-                    ((this->OperatingMode == CoolingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) >= 0.0))) {
+                if (((this->OperatingMode == OperMode::HeatingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) <= 0.0)) ||
+                    ((this->OperatingMode == OperMode::CoolingMode) && (state.dataHeatBalFanSys->QRadSysSource(SurfNum) >= 0.0))) {
                     WaterMassFlow = 0.0;
-                    if (this->OperatingMode == HeatingMode) {
+                    if (this->OperatingMode == OperMode::HeatingMode) {
                         SetComponentFlowRate(state,
                                              WaterMassFlow,
                                              this->HotWaterInNode,
@@ -5124,7 +5126,7 @@ namespace LowTempRadiantSystem {
                                              this->HWLoopSide,
                                              this->HWBranchNum,
                                              this->HWCompNum);
-                    } else if (this->OperatingMode == CoolingMode) {
+                    } else if (this->OperatingMode == OperMode::CoolingMode) {
                         SetComponentFlowRate(state,
                                              WaterMassFlow,
                                              this->ColdWaterInNode,
@@ -5135,7 +5137,7 @@ namespace LowTempRadiantSystem {
                                              this->CWCompNum);
                     }
                     this->WaterMassFlowRate = WaterMassFlow;
-                    this->OperatingMode = NotOperating;
+                    this->OperatingMode = OperMode::NotOperating;
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                         SurfNum2 = this->SurfacePtr(RadSurfNum2);
                         state.dataHeatBalFanSys->QRadSysSource(SurfNum2) = 0.0;
@@ -5153,7 +5155,7 @@ namespace LowTempRadiantSystem {
             this->CondCausedShutDown = false;
             DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(this->ZonePtr), state.dataEnvrn->OutBaroPress);
 
-            if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
+            if ((this->OperatingMode == OperMode::CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
@@ -5161,7 +5163,7 @@ namespace LowTempRadiantSystem {
                         // Condensation warning--must shut off radiant system
                         this->CondCausedShutDown = true;
                         WaterMassFlow = 0.0;
-                        this->OperatingMode = NotOperating;
+                        this->OperatingMode = OperMode::NotOperating;
                         SetComponentFlowRate(state,
                                              WaterMassFlow,
                                              this->ColdWaterInNode,
@@ -5212,7 +5214,8 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlNone)) {
+            } else if ((this->OperatingMode == OperMode::CoolingMode) &&
+                       (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlNone)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) < DewPointTemp) {
@@ -5221,7 +5224,8 @@ namespace LowTempRadiantSystem {
                     }
                 }
 
-            } else if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlVariedOff)) {
+            } else if ((this->OperatingMode == OperMode::CoolingMode) &&
+                       (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlVariedOff)) {
 
                 for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                     if (state.dataHeatBalSurf->TH(2, 1, this->SurfacePtr(RadSurfNum2)) <
@@ -5231,7 +5235,7 @@ namespace LowTempRadiantSystem {
                             // We have already iterated once so now we must shut off radiant system
                             this->CondCausedShutDown = true;
                             WaterMassFlow = 0.0;
-                            this->OperatingMode = NotOperating;
+                            this->OperatingMode = OperMode::NotOperating;
                             SetComponentFlowRate(state,
                                                  WaterMassFlow,
                                                  this->ColdWaterInNode,
@@ -5430,7 +5434,7 @@ namespace LowTempRadiantSystem {
 
             if (ControlTemp < OffTemp) { // HEATING MODE
 
-                this->OperatingMode = HeatingMode;
+                this->OperatingMode = OperMode::HeatingMode;
 
                 HeatFrac = this->calculateOperationalFraction(OffTemp, ControlTemp, this->ThrottlRange);
 
@@ -5540,7 +5544,7 @@ namespace LowTempRadiantSystem {
                                             state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
                                             RoutineName);
 
-            if (this->OperatingMode == HeatingMode) {
+            if (this->OperatingMode == OperMode::HeatingMode) {
                 if ((cpWater > 0.0) && (waterMassFlow > 0.0)) {
                     SafeCopyPlantNode(state, waterInletNode, waterOutletNode);
                     Node(waterOutletNode).Temp = Node(waterInletNode).Temp - TotalHeatSource / waterMassFlow / cpWater;
@@ -5567,7 +5571,7 @@ namespace LowTempRadiantSystem {
                                             state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                             RoutineName);
 
-            if (this->OperatingMode == CoolingMode) {
+            if (this->OperatingMode == OperMode::CoolingMode) {
                 if ((cpWater > 0.0) && (waterMassFlow > 0.0)) {
                     SafeCopyPlantNode(state, waterInletNode, waterOutletNode);
                     Node(waterOutletNode).Temp = Node(waterInletNode).Temp - TotalHeatSource / waterMassFlow / cpWater;
@@ -5607,7 +5611,7 @@ namespace LowTempRadiantSystem {
             waterOutletNode = this->HotWaterOutNode;
             SafeCopyPlantNode(state, waterInletNode, waterOutletNode);
 
-            if (this->OperatingMode == HeatingMode) {
+            if (this->OperatingMode == OperMode::HeatingMode) {
 
                 // Leave the inlet and outlet flow alone (if high enough) and perform a bypass if more flow than needed
                 if (state.dataLoopNodes->Node(waterInletNode).MassFlowRate <= this->WaterInjectionRate) {
@@ -5634,7 +5638,7 @@ namespace LowTempRadiantSystem {
             waterOutletNode = this->ColdWaterOutNode;
             SafeCopyPlantNode(state, waterInletNode, waterOutletNode);
 
-            if (this->OperatingMode == CoolingMode) {
+            if (this->OperatingMode == OperMode::CoolingMode) {
 
                 if (state.dataLoopNodes->Node(waterInletNode).MassFlowRate <= this->WaterInjectionRate) {
                     // Note that the water injection rate has already been restricted to the maximum available flow
@@ -5905,13 +5909,13 @@ namespace LowTempRadiantSystem {
         // arguments are glycol name, temperature, and concentration
         {
             auto const SELECT_CASE_var1(this->OperatingMode);
-            if (SELECT_CASE_var1 == HeatingMode) {
+            if (SELECT_CASE_var1 == OperMode::HeatingMode) {
                 CpWater = GetSpecificHeatGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
                                                 Temperature,
                                                 state.dataPlnt->PlantLoop(this->HWLoopNum).FluidIndex,
                                                 RoutineName);
-            } else if (SELECT_CASE_var1 == CoolingMode) {
+            } else if (SELECT_CASE_var1 == OperMode::CoolingMode) {
                 CpWater = GetSpecificHeatGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                 Temperature,
@@ -6149,13 +6153,13 @@ namespace LowTempRadiantSystem {
         this->HeatPower = 0.0;
         this->CoolPower = 0.0;
 
-        if (this->OperatingMode == HeatingMode) {
+        if (this->OperatingMode == OperMode::HeatingMode) {
             this->WaterInletTemp = state.dataLoopNodes->Node(this->HotWaterInNode).Temp;
             this->WaterOutletTemp = state.dataLoopNodes->Node(this->HotWaterOutNode).Temp;
             this->WaterMassFlowRate = state.dataLoopNodes->Node(this->HotWaterInNode).MassFlowRate;
             this->HeatPower = totalRadSysPower;
 
-        } else if (this->OperatingMode == CoolingMode) {
+        } else if (this->OperatingMode == OperMode::CoolingMode) {
             this->WaterInletTemp = state.dataLoopNodes->Node(this->ColdWaterInNode).Temp;
             this->WaterOutletTemp = state.dataLoopNodes->Node(this->ColdWaterOutNode).Temp;
             this->WaterMassFlowRate = state.dataLoopNodes->Node(this->ColdWaterInNode).MassFlowRate;
@@ -6205,7 +6209,7 @@ namespace LowTempRadiantSystem {
         // zero out the flow and power quantities (should have already been done
         // in another routine, but just in case...).
 
-        if (this->OperatingMode == HeatingMode) {
+        if (this->OperatingMode == OperMode::HeatingMode) {
             cpFluid = GetSpecificHeatGlycol(state,
                                             state.dataPlnt->PlantLoop(this->HWLoopNum).FluidName,
                                             state.dataLoopNodes->Node(this->HotWaterInNode).Temp,
@@ -6219,7 +6223,7 @@ namespace LowTempRadiantSystem {
                 this->PumpInletTemp = this->WaterInletTemp;
             }
 
-        } else if (this->OperatingMode == CoolingMode) {
+        } else if (this->OperatingMode == OperMode::CoolingMode) {
             cpFluid = GetSpecificHeatGlycol(state,
                                             state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                             state.dataLoopNodes->Node(this->ColdWaterInNode).Temp,

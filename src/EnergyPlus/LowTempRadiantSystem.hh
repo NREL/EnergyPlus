@@ -78,8 +78,14 @@ namespace LowTempRadiantSystem {
     };
 
     // Operating modes:
-    int constexpr NotOperating = 0; // Parameter for use with OperatingMode variable, set for heating
-    int constexpr HeatingMode = 1;  // Parameter for use with OperatingMode variable, set for heating
+    enum class OperMode
+    {
+        NotOperating = -1, // Parameter for use with OperatingMode variable, set for heating
+        HeatingMode,       // Parameter for use with OperatingMode variable, set for heating
+        CoolingMode        // Parameter for use with OperatingMode variable, set for cooling
+    };
+
+
     int constexpr CoolingMode = -1; // Parameter for use with OperatingMode variable, set for cooling
 
     // Control types:
@@ -141,10 +147,10 @@ namespace LowTempRadiantSystem {
                                                                                          // Surface Face Temp, Surface Interior Temp, Running Mean
                                                                                          // Temp for Constant Flow systems only)
         LowTempRadiantSetpointTypes SetpointType =
-            LowTempRadiantSetpointTypes::halfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
-        int OperatingMode = NotOperating;               // Operating mode currently being used (NotOperating, Heating, Cooling)
-        Real64 HeatPower;                               // heating sent to panel in Watts
-        Real64 HeatEnergy;                              // heating sent to panel in Joules
+            LowTempRadiantSetpointTypes::halfFlowPower;  // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
+        OperMode OperatingMode = OperMode::NotOperating; // Operating mode currently being used (NotOperating, Heating, Cooling)
+        Real64 HeatPower;                                // heating sent to panel in Watts
+        Real64 HeatEnergy;                               // heating sent to panel in Joules
         Real64 runningMeanOutdoorAirTemperatureWeightingFactor =
             0.0;                                                    // Weighting factor for running mean outdoor air temperature equation (user input)
         Real64 todayRunningMeanOutdoorDryBulbTemperature = 0.0;     // Current running mean outdoor air dry-bulb temperature
@@ -212,10 +218,10 @@ namespace LowTempRadiantSystem {
         Real64 CircLength = 0.0;              // Circuit length {m}
         std::string schedNameChangeoverDelay; // changeover delay schedule
         int schedPtrChangeoverDelay = 0;      // Pointer to the schedule for the changeover delay in hours
-        int lastOperatingMode = NotOperating; // Last mode of operation (heating or cooling)
-        int lastDayOfSim = 1;                 // Last day of simulation radiant system operated in lastOperatingMode
-        int lastHourOfDay = 1;                // Last hour of the day radiant system operated in lastOperatingMode
-        int lastTimeStep = 1;                 // Last time step radiant system operated in lastOperatingMode
+        OperMode lastOperatingMode = OperMode::NotOperating; // Last mode of operation (heating or cooling)
+        int lastDayOfSim = 1;                                // Last day of simulation radiant system operated in lastOperatingMode
+        int lastHourOfDay = 1;                               // Last hour of the day radiant system operated in lastOperatingMode
+        int lastTimeStep = 1;                                // Last time step radiant system operated in lastOperatingMode
         // Other parameters
         bool EMSOverrideOnWaterMdot = false;
         Real64 EMSWaterMdotOverrideValue = 0.0;
