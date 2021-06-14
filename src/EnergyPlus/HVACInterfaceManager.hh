@@ -72,6 +72,8 @@ namespace HVACInterfaceManager {
         SecondaryRecirc // flow from Supply-inlet/Demand-outlet to Supply-outlet/demand-inlet
     };
 
+    constexpr int SecondaryRecirc(2); // flow from Supply-inlet/Demand-outlet to Supply-outlet/demand-inlet
+
     enum class FlowType
     {
         Unassigned = -1,
