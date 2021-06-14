@@ -950,7 +950,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                          Optional_int_const indexGroupKey = _       // Group identifier for SQL output
 );
 
-// To take an enum class instance variable
+// to take an enum class instance variable 
 template <typename T>
 void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable
