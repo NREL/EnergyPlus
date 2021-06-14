@@ -5083,8 +5083,14 @@ namespace WindowManager {
             // Interaction with shade or blind, if one of these is present, is ignored. See below for
             // separate calculation of shade/blind temperature.
 
-            rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad);
-            rguess(state.dataWindowManager->nglface + 1) = 1.0 / (state.dataWindowManager->hcin + hrad);
+            if ((state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) && state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataWindowManager->coeffAdjRatioOut;
+                rguess(state.dataWindowManager->nglface + 1) =
+                    1.0 / (state.dataWindowManager->hcin + hrad) * state.dataWindowManager->coeffAdjRatioOut;
+            } else {
+                rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad);
+                rguess(state.dataWindowManager->nglface + 1) = 1.0 / (state.dataWindowManager->hcin + hrad);
+            }
 
             for (i = 2; i <= state.dataWindowManager->nglface; i += 2) {
                 rguess(i) = 1.0 / state.dataWindowManager->scon(i / 2);
@@ -7263,8 +7269,9 @@ namespace WindowManager {
         Real64 temdiff; // Inside/outside air temperature difference (K)
         Real64 ressum;  // Resistance sum (m2-K/W)
 
-        rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad);
-        rguess(state.dataWindowManager->nglface + 1) = 1.0 / (hcinStartValue + hrad);
+        // fixme: check exterior
+        rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataWindowManager->coeffAdjRatioOut;
+        rguess(state.dataWindowManager->nglface + 1) = 1.0 / (hcinStartValue + hrad) * state.dataWindowManager->coeffAdjRatioOut;
 
         for (i = 2; i <= state.dataWindowManager->nglface; i += 2) {
             rguess(i) = 1.0 / state.dataWindowManager->scon(i / 2);
