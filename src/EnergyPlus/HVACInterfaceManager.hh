@@ -65,13 +65,8 @@ struct EnergyPlusData;
 namespace HVACInterfaceManager {
 
     // Common Pipe Recirc Flow Directions
-    enum class FlowDirection
-    {
-        NoRecircFlow = -1,
-        PrimaryRecirc,  // flow from Supply-outlet/Demand-inlet to Supply-inlet/demand-outlet
-        SecondaryRecirc // flow from Supply-inlet/Demand-outlet to Supply-outlet/demand-inlet
-    };
-
+    constexpr int NoRecircFlow(0);
+    constexpr int PrimaryRecirc(1);   // flow from Supply-outlet/Demand-inlet to Supply-inlet/demand-outlet
     constexpr int SecondaryRecirc(2); // flow from Supply-inlet/Demand-outlet to Supply-outlet/demand-inlet
 
     enum class FlowType
@@ -88,8 +83,8 @@ namespace HVACInterfaceManager {
         FlowType SupplySideInletPumpType;
         FlowType DemandSideInletPumpType;
         // Following report variables are used in uncontrolled common pipe
-        FlowDirection FlowDir; // Direction in which flow is in Common Pipe
-        Real64 Flow;           // Flow in the Common Pipe
+        int FlowDir; // Direction in which flow is in Common Pipe
+        Real64 Flow; // Flow in the Common Pipe
         Real64 Temp;
         // Following report variables are used in two way common pipe
         Real64 SecCPLegFlow;     // Mass flow in the secondary side Common pipe leg
@@ -109,9 +104,9 @@ namespace HVACInterfaceManager {
         // Default Constructor
         CommonPipeData()
             : CommonPipeType(DataPlant::iCommonPipeType::No), SupplySideInletPumpType(FlowType::Unassigned),
-              DemandSideInletPumpType(FlowType::Unassigned), FlowDir(FlowDirection::NoRecircFlow), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0),
-              PriCPLegFlow(0.0), SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0), PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0),
-              PriInletSetPoint(0.0), SecInletSetPoint(0.0), PriInletControlled(false), SecInletControlled(false), PriFlowRequest(0.0)
+              DemandSideInletPumpType(FlowType::Unassigned), FlowDir(0), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0), PriCPLegFlow(0.0),
+              SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0), PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0), PriInletSetPoint(0.0),
+              SecInletSetPoint(0.0), PriInletControlled(false), SecInletControlled(false), PriFlowRequest(0.0)
         {
         }
     };
