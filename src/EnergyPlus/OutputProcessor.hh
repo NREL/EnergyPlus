@@ -950,21 +950,6 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                          Optional_int_const indexGroupKey = _       // Group identifier for SQL output
 );
 
-template <typename T>
-void SetupOutputVariable(EnergyPlusData &state,
-                         std::string const &VariableName,           // String Name of variable
-                         OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
-                         T &ActualVariable,                         // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
-                         std::string const &KeyedValue,             // Associated Key for this variable
-                         Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
-                         Optional_int_const indexGroupKey = _)
-{
-    int *holder = (int *)(&ActualVariable);
-    SetupOutputVariable(state, VariableName, VariableUnit, holder, TimeStepTypeKey, VariableTypeKey, KeyedValue);
-};
-
 void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
 
 void AssignReportNumber(EnergyPlusData &state, int &ReportNumber);
