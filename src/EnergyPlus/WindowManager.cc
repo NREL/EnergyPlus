@@ -6552,19 +6552,6 @@ namespace WindowManager {
             state.dataWindowManager->tin = 294.15;  // Inside air temperature (69.8F, 21.C)
             state.dataWindowManager->tout = 255.15; // Outside air temperature (-.4F, -18C)
             state.dataWindowManager->hcout = 26.0;  // Outside convective film conductance for 5.5 m/s (12.3 mph) wind speed
-            if (NominalConductance == Real64(-1)) {
-                // first time executed
-                state.dataWindowManager->coeffAdjRatioIn = Real64(1.0);
-                state.dataWindowManager->coeffAdjRatioOut = Real64(1.0);
-            } else {
-                Real64 inputU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
-                // only compute adjustment ratio when there is valid user input U
-                if (inputU > 0) {
-                    Real64 adjRatio = inputU / NominalConductance;
-                    state.dataWindowManager->coeffAdjRatioIn = adjRatio;
-                    state.dataWindowManager->coeffAdjRatioOut = adjRatio;
-                }
-            }
             // (the value used in Window 5)
             //  tin = 294.26   ! Inside air temperature (70F, 21.1C)
             //  tout = 255.35  ! Outside air temperature (0F, -17.8C)
@@ -6932,8 +6919,20 @@ namespace WindowManager {
             }
         }
 
-        NominalConductance = 1.0 / (rOut * 1 / state.dataWindowManager->coeffAdjRatioOut + Rbare +
-                                    rIn * 1 / state.dataWindowManager->coeffAdjRatioIn); // Autodesk:Uninit Rbare was uninitialized if ngllayer > 4
+        NominalConductance = 1.0 / (rOut  + Rbare + rIn);
+        Real64 inputU = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).SimpleWindowUfactor;
+        // only compute adjustment ratio when there is valid user input U
+        if ((WinterSummerFlag == 1)) {
+            if (inputU > 0) {
+                Real64 adjRatio = inputU / NominalConductance;
+                state.dataWindowManager->coeffAdjRatioIn = adjRatio;
+                state.dataWindowManager->coeffAdjRatioOut = adjRatio;
+                NominalConductance = 1.0 / (rOut * 1 / state.dataWindowManager->coeffAdjRatioOut + Rbare + rIn * 1 / state.dataWindowManager->coeffAdjRatioIn);
+            } else {
+                state.dataWindowManager->coeffAdjRatioIn = 1.0;
+                state.dataWindowManager->coeffAdjRatioOut = 1.0;
+            }
+        }
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
     }
 
@@ -7316,13 +7315,13 @@ namespace WindowManager {
         int BlNum; // Blind number
         int i;
         // initialize to some non-realistic values, which enables checking of whether it's first executed
-        Real64 NominalConductanceWinter(-1.0); // Nominal center-of-glass conductance of a window construction
+        Real64 NominalConductanceWinter; // Nominal center-of-glass conductance of a window construction
         // for ASHRAE winter conditions (W/m2-K):
         // Inside air temperature = 21.1C (70F)
         // Outside air temperature = -17.8C (0F)
         // Windspeed = 6.71 m/s (15 mph)
         // No solar radiation
-        Real64 NominalConductanceSummer(-1.0); // Nominal center-of-glass conductance of a window construction
+        Real64 NominalConductanceSummer; // Nominal center-of-glass conductance of a window construction
         // for ASHRAE summer conditions (W/m2-K):
         // Inside air temperature = 23.9C (75F)
         // Outside air temperature = 35.0C (95F)
@@ -7490,9 +7489,6 @@ namespace WindowManager {
 
                     } else {
 
-                        // compute the un-adjusted nominal U, here the input NominalConductanceWinter is -1, adjRatio = 1
-                        CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
-                        // compute the adjusted nominal U
                         CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
 
                         if (errFlag == 1) {
@@ -7765,7 +7761,6 @@ namespace WindowManager {
                 // (2) solar heat gain coefficient (SHGC), including inside and outside air films,
                 // (3) solar transmittance at normal incidence, and (4) visible transmittance at normal incidence.
 
-                CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
                 CalcNominalWindowCond(state, ThisNum, 1, NominalConductanceWinter, SHGCWinter, TransSolNorm, TransVisNorm, errFlag);
 
                 if (errFlag == 1 || errFlag == 2) continue;
