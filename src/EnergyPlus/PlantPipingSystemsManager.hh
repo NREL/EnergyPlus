@@ -987,7 +987,7 @@ namespace PlantPipingSystemsManager {
     bool SiteGroundDomainUsingNoMassMat(EnergyPlusData &state, Real64 const MaterialThickness, int const MaterialNum);
 
     void SiteGroundDomainNoMassMatError(EnergyPlusData &state,
-                                        std::string const &FieldName,
+                                        std::string_view FieldName,
                                         std::string const &UserInputField,
                                         std::string const &ObjectName);
 
@@ -1006,7 +1006,7 @@ namespace PlantPipingSystemsManager {
                                     std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
-                                    std::string const &FieldName,
+                                    std::string_view FieldName,
                                     std::string const &FieldEntry,
                                     std::string const &Condition,
                                     bool &ErrorsFound);
@@ -1015,7 +1015,7 @@ namespace PlantPipingSystemsManager {
                                     std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
-                                    std::string const &FieldName,
+                                    std::string_view FieldName,
                                     Real64 FieldEntry,
                                     std::string const &Condition,
                                     bool &ErrorsFound);

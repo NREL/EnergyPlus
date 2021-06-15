@@ -3385,7 +3385,7 @@ void SetupPlantEMSActuators(EnergyPlusData &state)
     std::string ActuatorType;
     std::string ActuatorName;
     std::string UniqueIDName;
-    static std::string const Units("[on/off]");
+    static constexpr std::string_view Units("[on/off]");
     // INTEGER                      :: NumAct
     int LoopNum;
     int LoopSideNum;

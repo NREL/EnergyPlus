@@ -192,7 +192,7 @@ void WaterThermalTankData::getDesignCapacities([[maybe_unused]] EnergyPlusData &
     OptLoad = this->MaxCapacity;
 }
 
-int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
+int getTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompIndex)
 {
     if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
         GetWaterThermalTankInput(state);
@@ -204,7 +204,7 @@ int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompInde
     if (CompIndex == 0) {
         CompNum = UtilityRoutines::FindItem(CompName, state.dataWaterThermalTanks->WaterThermalTank);
         if (CompNum == 0) {
-            ShowFatalError(state, "SimWaterThermalTank_WaterTank:  Unit not found=" + CompName);
+            ShowFatalError(state, "SimWaterThermalTank_WaterTank:  Unit not found=" + std::string{CompName});
         }
         CompIndex = CompNum;
     } else {
@@ -231,7 +231,7 @@ int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompInde
     return CompNum;
 }
 
-int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
+int getHPTankIDX(EnergyPlusData &state, std::string_view CompName, int &CompIndex)
 {
     if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
         GetWaterThermalTankInput(state);
@@ -243,7 +243,7 @@ int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIn
     if (CompIndex == 0) {
         CompNum = UtilityRoutines::FindItem(CompName, state.dataWaterThermalTanks->HPWaterHeater);
         if (CompNum == 0) {
-            ShowFatalError(state, "SimWaterThermalTank_HeatPump:  Unit not found=" + CompName);
+            ShowFatalError(state, "SimWaterThermalTank_HeatPump:  Unit not found=" + std::string{CompName});
         }
         CompIndex = CompNum;
     } else {
@@ -506,7 +506,7 @@ void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int const WaterHeaterN
 }
 
 void SimHeatPumpWaterHeater(EnergyPlusData &state,
-                            std::string const &CompName,
+                            std::string_view CompName,
                             bool const FirstHVACIteration,
                             Real64 &SensLoadMet, // sensible load met by this equipment and sent to zone, W
                             Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
@@ -535,7 +535,7 @@ void SimHeatPumpWaterHeater(EnergyPlusData &state,
     if (CompIndex == 0) {
         HeatPumpNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterThermalTanks->HPWaterHeater);
         if (HeatPumpNum == 0) {
-            ShowFatalError(state, "SimHeatPumpWaterHeater: Unit not found=" + CompName);
+            ShowFatalError(state, "SimHeatPumpWaterHeater: Unit not found=" + std::string{CompName});
         }
         CompIndex = HeatPumpNum;
     } else {
@@ -5694,8 +5694,8 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
     auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
     static constexpr std::string_view RoutineName("InitWaterThermalTank");
-    static std::string const GetWaterThermalTankInput("GetWaterThermalTankInput");
-    static std::string const SizeTankForDemand("SizeTankForDemandSide");
+    static constexpr std::string_view GetWaterThermalTankInput("GetWaterThermalTankInput");
+    static constexpr std::string_view SizeTankForDemand("SizeTankForDemandSide");
 
     if (this->scanPlantLoopsFlag && allocated(state.dataPlnt->PlantLoop)) {
         if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {

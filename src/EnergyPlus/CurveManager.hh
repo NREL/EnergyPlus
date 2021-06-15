@@ -330,9 +330,9 @@ namespace CurveManager {
                         int CurveIndex,
                         std::vector<int> validDims,
                         const std::string_view routineName,
-                        const std::string &objectType,
-                        const std::string &objectName,
-                        const std::string &curveFieldText);
+                        std::string_view objectType,
+                        std::string_view objectName,
+                        std::string_view curveFieldText);
 
     std::string GetCurveName(EnergyPlusData &state, int CurveIndex); // index of curve in curve array
 

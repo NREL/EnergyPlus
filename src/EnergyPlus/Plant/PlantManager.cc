@@ -143,7 +143,7 @@ using namespace DataBranchAirLoopPlant;
 using namespace DataLoopNode;
 using namespace FluidProperties;
 
-static std::string const fluidNameSteam("STEAM");
+static constexpr std::string_view fluidNameSteam("STEAM");
 
 void ManagePlantLoops(EnergyPlusData &state,
                       bool const FirstHVACIteration,

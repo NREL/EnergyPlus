@@ -96,7 +96,7 @@ namespace ScheduleManager {
     // Proposal for Schedule Manager in EnergyPlus (Rick Strand)
 
     // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
+    static constexpr std::string_view BlankString;
     Array1D_string ValidDayTypes(MaxDayTypes,
                                  {"Sunday",
                                   "Monday",
@@ -2453,9 +2453,9 @@ namespace ScheduleManager {
         ShowMinute.allocate(state.dataGlobal->NumOfTimeStepInHour);
         TimeHHMM.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         RoundTSValue.allocate(state.dataGlobal->NumOfTimeStepInHour, 24);
-        ShowMinute = BlankString;
-        TimeHHMM = BlankString;
-        RoundTSValue = BlankString;
+        ShowMinute = std::string{};
+        TimeHHMM = std::string{};
+        RoundTSValue = std::string{};
 
         CurMinute = state.dataGlobal->MinutesPerTimeStep;
         for (Count = 1; Count <= state.dataGlobal->NumOfTimeStepInHour - 1; ++Count) {

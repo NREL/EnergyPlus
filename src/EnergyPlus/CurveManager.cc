@@ -2803,9 +2803,9 @@ namespace CurveManager {
                         int const CurveIndex,
                         std::vector<int> validDims,
                         const std::string_view routineName,
-                        const std::string &objectType,
-                        const std::string &objectName,
-                        const std::string &curveFieldText)
+                        std::string_view objectType,
+                        std::string_view objectName,
+                        std::string_view curveFieldText)
     {
         // Returns true if errors found
         int curveDim = state.dataCurveManager->PerfCurve(CurveIndex).NumDims;
@@ -2815,7 +2815,7 @@ namespace CurveManager {
         } else {
             // Not compatible
             ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName));
-            ShowContinueError(state, "...Invalid curve for " + curveFieldText + ".");
+            ShowContinueError(state, "...Invalid curve for " + std::string{curveFieldText} + ".");
             std::string validString = fmt::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {
                 validString += format(" or {}", validDims[i]);

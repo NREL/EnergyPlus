@@ -150,7 +150,7 @@ namespace WindowAC {
     // Functions
 
     void SimWindowAC(EnergyPlusData &state,
-                     std::string const &CompName,   // name of the window AC unit
+                     std::string_view CompName,   // name of the window AC unit
                      int const ZoneNum,             // number of zone being served
                      bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                      Real64 &PowerMet,              // Sensible power supplied by window AC (W)

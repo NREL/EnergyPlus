@@ -104,7 +104,7 @@ namespace DualDuct {
     using namespace ScheduleManager;
 
     void SimulateDualDuct(
-        EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
+        EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -133,7 +133,7 @@ namespace DualDuct {
         if (CompIndex == 0) {
             DDNum = UtilityRoutines::FindItemInList(CompName, state.dataDualDuct->dd_airterminal, &DualDuctAirTerminal::Name);
             if (DDNum == 0) {
-                ShowFatalError(state, "SimulateDualDuct: Damper not found=" + CompName);
+                ShowFatalError(state, "SimulateDualDuct: Damper not found=" + std::string{CompName});
             }
             CompIndex = DDNum;
         } else {
@@ -188,7 +188,7 @@ namespace DualDuct {
             // Report the current Damper
             thisDualDuct.ReportDualDuct();
         } else {
-            ShowFatalError(state, "SimulateDualDuct: Damper not found=" + CompName);
+            ShowFatalError(state, "SimulateDualDuct: Damper not found=" + std::string{CompName});
         }
     }
 
@@ -2306,7 +2306,7 @@ namespace DualDuct {
 
     void GetDualDuctOutdoorAirRecircUse(EnergyPlusData &state,
                                         [[maybe_unused]] std::string const &CompTypeName,
-                                        std::string const &CompName,
+                                        std::string_view CompName,
                                         bool &RecircIsUsed)
     {
 

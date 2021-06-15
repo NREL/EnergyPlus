@@ -217,7 +217,7 @@ namespace UserDefinedComponents {
     }
 
     void SimCoilUserDefined(EnergyPlusData &state,
-                            std::string const &EquipName, // user name for component
+                            std::string_view EquipName, // user name for component
                             int &CompIndex,
                             int const AirLoopNum,
                             bool &HeatingActive,
@@ -325,7 +325,7 @@ namespace UserDefinedComponents {
     }
 
     void SimZoneAirUserDefined(EnergyPlusData &state,
-                               std::string const &CompName,    // name of the packaged terminal heat pump
+                               std::string_view CompName,    // name of the packaged terminal heat pump
                                int const ZoneNum,              // number of zone being served
                                Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
@@ -443,7 +443,7 @@ namespace UserDefinedComponents {
     }
 
     void SimAirTerminalUserDefined(EnergyPlusData &state,
-                                   std::string const &CompName,
+                                   std::string_view CompName,
                                    [[maybe_unused]] bool const FirstHVACIteration,
                                    int const ZoneNum,
                                    [[maybe_unused]] int const ZoneNodeNum,

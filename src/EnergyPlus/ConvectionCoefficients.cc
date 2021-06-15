@@ -695,7 +695,7 @@ bool SetAdaptiveConvectionAlgoCoefficient(EnergyPlusData &state,
                                           const std::string &sourceFieldName,
                                           const std::string &curveFieldName,
                                           const std::string_view RoutineName,
-                                          const std::string &CurrentModuleObject)
+                                          const std::string_view CurrentModuleObject)
 {
 
     bool ErrorsFound = false;
@@ -705,13 +705,13 @@ bool SetAdaptiveConvectionAlgoCoefficient(EnergyPlusData &state,
         if (HcInt_ConvectionTypesMap.at(equationName) == HcInt_UserCurve) {
             *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, state.dataConvectionCoefficient->HcInsideUserCurve);
             if (*InsideFaceAdaptiveConvectionAlgoParam == 0) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + equationName + ", invalid value");
+                ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + equationName + ", invalid value");
                 ShowContinueError(state, "Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
                 ErrorsFound = true;
             }
         }
     } else {
-        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + equationName + ", invalid value");
+        ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + equationName + ", invalid value");
         ShowContinueError(state, "Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
         ErrorsFound = true;
     }
@@ -1867,7 +1867,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
             &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum};
         for (int i = 2; i <= NumAlphas - 1; i += 2) { // up to 45
             static constexpr std::string_view RoutineName = "GetUserConvectionCoefficients";
-            static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
+            static constexpr std::string_view CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
             ErrorsFound = SetAdaptiveConvectionAlgoCoefficient(state,
                                                                HcInt_ConvectionTypesMap,
                                                                AdaptiveConvectionAlgoInsideDefaults[(i / 2) - 1],
@@ -1910,7 +1910,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
 
         for (int i = 2; i <= NumAlphas - 1; i += 2) {
             static constexpr std::string_view RoutineName = "GetUserConvectionCoefficients";
-            static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
+            static constexpr std::string_view CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
             ErrorsFound = SetAdaptiveConvectionAlgoCoefficient(state,
                                                                HcExt_ConvectionTypesMap,
                                                                AdaptiveConvectionAlgoOutsideDefaults[(i / 2) - 1],

@@ -116,7 +116,7 @@ using namespace ScheduleManager;
 using namespace Psychrometrics;
 using namespace DataGlobalConstants;
 
-void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 const ZoneEvapCoolerPLR)
+void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIndex, Real64 const ZoneEvapCoolerPLR)
 {
 
     // SUBROUTINE INFORMATION:
@@ -145,7 +145,7 @@ void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &Comp
     if (CompIndex == 0) {
         EvapCoolNum = UtilityRoutines::FindItemInList(CompName, EvapCond, &EvapConditions::EvapCoolerName);
         if (EvapCoolNum == 0) {
-            ShowFatalError(state, "SimEvapCooler: Unit not found=" + CompName);
+            ShowFatalError(state, "SimEvapCooler: Unit not found=" + std::string{CompName});
         }
         CompIndex = EvapCoolNum;
     } else {
@@ -3583,7 +3583,7 @@ void ReportEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
 //***************
 
 void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
-                                  std::string const &CompName,    // name of the packaged terminal heat pump
+                                  std::string_view CompName,    // name of the packaged terminal heat pump
                                   int const ZoneNum,              // number of zone being served
                                   Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                   Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative

@@ -247,7 +247,7 @@ namespace SystemReports {
 
     void FindDemandSideMatch(EnergyPlusData &state,
                              std::string const &CompType, // Inlet node of the component to find the match of
-                             std::string const &CompName, // Outlet node of the component to find the match of
+                             std::string_view CompName, // Outlet node of the component to find the match of
                              bool &MatchFound,            // Set to .TRUE. when a match is found
                              int &MatchLoopType,          // Loop number of the match
                              int &MatchLoop,              // Loop number of the match

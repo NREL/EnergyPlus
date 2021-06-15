@@ -79,11 +79,11 @@ int EndEnergyPlus(EnergyPlusData &state);
 
 int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
-void ConvertCaseToUpper(std::string const &InputString, // Input string
+void ConvertCaseToUpper(std::string_view InputString, // Input string
                         std::string &OutputString       // Output string (in UpperCase)
 );
 
-void ConvertCaseToLower(std::string const &InputString, // Input string
+void ConvertCaseToLower(std::string_view InputString, // Input string
                         std::string &OutputString       // Output string (in LowerCase)
 );
 
@@ -231,23 +231,23 @@ namespace UtilityRoutines {
     {
     };
 
-    Real64 ProcessNumber(std::string const &String, bool &ErrorFlag);
+    Real64 ProcessNumber(std::string_view const String, bool &ErrorFlag);
 
-    int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int NumItems);
+    int FindItemInList(std::string_view const String, Array1_string const &ListOfItems, int NumItems);
 
-    inline int FindItemInList(std::string const &String, Array1_string const &ListOfItems)
+    inline int FindItemInList(std::string_view const String, Array1_string const &ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
-    int FindItemInList(std::string const &String, Array1S_string const ListOfItems, int NumItems);
+    int FindItemInList(std::string_view const String, Array1S_string const ListOfItems, int NumItems);
 
-    inline int FindItemInList(std::string const &String, Array1S_string const ListOfItems)
+    inline int FindItemInList(std::string_view const String, Array1S_string const ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
-    template <typename A> inline int FindItemInList(std::string const &String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    template <typename A> inline int FindItemInList(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
     {
         for (int Count = 1; Count <= NumItems; ++Count) {
             if (String == ListOfItems(Count)) return Count;
@@ -255,14 +255,14 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename A> inline int FindItemInList(std::string const &String, MArray1<A, std::string> const &ListOfItems)
+    template <typename A> inline int FindItemInList(std::string_view const String, MArray1<A, std::string> const &ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs and operator[i] and elements need Name
-    inline int FindItemInList(std::string const &String, Container const &ListOfItems, int const NumItems)
+    inline int FindItemInList(std::string_view const String, Container const &ListOfItems, int const NumItems)
     {
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (String == ListOfItems[i].Name) return int(i + 1); // 1-based return index
@@ -272,14 +272,14 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs isize() and operator[i] and elements need Name
-    inline int FindItemInList(std::string const &String, Container const &ListOfItems)
+    inline int FindItemInList(std::string_view const String, Container const &ListOfItems)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs operator[i] and value_type
-    inline int FindItemInList(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
+    inline int FindItemInList(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
     {
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (String == ListOfItems[i].*name_p) return int(i + 1); // 1-based return index
@@ -289,19 +289,19 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs isize() and operator[i] and value_type
-    inline int FindItemInList(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p)
+    inline int FindItemInList(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p)
     {
         return UtilityRoutines::FindItemInList(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems, int NumItems);
+    int FindItemInSortedList(std::string_view const string, Array1S_string const ListOfItems, int NumItems);
 
-    inline int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems)
+    inline int FindItemInSortedList(std::string_view const String, Array1S_string const ListOfItems)
     {
         return FindItemInSortedList(String, ListOfItems, ListOfItems.isize());
     }
 
-    template <typename A> inline int FindItemInSortedList(std::string const &String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    template <typename A> inline int FindItemInSortedList(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
     {
         int Probe(0);
         int LBnd(0);
@@ -323,12 +323,12 @@ namespace UtilityRoutines {
         return Probe;
     }
 
-    template <typename A> inline int FindItemInSortedList(std::string const &String, MArray1<A, std::string> const &ListOfItems)
+    template <typename A> inline int FindItemInSortedList(std::string_view const String, MArray1<A, std::string> const &ListOfItems)
     {
         return FindItemInSortedList(String, ListOfItems, ListOfItems.isize());
     }
 
-    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string const &str, std::false_type)
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view const str, std::false_type)
     {
         using valueType = typename std::iterator_traits<InputIterator>::value_type;
         // static_assert( std::is_convertible< decltype( std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class Named"
@@ -343,7 +343,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string const &str, std::true_type)
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view const str, std::true_type)
     {
         using valueType = typename std::iterator_traits<InputIterator>::value_type;
         // static_assert( std::is_convertible< decltype( *std::declval< valueType >() ), Named >::value, "Iterator value must inherit from class
@@ -358,26 +358,26 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string const &str)
+    template <typename InputIterator> inline int FindItem(InputIterator first, InputIterator last, std::string_view const &str)
     {
         return FindItem(first, last, str, is_shared_ptr<typename std::iterator_traits<InputIterator>::value_type>{});
     }
 
-    int FindItem(std::string const &String, Array1D_string const &ListOfItems, int const NumItems);
+    int FindItem(std::string_view const String, Array1D_string const &ListOfItems, int const NumItems);
 
-    inline int FindItem(std::string const &String, Array1D_string const &ListOfItems)
+    inline int FindItem(std::string_view const String, Array1D_string const &ListOfItems)
     {
         return FindItem(String, ListOfItems, ListOfItems.isize());
     }
 
-    int FindItem(std::string const &String, Array1S_string const ListOfItems, int const NumItems);
+    int FindItem(std::string_view const String, Array1S_string const ListOfItems, int const NumItems);
 
-    inline int FindItem(std::string const &String, Array1S_string const ListOfItems)
+    inline int FindItem(std::string_view const String, Array1S_string const ListOfItems)
     {
         return FindItem(String, ListOfItems, ListOfItems.isize());
     }
 
-    template <typename A> inline int FindItem(std::string const &String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    template <typename A> inline int FindItem(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
     {
         int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
         if (item_number != 0) return item_number;
@@ -387,14 +387,14 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    template <typename A> inline int FindItem(std::string const &String, MArray1<A, std::string> const &ListOfItems)
+    template <typename A> inline int FindItem(std::string_view const String, MArray1<A, std::string> const &ListOfItems)
     {
         return FindItem(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and elements need Name
-    inline int FindItem(std::string const &String, Container const &ListOfItems, int const NumItems)
+    inline int FindItem(std::string_view const String, Container const &ListOfItems, int const NumItems)
     {
         int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, NumItems));
         if (item_number != 0) return item_number;
@@ -406,14 +406,14 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and elements need Name
-    inline int FindItem(std::string const &String, Container const &ListOfItems)
+    inline int FindItem(std::string_view const String, Container const &ListOfItems)
     {
         return FindItem(String, ListOfItems, ListOfItems.isize());
     }
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and value_type
-    inline int FindItem(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
+    inline int FindItem(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
     {
         int const item_number(UtilityRoutines::FindItemInList(String, ListOfItems, name_p, NumItems));
         if (item_number != 0) return item_number;
@@ -425,7 +425,7 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs size() and operator[i] and value_type
-    inline int FindItem(std::string const &String, Container const &ListOfItems, std::string Container::value_type::*name_p)
+    inline int FindItem(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p)
     {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
@@ -438,27 +438,6 @@ namespace UtilityRoutines {
         // case insensitive comparison
         return equali(s, t);
     }
-/*
-    typedef char const *c_cstring;
-
-    inline bool SameString(std::string const &s, c_cstring const &t)
-    {
-        // case insensitive comparison
-        return equali(s, t);
-    }
-
-    inline bool SameString(c_cstring const &s, std::string const &t)
-    {
-        // case insensitive comparison
-        return equali(s, t);
-    }
-
-    inline bool SameString(c_cstring const &s, c_cstring const &t)
-    {
-        // case insensitive comparison
-        return equali(s, t);
-    }
-     */
 
     template <typename InputIterator>
     inline void VerifyName(EnergyPlusData &state,
@@ -586,7 +565,7 @@ namespace UtilityRoutines {
         }
     }
 
-    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
+    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string_view StringToDisplay, bool &ErrorFound);
 
     // Two structs for case insensitive containers.
     // Eg: for unordered_map, we need to have a case insenstive hasher and a case insensitive comparator
@@ -594,12 +573,12 @@ namespace UtilityRoutines {
     // For map, you'd only need the comparator
     struct case_insensitive_hasher
     {
-        size_t operator()(const std::string &key) const noexcept;
+        size_t operator()(const std::string_view key) const noexcept;
     };
 
     struct case_insensitive_comparator
     {
-        bool operator()(const std::string &a, const std::string &b) const noexcept;
+        bool operator()(const std::string_view a, const std::string_view b) const noexcept;
     };
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);

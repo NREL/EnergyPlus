@@ -79,7 +79,7 @@ namespace EnergyPlus::MixerComponent {
 // Using/Aliasing
 using namespace DataLoopNode;
 
-void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
+void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompIndex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -106,7 +106,7 @@ void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIn
     if (CompIndex == 0) {
         MixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
         if (MixerNum == 0) {
-            ShowFatalError(state, "SimAirLoopMixer: Mixer not found=" + CompName);
+            ShowFatalError(state, "SimAirLoopMixer: Mixer not found=" + std::string{CompName});
         }
         CompIndex = MixerNum;
     } else {

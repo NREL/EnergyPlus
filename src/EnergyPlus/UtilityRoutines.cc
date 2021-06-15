@@ -96,7 +96,7 @@ namespace EnergyPlus {
 
 namespace UtilityRoutines {
 
-    Real64 ProcessNumber(std::string const &String, bool &ErrorFlag)
+    Real64 ProcessNumber(std::string_view const String, bool &ErrorFlag)
     {
 
         // FUNCTION INFORMATION:
@@ -122,7 +122,7 @@ namespace UtilityRoutines {
         // List directed Fortran input/output.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const ValidNumerics("0123456789.+-EeDd");
+        static constexpr std::string_view ValidNumerics("0123456789.+-EeDd");
 
         Real64 rProcessNumber = 0.0;
         //  Make sure the string has all what we think numerics should have
@@ -151,7 +151,7 @@ namespace UtilityRoutines {
         return rProcessNumber;
     }
 
-    int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int const NumItems)
+    int FindItemInList(std::string_view const String, Array1_string const &ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -175,7 +175,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    int FindItemInList(std::string const &String, Array1S_string const ListOfItems, int const NumItems)
+    int FindItemInList(std::string_view const String, Array1S_string const ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -199,7 +199,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    int FindItemInSortedList(std::string const &String, Array1S_string const ListOfItems, int const NumItems)
+    int FindItemInSortedList(std::string_view const String, Array1S_string const ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -235,7 +235,7 @@ namespace UtilityRoutines {
         return Probe;
     }
 
-    int FindItem(std::string const &String, Array1D_string const &ListOfItems, int const NumItems)
+    int FindItem(std::string_view const String, Array1D_string const &ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -260,7 +260,7 @@ namespace UtilityRoutines {
         return 0; // Not found
     }
 
-    int FindItem(std::string const &String, Array1S_string const ListOfItems, int const NumItems)
+    int FindItem(std::string_view const String, Array1S_string const ListOfItems, int const NumItems)
     {
 
         // FUNCTION INFORMATION:
@@ -397,10 +397,10 @@ namespace UtilityRoutines {
         }
     }
 
-    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound)
+    bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string_view StringToDisplay, bool &ErrorFound)
     {
         if (NameToVerify.empty()) {
-            ShowSevereError(state, StringToDisplay + " Name, cannot be blank");
+            ShowSevereError(state, std::string{StringToDisplay} + " Name, cannot be blank");
             ErrorFound = true;
             NameToVerify = "xxxxx";
             return true;
@@ -408,13 +408,13 @@ namespace UtilityRoutines {
         return false;
     }
 
-    size_t case_insensitive_hasher::operator()(const std::string &key) const noexcept
+    size_t case_insensitive_hasher::operator()(const std::string_view key) const noexcept
     {
         std::string keyCopy = MakeUPPERCase(key);
         return std::hash<std::string>()(keyCopy);
     }
 
-    bool case_insensitive_comparator::operator()(const std::string &a, const std::string &b) const noexcept
+    bool case_insensitive_comparator::operator()(const std::string_view a, const std::string_view b) const noexcept
     {
         return SameString(a, b);
     }
@@ -899,7 +899,7 @@ int EndEnergyPlus(EnergyPlusData &state)
     return EXIT_SUCCESS;
 }
 
-void ConvertCaseToUpper(std::string const &InputString, // Input string
+void ConvertCaseToUpper(std::string_view InputString, // Input string
                         std::string &OutputString       // Output string (in UpperCase)
 )
 {
@@ -920,8 +920,8 @@ void ConvertCaseToUpper(std::string const &InputString, // Input string
     // case alphabet, it makes an appropriate substitution.
 
     // Using/Aliasing
-    static std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
-    static std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
+    static constexpr std::string_view UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
+    static constexpr std::string_view LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
 
     OutputString = InputString;
 
@@ -933,7 +933,7 @@ void ConvertCaseToUpper(std::string const &InputString, // Input string
     }
 }
 
-void ConvertCaseToLower(std::string const &InputString, // Input string
+void ConvertCaseToLower(std::string_view InputString, // Input string
                         std::string &OutputString       // Output string (in LowerCase)
 )
 {
@@ -954,8 +954,8 @@ void ConvertCaseToLower(std::string const &InputString, // Input string
     // case alphabet, it makes an appropriate substitution.
 
     // Using/Aliasing
-    static std::string const UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
-    static std::string const LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
+    static constexpr std::string_view UpperCase("ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ");
+    static constexpr std::string_view LowerCase("abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüý");
 
     OutputString = InputString;
 
@@ -1677,7 +1677,7 @@ void ShowRecurringErrors(EnergyPlusData &state)
 
     using General::strip_trailing_zeros;
 
-    static std::string const StatMessageStart(" **   ~~~   ** ");
+    static constexpr std::string_view StatMessageStart(" **   ~~~   ** ");
 
     int Loop;
     std::string StatMessage;
@@ -1745,7 +1745,7 @@ void ShowRecurringErrors(EnergyPlusData &state)
                 if (!error.SumUnits.empty()) StatMessage += ' ' + error.SumUnits;
             }
             if (error.ReportMax || error.ReportMin || error.ReportSum) {
-                ShowMessage(state, StatMessageStart + StatMessage);
+                ShowMessage(state, std::string{StatMessageStart} + StatMessage);
             }
         }
         ShowMessage(state, "");

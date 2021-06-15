@@ -104,10 +104,10 @@ namespace SteamCoils {
     using PlantUtilities::ScanPlantLoopsForObject;
     using namespace ScheduleManager;
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimulateSteamCoilComponents(EnergyPlusData &state,
-                                     std::string const &CompName,
+                                     std::string_view CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq, // coil load to be met
@@ -142,7 +142,7 @@ namespace SteamCoils {
         if (CompIndex == 0) {
             CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataSteamCoils->SteamCoil);
             if (CoilNum == 0) {
-                ShowFatalError(state, "SimulateSteamCoilComponents: Coil not found=" + CompName);
+                ShowFatalError(state, "SimulateSteamCoilComponents: Coil not found=" + std::string{CompName});
             }
             CompIndex = CoilNum;
         } else {
@@ -1627,7 +1627,7 @@ namespace SteamCoils {
     }
 
     void CheckSteamCoilSchedule(
-        EnergyPlusData &state, [[maybe_unused]] std::string const &CompType, std::string const &CompName, Real64 &Value, int &CompIndex)
+        EnergyPlusData &state, [[maybe_unused]] std::string const &CompType, std::string_view CompName, Real64 &Value, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1652,7 +1652,7 @@ namespace SteamCoils {
         if (CompIndex == 0) {
             CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataSteamCoils->SteamCoil);
             if (CoilNum == 0) {
-                ShowFatalError(state, "CheckSteamCoilSchedule: Coil not found=" + CompName);
+                ShowFatalError(state, "CheckSteamCoilSchedule: Coil not found=" + std::string{CompName});
             }
             CompIndex = CoilNum;
             Value = GetCurrentScheduleValue(state, state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr); // not scheduled?

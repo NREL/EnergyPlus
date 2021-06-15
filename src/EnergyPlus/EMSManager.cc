@@ -2353,10 +2353,10 @@ namespace EMSManager {
 //  ScheduleManager and OutputProcessor. Followed pattern used for SetupOutputVariable
 
 void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
-                      std::string const &cUniqueIDName,
-                      std::string const &cControlTypeName,
-                      std::string const &cUnits,
+                      std::string_view cComponentTypeName,
+                      std::string_view cUniqueIDName,
+                      std::string_view cControlTypeName,
+                      std::string_view cUnits,
                       bool &lEMSActuated,
                       Real64 &rValue)
 {
@@ -2409,10 +2409,10 @@ void SetupEMSActuator(EnergyPlusData &state,
 }
 
 void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
-                      std::string const &cUniqueIDName,
-                      std::string const &cControlTypeName,
-                      std::string const &cUnits,
+                      std::string_view cComponentTypeName,
+                      std::string_view cUniqueIDName,
+                      std::string_view cControlTypeName,
+                      std::string_view cUnits,
                       bool &lEMSActuated,
                       int &iValue)
 {
@@ -2465,10 +2465,10 @@ void SetupEMSActuator(EnergyPlusData &state,
 }
 
 void SetupEMSActuator(EnergyPlusData &state,
-                      std::string const &cComponentTypeName,
-                      std::string const &cUniqueIDName,
-                      std::string const &cControlTypeName,
-                      std::string const &cUnits,
+                      std::string_view cComponentTypeName,
+                      std::string_view cUniqueIDName,
+                      std::string_view cControlTypeName,
+                      std::string_view cUnits,
                       bool &lEMSActuated,
                       bool &lValue)
 {
@@ -2521,7 +2521,7 @@ void SetupEMSActuator(EnergyPlusData &state,
 }
 
 void SetupEMSInternalVariable(
-    EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, Real64 &rValue)
+    EnergyPlusData &state, std::string_view cDataTypeName, std::string_view cUniqueIDName, std::string_view cUnits, Real64 &rValue)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2556,7 +2556,7 @@ void SetupEMSInternalVariable(
 
     if (FoundDuplicate) {
         ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.");
-        ShowContinueError(state, "Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName);
+        ShowContinueError(state, "Internal variable type = " + std::string{cDataTypeName} + " ; name = " + std::string{cUniqueIDName});
         ShowContinueError(state, "Called from SetupEMSInternalVariable.");
     } else {
         // add new internal data variable
@@ -2582,7 +2582,7 @@ void SetupEMSInternalVariable(
 }
 
 void SetupEMSInternalVariable(
-    EnergyPlusData &state, std::string const &cDataTypeName, std::string const &cUniqueIDName, std::string const &cUnits, int &iValue)
+    EnergyPlusData &state, std::string_view cDataTypeName, std::string_view cUniqueIDName, std::string_view cUnits, int &iValue)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2617,7 +2617,7 @@ void SetupEMSInternalVariable(
 
     if (FoundDuplicate) {
         ShowSevereError(state, "Duplicate internal variable was sent to SetupEMSInternalVariable.");
-        ShowContinueError(state, "Internal variable type = " + cDataTypeName + " ; name = " + cUniqueIDName);
+        ShowContinueError(state, "Internal variable type = " + std::string{cDataTypeName} + " ; name = " + std::string{cUniqueIDName});
         ShowContinueError(state, "called from SetupEMSInternalVariable");
     } else {
         // add new internal data variable

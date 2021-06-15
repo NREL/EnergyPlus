@@ -133,11 +133,11 @@ namespace UnitVentilator {
     using namespace Psychrometrics;
     using namespace FluidProperties;
 
-    static std::string const fluidNameSteam("STEAM");
-    static std::string const fluidNameWater("WATER");
+    static constexpr std::string_view fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameWater("WATER");
 
     void SimUnitVentilator(EnergyPlusData &state,
-                           std::string const &CompName,   // name of the fan coil unit
+                           std::string_view CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -166,7 +166,7 @@ namespace UnitVentilator {
         if (CompIndex == 0) {
             UnitVentNum = UtilityRoutines::FindItemInList(CompName, state.dataUnitVentilators->UnitVent);
             if (UnitVentNum == 0) {
-                ShowFatalError(state, "SimUnitVentilator: Unit not found=" + CompName);
+                ShowFatalError(state, "SimUnitVentilator: Unit not found=" + std::string{CompName});
             }
             CompIndex = UnitVentNum;
         } else {

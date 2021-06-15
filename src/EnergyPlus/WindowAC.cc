@@ -126,7 +126,7 @@ namespace WindowAC {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     void SimWindowAC(EnergyPlusData &state,
-                     std::string const &CompName,   // name of the window AC unit
+                     std::string_view CompName,   // name of the window AC unit
                      int const ZoneNum,             // number of zone being served
                      bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                      Real64 &PowerMet,              // Sensible power supplied by window AC (W)
@@ -158,7 +158,7 @@ namespace WindowAC {
         if (CompIndex == 0) {
             WindACNum = UtilityRoutines::FindItemInList(CompName, state.dataWindowAC->WindAC);
             if (WindACNum == 0) {
-                ShowFatalError(state, "SimWindowAC: Unit not found=" + CompName);
+                ShowFatalError(state, "SimWindowAC: Unit not found=" + std::string{CompName});
             }
             CompIndex = WindACNum;
         } else {

@@ -226,7 +226,7 @@ namespace Fans {
     };
 
     void SimulateFanComponents(EnergyPlusData &state,
-                               std::string const &CompName,
+                               std::string_view const CompName,
                                bool FirstHVACIteration,
                                int &CompIndex,
                                Optional<Real64 const> SpeedRatio = _,
@@ -273,15 +273,15 @@ namespace Fans {
     );
 
     Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
-                                      std::string const &FanType,     // must match fan types in this module
-                                      std::string const &FanName,     // must match fan names for the fan type
+                                      std::string_view FanType,     // must match fan types in this module
+                                      std::string_view FanName,     // must match fan names for the fan type
                                       bool &ErrorsFound,              // set to true if problem
                                       Optional_int_const FanIndex = _ // index to fan
     );
 
     int GetFanInletNode(EnergyPlusData &state,
-                        std::string const &FanType, // must match fan types in this module
-                        std::string const &FanName, // must match fan names for the fan type
+                        std::string_view FanType, // must match fan types in this module
+                        std::string_view FanName, // must match fan names for the fan type
                         bool &ErrorsFound           // set to true if problem
     );
 

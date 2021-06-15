@@ -77,7 +77,7 @@ namespace SplitterComponent {
     using namespace DataLoopNode;
 
     void SimAirLoopSplitter(EnergyPlusData &state,
-                            std::string const &CompName,
+                            std::string_view CompName,
                             bool const FirstHVACIteration,
                             bool const FirstCall,
                             bool &SplitterInletChanged,
@@ -107,7 +107,7 @@ namespace SplitterComponent {
         if (CompIndex == 0) {
             SplitterNum = UtilityRoutines::FindItemInList(CompName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
             if (SplitterNum == 0) {
-                ShowFatalError(state, "SimAirLoopSplitter: Splitter not found=" + CompName);
+                ShowFatalError(state, "SimAirLoopSplitter: Splitter not found=" + std::string{CompName});
             }
             CompIndex = SplitterNum;
         } else {

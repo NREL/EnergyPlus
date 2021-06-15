@@ -337,7 +337,7 @@ namespace PackagedTerminalHeatPump {
     };
 
     void SimPackagedTerminalUnit(EnergyPlusData &state,
-                                 std::string const &CompName, // name of the packaged terminal heat pump
+                                 std::string_view CompName, // name of the packaged terminal heat pump
                                  int ZoneNum,                 // number of zone being served
                                  bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep
                                  Real64 &QUnitOut,            // sensible capacity delivered to zone

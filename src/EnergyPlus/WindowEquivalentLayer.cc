@@ -1190,7 +1190,7 @@ void RB_BEAM(EnergyPlusData &state,
     //   TAU_BT0 = TAU_BB0 + TAU_BD0
     //   (openness)
 
-    static std::string const ContextName("RB_BEAM TauBD");
+    static constexpr std::string_view ContextName("RB_BEAM TauBD");
 
     Real64 THETA;        // working angle of incidence (limited < 90 deg)
     Real64 TAUM0;        // apparent blind material transmittance at normal incidence
@@ -1343,10 +1343,10 @@ void IS_BEAM(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
     //   TAU_BTO = TAU_BB0 + TAU_BD0
 
-    static std::string const RhoBD_Name("IS_BEAM RhoBD");
-    static std::string const TauBB_Name("IS_BEAM TauBB");
-    static std::string const TauBT_Name("IS_BEAM TauBT");
-    static std::string const TauBD_Name("IS_BEAM TauBD");
+    static constexpr std::string_view RhoBD_Name("IS_BEAM RhoBD");
+    static constexpr std::string_view TauBB_Name("IS_BEAM TauBB");
+    static constexpr std::string_view TauBT_Name("IS_BEAM TauBT");
+    static constexpr std::string_view TauBD_Name("IS_BEAM TauBD");
 
     Real64 THETA_CUTOFF; // cutoff angle, radians (beyond which TAU_BB = 0)
     Real64 B;            // working temp
@@ -1596,9 +1596,9 @@ void PD_LW(EnergyPlusData &state,
     //    typical (default) = 0.92
     //    typical (default) = 0.92
     //    nearly always 0
-    static std::string const RhoLWF_Name("PD_LW RhoLWF");
-    static std::string const RhoLWB_Name("PD_LW RhoLWB");
-    static std::string const EpsLWF_Name("PD_LW EpsLWF");
+    static constexpr std::string_view RhoLWF_Name("PD_LW RhoLWF");
+    static constexpr std::string_view RhoLWB_Name("PD_LW RhoLWB");
+    static constexpr std::string_view EpsLWF_Name("PD_LW EpsLWF");
 
     Real64 RHOLWF_FABRIC;
     Real64 RHOLWB_FABRIC;
@@ -1644,8 +1644,8 @@ void PD_DIFF(EnergyPlusData &state,
     // reflectance call this routine a second time with reversed front and back properties
 
     constexpr int N(6);
-    static std::string const TauDD_Name("PD_DIFF TauDD");
-    static std::string const RhoDD_Name("PD_DIFF RhoDD");
+    static constexpr std::string_view TauDD_Name("PD_DIFF TauDD");
+    static constexpr std::string_view RhoDD_Name("PD_DIFF RhoDD");
 
     Real64 AK; // length of diagonal strings of the rectangular enclosure
     Real64 CG;
@@ -3730,8 +3730,8 @@ void VB_DIFF(EnergyPlusData &state,
     //   ltyVBVER: + = front-side slat tip is counter-
     //                 clockwise from normal (viewed from above)
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const Tau_Name("VB_DIFF Tau");
-    static std::string const RhoF_Name("VB_DIFF RhoF");
+    static constexpr std::string_view Tau_Name("VB_DIFF Tau");
+    static constexpr std::string_view RhoF_Name("VB_DIFF RhoF");
 
     Real64 CD; // lengths of the diagonal strings used in the four-surface model
     Real64 AF;

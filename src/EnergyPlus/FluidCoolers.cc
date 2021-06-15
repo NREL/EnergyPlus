@@ -853,7 +853,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr int MaxIte(500);    // Maximum number of iterations
     constexpr Real64 Acc(0.0001); // Accuracy of result
-    static std::string const CalledFrom("SizeFluidCooler");
+    static constexpr std::string_view CalledFrom("SizeFluidCooler");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int SolFla;                     // Flag of solver
@@ -1147,7 +1147,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 } else if (SolFla == -2) {
                     CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA0, OutWaterTempAtUA0);
                     CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA1, OutWaterTempAtUA1);
-                    ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                    ShowSevereError(state, std::string{CalledFrom} + ": The combination of design input values did not allow the calculation of a ");
                     ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                     ShowContinueError(state, R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be )");
                     ShowContinueError(state, "contributing to this problem.");
@@ -1261,7 +1261,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             } else if (SolFla == -2) {
                 CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA0, OutWaterTempAtUA0);
                 CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA1, OutWaterTempAtUA1);
-                ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                ShowSevereError(state, std::string{CalledFrom} + ": The combination of design input values did not allow the calculation of a ");
                 ShowContinueError(state, "reasonable UA value. Review and revise design input values as appropriate. Specifying hard");
                 ShowContinueError(state, R"(sizes for some "autosizable" fields while autosizing other "autosizable" fields may be )");
                 ShowContinueError(state, "contributing to this problem.");
@@ -1414,7 +1414,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             } else if (SolFla == -2) {
                 CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA0, OutWaterTempAtUA0);
                 CalcFluidCoolerOutlet(state, int(Par[1]), Par[2], Par[3], UA1, OutWaterTempAtUA1);
-                ShowSevereError(state, CalledFrom + ": The combination of design input values did not allow the calculation of a ");
+                ShowSevereError(state, std::string{CalledFrom} + ": The combination of design input values did not allow the calculation of a ");
                 ShowContinueError(state, "reasonable low-speed UA value. Review and revise design input values as appropriate. ");
                 ShowContinueError(state, R"(Specifying hard sizes for some "autosizable" fields while autosizing other "autosizable" )");
                 ShowContinueError(state, "fields may be contributing to this problem.");

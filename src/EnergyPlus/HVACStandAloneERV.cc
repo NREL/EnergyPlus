@@ -113,7 +113,7 @@ using ScheduleManager::GetCurrentScheduleValue;
 using ScheduleManager::GetScheduleIndex;
 
 void SimStandAloneERV(EnergyPlusData &state,
-                      std::string const &CompName,   // name of the Stand Alone ERV unit
+                      std::string_view CompName,   // name of the Stand Alone ERV unit
                       int const ZoneNum,             // number of zone being served unused1208
                       bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                       Real64 &SensLoadMet,           // net sensible load supplied by the ERV unit to the zone (W)
@@ -151,7 +151,7 @@ void SimStandAloneERV(EnergyPlusData &state,
     if (CompIndex == 0) {
         StandAloneERVNum = UtilityRoutines::FindItem(CompName, state.dataHVACStandAloneERV->StandAloneERV);
         if (StandAloneERVNum == 0) {
-            ShowFatalError(state, "SimStandAloneERV: Unit not found=" + CompName);
+            ShowFatalError(state, "SimStandAloneERV: Unit not found=" + std::string{CompName});
         }
         CompIndex = StandAloneERVNum;
     } else {

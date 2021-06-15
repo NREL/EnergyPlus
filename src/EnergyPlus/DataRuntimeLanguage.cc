@@ -176,7 +176,7 @@ namespace DataRuntimeLanguage {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const InvalidStartCharacters("0123456789");
+        static constexpr std::string_view InvalidStartCharacters("0123456789");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

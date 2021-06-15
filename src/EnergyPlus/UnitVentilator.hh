@@ -208,7 +208,7 @@ namespace UnitVentilator {
     };
 
     void SimUnitVentilator(EnergyPlusData &state,
-                           std::string const &CompName,   // name of the fan coil unit
+                           std::string_view CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)

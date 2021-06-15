@@ -166,7 +166,7 @@ namespace SimulationManager {
     using namespace ExternalInterface;
 
     // MODULE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
+    static constexpr std::string_view BlankString;
 
     void ManageSimulation(EnergyPlusData &state)
     {
@@ -2849,10 +2849,10 @@ namespace SimulationManager {
                 ChildOutNodeName.allocate(NumChildren);
                 ChildInNodeNum.allocate(NumChildren);
                 ChildOutNodeNum.allocate(NumChildren);
-                ChildCType = BlankString;
-                ChildCName = BlankString;
-                ChildInNodeName = BlankString;
-                ChildOutNodeName = BlankString;
+                ChildCType = std::string{};
+                ChildCName = std::string{};
+                ChildInNodeName = std::string{};
+                ChildOutNodeName = std::string{};
                 ChildInNodeNum = 0;
                 ChildOutNodeNum = 0;
                 GetChildrenData(state,

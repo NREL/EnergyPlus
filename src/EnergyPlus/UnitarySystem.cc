@@ -103,8 +103,8 @@
 namespace EnergyPlus {
 namespace UnitarySystems {
 
-    static std::string const fluidNameSteam("STEAM");
-    static std::string const blankString("");
+    static constexpr std::string_view fluidNameSteam("STEAM");
+    static constexpr std::string_view blankString("");
 
     UnitarySysInputSpec::UnitarySysInputSpec()
         : dx_heating_coil_sizing_ratio(1.0), minimum_supply_air_temperature(2.0), cooling_supply_air_flow_rate(-999.0),
@@ -184,7 +184,7 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::simulate(EnergyPlusData &state,
-                              std::string const &Name,
+                              std::string_view Name,
                               bool const FirstHVACIteration,
                               int const &AirLoopNum,
                               int &CompIndex,
@@ -211,7 +211,7 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::simulateSys(EnergyPlusData &state,
-                                 std::string const &Name,
+                                 std::string_view Name,
                                  bool const FirstHVACIteration,
                                  int const &AirLoopNum,
                                  int &CompIndex,
@@ -466,7 +466,7 @@ namespace UnitarySystems {
 
     int getDesignSpecMSHPIndex(
         EnergyPlusData &state,        // lookup vector index for design spec object name in object array EnergyPlus::UnitarySystems::designSpecMSHP
-        std::string const &objectName // IDF name in input
+        std::string_view objectName // IDF name in input
     )
     {
         int index = -1;
@@ -477,13 +477,13 @@ namespace UnitarySystems {
                 return index;
             }
         }
-        ShowSevereError(state, "getDesignSpecMSHPIndex: did not find UnitarySystemPerformance:Multispeed name =" + objectName + ". Check inputs");
+        ShowSevereError(state, "getDesignSpecMSHPIndex: did not find UnitarySystemPerformance:Multispeed name =" + std::string{objectName} + ". Check inputs");
         return index;
     }
 
     int getUnitarySystemIndex(
         EnergyPlusData &state,        // lookup vector index for UnitarySystem object name in object array EnergyPlus::UnitarySystems::unitarySys
-        std::string const &objectName // IDF name in input
+        std::string_view objectName // IDF name in input
     )
     {
         int index = -1;
@@ -1423,7 +1423,7 @@ namespace UnitarySystems {
         }
     }
 
-    void UnitarySys::getUnitarySystemInput(EnergyPlusData &state, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
+    void UnitarySys::getUnitarySystemInput(EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
     {
 
         bool errorsFound(false);
@@ -1652,7 +1652,7 @@ namespace UnitarySystems {
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
             } else {
                 // should never happen
-                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Illegal entry for Cooling Supply Air Flow Rate Method.");
             }
 
@@ -1783,7 +1783,7 @@ namespace UnitarySystems {
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
                 // should never happen
-                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Illegal entry for Heating Supply Air Flow Rate Method.");
             }
 
@@ -1945,7 +1945,7 @@ namespace UnitarySystems {
             this->m_DesignFanVolFlowRate = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
             if (this->m_ActualFanVolFlowRate > 0.0) this->m_DesignFanVolFlowRate = this->m_ActualFanVolFlowRate;
             if (this->m_DesignFanVolFlowRate <= 0.0) {
-                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowFatalError(state, "Unable to determine fan air flow rate.");
             }
         }
@@ -2151,7 +2151,7 @@ namespace UnitarySystems {
                                                       0.0,
                                                       0.0); // conduct the sizing operation in the VS WSHP
             if (this->m_NumOfSpeedCooling != state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                 ShowFatalError(state,
                                "Cooling coil = " + state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).VarSpeedCoilType + ": " +
@@ -2202,7 +2202,7 @@ namespace UnitarySystems {
             auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
             // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
             if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
-                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                 ShowFatalError(state, "Cooling coil = Coil:Cooling:DX: " + newCoil.name);
             }
@@ -2363,7 +2363,7 @@ namespace UnitarySystems {
                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                             if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] < 1.0 &&
                                 this->m_ControlType == ControlType::Setpoint) {
-                                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
+                                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                                 ShowContinueError(state, "Design specification object = " + state.dataUnitarySystems->designSpecMSHP[MSHPIndex].name);
                                 ShowContinueError(state,
                                                   "When control type = SetPointBased the outlet air temperature must change with coil capacity, if "
@@ -2435,7 +2435,7 @@ namespace UnitarySystems {
                                                       0.0); // conduct the sizing operation in the VS WSHP
 
             if (this->m_NumOfSpeedHeating != state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Number of heating speeds does not match coil object.");
                 ShowFatalError(state,
                                "Heating coil = " + state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).VarSpeedCoilType + ": " +
@@ -2907,7 +2907,7 @@ namespace UnitarySystems {
                                       int const ZoneOAUnitNum)
     {
 
-        static std::string const unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
+        static constexpr std::string_view unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
         std::string cCurrentModuleObject("AirLoopHVAC:UnitarySystem");
         std::string thisObjectName = input_data.name;
@@ -6659,7 +6659,7 @@ namespace UnitarySystems {
             if (this->m_NumOfSpeedCooling == 0) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                 ShowContinueError(state,
-                                  "... Cooling coil object type requires valid " + unitarySysHeatPumpPerformanceObjectType +
+                                  "... Cooling coil object type requires valid " + std::string{unitarySysHeatPumpPerformanceObjectType} +
                                       " for cooling to be specified with number of speeds > 0");
                 errorsFound = true;
             }
@@ -6671,7 +6671,7 @@ namespace UnitarySystems {
             if (this->m_NumOfSpeedHeating == 0) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                 ShowContinueError(state,
-                                  "... Heating coil object type requires valid " + unitarySysHeatPumpPerformanceObjectType +
+                                  "... Heating coil object type requires valid " + std::string{unitarySysHeatPumpPerformanceObjectType} +
                                       " for heating to be specified with number of speeds > 0");
                 errorsFound = true;
             }
@@ -6806,10 +6806,10 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::getUnitarySystemInputData(
-        EnergyPlusData &state, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
+        EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
 
-        static std::string const getUnitarySystemInput("getUnitarySystemInputData");
+        static constexpr std::string_view getUnitarySystemInput("getUnitarySystemInputData");
 
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
 
@@ -16705,7 +16705,7 @@ namespace UnitarySystems {
         this->setAverageAirFlow(state, PartLoadRatio, OnOffAirFlowRatio);
     }
 
-    void UnitarySys::checkUnitarySysCoilInOASysExists(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum)
+    void UnitarySys::checkUnitarySysCoilInOASysExists(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -16747,15 +16747,15 @@ namespace UnitarySystems {
                 }
             }
             if (!UnitarySysFound) {
-                ShowSevereError(state, std::string{RoutineName} + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
+                ShowSevereError(state, std::string{RoutineName} + "System not found = UnitarySystem \"" + std::string{UnitarySysName} + "\"");
             }
         } else {
-            ShowSevereError(state, std::string{RoutineName} + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
+            ShowSevereError(state, std::string{RoutineName} + "System not found = UnitarySystem \"" + std::string{UnitarySysName} + "\"");
         }
     }
 
     void UnitarySys::getUnitarySysHeatCoolCoil(EnergyPlusData &state,
-                                               std::string const &UnitarySysName, // Name of Unitary System object
+                                               std::string_view UnitarySysName, // Name of Unitary System object
                                                bool &CoolingCoil,                 // Cooling coil exists
                                                bool &HeatingCoil,                 // Heating coil exists
                                                int const ZoneOAUnitNum            // index to zone OA unit
@@ -16790,7 +16790,7 @@ namespace UnitarySystems {
         }
     }
 
-    int UnitarySys::getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
+    int UnitarySys::getAirInNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
     {
         if (state.dataUnitarySystems->getInputOnceFlag) {
             getUnitarySystemInput(state, UnitarySysName, false, ZoneOAUnitNum);
@@ -16807,7 +16807,7 @@ namespace UnitarySystems {
         return airNode;
     }
 
-    int UnitarySys::getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
+    int UnitarySys::getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
     {
         if (state.dataUnitarySystems->getInputOnceFlag) {
             getUnitarySystemInput(state, UnitarySysName, false, ZoneOAUnitNum);
@@ -16899,7 +16899,7 @@ namespace UnitarySystems {
         }
     }
 
-    bool searchTotalComponents(EnergyPlusData &state, std::string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex)
+    bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex)
     {
         for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {

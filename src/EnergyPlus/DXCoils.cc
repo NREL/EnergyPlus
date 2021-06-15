@@ -132,7 +132,7 @@ using namespace ScheduleManager;
 // Functions
 
 void SimDXCoil(EnergyPlusData &state,
-               std::string const &CompName,   // name of the fan coil unit
+               std::string_view CompName,   // name of the fan coil unit
                int const CompOp,              // compressor operation; 1=on, 0=off
                bool const FirstHVACIteration, // True when first HVAC iteration
                int &CompIndex,
@@ -169,7 +169,7 @@ void SimDXCoil(EnergyPlusData &state,
     if (CompIndex == 0) {
         DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataDXCoils->DXCoil);
         if (DXCoilNum == 0) {
-            ShowFatalError(state, "DX Coil not found=" + CompName);
+            ShowFatalError(state, "DX Coil not found=" + std::string{CompName});
         }
         CompIndex = DXCoilNum;
     } else {
@@ -249,7 +249,7 @@ void SimDXCoil(EnergyPlusData &state,
             CalcVRFHeatingCoil_FluidTCtrl(state, CompOp, DXCoilNum, PartLoadRatio, FanOpMode, _, MaxCap);
 
         } else {
-            ShowSevereError(state, "Error detected in DX Coil=" + CompName);
+            ShowSevereError(state, "Error detected in DX Coil=" + std::string{CompName});
             ShowContinueError(state, "Invalid DX Coil Type=" + state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType);
             ShowFatalError(state, "Preceding condition causes termination.");
         }
@@ -263,7 +263,7 @@ void SimDXCoil(EnergyPlusData &state,
 }
 
 void SimDXCoilMultiSpeed(EnergyPlusData &state,
-                         std::string const &CompName, // name of the fan coil unit
+                         std::string_view CompName, // name of the fan coil unit
                          Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
                          Real64 const CycRatio,       // cycling part load ratio for variable speed
                          int &CompIndex,
@@ -305,7 +305,7 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
     if (CompIndex == 0) {
         DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataDXCoils->DXCoil);
         if (DXCoilNum == 0) {
-            ShowFatalError(state, "DX Coil not found=" + CompName);
+            ShowFatalError(state, "DX Coil not found=" + std::string{CompName});
         }
         CompIndex = DXCoilNum;
     } else {
@@ -368,7 +368,7 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
                                             SingleModeOper); // Autodesk:OPTIONAL FanOpMode used without PRESENT check
 
         } else {
-            ShowSevereError(state, "Error detected in DX Coil=" + CompName);
+            ShowSevereError(state, "Error detected in DX Coil=" + std::string{CompName});
             ShowContinueError(state, "Invalid DX Coil Type=" + state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType);
             ShowFatalError(state, "Preceding condition causes termination.");
         }
@@ -382,7 +382,7 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
 }
 
 void SimDXCoilMultiMode(EnergyPlusData &state,
-                        std::string const &CompName,       // name of the fan coil unit
+                        std::string_view CompName,       // name of the fan coil unit
                         [[maybe_unused]] int const CompOp, // compressor operation; 1=on, 0=off !unused1208
                         bool const FirstHVACIteration,     // true if first hvac iteration
                         Real64 const PartLoadRatio,        // part load ratio
@@ -457,7 +457,7 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
     if (CompIndex == 0) {
         DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataDXCoils->DXCoil);
         if (DXCoilNum == 0) {
-            ShowFatalError(state, "DX Coil not found=" + CompName);
+            ShowFatalError(state, "DX Coil not found=" + std::string{CompName});
         }
         CompIndex = DXCoilNum;
     } else {
@@ -708,7 +708,7 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
             CalcBasinHeaterPowerForMultiModeDXCoil(state, DXCoilNum, DehumidMode);
 
         } else {
-            ShowSevereError(state, "Error detected in DX Coil=" + CompName);
+            ShowSevereError(state, "Error detected in DX Coil=" + std::string{CompName});
             ShowContinueError(state, "Invalid DX Coil Type=" + state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType);
             ShowFatalError(state, "Preceding condition causes termination.");
         }
@@ -9046,7 +9046,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcDoe2DXCoil: ");
-    static std::string const calcDoe2DXCoil("CalcDoe2DXCoil");
+    static constexpr std::string_view calcDoe2DXCoil("CalcDoe2DXCoil");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 AirMassFlow;       // dry air mass flow rate through coil [kg/s] (adjusted for bypass if any)

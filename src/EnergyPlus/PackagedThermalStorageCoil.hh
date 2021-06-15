@@ -419,7 +419,7 @@ namespace PackagedThermalStorageCoil {
     };
 
     void SimTESCoil(EnergyPlusData &state,
-                    std::string const &CompName, // name of the fan coil unit
+                    std::string_view CompName, // name of the fan coil unit
                     int &CompIndex,
                     int const FanOpMode, // allows parent object to control fan mode
                     int &TESOpMode,

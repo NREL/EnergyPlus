@@ -66,7 +66,7 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void HalfLoopData::solve(EnergyPlusData &state, bool const FirstHVACIteration, bool &ReSimOtherSideNeeded)
     {

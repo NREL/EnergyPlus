@@ -881,7 +881,7 @@ void CheckUniqueNodes(EnergyPlusData &state,
                 ShowFatalError(state, "Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument.");
             }
             if (!CheckName().empty()) {
-                Found = UtilityRoutines::FindItemInList(CheckName, state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
+                Found = UtilityRoutines::FindItemInList(CheckName(), state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
                 if (Found != 0) {
                     ShowSevereError(state, state.dataNodeInputMgr->CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
                     ShowContinueError(state, "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\".");

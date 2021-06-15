@@ -312,7 +312,7 @@ namespace StandardRatings {
 
     void ReportDXCoilRating(EnergyPlusData &state,
                             std::string const &CompType,     // Type of component
-                            std::string const &CompName,     // Name of component
+                            std::string_view CompName,     // Name of component
                             int const CompTypeNum,           // TypeNum of component
                             Real64 const CoolCapVal,         // Standard total (net) cooling capacity for AHRI Std. 210/240 {W}
                             Real64 const SEERValueIP,        // SEER value in IP units from user PLR curve {Btu/W-h}
@@ -328,7 +328,7 @@ namespace StandardRatings {
 
     void ReportDXCoolCoilDataCenterApplication(EnergyPlusData &state,
                                                std::string const &CompType,           // Type of component
-                                               std::string const &CompName,           // Name of component
+                                               std::string_view CompName,           // Name of component
                                                int const CompTypeNum,                 // TypeNum of component
                                                Array1D<Real64> &NetCoolingCapRated,   // net cooling capacity of single speed DX cooling coil
                                                Array1D<Real64> &TotElectricPowerRated // total electric power including supply fan

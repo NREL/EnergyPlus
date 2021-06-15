@@ -105,7 +105,7 @@ namespace HVACHXAssistedCoolingCoil {
     };
 
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
-                                  std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+                                  std::string_view HXAssistedCoilName,  // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,         // FirstHVACIteration flag
                                   int const CompOp,                      // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,            // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
@@ -137,7 +137,7 @@ namespace HVACHXAssistedCoolingCoil {
 
     void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state,
                                             std::string const &CompType, // unused1208
-                                            std::string const &CompName,
+                                            std::string_view CompName,
                                             Real64 &Value,
                                             int &CompIndex);
 

@@ -72,7 +72,7 @@ namespace EnergyPlus::IntegratedHeatPump {
 using namespace DataLoopNode;
 
 void SimIHP(EnergyPlusData &state,
-            std::string const &CompName,   // Coil Name
+            std::string_view CompName,   // Coil Name
             int &CompIndex,                // Index for Component name
             int const CyclingScheme,       // Continuous fan OR cycling compressor
             Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -117,7 +117,7 @@ void SimIHP(EnergyPlusData &state,
     if (CompIndex == 0) {
         DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataIntegratedHP->IntegratedHeatPumps);
         if (DXCoilNum == 0) {
-            ShowFatalError(state, "Integrated Heat Pump not found=" + CompName);
+            ShowFatalError(state, "Integrated Heat Pump not found=" + std::string{CompName});
         }
         CompIndex = DXCoilNum;
     } else {

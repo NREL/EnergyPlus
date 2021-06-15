@@ -243,7 +243,7 @@ namespace OutdoorAirUnit {
     };
 
     void SimOutdoorAirUnit(EnergyPlusData &state,
-                           std::string const &CompName, // name of the outdoor air unit
+                           std::string_view CompName, // name of the outdoor air unit
                            int ZoneNum,                 // number of zone being served
                            bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,            // Sensible power supplied (W)

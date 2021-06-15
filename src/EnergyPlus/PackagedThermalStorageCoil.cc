@@ -104,7 +104,7 @@ using namespace Psychrometrics;
 using namespace CurveManager;
 
 void SimTESCoil(EnergyPlusData &state,
-                std::string const &CompName, // name of the fan coil unit
+                std::string_view CompName, // name of the fan coil unit
                 int &CompIndex,
                 int const FanOpMode, // allows parent object to control fan mode
                 int &TESOpMode,
@@ -129,7 +129,7 @@ void SimTESCoil(EnergyPlusData &state,
     if (CompIndex == 0) {
         TESCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataPackagedThermalStorageCoil->TESCoil);
         if (TESCoilNum == 0) {
-            ShowFatalError(state, "Thermal Energy Storage Cooling Coil not found=" + CompName);
+            ShowFatalError(state, "Thermal Energy Storage Cooling Coil not found=" + std::string{CompName});
         }
         CompIndex = TESCoilNum;
     } else {
@@ -2392,7 +2392,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SizeTESCoil ");
-    static std::string const calcTESWaterStorageTank("CalcTESWaterStorageTank");
+    static constexpr std::string_view calcTESWaterStorageTank("CalcTESWaterStorageTank");
     Real64 const FluidTankSizingDeltaT(10.0);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4298,7 +4298,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
     Real64 const RelaxationFactor(0.4);
     Real64 const Tolerance(0.1);
     static constexpr std::string_view RoutineName("CalcTESCoilDischargeOnlyMode");
-    static std::string const StorageTankName("CalcTESWaterStorageTank");
+    static constexpr std::string_view StorageTankName("CalcTESWaterStorageTank");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 AirMassFlowRatio;      // evaporator inlet air mass flow divided by design mass flow [ ]
@@ -4998,7 +4998,7 @@ void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcTESWaterStorageTank");
-    static std::string const calcTESIceStorageTank("CalcTESIceStorageTank");
+    static constexpr std::string_view calcTESIceStorageTank("CalcTESIceStorageTank");
 
     Real64 TimeElapsed;        // Fraction of the current hour that has elapsed (h)
     Real64 AmbientTemp;        // Current ambient air temperature around tank (C)

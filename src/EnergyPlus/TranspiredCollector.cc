@@ -115,7 +115,7 @@ namespace TranspiredCollector {
     using DataVectorTypes::Vector;
 
     void SimTranspiredCollector(EnergyPlusData &state,
-                                std::string const &CompName, // component name
+                                std::string_view CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     )
     {
@@ -150,7 +150,7 @@ namespace TranspiredCollector {
         if (CompIndex == 0) {
             UTSCNum = UtilityRoutines::FindItemInList(CompName, state.dataTranspiredCollector->UTSC);
             if (UTSCNum == 0) {
-                ShowFatalError(state, "Transpired Collector not found=" + CompName);
+                ShowFatalError(state, "Transpired Collector not found=" + std::string{CompName});
             }
             CompIndex = UTSCNum;
         } else {

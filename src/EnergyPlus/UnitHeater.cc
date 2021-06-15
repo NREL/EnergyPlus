@@ -127,10 +127,10 @@ namespace UnitHeater {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace FluidProperties;
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimUnitHeater(EnergyPlusData &state,
-                       std::string const &CompName,   // name of the fan coil unit
+                       std::string_view CompName,   // name of the fan coil unit
                        int const ZoneNum,             // number of zone being served
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        Real64 &PowerMet,              // Sensible power supplied (W)
@@ -159,7 +159,7 @@ namespace UnitHeater {
         if (CompIndex == 0) {
             UnitHeatNum = UtilityRoutines::FindItemInList(CompName, state.dataUnitHeaters->UnitHeat);
             if (UnitHeatNum == 0) {
-                ShowFatalError(state, "SimUnitHeater: Unit not found=" + CompName);
+                ShowFatalError(state, "SimUnitHeater: Unit not found=" + std::string{CompName});
             }
             CompIndex = UnitHeatNum;
         } else {

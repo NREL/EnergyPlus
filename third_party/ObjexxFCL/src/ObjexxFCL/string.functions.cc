@@ -329,7 +329,7 @@ trimmed( std::string_view const s )
 std::string
 trimmed_whitespace( std::string_view const s )
 {
-	static std::string const WHITE( " \t\0", 3 );
+	static constexpr std::string_view WHITE( " \t\0", 3 );
 	if ( s.empty() ) { // Empty string
 		return std::string{};
 	} else {
@@ -450,7 +450,7 @@ rstripped( std::string_view const s )
 std::string
 stripped_whitespace( std::string_view const s )
 {
-	static std::string const WHITE( " \t\0", 3 );
+	static constexpr std::string_view WHITE( " \t\0", 3 );
 	if ( s.empty() ) {
 		return std::string{};
 	} else {

@@ -115,7 +115,7 @@ namespace HVACDXSystem {
     Real64 constexpr LatCapTimeConst(45.0);
 
     void SimDXCoolingSystem(EnergyPlusData &state,
-                            std::string const &DXCoolingSystemName, // Name of DXSystem:Airloop object
+                            std::string_view DXCoolingSystemName, // Name of DXSystem:Airloop object
                             bool const FirstHVACIteration,          // True when first HVAC iteration
                             int const AirLoopNum,                   // Primary air loop number
                             int &CompIndex,                         // Index to DXSystem:Airloop object
@@ -167,7 +167,7 @@ namespace HVACDXSystem {
         if (CompIndex == 0) {
             DXSystemNum = UtilityRoutines::FindItemInList(DXCoolingSystemName, state.dataHVACDXSys->DXCoolingSystem);
             if (DXSystemNum == 0) {
-                ShowFatalError(state, "SimDXCoolingSystem: DXUnit not found=" + DXCoolingSystemName);
+                ShowFatalError(state, "SimDXCoolingSystem: DXUnit not found=" + std::string{DXCoolingSystemName});
             }
             CompIndex = DXSystemNum;
         } else {

@@ -127,10 +127,10 @@ namespace HVACUnitaryBypassVAV {
     // "Ventilation for Changeover-Bypass VAV Systems," D. Stanke, ASHRAE Journal Vol. 46, No. 11, November 2004.
     //  Lawrence Berkeley Laboratory. Nov. 1993. DOE-2 Supplement Version 2.1E, Winklemann et.al.
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimUnitaryBypassVAV(EnergyPlusData &state,
-                             std::string const &CompName,   // Name of the CBVAV system
+                             std::string_view CompName,   // Name of the CBVAV system
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                              int const AirLoopNum,          // air loop index
                              int &CompIndex                 // Index to changeover-bypass VAV system
@@ -158,7 +158,7 @@ namespace HVACUnitaryBypassVAV {
         if (CompIndex == 0) {
             CBVAVNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACUnitaryBypassVAV->CBVAV);
             if (CBVAVNum == 0) {
-                ShowFatalError(state, "SimUnitaryBypassVAV: Unit not found=" + CompName);
+                ShowFatalError(state, "SimUnitaryBypassVAV: Unit not found=" + std::string{CompName});
             }
             CompIndex = CBVAVNum;
         } else {
@@ -322,7 +322,7 @@ namespace HVACUnitaryBypassVAV {
         // Uses "Get" routines to read in data.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const getUnitaryHeatCoolVAVChangeoverBypass("GetUnitaryHeatCool:VAVChangeoverBypass");
+        static constexpr std::string_view getUnitaryHeatCoolVAVChangeoverBypass("GetUnitaryHeatCool:VAVChangeoverBypass");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;                      // Number of Alphas for each GetObjectItem call

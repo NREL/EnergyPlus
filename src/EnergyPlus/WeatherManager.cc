@@ -3410,8 +3410,8 @@ namespace WeatherManager {
 
         EP_SIZE_CHECK(WCodesArr, 9); // NOLINT(misc-static-assert)
 
-        static std::string const ValidDigits("0123456789");
-        static std::string const fmt9I1("(9I1)");
+        static constexpr std::string_view ValidDigits("0123456789");
+        static constexpr std::string_view fmt9I1("(9I1)");
 
         std::string::size_type Pos;
 
@@ -3692,7 +3692,7 @@ namespace WeatherManager {
         static constexpr std::string_view RoutineNamePsyWFnTdbTwbPb("SetUpDesignDay:PsyWFnTdbTwbPb");
         static constexpr std::string_view RoutineNamePsyWFnTdpPb("SetUpDesignDay:PsyWFnTdpPb");
         static constexpr std::string_view RoutineNamePsyWFnTdbH("SetUpDesignDay:PsyWFnTdbH");
-        static std::string const WeatherManager("WeatherManager");
+        static constexpr std::string_view WeatherManager("WeatherManager");
         static constexpr std::string_view RoutineNameLong("WeatherManager.cc subroutine SetUpDesignDay");
 
         std::string StringOut;
@@ -4939,14 +4939,14 @@ namespace WeatherManager {
         // incremented.  Finally, the header information for the report must
         // be sent to the output file.
 
-        static std::string const EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
-        static std::string const TimeStepString(
+        static constexpr std::string_view EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
+        static constexpr std::string_view TimeStepString(
             ",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType");
-        static std::string const DailyString(
+        static constexpr std::string_view DailyString(
             ",5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily ");
-        static std::string const MonthlyString(",2,Cumulative Days of Simulation[],Month[]  ! When Monthly ");
-        static std::string const RunPeriodString(",1,Cumulative Days of Simulation[] ! When Run Period ");
-        static std::string const YearlyString(",1,Calendar Year of Simulation[] ! When Annual ");
+        static constexpr std::string_view MonthlyString(",2,Cumulative Days of Simulation[],Month[]  ! When Monthly ");
+        static constexpr std::string_view RunPeriodString(",1,Cumulative Days of Simulation[] ! When Run Period ");
+        static constexpr std::string_view YearlyString(",1,Calendar Year of Simulation[] ! When Annual ");
 
         AssignReportNumber(state, state.dataWeatherManager->EnvironmentReportNbr);
         if (state.dataWeatherManager->EnvironmentReportNbr != 1) { //  problem
@@ -8819,7 +8819,7 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine skips the initial header records on the EnergyPlus Weather File (in.epw).
 
-        static std::string const Header("DATA PERIODS");
+        static constexpr std::string_view Header("DATA PERIODS");
 
         // Read in Header Information
         InputFile::ReadResult<std::string> Line{"", true, false};
@@ -8829,7 +8829,7 @@ namespace WeatherManager {
             Line = state.files.inputWeatherFile.readLine();
             if (Line.eof) {
                 ShowFatalError(state,
-                               "Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header,
+                               "Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + std::string{Header},
                                OptionalOutputFileRef{state.files.eso});
             }
             uppercase(Line.data);
@@ -8895,11 +8895,11 @@ namespace WeatherManager {
         // This subroutine reports the counts of missing/out of range data
         // for weather file environments.
 
-        static std::string const MissString("Missing Data Found on Weather Data File");
+        static constexpr std::string_view MissString("Missing Data Found on Weather Data File");
         static constexpr fmt::string_view msFmt("Missing {}, Number of items={:5}");
-        static std::string const InvString("Invalid Data Found on Weather Data File");
+        static constexpr std::string_view InvString("Invalid Data Found on Weather Data File");
         static constexpr fmt::string_view ivFmt("Invalid {}, Number of items={:5}");
-        static std::string const RangeString("Out of Range Data Found on Weather Data File");
+        static constexpr std::string_view RangeString("Out of Range Data Found on Weather Data File");
         static constexpr fmt::string_view rgFmt("Out of Range {} [{},{}], Number of items={:5}");
 
         if (!state.dataEnvrn->DisplayWeatherMissingDataWarnings) return;
@@ -8908,7 +8908,7 @@ namespace WeatherManager {
         auto missedHeaderCheck{[&](Real64 const value, std::string const &description) {
             if (value > 0) {
                 if (!MissedHeader) {
-                    ShowWarningError(state, MissString);
+                    ShowWarningError(state, std::string{MissString});
                     MissedHeader = true;
                 }
                 ShowMessage(state, format(msFmt, "\"" + description + "\"", value));
@@ -8927,24 +8927,24 @@ namespace WeatherManager {
         missedHeaderCheck(state.dataWeatherManager->Missed.OpaqSkyCvr, "Opaque Sky Cover");
         missedHeaderCheck(state.dataWeatherManager->Missed.SnowDepth, "Snow Depth");
         if (state.dataWeatherManager->Missed.WeathCodes > 0) {
-            ShowWarningError(state, InvString);
+            ShowWarningError(state, std::string{InvString});
             ShowMessage(state, format(ivFmt, "\"Weather Codes\" (not equal 9 digits)", state.dataWeatherManager->Missed.WeathCodes));
         }
         missedHeaderCheck(state.dataWeatherManager->Missed.LiquidPrecip, "Liquid Precipitation Depth");
 
         bool OutOfRangeHeader = false;
         auto outOfRangeHeaderCheck{[&](Real64 const value,
-                                       std::string const &description,
-                                       std::string const &rangeLow,
-                                       std::string const &rangeHigh,
-                                       std::string const &extraMsg) {
+                                       std::string_view description,
+                                       std::string_view rangeLow,
+                                       std::string_view rangeHigh,
+                                       std::string_view extraMsg) {
             if (value > 0) {
                 if (!OutOfRangeHeader) {
-                    ShowWarningError(state, RangeString);
+                    ShowWarningError(state, std::string{RangeString});
                     OutOfRangeHeader = true;
                 }
                 ShowMessage(state, EnergyPlus::format(rgFmt, description, rangeLow, rangeHigh, value));
-                if (!extraMsg.empty()) ShowMessage(state, extraMsg);
+                if (!extraMsg.empty()) ShowMessage(state, std::string{extraMsg});
             }
         }};
         outOfRangeHeaderCheck(state.dataWeatherManager->OutOfRange.DryBulb, "Dry Bulb Temperatures", ">=-90", "<=70", "");

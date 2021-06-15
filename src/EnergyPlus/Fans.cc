@@ -115,7 +115,7 @@ using Psychrometrics::PsyTdbFnHW;
 using namespace ScheduleManager;
 
 void SimulateFanComponents(EnergyPlusData &state,
-                           std::string const &CompName,
+                           std::string_view const CompName,
                            bool const FirstHVACIteration,
                            int &CompIndex,
                            Optional<Real64 const> SpeedRatio,
@@ -148,7 +148,7 @@ void SimulateFanComponents(EnergyPlusData &state,
     if (CompIndex == 0) {
         FanNum = UtilityRoutines::FindItemInList(CompName, Fan, &FanEquipConditions::FanName);
         if (FanNum == 0) {
-            ShowFatalError(state, "SimulateFanComponents: Fan not found=" + CompName);
+            ShowFatalError(state, "SimulateFanComponents: Fan not found=" + std::string{CompName});
         }
         CompIndex = FanNum;
     } else {
@@ -2580,8 +2580,8 @@ void GetFanType(EnergyPlusData &state,
 }
 
 Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
-                                  std::string const &FanType, // must match fan types in this module
-                                  std::string const &FanName, // must match fan names for the fan type
+                                  std::string_view FanType, // must match fan types in this module
+                                  std::string_view FanName, // must match fan names for the fan type
                                   bool &ErrorsFound,          // set to true if problem
                                   Optional_int_const FanIndex // index to fan
 )
@@ -2619,7 +2619,7 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
         if (WhichFan != 0) {
             DesignVolumeFlowRate = Fan(WhichFan).MaxAirFlowRate;
         } else {
-            ShowSevereError(state, "GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+            ShowSevereError(state, "GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"" + std::string{FanType} + "\" Name=\"" + std::string{FanName} + "\"");
             ShowContinueError(state, "... Design Volume Flow rate returned as -1000.");
             ErrorsFound = true;
             DesignVolumeFlowRate = -1000.0;
@@ -2630,8 +2630,8 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
 }
 
 int GetFanInletNode(EnergyPlusData &state,
-                    std::string const &FanType, // must match fan types in this module
-                    std::string const &FanName, // must match fan names for the fan type
+                    std::string_view FanType, // must match fan types in this module
+                    std::string_view FanName, // must match fan names for the fan type
                     bool &ErrorsFound           // set to true if problem
 )
 {
@@ -2665,7 +2665,7 @@ int GetFanInletNode(EnergyPlusData &state,
     if (WhichFan != 0) {
         NodeNumber = Fan(WhichFan).InletNodeNum;
     } else {
-        ShowSevereError(state, "GetFanInletNode: Could not find Fan, Type=\"" + FanType + "\" Name=\"" + FanName + "\"");
+        ShowSevereError(state, "GetFanInletNode: Could not find Fan, Type=\"" + std::string{FanType} + "\" Name=\"" + std::string{FanName} + "\"");
         ErrorsFound = true;
         NodeNumber = 0;
     }

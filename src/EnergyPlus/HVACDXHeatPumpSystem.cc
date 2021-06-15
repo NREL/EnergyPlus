@@ -98,7 +98,7 @@ namespace HVACDXHeatPumpSystem {
     using namespace ScheduleManager;
 
     void SimDXHeatPumpSystem(EnergyPlusData &state,
-                             std::string const &DXHeatPumpSystemName, // Name of DXSystem:Airloop object
+                             std::string_view DXHeatPumpSystemName, // Name of DXSystem:Airloop object
                              bool const FirstHVACIteration,           // True when first HVAC iteration
                              int const AirLoopNum,                    // Primary air loop number
                              int &CompIndex,                          // Index to CoilSystem:Heating:DX object
@@ -145,7 +145,7 @@ namespace HVACDXHeatPumpSystem {
         if (CompIndex == 0) {
             DXSystemNum = UtilityRoutines::FindItemInList(DXHeatPumpSystemName, DXHeatPumpSystem);
             if (DXSystemNum == 0) {
-                ShowFatalError(state, "SimDXHeatPumpSystem: DXUnit not found=" + DXHeatPumpSystemName);
+                ShowFatalError(state, "SimDXHeatPumpSystem: DXUnit not found=" + std::string{DXHeatPumpSystemName});
             }
             CompIndex = DXSystemNum;
         } else {

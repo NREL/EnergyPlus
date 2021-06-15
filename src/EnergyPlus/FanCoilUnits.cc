@@ -144,7 +144,7 @@ namespace FanCoilUnits {
     using namespace ScheduleManager;
 
     void SimFanCoilUnit(EnergyPlusData &state,
-                        std::string const &CompName,   // name of the fan coil unit
+                        std::string_view CompName,   // name of the fan coil unit
                         int const ZoneNum,             // number of zone being served
                         int const ControlledZoneNum,   // index into ZoneEquipConfig array; may not be equal to ZoneNum
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -177,7 +177,7 @@ namespace FanCoilUnits {
         if (CompIndex == 0) {
             FanCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataFanCoilUnits->FanCoil);
             if (FanCoilNum == 0) {
-                ShowFatalError(state, "SimFanCoil: Unit not found=" + CompName);
+                ShowFatalError(state, "SimFanCoil: Unit not found=" + std::string{CompName});
             }
             CompIndex = FanCoilNum;
         } else {

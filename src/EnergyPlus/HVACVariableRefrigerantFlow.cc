@@ -121,7 +121,7 @@ using namespace Psychrometrics;
 using namespace DataPlant;
 
 void SimulateVRF(EnergyPlusData &state,
-                 std::string const &CompName,
+                 std::string_view CompName,
                  bool const FirstHVACIteration,
                  int const ZoneNum,
                  int &CompIndex,
@@ -166,7 +166,7 @@ void SimulateVRF(EnergyPlusData &state,
     if (CompIndex == 0) {
         VRFTUNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACVarRefFlow->VRFTU);
         if (VRFTUNum == 0) {
-            ShowFatalError(state, "SimulateVRF: VRF Terminal Unit not found=" + CompName);
+            ShowFatalError(state, "SimulateVRF: VRF Terminal Unit not found=" + std::string{CompName});
         }
         CompIndex = VRFTUNum;
 
@@ -10070,7 +10070,7 @@ void UpdateVRFCondenser(EnergyPlusData &state, int const VRFCond) // index to VR
     state.dataLoopNodes->Node(CondenserOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(CondenserOutletNode).MassFlowRateMinAvail;
 }
 
-void isVRFCoilPresent(EnergyPlusData &state, std::string const VRFTUName, bool &CoolCoilPresent, bool &HeatCoilPresent)
+void isVRFCoilPresent(EnergyPlusData &state, std::string_view VRFTUName, bool &CoolCoilPresent, bool &HeatCoilPresent)
 {
 
     if (state.dataHVACVarRefFlow->GetVRFInputFlag) {
@@ -10084,7 +10084,7 @@ void isVRFCoilPresent(EnergyPlusData &state, std::string const VRFTUName, bool &
         CoolCoilPresent = state.dataHVACVarRefFlow->VRFTU(WhichVRFTU).CoolingCoilPresent;
         HeatCoilPresent = state.dataHVACVarRefFlow->VRFTU(WhichVRFTU).HeatingCoilPresent;
     } else {
-        ShowSevereError(state, "isVRFCoilPresent: Could not find VRF TU = \"" + VRFTUName + "\"");
+        ShowSevereError(state, "isVRFCoilPresent: Could not find VRF TU = \"" + std::string{VRFTUName} + "\"");
     }
 }
 

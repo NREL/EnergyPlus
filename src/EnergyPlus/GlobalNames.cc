@@ -68,12 +68,12 @@ namespace EnergyPlus::GlobalNames {
 void IntraObjUniquenessCheck(EnergyPlusData &state,
                              std::string &NameToVerify,
                              std::string const &CurrentModuleObject,
-                             std::string const &FieldName,
+                             std::string_view FieldName,
                              std::unordered_set<std::string> &UniqueStrings,
                              bool &ErrorsFound)
 {
     if (NameToVerify.empty()) {
-        ShowSevereError(state, "E+ object type " + CurrentModuleObject + " cannot have a blank " + FieldName + " field");
+        ShowSevereError(state, "E+ object type " + CurrentModuleObject + " cannot have a blank " + std::string{FieldName} + " field");
         ErrorsFound = true;
         NameToVerify = "xxxxx";
         return;
@@ -91,12 +91,12 @@ void IntraObjUniquenessCheck(EnergyPlusData &state,
 bool VerifyUniqueInterObjectName(EnergyPlusData &state,
                                  std::unordered_map<std::string, std::string> &names,
                                  std::string &object_name,
-                                 std::string const &object_type,
-                                 std::string const &field_name,
+                                 std::string_view object_type,
+                                 std::string_view field_name,
                                  bool &ErrorsFound)
 {
     if (object_name.empty()) {
-        ShowSevereError(state, "E+ object type " + object_name + " cannot have blank " + field_name + " field");
+        ShowSevereError(state, "E+ object type " + object_name + " cannot have blank " + std::string{field_name} + " field");
         ErrorsFound = true;
         object_name = "xxxxx";
         return true;
@@ -106,7 +106,7 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
         names.emplace(object_name, object_type);
     } else {
         ErrorsFound = true;
-        ShowSevereError(state, object_name + " with object type " + object_type + " duplicates a name in object type " + names_iter->second);
+        ShowSevereError(state, object_name + " with object type " + std::string{object_type} + " duplicates a name in object type " + names_iter->second);
         return true;
     }
     return false;

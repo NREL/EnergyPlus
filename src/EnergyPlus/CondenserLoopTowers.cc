@@ -110,7 +110,7 @@ namespace CondenserLoopTowers {
     std::string const cCoolingTower_VariableSpeed("CoolingTower:VariableSpeed");
     std::string const cCoolingTower_VariableSpeedMerkel("CoolingTower:VariableSpeed:Merkel");
 
-    PlantComponent *CoolingTower::factory(EnergyPlusData &state, std::string const &objectName)
+    PlantComponent *CoolingTower::factory(EnergyPlusData &state, std::string_view objectName)
     {
         // Process the input data for towers if it hasn't been done already
         if (state.dataCondenserLoopTowers->GetInput) {
@@ -124,7 +124,7 @@ namespace CondenserLoopTowers {
             }
         }
         // If we didn't find it, fatal
-        ShowFatalError(state, "CoolingTowerFactory: Error getting inputs for tower named: " + objectName); // LCOV_EXCL_LINE
+        ShowFatalError(state, "CoolingTowerFactory: Error getting inputs for tower named: " + std::string{objectName}); // LCOV_EXCL_LINE
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
@@ -4394,7 +4394,7 @@ namespace CondenserLoopTowers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("calculateSingleSpeedTower");
         int const MaxIteration(100); // Maximum fluid bypass iteration calculations
-        static std::string const MaxItChar("100");
+        static constexpr std::string_view MaxItChar("100");
         Real64 const BypassFractionThreshold(0.01); // Threshold to stop bypass iteration
         Real64 const OWTLowerLimit(0.0);            // The limit of tower exit fluid temperature used in the fluid bypass
         //  calculation to avoid fluid freezing. For water, it is 0 degreeC,
@@ -4613,7 +4613,7 @@ namespace CondenserLoopTowers {
                         }
                         if (NumIteration > MaxIteration) {
                             ShowWarningError(state,
-                                             "Cooling tower fluid bypass iteration exceeds maximum limit of " + MaxItChar + " for " + this->Name);
+                                             "Cooling tower fluid bypass iteration exceeds maximum limit of " + std::string{MaxItChar} + " for " + this->Name);
                         }
                         this->BypassFraction = BypassFraction2;
                         // may not meet TempSetPoint due to limit of tower outlet temp to OWTLowerLimit

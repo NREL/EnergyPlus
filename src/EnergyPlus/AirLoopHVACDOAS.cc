@@ -742,16 +742,16 @@ namespace AirLoopHVACDOAS {
                                 state, state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                     } else {
                         ShowSevereError(state,
-                                        CurrentModuleObject + " = \"" + CompName + "\" invalid Outside Air Component=\"" +
+                                        CurrentModuleObject + " = \"" + std::string{CompName} + "\" invalid Outside Air Component=\"" +
                                             state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum) + "\".");
                         errorsFound = true;
                     }
                     if (InletNodeErrFlag) {
-                        ShowSevereError(state, "Inlet node number is not found in " + CurrentModuleObject + " = " + CompName);
+                        ShowSevereError(state, "Inlet node number is not found in " + CurrentModuleObject + " = " + std::string{CompName});
                         errorsFound = true;
                     }
                     if (OutletNodeErrFlag) {
-                        ShowSevereError(state, "Outlet node number is not found in " + CurrentModuleObject + " = " + CompName);
+                        ShowSevereError(state, "Outlet node number is not found in " + CurrentModuleObject + " = " + std::string{CompName});
                         errorsFound = true;
                     }
                 }

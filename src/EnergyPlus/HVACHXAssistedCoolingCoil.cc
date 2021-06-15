@@ -99,7 +99,7 @@ namespace HVACHXAssistedCoolingCoil {
     using namespace DataHVACGlobals;
 
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
-                                  std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+                                  std::string_view HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,         // FirstHVACIteration flag
                                   int const CompOp,                      // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,            // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
@@ -146,7 +146,7 @@ namespace HVACHXAssistedCoolingCoil {
         if (CompIndex == 0) {
             HXAssistedCoilNum = UtilityRoutines::FindItemInList(HXAssistedCoilName, state.dataHVACAssistedCC->HXAssistedCoil);
             if (HXAssistedCoilNum == 0) {
-                ShowFatalError(state, "HX Assisted Coil not found=" + HXAssistedCoilName);
+                ShowFatalError(state, "HX Assisted Coil not found=" + std::string{HXAssistedCoilName});
             }
             CompIndex = HXAssistedCoilNum;
         } else {
@@ -1110,7 +1110,7 @@ namespace HVACHXAssistedCoolingCoil {
 
     void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state,
                                             [[maybe_unused]] std::string const &CompType, // unused1208
-                                            std::string const &CompName,
+                                            std::string_view CompName,
                                             Real64 &Value,
                                             int &CompIndex)
     {
@@ -1145,7 +1145,7 @@ namespace HVACHXAssistedCoolingCoil {
             }
 
             if (HXAssistedCoilNum == 0) {
-                ShowFatalError(state, "CheckHXAssistedCoolingCoilSchedule: HX Assisted Coil not found=" + CompName);
+                ShowFatalError(state, "CheckHXAssistedCoolingCoilSchedule: HX Assisted Coil not found=" + std::string{CompName});
             }
             CompIndex = HXAssistedCoilNum;
             Value = 1.0; // not scheduled?

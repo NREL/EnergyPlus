@@ -129,7 +129,7 @@ namespace WaterToAirHeatPumpSimple {
     using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
 
     void SimWatertoAirHPSimple(EnergyPlusData &state,
-                               std::string const &CompName,   // Coil Name
+                               std::string_view CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
                                Real64 const LatentLoad,       // Latent demand load [W]
@@ -183,7 +183,7 @@ namespace WaterToAirHeatPumpSimple {
         if (CompIndex == 0) {
             HPNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP);
             if (HPNum == 0) {
-                ShowFatalError(state, "WaterToAirHPSimple not found=" + CompName);
+                ShowFatalError(state, "WaterToAirHPSimple not found=" + std::string{CompName});
             }
             CompIndex = HPNum;
         } else {

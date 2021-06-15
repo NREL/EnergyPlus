@@ -901,7 +901,7 @@ TEST_F(AutoSizingFixture, ASHRAEMaxSATHeatingSizingGauntlet)
 TEST_F(AutoSizingFixture, DesiccantDehumidifierBFPerfDataFaceVelocitySizingGauntlet)
 {
     static constexpr std::string_view routineName("DesiccantDehumidifierBFPerfDataFaceVelocitySizingGauntlet");
-    static std::string const compType("HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1");
+    static constexpr std::string_view compType("HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1");
 
     // create the sizer and set up the flags to specify the sizing configuration
     DesiccantDehumidifierBFPerfDataFaceVelocitySizer sizer;
@@ -941,7 +941,7 @@ TEST_F(AutoSizingFixture, DesiccantDehumidifierBFPerfDataFaceVelocitySizingGaunt
 
     std::string eiooutput = std::string("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n"
                                         " Component Sizing Information, " +
-                                        compType + ", MyDesiccantHX, User-Specified Nominal Air Face Velocity [m/s], 4.50000\n");
+                                        std::string{compType} + ", MyDesiccantHX, User-Specified Nominal Air Face Velocity [m/s], 4.50000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
     state->dataSize->ZoneSizingInput.allocate(1);
@@ -1024,7 +1024,7 @@ TEST_F(AutoSizingFixture, DesiccantDehumidifierBFPerfDataFaceVelocitySizingGaunt
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // <Component Sizing Information> header already reported above (and flag set false). Only HX sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, " + compType + ", MyDesiccantHX, Design Size Nominal Air Face Velocity [m/s], 4.30797\n");
+    eiooutput = std::string(" Component Sizing Information, " + std::string{compType} + ", MyDesiccantHX, Design Size Nominal Air Face Velocity [m/s], 4.30797\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
@@ -1038,10 +1038,10 @@ TEST_F(AutoSizingFixture, DesiccantDehumidifierBFPerfDataFaceVelocitySizingGaunt
     EXPECT_NEAR(3.2, sizedValue, 0.001);
     sizer.autoSizedValue = 0.0; // reset for next test
     // <Component Sizing Information> header already reported above (and flag set false). Only HX sizing information reported here.
-    eiooutput = std::string(" Component Sizing Information, " + compType +
+    eiooutput = std::string(" Component Sizing Information, " + std::string{compType} +
                             ", MyDesiccantHX, Design Size Nominal Air Face Velocity [m/s], 4.30797\n"
                             " Component Sizing Information, " +
-                            compType + ", MyDesiccantHX, User-Specified Nominal Air Face Velocity [m/s], 3.20000\n");
+                            std::string{compType} + ", MyDesiccantHX, User-Specified Nominal Air Face Velocity [m/s], 3.20000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 

@@ -512,7 +512,7 @@ namespace UnitarySystems {
         };
         WarnMessages warnIndex;
 
-        static void getUnitarySystemInput(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
+        static void getUnitarySystemInput(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
         void processInputSpec(EnergyPlusData &state,
                               const UnitarySysInputSpec &input_data,
@@ -805,13 +805,13 @@ namespace UnitarySystems {
         }
 
         static void getUnitarySystemInputData(
-            EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+            EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
         void simulateSys(EnergyPlusData &state,
-                         std::string const &Name,
+                         std::string_view Name,
                          bool const firstHVACIteration,
                          int const &AirLoopNum,
                          int &CompIndex,
@@ -838,10 +838,10 @@ namespace UnitarySystems {
                                      int const CompOn               // Determines if compressor is on or off
         );
 
-        static void checkUnitarySysCoilInOASysExists(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum);
+        static void checkUnitarySysCoilInOASysExists(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum);
 
         static void getUnitarySysHeatCoolCoil(EnergyPlusData &state,
-                                              std::string const &UnitarySysName, // Name of Unitary System object
+                                              std::string_view UnitarySysName, // Name of Unitary System object
                                               bool &CoolingCoil,                 // Cooling coil exists
                                               bool &HeatingCoil,                 // Heating coil exists
                                               int const ZoneOAUnitNum            // index to zone OA unit
@@ -853,7 +853,7 @@ namespace UnitarySystems {
         );
 
         void simulate(EnergyPlusData &state,
-                      std::string const &Name,
+                      std::string_view Name,
                       bool const firstHVACIteration,
                       int const &AirLoopNum,
                       int &CompIndex,
@@ -867,19 +867,19 @@ namespace UnitarySystems {
                       ) override;
 
         void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) override;
-        int getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
-        int getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
+        int getAirInNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
+        int getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
     };
 
-    int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string const &objectName);
-    int getUnitarySystemIndex(EnergyPlusData &state, std::string const &objectName);
+    int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string_view objectName);
+    int getUnitarySystemIndex(EnergyPlusData &state, std::string_view objectName);
 
     bool searchZoneInletNodes(EnergyPlusData &state, int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
     bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
     bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
     // void setSystemParams(EnergyPlusData &state, UnitarySys &thisSys, Real64 &TotalFloorAreaOnAirLoop, const std::string thisObjectName);
-    bool searchTotalComponents(EnergyPlusData &state, std::string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
+    bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct

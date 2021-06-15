@@ -108,7 +108,7 @@ namespace SteamBaseboardRadiator {
     using DataPlant::TypeOf_Baseboard_Rad_Conv_Steam;
     using DataZoneEquipment::CheckZoneEquipmentList;
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimSteamBaseboard(EnergyPlusData &state,
                            std::string const &EquipName,

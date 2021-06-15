@@ -200,7 +200,7 @@ namespace HVACDXSystem {
     };
 
     void SimDXCoolingSystem(EnergyPlusData &state,
-                            std::string const &DXCoolingSystemName,    // Name of DXSystem:Airloop object
+                            std::string_view DXCoolingSystemName,    // Name of DXSystem:Airloop object
                             bool const FirstHVACIteration,             // True when first HVAC iteration
                             int const AirLoopNum,                      // Primary air loop number
                             int &CompIndex,                            // Index to DXSystem:Airloop object

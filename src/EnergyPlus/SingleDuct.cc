@@ -125,11 +125,11 @@ using namespace FluidProperties;
 using namespace ScheduleManager;
 using namespace SteamCoils;
 
-static std::string const fluidNameSteam("STEAM");
-static std::string const fluidNameWater("WATER");
+static constexpr std::string_view fluidNameSteam("STEAM");
+static constexpr std::string_view fluidNameWater("WATER");
 
 void SimulateSingleDuct(
-    EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
+    EnergyPlusData &state, std::string_view CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -158,7 +158,7 @@ void SimulateSingleDuct(
     if (CompIndex == 0) {
         SysNum = UtilityRoutines::FindItemInList(CompName, state.dataSingleDuct->sd_airterminal, &SingleDuctAirTerminal::SysName);
         if (SysNum == 0) {
-            ShowFatalError(state, "SimulateSingleDuct: System not found=" + CompName);
+            ShowFatalError(state, "SimulateSingleDuct: System not found=" + std::string{CompName});
         }
         CompIndex = SysNum;
     } else {

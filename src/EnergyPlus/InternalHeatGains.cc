@@ -140,7 +140,7 @@ namespace InternalHeatGains {
     int const ITEInletZoneAirNode(1);
     int const ITEInletRoomAirModel(2);
 
-    static std::string const BlankString;
+    static constexpr std::string_view BlankString;
 
     void ManageInternalHeatGains(EnergyPlusData &state,
                                  Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
@@ -458,7 +458,7 @@ namespace InternalHeatGains {
         if (state.dataHeatBal->TotPeople > 0) {
             Loop = 0;
             for (Item = 1; Item <= state.dataHeatBal->NumPeopleStatements; ++Item) {
-                AlphaName = BlankString;
+                AlphaName = std::string{};
                 IHGNumbers = 0.0;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -1448,7 +1448,7 @@ namespace InternalHeatGains {
         if (state.dataHeatBal->TotLights > 0) {
             Loop = 0;
             for (Item = 1; Item <= state.dataHeatBal->NumLightsStatements; ++Item) {
-                AlphaName = BlankString;
+                AlphaName = std::string{};
                 IHGNumbers = 0.0;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2014,7 +2014,7 @@ namespace InternalHeatGains {
         if (state.dataHeatBal->TotElecEquip > 0) {
             Loop = 0;
             for (Item = 1; Item <= state.dataHeatBal->NumZoneElectricStatements; ++Item) {
-                AlphaName = BlankString;
+                AlphaName = std::string{};
                 IHGNumbers = 0.0;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2473,7 +2473,7 @@ namespace InternalHeatGains {
         if (state.dataHeatBal->TotGasEquip > 0) {
             Loop = 0;
             for (Item = 1; Item <= state.dataHeatBal->NumZoneGasStatements; ++Item) {
-                AlphaName = BlankString;
+                AlphaName = std::string{};
                 IHGNumbers = 0.0;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2967,7 +2967,7 @@ namespace InternalHeatGains {
         if (state.dataHeatBal->TotHWEquip > 0) {
             Loop = 0;
             for (Item = 1; Item <= state.dataHeatBal->NumHotWaterEqStatements; ++Item) {
-                AlphaName = BlankString;
+                AlphaName = std::string{};
                 IHGNumbers = 0.0;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -3426,7 +3426,7 @@ namespace InternalHeatGains {
         if (state.dataHeatBal->TotStmEquip > 0) {
             Loop = 0;
             for (Item = 1; Item <= state.dataHeatBal->NumSteamEqStatements; ++Item) {
-                AlphaName = BlankString;
+                AlphaName = std::string{};
                 IHGNumbers = 0.0;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -3885,7 +3885,7 @@ namespace InternalHeatGains {
         if (state.dataHeatBal->TotOthEquip > 0) {
             Loop = 0;
             for (Item = 1; Item <= state.dataHeatBal->NumOtherEqStatements; ++Item) {
-                AlphaName = BlankString;
+                AlphaName = std::string{};
                 IHGNumbers = 0.0;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -4321,7 +4321,7 @@ namespace InternalHeatGains {
         if (state.dataHeatBal->NumZoneITEqStatements > 0) {
             Loop = 0;
             for (Loop = 1; Loop <= state.dataHeatBal->NumZoneITEqStatements; ++Loop) {
-                AlphaName = BlankString;
+                AlphaName = std::string{};
                 IHGNumbers = 0.0;
 
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,

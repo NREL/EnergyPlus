@@ -91,7 +91,7 @@ using Psychrometrics::PsyTdbFnHW;
 // Functions
 
 void SimAirZonePlenum(EnergyPlusData &state,
-                      std::string const &CompName,
+                      std::string_view CompName,
                       int const iCompType,
                       int &CompIndex,
                       Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
@@ -130,7 +130,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
             ZonePlenumNum =
                 UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName);
             if (ZonePlenumNum == 0) {
-                ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + CompName);
+                ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found=" + std::string{CompName});
             }
             CompIndex = ZonePlenumNum;
         } else {
@@ -168,7 +168,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
             ZonePlenumNum =
                 UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
             if (ZonePlenumNum == 0) {
-                ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + CompName);
+                ShowFatalError(state, "SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found=" + std::string{CompName});
             }
             CompIndex = ZonePlenumNum;
         } else {
@@ -201,7 +201,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
         UpdateAirZoneSupplyPlenum(state, ZonePlenumNum, PlenumInletChanged, FirstCall);
 
     } else {
-        ShowSevereError(state, "SimAirZonePlenum: Errors in Plenum=" + CompName);
+        ShowSevereError(state, "SimAirZonePlenum: Errors in Plenum=" + std::string{CompName});
         ShowContinueError(state, format("ZonePlenum: Unhandled plenum type found:{}", iCompType));
         ShowFatalError(state, "Preceding conditions cause termination.");
     }

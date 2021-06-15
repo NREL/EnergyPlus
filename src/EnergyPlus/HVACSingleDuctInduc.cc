@@ -108,7 +108,7 @@ namespace HVACSingleDuctInduc {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     void SimIndUnit(EnergyPlusData &state,
-                    std::string const &CompName,   // name of the terminal unit
+                    std::string_view CompName,   // name of the terminal unit
                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                     int const ZoneNum,             // index of zone served by the terminal unit
                     int const ZoneNodeNum,         // zone node number of zone served by the terminal unit
@@ -141,7 +141,7 @@ namespace HVACSingleDuctInduc {
         if (CompIndex == 0) {
             IUNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACSingleDuctInduc->IndUnit);
             if (IUNum == 0) {
-                ShowFatalError(state, "SimIndUnit: Induction Unit not found=" + CompName);
+                ShowFatalError(state, "SimIndUnit: Induction Unit not found=" + std::string{CompName});
             }
             CompIndex = IUNum;
         } else {
@@ -1676,7 +1676,7 @@ namespace HVACSingleDuctInduc {
 
     // ========================= Utilities =======================
 
-    bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string const &CompName) // component (mixer) name
+    bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // component (mixer) name
     {
 
         // FUNCTION INFORMATION:

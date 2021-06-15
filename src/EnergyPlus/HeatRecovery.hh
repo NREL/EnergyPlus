@@ -494,7 +494,7 @@ namespace HeatRecovery {
     // Functions
 
     void SimHeatRecovery(EnergyPlusData &state,
-                         std::string const &CompName,                 // name of the heat exchanger unit
+                         std::string_view CompName,                 // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                              // Pointer to Component
                          int const FanOpMode,                         // Supply air fan operating mode

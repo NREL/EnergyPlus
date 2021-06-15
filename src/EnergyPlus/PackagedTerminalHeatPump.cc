@@ -134,7 +134,7 @@ using namespace ScheduleManager;
 constexpr const char *fluidNameSteam("STEAM");
 
 void SimPackagedTerminalUnit(EnergyPlusData &state,
-                             std::string const &CompName,   // name of the packaged terminal heat pump
+                             std::string_view CompName,   // name of the packaged terminal heat pump
                              int const ZoneNum,             // number of zone being served
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                              Real64 &QUnitOut,              // sensible capacity delivered to zone
@@ -178,7 +178,7 @@ void SimPackagedTerminalUnit(EnergyPlusData &state,
     if (CompIndex == 0) {
         PTUnitNum = UtilityRoutines::FindItemInList(CompName, state.dataPTHP->PTUnit);
         if (PTUnitNum == 0) {
-            ShowFatalError(state, "SimPackagedTerminalUnit: Unit not found=" + CompName);
+            ShowFatalError(state, "SimPackagedTerminalUnit: Unit not found=" + std::string{CompName});
         }
         CompIndex = state.dataPTHP->PTUnit(PTUnitNum).PTObjectIndex;
     } else {

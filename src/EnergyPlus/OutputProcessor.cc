@@ -4349,9 +4349,9 @@ namespace OutputProcessor {
             break;
         }
 
-        static std::string const keyedValueStringCum("Cumulative ");
-        static std::string const keyedValueStringNon;
-        std::string const &keyedValueString(cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon);
+        static constexpr std::string_view keyedValueStringCum("Cumulative ");
+        static constexpr std::string_view keyedValueStringNon;
+        std::string_view const keyedValueString(cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,

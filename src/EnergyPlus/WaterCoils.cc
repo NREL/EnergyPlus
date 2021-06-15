@@ -140,7 +140,7 @@ using Psychrometrics::PsyWFnTdpPb;
 using namespace ScheduleManager;
 
 void SimulateWaterCoilComponents(EnergyPlusData &state,
-                                 std::string const &CompName,
+                                 std::string_view CompName,
                                  bool const FirstHVACIteration,
                                  int &CompIndex,
                                  Optional<Real64> QActual,
@@ -174,7 +174,7 @@ void SimulateWaterCoilComponents(EnergyPlusData &state,
     if (CompIndex == 0) {
         CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
         if (CoilNum == 0) {
-            ShowFatalError(state, "SimulateWaterCoilComponents: Coil not found=" + CompName);
+            ShowFatalError(state, "SimulateWaterCoilComponents: Coil not found=" + std::string{CompName});
         }
         CompIndex = CoilNum;
     } else {
@@ -2293,7 +2293,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
     using PlantUtilities::RegisterPlantCompDesignFlow;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const InitWaterCoil("InitWaterCoil");
+    static constexpr std::string_view InitWaterCoil("InitWaterCoil");
     static constexpr std::string_view RoutineName("SizeWaterCoil");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2965,7 +2965,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             sizerHWCoilUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             state.dataWaterCoils->WaterCoil(CoilNum).UACoil = sizerHWCoilUA.size(state, TempSize, ErrorsFound);
             if (DesCoilWaterInTempSaved < DesCoilHWInletTempMin) {
-                ShowWarningError(state, "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
+                ShowWarningError(state, "Autosizing of heating coil UA for Coil:Heating:Water \"" + std::string{CompName} + "\"");
                 ShowContinueError(state,
                                   format(" Plant design loop exit temperature = {:.2T} C",
                                          state.dataSize->PlantSizData(state.dataSize->DataPltSizHeatNum).ExitTemp));
@@ -5966,7 +5966,7 @@ Label10:;
 
 void CheckWaterCoilSchedule(EnergyPlusData &state,
                             [[maybe_unused]] std::string const &CompType, // unused1208
-                            std::string const &CompName,
+                            std::string_view CompName,
                             Real64 &Value,
                             int &CompIndex)
 {
@@ -5995,7 +5995,7 @@ void CheckWaterCoilSchedule(EnergyPlusData &state,
     if (CompIndex == 0) {
         CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
         if (CoilNum == 0) {
-            ShowFatalError(state, "CheckWaterCoilSchedule: Coil not found=" + CompName);
+            ShowFatalError(state, "CheckWaterCoilSchedule: Coil not found=" + std::string{CompName});
         }
         CompIndex = CoilNum;
         Value = GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr); // not scheduled?

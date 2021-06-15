@@ -125,7 +125,7 @@ constexpr const char *fluidNameSteam("STEAM");
 constexpr const char *fluidNameWater("WATER");
 
 void SimPIU(EnergyPlusData &state,
-            std::string const &CompName,   // name of the PIU
+            std::string_view CompName,   // name of the PIU
             bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
             int const ZoneNum,             // index of zone served by PIU
             int const ZoneNodeNum,         // zone node number of zone served by PIU
@@ -156,7 +156,7 @@ void SimPIU(EnergyPlusData &state,
     if (CompIndex == 0) {
         PIUNum = UtilityRoutines::FindItemInList(CompName, state.dataPowerInductionUnits->PIU);
         if (PIUNum == 0) {
-            ShowFatalError(state, "SimPIU: PIU Unit not found=" + CompName);
+            ShowFatalError(state, "SimPIU: PIU Unit not found=" + std::string{CompName});
         }
         CompIndex = PIUNum;
     } else {
@@ -2347,7 +2347,7 @@ void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current
 
 // ===================== Utilities =====================================
 
-bool PIUnitHasMixer(EnergyPlusData &state, std::string const &CompName) // component (mixer) name
+bool PIUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // component (mixer) name
 {
 
     // FUNCTION INFORMATION:

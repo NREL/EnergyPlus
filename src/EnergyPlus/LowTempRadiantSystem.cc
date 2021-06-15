@@ -159,7 +159,7 @@ namespace LowTempRadiantSystem {
     // Object Data
 
     void SimLowTempRadiantSystem(EnergyPlusData &state,
-                                 std::string const &CompName,   // name of the low temperature radiant system
+                                 std::string_view CompName,   // name of the low temperature radiant system
                                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                  Real64 &LoadMet,               // load met by the radiant system, in Watts
                                  int &CompIndex)
@@ -185,7 +185,7 @@ namespace LowTempRadiantSystem {
         if (CompIndex == 0) {
             RadSysNum = UtilityRoutines::FindItemInList(CompName, state.dataLowTempRadSys->RadSysTypes);
             if (RadSysNum == 0) {
-                ShowFatalError(state, "SimLowTempRadiantSystem: Unit not found=" + CompName);
+                ShowFatalError(state, "SimLowTempRadiantSystem: Unit not found=" + std::string{CompName});
             }
             CompIndex = RadSysNum;
             SystemType = state.dataLowTempRadSys->RadSysTypes(RadSysNum).SystemType;
@@ -240,7 +240,7 @@ namespace LowTempRadiantSystem {
             } else if (SystemType == LowTempRadiantSystem::SystemType::ElectricSystem) {
                 baseSystem = &state.dataLowTempRadSys->ElecRadSys(state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex);
             } else {
-                ShowFatalError(state, "SimLowTempRadiantSystem: Illegal system type for system " + CompName);
+                ShowFatalError(state, "SimLowTempRadiantSystem: Illegal system type for system " + std::string{CompName});
             }
 
             if ((SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) ||

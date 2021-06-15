@@ -216,7 +216,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
 
-    static std::string const vertexstring("X,Y,Z ==> Vertex");
+    static constexpr std::string_view vertexstring("X,Y,Z ==> Vertex");
 
     if (state.dataSurface->TotSurfaces > 0 && !allocated(state.dataSurface->Surface)) {
         // no error needed, probably in end processing, just return

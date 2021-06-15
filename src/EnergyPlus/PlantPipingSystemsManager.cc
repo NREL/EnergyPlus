@@ -1432,12 +1432,12 @@ namespace PlantPipingSystemsManager {
     }
 
     void SiteGroundDomainNoMassMatError(EnergyPlusData &state,
-                                        std::string const &FieldName,
+                                        std::string_view FieldName,
                                         std::string const &UserInputField,
                                         std::string const &ObjectName)
     {
 
-        ShowSevereError(state, "Invalid " + FieldName + "=" + UserInputField + " was found in: " + ObjectName);
+        ShowSevereError(state, "Invalid " + std::string{FieldName} + "=" + UserInputField + " was found in: " + ObjectName);
         ShowContinueError(
             state, "The user of no mass materials or ones with no thickness are not allowed for the insulation fields of the following objects:");
         ShowContinueError(state, "  " + ObjName_ZoneCoupled_Slab + " or " + ObjName_ZoneCoupled_Basement);
@@ -2229,7 +2229,7 @@ namespace PlantPipingSystemsManager {
                                     std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
-                                    std::string const &FieldName,
+                                    std::string_view FieldName,
                                     std::string const &FieldEntry,
                                     std::string const &Condition,
                                     bool &ErrorsFound)
@@ -2242,7 +2242,7 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         ShowSevereError(state,
-                        std::string{RoutineName} + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + FieldName + "=\"" + FieldEntry +
+                        std::string{RoutineName} + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + std::string{FieldName} + "=\"" + FieldEntry +
                             "\", Condition: " + Condition);
         ErrorsFound = true;
     }
@@ -2251,7 +2251,7 @@ namespace PlantPipingSystemsManager {
                                     std::string_view const RoutineName,
                                     std::string const &ObjectName,
                                     std::string const &InstanceName,
-                                    std::string const &FieldName,
+                                    std::string_view FieldName,
                                     Real64 const FieldEntry,
                                     std::string const &Condition,
                                     bool &ErrorsFound)

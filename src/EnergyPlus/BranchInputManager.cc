@@ -317,7 +317,7 @@ namespace BranchInputManager {
         return NumCompsInBranch;
     }
 
-    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string const &CompName)
+    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string_view CompName)
     {
 
         // FUNCTION INFORMATION:
@@ -346,7 +346,7 @@ namespace BranchInputManager {
         NumBranches = size(state.dataBranchInputManager->Branch);
 
         if (NumBranches == 0) {
-            ShowSevereError(state, "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + CompName + "\"");
+            ShowSevereError(state, "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + std::string{CompName} + "\"");
         } else {
             for (BranchNum = 1; BranchNum <= NumBranches; ++BranchNum) {
                 for (CompNum = 1; CompNum <= state.dataBranchInputManager->Branch(BranchNum).NumOfComponents; ++CompNum) {
@@ -2480,7 +2480,7 @@ namespace BranchInputManager {
                     ShowContinueError(
                         state, "AuditBranches: Branch=\"" + state.dataBranchInputManager->Branch(BrN).Name + "\" not found on any BranchLists.");
                     if (!FoundBranchName.empty()) {
-                        ShowContinueError(state, "Branch contains component, type=\"" + CompType + "\", name=\"" + CompName + "\"");
+                        ShowContinueError(state, "Branch contains component, type=\"" + CompType + "\", name=\"" + std::string{CompName} + "\"");
                     }
                 } else {
                     ShowSevereMessage(
@@ -2490,7 +2490,7 @@ namespace BranchInputManager {
             }
         }
         if (mustprint && NeverFound) { // this may be caught during branch input, not sure
-            ShowContinueError(state, "Component, type=\"" + CompType + "\", name=\"" + CompName + "\" was not found on any Branch.");
+            ShowContinueError(state, "Component, type=\"" + CompType + "\", name=\"" + std::string{CompName} + "\" was not found on any Branch.");
             ShowContinueError(state, "Look for mistyped branch or component names/types.");
         }
         if (!mustprint && NumDanglingCount > 0) {

@@ -149,7 +149,7 @@ namespace HVACCooledBeam {
     };
 
     void SimCoolBeam(EnergyPlusData &state,
-                     std::string const &CompName, // name of the cooled beam unit
+                     std::string_view CompName, // name of the cooled beam unit
                      bool FirstHVACIteration,     // TRUE if first HVAC iteration in time step
                      int ZoneNum,                 // index of zone served by the unit
                      int ZoneNodeNum,             // zone node number of zone served by the unit

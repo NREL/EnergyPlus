@@ -734,7 +734,7 @@ Real64 PondGroundHeatExchangerData::CalcEffectiveness(EnergyPlusData &state,
 
     Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
     Real64 const GravConst(9.81);      // gravitational constant - should be fixed!
-    static std::string const CalledFrom("PondGroundHeatExchanger:CalcEffectiveness");
+    static constexpr std::string_view CalledFrom("PondGroundHeatExchanger:CalcEffectiveness");
 
     // evaluate properties at pipe fluid temperature for given pipe fluid
 

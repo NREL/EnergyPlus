@@ -122,7 +122,7 @@ namespace HeatingCoils {
     using RefrigeratedCase::GetRefrigeratedRackIndex;
 
     void SimulateHeatingCoilComponents(EnergyPlusData &state,
-                                       std::string const &CompName,
+                                       std::string_view CompName,
                                        bool const FirstHVACIteration,
                                        Optional<Real64 const> QCoilReq, // coil load to be met
                                        Optional_int CompIndex,
@@ -168,7 +168,7 @@ namespace HeatingCoils {
             if (CompIndex == 0) {
                 CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataHeatingCoils->HeatingCoil);
                 if (CoilNum == 0) {
-                    ShowFatalError(state, "SimulateHeatingCoilComponents: Coil not found=" + CompName);
+                    ShowFatalError(state, "SimulateHeatingCoilComponents: Coil not found=" + std::string{CompName});
                 }
                 //    CompIndex=CoilNum
             } else {
@@ -194,7 +194,7 @@ namespace HeatingCoils {
             }
         } else {
             ShowSevereError(state, "SimulateHeatingCoilComponents: CompIndex argument not used.");
-            ShowContinueError(state, "..CompName = " + CompName);
+            ShowContinueError(state, "..CompName = " + std::string{CompName});
             ShowFatalError(state, "Preceding conditions cause termination.");
         }
 
@@ -1739,7 +1739,7 @@ namespace HeatingCoils {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " + CompName);
+                                    ShowMessage(state, "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " + std::string{CompName});
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NominalCapacityUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NominalCapacityDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -3094,7 +3094,7 @@ namespace HeatingCoils {
 
     void CheckHeatingCoilSchedule(EnergyPlusData &state,
                                   std::string const &CompType, // unused1208
-                                  std::string const &CompName,
+                                  std::string_view CompName,
                                   Real64 &Value,
                                   int &CompIndex)
     {
@@ -3124,10 +3124,10 @@ namespace HeatingCoils {
         if (CompIndex == 0) {
             CoilNum = UtilityRoutines::FindItem(CompName, state.dataHeatingCoils->HeatingCoil);
             if (CoilNum == 0) {
-                ShowFatalError(state, "CheckHeatingCoilSchedule: Coil not found=\"" + CompName + "\".");
+                ShowFatalError(state, "CheckHeatingCoilSchedule: Coil not found=\"" + std::string{CompName} + "\".");
             }
             if (!UtilityRoutines::SameString(CompType, cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num))) {
-                ShowSevereError(state, "CheckHeatingCoilSchedule: Coil=\"" + CompName + "\"");
+                ShowSevereError(state, "CheckHeatingCoilSchedule: Coil=\"" + std::string{CompName} + "\"");
                 ShowContinueError(state,
                                   "...expected type=\"" + CompType + "\", actual type=\"" +
                                       cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) + "\".");

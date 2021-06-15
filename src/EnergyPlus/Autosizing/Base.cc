@@ -304,9 +304,9 @@ void BaseSizer::preSize(EnergyPlusData &state, Real64 const _originalValue)
 }
 
 void BaseSizer::reportSizerOutput(EnergyPlusData &state,
-                                  std::string const &CompType,
-                                  std::string const &CompName,
-                                  std::string const &VarDesc,
+                                  std::string_view CompType,
+                                  std::string_view CompName,
+                                  std::string_view VarDesc,
                                   Real64 const VarValue,
                                   Optional_string_const UsrDesc,
                                   Optional<Real64 const> UsrValue)
@@ -328,7 +328,7 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
 
     if (present(UsrDesc) && present(UsrValue)) {
         print(state.files.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
-        OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, UsrDesc, UsrValue);
+        OutputReportPredefined::AddCompSizeTableEntry(state, CompType, CompName, UsrDesc(), UsrValue);
     } else if (present(UsrDesc) || present(UsrValue)) {
         ShowFatalError(state, "ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
     }
@@ -337,7 +337,7 @@ void BaseSizer::reportSizerOutput(EnergyPlusData &state,
     if (state.dataSQLiteProcedures->sqlite) state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, VarDesc, VarValue);
     if (present(UsrDesc) && present(UsrValue)) {
         if (state.dataSQLiteProcedures->sqlite)
-            state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc, UsrValue);
+            state.dataSQLiteProcedures->sqlite->addSQLiteComponentSizingRecord(CompType, CompName, UsrDesc(), UsrValue);
     }
 }
 

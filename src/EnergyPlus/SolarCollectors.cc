@@ -92,7 +92,7 @@ namespace SolarCollectors {
     // must be connected to a WATER HEATER object on the supply side of the plant loop.  Water is assumed to be
     // the heat transfer fluid.
 
-    static std::string const fluidNameWater("WATER");
+    static constexpr std::string_view fluidNameWater("WATER");
 
     PlantComponent *CollectorData::factory(EnergyPlusData &state, std::string const &objectName)
     {
@@ -2022,7 +2022,7 @@ namespace SolarCollectors {
         Real64 hConvA2W; // convection coefficient, [W/m2K]
 
         Real64 const gravity(9.806); // gravitational constant [m/s^2]
-        static std::string const CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
+        static constexpr std::string_view CalledFrom("SolarCollectors:CalcConvCoeffAbsPlateAndWater");
 
         Real64 DeltaT = std::abs(TAbsorber - TWater);
         Real64 TReference = TAbsorber - 0.25 * (TAbsorber - TWater);

@@ -159,7 +159,7 @@ namespace WaterToAirHeatPump {
     // Functions
 
     void SimWatertoAirHP(EnergyPlusData &state,
-                         std::string const &CompName,   // component name
+                         std::string_view CompName,   // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
                          int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or

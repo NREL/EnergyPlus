@@ -162,7 +162,7 @@ namespace WaterToAirHeatPumpSimple {
     };
 
     void SimWatertoAirHPSimple(EnergyPlusData &state,
-                               std::string const &CompName,   // Coil Name
+                               std::string_view CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
                                Real64 const LatentLoad,       // Latent demand load [W]

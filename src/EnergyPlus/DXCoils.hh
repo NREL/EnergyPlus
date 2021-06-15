@@ -539,7 +539,7 @@ namespace DXCoils {
     // Functions
 
     void SimDXCoil(EnergyPlusData &state,
-                   std::string const &CompName,   // name of the fan coil unit
+                   std::string_view CompName,   // name of the fan coil unit
                    int const CompOp,              // compressor operation; 1=on, 0=off
                    bool const FirstHVACIteration, // True when first HVAC iteration
                    int &CompIndex,
@@ -552,7 +552,7 @@ namespace DXCoils {
     );
 
     void SimDXCoilMultiSpeed(EnergyPlusData &state,
-                             std::string const &CompName, // name of the fan coil unit
+                             std::string_view CompName, // name of the fan coil unit
                              Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
                              Real64 const CycRatio,       // cycling part load ratio for variable speed
                              int &CompIndex,
@@ -563,7 +563,7 @@ namespace DXCoils {
     );
 
     void SimDXCoilMultiMode(EnergyPlusData &state,
-                            std::string const &CompName,   // name of the fan coil unit
+                            std::string_view CompName,   // name of the fan coil unit
                             int const CompOp,              // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration, // true if first hvac iteration
                             Real64 const PartLoadRatio,    // part load ratio

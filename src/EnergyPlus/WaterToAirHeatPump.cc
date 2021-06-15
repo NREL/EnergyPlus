@@ -100,10 +100,10 @@ namespace WaterToAirHeatPump {
     using DataPlant::TypeOf_CoilWAHPCoolingParamEst;
     using DataPlant::TypeOf_CoilWAHPHeatingParamEst;
 
-    static std::string const fluidNameWater("WATER");
+    static constexpr std::string_view fluidNameWater("WATER");
 
     void SimWatertoAirHP(EnergyPlusData &state,
-                         std::string const &CompName,   // component name
+                         std::string_view CompName,   // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
                          int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
@@ -147,7 +147,7 @@ namespace WaterToAirHeatPump {
         if (CompIndex == 0) {
             HPNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterToAirHeatPump->WatertoAirHP);
             if (HPNum == 0) {
-                ShowFatalError(state, "WaterToAir HP not found=" + CompName);
+                ShowFatalError(state, "WaterToAir HP not found=" + std::string{CompName});
             }
             CompIndex = HPNum;
         } else {
@@ -2546,7 +2546,7 @@ namespace WaterToAirHeatPump {
 
         // Locals
         // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const CalledFrom("HVACWaterToAir:DegradF");
+        static constexpr std::string_view CalledFrom("HVACWaterToAir:DegradF");
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 VisWater;       // Viscosity of water [mPa-s]

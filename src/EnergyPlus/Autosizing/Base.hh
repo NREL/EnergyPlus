@@ -293,9 +293,9 @@ protected:
 
 public:
     static void reportSizerOutput(EnergyPlusData &state,
-                                  std::string const &CompType,
-                                  std::string const &CompName,
-                                  std::string const &VarDesc,
+                                  std::string_view CompType,
+                                  std::string_view CompName,
+                                  std::string_view VarDesc,
                                   Real64 VarValue,
                                   Optional_string_const UsrDesc = _,
                                   Optional<Real64 const> UsrValue = _);

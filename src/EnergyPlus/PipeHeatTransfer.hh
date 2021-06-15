@@ -250,7 +250,7 @@ namespace PipeHeatTransfer {
         void ValidatePipeConstruction(EnergyPlusData &state,
                                       std::string const &PipeType,         // module object of pipe (error messages)
                                       std::string const &ConstructionName, // construction name of pipe (error messages)
-                                      std::string const &FieldName,        // fieldname of pipe (error messages)
+                                      std::string_view FieldName,        // fieldname of pipe (error messages)
                                       int ConstructionNum,                 // pointer into construction data
                                       bool &ErrorsFound                    // set to true if errors found here
         );

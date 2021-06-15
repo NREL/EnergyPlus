@@ -111,7 +111,7 @@ namespace HVACCooledBeam {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     void SimCoolBeam(EnergyPlusData &state,
-                     std::string const &CompName,   // name of the cooled beam unit
+                     std::string_view CompName,   // name of the cooled beam unit
                      bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                      int const ZoneNum,             // index of zone served by the unit
                      int const ZoneNodeNum,         // zone node number of zone served by the unit
@@ -143,7 +143,7 @@ namespace HVACCooledBeam {
         if (CompIndex == 0) {
             CBNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACCooledBeam->CoolBeam);
             if (CBNum == 0) {
-                ShowFatalError(state, "SimCoolBeam: Cool Beam Unit not found=" + CompName);
+                ShowFatalError(state, "SimCoolBeam: Cool Beam Unit not found=" + std::string{CompName});
             }
             CompIndex = CBNum;
         } else {
@@ -167,7 +167,7 @@ namespace HVACCooledBeam {
             }
         }
         if (CBNum == 0) {
-            ShowFatalError(state, "Cool Beam Unit not found = " + CompName);
+            ShowFatalError(state, "Cool Beam Unit not found = " + std::string{CompName});
         }
 
         state.dataSize->CurTermUnitSizingNum =

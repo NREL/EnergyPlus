@@ -165,7 +165,7 @@ using namespace MultiLayerOptics;
 
 // Data
 // MODULE PARAMETER DEFINITIONS:
-static std::string const BlankString;
+static constexpr std::string_view BlankString;
 
 namespace {
 
@@ -5806,7 +5806,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
     constexpr const char *HBSurfManRainHAMT("HBSurfMan:Rain:HAMT");
     constexpr const char *HBSurfManDrySurfCondFD("HBSurfMan:DrySurf:CondFD");
     constexpr const char *Outside("Outside");
-    static std::string const BlankString;
+    static constexpr std::string_view BlankString;
 
     bool MovInsulErrorFlag = false; // Movable Insulation error flag
 
@@ -6623,7 +6623,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     constexpr const char *wsurf("Wsurf");
     constexpr const char *HBSurfManInsideSurf("HB,SurfMan:InsideSurf");
     constexpr const char *Inside("Inside");
-    static std::string const BlankString;
+    static constexpr std::string_view BlankString;
 
     Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
     Real64 TempSurfInSat;  // Local temporary surface dew point temperature
@@ -8679,7 +8679,7 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     using Psychrometrics::PsyWFnTdbTwbPb;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
+    static constexpr std::string_view BlankString;
 
     // local working variables
     Real64 AspRat; // Aspect Ratio of gap

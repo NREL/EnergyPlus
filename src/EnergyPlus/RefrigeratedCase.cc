@@ -303,9 +303,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // GetObjectItem is called to read refrigerated case information
 
-    static std::string const TrackMessage("from refrigerated case");
+    static constexpr std::string_view TrackMessage("from refrigerated case");
     static constexpr std::string_view RoutineName("GetRefrigerationInput: ");
-    static std::string const TrackMessageAlt("GetInput in RefrigeratedCase");
+    static constexpr std::string_view TrackMessageAlt("GetInput in RefrigeratedCase");
     static constexpr std::string_view RoutineNameNoColon("GetRefrigerationInput");
 
     int const AlwaysOn(-1); // -1 pointer sent to schedule manager returns a value of 1.0
@@ -15127,7 +15127,7 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
     // Unit Load Factor, Total Capacity Map, or a set of European standards.
     // Correction factors for material and refrigerant are applied to all of these ratings.
 
-    static std::string const TrackMessage("from RefrigeratedCase:CalculateCoil");
+    static constexpr std::string_view TrackMessage("from RefrigeratedCase:CalculateCoil");
 
     Real64 CoilSchedule = ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr); // Current value of Coil operating (availability) schedule
     if (CoilSchedule <= 0.0) return;
@@ -15239,7 +15239,7 @@ void WarehouseCoilData::CalculateCoil(EnergyPlusData &state, Real64 const QZnReq
                 Real64 ExitTemperatureEstimate =
                     CoilInletTemp - (SensibleCapacityMax / (DryAirMassFlowMax * CoilInletDryAirCp)); // Estimated Air temperature leaving the coil (C)
                 if (ExitTemperatureEstimate <= TEvap) {
-                    ShowWarningError(state, TrackMessage + "Refrigeration:AirCoil: " + this->Name);
+                    ShowWarningError(state, std::string{TrackMessage} + "Refrigeration:AirCoil: " + this->Name);
                     ShowContinueError(state, " The estimated air outlet temperature is less than the evaporating temperature.");
                 }
                 Real64 ExitEnthalpyEstimate = Psychrometrics::PsyHFnTdbRhPb(state,

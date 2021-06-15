@@ -187,7 +187,7 @@ namespace PlantUtilities {
     void LogPlantConvergencePoints(EnergyPlusData &state, bool FirstHVACIteration);
 
     void ScanPlantLoopsForObject(EnergyPlusData &state,
-                                 std::string const &CompName,
+                                 std::string_view CompName,
                                  int CompType,
                                  int &LoopNum,
                                  int &LoopSideNum,
@@ -216,7 +216,7 @@ namespace PlantUtilities {
 
     int MyPlantSizingIndex(EnergyPlusData &state,
                            std::string const &CompType,          // component description
-                           std::string const &CompName,          // user name of component
+                           std::string_view CompName,          // user name of component
                            int NodeNumIn,                        // component water inlet node
                            int NodeNumOut,                       // component water outlet node
                            bool &ErrorsFound,                    // set to true if there's an error

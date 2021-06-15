@@ -100,7 +100,7 @@ namespace VariableSpeedCoils {
     using DXCoils::CalcCBF;
 
     void SimVariableSpeedCoils(EnergyPlusData &state,
-                               std::string const &CompName,   // Coil Name
+                               std::string_view CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -143,7 +143,7 @@ namespace VariableSpeedCoils {
         if (CompIndex == 0) {
             DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataVariableSpeedCoils->VarSpeedCoil);
             if (DXCoilNum == 0) {
-                ShowFatalError(state, "WaterToAirHPVSWEquationFit not found=" + CompName);
+                ShowFatalError(state, "WaterToAirHPVSWEquationFit not found=" + std::string{CompName});
             }
             CompIndex = DXCoilNum;
         } else {

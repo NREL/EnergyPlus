@@ -339,7 +339,7 @@ namespace EvaporativeCoolers {
 
     // Functions
 
-    void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 PartLoadRatio = 1.0);
+    void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIndex, Real64 PartLoadRatio = 1.0);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -438,7 +438,7 @@ namespace EvaporativeCoolers {
     //***************
 
     void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
-                                      std::string const &CompName,    // name of the packaged terminal heat pump
+                                      std::string_view CompName,    // name of the packaged terminal heat pump
                                       int ZoneNum,                    // number of zone being served
                                       Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                       Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative

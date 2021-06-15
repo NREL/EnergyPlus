@@ -142,10 +142,10 @@ namespace HVACMultiSpeedHeatPump {
         Cubic,       // Cubic curve type
     };
 
-    static std::string const fluidNameSteam("STEAM");
+    static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimMSHeatPump(EnergyPlusData &state,
-                       std::string const &CompName,   // Name of the unitary engine driven heat pump system
+                       std::string_view CompName,   // Name of the unitary engine driven heat pump system
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                        int const AirLoopNum,          // air loop index
                        int &CompIndex                 // Index to changeover-bypass VAV system
@@ -178,7 +178,7 @@ namespace HVACMultiSpeedHeatPump {
         if (CompIndex == 0) {
             MSHeatPumpNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACMultiSpdHP->MSHeatPump);
             if (MSHeatPumpNum == 0) {
-                ShowFatalError(state, "MultiSpeed Heat Pump is not found=" + CompName);
+                ShowFatalError(state, "MultiSpeed Heat Pump is not found=" + std::string{CompName});
             }
             CompIndex = MSHeatPumpNum;
         } else {
@@ -4448,7 +4448,7 @@ namespace HVACMultiSpeedHeatPump {
         using WaterCoils::SimulateWaterCoilComponents;
 
         // Locals
-        static std::string const CurrentModuleObject("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed");
+        static constexpr std::string_view CurrentModuleObject("AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed");
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4553,7 +4553,7 @@ namespace HVACMultiSpeedHeatPump {
                             if (SolFlag == -1) {
                                 if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex == 0) {
                                     ShowWarningMessage(state,
-                                                       "CalcNonDXHeatingCoils: Hot water coil control failed for " + CurrentModuleObject + "=\"" +
+                                                       "CalcNonDXHeatingCoils: Hot water coil control failed for " + std::string{CurrentModuleObject} + "=\"" +
                                                            MSHeatPump(MSHeatPumpNum).Name + "\"");
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(
@@ -4570,7 +4570,7 @@ namespace HVACMultiSpeedHeatPump {
                                 if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2 == 0) {
                                     ShowWarningMessage(state,
                                                        "CalcNonDXHeatingCoils: Hot water coil control failed (maximum flow limits) for " +
-                                                           CurrentModuleObject + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
+                                                           std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(state, "...Bad hot water maximum flow rate limits");
                                     ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", MinWaterFlow));
@@ -4578,7 +4578,7 @@ namespace HVACMultiSpeedHeatPump {
                                 }
                                 ShowRecurringWarningErrorAtEnd(state,
                                                                "CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for " +
-                                                                   CurrentModuleObject + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"",
+                                                                   std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"",
                                                                MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex2,
                                                                MaxHotWaterFlow,
                                                                MinWaterFlow,

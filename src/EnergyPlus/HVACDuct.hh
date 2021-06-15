@@ -95,7 +95,7 @@ namespace HVACDuct {
     // Object Data
 
     void SimDuct(EnergyPlusData &state,
-                 std::string const &CompName, // name of the duct component
+                 std::string_view CompName, // name of the duct component
                  bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep !unused1208
                  int &CompIndex               // index of duct component
     );

@@ -394,19 +394,19 @@ void GetSwimmingPool(EnergyPlusData &state)
 }
 
 void SwimmingPoolData::ErrorCheckSetupPoolSurface(
-    EnergyPlusData &state, std::string const &Alpha1, std::string const &Alpha2, std::string const &cAlphaField2, bool &ErrorsFound)
+    EnergyPlusData &state, std::string_view Alpha1, std::string_view Alpha2, std::string_view cAlphaField2, bool &ErrorsFound)
 {
 
     static constexpr std::string_view RoutineName("ErrorCheckSetupPoolSurface: "); // include trailing blank space
-    static std::string const CurrentModuleObject("SwimmingPool:Indoor");
+    static constexpr std::string_view CurrentModuleObject("SwimmingPool:Indoor");
 
     if (this->SurfacePtr <= 0) {
-        ShowSevereError(state, std::string{RoutineName} + "Invalid " + cAlphaField2 + " = " + Alpha2);
-        ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alpha1);
+        ShowSevereError(state, std::string{RoutineName} + "Invalid " + std::string{cAlphaField2} + " = " + std::string{Alpha2});
+        ShowContinueError(state, "Occurs in " + std::string{CurrentModuleObject} + " = " + std::string{Alpha1});
         ErrorsFound = true;
     } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr)) {
-        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha1 + "\", Invalid Surface");
-        ShowContinueError(state, cAlphaField2 + "=\"" + Alpha2 + "\" has been used in another radiant system, ventilated slab, or pool.");
+        ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + std::string{Alpha1} + "\", Invalid Surface");
+        ShowContinueError(state, std::string{cAlphaField2} + "=\"" + std::string{Alpha2} + "\" has been used in another radiant system, ventilated slab, or pool.");
         ShowContinueError(state,
                           "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
         ErrorsFound = true;
@@ -440,7 +440,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
         this->ZonePtr = state.dataSurface->Surface(this->SurfacePtr).Zone;
         // Check to make sure pool surface is a floor
         if (state.dataSurface->Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::Floor) {
-            ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alpha1 + " contains a surface name that is NOT a floor.");
+            ShowSevereError(state, std::string{RoutineName} + std::string{CurrentModuleObject} + "=\"" + std::string{Alpha1} + " contains a surface name that is NOT a floor.");
             ShowContinueError(
                 state, "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
             ErrorsFound = true;

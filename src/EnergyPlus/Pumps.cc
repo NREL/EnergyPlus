@@ -119,8 +119,8 @@ std::map<PumpType, std::string> cPumpTypes = {
     {PumpType::Bank_ConSpeed, cPumpBank_ConSpeed},
 };
 
-static std::string const fluidNameSteam("STEAM");
-static std::string const fluidNameWater("WATER");
+static constexpr std::string_view fluidNameSteam("STEAM");
+static constexpr std::string_view fluidNameWater("WATER");
 
 void SimPumps(EnergyPlusData &state,
               std::string const &PumpName, // Name of pump to be managed
