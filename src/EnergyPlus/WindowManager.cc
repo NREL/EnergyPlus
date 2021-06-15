@@ -6628,14 +6628,18 @@ namespace WindowManager {
             BlNum = state.dataMaterial->Material(MatShade).BlindDataPtr;
             ShadeFlag = WinShadingType::IntBlind;
         } else if (TotGlassLay == 2) {
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group == DataHeatBalance::MaterialGroup::Shade)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group ==
+                DataHeatBalance::MaterialGroup::Shade)
                 ShadeFlag = WinShadingType::BGShade;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group == DataHeatBalance::MaterialGroup::WindowBlind)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group ==
+                DataHeatBalance::MaterialGroup::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         } else if (TotGlassLay == 3) {
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == DataHeatBalance::MaterialGroup::Shade)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group ==
+                DataHeatBalance::MaterialGroup::Shade)
                 ShadeFlag = WinShadingType::BGShade;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == DataHeatBalance::MaterialGroup::WindowBlind)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group ==
+                DataHeatBalance::MaterialGroup::WindowBlind)
                 ShadeFlag = WinShadingType::BGBlind;
         }
 

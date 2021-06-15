@@ -11441,7 +11441,8 @@ namespace SurfaceGeometry {
                         (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) ||
                         (MaterialLayerGroup == DataHeatBalance::MaterialGroup::GapEquivalentLayer)) {
                         ShowSevereError(state, "Invalid movable insulation material for " + cCurrentModuleObject + ":");
-                        ShowSevereError(state, "...Movable insulation material type specified = " + cMaterialGroupType(static_cast<int>(MaterialLayerGroup)));
+                        ShowSevereError(
+                            state, "...Movable insulation material type specified = " + cMaterialGroupType(static_cast<int>(MaterialLayerGroup)));
                         ShowSevereError(state, "...Movable insulation material name specified = " + state.dataIPShortCut->cAlphaArgs(3));
                         ErrorsFound = true;
                     }
