@@ -29,7 +29,7 @@ add_library(TransitionLib STATIC ${LIB_SRC})
 target_include_directories(TransitionLib PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_compile_options(TransitionLib PUBLIC -fbounds-check)
 
-if(NOT UNIX)  # Defined as top-level target on Unix only
+if(NOT UNIX)  # Need to reinclude it on Windows
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
 endif()
 get_target_property(F_INTERFACE_COMPILE_FLAGS fortran_project_options INTERFACE_COMPILE_OPTIONS)

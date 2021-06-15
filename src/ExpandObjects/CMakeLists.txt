@@ -22,7 +22,7 @@ set(SKIP_BUILD_RPATH TRUE)
 add_executable(ExpandObjects ${SRC})
 target_link_libraries(ExpandObjects PRIVATE fortran_project_options)
 
-if(NOT UNIX)  # Defined as top-level target on Unix only
+if(NOT UNIX)  # Need to reinclude it on Windows
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
 endif()
 get_target_property(F_INTERFACE_COMPILE_FLAGS fortran_project_options INTERFACE_COMPILE_OPTIONS)

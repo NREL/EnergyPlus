@@ -58,7 +58,7 @@ add_executable(Basement ${SRC})
 target_compile_options(Basement PRIVATE -O1)
 set_target_properties(Basement PROPERTIES FOLDER Auxiliary)
 
-if(NOT UNIX)  # Defined as top-level target on Unix only
+if(NOT UNIX)  # Need to reinclude it on Windows
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
 endif()
 get_target_property(F_INTERFACE_COMPILE_FLAGS fortran_project_options INTERFACE_COMPILE_OPTIONS)
