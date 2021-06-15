@@ -64,6 +64,7 @@ foreach(i RANGE 1 ${end})
 
   set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME})
   add_executable("${LAST_NAME}" ${SRC})
+  target_include_directories("${LAST_NAME}" PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
   set_target_properties("${LAST_NAME}" PROPERTIES FOLDER Auxiliary)
   target_link_libraries("${LAST_NAME}" TransitionLib)
 
