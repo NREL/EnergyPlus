@@ -639,11 +639,11 @@ namespace SurfaceGeometry {
         ZoneCeilingHeightEntered.deallocate();
         ZoneCeilingArea.deallocate();
 
-        state.dataSurface->AdjacentZoneToSurface.dimension(state.dataSurface->TotSurfaces, 0);
+        state.dataSurface->SurfAdjacentZone.dimension(state.dataSurface->TotSurfaces, 0);
         // note -- adiabatic surfaces will show same zone as surface
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->Surface(SurfNum).ExtBoundCond <= 0) continue;
-            state.dataSurface->AdjacentZoneToSurface(SurfNum) = state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).ExtBoundCond).Zone;
+            state.dataSurface->SurfAdjacentZone(SurfNum) = state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).ExtBoundCond).Zone;
         }
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {

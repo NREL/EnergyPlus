@@ -1201,10 +1201,8 @@ struct SurfacesData : BaseGlobalStruct
     bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
     bool AnyMovableInsulation = false;            // True if any movable insulation presents
     bool AnyMovableSlat = false;                  // True if there are any movable slats for window blinds presented
-    Array1D_int InsideGlassCondensationFlag;      // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
-    Array1D_int InsideFrameCondensationFlag;      // 1 if frame inside surface temp < zone air dew point; 0 otherwise
-    Array1D_int InsideDividerCondensationFlag;    // 1 if divider inside surface temp < zone air dew point;  0 otherwise
-    Array1D_int AdjacentZoneToSurface;            // Array of adjacent zones to each surface
+
+    Array1D_int SurfAdjacentZone;            // Array of adjacent zones to each surface
     Array1D<Real64> X0;                           // X-component of translation vector
     Array1D<Real64> Y0;                           // Y-component of translation vector
     Array1D<Real64> Z0;                           // Z-component of translation vector
@@ -1325,6 +1323,10 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIntConvSurfHasActiveInIt;
 
     // Surface Window Heat Balance
+    Array1D_int SurfWinInsideGlassCondensationFlag;      // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
+    Array1D_int SurfWinInsideFrameCondensationFlag;      // 1 if frame inside surface temp < zone air dew point; 0 otherwise
+    Array1D_int SurfWinInsideDividerCondensationFlag;    // 1 if divider inside surface temp < zone air dew point;  0 otherwise
+
     Array2D<Real64> SurfWinA;            // Time step value of factor for beam absorbed in window glass layers
     Array2D<Real64> SurfWinADiffFront;   // Time step value of factor for diffuse absorbed in window layers
     Array2D<Real64> SurfWinACFOverlap;   // Time step value of factor for beam absorbed in window glass layers which comes from other windows
@@ -1592,10 +1594,10 @@ struct SurfacesData : BaseGlobalStruct
         this->ShadingTransmittanceVaries = false;
         this->AnyMovableInsulation = false;
         this->AnyMovableSlat = false;
-        this->InsideGlassCondensationFlag.deallocate();
-        this->InsideFrameCondensationFlag.deallocate();
-        this->InsideDividerCondensationFlag.deallocate();
-        this->AdjacentZoneToSurface.deallocate();
+        this->SurfWinInsideGlassCondensationFlag.deallocate();
+        this->SurfWinInsideFrameCondensationFlag.deallocate();
+        this->SurfWinInsideDividerCondensationFlag.deallocate();
+        this->SurfAdjacentZone.deallocate();
         this->X0.deallocate();
         this->Y0.deallocate();
         this->Z0.deallocate();
