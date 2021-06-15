@@ -78,6 +78,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
@@ -99,6 +100,7 @@
 #include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SurfaceOctree.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
@@ -217,12 +219,14 @@ namespace HeatBalanceManager {
         }
 
         bool anyRan;
+
         ManageEMS(state,
                   EMSManager::EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance,
                   anyRan,
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
+
         InitHeatBalance(state); // Initialize all heat balance related parameters
         ManageEMS(
             state, EMSManager::EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
@@ -1558,75 +1562,62 @@ namespace HeatBalanceManager {
         MaterNum = 0;
 
         // Regular Materials
+        auto &ip = state.dataInputProcessing->inputProcessor;
 
         state.dataHeatBalMgr->CurrentModuleObject = "Material";
-        for (Loop = 1; Loop <= RegMat; ++Loop) {
+        auto const instances = ip->epJSON.find(state.dataHeatBalMgr->CurrentModuleObject);
+        if (instances != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, state.dataHeatBalMgr->CurrentModuleObject);
 
-            // Call Input Get routine to retrieve material data
-            state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     state.dataHeatBalMgr->CurrentModuleObject,
-                                                                     Loop,
-                                                                     MaterialNames,
-                                                                     MaterialNumAlpha,
-                                                                     MaterialProps,
-                                                                     MaterialNumProp,
-                                                                     IOStat,
-                                                                     state.dataIPShortCut->lNumericFieldBlanks,
-                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                     state.dataIPShortCut->cAlphaFieldNames,
-                                                                     state.dataIPShortCut->cNumericFieldNames);
-            if (GlobalNames::VerifyUniqueInterObjectName(state,
-                                                         state.dataHeatBalMgr->UniqueMaterialNames,
-                                                         MaterialNames(1),
-                                                         state.dataHeatBalMgr->CurrentModuleObject,
-                                                         state.dataIPShortCut->cAlphaFieldNames(1),
-                                                         ErrorsFound)) {
-                continue;
-            }
-            // Load the material derived type from the input data.
-            ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = RegularMaterial;
-            state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
+            int counter = 0;
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &objectFields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                ip->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
+                std::string materialName = thisObjectName;
 
-            ValidateMaterialRoughness(state, MaterNum, MaterialNames(2), ErrorsFound);
+                if (GlobalNames::VerifyUniqueInterObjectName(state,
+                                                             state.dataHeatBalMgr->UniqueMaterialNames,
+                                                             materialName,
+                                                             state.dataHeatBalMgr->CurrentModuleObject,
+                                                             state.dataIPShortCut->cAlphaFieldNames(1),
+                                                             ErrorsFound)) {
+                    continue;
+                }
+                // For incoming idf, maintain object order
+                ++counter;
+                MaterNum = ip->getIDFObjNum(state, state.dataHeatBalMgr->CurrentModuleObject, counter);
 
-            state.dataMaterial->Material(MaterNum).Thickness = MaterialProps(1);
-            state.dataMaterial->Material(MaterNum).Conductivity = MaterialProps(2);
-            state.dataMaterial->Material(MaterNum).Density = MaterialProps(3);
-            state.dataMaterial->Material(MaterNum).SpecHeat = MaterialProps(4);
-            // min fields is 6 -- previous four will be there
-            if (MaterialNumProp >= 5) {
-                state.dataMaterial->Material(MaterNum).AbsorpThermal = MaterialProps(5);
-                state.dataMaterial->Material(MaterNum).AbsorpThermalInput = MaterialProps(5);
-            } else {
-                state.dataMaterial->Material(MaterNum).AbsorpThermal = 0.9;
-                state.dataMaterial->Material(MaterNum).AbsorpThermalInput = 0.9;
-            }
-            if (MaterialNumProp >= 6) {
-                state.dataMaterial->Material(MaterNum).AbsorpSolar = MaterialProps(6);
-                state.dataMaterial->Material(MaterNum).AbsorpSolarInput = MaterialProps(6);
-            } else {
-                state.dataMaterial->Material(MaterNum).AbsorpSolar = 0.7;
-                state.dataMaterial->Material(MaterNum).AbsorpSolarInput = 0.7;
-            }
-            if (MaterialNumProp >= 7) {
-                state.dataMaterial->Material(MaterNum).AbsorpVisible = MaterialProps(7);
-                state.dataMaterial->Material(MaterNum).AbsorpVisibleInput = MaterialProps(7);
-            } else {
-                state.dataMaterial->Material(MaterNum).AbsorpVisible = 0.7;
-                state.dataMaterial->Material(MaterNum).AbsorpVisibleInput = 0.7;
-            }
+                // Load the material derived type from the input data.
+                auto &thisMaterial = state.dataMaterial->Material(MaterNum);
+                thisMaterial.Group = RegularMaterial;
+                thisMaterial.Name = materialName;
 
-            if (state.dataMaterial->Material(MaterNum).Conductivity > 0.0) {
-                state.dataHeatBal->NominalR(MaterNum) =
-                    state.dataMaterial->Material(MaterNum).Thickness / state.dataMaterial->Material(MaterNum).Conductivity;
-                state.dataMaterial->Material(MaterNum).Resistance = state.dataHeatBal->NominalR(MaterNum);
-            } else {
-                ShowSevereError(state, "Positive thermal conductivity required for material " + state.dataMaterial->Material(MaterNum).Name);
-                ErrorsFound = true;
+                std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
+                ValidateMaterialRoughness(state, MaterNum, roughness, ErrorsFound);
+
+                thisMaterial.Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
+                thisMaterial.Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
+                thisMaterial.Density = ip->getRealFieldValue(objectFields, objectSchemaProps, "density");
+                thisMaterial.SpecHeat = ip->getRealFieldValue(objectFields, objectSchemaProps, "specific_heat");
+                thisMaterial.AbsorpThermal = ip->getRealFieldValue(objectFields, objectSchemaProps, "thermal_absorptance");
+                thisMaterial.AbsorpThermalInput = thisMaterial.AbsorpThermal;
+                thisMaterial.AbsorpSolar = ip->getRealFieldValue(objectFields, objectSchemaProps, "solar_absorptance");
+                thisMaterial.AbsorpSolarInput = thisMaterial.AbsorpSolar;
+                thisMaterial.AbsorpVisible = ip->getRealFieldValue(objectFields, objectSchemaProps, "visible_absorptance");
+                thisMaterial.AbsorpVisibleInput = thisMaterial.AbsorpVisible;
+
+                if (thisMaterial.Conductivity > 0.0) {
+                    state.dataHeatBal->NominalR(MaterNum) = thisMaterial.Thickness / thisMaterial.Conductivity;
+                    thisMaterial.Resistance = state.dataHeatBal->NominalR(MaterNum);
+                } else {
+                    ShowSevereError(state, "Positive thermal conductivity required for material " + thisMaterial.Name);
+                    ErrorsFound = true;
+                }
             }
+            MaterNum = counter; // This works here, because this is the first material type processed
         }
-
         // Add the 6" heavy concrete for constructions defined with F or C factor method
         if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
             ++MaterNum;
@@ -4837,21 +4828,21 @@ namespace HeatBalanceManager {
             // A FrameAndDivider object will also be created if window on data file has a
             // frame or divider.)
 
-            std::string window5DataFileName;
+            fs::path window5DataFilePath;
             if (ConstructAlphas(1) == "") {
-                window5DataFileName = state.dataStrGlobals->CurrentWorkingFolder + "Window5DataFile.dat";
+                window5DataFilePath = state.dataStrGlobals->CurrentWorkingFolder / "Window5DataFile.dat";
             } else {
-                window5DataFileName = ConstructAlphas(1);
+                window5DataFilePath = ConstructAlphas(1);
             }
             DisplayString(state, "Searching Window5 data file for Construction=" + ConstructAlphas(0));
 
-            SearchWindow5DataFile(state, window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
+            SearchWindow5DataFile(state, window5DataFilePath, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
 
             if (EOFonW5File || !ConstructionFound) {
                 DisplayString(state, "--Construction not found");
                 ErrorsFound = true;
                 ShowSevereError(state, "No match on WINDOW5 data file for Construction=" + ConstructAlphas(0) + ", or error in data file.");
-                ShowContinueError(state, "...Looking on file=" + window5DataFileName);
+                ShowContinueError(state, "...Looking on file=" + window5DataFilePath.string()); // TODO: call getAbsolutePath maybe?
                 continue;
             }
 
@@ -5264,7 +5255,7 @@ namespace HeatBalanceManager {
                                             state.dataIPShortCut->cAlphaArgs(1),
                                             DataLoopNode::NodeFluidType::Air,
                                             DataLoopNode::NodeConnectionType::Inlet,
-                                            1,
+                                            NodeInputManager::compFluidStream::Primary,
                                             ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                     ShowSevereError(state,
@@ -5702,6 +5693,42 @@ namespace HeatBalanceManager {
         }
     }
 
+    void AllocateZoneHeatBalArrays(EnergyPlusData &state)
+    {
+        // Allocate zone / encl hb arrays
+        state.dataHeatBal->EnclSolDB.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolDBSSG.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolDBIntWin.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQD.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclRadQThermalRad.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclRadThermAbsMult.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->ZoneSolAbsFirstCalc.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->EnclRadReCalc.allocate(state.dataGlobal->NumOfZones);
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            state.dataHeatBal->EnclSolDB(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolDBSSG(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolDBIntWin(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQSDifSol(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQD(zoneNum) = 0.0;
+            state.dataHeatBal->EnclSolQDforDaylight(zoneNum) = 0.0;
+            state.dataHeatBal->EnclRadQThermalRad(zoneNum) = 0.0;
+            state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
+            state.dataHeatBal->EnclRadThermAbsMult(zoneNum) = 0.0;
+            state.dataHeatBal->ZoneSolAbsFirstCalc(zoneNum) = true;
+            state.dataHeatBal->EnclRadReCalc(zoneNum) = false;
+        }
+        state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolVMULT.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            state.dataHeatBal->EnclSolQSWRad(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolVMULT(enclosureNum) = 0.0;
+        }
+    }
     void AllocateHeatBalArrays(EnergyPlusData &state)
     {
 
@@ -5741,6 +5768,7 @@ namespace HeatBalanceManager {
         // Allocate real Variables
         // Following used for Calculations
         //  Allocate variables in DataHeatBalSys
+        AllocateZoneHeatBalArrays(state);
         state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
         state.dataHeatBalFanSys->SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -5854,6 +5882,17 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
 
         state.dataHeatBalMgr->CountWarmupDayPoints = 0;
+
+        for (int loop = 1; loop <= state.dataGlobal->NumOfZones; ++loop) {
+            // CurrentModuleObject='Zone'
+            SetupOutputVariable(state,
+                                "Zone Mean Radiant Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBal->ZoneMRT(loop),
+                                "Zone",
+                                "State",
+                                state.dataHeatBal->Zone(loop).Name);
+        }
     }
 
     // End Initialization Section of the Module
@@ -6515,7 +6554,7 @@ namespace HeatBalanceManager {
     }
 
     void SearchWindow5DataFile(EnergyPlusData &state,
-                               std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
+                               fs::path const &DesiredFilePath,            // File path that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
                                bool &EOFonFile,                            // True if EOF during file read
@@ -6556,7 +6595,7 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace DataStringGlobals;
-        using DataSystemVariables::CheckForActualFileName;
+        using DataSystemVariables::CheckForActualFilePath;
         using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -6591,7 +6630,6 @@ namespace HeatBalanceManager {
         int MaterNum; // Material number
         int MatNum;
         int FrDivNum;                 // FrameDivider number
-        bool exists;                  // True if Window5 data file exists
         Array1D<Real64> WinHeight(2); // Height, width for glazing system (m)
         Array1D<Real64> WinWidth(2);
         Array1D<Real64> UValCenter(2);      // Center of glass U-value (W/m2-K) for glazing system
@@ -6648,20 +6686,20 @@ namespace HeatBalanceManager {
         EOFonFile = false;
         std::string contextString = "HeatBalanceManager::SearchWindow5DataFile: ";
 
-        CheckForActualFileName(state, DesiredFileName, exists, state.files.TempFullFileName.fileName, contextString);
+        state.files.TempFullFilePath.filePath = CheckForActualFilePath(state, DesiredFilePath, contextString);
 
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
-        if (!exists) {
+        if (state.files.TempFullFilePath.filePath.empty()) {
             ShowFatalError(state, "Program terminates due to these conditions.");
         }
 
-        auto W5DataFile = state.files.TempFullFileName.open(state, "SearchWindow5DataFile");
+        auto W5DataFile = state.files.TempFullFilePath.open(state, "SearchWindow5DataFile");
         auto NextLine = W5DataFile.readLine();
         endcol = len(NextLine.data);
         if (endcol > 0) {
             if (int(NextLine.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
                 ShowSevereError(state,
-                                "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFileName +
+                                "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFilePath.string() +
                                     " fiile, appears to be a Unicode or binary file.");
                 ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                 ShowFatalError(state, "Program terminates due to previous condition.");
@@ -6674,7 +6712,7 @@ namespace HeatBalanceManager {
         if (NextLine.eof) goto Label1000;
         ++FileLineCount;
         if (!has_prefixi(NextLine.data, "WINDOW5")) {
-            ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFileName);
+            ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFilePath.string());
             ShowFatalError(
                 state, "Error reading Window5 Data File: first word of window entry is \"" + NextLine.data.substr(0, 7) + "\", should be Window5.");
         }
@@ -9064,11 +9102,11 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
                 if (SELECT_CASE_var == "ISO15099") {
-                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csISO15099;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::ISO15099;
                 } else if (SELECT_CASE_var == "EN673DECLARED") {
-                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csEN673Declared;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::EN673;
                 } else if (SELECT_CASE_var == "EN673DESIGN") {
-                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = csEN673Design;
+                    state.dataHeatBal->WindowThermalModel(Loop).CalculationStandard = TARCOGGassesParams::Stdrd::EN673Design;
                 } else {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -9215,9 +9253,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(2)); // Basis Type Keyword
                 if (SELECT_CASE_var == "LBNLWINDOW") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::BasisType_WINDOW;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::Basis::WINDOW;
                 } else if (SELECT_CASE_var == "USERDEFINED") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::BasisType_Custom;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType = DataBSDFWindow::Basis::Custom;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -9232,9 +9270,9 @@ namespace HeatBalanceManager {
             {
                 auto const SELECT_CASE_var(locAlphaArgs(3)); // Basis Symmetry Keyword
                 if (SELECT_CASE_var == "AXISYMMETRIC") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_Axisymmetric;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::Axisymmetric;
                 } else if (SELECT_CASE_var == "NONE") {
-                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry_None;
+                    state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType = DataBSDFWindow::BasisSymmetry::None;
                 } else {
                     // throw error
                     ErrorsFound = true;
@@ -9279,7 +9317,7 @@ namespace HeatBalanceManager {
             Get2DMatrix(state,
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMatIndex,
                         state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisMat);
-            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::BasisType_WINDOW)
+            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::Basis::WINDOW)
                 CalculateBasisLength(state,
                                      state.dataConstruction->Construct(ConstrNum).BSDFInput,
                                      ConstrNum,
@@ -9302,7 +9340,7 @@ namespace HeatBalanceManager {
                 ShowContinueError(state, locAlphaArgs(1) + " is missing some of the layers or/and gaps.");
             }
 
-            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry_None) {
+            if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisSymmetryType == DataBSDFWindow::BasisSymmetry::None) {
                 // Non-Symmetric basis
 
                 NBasis = state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis;
@@ -9334,7 +9372,7 @@ namespace HeatBalanceManager {
                                       "Solar front transmittance matrix \"" + locAlphaArgs(6) + "\" must have the same number of rows and columns.");
                 }
 
-                if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::BasisType_Custom) {
+                if (state.dataConstruction->Construct(ConstrNum).BSDFInput.BasisType == DataBSDFWindow::Basis::Custom) {
                     state.dataConstruction->Construct(ConstrNum).BSDFInput.NBasis = NumRows; // For custom basis, no rows in transmittance
                                                                                              // matrix defines the basis length
                 }

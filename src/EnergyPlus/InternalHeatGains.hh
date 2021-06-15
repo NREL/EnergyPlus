@@ -99,12 +99,10 @@ namespace InternalHeatGains {
                                            const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                            Real64 &SumConvGainRate);
 
-    void GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                    int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                    int const IntGainTypeOfNum,     // zone internal gain type number
-                                    std::string const &IntGainName, // Internal gain name
-                                    int &DeviceIndex,               // Device index
-                                    bool &ErrorFound);
+    int GetInternalGainDeviceIndex(EnergyPlusData &state,
+                                   int const ZoneNum,                    // zone index pointer for which zone to sum gains for
+                                   int const IntGainTypeOfNum,           // zone internal gain type number
+                                   std::string_view const &IntGainName); // Internal gain name
 
     void SumInternalConvectionGainsByIndices(
         EnergyPlusData &state,
