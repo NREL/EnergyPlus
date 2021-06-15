@@ -633,46 +633,7 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    bool errFlag;
-
-    if (this->myFlag) {
-        this->setupOutputVars(state);
-        this->myFlag = false;
-    }
-
-    if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
-        errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::TypeOf_Generator_MicroCHP,
-                                                this->CWLoopNum,
-                                                this->CWLoopSideNum,
-                                                this->CWBranchNum,
-                                                this->CWCompNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
-
-        if (errFlag) {
-            ShowFatalError(state, "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");
-        }
-
-        if (!this->A42Model.InternalFlowControl) {
-            // IF this is on the supply side and not internal flow control then reset flow priority to lower
-            if (this->CWLoopSideNum == DataPlant::SupplySide) {
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_TakesWhatGets;
-            }
-        }
-
-        this->MyPlantScanFlag = false;
-    }
+    this->oneTimeInit(state);
 
     if (!state.dataGlobal->SysSizingCalc && this->MySizeFlag && !this->MyPlantScanFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
         this->MySizeFlag = false;
@@ -1433,7 +1394,48 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
         state.dataLoopNodes->Node(this->AirOutletNodeID).Temp = this->A42Model.Teng;
     }
 }
-void MicroCHPDataStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
 {
+
+    bool errFlag;
+
+    if (this->myFlag) {
+        this->setupOutputVars(state);
+        this->myFlag = false;
+    }
+
+    if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
+        errFlag = false;
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_Generator_MicroCHP,
+                                                this->CWLoopNum,
+                                                this->CWLoopSideNum,
+                                                this->CWBranchNum,
+                                                this->CWCompNum,
+                                                errFlag,
+                                                _,
+                                                _,
+                                                _,
+                                                _,
+                                                _);
+
+        if (errFlag) {
+            ShowFatalError(state, "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");
+        }
+
+        if (!this->A42Model.InternalFlowControl) {
+            // IF this is on the supply side and not internal flow control then reset flow priority to lower
+            if (this->CWLoopSideNum == DataPlant::SupplySide) {
+                state.dataPlnt->PlantLoop(this->CWLoopNum)
+                    .LoopSide(this->CWLoopSideNum)
+                    .Branch(this->CWBranchNum)
+                    .Comp(this->CWCompNum)
+                    .FlowPriority = DataPlant::LoopFlowStatus_TakesWhatGets;
+            }
+        }
+
+        this->MyPlantScanFlag = false;
+    }
 }
 } // namespace EnergyPlus::MicroCHPElectricGenerator
