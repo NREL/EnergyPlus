@@ -58,7 +58,11 @@ add_executable(Basement ${SRC})
 target_compile_options(Basement PRIVATE -O1)
 set_target_properties(Basement PROPERTIES FOLDER Auxiliary)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
+if(NOT UNIX)  # Defined as top-level target on Unix only
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
+endif()
+get_target_property(F_INTERFACE_COMPILE_FLAGS fortran_project_options INTERFACE_COMPILE_OPTIONS)
+message(DEBUG "Basement: F_INTERFACE_COMPILE_FLAGS=${F_INTERFACE_COMPILE_FLAGS}")
 target_link_libraries(Basement PRIVATE BasementOptions fortran_project_options)
 
 install(TARGETS Basement DESTINATION PreProcess/GrndTempCalc)

@@ -16,7 +16,11 @@ set(SKIP_BUILD_RPATH true)
 add_executable(ParametricPreprocessor ${SRC})
 set_target_properties(ParametricPreprocessor PROPERTIES FOLDER Auxiliary)
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
+if(NOT UNIX)  # Defined as top-level target on Unix only
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
+endif()
+get_target_property(F_INTERFACE_COMPILE_FLAGS fortran_project_options INTERFACE_COMPILE_OPTIONS)
+message(DEBUG "ParametricPreprocessor: F_INTERFACE_COMPILE_FLAGS=${F_INTERFACE_COMPILE_FLAGS}")
 target_link_libraries(ParametricPreprocessor PRIVATE fortran_project_options)
 
 install(TARGETS ParametricPreprocessor DESTINATION PreProcess/ParametricPreprocessor)

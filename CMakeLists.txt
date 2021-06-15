@@ -326,7 +326,12 @@ add_subdirectory(src/ConvertInputFormat)
 
 if(BUILD_FORTRAN)
   include(CMakeAddFortranSubdirectory)
-  include(cmake/Fortran.cmake)
+  if (UNIX)
+    # Define a top-level target `fortran_project_options`
+    # It seems that CMakeAddFortranSubdirectory] doesn't know about the target `fortran_project_option` on Windows only.
+    # On Unix it is seen and detected as multiple targets defined with the same name (CMP0002)
+    include(cmake/Fortran.cmake)
+  endif()
   cmake_add_fortran_subdirectory(
     src/ExpandObjects
     PROJECT ExpandObjects
