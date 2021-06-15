@@ -55,7 +55,7 @@ set(CMAKE_SKIP_RPATH ${FORTRAN_SKIP_RPATH})
 set(SKIP_BUILD_RPATH TRUE)
 
 add_executable(Basement ${SRC})
-set_target_properties(Basement PROPERTIES COMPILE_FLAGS "-O1")
+target_compile_options(Basement PRIVATE -O1)
 set_target_properties(Basement PROPERTIES FOLDER Auxiliary)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
