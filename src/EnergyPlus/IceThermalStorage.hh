@@ -151,7 +151,7 @@ namespace IceThermalStorage {
         void
         simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitSimpleIceStorage(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state);
 
         void CalcIceStorageDormant(EnergyPlusData &state);
 
@@ -174,8 +174,6 @@ namespace IceThermalStorage {
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
         void setupOutputVars(EnergyPlusData &state);
-
-        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct DetailedIceStorageData : PlantComponent
@@ -255,7 +253,7 @@ namespace IceThermalStorage {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void InitDetailedIceStorage(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void SimDetailedIceStorage(EnergyPlusData &state);
 
@@ -265,7 +263,6 @@ namespace IceThermalStorage {
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetIceStorageInput(EnergyPlusData &state);
