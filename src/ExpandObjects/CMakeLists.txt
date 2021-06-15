@@ -21,6 +21,8 @@ set(SKIP_BUILD_RPATH TRUE)
 
 add_executable(ExpandObjects ${SRC})
 target_link_libraries(ExpandObjects PRIVATE fortran_project_options)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
 set_target_properties(ExpandObjects PROPERTIES FOLDER Auxiliary)
 
 install(TARGETS ExpandObjects DESTINATION "./")

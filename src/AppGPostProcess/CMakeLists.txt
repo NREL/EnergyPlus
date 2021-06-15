@@ -14,8 +14,10 @@ set(CMAKE_SKIP_RPATH ${FORTRAN_SKIP_RPATH})
 set(SKIP_BUILD_RPATH TRUE)
 
 add_executable(AppGPostProcess ${SRC})
-target_link_libraries(AppGPostProcess PRIVATE fortran_project_options)
 set_target_properties(AppGPostProcess PROPERTIES FOLDER Auxiliary)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
+target_link_libraries(AppGPostProcess PRIVATE fortran_project_options)
 
 install(TARGETS AppGPostProcess DESTINATION PostProcess)
 if(NOT ${FORTRAN_STATIC_EXE})

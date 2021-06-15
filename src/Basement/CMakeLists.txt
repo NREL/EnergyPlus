@@ -57,6 +57,8 @@ set(SKIP_BUILD_RPATH TRUE)
 add_executable(Basement ${SRC})
 set_target_properties(Basement PROPERTIES COMPILE_FLAGS "-O1")
 set_target_properties(Basement PROPERTIES FOLDER Auxiliary)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
 target_link_libraries(Basement PRIVATE BasementOptions fortran_project_options)
 
 install(TARGETS Basement DESTINATION PreProcess/GrndTempCalc)

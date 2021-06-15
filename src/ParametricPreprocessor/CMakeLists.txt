@@ -14,8 +14,10 @@ set(CMAKE_SKIP_RPATH ${FORTRAN_SKIP_RPATH})
 set(SKIP_BUILD_RPATH true)
 
 add_executable(ParametricPreprocessor ${SRC})
-target_link_libraries(ParametricPreprocessor PRIVATE fortran_project_options)
 set_target_properties(ParametricPreprocessor PROPERTIES FOLDER Auxiliary)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
+target_link_libraries(ParametricPreprocessor PRIVATE fortran_project_options)
 
 install(TARGETS ParametricPreprocessor DESTINATION PreProcess/ParametricPreprocessor)
 if(NOT ${FORTRAN_STATIC_EXE})

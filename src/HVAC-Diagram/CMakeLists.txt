@@ -14,8 +14,11 @@ set(CMAKE_SKIP_RPATH ${FORTRAN_SKIP_RPATH})
 set(SKIP_BUILD_RPATH true)
 
 add_executable(HVAC-Diagram ${SRC})
-target_link_libraries(HVAC-Diagram PRIVATE fortran_project_options)
 set_target_properties(HVAC-Diagram PROPERTIES FOLDER Auxiliary)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
+target_link_libraries(HVAC-Diagram PRIVATE fortran_project_options)
+
 if(NOT CMAKE_Fortran_COMPILER MATCHES "ifort")
   target_compile_options(HVAC-Diagram PRIVATE -std=legacy)
 endif()

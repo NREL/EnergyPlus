@@ -15,6 +15,8 @@ set(SKIP_BUILD_RPATH TRUE)
 
 add_executable(convertESOMTR ${SRC})
 set_target_properties(convertESOMTR PROPERTIES FOLDER Auxiliary)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/Fortran.cmake")
 target_link_libraries(convertESOMTR PRIVATE fortran_project_options)
 
 install(TARGETS convertESOMTR DESTINATION "PostProcess/convertESOMTRpgm/")
