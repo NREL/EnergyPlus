@@ -206,15 +206,21 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
         MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
 
-        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != GlassEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != ShadeEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != DrapeEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != ScreenEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != BlindEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != GapEquivalentLayer)
+        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
+                DataHeatBalance::MaterialGroup::GlassEquivalentLayer &&
+            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
+                DataHeatBalance::MaterialGroup::ShadeEquivalentLayer &&
+            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
+                DataHeatBalance::MaterialGroup::DrapeEquivalentLayer &&
+            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
+                DataHeatBalance::MaterialGroup::ScreenEquivalentLayer &&
+            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
+                DataHeatBalance::MaterialGroup::BlindEquivalentLayer &&
+            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
+                DataHeatBalance::MaterialGroup::GapEquivalentLayer)
             continue;
 
-        if (state.dataMaterial->Material(MaterNum).Group == GapEquivalentLayer) {
+        if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer) {
             // Gap or Gas Layer
             ++gLayer;
         } else {
@@ -227,7 +233,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).LWP_MAT.TAUL = state.dataMaterial->Material(MaterNum).TausThermal;
         }
 
-        if (state.dataMaterial->Material(MaterNum).Group == BlindEquivalentLayer) {
+        if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) {
             CFS(EQLNum).VBLayerPtr = sLayer;
             if (state.dataMaterial->Material(MaterNum).SlatOrientation == Horizontal) {
                 CFS(EQLNum).L(sLayer).LTYPE = LayerType::VBHOR;
@@ -247,7 +253,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).S = state.dataMaterial->Material(MaterNum).SlatSeparation;
             CFS(EQLNum).L(sLayer).W = state.dataMaterial->Material(MaterNum).SlatWidth;
             CFS(EQLNum).L(sLayer).C = state.dataMaterial->Material(MaterNum).SlatCrown;
-        } else if (state.dataMaterial->Material(MaterNum).Group == GlassEquivalentLayer) {
+        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) {
             // glazing
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::GLAZE;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBB = state.dataMaterial->Material(MaterNum).ReflFrontBeamBeam;
@@ -262,7 +268,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = state.dataMaterial->Material(MaterNum).ReflFrontDiffDiff;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = state.dataMaterial->Material(MaterNum).ReflBackDiffDiff;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = state.dataMaterial->Material(MaterNum).TausDiffDiff;
-        } else if (state.dataMaterial->Material(MaterNum).Group == ShadeEquivalentLayer) {
+        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) {
             // roller blind
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::ROLLB;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
@@ -272,7 +278,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBD = state.dataMaterial->Material(MaterNum).TausFrontBeamDiff;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSBBD = state.dataMaterial->Material(MaterNum).TausBackBeamDiff;
 
-        } else if (state.dataMaterial->Material(MaterNum).Group == DrapeEquivalentLayer) {
+        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) {
             // drapery fabric
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::DRAPE;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
@@ -288,7 +294,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFDD = -1.0;
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSBDD = -1.0;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUS_DD = -1.0;
-        } else if (state.dataMaterial->Material(MaterNum).Group == ScreenEquivalentLayer) {
+        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) {
             // insect screen
             CFS(EQLNum).L(sLayer).LTYPE = LayerType::INSCRN;
             CFS(EQLNum).L(sLayer).SWP_MAT.TAUSFBB = state.dataMaterial->Material(MaterNum).TausFrontBeamBeam;
@@ -301,7 +307,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
             // wire geometry
             CFS(EQLNum).L(sLayer).S = state.dataMaterial->Material(MaterNum).ScreenWireSpacing;
             CFS(EQLNum).L(sLayer).W = state.dataMaterial->Material(MaterNum).ScreenWireDiameter;
-        } else if (state.dataMaterial->Material(MaterNum).Group == GapEquivalentLayer) {
+        } else if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer) {
             // This layer is a gap.  Fill in the parameters
             CFS(EQLNum).G(gLayer).Name = state.dataMaterial->Material(MaterNum).Name;
             CFS(EQLNum).G(gLayer).GTYPE = state.dataMaterial->Material(MaterNum).GapVentType;

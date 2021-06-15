@@ -1591,7 +1591,7 @@ namespace HeatBalanceManager {
 
                 // Load the material derived type from the input data.
                 auto &thisMaterial = state.dataMaterial->Material(MaterNum);
-                thisMaterial.Group = RegularMaterial;
+                thisMaterial.Group = DataHeatBalance::MaterialGroup::RegularMaterial;
                 thisMaterial.Name = materialName;
 
                 std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
@@ -1622,7 +1622,7 @@ namespace HeatBalanceManager {
         if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
             ++MaterNum;
 
-            state.dataMaterial->Material(MaterNum).Group = RegularMaterial;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
             state.dataMaterial->Material(MaterNum).Name = "~FC_Concrete";
             state.dataMaterial->Material(MaterNum).Thickness = 0.15;    // m, 0.15m = 6 inches
             state.dataMaterial->Material(MaterNum).Conductivity = 1.95; // W/mK
@@ -1667,7 +1667,7 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = RegularMaterial;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
 
             ValidateMaterialRoughness(state, MaterNum, MaterialNames(2), ErrorsFound);
@@ -1703,7 +1703,7 @@ namespace HeatBalanceManager {
         if (TotFfactorConstructs + TotCfactorConstructs >= 1) {
             for (Loop = 1; Loop <= TotFfactorConstructs + TotCfactorConstructs; ++Loop) {
                 ++MaterNum;
-                state.dataMaterial->Material(MaterNum).Group = RegularMaterial;
+                state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
                 state.dataMaterial->Material(MaterNum).Name = format("~FC_Insulation_{}", Loop);
                 state.dataMaterial->Material(MaterNum).ROnly = true;
                 state.dataMaterial->Material(MaterNum).Roughness = MediumRough;
@@ -1743,7 +1743,7 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = Air;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::Air;
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
 
             state.dataMaterial->Material(MaterNum).Roughness = MediumRough;
@@ -1781,7 +1781,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = IRTMaterial;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::IRTMaterial;
 
             // Load the material derived type from the input data.
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
@@ -1828,7 +1828,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = WindowGlass;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::WindowGlass;
 
             // Load the material derived type from the input data.
 
@@ -2296,7 +2296,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = WindowGlass;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::WindowGlass;
 
             // Load the material derived type from the input data.
 
@@ -2390,7 +2390,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = GlassEquivalentLayer;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::GlassEquivalentLayer;
 
             // Load the material derived type from the input data.
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
@@ -2483,7 +2483,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = WindowGas;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::WindowGas;
             state.dataMaterial->Material(MaterNum).GasType(1) = -1;
             state.dataMaterial->Material(MaterNum).NumberOfGasesInMixture = 1;
             state.dataMaterial->Material(MaterNum).GasFract(1) = 1.0;
@@ -2602,7 +2602,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = GapEquivalentLayer;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::GapEquivalentLayer;
             state.dataMaterial->Material(MaterNum).GasType(1) = -1;
             state.dataMaterial->Material(MaterNum).NumberOfGasesInMixture = 1;
             state.dataMaterial->Material(MaterNum).GasFract(1) = 1.0;
@@ -2730,7 +2730,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = WindowGasMixture;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::WindowGasMixture;
             state.dataMaterial->Material(MaterNum).GasType = -1;
 
             // Load the material derived type from the input data.
@@ -2814,7 +2814,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = Shade;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::Shade;
 
             // Load the material derived type from the input data.
 
@@ -2900,7 +2900,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = ShadeEquivalentLayer;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::ShadeEquivalentLayer;
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
             state.dataMaterial->Material(MaterNum).Roughness = MediumRough;
@@ -2991,7 +2991,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = DrapeEquivalentLayer;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::DrapeEquivalentLayer;
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
             state.dataMaterial->Material(MaterNum).Roughness = MediumRough;
@@ -3078,7 +3078,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = Screen;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::Screen;
 
             // Load the material derived type from the input data.
 
@@ -3273,7 +3273,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = ScreenEquivalentLayer;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::ScreenEquivalentLayer;
 
             // Load the material derived type from the input data.
             // WindowMaterial:Screen:EquivalentLayer,
@@ -3419,7 +3419,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = WindowBlind;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::WindowBlind;
 
             // Load the material derived type from the input data.
 
@@ -3714,7 +3714,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = BlindEquivalentLayer;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::BlindEquivalentLayer;
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
             state.dataMaterial->Material(MaterNum).Roughness = Rough;
@@ -3897,7 +3897,7 @@ namespace HeatBalanceManager {
             // this part is similar to the regular material
             // Load the material derived type from the input data.
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = EcoRoof;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::EcoRoof;
 
             // this part is new for Ecoroof properties,
             // especially for the Plant Layer of the ecoroof
@@ -4027,7 +4027,7 @@ namespace HeatBalanceManager {
                         state.dataHeatBal->TCGlazings(Loop).LayerPoint(iTC) = iMat;
 
                         // test that named material is of the right type
-                        if (state.dataMaterial->Material(iMat).Group != WindowGlass) {
+                        if (state.dataMaterial->Material(iMat).Group != DataHeatBalance::MaterialGroup::WindowGlass) {
                             ShowSevereError(state,
                                             state.dataHeatBalMgr->CurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                                 "\" is not defined correctly.");
@@ -4071,7 +4071,7 @@ namespace HeatBalanceManager {
                 continue;
             }
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = WindowSimpleGlazing;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::WindowSimpleGlazing;
             state.dataMaterial->Material(MaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataMaterial->Material(MaterNum).SimpleWindowUfactor = state.dataIPShortCut->rNumericArgs(1);
             state.dataMaterial->Material(MaterNum).SimpleWindowSHGC = state.dataIPShortCut->rNumericArgs(2);
@@ -4109,7 +4109,7 @@ namespace HeatBalanceManager {
 
                 {
                     auto const SELECT_CASE_var(state.dataMaterial->Material(MaterNum).Group);
-                    if (SELECT_CASE_var == Air) {
+                    if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Air) {
                         print(state.files.eio,
                               Format_702,
                               state.dataMaterial->Material(MaterNum).Name,
@@ -4137,7 +4137,7 @@ namespace HeatBalanceManager {
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
 
             for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
-                if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) continue;
+                if (state.dataMaterial->Material(MaterNum).Group != DataHeatBalance::MaterialGroup::RegularMaterial) continue;
                 SetupEMSActuator(state,
                                  "Material",
                                  state.dataMaterial->Material(MaterNum).Name,
@@ -4437,8 +4437,8 @@ namespace HeatBalanceManager {
         int TotWindow5Constructs; // Number of constructions from Window5 data file
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
-        bool EOFonW5File;       // True if EOF encountered reading Window5 data file
-        int MaterialLayerGroup; // window construction layer material group index
+        bool EOFonW5File;                                  // True if EOF encountered reading Window5 data file
+        DataHeatBalance::MaterialGroup MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
         Array1D_string WConstructNames;
@@ -4544,12 +4544,16 @@ namespace HeatBalanceManager {
 
                 // count number of glass layers
                 if (state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer) > 0) {
-                    if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group == WindowGlass)
+                    if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group ==
+                        DataHeatBalance::MaterialGroup::WindowGlass)
                         ++iMatGlass;
                     MaterialLayerGroup = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group;
-                    if ((MaterialLayerGroup == GlassEquivalentLayer) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
-                        (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
-                        (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer)) {
+                    if ((MaterialLayerGroup == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) ||
+                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::GapEquivalentLayer)) {
                         ShowSevereError(state,
                                         "Invalid material layer type in window " + state.dataHeatBalMgr->CurrentModuleObject + " = " +
                                             state.dataConstruction->Construct(ConstrNum).Name);
@@ -4570,7 +4574,8 @@ namespace HeatBalanceManager {
                         state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer) =
                             state.dataHeatBal->TCGlazings(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).LayerPoint(1);
                         state.dataConstruction->Construct(ConstrNum).TCLayer = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group == WindowGlass)
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group ==
+                            DataHeatBalance::MaterialGroup::WindowGlass)
                             ++iMatGlass;
                         state.dataConstruction->Construct(ConstrNum).TCFlag = 1;
                         state.dataConstruction->Construct(ConstrNum).TCMasterConst = ConstrNum;
@@ -4588,7 +4593,8 @@ namespace HeatBalanceManager {
                 } else {
                     state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
                         state.dataHeatBal->NominalR(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer));
-                    if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group == RegularMaterial &&
+                    if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group ==
+                            DataHeatBalance::MaterialGroup::RegularMaterial &&
                         !state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).ROnly) {
                         state.dataHeatBal->NoRegularMaterialsUsed = false;
                     }
@@ -4758,9 +4764,12 @@ namespace HeatBalanceManager {
                 } else {
                     MaterialLayerGroup =
                         state.dataMaterial->Material(state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer)).Group;
-                    if (!((MaterialLayerGroup == GlassEquivalentLayer) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
-                          (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
-                          (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer))) {
+                    if (!((MaterialLayerGroup == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) ||
+                          (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) ||
+                          (MaterialLayerGroup == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) ||
+                          (MaterialLayerGroup == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) ||
+                          (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) ||
+                          (MaterialLayerGroup == DataHeatBalance::MaterialGroup::GapEquivalentLayer))) {
                         ShowSevereError(state,
                                         "Invalid material layer type in window " + state.dataHeatBalMgr->CurrentModuleObject + " = " +
                                             state.dataConstruction->Construct(TotRegConstructs + ConstrNum).Name);
@@ -7010,7 +7019,7 @@ namespace HeatBalanceManager {
             // Initialize new materials
             for (loop = TotMaterialsPrev + 1; loop <= state.dataHeatBal->TotMaterials; ++loop) {
                 state.dataMaterial->Material(loop).Name = "";
-                state.dataMaterial->Material(loop).Group = -1;
+                state.dataMaterial->Material(loop).Group = DataHeatBalance::MaterialGroup::Unassigned;
                 state.dataMaterial->Material(loop).Roughness = 0;
                 state.dataMaterial->Material(loop).Conductivity = 0.0;
                 state.dataMaterial->Material(loop).Density = 0.0;
@@ -7079,7 +7088,7 @@ namespace HeatBalanceManager {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     ++MaterNum;
                     MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
-                    state.dataMaterial->Material(MaterNum).Group = WindowGlass;
+                    state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::WindowGlass;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
 
@@ -7148,8 +7157,8 @@ namespace HeatBalanceManager {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     MaterNum = MaterNumSysGap(IGap, IGlSys);
                     state.dataMaterial->Material(MaterNum).NumberOfGasesInMixture = NumGases(IGap, IGlSys);
-                    state.dataMaterial->Material(MaterNum).Group = WindowGas;
-                    if (NumGases(IGap, IGlSys) > 1) state.dataMaterial->Material(MaterNum).Group = WindowGasMixture;
+                    state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::WindowGas;
+                    if (NumGases(IGap, IGlSys) > 1) state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::WindowGasMixture;
                     for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
                         NextLine = W5DataFile.readLine();
                         ++FileLineCount;
@@ -7415,11 +7424,11 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) = 0.0;
                 for (loop = 1; loop <= NGlass(IGlSys) + NGaps(IGlSys); ++loop) {
                     MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(loop);
-                    if (state.dataMaterial->Material(MatNum).Group == WindowGlass) {
+                    if (state.dataMaterial->Material(MatNum).Group == DataHeatBalance::MaterialGroup::WindowGlass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
                             state.dataMaterial->Material(MatNum).Thickness / state.dataMaterial->Material(MatNum).Conductivity;
-                    } else if (state.dataMaterial->Material(MatNum).Group == WindowGas ||
-                               state.dataMaterial->Material(MatNum).Group == WindowGasMixture) {
+                    } else if (state.dataMaterial->Material(MatNum).Group == DataHeatBalance::MaterialGroup::WindowGas ||
+                               state.dataMaterial->Material(MatNum).Group == DataHeatBalance::MaterialGroup::WindowGasMixture) {
                         // If mixture, use conductivity of first gas in mixture
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
                             state.dataMaterial->Material(MatNum).Thickness /
@@ -8676,7 +8685,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = ComplexWindowGap;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::ComplexWindowGap;
             state.dataMaterial->Material(MaterNum).Roughness = Rough;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
@@ -8753,7 +8762,7 @@ namespace HeatBalanceManager {
             }
 
             ++MaterNum;
-            state.dataMaterial->Material(MaterNum).Group = ComplexWindowShade;
+            state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::ComplexWindowShade;
             state.dataMaterial->Material(MaterNum).Roughness = Rough;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 

@@ -2207,7 +2207,7 @@ bool SQLite::Material::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, name);
-    sqliteBindInteger(insertStmt, 3, group);
+    sqliteBindInteger(insertStmt, 3, static_cast<int>(group));
     sqliteBindInteger(insertStmt, 4, roughness);
     sqliteBindDouble(insertStmt, 5, conductivity);
     sqliteBindDouble(insertStmt, 6, density);

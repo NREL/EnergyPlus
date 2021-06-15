@@ -96,8 +96,6 @@ namespace HeatBalFiniteDiffManager {
     //    involving latent heat, Simulation, Vol 18, No. 2, February 1972
 
     // Using/Aliasing
-    using DataHeatBalance::Air;
-    using DataHeatBalance::RegularMaterial;
     using DataHeatBalSurface::MinSurfaceTempLimit;
     using DataSurfaces::Ground;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
@@ -249,7 +247,7 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
+                if (state.dataMaterial->Material(MaterNum).Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
                                         state.dataMaterial->Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
@@ -344,7 +342,7 @@ namespace HeatBalFiniteDiffManager {
                     continue;
                 }
 
-                if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
+                if (state.dataMaterial->Material(MaterNum).Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + ": Reference Material is not appropriate type for CondFD properties, material=" +
                                         state.dataMaterial->Material(MaterNum).Name + ", must have regular properties (L,Cp,K,D)");
@@ -655,7 +653,7 @@ namespace HeatBalFiniteDiffManager {
 
                     mAlpha = 0.0;
 
-                } else if (state.dataMaterial->Material(CurrentLayer).Group == 1) { //  Group 1 = Air
+                } else if (state.dataMaterial->Material(CurrentLayer).Group == DataHeatBalance::MaterialGroup::Air) { //  Group 1 = Air
 
                     //  Again, these values are only needed temporarily and to calculate flux,
                     //   Air layer will be handled
@@ -745,7 +743,8 @@ namespace HeatBalFiniteDiffManager {
                 Ipts1 = int(state.dataMaterial->Material(CurrentLayer).Thickness / dxn);
                 //  set high conductivity layers to a single full size node thickness. (two half nodes)
                 if (Ipts1 <= 1) Ipts1 = 1;
-                if (state.dataMaterial->Material(CurrentLayer).ROnly || state.dataMaterial->Material(CurrentLayer).Group == 1) {
+                if (state.dataMaterial->Material(CurrentLayer).ROnly ||
+                    state.dataMaterial->Material(CurrentLayer).Group == DataHeatBalance::MaterialGroup::Air) {
 
                     Ipts1 = 1; //  single full node in R layers- surfaces of adjacent material or inside/outside layer
                 }
@@ -1534,7 +1533,7 @@ namespace HeatBalFiniteDiffManager {
 
                 // Calculate the Dry Heat Conduction Equation
 
-                if (mat.ROnly || mat.Group == 1) { // R Layer or Air Layer  **********
+                if (mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer  **********
                     // Use algebraic equation for TDT based on R
                     Real64 const Rlayer(mat.Resistance);
                     TDT_i = (TDT_p + (QRadSWOutFD + hgnd * Tgnd + (hconvo + hrad) * Toa + hsky * Tsky) * Rlayer) /
@@ -1837,8 +1836,8 @@ namespace HeatBalFiniteDiffManager {
             auto const TDT_m(TDT(i - 1));
             auto const TDT_p(TDT(i + 1));
 
-            bool const RLayerPresent(mat.ROnly || mat.Group == 1);
-            bool const RLayer2Present(mat2.ROnly || mat2.Group == 1);
+            bool const RLayerPresent(mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air);
+            bool const RLayer2Present(mat2.ROnly || mat2.Group == DataHeatBalance::MaterialGroup::Air);
 
             Real64 const Rlayer(mat.Resistance);   // Resistance value of R Layer
             Real64 const Rlayer2(mat2.Resistance); // Resistance value of next layer to inside
@@ -2210,7 +2209,7 @@ namespace HeatBalFiniteDiffManager {
 
             // Calculate the Dry Heat Conduction Equation
 
-            if (mat.ROnly || mat.Group == 1) { // R Layer or Air Layer
+            if (mat.ROnly || mat.Group == DataHeatBalance::MaterialGroup::Air) { // R Layer or Air Layer
                 // Use algebraic equation for TDT based on R
                 Real64 const IterDampConst(
                     5.0); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls

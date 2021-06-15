@@ -577,7 +577,7 @@ private:
     private:
         int const number;
         std::string const &name;
-        int const &group;
+        DataHeatBalance::MaterialGroup const &group;
         int const &roughness;
         double const &conductivity;
         double const &density;

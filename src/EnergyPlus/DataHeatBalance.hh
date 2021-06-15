@@ -84,27 +84,29 @@ namespace DataHeatBalance {
 
     // Parameters to indicate material group type for use with the Material
     // derived type (see below):
-
-    constexpr int RegularMaterial(0);
-    constexpr int Air(1);
-    constexpr int Shade(2);
-    constexpr int WindowGlass(3);
-    constexpr int WindowGas(4);
-    constexpr int WindowBlind(5);
-    constexpr int WindowGasMixture(6);
-    constexpr int Screen(7);
-    constexpr int EcoRoof(8);
-    constexpr int IRTMaterial(9);
-    constexpr int WindowSimpleGlazing(10);
-    constexpr int ComplexWindowShade(11);
-    constexpr int ComplexWindowGap(12);
-
-    constexpr int GlassEquivalentLayer(13);
-    constexpr int ShadeEquivalentLayer(14);
-    constexpr int DrapeEquivalentLayer(15);
-    constexpr int BlindEquivalentLayer(16);
-    constexpr int ScreenEquivalentLayer(17);
-    constexpr int GapEquivalentLayer(18);
+    enum class MaterialGroup
+    {
+        Unassigned = -1,
+        RegularMaterial,
+        Air,
+        Shade,
+        WindowGlass,
+        WindowGas,
+        WindowBlind,
+        WindowGasMixture,
+        Screen,
+        EcoRoof,
+        IRTMaterial,
+        WindowSimpleGlazing,
+        ComplexWindowShade,
+        ComplexWindowGap,
+        GlassEquivalentLayer,
+        ShadeEquivalentLayer,
+        DrapeEquivalentLayer,
+        BlindEquivalentLayer,
+        ScreenEquivalentLayer,
+        GapEquivalentLayer
+    };
 
     // Parameters to indicate surface roughness for use with the Material
     // derived type (see below):

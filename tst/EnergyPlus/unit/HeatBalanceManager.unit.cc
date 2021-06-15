@@ -341,9 +341,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetWindowConstructData)
     state->dataMaterial->Material(3).Name = "GLASS";
 
     // Material layer group index
-    state->dataMaterial->Material(1).Group = 3; // WindowGlass
-    state->dataMaterial->Material(2).Group = 4; // WindowGas
-    state->dataMaterial->Material(3).Group = 3; // WindowGlass
+    state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::WindowGlass;
+    state->dataMaterial->Material(2).Group = DataHeatBalance::MaterialGroup::WindowGas;
+    state->dataMaterial->Material(3).Group = DataHeatBalance::MaterialGroup::WindowGlass;
 
     state->dataHeatBal->NominalRforNominalUCalculation.allocate(1);
     state->dataHeatBal->NominalRforNominalUCalculation(1) = 0.0;

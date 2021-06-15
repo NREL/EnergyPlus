@@ -136,8 +136,6 @@ namespace LowTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataHeatBalance::Air;
-    using DataHeatBalance::RegularMaterial;
     using DataHVACGlobals::SmallLoad;
     using Psychrometrics::PsyTdpFnWPb;
 
