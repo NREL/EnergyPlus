@@ -872,7 +872,7 @@ void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
     Real64 rho;         // local fluid density
     Real64 mdot;        // lcoal fluid mass flow rate
 
-        this->oneTimeInit(state);
+    this->oneTimeInit(state);
 
     CondInletNode = this->CondReturnNodeNum;
     CondOutletNode = this->CondSupplyNodeNum;

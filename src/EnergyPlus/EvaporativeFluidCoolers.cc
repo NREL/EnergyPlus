@@ -2676,10 +2676,10 @@ namespace EvaporativeFluidCoolers {
                 if (FluidName != "WATER") {
                     ShowSevereError(state,
                                     state.dataIPShortCut->cCurrentModuleObject + " = \"" + this->Name +
-                                    R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
+                                        R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
                     ShowContinueError(state,
                                       "Currently, Fluid Type = " + FluidName +
-                                      " in CondenserLoop = " + state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).Name);
+                                          " in CondenserLoop = " + state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).Name);
                     ErrorsFound = true;
                 }
             }
@@ -2701,15 +2701,15 @@ namespace EvaporativeFluidCoolers {
                     if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate) {
                         ShowSevereError(state,
                                         "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
-                                        "\". Low speed air flow rate must be less than the high speed air flow rate.");
+                                            "\". Low speed air flow rate must be less than the high speed air flow rate.");
                         ErrorsFound = true;
                     }
                     if ((this->HighSpeedEvapFluidCoolerUA > 0.0) && (this->LowSpeedEvapFluidCoolerUA > 0.0) &&
                         (this->HighSpeedEvapFluidCoolerUA <= this->LowSpeedEvapFluidCoolerUA)) {
                         ShowSevereError(state,
                                         "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
-                                        "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at "
-                                        "high fan speed.");
+                                            "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at "
+                                            "high fan speed.");
                         ErrorsFound = true;
                     }
                 }
