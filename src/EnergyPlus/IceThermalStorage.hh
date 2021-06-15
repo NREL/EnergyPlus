@@ -151,7 +151,7 @@ namespace IceThermalStorage {
         void
         simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void oneTimeInit(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void CalcIceStorageDormant(EnergyPlusData &state);
 
