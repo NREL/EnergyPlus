@@ -6437,7 +6437,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int IOStat;                            // IO Status when calling get input subroutine
-        Array1D_string FrameDividerNames(2);   // Frame/Divider Alpha names
+        Array1D_string FrameDividerNames(3);   // Frame/Divider Alpha names
         int FrameDividerNum;                   // Counter to keep track of the frame/divider number
         int FrameDividerNumAlpha;              // Number of frame/divider alpha names being passed
         int FrameDividerNumProp;               // Number of frame/divider properties being passed
@@ -6510,6 +6510,16 @@ namespace HeatBalanceManager {
             state.dataSurface->FrameDivider(FrameDividerNum).DividerSolAbsorp = FrameDividerProps(16);
             state.dataSurface->FrameDivider(FrameDividerNum).DividerVisAbsorp = FrameDividerProps(17);
             state.dataSurface->FrameDivider(FrameDividerNum).DividerEmis = FrameDividerProps(18);
+            state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
+
+            // look up the NFRC Product Type for Assembly Calculations using the DataSurfaces::NfrcProductMap
+            auto it = DataSurfaces::NfrcProductMap.find(FrameDividerNames(3));
+            if (it != DataSurfaces::NfrcProductMap.end()) {
+                state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType = it->second;
+            } else {
+                state.dataSurface->FrameDivider(FrameDividerNum).NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
+            }
+
             state.dataSurface->FrameDivider(FrameDividerNum).OutsideRevealSolAbs = FrameDividerProps(19);
             state.dataSurface->FrameDivider(FrameDividerNum).InsideSillDepth = FrameDividerProps(20);
             state.dataSurface->FrameDivider(FrameDividerNum).InsideSillSolAbs = FrameDividerProps(21);

@@ -746,6 +746,58 @@ namespace DataSurfaces {
         }
     };
 
+    enum class NfrcProductOptions 
+    {
+        CasementDouble,
+        CasementSingle,
+        DualAction,
+        Fixed,
+        Garage,
+        Greenhouse,
+        HingedEscape,
+        HorizontalSlider,
+        Jal,
+        Pivoted,
+        ProjectingSingle,
+        ProjectingDual,
+        DoorSidelite,
+        Skylight,
+        SlidingPatioDoor,
+        CurtainWall,
+        SpandrelPanel,
+        SideHingedDoor,
+        DoorTransom,
+        TropicalAwning,
+        TubularDaylightingDevice,
+        VerticalSlider
+    };
+
+    std::unordered_map<std::string, NfrcProductOptions> const NfrcProductMap =
+    {
+        {"CASEMENTDOUBLE", NfrcProductOptions::CasementDouble},
+        {"CASEMENTSINGLE", NfrcProductOptions::CasementSingle},
+        {"DUALACTION", NfrcProductOptions::DualAction},
+        {"FIXED", NfrcProductOptions::Fixed},
+        {"GARAGE", NfrcProductOptions::Garage},
+        {"GREENHOUSE", NfrcProductOptions::Greenhouse},
+        {"HINGEDESCAPE", NfrcProductOptions::HingedEscape},
+        {"HORIZONTALSLIDER", NfrcProductOptions::HorizontalSlider},
+        {"JAL", NfrcProductOptions::Jal},
+        {"PIVOTED", NfrcProductOptions::Pivoted},
+        {"PROJECTINGSINGLE", NfrcProductOptions::ProjectingSingle},
+        {"PROJECTINGDUAL", NfrcProductOptions::ProjectingDual},
+        {"DOORSIDELITE", NfrcProductOptions::DoorSidelite},
+        {"SKYLIGHT", NfrcProductOptions::Skylight},
+        {"SLIDINGPATIODOOR", NfrcProductOptions::SlidingPatioDoor},
+        {"CURTAINWALL", NfrcProductOptions::CurtainWall},
+        {"SPANDRELPANEL", NfrcProductOptions::SpandrelPanel},
+        {"SIDEHINGEDDOOR", NfrcProductOptions::SideHingedDoor},
+        {"DOORTRANSOM", NfrcProductOptions::DoorTransom},
+        {"TROPICALAWNING", NfrcProductOptions::TropicalAwning},
+        {"TUBULARDAYLIGHTINGDEVICE", NfrcProductOptions::TubularDaylightingDevice},
+        {"VERTICALSLIDER", NfrcProductOptions::VerticalSlider}
+    };
+
     struct FrameDividerProperties
     {
         // Members
@@ -779,6 +831,7 @@ namespace DataSurfaces {
         Real64 DividerEmis;      // Thermal emissivity of divider
         int MullionOrientation;  // Horizontal or Vertical; used only for windows with two glazing systems
         //  divided by a mullion; obtained from Window5 data file.
+        NfrcProductOptions NfrcProductType; //NFRC Product Type for Assembly Calculations
         Real64 OutsideRevealSolAbs; // Solar absorptance of outside reveal
         Real64 InsideSillDepth;     // Inside sill depth (m)
         Real64 InsideReveal;        // Inside reveal (m)
@@ -791,6 +844,7 @@ namespace DataSurfaces {
               FrEdgeToCenterGlCondRatio(1.0), FrameSolAbsorp(0.0), FrameVisAbsorp(0.0), FrameEmis(0.9), DividerType(0), DividerWidth(0.0),
               HorDividers(0), VertDividers(0), DividerProjectionOut(0.0), DividerProjectionIn(0.0), DividerEdgeWidth(0.06355),
               DividerConductance(0.0), DivEdgeToCenterGlCondRatio(1.0), DividerSolAbsorp(0.0), DividerVisAbsorp(0.0), DividerEmis(0.9),
+              NfrcProductType(NfrcProductOptions::CurtainWall),
               MullionOrientation(0), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0), InsideReveal(0.0), InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
         {
         }
