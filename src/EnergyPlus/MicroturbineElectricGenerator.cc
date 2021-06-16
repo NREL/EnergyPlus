@@ -1050,7 +1050,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
 
-    this->oneTimeInit(state);  //end one time inits
+    this->oneTimeInit(state); // end one time inits
 
     if (!this->HeatRecActive) return;
 
@@ -1950,7 +1950,6 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
                                            this->HRCompNum);
 
         this->MySizeAndNodeInitFlag = false;
-
     }
 }
 
