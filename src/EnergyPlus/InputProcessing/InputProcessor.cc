@@ -542,6 +542,117 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
     return defaultFound;
 }
 
+std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as a string.
+    // If the field is not present in ep_object then return its default if there is one, or return an empty string
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    std::string value;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_string()) {
+            auto valuePair = getObjectItemValue(field_value.get<std::string>(), schema_field_obj);
+            value = valuePair.first;
+            isDefaulted = valuePair.second;
+        } else {
+            assert(false); // String value requested but field type is numeric
+        }
+    } else {
+        isDefaulted = findDefault(value, schema_field_obj);
+        if (!isDefaulted) {
+            value = "";
+        }
+    }
+    return value;
+}
+
+Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as a Real64.
+    // If the field value is a string, then assum autosize and return -99999.
+    // If the field is not present in ep_object then return its default if there is one, or return 0.0
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    Real64 value = 0.0;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_number()) {
+            if (field_value.is_number_integer()) {
+                value = field_value.get<std::int64_t>();
+            } else {
+                value = field_value.get<double>();
+            }
+        } else {
+            bool is_empty = field_value.get<std::string>().empty();
+            if (is_empty) {
+                isDefaulted = findDefault(value, schema_field_obj);
+            } else {
+                value = -99999; // autosize and autocalculate
+            }
+        }
+    } else {
+        isDefaulted = findDefault(value, schema_field_obj);
+        if (!isDefaulted) {
+            value = 0.0;
+        }
+    }
+    return value;
+}
+
+int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+{
+    // Return the value of fieldName in ep_object as an integer (rounded to nearest integer if the input value is real).
+    // If the field value is a string, then assume autosize or autocalulate and return -99999.
+    // If the field is not present in ep_object then return its default if there is one, or return 0
+
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+    bool isDefaulted = false;
+    int value = 0;
+    Real64 defaultValue = 0.0;
+    auto it = ep_object.find(fieldName);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_value.is_number()) {
+            if (field_value.is_number_integer()) {
+                value = field_value.get<std::int64_t>();
+            } else {
+                value = nint(field_value.get<double>());
+            }
+        } else {
+            bool is_empty = field_value.get<std::string>().empty();
+            if (is_empty) {
+                isDefaulted = findDefault(defaultValue, schema_field_obj);
+            } else {
+                value = -99999; // autosize and autocalculate
+            }
+        }
+    } else {
+        isDefaulted = findDefault(defaultValue, schema_field_obj);
+        if (isDefaulted) {
+            value = nint(defaultValue);
+        } else {
+            value = 0.0;
+        }
+    }
+    return value;
+}
+
+const json &InputProcessor::getObjectSchemaProps(EnergyPlusData &state, std::string const &objectWord)
+{
+    auto const &schema_properties = schema.at("properties");
+    const json &object_schema = schema_properties.at(objectWord);
+    assert(!object_schema.empty()); // If this fails, the object type does not exist in the schema
+
+    auto const &schema_obj_props = getPatternProperties(state, object_schema);
+    return schema_obj_props;
+}
+
 std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string const &field_value, json const &schema_field_obj)
 {
     std::pair<std::string, bool> output;
