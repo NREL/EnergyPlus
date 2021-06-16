@@ -784,6 +784,8 @@ namespace PlantChillers {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
 
+        static std::string const RoutineName("InitElectricChiller");
+
         this->oneTimeInit(state);
 
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -2025,8 +2027,6 @@ namespace PlantChillers {
     void ElectricChillerSpecs::oneTimeInit(EnergyPlusData &state)
     {
 
-        static std::string const RoutineName("InitElectricChiller");
-
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
@@ -2854,6 +2854,8 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+
+        static std::string const RoutineName("InitEngineDrivenChiller");
 
         this->oneTimeInit(state);
 
@@ -4084,8 +4086,6 @@ namespace PlantChillers {
     void EngineDrivenChillerSpecs::oneTimeInit(EnergyPlusData &state)
     {
 
-        static std::string const RoutineName("InitEngineDrivenChiller");
-
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
@@ -4837,6 +4837,8 @@ namespace PlantChillers {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+
+        static std::string const RoutineName("InitGTChiller");
 
         this->oneTimeInit(state);
 
@@ -6062,8 +6064,6 @@ namespace PlantChillers {
     }
     void GTChillerSpecs::oneTimeInit(EnergyPlusData &state)
     {
-        static std::string const RoutineName("InitGTChiller");
-
         // Init more variables
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
@@ -6643,6 +6643,8 @@ namespace PlantChillers {
         // Based on InitElectricChiller from Fred Buhl
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+
+        static std::string const RoutineName("InitConstCOPChiller");
 
         Real64 const TempDesCondIn(25.0); // Design condenser inlet temp. C
 
@@ -7549,8 +7551,6 @@ namespace PlantChillers {
     }
     void ConstCOPChillerSpecs::oneTimeInit(EnergyPlusData &state)
     {
-        static std::string const RoutineName("InitConstCOPChiller");
-
         // Init more variables
         if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
