@@ -43,7 +43,9 @@ set_target_properties(
 endif()
 
 if(BUILD_TESTING)
+  # Avoid creating some artifacts (ShadingController/modelDescription.xml and ShadingController/binaries inside "${PROJECT_SOURCE_DIR}/datasets/FMUs/"
+  configure_file("${PROJECT_SOURCE_DIR}/datasets/FMUs/ShadingController.fmu" "${CMAKE_CURRENT_BINARY_DIR}/ShadingController.fmu" COPYONLY)
   add_test(NAME "FMUParser"
-    COMMAND parser "--printidf" "${PROJECT_SOURCE_DIR}/datasets/FMUs/ShadingController.fmu"
+    COMMAND parser "--printidf" "${CMAKE_CURRENT_BINARY_DIR}/ShadingController.fmu"
   )
 endif()
