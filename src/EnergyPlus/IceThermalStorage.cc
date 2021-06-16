@@ -1828,7 +1828,8 @@ namespace IceThermalStorage {
         if (DeltaTif < DeltaTifMin) DeltaTif = DeltaTifMin;
         if (DeltaTof < DeltaTofMin) DeltaTof = DeltaTofMin;
 
-        CalcDetIceStorLMTDstar = (DeltaTio / std::log(DeltaTif / DeltaTof)) / Tnom;
+        if (DeltaTif == DeltaTof) CalcDetIceStorLMTDstar = 0.0; 
+        else CalcDetIceStorLMTDstar = (DeltaTio / std::log(DeltaTif / DeltaTof)) / Tnom;
 
         return CalcDetIceStorLMTDstar;
     }

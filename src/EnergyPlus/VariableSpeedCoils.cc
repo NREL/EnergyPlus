@@ -7108,9 +7108,14 @@ namespace VariableSpeedCoils {
         }
 
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QWasteHeat = QWasteHeat;
-        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondOutletTemp = 
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondInletTemp +
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource / CpSource / state.dataVariableSpeedCoils->SourceSideMassFlowRate;
+        if (state.dataVariableSpeedCoils->SourceSideMassFlowRate > 0.0)
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondOutletTemp =
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondInletTemp +
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).QSource / CpSource / state.dataVariableSpeedCoils->SourceSideMassFlowRate;
+        else
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondOutletTemp =
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondInletTemp;
+
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SourceAirMassFlowRate = state.dataVariableSpeedCoils->SourceSideMassFlowRate;
 
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondensateCollectMode ==  state.dataVariableSpeedCoils->CondensateToTank) {
