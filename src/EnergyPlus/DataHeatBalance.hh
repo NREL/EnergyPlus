@@ -333,6 +333,22 @@ namespace DataHeatBalance {
         }
     };
 
+    struct SpaceData
+    {
+        std::string Name;           // Space name
+        std::string ZoneName;       // Name of Zone which contains this space
+        int ZoneNum;                // Pointer to Zone wich contains this space
+        std::string SpaceType;      // Space type tag
+        EPVector<std::string> Tags; // Optional tags for reporting
+    };
+
+    struct SpaceListData
+    {
+        std::string Name;                          // Space List name
+        std::string::size_type MaxSpaceNameLength; // Max Name length of Spaces in the list
+        EPVector<int> Spaces;                      // Pointers to Spaces in the list
+    };
+
     struct ZoneData
     {
         // Members
@@ -2207,6 +2223,8 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::GapSupportPillar> SupportPillar;
     EPVector<DataHeatBalance::GapDeflectionState> DeflectionState;
     EPVector<DataHeatBalance::SpectralDataProperties> SpectralData;
+    EPVector<DataHeatBalance::SpaceData> Space;
+    EPVector<DataHeatBalance::SpaceListData> SpaceList;
     EPVector<DataHeatBalance::ZoneData> Zone;
     EPVector<DataHeatBalance::ZoneListData> ZoneList;
     EPVector<DataHeatBalance::ZoneGroupData> ZoneGroup;
@@ -2490,6 +2508,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->SupportPillar.deallocate();
         this->DeflectionState.deallocate();
         this->SpectralData.deallocate();
+        this->Space.deallocate();
+        this->SpaceList.deallocate();
         this->Zone.deallocate();
         this->ZoneList.deallocate();
         this->ZoneGroup.deallocate();

@@ -124,6 +124,8 @@ extension_renaming = {
     'RoofCeiling:Detailed': 'vertices',
     'Shading:Site:Detailed': 'vertices',
     'Wall:Detailed': 'vertices',
+    'Space': 'tags',
+    'SpaceList': 'spaces',
     'ZoneList': 'zones',
     'Floor:Detailed': 'vertices',
     'Shading:Building:Detailed': 'vertices',
