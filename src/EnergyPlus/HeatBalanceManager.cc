@@ -5485,7 +5485,6 @@ namespace HeatBalanceManager {
                 auto const &extensionSchemaProps = objectSchemaProps["tags"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
                     auto extensiblesArray = extensibles.value();
-                    int numExtensibles = extensiblesArray.size();
                     for (auto extensibleInstance : extensiblesArray) {
                         thisSpace.Tags.emplace_back(ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "tag"));
                     }
@@ -5522,7 +5521,6 @@ namespace HeatBalanceManager {
                 auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
                 if (extensibles != objectFields.end()) {
                     auto extensiblesArray = extensibles.value();
-                    int numExtensibles = extensiblesArray.size();
                     for (auto extensibleInstance : extensiblesArray) {
                         std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space");
                         int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->Space);
@@ -5534,7 +5532,7 @@ namespace HeatBalanceManager {
                             ErrorsFound = true;
                         }
                         // Check for duplicate spaces
-                        for (int loop = 1; loop <= thisSpaceList.Spaces.size() - 1; ++loop) {
+                        for (int loop = 1; loop <= int(thisSpaceList.Spaces.size()) - 1; ++loop) {
                             if (thisSpaceNum == thisSpaceList.Spaces(loop)) {
                                 ShowSevereError(state,
                                                 RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  Space Name " + thisSpaceName +
