@@ -479,7 +479,7 @@ namespace ICEngineElectricGenerator {
 
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
         Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
-        static std::string const RoutineName("CalcICEngineGeneratorModel");
+        static constexpr std::string_view RoutineName("CalcICEngineGeneratorModel");
 
         // Heat Recovery Fluid Mass FlowRate (kg/s)
         Real64 HeatRecMdot;
@@ -694,7 +694,7 @@ namespace ICEngineElectricGenerator {
         // The chiller sets the flow on the loop first by the input design flow rate and then
         // performs a check to verify that
 
-        static std::string const RoutineName("CalcICEngineGeneratorModel");
+        static constexpr std::string_view RoutineName("CalcICEngineGeneratorModel");
 
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HRecRatio = 1.0;
@@ -826,7 +826,7 @@ namespace ICEngineElectricGenerator {
     }
     void ICEngineGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
     {
-        static std::string const RoutineName("InitICEngineGenerators");
+        static constexpr std::string_view RoutineName("InitICEngineGenerators");
 
         bool errFlag;
 
