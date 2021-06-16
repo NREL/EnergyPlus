@@ -1504,8 +1504,7 @@ namespace HeatBalFiniteDiffManager {
             Real64 const QNetSurfFromOutside(state.dataHeatBalSurf->SurfOpaqInsFaceConductionFlux(surface_ExtBoundCond)); // filled in InteriorBCEqns
             //    QFluxOutsideToOutSurf(Surf)       = QnetSurfFromOutside
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -QNetSurfFromOutside;
-            state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) =
-                surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
+            state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
             state.dataHeatBalFiniteDiffMgr->QHeatOutFlux(Surf) = QNetSurfFromOutside;
 
         } else if (surface_ExtBoundCond <= 0) { // regular outside conditions
@@ -1662,8 +1661,7 @@ namespace HeatBalFiniteDiffManager {
 
             // Same sign convention as CTFs
             state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -QNetSurfFromOutside;
-            state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) =
-                surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
+            state.dataHeatBalSurf->SurfOpaqOutFaceCond(Surf) = surface.Area * state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf);
 
             // Report all outside BC heat fluxes
             state.dataHeatBalSurf->QdotRadOutRepPerArea(Surf) = -(hgnd * (TDT_i - Tgnd) + hrad * (-Toa_TDT_i) + hsky * (TDT_i - Tsky));
@@ -2126,7 +2124,7 @@ namespace HeatBalFiniteDiffManager {
 
                     if (construct.SourceSinkPresent && (Lay == construct.SourceAfterLayer)) {
                         state.dataHeatBalFanSys->TCondFDSourceNode(Surf) = TDT_i; // Transfer node temp to Radiant System
-                        state.dataHeatBalSurf->SurfTempSource(Surf) = TDT_i;          // Transfer node temp to DataHeatBalSurface module
+                        state.dataHeatBalSurf->SurfTempSource(Surf) = TDT_i;      // Transfer node temp to DataHeatBalSurface module
                         state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).QSource = QSSFlux;
                         state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).SourceNodeNum = i;
                     }

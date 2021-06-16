@@ -87,16 +87,16 @@ struct HeatBalSurfData : BaseGlobalStruct
     Real64 MaxSurfaceTempLimit = 200.0;            // Highest inside surface temperature allowed in Celsius
     Real64 MaxSurfaceTempLimitBeforeFatal = 500.0; // 2.5 times MaxSurfaceTempLimit
     int MinIterations = 1;                         // Minimum number of iterations for surface heat balance
-    bool InterZoneWindow = false;        // True if there is an interzone window
-    Real64 SumSurfaceHeatEmission = 0.0; // Heat emission from all surfaces
+    bool InterZoneWindow = false;                  // True if there is an interzone window
+    Real64 SumSurfaceHeatEmission = 0.0;           // Heat emission from all surfaces
 
     // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
     Array1D<Real64> SurfCTFConstInPart;  // Constant Inside Portion of the CTF calculation
     Array1D<Real64> SurfCTFConstOutPart; // Constant Outside Portion of the CTF calculation
     // This group of arrays (soon to be vectors) added to facilitate vectorizable loops in CalcHeatBalanceInsideSurf2CTFOnly
-    Array1D<Real64> SurfCTFCross0;           // Construct.CTFCross(0)
-    Array1D<Real64> SurfCTFInside0;          // Construct.CTFInside(0)
-    Array1D<Real64> SurfCTFSourceIn0;        // Construct.CTFSourceIn(0)
+    Array1D<Real64> SurfCTFCross0;       // Construct.CTFCross(0)
+    Array1D<Real64> SurfCTFInside0;      // Construct.CTFInside(0)
+    Array1D<Real64> SurfCTFSourceIn0;    // Construct.CTFSourceIn(0)
     Array1D<Real64> SurfTempOutHist;     // TH(1,1,SurfNum)
     Array1D<Real64> SurfQSourceSinkHist; // QsrcHist(SurfNum, 1)
 
@@ -107,15 +107,15 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfTempDiv;     // Divisor for heatbalance equation
     // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
     Array1D<Real64> SurfTempIn;          // Temperature of the Inside Surface for each heat transfer surface
-    Array1D<Real64> SurfTempInsOld;          // SurfTempIn from previous iteration for convergence check
+    Array1D<Real64> SurfTempInsOld;      // SurfTempIn from previous iteration for convergence check
     Array1D<Real64> SurfTempInTmp;       // Inside Surface Temperature Of Each Heat Transfer Surface
     Array1D<Real64> SurfHcExt;           // Outside Convection Coefficient
     Array1D<Real64> SurfHAirExt;         // Outside Convection Coefficient to Air
     Array1D<Real64> SurfHSkyExt;         // Outside Convection Coefficient to Sky
     Array1D<Real64> SurfHGrdExt;         // Outside Convection Coefficient to Ground
-    Array1D<Real64> SurfHConvInt;                // INSIDE CONVECTION COEFFICIENT
-    Array1D<Real64> SurfTempSource;          // Temperature at the source location for each heat transfer surface
-    Array1D<Real64> SurfTempUserLoc;         // Temperature at the user specified location for each heat transfer surface
+    Array1D<Real64> SurfHConvInt;        // INSIDE CONVECTION COEFFICIENT
+    Array1D<Real64> SurfTempSource;      // Temperature at the source location for each heat transfer surface
+    Array1D<Real64> SurfTempUserLoc;     // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> SurfTempInRep;       // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> SurfTempInMovInsRep; // Temperature of interior movable insulation on the side facing the zone
 
@@ -220,8 +220,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array2D<Real64> TuserHistM; // Master temperature history at the user specified location (SurfNum,Term)
     Array2D<Real64> QsrcHistM;  // Master heat source/sink history for the surface (SurfNum,Term)
 
-    Array2D<Real64> ZoneFractDifShortZtoZ;   // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
-    Array1D_bool ZoneRecDifShortFromZ;       // True if Zone gets short radiation from another
+    Array2D<Real64> ZoneFractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
+    Array1D_bool ZoneRecDifShortFromZ;     // True if Zone gets short radiation from another
 
     // Surface Heat Balance
     Array1D<bool> SurfMovInsulExtPresent;       // True when interior movable insulation is present

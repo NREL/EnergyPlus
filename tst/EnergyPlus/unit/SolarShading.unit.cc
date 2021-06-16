@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataHeatBal->SurfSunlitFracWithoutReveal.allocate(24, NumTimeSteps, state->dataSurface->TotSurfaces);
     state->dataSolarShading->SurfSunCosTheta.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->SurfCosIncAngHR.allocate(24, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SurfCosIncAng.allocate(24, NumTimeSteps,  state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfCosIncAng.allocate(24, NumTimeSteps, state->dataSurface->TotSurfaces);
     state->dataSurface->SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->SurfWinBackSurfaces.allocate(24, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
     state->dataHeatBal->SurfWinOverlapAreas.allocate(24, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);

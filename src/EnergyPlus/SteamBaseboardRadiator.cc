@@ -1639,8 +1639,7 @@ namespace SteamBaseboardRadiator {
                     !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                  state.dataSurface->SurfWinDividerTempIn(SurfNum);
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
                 }
             }
 

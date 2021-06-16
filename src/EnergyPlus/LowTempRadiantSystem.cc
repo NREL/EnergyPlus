@@ -6119,8 +6119,7 @@ namespace LowTempRadiantSystem {
                     !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) *
-                                  state.dataSurface->SurfWinDividerTempIn(surfNum);
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) * state.dataSurface->SurfWinDividerTempIn(surfNum);
                 }
             }
 

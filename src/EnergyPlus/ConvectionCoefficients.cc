@@ -2556,7 +2556,8 @@ void CalcASHRAESimpleIntConvCoeff(EnergyPlusData &state,
             return CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, cosTilt);
         };
     } else {
-        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = CalcASHRAESimpleIntConvCoeff(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
+            CalcASHRAESimpleIntConvCoeff(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
     }
 
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)

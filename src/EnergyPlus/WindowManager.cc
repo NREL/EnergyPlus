@@ -2892,7 +2892,8 @@ namespace WindowManager {
                                             ConstrNum);
             if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                 state.dataSurface->SurfWinInsideFrameCondensationFlag(SurfNum) = 0;
-                if (state.dataSurface->SurfWinFramerTempIn(SurfNum) < RoomDewPoint) state.dataSurface->SurfWinInsideFrameCondensationFlag(SurfNum) = 1;
+                if (state.dataSurface->SurfWinFramerTempIn(SurfNum) < RoomDewPoint)
+                    state.dataSurface->SurfWinInsideFrameCondensationFlag(SurfNum) = 1;
             }
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
                 state.dataSurface->SurfWinInsideDividerCondensationFlag(SurfNum) = 0;
@@ -6270,8 +6271,7 @@ namespace WindowManager {
             Efac = FrameCon / (HInRad + FrameCon + HInConvFr);
             state.dataSurface->SurfWinFramerTempIn(SurfNum) = (Dfac + Efac * Afac) / (1.0 - Efac * Bfac) - state.dataWindowManager->TKelvin;
             state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) =
-                Afac + Bfac * (state.dataSurface->SurfWinFramerTempIn(SurfNum) + state.dataWindowManager->TKelvin) -
-                state.dataWindowManager->TKelvin;
+                Afac + Bfac * (state.dataSurface->SurfWinFramerTempIn(SurfNum) + state.dataWindowManager->TKelvin) - state.dataWindowManager->TKelvin;
             // Heat gain to zone from frame
 
             FrameHeatTransfer = state.dataSurface->SurfWinFrameArea(SurfNum) * FrameCon *

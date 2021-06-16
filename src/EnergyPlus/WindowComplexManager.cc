@@ -2887,7 +2887,7 @@ namespace WindowComplexManager {
             }
 
             hin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
-            ibc(2) = 0;                                // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
+            ibc(2) = 0; // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
 
             // hcout=HextConvCoeff  ! Exterior convection coefficient is passed in from outer routine
             hout = HextConvCoeff; // Exterior convection coefficient is passed in from outer routine

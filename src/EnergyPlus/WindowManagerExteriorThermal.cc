@@ -195,8 +195,8 @@ namespace WindowManager {
                 ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) *
                 (state.dataWindowManager->sigma * pow(state.dataWindowManager->thetas(state.dataWindowManager->nglface), 4) - rmir);
             auto tind = surface.getInsideAirTemperature(state, SurfNum) + DataGlobalConstants::KelvinConv;
-            auto ConvHeatGainFrZoneSideOfShade =
-                ShadeArea * state.dataHeatBalSurf->SurfHConvInt(SurfNum) * (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
+            auto ConvHeatGainFrZoneSideOfShade = ShadeArea * state.dataHeatBalSurf->SurfHConvInt(SurfNum) *
+                                                 (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep) - tind);
             state.dataSurface->SurfWinHeatGain(SurfNum) =
                 state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
             state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);

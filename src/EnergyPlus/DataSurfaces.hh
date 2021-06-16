@@ -1202,10 +1202,10 @@ struct SurfacesData : BaseGlobalStruct
     bool AnyMovableInsulation = false;            // True if any movable insulation presents
     bool AnyMovableSlat = false;                  // True if there are any movable slats for window blinds presented
 
-    Array1D_int SurfAdjacentZone;            // Array of adjacent zones to each surface
-    Array1D<Real64> X0;                           // X-component of translation vector
-    Array1D<Real64> Y0;                           // Y-component of translation vector
-    Array1D<Real64> Z0;                           // Z-component of translation vector
+    Array1D_int SurfAdjacentZone; // Array of adjacent zones to each surface
+    Array1D<Real64> X0;           // X-component of translation vector
+    Array1D<Real64> Y0;           // Y-component of translation vector
+    Array1D<Real64> Z0;           // Z-component of translation vector
 
     std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
@@ -1323,9 +1323,9 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIntConvSurfHasActiveInIt;
 
     // Surface Window Heat Balance
-    Array1D_int SurfWinInsideGlassCondensationFlag;      // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
-    Array1D_int SurfWinInsideFrameCondensationFlag;      // 1 if frame inside surface temp < zone air dew point; 0 otherwise
-    Array1D_int SurfWinInsideDividerCondensationFlag;    // 1 if divider inside surface temp < zone air dew point;  0 otherwise
+    Array1D_int SurfWinInsideGlassCondensationFlag;   // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
+    Array1D_int SurfWinInsideFrameCondensationFlag;   // 1 if frame inside surface temp < zone air dew point; 0 otherwise
+    Array1D_int SurfWinInsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;  0 otherwise
 
     Array2D<Real64> SurfWinA;            // Time step value of factor for beam absorbed in window glass layers
     Array2D<Real64> SurfWinADiffFront;   // Time step value of factor for diffuse absorbed in window layers
@@ -1458,8 +1458,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio;  // Ratio of frame edge of glass conductance (without air films) to center of glass conductance
                                                        // (without air films)
     Array1D<Real64> SurfWinFrameEdgeArea;              // Area of glass near frame (m2)
-    Array1D<Real64> SurfWinFramerTempIn;            // Frame inside surface temperature (C)
-    Array1D<Real64> SurfWinFramerTempInOld;         // Previous value of frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFramerTempIn;               // Frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFramerTempInOld;            // Previous value of frame inside surface temperature (C)
     Array1D<Real64> SurfWinFrameTempSurfOut;           // Frame outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrFrOut;              // Correction factor to absorbed radiation due to frame outside projection
     Array1D<Real64> SurfWinProjCorrFrIn;               // Correction factor to absorbed radiation due to frame inside projection
@@ -1472,8 +1472,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinDivEdgeToCenterGlCondRatio; // Ratio of divider edge of glass conductance (without air films) to center of glass
                                                        // conductance (without air films)
     Array1D<Real64> SurfWinDividerEdgeArea;            // Area of glass near dividers (m2)
-    Array1D<Real64> SurfWinDividerTempIn;          // Divider inside surface temperature (C)
-    Array1D<Real64> SurfWinDividerTempInOld;       // Previous value of divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempIn;              // Divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempInOld;           // Previous value of divider inside surface temperature (C)
     Array1D<Real64> SurfWinDividerTempSurfOut;         // Divider outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrDivOut;             // Correction factor to absorbed radiation due to divider outside projection
     Array1D<Real64> SurfWinProjCorrDivIn;              // Correction factor to absorbed radiation due to divider inside projection
