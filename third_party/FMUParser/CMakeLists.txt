@@ -41,3 +41,9 @@ set_target_properties(
   INSTALL_NAME_DIR "@executable_path"
 )
 endif()
+
+if(BUILD_TESTING)
+  add_test(NAME "FMUParser"
+    COMMAND parser "--printidf" "${PROJECT_SOURCE_DIR}/datasets/FMUs/ShadingController.fmu"
+  )
+endif()
