@@ -284,7 +284,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        1,
+                                                                        NodeInputManager::compFluidStream::Primary,
                                                                         ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
@@ -301,7 +301,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         1,
+                                                                         NodeInputManager::compFluidStream::Primary,
                                                                          ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
@@ -439,7 +439,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        1,
+                                                                        NodeInputManager::compFluidStream::Primary,
                                                                         ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
@@ -456,7 +456,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         1,
+                                                                         NodeInputManager::compFluidStream::Primary,
                                                                          ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));
@@ -483,7 +483,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Air,
                                                                           DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                                                          1,
+                                                                          NodeInputManager::compFluidStream::Primary,
                                                                           ObjectIsNotParent);
         if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
             if (!CheckOutAirNodeNumber(state, state.dataPipeHT->PipeHT(Item).EnvrAirNodeNum)) {
@@ -576,7 +576,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                         DataLoopNode::NodeFluidType::Water,
                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                        1,
+                                                                        NodeInputManager::compFluidStream::Primary,
                                                                         ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).InletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '=' + state.dataIPShortCut->cAlphaArgs(3));
@@ -593,7 +593,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                         1,
+                                                                         NodeInputManager::compFluidStream::Primary,
                                                                          ObjectIsNotParent);
         if (state.dataPipeHT->PipeHT(Item).OutletNodeNum == 0) {
             ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '=' + state.dataIPShortCut->cAlphaArgs(4));

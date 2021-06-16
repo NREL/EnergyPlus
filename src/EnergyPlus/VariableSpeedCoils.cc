@@ -393,7 +393,7 @@ namespace VariableSpeedCoils {
                                                                                                         AlphArray(1),
                                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                        2,
+                                                                                                        NodeInputManager::compFluidStream::Secondary,
                                                                                                         ObjectIsNotParent);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
                                                                                                          AlphArray(3),
@@ -402,7 +402,7 @@ namespace VariableSpeedCoils {
                                                                                                          AlphArray(1),
                                                                                                          DataLoopNode::NodeFluidType::Water,
                                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                         2,
+                                                                                                         NodeInputManager::compFluidStream::Secondary,
                                                                                                          ObjectIsNotParent);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                                       AlphArray(4),
@@ -411,7 +411,7 @@ namespace VariableSpeedCoils {
                                                                                                       AlphArray(1),
                                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                      1,
+                                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                                       ObjectIsNotParent);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                                        AlphArray(5),
@@ -420,7 +420,7 @@ namespace VariableSpeedCoils {
                                                                                                        AlphArray(1),
                                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                       1,
+                                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                                        ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
@@ -906,7 +906,7 @@ namespace VariableSpeedCoils {
                                                                                                       AlphArray(1),
                                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                      1,
+                                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                                       ObjectIsNotParent);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                                        AlphArray(3),
@@ -915,7 +915,7 @@ namespace VariableSpeedCoils {
                                                                                                        AlphArray(1),
                                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                       1,
+                                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                                        ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Air Nodes");
@@ -980,7 +980,7 @@ namespace VariableSpeedCoils {
                                       state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
 
                 if (!CheckOutAirNodeNumber(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserInletNodeNum)) {
@@ -1400,7 +1400,7 @@ namespace VariableSpeedCoils {
                                                                                                         AlphArray(1),
                                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                        2,
+                                                                                                        NodeInputManager::compFluidStream::Secondary,
                                                                                                         ObjectIsNotParent);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
                                                                                                          AlphArray(3),
@@ -1409,7 +1409,7 @@ namespace VariableSpeedCoils {
                                                                                                          AlphArray(1),
                                                                                                          DataLoopNode::NodeFluidType::Water,
                                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                         2,
+                                                                                                         NodeInputManager::compFluidStream::Secondary,
                                                                                                          ObjectIsNotParent);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                                       AlphArray(4),
@@ -1418,7 +1418,7 @@ namespace VariableSpeedCoils {
                                                                                                       AlphArray(1),
                                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                      1,
+                                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                                       ObjectIsNotParent);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                                        AlphArray(5),
@@ -1427,7 +1427,7 @@ namespace VariableSpeedCoils {
                                                                                                        AlphArray(1),
                                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                       1,
+                                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                                        ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Water Nodes");
@@ -1882,7 +1882,7 @@ namespace VariableSpeedCoils {
                                                                                                       AlphArray(1),
                                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                      1,
+                                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                                       ObjectIsNotParent);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                                        AlphArray(3),
@@ -1891,7 +1891,7 @@ namespace VariableSpeedCoils {
                                                                                                        AlphArray(1),
                                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                       1,
+                                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                                        ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Air Nodes");
@@ -2431,7 +2431,7 @@ namespace VariableSpeedCoils {
                                                                                                       AlphArray(1),
                                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                                       DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                      1,
+                                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                                       ObjectIsNotParent);
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
@@ -2441,7 +2441,7 @@ namespace VariableSpeedCoils {
                                                                                                        AlphArray(1),
                                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                       1,
+                                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                                        ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(5), AlphArray(6), "Air Nodes");
@@ -2458,7 +2458,7 @@ namespace VariableSpeedCoils {
                                                                                                         AlphArray(1),
                                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                        2,
+                                                                                                        NodeInputManager::compFluidStream::Secondary,
                                                                                                         ObjectIsNotParent);
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterOutletNodeNum = GetOnlySingleNode(state,
@@ -2468,7 +2468,7 @@ namespace VariableSpeedCoils {
                                                                                                          AlphArray(1),
                                                                                                          DataLoopNode::NodeFluidType::Water,
                                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                         2,
+                                                                                                         NodeInputManager::compFluidStream::Secondary,
                                                                                                          ObjectIsNotParent);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(7), AlphArray(8), "Water Nodes");

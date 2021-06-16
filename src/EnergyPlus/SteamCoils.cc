@@ -307,7 +307,7 @@ namespace SteamCoils {
                                                                                            AlphArray(1),
                                                                                            DataLoopNode::NodeFluidType::Steam,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           2,
+                                                                                           NodeInputManager::compFluidStream::Secondary,
                                                                                            ObjectIsNotParent);
             state.dataSteamCoils->SteamCoil(CoilNum).SteamOutletNodeNum = GetOnlySingleNode(state,
                                                                                             AlphArray(4),
@@ -316,7 +316,7 @@ namespace SteamCoils {
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Steam,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            2,
+                                                                                            NodeInputManager::compFluidStream::Secondary,
                                                                                             ObjectIsNotParent);
             state.dataSteamCoils->SteamCoil(CoilNum).AirInletNodeNum = GetOnlySingleNode(state,
                                                                                          AlphArray(5),
@@ -325,7 +325,7 @@ namespace SteamCoils {
                                                                                          AlphArray(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                                         1,
+                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                          ObjectIsNotParent);
             state.dataSteamCoils->SteamCoil(CoilNum).AirOutletNodeNum = GetOnlySingleNode(state,
                                                                                           AlphArray(6),
@@ -334,7 +334,7 @@ namespace SteamCoils {
                                                                                           AlphArray(1),
                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                                          1,
+                                                                                          NodeInputManager::compFluidStream::Primary,
                                                                                           ObjectIsNotParent);
 
             {
@@ -349,7 +349,7 @@ namespace SteamCoils {
                                                                                                      AlphArray(1),
                                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                                      DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                     1,
+                                                                                                     NodeInputManager::compFluidStream::Primary,
                                                                                                      ObjectIsNotParent);
                     if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
                         ShowSevereError(state, std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));

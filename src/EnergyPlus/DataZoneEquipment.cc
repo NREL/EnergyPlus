@@ -313,7 +313,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType::ZoneNode,
-                                                                                             1,
+                                                                                             NodeInputManager::compFluidStream::Primary,
                                                                                              ObjectIsNotParent); // all zone air state variables are
         if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == 0) {
             ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\", invalid");
@@ -677,7 +677,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::ZoneInlet,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -729,7 +729,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::ZoneExhaust,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -769,7 +769,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::ZoneReturn,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -818,7 +818,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     "ZoneHVAC:EquipmentConnections",
                     state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName,
                     DataLoopNode::NodeConnectionType::Sensor,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsNotParent);
 
         if (!NodeListError) {
@@ -922,7 +922,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                      AlphArray(1),
                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                      DataLoopNode::NodeConnectionType::Inlet,
-                                                                                     1,
+                                                                                     NodeInputManager::compFluidStream::Primary,
                                                                                      ObjectIsParent);
 
         state.dataZoneEquip->SupplyAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents);
@@ -995,7 +995,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                                       AlphArray(1),
                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType::Outlet,
-                                                                                      1,
+                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                       ObjectIsParent);
 
         state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);

@@ -448,7 +448,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -461,7 +461,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -726,7 +726,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    2,
+                                                    NodeInputManager::compFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 
@@ -749,7 +749,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    2,
+                                                    NodeInputManager::compFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
         }
 

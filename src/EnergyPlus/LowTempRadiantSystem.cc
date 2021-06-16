@@ -743,7 +743,7 @@ namespace LowTempRadiantSystem {
                                                           Alphas(1),
                                                           DataLoopNode::NodeFluidType::Water,
                                                           DataLoopNode::NodeConnectionType::Inlet,
-                                                          1,
+                                                          NodeInputManager::compFluidStream::Primary,
                                                           ObjectIsNotParent);
 
             thisRadSys.HotWaterOutNode = GetOnlySingleNode(state,
@@ -753,7 +753,7 @@ namespace LowTempRadiantSystem {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Outlet,
-                                                           1,
+                                                           NodeInputManager::compFluidStream::Primary,
                                                            ObjectIsNotParent);
 
             if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
@@ -803,7 +803,7 @@ namespace LowTempRadiantSystem {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           2,
+                                                           NodeInputManager::compFluidStream::Secondary,
                                                            ObjectIsNotParent);
 
             thisRadSys.ColdWaterOutNode = GetOnlySingleNode(state,
@@ -813,7 +813,7 @@ namespace LowTempRadiantSystem {
                                                             Alphas(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            2,
+                                                            NodeInputManager::compFluidStream::Secondary,
                                                             ObjectIsNotParent);
 
             if ((!lAlphaBlanks(8)) || (!lAlphaBlanks(9))) {
@@ -821,11 +821,11 @@ namespace LowTempRadiantSystem {
             }
 
             if (UtilityRoutines::SameString(Alphas(10), OnePerSurf)) {
-                thisRadSys.NumCircCalcMethod = OneCircuit;
+                thisRadSys.NumCircCalcMethod = CircuitCalc::OneCircuit;
             } else if (UtilityRoutines::SameString(Alphas(10), CalcFromLength)) {
-                thisRadSys.NumCircCalcMethod = CalculateFromLength;
+                thisRadSys.NumCircCalcMethod = CircuitCalc::CalculateFromLength;
             } else {
-                thisRadSys.NumCircCalcMethod = OneCircuit;
+                thisRadSys.NumCircCalcMethod = CircuitCalc::OneCircuit;
             }
 
             thisRadSys.schedPtrChangeoverDelay = variableFlowDesignDataObject.schedPtrChangeoverDelay;
@@ -1028,7 +1028,7 @@ namespace LowTempRadiantSystem {
                                                            Alphas(1),
                                                            DataLoopNode::NodeFluidType::Water,
                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                           1,
+                                                           NodeInputManager::compFluidStream::Primary,
                                                            ObjectIsNotParent);
 
             thisCFloSys.HotWaterOutNode = GetOnlySingleNode(state,
@@ -1038,7 +1038,7 @@ namespace LowTempRadiantSystem {
                                                             Alphas(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            1,
+                                                            NodeInputManager::compFluidStream::Primary,
                                                             ObjectIsNotParent);
 
             if ((!lAlphaBlanks(7)) || (!lAlphaBlanks(8))) {
@@ -1085,7 +1085,7 @@ namespace LowTempRadiantSystem {
                                                             Alphas(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                            2,
+                                                            NodeInputManager::compFluidStream::Secondary,
                                                             ObjectIsNotParent);
 
             thisCFloSys.ColdWaterOutNode = GetOnlySingleNode(state,
@@ -1095,7 +1095,7 @@ namespace LowTempRadiantSystem {
                                                              Alphas(1),
                                                              DataLoopNode::NodeFluidType::Water,
                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                             2,
+                                                             NodeInputManager::compFluidStream::Secondary,
                                                              ObjectIsNotParent);
 
             if ((!lAlphaBlanks(13)) || (!lAlphaBlanks(14))) {
@@ -1135,11 +1135,11 @@ namespace LowTempRadiantSystem {
             }
 
             if (UtilityRoutines::SameString(Alphas(19), OnePerSurf)) {
-                thisCFloSys.NumCircCalcMethod = OneCircuit;
+                thisCFloSys.NumCircCalcMethod = CircuitCalc::OneCircuit;
             } else if (UtilityRoutines::SameString(Alphas(19), CalcFromLength)) {
-                thisCFloSys.NumCircCalcMethod = CalculateFromLength;
+                thisCFloSys.NumCircCalcMethod = CircuitCalc::CalculateFromLength;
             } else {
-                thisCFloSys.NumCircCalcMethod = OneCircuit;
+                thisCFloSys.NumCircCalcMethod = CircuitCalc::OneCircuit;
             }
 
             thisCFloSys.schedPtrChangeoverDelay = ConstantFlowRadDesignDataObject.schedPtrChangeoverDelay;
@@ -3260,7 +3260,7 @@ namespace LowTempRadiantSystem {
             }
 
             for (SurfNum = 1; SurfNum <= state.dataLowTempRadSys->HydrRadSys(RadSysNum).NumOfSurfaces; ++SurfNum) {
-                if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).NumCircCalcMethod == CalculateFromLength) {
+                if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).NumCircCalcMethod == CircuitCalc::CalculateFromLength) {
                     state.dataLowTempRadSys->HydrRadSys(RadSysNum).NumCircuits(SurfNum) =
                         (state.dataLowTempRadSys->HydrRadSys(RadSysNum).SurfaceFrac(SurfNum) *
                          state.dataLowTempRadSys->HydrRadSys(RadSysNum).TubeLength) /
@@ -3485,7 +3485,7 @@ namespace LowTempRadiantSystem {
             }
 
             for (SurfNum = 1; SurfNum <= state.dataLowTempRadSys->CFloRadSys(RadSysNum).NumOfSurfaces; ++SurfNum) {
-                if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).NumCircCalcMethod == CalculateFromLength) {
+                if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).NumCircCalcMethod == CircuitCalc::CalculateFromLength) {
                     state.dataLowTempRadSys->CFloRadSys(RadSysNum).NumCircuits(SurfNum) =
                         (state.dataLowTempRadSys->CFloRadSys(RadSysNum).SurfaceFrac(SurfNum) *
                          state.dataLowTempRadSys->CFloRadSys(RadSysNum).TubeLength) /

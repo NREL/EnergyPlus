@@ -287,7 +287,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           1,
+                                                                           NodeInputManager::compFluidStream::Primary,
                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.EvapOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(3),
@@ -296,7 +296,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            1,
+                                                                            NodeInputManager::compFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -312,7 +312,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                                            state.dataIPShortCut->cAlphaArgs(1),
                                                                            DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                           2,
+                                                                           NodeInputManager::compFluidStream::Secondary,
                                                                            DataLoopNode::ObjectIsNotParent);
         thisChiller.CondOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(5),
@@ -321,7 +321,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                                             DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                            2,
+                                                                            NodeInputManager::compFluidStream::Secondary,
                                                                             DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -383,7 +383,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                        3,
+                                                                                        NodeInputManager::compFluidStream::Tertiary,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                          state.dataIPShortCut->cAlphaArgs(10),
@@ -392,7 +392,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Water,
                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                         3,
+                                                                                         NodeInputManager::compFluidStream::Tertiary,
                                                                                          DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,
@@ -409,7 +409,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                                                         DataLoopNode::NodeFluidType::Steam,
                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                        3,
+                                                                                        NodeInputManager::compFluidStream::Tertiary,
                                                                                         DataLoopNode::ObjectIsNotParent);
                 thisChiller.GeneratorOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                          state.dataIPShortCut->cAlphaArgs(10),
@@ -418,7 +418,7 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                                          DataLoopNode::NodeFluidType::Steam,
                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                         3,
+                                                                                         NodeInputManager::compFluidStream::Tertiary,
                                                                                          DataLoopNode::ObjectIsNotParent);
                 BranchNodeConnections::TestCompSet(state,
                                                    state.dataIPShortCut->cCurrentModuleObject,

@@ -690,7 +690,7 @@ namespace BranchInputManager {
                                        "Connector:Mixer",
                                        MixerName,
                                        DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
-                                       1,
+                                       NodeInputManager::compFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
 
@@ -722,7 +722,7 @@ namespace BranchInputManager {
                                                "Connector:Mixer",
                                                MixerName,
                                                DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
-                                               1,
+                                               NodeInputManager::compFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);
                     }
@@ -848,7 +848,7 @@ namespace BranchInputManager {
                                        "Connector:Splitter",
                                        SplitterName,
                                        DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Inlet),
-                                       1,
+                                       NodeInputManager::compFluidStream::Primary,
                                        ObjectIsNotParent,
                                        errFlag);
 
@@ -881,7 +881,7 @@ namespace BranchInputManager {
                                                "Connector:Splitter",
                                                SplitterName,
                                                DataLoopNode::ValidConnectionTypes(DataLoopNode::NodeConnectionType::Outlet),
-                                               1,
+                                               NodeInputManager::compFluidStream::Primary,
                                                ObjectIsNotParent,
                                                errFlag);
                     }
@@ -1183,7 +1183,7 @@ namespace BranchInputManager {
                             CurrentModuleObject,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
-                            1,
+                            NodeInputManager::compFluidStream::Primary,
                             ObjectIsParent,
                             _,
                             cAlphaFields(Loop + 2));
@@ -1225,7 +1225,7 @@ namespace BranchInputManager {
                             CurrentModuleObject,
                             state.dataBranchInputManager->Branch(BCount).Name,
                             ConnectionType,
-                            1,
+                            NodeInputManager::compFluidStream::Primary,
                             ObjectIsParent,
                             _,
                             cAlphaFields(Loop + 3));

@@ -428,7 +428,7 @@ namespace UnitVentilator {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsParent);
             state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode = GetOnlySingleNode(state,
                                                                                             Alphas(7),
@@ -437,7 +437,7 @@ namespace UnitVentilator {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            1,
+                                                                                            NodeInputManager::compFluidStream::Primary,
                                                                                             ObjectIsParent);
 
             // Get AirTerminal mixer data
@@ -463,7 +463,7 @@ namespace UnitVentilator {
                                                                                                Alphas(1),
                                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                                               1,
+                                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             }
 
@@ -611,7 +611,7 @@ namespace UnitVentilator {
                                       Alphas(1),
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 if (!lAlphaBlanks(8)) {
                     CheckAndAddAirNodeNumber(state, state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode, IsValid);
@@ -627,7 +627,7 @@ namespace UnitVentilator {
                                                                                                    Alphas(1),
                                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                                    DataLoopNode::NodeConnectionType::ReliefAir,
-                                                                                                   1,
+                                                                                                   NodeInputManager::compFluidStream::Primary,
                                                                                                    ObjectIsNotParent);
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerOutNode = GetOnlySingleNode(state,
@@ -637,7 +637,7 @@ namespace UnitVentilator {
                                                                                                     Alphas(1),
                                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                    1,
+                                                                                                    NodeInputManager::compFluidStream::Primary,
                                                                                                     ObjectIsNotParent);
             } else {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode;

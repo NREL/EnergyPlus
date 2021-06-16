@@ -171,7 +171,7 @@ namespace GeneratorFuelSupply {
                                                                                         AlphArray(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Sensor,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         ObjectIsNotParent);
 
                 state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));

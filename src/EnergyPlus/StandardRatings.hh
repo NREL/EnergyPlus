@@ -89,12 +89,20 @@ namespace StandardRatings {
     extern Real64 const OADBTempLowReducedCapacityTest; // Outdoor air dry-bulb temp in degrees C (65F)
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
+    // Defrost strategy (heat pump only)
+    enum class DefrostStrat
+    {
+        Unassigned = -1,
+        ReverseCycle, // uses reverse cycle defrost strategy
+        Resistive     // uses electric resistance heater for defrost
+    };
+
     // Defrost control  (heat pump only)
     enum class HPdefrostControl : int
     {
         Unassigned = -1,
-        Timed = 0,   // defrost cycle is timed
-        OnDemand = 1 // defrost cycle occurs only when required
+        Timed,   // defrost cycle is timed
+        OnDemand // defrost cycle occurs only when required
     };
 
     extern Array1D_int const TotalNumOfTemperatureBins; // Total number of temperature

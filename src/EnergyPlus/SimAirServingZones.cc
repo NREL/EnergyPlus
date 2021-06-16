@@ -489,7 +489,7 @@ void GetAirPathData(EnergyPlusData &state)
                                                                                  Alphas(1),
                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                 1,
+                                                                                 NodeInputManager::compFluidStream::Primary,
                                                                                  ObjectIsParent);
         if (!lAlphaBlanks(7)) {
             AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(state,
@@ -499,7 +499,7 @@ void GetAirPathData(EnergyPlusData &state)
                                                                                        Alphas(1),
                                                                                        DataLoopNode::NodeFluidType::Air,
                                                                                        DataLoopNode::NodeConnectionType::Outlet,
-                                                                                       1,
+                                                                                       NodeInputManager::compFluidStream::Primary,
                                                                                        ObjectIsParent);
         } else {
             // If no return path, set this to zero to trigger special handling when calling UpdateHVACInterface
@@ -608,7 +608,7 @@ void GetAirPathData(EnergyPlusData &state)
                     CurrentModuleObject,
                     PrimaryAirSystems(AirSysNum).Name,
                     DataLoopNode::NodeConnectionType::Inlet,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsParent,
                     _,
                     cAlphaFields(8));
@@ -648,7 +648,7 @@ void GetAirPathData(EnergyPlusData &state)
                     CurrentModuleObject,
                     PrimaryAirSystems(AirSysNum).Name,
                     DataLoopNode::NodeConnectionType::Outlet,
-                    1,
+                    NodeInputManager::compFluidStream::Primary,
                     ObjectIsParent,
                     _,
                     cAlphaFields(9));

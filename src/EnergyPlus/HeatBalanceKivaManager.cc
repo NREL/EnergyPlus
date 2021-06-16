@@ -443,7 +443,7 @@ KivaManager::~KivaManager()
 void KivaManager::readWeatherData(EnergyPlusData &state)
 {
     // Below from OpenEPlusWeatherFile
-    auto kivaWeatherFile = state.files.inputWeatherFileName.open(state, "KivaManager::readWeatherFile");
+    auto kivaWeatherFile = state.files.inputWeatherFilePath.open(state, "KivaManager::readWeatherFile");
 
     // Read in Header Information
     static Array1D_string const Header(8,

@@ -368,7 +368,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                                                                                       state.dataIPShortCut->cAlphaArgs(1),
                                                                                                       DataLoopNode::NodeFluidType::Air,
                                                                                                       DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                      1,
+                                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                                       ObjectIsNotParent);
 
         ZoneIndexTrial =
@@ -393,7 +393,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                    1,
+                                                                                                    NodeInputManager::compFluidStream::Primary,
                                                                                                     ObjectIsNotParent);
         state.dataPackagedThermalStorageCoil->TESCoil(item).EvapAirOutletNodeNum = GetOnlySingleNode(state,
                                                                                                      state.dataIPShortCut->cAlphaArgs(9),
@@ -402,7 +402,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                                      DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                     1,
+                                                                                                     NodeInputManager::compFluidStream::Primary,
                                                                                                      ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -1628,7 +1628,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                               state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::OutsideAirReference,
-                              1,
+                              NodeInputManager::compFluidStream::Primary,
                               ObjectIsNotParent);
         state.dataPackagedThermalStorageCoil->TESCoil(item).CondAirOutletNodeNum =
             GetOnlySingleNode(state,
@@ -1638,7 +1638,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                               state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
                               DataLoopNode::NodeFluidType::Air,
                               DataLoopNode::NodeConnectionType::ReliefAir,
-                              1,
+                              NodeInputManager::compFluidStream::Primary,
                               ObjectIsNotParent);
 
         state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserAirVolumeFlow = state.dataIPShortCut->rNumericArgs(34);
@@ -1712,7 +1712,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                                                          DataLoopNode::NodeFluidType::Water,
                                                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                         2,
+                                                                                                         NodeInputManager::compFluidStream::Secondary,
                                                                                                          ObjectIsNotParent);
 
             state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantConnectionAvailable = true;
@@ -1720,15 +1720,16 @@ void GetTESCoilInput(EnergyPlusData &state)
             state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantConnectionAvailable = false;
         }
         if (!state.dataIPShortCut->lAlphaFieldBlanks(63)) {
-            state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantOutletNodeNum = GetOnlySingleNode(state,
-                                                                                                          state.dataIPShortCut->cAlphaArgs(63),
-                                                                                                          ErrorsFound,
-                                                                                                          cCurrentModuleObject,
-                                                                                                          state.dataIPShortCut->cAlphaArgs(1),
-                                                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                          2,
-                                                                                                          ObjectIsNotParent);
+            state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantOutletNodeNum =
+                GetOnlySingleNode(state,
+                                  state.dataIPShortCut->cAlphaArgs(63),
+                                  ErrorsFound,
+                                  cCurrentModuleObject,
+                                  state.dataIPShortCut->cAlphaArgs(1),
+                                  DataLoopNode::NodeFluidType::Water,
+                                  DataLoopNode::NodeConnectionType::Outlet,
+                                  NodeInputManager::compFluidStream::Secondary,
+                                  ObjectIsNotParent);
         } else {
             if (state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantConnectionAvailable) {
                 ShowSevereError(

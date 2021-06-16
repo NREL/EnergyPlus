@@ -316,7 +316,7 @@ namespace Humidifiers {
                                                              Alphas(1),
                                                              DataLoopNode::NodeFluidType::Air,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             1,
+                                                             NodeInputManager::compFluidStream::Primary,
                                                              ObjectIsNotParent);
             Humidifier(HumNum).AirOutNode = GetOnlySingleNode(state,
                                                               Alphas(4),
@@ -325,7 +325,7 @@ namespace Humidifiers {
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              1,
+                                                              NodeInputManager::compFluidStream::Primary,
                                                               ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -387,7 +387,7 @@ namespace Humidifiers {
                                                              Alphas(1),
                                                              DataLoopNode::NodeFluidType::Air,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             1,
+                                                             NodeInputManager::compFluidStream::Primary,
                                                              ObjectIsNotParent);
             Humidifier(HumNum).AirOutNode = GetOnlySingleNode(state,
                                                               Alphas(5),
@@ -396,7 +396,7 @@ namespace Humidifiers {
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              1,
+                                                              NodeInputManager::compFluidStream::Primary,
                                                               ObjectIsNotParent);
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
 

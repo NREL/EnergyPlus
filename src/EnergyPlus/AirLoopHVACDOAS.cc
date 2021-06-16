@@ -167,7 +167,7 @@ namespace AirLoopHVACDOAS {
                                                                               thisObjectName,
                                                                               DataLoopNode::NodeFluidType::Air,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              1,
+                                                                              NodeInputManager::compFluidStream::Primary,
                                                                               DataLoopNode::ObjectIsParent);
 
                 auto NodeNames = fields.find("nodes");

@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 
@@ -240,11 +241,11 @@ namespace CurveManager {
     {
     public:
         TableFile() = default;
-        TableFile(EnergyPlusData &state, std::string path);
-        std::string filePath;
+        TableFile(EnergyPlusData &state, fs::path const &path);
+        fs::path filePath;
         std::vector<std::vector<std::string>> contents;
         std::map<std::pair<std::size_t, std::size_t>, std::vector<double>> arrays;
-        bool load(EnergyPlusData &state, std::string path);
+        bool load(EnergyPlusData &state, fs::path const &path); // Note: this returns 'True' if ErrorsFound
         std::vector<double> &getArray(EnergyPlusData &state, std::pair<std::size_t, std::size_t> colAndRow);
 
     private:
@@ -273,7 +274,7 @@ namespace CurveManager {
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
         std::map<std::string, const json &> independentVarRefs;
-        std::map<std::string, TableFile> tableFiles;
+        std::map<fs::path, TableFile> tableFiles;
         void clear();
 
     private:

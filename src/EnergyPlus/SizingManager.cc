@@ -235,11 +235,11 @@ void ManageSizing(EnergyPlusData &state)
         Available = true;
 
         if (state.dataSize->SizingFileColSep == CharComma) {
-            state.files.zsz.fileName = state.files.outputZszCsvFileName;
+            state.files.zsz.filePath = state.files.outputZszCsvFilePath;
         } else if (state.dataSize->SizingFileColSep == CharTab) {
-            state.files.zsz.fileName = state.files.outputZszTabFileName;
+            state.files.zsz.filePath = state.files.outputZszTabFilePath;
         } else {
-            state.files.zsz.fileName = state.files.outputZszTxtFileName;
+            state.files.zsz.filePath = state.files.outputZszTxtFilePath;
         }
 
         state.files.zsz.ensure_open(state, "ManageSizing", state.files.outputControl.zsz);
@@ -447,11 +447,11 @@ void ManageSizing(EnergyPlusData &state)
         state.dataGlobal->SysSizingCalc = true;
         Available = true;
         if (state.dataSize->SizingFileColSep == CharComma) {
-            state.files.ssz.fileName = state.files.outputSszCsvFileName;
+            state.files.ssz.filePath = state.files.outputSszCsvFilePath;
         } else if (state.dataSize->SizingFileColSep == CharTab) {
-            state.files.ssz.fileName = state.files.outputSszTabFileName;
+            state.files.ssz.filePath = state.files.outputSszTabFilePath;
         } else {
-            state.files.ssz.fileName = state.files.outputSszTxtFileName;
+            state.files.ssz.filePath = state.files.outputSszTxtFilePath;
         }
         state.files.ssz.ensure_open(state, "ManageSizing", state.files.outputControl.ssz);
 

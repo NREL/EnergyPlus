@@ -175,7 +175,7 @@ namespace ICEngineElectricGenerator {
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Electric,
                                                     DataLoopNode::NodeConnectionType::Electric,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             state.dataICEngElectGen->ICEngineGenerator(genNum).MinPartLoadRat = NumArray(2);
@@ -248,7 +248,7 @@ namespace ICEngineElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecInletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + '=' + AlphArray(8));
@@ -263,7 +263,7 @@ namespace ICEngineElectricGenerator {
                                                         AlphArray(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 if (state.dataICEngElectGen->ICEngineGenerator(genNum).HeatRecOutletNodeNum == 0) {
                     ShowSevereError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + '=' + AlphArray(9));

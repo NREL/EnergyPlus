@@ -335,7 +335,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                               AlphArray(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                                                              1,
+                                                                                              NodeInputManager::compFluidStream::Primary,
                                                                                               ObjectIsNotParent);
 
         state.dataHPWaterToWaterHtg->GSHP(GSHPNum).SourceSideOutletNodeNum = GetOnlySingleNode(state,
@@ -345,7 +345,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                                AlphArray(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                                                               1,
+                                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                                ObjectIsNotParent);
 
         state.dataHPWaterToWaterHtg->GSHP(GSHPNum).LoadSideInletNodeNum = GetOnlySingleNode(state,
@@ -355,7 +355,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            2,
+                                                                                            NodeInputManager::compFluidStream::Secondary,
                                                                                             ObjectIsNotParent);
 
         state.dataHPWaterToWaterHtg->GSHP(GSHPNum).LoadSideOutletNodeNum = GetOnlySingleNode(state,
@@ -365,7 +365,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             2,
+                                                                                             NodeInputManager::compFluidStream::Secondary,
                                                                                              ObjectIsNotParent);
 
         // Test node sets

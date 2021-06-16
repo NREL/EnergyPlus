@@ -443,7 +443,7 @@ namespace WaterUse {
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                            1,
+                                                            NodeInputManager::compFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
                     state.dataWaterUse->WaterConnections(WaterConnNum).OutletNode =
                         NodeInputManager::GetOnlySingleNode(state,
@@ -453,7 +453,7 @@ namespace WaterUse {
                                                             state.dataIPShortCut->cAlphaArgs(1),
                                                             DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                            1,
+                                                            NodeInputManager::compFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
                     // Check plant connections

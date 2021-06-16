@@ -324,7 +324,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             1,
+                                                                             NodeInputManager::compFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -334,7 +334,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              1,
+                                                                              NodeInputManager::compFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -575,7 +575,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             1,
+                                                                             NodeInputManager::compFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -585,7 +585,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              1,
+                                                                              NodeInputManager::compFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -748,7 +748,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Steam,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             1,
+                                                                             NodeInputManager::compFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -758,7 +758,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Steam,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              1,
+                                                                              NodeInputManager::compFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -889,7 +889,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             1,
+                                                                             NodeInputManager::compFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -899,7 +899,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              1,
+                                                                              NodeInputManager::compFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
@@ -1049,7 +1049,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                              state.dataIPShortCut->cAlphaArgs(1),
                                                                              DataLoopNode::NodeFluidType::Water,
                                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                                             1,
+                                                                             NodeInputManager::compFluidStream::Primary,
                                                                              ObjectIsNotParent);
 
         state.dataPumps->PumpEquip(PumpNum).OutletNodeNum = GetOnlySingleNode(state,
@@ -1059,7 +1059,7 @@ void GetPumpInput(EnergyPlusData &state)
                                                                               state.dataIPShortCut->cAlphaArgs(1),
                                                                               DataLoopNode::NodeFluidType::Water,
                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                              1,
+                                                                              NodeInputManager::compFluidStream::Primary,
                                                                               ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
