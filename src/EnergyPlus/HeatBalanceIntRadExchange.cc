@@ -1563,9 +1563,9 @@ namespace HeatBalanceIntRadExchange {
         // be helpful in avoiding these problems.  So, the criteria below (with the 0.9 term added
         // into the comparison in the next line of code) intends to capture more cases that are
         // "unbalanced" in surface area distribution so other strange cases can take advantage of
-        // this correction.  The use of 0.9 is simply to provide some reasonable boundary numerically
+        // this correction.  The use of 0.99 is simply to provide some reasonable boundary numerically
         // and does not have some derived theoretical basis.
-        if (LargestArea > 0.9 * (sum(A) - LargestArea) && (N > 3)) {
+        if (LargestArea > 0.99 * (sum(A) - LargestArea) && (N > 3)) {
             for (i = 1; i <= N; ++i) {
                 if (LargestArea != A(i)) continue;
                 state.dataHeatBalIntRadExchg->LargestSurf = i;
@@ -1723,6 +1723,11 @@ namespace HeatBalanceIntRadExchange {
                                           "For zones with internal mass like this one, this"
                                           "can happen when the internal mass has an area that"
                                           "is much larger than the other surfaces in the zone.");
+                        ShowContinueError(state,
+                                          "If a single thermal mass element exists in this zone"
+                                          "that has an area that is larger than the sum of the"
+                                          "rest of the surface areas, consider breaking it up"
+                                          "into two or more separate internal mass elements.");
                     }
                 }
                 if (std::abs(FixedCheckValue) < std::abs(OriginalCheckValue)) {
