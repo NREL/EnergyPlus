@@ -458,7 +458,7 @@ namespace HVACUnitaryBypassVAV {
                                                                             Alphas(1),
                                                                             DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                            1,
+                                                                            NodeInputManager::compFluidStream::Primary,
                                                                             DataLoopNode::ObjectIsParent);
 
             MixerInletNodeName = Alphas(5);
@@ -471,7 +471,7 @@ namespace HVACUnitaryBypassVAV {
                                                                              Alphas(1),
                                                                              DataLoopNode::NodeFluidType::Air,
                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                             1,
+                                                                             NodeInputManager::compFluidStream::Primary,
                                                                              DataLoopNode::ObjectIsParent);
 
             CBVAV(CBVAVNum).SplitterOutletAirNode = NodeInputManager::GetOnlySingleNode(state,
@@ -481,7 +481,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                         Alphas(1),
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Internal,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         DataLoopNode::ObjectIsParent);
 
             if (NumAlphas > 19 && !lAlphaBlanks(20)) {
@@ -492,7 +492,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                               Alphas(1),
                                                                                               DataLoopNode::NodeFluidType::Air,
                                                                                               DataLoopNode::NodeConnectionType::Internal,
-                                                                                              1,
+                                                                                              NodeInputManager::compFluidStream::Primary,
                                                                                               DataLoopNode::ObjectIsParent);
                 CBVAV(CBVAVNum).PlenumMixerInletAirNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                               Alphas(20),
@@ -501,7 +501,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                               Alphas(1) + "_PlenumMixerInlet",
                                                                                               DataLoopNode::NodeFluidType::Air,
                                                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                                                              1,
+                                                                                              NodeInputManager::compFluidStream::Primary,
                                                                                               DataLoopNode::ObjectIsParent);
             }
 
@@ -527,7 +527,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                     Alphas(1),
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Internal,
-                                                                                    1,
+                                                                                    NodeInputManager::compFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsParent);
 
             CBVAV(CBVAVNum).MixerInletAirNode = NodeInputManager::GetOnlySingleNode(state,
@@ -537,7 +537,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                     Alphas(1) + "_Mixer",
                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                    1,
+                                                                                    NodeInputManager::compFluidStream::Primary,
                                                                                     DataLoopNode::ObjectIsParent);
 
             CBVAV(CBVAVNum).SplitterOutletAirNode = NodeInputManager::GetOnlySingleNode(state,
@@ -547,7 +547,7 @@ namespace HVACUnitaryBypassVAV {
                                                                                         Alphas(1) + "_Splitter",
                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                                                        1,
+                                                                                        NodeInputManager::compFluidStream::Primary,
                                                                                         DataLoopNode::ObjectIsParent);
 
             CBVAV(CBVAVNum).OAMixType = Alphas(8);

@@ -127,16 +127,6 @@ using namespace FaultsManager;
 using namespace HybridModel;
 using ScheduleManager::GetCurrentScheduleValue;
 
-// Data
-// MODULE PARAMETER DEFINITIONS:
-// Controls for PredictorCorrector
-// INTEGER, PUBLIC, PARAMETER :: iGetZoneSetPoints             = 1
-// INTEGER, PUBLIC, PARAMETER :: iPredictStep                  = 2
-// INTEGER, PUBLIC, PARAMETER :: iCorrectStep                  = 3
-// INTEGER, PUBLIC, PARAMETER :: iRevertZoneTimestepHistories  = 4
-// INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
-// INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
-
 Array1D_string const ValidControlTypes(4,
                                        {"ThermostatSetpoint:SingleHeating",
                                         "ThermostatSetpoint:SingleCooling",
@@ -177,8 +167,8 @@ Array1D_string const AdaptiveComfortModelTypes(8,
 
 // Functions
 void ManageZoneAirUpdates(EnergyPlusData &state,
-                          int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-                          Real64 &ZoneTempChange, // Temp change in zone air btw previous and current timestep
+                          DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                          Real64 &ZoneTempChange,                                     // Temp change in zone air btw previous and current timestep
                           bool const ShortenTimeStepSys,
                           bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                           Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
@@ -206,22 +196,22 @@ void ManageZoneAirUpdates(EnergyPlusData &state,
     {
         auto const SELECT_CASE_var(UpdateType);
 
-        if (SELECT_CASE_var == iGetZoneSetPoints) {
+        if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints) {
             CalcZoneAirTempSetPoints(state);
 
-        } else if (SELECT_CASE_var == iPredictStep) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep) {
             PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        } else if (SELECT_CASE_var == iCorrectStep) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep) {
             CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        } else if (SELECT_CASE_var == iRevertZoneTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories) {
             RevertZoneTimestepHistories(state);
 
-        } else if (SELECT_CASE_var == iPushZoneTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories) {
             PushZoneTimestepHistories(state);
 
-        } else if (SELECT_CASE_var == iPushSystemTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories) {
             PushSystemTimestepHistories(state);
         }
     }
@@ -2667,9 +2657,9 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     Array1D<Real64> dailyDryTemp(state.dataWeatherManager->NumDaysInYear, 0.0);
 
     readStat = 0;
-    if (FileSystem::fileExists(state.files.inputWeatherFileName.fileName)) {
+    if (FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
         // Read hourly dry bulb temperature first
-        auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptive");
+        auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptive");
         for (i = 1; i <= 9; ++i) { // Headers
             epwFile.readLine();
         }
@@ -2737,7 +2727,7 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
         }
     } else {
         ShowFatalError(state,
-                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFileName.fileName +
+                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
                            " for input (read). (File does not exist)");
     }
 }
