@@ -490,6 +490,8 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // init for PVT
 
+        static std::string const RoutineName("InitPVTcollectors");
+
         // Do the one time initializations
         this->oneTimeInit(state);
 
@@ -1095,8 +1097,6 @@ namespace PhotovoltaicThermalCollectors {
     }
     void PVTCollectorStruct::oneTimeInit(EnergyPlusData &state)
     {
-
-        static std::string const RoutineName("InitPVTcollectors");
 
         if (this->MyOneTimeFlag) {
             this->setupReportVars(state);
