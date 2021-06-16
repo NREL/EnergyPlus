@@ -264,8 +264,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -273,8 +273,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCGenerateRateSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -287,15 +287,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -309,8 +309,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericConstant(Loop).GCRemovalCoefSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(4) + " is required.");
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -323,15 +323,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(4) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(4) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(4), SchMax));
                     ErrorsFound = true;
                 }
@@ -403,8 +403,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             AlphaName(2), state.dataAirflowNetwork->MultizoneSurfaceData, &AirflowNetwork::MultizoneSurfaceProp::SurfName);
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).SurfNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ShowContinueError(state, "which is not listed in AirflowNetwork:MultiZone:Surface.");
             ErrorsFound = true;
         }
@@ -424,8 +424,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCGenRateCoefSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -438,15 +438,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -465,15 +465,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericPDriven(Loop).GCExpo = IHGNumbers(2);
         if (IHGNumbers(2) <= 0.0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + "Negative or zero value is not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "Negative or zero value is not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
         if (IHGNumbers(2) > 1.0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + "The value greater than 1.0 is not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "The value greater than 1.0 is not allowed for " +
+                                state.dataIPShortCut->cNumericFieldNames(2) + " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
@@ -550,8 +550,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -559,8 +559,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericCutoff(Loop).GCGenerateRateSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -573,15 +573,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -600,8 +600,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         if (IHGNumbers(2) <= 0.0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
@@ -669,8 +669,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -678,8 +678,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericDecay(Loop).GCEmiRateSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -692,15 +692,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -719,8 +719,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         if (IHGNumbers(2) <= 0.0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
@@ -795,8 +795,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataSurface->Surface);
         if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).SurfNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -804,8 +804,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericBLDiff(Loop).GCTranCoefSchedPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -818,15 +818,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -844,8 +844,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         }
         if (IHGNumbers(2) <= 0.0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) + " in " +
-                                CurrentModuleObject + " = " + AlphaName(1));
+                            std::string{RoutineName} + "Negative values or zero are not allowed for " + state.dataIPShortCut->cNumericFieldNames(2) +
+                                " in " + CurrentModuleObject + " = " + AlphaName(1));
             ShowContinueError(state, format("The input value is {:.2R}", IHGNumbers(2)));
             ErrorsFound = true;
         }
@@ -920,8 +920,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum = UtilityRoutines::FindItemInList(AlphaName(2), state.dataSurface->Surface);
         if (state.dataContaminantBalance->ZoneContamGenericDVS(Loop).SurfNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -929,8 +929,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericDVS(Loop).GCDepoVeloPtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -943,15 +943,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }
@@ -1029,8 +1029,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             UtilityRoutines::FindItemInList(AlphaName(2), state.dataHeatBal->Zone);
         if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).ActualZoneNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(2) +
-                                " entered=" + AlphaName(2));
+                            std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                state.dataIPShortCut->cAlphaFieldNames(2) + " entered=" + AlphaName(2));
             ErrorsFound = true;
         }
 
@@ -1038,8 +1038,8 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
         if (state.dataContaminantBalance->ZoneContamGenericDRS(Loop).GCDepoRatePtr == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                    " is required.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                    state.dataIPShortCut->cAlphaFieldNames(3) + " is required.");
             } else {
                 ShowSevereError(state,
                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
@@ -1052,15 +1052,15 @@ void GetZoneContaminanInputs(EnergyPlusData &state)
             if (SchMin < 0.0 || SchMax < 0.0) {
                 if (SchMin < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", minimum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", minimum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMin));
                     ErrorsFound = true;
                 }
                 if (SchMax < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + state.dataIPShortCut->cAlphaFieldNames(3) +
-                                        ", maximum is < 0.0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + ", maximum is < 0.0");
                     ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", AlphaName(3), SchMax));
                     ErrorsFound = true;
                 }

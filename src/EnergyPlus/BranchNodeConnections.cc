@@ -110,7 +110,9 @@ void RegisterNodeConnection(EnergyPlusData &state,
     ErrorsFoundHere = false;
     if (!IsValidConnectionType(ConnectionType)) {
         ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
-        ShowContinueError(state, "Occurs for Node=" + std::string{NodeName} + ", ObjectType=" + std::string{ObjectType} + ", ObjectName=" + std::string{ObjectName});
+        ShowContinueError(state,
+                          "Occurs for Node=" + std::string{NodeName} + ", ObjectType=" + std::string{ObjectType} +
+                              ", ObjectName=" + std::string{ObjectName});
         ErrorsFoundHere = true;
     }
 
@@ -1281,12 +1283,12 @@ void GetChildrenData(EnergyPlusData &state,
 }
 
 void SetUpCompSets(EnergyPlusData &state,
-                   std::string_view ParentType,    // Parent Object Type
-                   std::string_view ParentName,    // Parent Object Name
-                   std::string_view CompType,      // Component Type
-                   std::string_view CompName,      // Component Name
-                   std::string_view InletNode,     // Inlet Node Name
-                   std::string_view OutletNode,    // Outlet Node Name
+                   std::string_view ParentType,      // Parent Object Type
+                   std::string_view ParentName,      // Parent Object Name
+                   std::string_view CompType,        // Component Type
+                   std::string_view CompName,        // Component Name
+                   std::string_view InletNode,       // Inlet Node Name
+                   std::string_view OutletNode,      // Outlet Node Name
                    Optional_string_const Description // Description
 )
 {
@@ -1548,7 +1550,7 @@ void TestInletOutletNodes(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFo
 
 void TestCompSet(EnergyPlusData &state,
                  std::string const &CompType,   // Component Type
-                 std::string_view CompName,   // Component Name
+                 std::string_view CompName,     // Component Name
                  std::string const &InletNode,  // Inlet Node Name
                  std::string const &OutletNode, // Outlet Node Name
                  std::string const &Description // Description of Node Pair (for warning message)

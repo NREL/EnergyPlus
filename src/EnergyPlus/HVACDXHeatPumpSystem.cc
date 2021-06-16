@@ -99,12 +99,12 @@ namespace HVACDXHeatPumpSystem {
 
     void SimDXHeatPumpSystem(EnergyPlusData &state,
                              std::string_view DXHeatPumpSystemName, // Name of DXSystem:Airloop object
-                             bool const FirstHVACIteration,           // True when first HVAC iteration
-                             int const AirLoopNum,                    // Primary air loop number
-                             int &CompIndex,                          // Index to CoilSystem:Heating:DX object
-                             Optional_int_const OAUnitNum,            // If the system is an equipment of OutdoorAirUnit
-                             Optional<Real64 const> OAUCoilOutTemp,   // the coil inlet temperature of OutdoorAirUnit
-                             Optional<Real64> QTotOut                 // the total cooling output of unit
+                             bool const FirstHVACIteration,         // True when first HVAC iteration
+                             int const AirLoopNum,                  // Primary air loop number
+                             int &CompIndex,                        // Index to CoilSystem:Heating:DX object
+                             Optional_int_const OAUnitNum,          // If the system is an equipment of OutdoorAirUnit
+                             Optional<Real64 const> OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                             Optional<Real64> QTotOut               // the total cooling output of unit
     )
     {
 
@@ -323,8 +323,8 @@ namespace HVACDXHeatPumpSystem {
                 DXHeatPumpSystem(DXHeatSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (DXHeatPumpSystem(DXHeatSysNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     state.dataHVACDXHeatPumpSys->ErrorsFound = true;
                 }
             }

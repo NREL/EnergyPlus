@@ -196,7 +196,8 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(EnergyPlus::EnergyPlus
     }
 
     if (errorsFound) {
-        ShowFatalError(state, std::string{routineName} + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(
+            state, std::string{routineName} + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 
@@ -696,7 +697,8 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
 
     if (iter > maxIter) {
         ShowSevereError(state,
-                        std::string{RoutineName} + object_name + " \"" + name + "\" -- coil bypass factor calculation did not converge after max iterations.");
+                        std::string{RoutineName} + object_name + " \"" + name +
+                            "\" -- coil bypass factor calculation did not converge after max iterations.");
         ShowContinueError(state, format("The RatedSHR of [{:.3R}], entered by the user or autosized (see *.eio file),", this->grossRatedSHR));
         ShowContinueError(state, "may be causing this. The line defined by the coil rated inlet air conditions");
         ShowContinueError(state, "(26.7C drybulb and 19.4C wetbulb) and the RatedSHR (i.e., slope of the line) must intersect");

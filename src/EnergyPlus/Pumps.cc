@@ -2118,9 +2118,9 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
             TotalEffic = state.dataPumps->PumpEquip(PumpNum).PumpEffic * state.dataPumps->PumpEquip(PumpNum).MotorEffic;
             // Efficiency errors are caught previously, but it doesn't hurt to add another catch before dividing by zero!!!
             if (TotalEffic == 0.0) {
-                ShowSevereError(
-                    state,
-                    std::string{RoutineName} + " Plant pressure simulation encountered a pump with zero efficiency: " + state.dataPumps->PumpEquip(PumpNum).Name);
+                ShowSevereError(state,
+                                std::string{RoutineName} + " Plant pressure simulation encountered a pump with zero efficiency: " +
+                                    state.dataPumps->PumpEquip(PumpNum).Name);
                 ShowContinueError(state, "Check efficiency inputs for this pump component.");
                 ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
             }
@@ -2133,8 +2133,9 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
         TotalEffic = state.dataPumps->PumpEquip(PumpNum).PumpEffic * state.dataPumps->PumpEquip(PumpNum).MotorEffic;
         // Efficiency errors are caught previously, but it doesn't hurt to add another catch before dividing by zero!!!
         if (TotalEffic == 0.0) {
-            ShowSevereError(
-                state, std::string{RoutineName} + " Plant pump simulation encountered a pump with zero efficiency: " + state.dataPumps->PumpEquip(PumpNum).Name);
+            ShowSevereError(state,
+                            std::string{RoutineName} +
+                                " Plant pump simulation encountered a pump with zero efficiency: " + state.dataPumps->PumpEquip(PumpNum).Name);
             ShowContinueError(state, "Check efficiency inputs for this pump component.");
             ShowFatalError(state, "Errors in plant calculation would result in divide-by-zero cause program termination.");
         }

@@ -483,7 +483,8 @@ void SizeZoneEquipment(EnergyPlusData &state)
                 SupplyAirNode1 = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(1);
                 SupplyAirNode2 = 0;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing");
+                ShowSevereError(state,
+                                std::string{RoutineName} + ": to account for the effect a Dedicated Outside Air System on zone equipment sizing");
                 ShowContinueError(state, "there must be at least one zone air inlet node");
                 ShowFatalError(state, "Previous severe error causes abort ");
             }
@@ -2617,7 +2618,8 @@ void UpdateZoneSizing(EnergyPlusData &state, DataGlobalConstants::CallIndicator 
                         // issue 6006, heating coils sizing to 0 when no heating load in zone
                         if (state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum).DesCoolSetPtSeq.empty()) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + ":  Thermostat cooling set point temperatures are not initialized for Zone = " +
+                                            std::string{RoutineName} +
+                                                ":  Thermostat cooling set point temperatures are not initialized for Zone = " +
                                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName);
                             ShowFatalError(state,
                                            "Please send your input file to the EnergyPlus support/development team for further investigation.");
@@ -6351,8 +6353,9 @@ void ReportZoneSizingDOASInputs(EnergyPlusData &state,
     // Using/Aliasing
 
     // Formats
-    static constexpr fmt::string_view Format_990("! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
-                                     "{C}, DOAS Design High Setpoint Temperature {C} ");
+    static constexpr fmt::string_view Format_990(
+        "! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
+        "{C}, DOAS Design High Setpoint Temperature {C} ");
 
     if (state.dataZoneEquipmentManager->reportDOASZoneSizingHeader) {
         print(state.files.eio, "{}\n", Format_990);

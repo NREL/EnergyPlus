@@ -134,7 +134,7 @@ using namespace ScheduleManager;
 constexpr const char *fluidNameSteam("STEAM");
 
 void SimPackagedTerminalUnit(EnergyPlusData &state,
-                             std::string_view CompName,   // name of the packaged terminal heat pump
+                             std::string_view CompName,     // name of the packaged terminal heat pump
                              int const ZoneNum,             // number of zone being served
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                              Real64 &QUnitOut,              // sensible capacity delivered to zone
@@ -2538,7 +2538,8 @@ void GetPTUnit(EnergyPlusData &state)
         } else {
             state.dataPTHP->PTUnit(PTUnitNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
             if (state.dataPTHP->PTUnit(PTUnitNum).SchedPtr == 0) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\" invalid data.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name + "\" invalid data.");
                 ShowContinueError(state, "invalid-not found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                 ErrorsFound = true;
             }
@@ -8873,7 +8874,8 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                        SolveMaxIter,
                                        state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                        state.dataPTHP->PTUnit(PTUnitNum).Name),
-                                state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
+                                state.dataPTHP->PTUnit(PTUnitNum)
+                                    .HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
                         } else if (SolFlag == -2) {
                             if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2 == 0) {
                                 ShowWarningMessage(state,

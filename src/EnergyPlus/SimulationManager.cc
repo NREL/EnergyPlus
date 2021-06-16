@@ -1181,7 +1181,8 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    state.dataGlobal->DoCoilDirectSolutions = UtilityRoutines::MakeUPPERCase(AsString(fields.at("use_coil_direct_solutions"))) == "YES";
+                    state.dataGlobal->DoCoilDirectSolutions =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("use_coil_direct_solutions"))) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
@@ -1924,10 +1925,11 @@ namespace SimulationManager {
                   state.dataHeatBal->CondFDRelaxFactor);
         }
         // Report number of threads to eio file
-        static constexpr fmt::string_view ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
-                                              "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
-                                              "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
-                                              "Parallel Sims");
+        static constexpr fmt::string_view ThreadingHeader(
+            "! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
+            "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
+            "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
+            "Parallel Sims");
         print(state.files.eio, "{}\n", ThreadingHeader);
         static constexpr fmt::string_view ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
         if (state.dataSysVars->Threading) {
@@ -2263,12 +2265,13 @@ namespace SimulationManager {
         // Formats
         static constexpr fmt::string_view Format_700("! <#Component Sets>,<Number of Component Sets>");
         static constexpr fmt::string_view Format_702("! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component "
-                                         "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>");
+                                                     "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>");
         static constexpr fmt::string_view Format_720("! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>");
         static constexpr fmt::string_view Format_722(
             "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>");
-        static constexpr fmt::string_view Format_723("! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating "
-                                         "Priority>,<Cooling Priority>");
+        static constexpr fmt::string_view Format_723(
+            "! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating "
+            "Priority>,<Cooling Priority>");
 
         // Report outside air node names on the Branch-Node Details file
         print(state.files.bnd, "{}\n", "! ===============================================================");

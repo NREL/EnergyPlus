@@ -1094,8 +1094,9 @@ namespace BranchInputManager {
                 lAlphaBlanks.deallocate();
                 lNumericBlanks.deallocate();
                 if (ErrFound) {
-                    ShowSevereError(
-                        state, std::string{RoutineName} + " Invalid " + CurrentModuleObject + " Input, preceding condition(s) will likely cause termination.");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + " Invalid " + CurrentModuleObject +
+                                        " Input, preceding condition(s) will likely cause termination.");
                     state.dataBranchInputManager->InvalidBranchDefinitions = true;
                 }
                 TestInletOutletNodes(state, ErrFound);
@@ -1335,8 +1336,9 @@ namespace BranchInputManager {
         lNumericBlanks.dimension(NumNumbers, true);
 
         if (NumNumbers > 0) {
-            ShowSevereError(
-                state, std::string{RoutineName} + CurrentModuleObject + " Object definition contains numbers, cannot be decoded by GetBranchListInput routine.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + CurrentModuleObject +
+                                " Object definition contains numbers, cannot be decoded by GetBranchListInput routine.");
             ErrFound = true;
         }
         BCount = 0;
@@ -1377,8 +1379,8 @@ namespace BranchInputManager {
                                                                 state.dataBranchInputManager->Branch);
                         if (Found == 0) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
-                                                "\", invalid data.");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataBranchInputManager->BranchList(BCount).Name + "\", invalid data.");
                             ShowContinueError(state,
                                               "..invalid Branch Name not found=\"" +
                                                   state.dataBranchInputManager->BranchList(BCount).BranchNames(Loop) + "\".");
@@ -1395,8 +1397,9 @@ namespace BranchInputManager {
             TestName = state.dataBranchInputManager->BranchList(Count).BranchNames(1);
             for (Loop = 2; Loop <= state.dataBranchInputManager->BranchList(Count).NumOfBranchNames; ++Loop) {
                 if (TestName != state.dataBranchInputManager->BranchList(Count).BranchNames(Loop)) continue;
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name + "\", invalid data.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataBranchInputManager->BranchList(BCount).Name +
+                                    "\", invalid data.");
                 ShowContinueError(state, "..invalid: duplicate branch name specified in the list.");
                 ShowContinueError(state, "..Branch Name=" + TestName);
                 ShowContinueError(state, fmt::format("..Branch Name #{} is duplicate.", Loop));
@@ -2568,7 +2571,8 @@ namespace BranchInputManager {
         static constexpr fmt::string_view Format_700("! <#Branch Lists>,<Number of Branch Lists>");
         print(state.files.bnd, "{}\n", Format_700);
         print(state.files.bnd, " #Branch Lists,{}\n", state.dataBranchInputManager->NumOfBranchLists);
-        static constexpr fmt::string_view Format_702("! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>");
+        static constexpr fmt::string_view Format_702(
+            "! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>");
         print(state.files.bnd, "{}\n", Format_702);
         static constexpr fmt::string_view Format_704(
             "! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>");

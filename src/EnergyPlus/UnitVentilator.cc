@@ -137,7 +137,7 @@ namespace UnitVentilator {
     static constexpr std::string_view fluidNameWater("WATER");
 
     void SimUnitVentilator(EnergyPlusData &state,
-                           std::string_view CompName,   // name of the fan coil unit
+                           std::string_view CompName,     // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -344,7 +344,8 @@ namespace UnitVentilator {
             state.dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr = GetScheduleIndex(state, Alphas(4)); // convert schedule name to pointer
             if (state.dataUnitVentilators->UnitVent(UnitVentNum).MinOASchedPtr == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                    "\", invalid");
                 ShowContinueError(state, "not found: " + cAlphaFields(4) + "=\"" + Alphas(4) + "\".");
                 ErrorsFound = true;
             }
@@ -361,15 +362,17 @@ namespace UnitVentilator {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr =
                         GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr == 0) {
-                        ShowSevereError(
-                            state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(
                             state, "not found:" + cAlphaFields(5) + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName + "\".");
                         ErrorsFound = true;
                     } else if (!CheckScheduleValueMinMax(
                                    state, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
-                        ShowSevereError(
-                            state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(state,
                                           "out of range [0,1]: " + cAlphaFields(5) + "=\"" +
                                               state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName + "\".");
@@ -385,8 +388,9 @@ namespace UnitVentilator {
                         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
                         ErrorsFound = true;
                     } else if (!CheckScheduleValueMinMax(state, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedPtr, ">=0", 0.0)) {
-                        ShowSevereError(
-                            state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(state,
                                           "out of range [0,1]: " + cAlphaFields(5) + "=\"" +
                                               state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName + "\".");
@@ -398,16 +402,18 @@ namespace UnitVentilator {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr =
                         GetScheduleIndex(state, Alphas(5)); // convert schedule name to pointer
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).TempSchedPtr == 0) {
-                        ShowSevereError(
-                            state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                         ShowContinueError(state,
                                           " not found: " + cAlphaFields(5) + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).MaxOASchedName +
                                               "\".");
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(
-                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                        "\", invalid");
                     ShowContinueError(state, "Illegal " + cAlphaFields(3) + "=\"" + Alphas(3) + "\".");
                 }
             }
@@ -553,7 +559,8 @@ namespace UnitVentilator {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                             ShowContinueError(state, "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume.");
                             ErrorsFound = true;
                         }
@@ -570,7 +577,8 @@ namespace UnitVentilator {
                     if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize &&
                         FanVolFlow < state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                            state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                         ShowContinueError(
                             state,
                             format(
@@ -583,12 +591,14 @@ namespace UnitVentilator {
                         ErrorsFound = true;
                     } else if (FanVolFlow == AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow != AutoSize) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                         ShowContinueError(state, "...the fan flow rate is autosized while the unit ventilator flow rate is not.");
                         ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                     } else if (FanVolFlow != AutoSize && state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow == AutoSize) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                             state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\"");
                         ShowContinueError(state, "...the unit ventilator flow rate is autosized while the fan flow rate is not.");
                         ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                     }
@@ -732,8 +742,9 @@ namespace UnitVentilator {
                 } else if (SELECT_CASE_var == "NONE") {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption = state.dataUnitVentilators->NoneOption;
                 } else {
-                    ShowSevereError(
-                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
+                                        "\", invalid");
                     ShowContinueError(state, "illegal value: " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                     ErrorsFound = true;
                 }
@@ -801,8 +812,8 @@ namespace UnitVentilator {
                             state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilType = state.dataUnitVentilators->Heating_GasCoilType;
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
-                                                "\", invalid");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                             ShowContinueError(state, "illegal value: " + cAlphaFields(15) + "=\"" + Alphas(15) + "\".");
                             ErrorsFound = true;
                             errFlag = true;
@@ -926,8 +937,8 @@ namespace UnitVentilator {
                                 state.dataUnitVentilators->UnitVent(UnitVentNum).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
                             } else {
                                 ShowSevereError(state,
-                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
-                                                    "\", invalid");
+                                                std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                    state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                                 ShowContinueError(state, "For: " + cAlphaFields(17) + "=\"" + Alphas(17) + "\".");
                                 ShowContinueError(state,
                                                   "Invalid Coil Type=" + state.dataUnitVentilators->UnitVent(UnitVentNum).CCoilPlantType +
@@ -937,8 +948,8 @@ namespace UnitVentilator {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataUnitVentilators->UnitVent(UnitVentNum).Name +
-                                                "\", invalid");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataUnitVentilators->UnitVent(UnitVentNum).Name + "\", invalid");
                             ShowContinueError(state, "illegal value: " + cAlphaFields(17) + "=\"" + cCoolingCoilType + "\".");
                             ErrorsFound = true;
                             errFlag = true;

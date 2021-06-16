@@ -1240,7 +1240,9 @@ namespace WaterManager {
 
         TankIndex = UtilityRoutines::FindItemInList(TankName, state.dataWaterData->WaterStorage);
         if (TankIndex == 0) {
-            ShowSevereError(state, "WaterUse:Storage (Water Storage Tank) =\"" + std::string{TankName} + "\" not found in " + std::string{CompType} + " called " + std::string{CompName});
+            ShowSevereError(state,
+                            "WaterUse:Storage (Water Storage Tank) =\"" + std::string{TankName} + "\" not found in " + std::string{CompType} +
+                                " called " + std::string{CompName});
             ErrorsFound = true;
             return; // So we don't pass TankIndex=0
         }
@@ -1349,7 +1351,9 @@ namespace WaterManager {
 
         TankIndex = UtilityRoutines::FindItemInList(TankName, state.dataWaterData->WaterStorage);
         if (TankIndex == 0) {
-            ShowSevereError(state, "WaterUse:Storage (Water Storage Tank) =\"" + std::string{TankName} + "\" not found in " + std::string{CompType} + " called " + std::string{CompName});
+            ShowSevereError(state,
+                            "WaterUse:Storage (Water Storage Tank) =\"" + std::string{TankName} + "\" not found in " + std::string{CompType} +
+                                " called " + std::string{CompName});
             ErrorsFound = true;
             return;
         }

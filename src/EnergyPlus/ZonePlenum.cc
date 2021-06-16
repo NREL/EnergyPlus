@@ -314,7 +314,8 @@ void GetZonePlenumInput(EnergyPlusData &state)
             AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName, ZonePlenumNum - 1);
         if (IOStat != 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
+                            std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " +
+                                CurrentModuleObject + '.');
             ShowContinueError(state, "..Only one " + CurrentModuleObject + " object may be connected to a given zone.");
             ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
             ErrorsFound = true;
@@ -513,7 +514,8 @@ void GetZonePlenumInput(EnergyPlusData &state)
             AlphArray(2), state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZoneName, ZonePlenumNum - 1);
         if (IOStat != 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject + '.');
+                            std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " +
+                                CurrentModuleObject + '.');
             ShowContinueError(state, "..Only one " + CurrentModuleObject + " object may be connected to a given zone.");
             ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
             ErrorsFound = true;
@@ -522,8 +524,8 @@ void GetZonePlenumInput(EnergyPlusData &state)
             IOStat = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName);
             if (IOStat != 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " + CurrentModuleObject +
-                                    " or AirLoopHVAC:ReturnPlenum.");
+                                std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is used more than once as a " +
+                                    CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum.");
                 ShowContinueError(state,
                                   "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object may be connected to a given zone.");
                 ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
@@ -549,8 +551,8 @@ void GetZonePlenumInput(EnergyPlusData &state)
             ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
             if (ZoneEquipConfigLoop != 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) + "\" is a controlled zone. It cannot be used as a " +
-                                    CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum.");
+                                std::string{RoutineName} + cAlphaFields(2) + " \"" + AlphArray(2) +
+                                    "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum.");
                 ShowContinueError(state, "..occurs in " + CurrentModuleObject + " = " + AlphArray(1));
                 ErrorsFound = true;
             }

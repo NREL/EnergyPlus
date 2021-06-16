@@ -6469,7 +6469,8 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                     if (EMSSetPointErrorFlag) {
                         if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
-                            ShowWarningError(state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                            ShowWarningError(
+                                state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                             ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
                             ShowContinueError(state,
                                               " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -6481,7 +6482,8 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                     if (EMSSetPointErrorFlag) {
                         if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
-                            ShowWarningError(state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                            ShowWarningError(
+                                state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                             ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
                             ShowContinueError(state,
                                               " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -6493,7 +6495,8 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                     if (EMSSetPointErrorFlag) {
                         if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
-                            ShowWarningError(state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                            ShowWarningError(
+                                state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                             ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
                             ShowContinueError(state,
                                               " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -6505,7 +6508,8 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                     if (EMSSetPointErrorFlag) {
                         if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
-                            ShowWarningError(state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                            ShowWarningError(
+                                state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                             ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
                             ShowContinueError(state,
                                               " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");

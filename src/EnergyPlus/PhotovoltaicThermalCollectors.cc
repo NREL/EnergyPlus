@@ -1174,7 +1174,8 @@ namespace PhotovoltaicThermalCollectors {
         if (WhichPVT != 0) {
             NodeNum = state.dataPhotovoltaicThermalCollector->PVT(WhichPVT).HVACInletNodeNum;
         } else {
-            ShowSevereError(state, "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + std::string{PVTName} + "\"");
+            ShowSevereError(state,
+                            "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + std::string{PVTName} + "\"");
             ErrorsFound = true;
             NodeNum = 0;
         }
@@ -1205,7 +1206,8 @@ namespace PhotovoltaicThermalCollectors {
         if (WhichPVT != 0) {
             NodeNum = state.dataPhotovoltaicThermalCollector->PVT(WhichPVT).HVACOutletNodeNum;
         } else {
-            ShowSevereError(state, "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + std::string{PVTName} + "\"");
+            ShowSevereError(state,
+                            "GetAirInletNodeNum: Could not find SolarCollector FlatPlate PhotovoltaicThermal = \"" + std::string{PVTName} + "\"");
             ErrorsFound = true;
             NodeNum = 0;
         }

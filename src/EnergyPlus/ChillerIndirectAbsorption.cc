@@ -453,7 +453,8 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
                 thisChiller.FlowMode = DataPlant::FlowMode::NotModulated;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\",");
+                                std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\",");
                 ShowContinueError(state, "Invalid " + state.dataIPShortCut->cAlphaFieldNames(6) + '=' + state.dataIPShortCut->cAlphaArgs(6));
                 ShowContinueError(state, "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated");
                 ShowContinueError(state, "Flow mode NotModulated is assumed and the simulation continues.");
@@ -2043,12 +2044,19 @@ void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad
                 //************************* Loop Losses *****************************
 
                 // temperature of condensed steam leaving generator (after condensate trap)
-                Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(
-                    state, fluidNameSteam, state.dataEnvrn->OutBaroPress, this->SteamFluidIndex, std::string{LoopLossesChillerAbsorptionIndirect} + this->Name);
+                Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(state,
+                                                                                    fluidNameSteam,
+                                                                                    state.dataEnvrn->OutBaroPress,
+                                                                                    this->SteamFluidIndex,
+                                                                                    std::string{LoopLossesChillerAbsorptionIndirect} + this->Name);
 
                 // enthalpy  of condensed steam leaving generator (after condensate trap)
-                Real64 EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(
-                    state, fluidNameSteam, TempWaterAtmPress, 0.0, this->SteamFluidIndex, std::string{LoopLossesChillerAbsorptionIndirectSpace} + this->Name);
+                Real64 EnthAtAtmPress = FluidProperties::GetSatEnthalpyRefrig(state,
+                                                                              fluidNameSteam,
+                                                                              TempWaterAtmPress,
+                                                                              0.0,
+                                                                              this->SteamFluidIndex,
+                                                                              std::string{LoopLossesChillerAbsorptionIndirectSpace} + this->Name);
 
                 // Point 4 at atm - loop delta subcool during return journey back to pump
 

@@ -2358,8 +2358,9 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
         if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            ShowSevereError(
-                state, std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                "\", missing data.");
             ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(2) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
@@ -2870,8 +2871,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(5));
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-            ShowSevereError(
-                state, std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                "\", missing data.");
             ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(5) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule == 0) {
@@ -2915,8 +2917,9 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         Tank.SetPointTempSchedule2 = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
         if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-            ShowSevereError(
-                state, std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", missing data.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                "\", missing data.");
             ShowContinueError(state, "blank field, missing " + state.dataIPShortCut->cAlphaFieldNames(6) + " is required");
             ErrorsFound = true;
         } else if (Tank.SetPointTempSchedule2 == 0) {
@@ -4093,10 +4096,12 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
             static constexpr fmt::string_view Format_721(
                 "! <Heat Pump Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery "
                 "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {{W, HPWH Only}}\"\n");
-            static constexpr fmt::string_view Format_722("! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
-                                             "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
-            static constexpr fmt::string_view Format_725("! <Chilled Water Tank Information>,Type,Name,Volume {{m3}},Use Side Design Flow Rate {{m3/s}}, "
-                                             "Source Side Design Flow Rate {{m3/s}}\n");
+            static constexpr fmt::string_view Format_722(
+                "! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
+                "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
+            static constexpr fmt::string_view Format_725(
+                "! <Chilled Water Tank Information>,Type,Name,Volume {{m3}},Use Side Design Flow Rate {{m3/s}}, "
+                "Source Side Design Flow Rate {{m3/s}}\n");
             static constexpr fmt::string_view Format_726(
                 "! <Chilled Water Tank Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},UA {{W/K}},Number Of "
                 "Inlets,Number Of Outlets\n");

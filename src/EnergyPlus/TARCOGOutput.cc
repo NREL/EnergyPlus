@@ -204,7 +204,8 @@ void WriteInputArguments(EnergyPlusData &state,
     static constexpr fmt::string_view Format_1055("  esky           =  {:7.3F}    - Effective night sky emmitance\n");
     static constexpr fmt::string_view Format_1060("  fclr           =  {:7.3F}    - Fraction of sky that is clear\n");
     static constexpr fmt::string_view Format_1061("  VacuumPressure =  {:7.3F}    - maximum allowed gas pressure to be considered as vacuum\n");
-    static constexpr fmt::string_view Format_1062("  VacuumMaxGapThickness =  {:7.3F}    - maximum allowed vacuum gap thickness with support pillar\n");
+    static constexpr fmt::string_view Format_1062(
+        "  VacuumMaxGapThickness =  {:7.3F}    - maximum allowed vacuum gap thickness with support pillar\n");
     static constexpr fmt::string_view Format_1063("  ibc(1)         =  {:3}        - Outdoor BC switch\n");
     static constexpr fmt::string_view Format_1065("  hout           =  {:9.5F}  - Outdoor film coeff. [W/m^2-K]\n");
     static constexpr fmt::string_view Format_1066("  ibc(2)         =  {:3}        - Indoor BC switch\n");
@@ -216,7 +217,7 @@ void WriteInputArguments(EnergyPlusData &state,
     static constexpr fmt::string_view Format_10732("  ThermalMod =  {:3}        - Scaled Cavity Width (SCW) thermal model\n");
     static constexpr fmt::string_view Format_10733("  ThermalMod =  {:3}        - Convective Scalar Model (CSM) thermal model\n");
     static constexpr fmt::string_view Format_10740("  SDScalar =  {:7.5F}      - Factor of Venetian SD layer contribution to convection\n\n (only if "
-                                       "ThermalModel = 2, otherwise ignored)\n");
+                                                   "ThermalModel = 2, otherwise ignored)\n");
     static constexpr fmt::string_view Format_1075("IGU parameters:\n");
     static constexpr fmt::string_view Format_1076("  height     =  {:10.6F} - IGU cavity height [m]\n");
     static constexpr fmt::string_view Format_1077("  heightt    =  {:10.6F} - Total window height [m]\n");
@@ -624,9 +625,10 @@ void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
     static constexpr fmt::string_view Format_2170("  hflux    = {:12.6F}\n");
     static constexpr fmt::string_view Format_2105("                                            Tamb ={:11.6F} K ( {:7.3F} deg C)\n");
     static constexpr fmt::string_view Format_2110("  ----------------- ------------------   Theta{:2} ={:11.6F} K ( {:7.3F} deg C)\n");
-    static constexpr fmt::string_view Format_2111("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
-                                      "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\   Theta{:2} ={:11.6F} K ( {:7.3F} "
-                                      "deg C)\n");
+    static constexpr fmt::string_view Format_2111(
+        "  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
+        "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\   Theta{:2} ={:11.6F} K ( {:7.3F} "
+        "deg C)\n");
     static constexpr fmt::string_view Format_2112("  +++++++++++++++++ ++++++++++++++++++   Theta{:2} ={:11.6F} K ( {:7.3F} deg C)\n");
     static constexpr fmt::string_view Format_2115("                                           Troom ={:11.6F} K ( {:7.3F} deg C)\n");
     static constexpr fmt::string_view Format_2180("           qout ={:12.5F}\n");
@@ -649,7 +651,7 @@ void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
     static constexpr fmt::string_view Format_4111("  ----------------- ------------------\n");
     static constexpr fmt::string_view Format_4112("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
     static constexpr fmt::string_view Format_4113("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
-                                      "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
+                                                  "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
     static constexpr fmt::string_view Format_4114("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
     static constexpr fmt::string_view Format_4115("  +++++++++++++++++ ++++++++++++++++++\n");
     static constexpr fmt::string_view Format_4116("  Ef{:2} ={:11.6F} [W/m2], Rf{:2} ={:11.6F} [W/m2]\n");
@@ -658,7 +660,7 @@ void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
     static constexpr fmt::string_view Format_4121("  ----------------- ------------------\n");
     static constexpr fmt::string_view Format_4122("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
     static constexpr fmt::string_view Format_4123("  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ "
-                                      "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
+                                                  "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n");
     static constexpr fmt::string_view Format_4124("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
     static constexpr fmt::string_view Format_4125("  +++++++++++++++++ ++++++++++++++++++\n");
     static constexpr fmt::string_view Format_4126("  Eb{:2} ={:11.6F} [W/m2], Rb{:2} ={:11.6F} [W/m2]\n");
@@ -987,7 +989,8 @@ void WriteTARCOGInputFile(EnergyPlusData &state,
     static constexpr fmt::string_view Format_112("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n");
     static constexpr fmt::string_view Format_113("*------------------------------------------------------------\n");
     static constexpr fmt::string_view Format_200("* General options:\n");
-    static constexpr fmt::string_view Format_210("* <nlayer, debug, standard, ThermalMod, CalcDeflection, SDScalar, VacuumPressure, VacuumMaxGapThickness>\n");
+    static constexpr fmt::string_view Format_210(
+        "* <nlayer, debug, standard, ThermalMod, CalcDeflection, SDScalar, VacuumPressure, VacuumMaxGapThickness>\n");
     static constexpr fmt::string_view Format_300("* Environmental settings:\n");
     static constexpr fmt::string_view Format_310("* <tout, tind, wso, iwd, wsi, dir, outir, isky, tsky, esky, fclr, trmin, Pa, Pini, Tini>\n");
     static constexpr fmt::string_view Format_400("* Overall IGU properties:\n");
@@ -1006,20 +1009,23 @@ void WriteTARCOGInputFile(EnergyPlusData &state,
     static constexpr fmt::string_view Format_1007("*     IGUID:      {:8} \n");
     static constexpr fmt::string_view Format_1008("*     Num Layers: {:8} \n");
     static constexpr fmt::string_view Format_1010("    {:1}, {:1}, {:1}, {:1}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}\n");
-    static constexpr fmt::string_view Format_1020("    {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, "
-                                      "{:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
+    static constexpr fmt::string_view Format_1020(
+        "    {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:24.12F}, {:24.12F}, "
+        "{:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
     static constexpr fmt::string_view Format_1030("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
-    // static constexpr fmt::string_view Format_1031("    {:24.12F}, {:24.12F}, {:3}, {:24.12F}, {:3}, {:3}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, "
+    // static constexpr fmt::string_view Format_1031("    {:24.12F}, {:24.12F}, {:3}, {:24.12F}, {:3}, {:3}, {:24.12F}, {:24.12F}, {:24.12F},
+    // {:24.12F}, "
     //                                  "{:24.12F}, {:24.12F}, {:2}, {:2}, {:2}, {:2}\n");
     static constexpr fmt::string_view Format_1034("* <PillarSpacing(i), PillarRadius(i)\n");
     static constexpr fmt::string_view Format_1035("    {:24.12F}, {:24.12F}\n");
     static constexpr fmt::string_view Format_1040("    {:1}, {:24.12F}, {:24.12F}, {:1}, {:1}, {:24.12F}, {:24.12F}, {:24.12F}\n");
     static constexpr fmt::string_view Format_1048("* <gap(i), GapDef(i), presure(i+1), nmix(i+1), (iprop(i+1, j), j=1,nmix(i+1)), (frct(i+1, j), "
-                                      "\n\nj=1,nmix(i+1)), vvent(i), tvent(i), SupportPillar(i)>\n");
+                                                  "\n\nj=1,nmix(i+1)), vvent(i), tvent(i), SupportPillar(i)>\n");
     static constexpr fmt::string_view Format_1049("* Gap {:1}:\n");
     static constexpr fmt::string_view Format_1050(
         "* <scon(i), asol(i), thick(i), emis(2*i-1), emis(2*i), tir(2*i-1), YoungsMod(i),\n\n PoissonsRat(i), LayerType(i), nslice(i)>\n");
-    static constexpr fmt::string_view Format_1051("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:1}\n");
+    static constexpr fmt::string_view Format_1051(
+        "    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:1}, {:1}\n");
     static constexpr fmt::string_view Format_1052("* <Atop(i), Abot(i), Al(i), Ar(i), Ah(i)>\n");
     static constexpr fmt::string_view Format_1053("    {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}, {:24.12F}\n");
     static constexpr fmt::string_view Format_1054("* <SlatThick(i), SlatWidth(i), SlatAngle(i), SlatCond(i), SlatSpacing(i), SlatCurve(i)>\n");

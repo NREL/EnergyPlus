@@ -352,7 +352,8 @@ namespace SteamCoils {
                                                                                                      NodeInputManager::compFluidStream::Primary,
                                                                                                      ObjectIsNotParent);
                     if (state.dataSteamCoils->SteamCoil(CoilNum).TempSetPointNodeNum == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + cAlphaFields(8) + " not found for " + CurrentModuleObject + " = " + AlphArray(1));
                         ShowContinueError(state, "..required for Temperature Setpoint Controlled Coils.");
                         ErrorsFound = true;
                     }
@@ -368,8 +369,8 @@ namespace SteamCoils {
 
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + "Invalid " + cAlphaFields(7) + " [" + AlphArray(7) + "] specified for " + CurrentModuleObject +
-                                        " = " + AlphArray(1));
+                                    std::string{RoutineName} + "Invalid " + cAlphaFields(7) + " [" + AlphArray(7) + "] specified for " +
+                                        CurrentModuleObject + " = " + AlphArray(1));
                     ErrorsFound = true;
                 }
             }

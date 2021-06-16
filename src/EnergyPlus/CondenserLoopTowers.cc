@@ -4613,7 +4613,8 @@ namespace CondenserLoopTowers {
                         }
                         if (NumIteration > MaxIteration) {
                             ShowWarningError(state,
-                                             "Cooling tower fluid bypass iteration exceeds maximum limit of " + std::string{MaxItChar} + " for " + this->Name);
+                                             "Cooling tower fluid bypass iteration exceeds maximum limit of " + std::string{MaxItChar} + " for " +
+                                                 this->Name);
                         }
                         this->BypassFraction = BypassFraction2;
                         // may not meet TempSetPoint due to limit of tower outlet temp to OWTLowerLimit

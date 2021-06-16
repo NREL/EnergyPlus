@@ -114,7 +114,8 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     this->nominalSpeedIndex = input_data.nominal_speed_number - 1;
 
     if (errorsFound) {
-        ShowFatalError(state, std::string{routineName} + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
+        ShowFatalError(
+            state, std::string{routineName} + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
 }
 

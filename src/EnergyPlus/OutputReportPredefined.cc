@@ -1475,11 +1475,8 @@ namespace OutputReportPredefined {
         }
     }
 
-    void AddCompSizeTableEntry(EnergyPlusData &state,
-                               std::string_view FieldType,
-                               std::string_view FieldName,
-                               std::string_view FieldDescription,
-                               Real64 const FieldValue)
+    void AddCompSizeTableEntry(
+        EnergyPlusData &state, std::string_view FieldType, std::string_view FieldName, std::string_view FieldDescription, Real64 const FieldValue)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1585,10 +1582,7 @@ namespace OutputReportPredefined {
         state.dataOutRptPredefined->ShadowRelate(state.dataOutRptPredefined->numShadowRelate).recKind = receivingKind;
     }
 
-    int newPreDefReport(EnergyPlusData &state,
-                        std::string_view inReportName,
-                        std::string_view inReportAbrev,
-                        std::string_view inReportNamewithSpaces)
+    int newPreDefReport(EnergyPlusData &state, std::string_view inReportName, std::string_view inReportAbrev, std::string_view inReportNamewithSpaces)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer

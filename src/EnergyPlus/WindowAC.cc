@@ -126,7 +126,7 @@ namespace WindowAC {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     void SimWindowAC(EnergyPlusData &state,
-                     std::string_view CompName,   // name of the window AC unit
+                     std::string_view CompName,     // name of the window AC unit
                      int const ZoneNum,             // number of zone being served
                      bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                      Real64 &PowerMet,              // Sensible power supplied by window AC (W)
@@ -666,7 +666,8 @@ namespace WindowAC {
 
         if (ErrorsFound) {
             ShowFatalError(state,
-                           std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition causes termination.");
+                           std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
+                               " input.  Preceding condition causes termination.");
         }
 
         for (WindACNum = 1; WindACNum <= state.dataWindowAC->NumWindAC; ++WindACNum) {

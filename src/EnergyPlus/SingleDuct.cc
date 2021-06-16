@@ -2432,7 +2432,8 @@ void GetSysInput(EnergyPlusData &state)
                     if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ActualZoneNum ==
                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysIndexGSI).ActualZoneNum) {
                         if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation > 0.0) {
-                            ShowWarningError(state, std::string{RoutineName} + "A zone secondary recirculation fraction is specified for zone served by ");
+                            ShowWarningError(state,
+                                             std::string{RoutineName} + "A zone secondary recirculation fraction is specified for zone served by ");
                             ShowContinueError(state,
                                               "...terminal unit \"" +
                                                   state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysIndexGSI).SysName +
@@ -6074,7 +6075,8 @@ void GetATMixers(EnergyPlusData &state)
             state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr =
                 UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(8), state.dataSize->OARequirements);
             if (state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr == 0) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
                 ShowContinueError(state,
                                   "..invalid " + state.dataIPShortCut->cAlphaFieldNames(8) + "=\"" + state.dataIPShortCut->cAlphaArgs(8) + "\".");
                 ErrorsFound = true;
@@ -6092,7 +6094,8 @@ void GetATMixers(EnergyPlusData &state)
                 state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonByDesignLevel;
             } else {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).OAPerPersonMode = DataZoneEquipment::PerPersonDCVByCurrentLevel;
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
                 ShowContinueError(state,
                                   "..invalid " + state.dataIPShortCut->cAlphaFieldNames(9) + "=\"" + state.dataIPShortCut->cAlphaArgs(9) +
                                       "\". The default input of CurrentOccupancy is assigned");
@@ -6238,7 +6241,8 @@ void GetATMixers(EnergyPlusData &state)
                     if (state.dataSize->ZoneSizingInput(SizingInputNum).ZoneNum == state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum) {
                         if (state.dataSize->ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex == 0) {
                             ShowWarningError(state,
-                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\", invalid data.");
+                                             std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                                 "\", invalid data.");
                             ShowContinueError(state,
                                               state.dataIPShortCut->cAlphaFieldNames(8) +
                                                   " is blank in both the mixer and the Sizing:Zone object for the same zone.");

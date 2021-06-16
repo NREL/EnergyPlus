@@ -383,8 +383,8 @@ namespace DesiccantDehumidifiers {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
@@ -481,7 +481,8 @@ namespace DesiccantDehumidifiers {
                     errFlag = false;
                     DesicDehum(DesicDehumNum).RegenCoilIndex = GetWaterCoilIndex(state, "COIL:HEATING:WATER", RegenCoilName, errFlag);
                     if (DesicDehum(DesicDehumNum).RegenCoilIndex == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
                         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                         ErrorsFound = true;
                     }
@@ -531,7 +532,8 @@ namespace DesiccantDehumidifiers {
                     errFlag = false;
                     DesicDehum(DesicDehumNum).RegenCoilIndex = GetSteamCoilIndex(state, "COIL:HEATING:STEAM", RegenCoilName, errFlag);
                     if (DesicDehum(DesicDehumNum).RegenCoilIndex == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + " illegal " + cAlphaFields(9) + " = " + RegenCoilName);
                         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
                         ErrorsFound = true;
                     }
@@ -781,8 +783,8 @@ namespace DesiccantDehumidifiers {
                 DesicDehum(DesicDehumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (DesicDehum(DesicDehumNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }

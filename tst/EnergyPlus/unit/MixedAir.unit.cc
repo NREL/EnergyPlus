@@ -143,7 +143,8 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
     int IOStat(0);
     auto const CurrentModuleObject = CurrentModuleObjects[static_cast<std::size_t>(CMO::OAController)];
 
-    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObjects[static_cast<std::size_t>(CMO::OAController)], NumArg, NumAlphas, NumNums);
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        *state, CurrentModuleObjects[static_cast<std::size_t>(CMO::OAController)], NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
     Array1D_string AlphArray(NumAlphas);
@@ -1491,7 +1492,8 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     int IOStat(0);
     auto const CurrentModuleObject = CurrentModuleObjects[static_cast<std::size_t>(CMO::OAController)];
 
-    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObjects[static_cast<std::size_t>(CMO::OAController)], NumArg, NumAlphas, NumNums);
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        *state, CurrentModuleObjects[static_cast<std::size_t>(CMO::OAController)], NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
     Array1D_string AlphArray(NumAlphas);
@@ -1624,7 +1626,8 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     int IOStat(0);
     auto const CurrentModuleObject = CurrentModuleObjects[static_cast<std::size_t>(CMO::OAController)];
 
-    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObjects[static_cast<std::size_t>(CMO::OAController)], NumArg, NumAlphas, NumNums);
+    state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+        *state, CurrentModuleObjects[static_cast<std::size_t>(CMO::OAController)], NumArg, NumAlphas, NumNums);
 
     Array1D<Real64> NumArray(NumNums, 0.0);
     Array1D_string AlphArray(NumAlphas);

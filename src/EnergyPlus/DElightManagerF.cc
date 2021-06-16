@@ -181,17 +181,19 @@ namespace DElightManagerF {
         static constexpr fmt::string_view Format_905("\nZONE LIGHTING SCHEDULES\nN_Lt_Scheds 0\n");
         static constexpr fmt::string_view Format_906("\nZONE SURFACES\nN_Surfaces {:4}\n");
         static constexpr fmt::string_view Format_907("\nZONE SURFACE DATA\nSurface {}\nWCS_Azimuth {:12.4F}\nWCS_Tilt    {:12.4F}\nVis_Refl    "
-                                         "{:12.4F}\nExt_Refl    {:12.4F}\nGnd_Refl     0.2\nN_WCS_Vertices {:6}\n");
+                                                     "{:12.4F}\nExt_Refl    {:12.4F}\nGnd_Refl     0.2\nN_WCS_Vertices {:6}\n");
         static constexpr fmt::string_view Format_908("Vertex {:12.4F}{:12.4F}{:12.4F}\n");
         static constexpr fmt::string_view Format_909("\nSURFACE WINDOWS\nN_Windows {:6}\n");
-        static constexpr fmt::string_view Format_910("\nSURFACE WINDOW DATA\nWindow     {}\nGlass_Type {:8}\nShade_Flag   0\nOverhang_Fin_Depth    0.0 0.0 "
-                                         "0.0\nOverhang_Fin_Distance 0.0 0.0 0.0\nN_WCS_Vertices {:4}\n");
+        static constexpr fmt::string_view Format_910(
+            "\nSURFACE WINDOW DATA\nWindow     {}\nGlass_Type {:8}\nShade_Flag   0\nOverhang_Fin_Depth    0.0 0.0 "
+            "0.0\nOverhang_Fin_Distance 0.0 0.0 0.0\nN_WCS_Vertices {:4}\n");
         static constexpr fmt::string_view Format_911("\nSURFACE CFS\nN_CFS {:6}\n");
         static constexpr fmt::string_view Format_915(
             "\nCOMPLEX FENESTRATION DATA\nCFS_Name   {}\nCFS_Type   {}\nFenestration_Rotation {:12.4F}\nN_WCS_Vertices {:4}\n");
         static constexpr fmt::string_view Format_912("\nZONE REFERENCE POINTS\nN_Ref_Pts {:4}\n");
-        static constexpr fmt::string_view Format_913("\nZONE REFERENCE POINT DATA\nReference_Point {}\nRefPt_WCS_Coords {:12.4F}{:12.4F}{:12.4F}\nZone_Fraction "
-                                         "{:12.4F}\nLight_Set_Pt {:12.4F}\nLight_Ctrl_Type {:4}\n");
+        static constexpr fmt::string_view Format_913(
+            "\nZONE REFERENCE POINT DATA\nReference_Point {}\nRefPt_WCS_Coords {:12.4F}{:12.4F}{:12.4F}\nZone_Fraction "
+            "{:12.4F}\nLight_Set_Pt {:12.4F}\nLight_Ctrl_Type {:4}\n");
         static constexpr fmt::string_view Format_914("\nBUILDING SHADES\nN_BShades 0\n");
         static constexpr fmt::string_view Format_920("\nLIBRARY DATA\nGLASS TYPES\nN_Glass_Types {:4}\n");
         static constexpr fmt::string_view Format_921(

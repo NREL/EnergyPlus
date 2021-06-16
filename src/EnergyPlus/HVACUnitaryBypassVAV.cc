@@ -130,7 +130,7 @@ namespace HVACUnitaryBypassVAV {
     static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimUnitaryBypassVAV(EnergyPlusData &state,
-                             std::string_view CompName,   // Name of the CBVAV system
+                             std::string_view CompName,     // Name of the CBVAV system
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                              int const AirLoopNum,          // air loop index
                              int &CompIndex                 // Index to changeover-bypass VAV system

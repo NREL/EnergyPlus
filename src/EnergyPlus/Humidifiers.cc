@@ -106,7 +106,7 @@ namespace Humidifiers {
     using namespace ScheduleManager;
 
     void SimHumidifier(EnergyPlusData &state,
-                       std::string_view CompName,                    // name of the humidifier unit
+                       std::string_view CompName,                      // name of the humidifier unit
                        [[maybe_unused]] bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        int &CompIndex                                  // Pointer to Humidifier Unit
     )
@@ -300,8 +300,8 @@ namespace Humidifiers {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
@@ -370,8 +370,8 @@ namespace Humidifiers {
                 Humidifier(HumNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (Humidifier(HumNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
@@ -1019,9 +1019,10 @@ namespace Humidifiers {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(
-                state,
-                std::string{CalledFrom} + ": Mismatch was found in the Rated Gas Use Rate and Thermal Efficiency for gas fired steam humidifier = " + Name + ". ");
+            ShowFatalError(state,
+                           std::string{CalledFrom} +
+                               ": Mismatch was found in the Rated Gas Use Rate and Thermal Efficiency for gas fired steam humidifier = " + Name +
+                               ". ");
         }
     }
 

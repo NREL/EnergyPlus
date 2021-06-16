@@ -1789,7 +1789,7 @@ void SQLite::addSQLiteSystemSizingRecord(std::string const &SysName,      // the
 void SQLite::addSQLiteComponentSizingRecord(std::string_view compType, // the type of the component
                                             std::string_view compName, // the name of the component
                                             std::string_view varDesc,  // the description of the input variable
-                                            Real64 const varValue        // the value from the sizing calculation
+                                            Real64 const varValue      // the value from the sizing calculation
 )
 {
     if (m_writeOutputToSQLite) {

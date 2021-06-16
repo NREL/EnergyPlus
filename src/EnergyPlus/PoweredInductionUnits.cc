@@ -125,7 +125,7 @@ constexpr const char *fluidNameSteam("STEAM");
 constexpr const char *fluidNameWater("WATER");
 
 void SimPIU(EnergyPlusData &state,
-            std::string_view CompName,   // name of the PIU
+            std::string_view CompName,     // name of the PIU
             bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
             int const ZoneNum,             // index of zone served by PIU
             int const ZoneNodeNum,         // zone node number of zone served by PIU
@@ -475,8 +475,8 @@ void GetPIUs(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" +
+                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
             ShowContinueError(state,
                               "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
             ErrorsFound = true;
@@ -728,8 +728,8 @@ void GetPIUs(EnergyPlusData &state)
         // one assumes if there isn't one assigned, it's an error?
         if (state.dataPowerInductionUnits->PIU(PIUNum).ADUNum == 0) {
             ShowSevereError(state,
-                            std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
-                                ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
+                            std::string{RoutineName} + "No matching Air Distribution Unit, for PIU = [" +
+                                state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ',' + state.dataPowerInductionUnits->PIU(PIUNum).Name + "].");
             ShowContinueError(state,
                               "...should have outlet node = " + state.dataLoopNodes->NodeID(state.dataPowerInductionUnits->PIU(PIUNum).OutAirNode));
             ErrorsFound = true;

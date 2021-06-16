@@ -145,7 +145,7 @@ namespace HVACMultiSpeedHeatPump {
     static constexpr std::string_view fluidNameSteam("STEAM");
 
     void SimMSHeatPump(EnergyPlusData &state,
-                       std::string_view CompName,   // Name of the unitary engine driven heat pump system
+                       std::string_view CompName,     // Name of the unitary engine driven heat pump system
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                        int const AirLoopNum,          // air loop index
                        int &CompIndex                 // Index to changeover-bypass VAV system
@@ -4553,8 +4553,8 @@ namespace HVACMultiSpeedHeatPump {
                             if (SolFlag == -1) {
                                 if (MSHeatPump(MSHeatPumpNum).HotWaterCoilMaxIterIndex == 0) {
                                     ShowWarningMessage(state,
-                                                       "CalcNonDXHeatingCoils: Hot water coil control failed for " + std::string{CurrentModuleObject} + "=\"" +
-                                                           MSHeatPump(MSHeatPumpNum).Name + "\"");
+                                                       "CalcNonDXHeatingCoils: Hot water coil control failed for " +
+                                                           std::string{CurrentModuleObject} + "=\"" + MSHeatPump(MSHeatPumpNum).Name + "\"");
                                     ShowContinueErrorTimeStamp(state, "");
                                     ShowContinueError(
                                         state, format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));

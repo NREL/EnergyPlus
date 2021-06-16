@@ -617,15 +617,17 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = state.dataIPShortCut->rNumericArgs(3);
             if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax >= MaxSteamFlowRate) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\", " + state.dataIPShortCut->cNumericFieldNames(3) + " was higher than the allowable maximum.");
+                                 std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" +
+                                     state.dataIPShortCut->cAlphaArgs(1) + "\", " + state.dataIPShortCut->cNumericFieldNames(3) +
+                                     " was higher than the allowable maximum.");
                 ShowContinueError(state, format("...reset to maximum value=[{:.2R}].", MaxSteamFlowRate));
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = MaxSteamFlowRate;
             } else if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax <= MinSteamFlowRate &&
                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax != AutoSize) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\", " + state.dataIPShortCut->cNumericFieldNames(3) + " was less than the allowable minimum.");
+                                 std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" +
+                                     state.dataIPShortCut->cAlphaArgs(1) + "\", " + state.dataIPShortCut->cNumericFieldNames(3) +
+                                     " was less than the allowable minimum.");
                 ShowContinueError(state, format("...reset to minimum value=[{:.2R}].", MinSteamFlowRate));
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = MinSteamFlowRate;
             }
@@ -633,8 +635,8 @@ namespace SteamBaseboardRadiator {
             AllFracsSummed = SteamBaseboardDesignDataObject.FracRadiant;
             if (AllFracsSummed > MaxFraction) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\", Fraction Radiant was higher than the allowable maximum.");
+                                 std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" +
+                                     state.dataIPShortCut->cAlphaArgs(1) + "\", Fraction Radiant was higher than the allowable maximum.");
                 SteamBaseboardDesignDataObject.FracRadiant = MaxFraction;
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracConvect = 0.0;
             } else {
@@ -652,7 +654,8 @@ namespace SteamBaseboardRadiator {
             if ((state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib < MinDistribSurfaces) &&
                 (SteamBaseboardDesignDataObject.FracRadiant > MinFraction)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" +
+                                    state.dataIPShortCut->cAlphaArgs(1) +
                                     "\", the number of surface/radiant fraction groups entered was less than the allowable minimum.");
                 ShowContinueError(state, format("...the minimum that must be entered=[{}].", MinDistribSurfaces));
                 ErrorsFound = true;
@@ -735,8 +738,8 @@ namespace SteamBaseboardRadiator {
                 (SteamBaseboardDesignDataObject.FracRadiant >
                  MinFraction)) { // User didn't distribute all of the | radiation warn that some will be lost
                 ShowWarningError(state,
-                                 std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                     "\", Summed radiant fractions for people + surface groups < 1.0");
+                                 std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "=\"" +
+                                     state.dataIPShortCut->cAlphaArgs(1) + "\", Summed radiant fractions for people + surface groups < 1.0");
                 ShowContinueError(state, "The rest of the radiant energy delivered by the baseboard heater will be lost");
             }
 
@@ -754,7 +757,8 @@ namespace SteamBaseboardRadiator {
 
         if (ErrorsFound) {
             ShowFatalError(state,
-                           std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam + "Errors found getting input. Program terminates.");
+                           std::string{RoutineName} + state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam +
+                               "Errors found getting input. Program terminates.");
         }
 
         // Setup Report variables for the Coils

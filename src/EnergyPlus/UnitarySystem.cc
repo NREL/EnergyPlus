@@ -465,7 +465,7 @@ namespace UnitarySystems {
     }
 
     int getDesignSpecMSHPIndex(
-        EnergyPlusData &state,        // lookup vector index for design spec object name in object array EnergyPlus::UnitarySystems::designSpecMSHP
+        EnergyPlusData &state,      // lookup vector index for design spec object name in object array EnergyPlus::UnitarySystems::designSpecMSHP
         std::string_view objectName // IDF name in input
     )
     {
@@ -477,12 +477,13 @@ namespace UnitarySystems {
                 return index;
             }
         }
-        ShowSevereError(state, "getDesignSpecMSHPIndex: did not find UnitarySystemPerformance:Multispeed name =" + std::string{objectName} + ". Check inputs");
+        ShowSevereError(
+            state, "getDesignSpecMSHPIndex: did not find UnitarySystemPerformance:Multispeed name =" + std::string{objectName} + ". Check inputs");
         return index;
     }
 
     int getUnitarySystemIndex(
-        EnergyPlusData &state,        // lookup vector index for UnitarySystem object name in object array EnergyPlus::UnitarySystems::unitarySys
+        EnergyPlusData &state,      // lookup vector index for UnitarySystem object name in object array EnergyPlus::UnitarySystems::unitarySys
         std::string_view objectName // IDF name in input
     )
     {
@@ -6916,7 +6917,8 @@ namespace UnitarySystems {
                     input_spec.supplemental_heating_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("supplemental_heating_coil_name")));
                 }
                 if (fields.find("cooling_supply_air_flow_rate_method") != fields.end()) { // not required field
-                    input_spec.cooling_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_supply_air_flow_rate_method")));
+                    input_spec.cooling_supply_air_flow_rate_method =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_supply_air_flow_rate_method")));
                 }
                 if (fields.find("cooling_supply_air_flow_rate") != fields.end()) { // not required field, autosizable
                     auto tempFieldVal = fields.at("cooling_supply_air_flow_rate");
@@ -6937,7 +6939,8 @@ namespace UnitarySystems {
                     input_spec.cooling_supply_air_flow_rate_per_unit_of_capacity = fields.at("cooling_supply_air_flow_rate_per_unit_of_capacity");
                 }
                 if (fields.find("heating_supply_air_flow_rate_method") != fields.end()) { // not required field
-                    input_spec.heating_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(AsString(fields.at("heating_supply_air_flow_rate_method")));
+                    input_spec.heating_supply_air_flow_rate_method =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("heating_supply_air_flow_rate_method")));
                 }
                 if (fields.find("heating_supply_air_flow_rate") != fields.end()) { // not required field
                     auto tempFieldVal = fields.at("heating_supply_air_flow_rate");
@@ -6958,7 +6961,8 @@ namespace UnitarySystems {
                     input_spec.heating_supply_air_flow_rate_per_unit_of_capacity = fields.at("heating_supply_air_flow_rate_per_unit_of_capacity");
                 }
                 if (fields.find("no_load_supply_air_flow_rate_method") != fields.end()) { // not required field
-                    input_spec.no_load_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(AsString(fields.at("no_load_supply_air_flow_rate_method")));
+                    input_spec.no_load_supply_air_flow_rate_method =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("no_load_supply_air_flow_rate_method")));
                 }
                 if (fields.find("no_load_supply_air_flow_rate") != fields.end()) { // not required field
                     auto tempFieldVal = fields.at("no_load_supply_air_flow_rate");
@@ -7029,7 +7033,8 @@ namespace UnitarySystems {
                     input_spec.maximum_temperature_for_heat_recovery = fields.at("maximum_temperature_for_heat_recovery");
                 }
                 if (fields.find("heat_recovery_water_inlet_node_name") != fields.end()) { // not required field
-                    input_spec.heat_recovery_water_inlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("heat_recovery_water_inlet_node_name")));
+                    input_spec.heat_recovery_water_inlet_node_name =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("heat_recovery_water_inlet_node_name")));
                 }
                 if (fields.find("heat_recovery_water_outlet_node_name") != fields.end()) { // not required field
                     input_spec.heat_recovery_water_outlet_node_name =
@@ -16756,9 +16761,9 @@ namespace UnitarySystems {
 
     void UnitarySys::getUnitarySysHeatCoolCoil(EnergyPlusData &state,
                                                std::string_view UnitarySysName, // Name of Unitary System object
-                                               bool &CoolingCoil,                 // Cooling coil exists
-                                               bool &HeatingCoil,                 // Heating coil exists
-                                               int const ZoneOAUnitNum            // index to zone OA unit
+                                               bool &CoolingCoil,               // Cooling coil exists
+                                               bool &HeatingCoil,               // Heating coil exists
+                                               int const ZoneOAUnitNum          // index to zone OA unit
     )
     {
 

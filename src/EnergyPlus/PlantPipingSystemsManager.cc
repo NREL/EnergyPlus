@@ -1636,8 +1636,9 @@ namespace PlantPipingSystemsManager {
 
             // Issue a severe if Inner >= Outer diameter
             if (thisCircuit.PipeSize.InnerDia >= thisCircuit.PipeSize.OuterDia) {
-                ShowSevereError(
-                    state, std::string{RoutineName} + ": " + ObjName_HorizTrench + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid pipe diameters.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + ": " + ObjName_HorizTrench + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
+                                    "\" has invalid pipe diameters.");
                 ShowContinueError(state,
                                   format("Outer diameter [{:.3T}] must be greater than inner diameter [{:.3T}].",
                                          thisCircuit.PipeSize.OuterDia,
@@ -2242,8 +2243,8 @@ namespace PlantPipingSystemsManager {
         //       RE-ENGINEERED  na
 
         ShowSevereError(state,
-                        std::string{RoutineName} + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + std::string{FieldName} + "=\"" + FieldEntry +
-                            "\", Condition: " + Condition);
+                        std::string{RoutineName} + ':' + ObjectName + "=\"" + InstanceName + "\", invalid " + std::string{FieldName} + "=\"" +
+                            FieldEntry + "\", Condition: " + Condition);
         ErrorsFound = true;
     }
 
@@ -5826,17 +5827,20 @@ namespace PlantPipingSystemsManager {
         bool OutOfRange = this->CheckForOutOfRangeTemps();
         if (OutOfRange) {
             if (this->HasZoneCoupledSlab) {
-                ShowSevereError(state, "Site:GroundDomain:Slab" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.");
+                ShowSevereError(state,
+                                "Site:GroundDomain:Slab" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.");
                 ShowContinueError(state, "This could be due to the size of the loads on the domain.");
                 ShowContinueError(state, "Verify inputs are correct. If problem persists, notify EnergyPlus support.");
                 ShowFatalError(state, "Preceding error(s) cause program termination");
             } else if (this->HasZoneCoupledBasement) {
-                ShowSevereError(state, "Site:GroundDomain:Basement" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.");
+                ShowSevereError(
+                    state, "Site:GroundDomain:Basement" + std::string{RoutineName} + ": Out of range temperatures detected in the ground domain.");
                 ShowContinueError(state, "This could be due to the size of the loads on the domain.");
                 ShowContinueError(state, "Verify inputs are correct. If problem persists, notify EnergyPlus support.");
                 ShowFatalError(state, "Preceding error(s) cause program termination");
             } else {
-                ShowSevereError(state, "PipingSystems:" + std::string{RoutineName} + ": Out of range temperatures detected in piping system simulation.");
+                ShowSevereError(state,
+                                "PipingSystems:" + std::string{RoutineName} + ": Out of range temperatures detected in piping system simulation.");
                 ShowContinueError(state, "This could be due to the size of the pipe circuit in relation to the loads being imposed.");
                 ShowContinueError(state, "Try increasing the size of the pipe circuit and investigate sizing effects.");
                 ShowFatalError(state, "Preceding error(s) cause program termination");

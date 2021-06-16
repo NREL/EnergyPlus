@@ -467,7 +467,8 @@ namespace FourPipeBeam {
         // assumes if there isn't one assigned, it's an error
         if (thisBeam->aDUNum == 0) {
             ShowSevereError(state,
-                            std::string{routineName} + "No matching Air Distribution Unit, for Unit = [" + cCurrentModuleObject + ',' + thisBeam->name + "].");
+                            std::string{routineName} + "No matching Air Distribution Unit, for Unit = [" + cCurrentModuleObject + ',' +
+                                thisBeam->name + "].");
             ShowContinueError(state, "...should have outlet node=" + state.dataLoopNodes->NodeID(thisBeam->airOutNodeNum));
             ErrorsFound = true;
         } else {
@@ -615,8 +616,8 @@ namespace FourPipeBeam {
             if (this->aDUNum != 0) {
                 if (!CheckZoneEquipmentList(state, "ZONEHVAC:AIRDISTRIBUTIONUNIT", state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name)) {
                     ShowSevereError(state,
-                                    std::string{routineName} + ": ADU=[Air Distribution Unit," + state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name +
-                                        "] is not on any ZoneHVAC:EquipmentList.");
+                                    std::string{routineName} + ": ADU=[Air Distribution Unit," +
+                                        state.dataDefineEquipment->AirDistUnit(this->aDUNum).Name + "] is not on any ZoneHVAC:EquipmentList.");
                     ShowContinueError(state, "...Unit=[" + this->unitType + ',' + this->name + "] will not be simulated.");
                 }
                 this->zoneEquipmentListChecked = true;

@@ -455,7 +455,9 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes");
+        ShowFatalError(state,
+                       std::string{RoutineName} +
+                           "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes");
     }
 }
 

@@ -586,7 +586,8 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             }
         }
         if (ThisCP.ZonePtr <= 0) {
-            ShowSevereError(state, std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + ThisCP.EquipID + "\" is not on any ZoneHVAC:EquipmentList.");
+            ShowSevereError(
+                state, std::string{RoutineName} + cCMO_CoolingPanel_Simple + "=\"" + ThisCP.EquipID + "\" is not on any ZoneHVAC:EquipmentList.");
             ErrorsFound = true;
             continue;
         }
@@ -1026,7 +1027,8 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                 state.dataSize->DataScalableCapSizingON = false;
             } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                 if (ThisCP.WaterVolFlowRateMax == AutoSize) {
-                    ShowSevereError(state, std::string{RoutineName} + ": auto-sizing cannot be done for " + CompType + " = " + ThisCP.EquipID + "\".");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + ": auto-sizing cannot be done for " + CompType + " = " + ThisCP.EquipID + "\".");
                     ShowContinueError(state,
                                       "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the "
                                       "Cooling Design Capacity Method = \"FractionOfAutosizedCoolingCapacity\".");

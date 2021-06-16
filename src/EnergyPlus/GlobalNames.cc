@@ -106,7 +106,8 @@ bool VerifyUniqueInterObjectName(EnergyPlusData &state,
         names.emplace(object_name, object_type);
     } else {
         ErrorsFound = true;
-        ShowSevereError(state, object_name + " with object type " + std::string{object_type} + " duplicates a name in object type " + names_iter->second);
+        ShowSevereError(state,
+                        object_name + " with object type " + std::string{object_type} + " duplicates a name in object type " + names_iter->second);
         return true;
     }
     return false;

@@ -3216,7 +3216,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     } else if (UnitsB == "" && UnitsA != "") {
                         UnitsB = UnitsA;
                         ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                             "\" using deprecated units designation.");
                         ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                     }
                 }
@@ -3397,7 +3398,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     } else if (UnitsB == "" && UnitsA != "") {
                         UnitsB = UnitsA;
                         ShowWarningError(state,
-                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" using deprecated units designation.");
+                                         std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
+                                             "\" using deprecated units designation.");
                         ShowContinueError(state, "...Units entered in " + cAlphaFieldNames(1) + " (deprecated use)=\"" + UnitsA + "\"");
                     }
                 }

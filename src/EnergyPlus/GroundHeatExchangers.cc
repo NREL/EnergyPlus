@@ -320,8 +320,8 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
         }
     } else if (j.find("ghe_vertical_array_object_name") != j.end()) {
         // Response factors come from array object
-        this->myRespFactors =
-            BuildAndGetResponseFactorObjectFromArray(state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_array_object_name"]))));
+        this->myRespFactors = BuildAndGetResponseFactorObjectFromArray(
+            state, GetVertArray(state, UtilityRoutines::MakeUPPERCase(AsString(j["ghe_vertical_array_object_name"]))));
 
         if (!this->myRespFactors) {
             errorsFound = true;

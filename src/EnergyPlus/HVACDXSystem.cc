@@ -115,13 +115,13 @@ namespace HVACDXSystem {
     Real64 constexpr LatCapTimeConst(45.0);
 
     void SimDXCoolingSystem(EnergyPlusData &state,
-                            std::string_view DXCoolingSystemName, // Name of DXSystem:Airloop object
-                            bool const FirstHVACIteration,          // True when first HVAC iteration
-                            int const AirLoopNum,                   // Primary air loop number
-                            int &CompIndex,                         // Index to DXSystem:Airloop object
-                            Optional_int_const OAUnitNum,           // If the system is an equipment of OutdoorAirUnit
-                            Optional<Real64 const> OAUCoilOutTemp,  // the coil inlet temperature of OutdoorAirUnit
-                            Optional<Real64> QTotOut                // the total cooling output of unit
+                            std::string_view DXCoolingSystemName,  // Name of DXSystem:Airloop object
+                            bool const FirstHVACIteration,         // True when first HVAC iteration
+                            int const AirLoopNum,                  // Primary air loop number
+                            int &CompIndex,                        // Index to DXSystem:Airloop object
+                            Optional_int_const OAUnitNum,          // If the system is an equipment of OutdoorAirUnit
+                            Optional<Real64 const> OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                            Optional<Real64> QTotOut               // the total cooling output of unit
     )
     {
 
@@ -399,8 +399,8 @@ namespace HVACDXSystem {
                 state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).SchedPtr = GetScheduleIndex(state, Alphas(2));
                 if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }

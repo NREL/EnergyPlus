@@ -460,7 +460,8 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
         print(state.files.bnd, "{}\n", Format_700);
         print(state.files.bnd, " #Nodes,{}\n", state.dataNodeInputMgr->NumOfUniqueNodeNames);
         if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
-            static constexpr fmt::string_view Format_702("! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
+            static constexpr fmt::string_view Format_702(
+                "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
             print(state.files.bnd, "{}\n", Format_702);
         }
         int Count0 = 0;

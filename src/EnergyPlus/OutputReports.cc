@@ -304,10 +304,12 @@ static void WriteDXFCommon(EnergyPlusData &state, InputOutputFile &of, const std
 {
     using namespace DataSurfaces;
     using namespace DataSurfaceColors;
-    static constexpr fmt::string_view Format_800("  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .25\n  "
-                                     "1\nTrue North\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
-    static constexpr fmt::string_view Format_801("  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .4\n  "
-                                     "1\n{}\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
+    static constexpr fmt::string_view Format_800(
+        "  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .25\n  "
+        "1\nTrue North\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
+    static constexpr fmt::string_view Format_801(
+        "  0\nTEXT\n  8\n1\n  6\nContinuous\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n .4\n  "
+        "1\n{}\n 41\n 0.0\n  7\nMONOTXT\n210\n0.0\n220\n0.0\n230\n1.0\n");
 
     static constexpr fmt::string_view Format_703_0("  0\n3DFACE\n  8\n1\n 62\n{:3}\n");
     static constexpr fmt::string_view Format_703_1(" 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n");
@@ -1896,7 +1898,8 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
     static constexpr fmt::string_view Format_707(
         "WorldInfo {{\n   title \"Building - {}\"\n   info [\"EnergyPlus Program Version {}\"]\n   info [\"Surface Color Scheme {}\"]\n}}\n");
     static constexpr fmt::string_view Format_800("Shape {{\nappearance DEF {} Appearance {{\nmaterial Material {{ diffuseColor {} }}\n}}\n}}\n");
-    static constexpr fmt::string_view Format_801("Shape {{\nappearance USE {}\ngeometry IndexedFaceSet {{\nsolid TRUE\ncoord DEF {}{} Coordinate {{\npoint [\n");
+    static constexpr fmt::string_view Format_801(
+        "Shape {{\nappearance USE {}\ngeometry IndexedFaceSet {{\nsolid TRUE\ncoord DEF {}{} Coordinate {{\npoint [\n");
     static constexpr fmt::string_view Format_802("{:15.5F} {:15.5F} {:15.5F},\n");
     static constexpr fmt::string_view Format_803("]\n}}\ncoordIndex [\n");
     static constexpr fmt::string_view Format_805("]\nccw TRUE\nsolid TRUE\n}}\n}}\n");

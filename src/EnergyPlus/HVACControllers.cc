@@ -628,7 +628,8 @@ void GetControllerInput(EnergyPlusData &state)
             ControllerProps(Num).MinVolFlowActuated = NumArray(3);
 
             if (!CheckForControllerWaterCoil(state, CurrentModuleObject, AlphArray(1))) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\" not found on any AirLoopHVAC:ControllerList.");
+                ShowSevereError(
+                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + AlphArray(1) + "\" not found on any AirLoopHVAC:ControllerList.");
                 ErrorsFound = true;
             }
 
@@ -642,7 +643,8 @@ void GetControllerInput(EnergyPlusData &state)
 
                 if (NodeNotFound) {
                     // the sensor node is not on the water coil air outlet node
-                    ShowWarningError(state, std::string{RoutineName} + ControllerProps(Num).ControllerType + "=\"" + ControllerProps(Num).ControllerName + "\". ");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + ControllerProps(Num).ControllerType + "=\"" + ControllerProps(Num).ControllerName + "\". ");
                     ShowContinueError(state, " ..Sensor node not found on water coil air outlet node.");
                     ShowContinueError(state,
                                       " ..The sensor node may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -1104,8 +1106,9 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
 
         // Check to make sure that the Minimum Flow rate is less than the max.
         if (ControllerProps(ControlNum).MaxVolFlowActuated == 0.0) {
-            ShowWarningError(
-                state, std::string{RoutineName} + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName + "\", Maximum Actuated Flow is zero.");
+            ShowWarningError(state,
+                             std::string{RoutineName} + ": Controller:WaterCoil=\"" + ControllerProps(ControlNum).ControllerName +
+                                 "\", Maximum Actuated Flow is zero.");
             ControllerProps(ControlNum).MinVolFlowActuated = 0.0;
         } else if (ControllerProps(ControlNum).MinVolFlowActuated >= ControllerProps(ControlNum).MaxVolFlowActuated) {
             ShowFatalError(state,

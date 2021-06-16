@@ -625,8 +625,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
             if (RefrigCase(CaseNum).ActualZoneNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(3) +
-                                    " not valid: " + Alphas(3));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(3) + " not valid: " + Alphas(3));
                 ErrorsFound = true;
             } else {
                 state.dataRefrigCase->RefrigPresentInZone(RefrigCase(CaseNum).ActualZoneNum) = true;
@@ -703,16 +703,16 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).LatentEnergyCurveType = iEnergyEqnForm::DPCubic;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(4) + "=\"" +
-                                    Alphas(4) + "\".");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(4) + "=\"" + Alphas(4) + "\".");
                 ErrorsFound = true;
             }
 
             RefrigCase(CaseNum).LatCapCurvePtr = CurveManager::GetCurveIndex(state, Alphas(5)); // convert curve name to number
             if (RefrigCase(CaseNum).LatCapCurvePtr == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(5) +
-                                    " not found:" + Alphas(5));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(5) + " not found:" + Alphas(5));
                 ErrorsFound = true;
             }
 
@@ -729,8 +729,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).STDFanPower = Numbers(NumNum);
                 if (Numbers(NumNum) < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                        " must be greater than or equal to 0 W/m");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                        cNumericFieldNames(NumNum) + " must be greater than or equal to 0 W/m");
                     ErrorsFound = true;
                 }
             } else { // blank use default of 75 W/m
@@ -742,8 +742,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).OperatingFanPower = Numbers(NumNum);
                 if (Numbers(NumNum) < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                        " must be greater than or equal to 0 W/m");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                        cNumericFieldNames(NumNum) + " must be greater than or equal to 0 W/m");
                     ErrorsFound = true;
                 }
             } else { // if blank set = to std fan power
@@ -755,8 +755,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).RatedLightingPower = Numbers(NumNum);
                 if (Numbers(NumNum) < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                        " must be greater than or equal to 0 W/m");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                        cNumericFieldNames(NumNum) + " must be greater than or equal to 0 W/m");
                     ErrorsFound = true;
                 }
             } else { // blank input - use default of 90 W/m
@@ -768,8 +768,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).LightingPower = Numbers(NumNum);
                 if (Numbers(NumNum) < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                        " must be greater than or equal to 0 W/m");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                        cNumericFieldNames(NumNum) + " must be greater than or equal to 0 W/m");
                     ErrorsFound = true;
                 }
             } else { // blank input so set lighting power equal to rated/std lighting power
@@ -780,8 +780,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).LightingSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(6)); // convert schedule name to pointer
                 if (RefrigCase(CaseNum).LightingSchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(6) +
-                                        " not found: " + Alphas(6));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                        cAlphaFieldNames(6) + " not found: " + Alphas(6));
                     ErrorsFound = true;
                 }    // ptr == 0
             } else { // no schedule specified
@@ -806,8 +806,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             //   check lighting fraction to case input
             if (RefrigCase(CaseNum).LightingFractionToCase < 0.0 || RefrigCase(CaseNum).LightingFractionToCase > 1.0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " has a value outside the valid range");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " has a value outside the valid range");
                 ShowContinueError(state, "  Minimum should be >= 0.0 and Maximum should be <= 1.0");
                 ErrorsFound = true;
             }
@@ -816,8 +816,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             RefrigCase(CaseNum).AntiSweatPower = Numbers(NumNum);
             if (Numbers(NumNum) < 0.0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be greater than or equal to 0 W/m");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be greater than or equal to 0 W/m");
                 ErrorsFound = true;
             }
 
@@ -825,8 +825,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             RefrigCase(CaseNum).MinimumASPower = Numbers(NumNum);
             if (Numbers(NumNum) < 0.0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be greater than or equal to 0 W/m");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be greater than or equal to 0 W/m");
                 ErrorsFound = true;
             }
 
@@ -843,8 +843,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).AntiSweatControlType = iASHtrCtrlType::HeatBalance;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(7) + "=\"" +
-                                    Alphas(7) + "\".");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(7) + "=\"" + Alphas(7) + "\".");
                 ErrorsFound = true;
             }
 
@@ -865,8 +865,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (RefrigCase(CaseNum).HumAtZeroAS >= RefrigCase(CaseNum).RatedAmbientRH &&
                 RefrigCase(CaseNum).AntiSweatControlType == iASHtrCtrlType::Linear) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be less than " + cNumericFieldNames(2));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be less than " + cNumericFieldNames(2));
                 ShowContinueError(state, " for Linear " + cAlphaFieldNames(7) + '.');
                 ErrorsFound = true;
             }
@@ -875,15 +875,15 @@ void GetRefrigerationInput(EnergyPlusData &state)
             RefrigCase(CaseNum).Height = Numbers(NumNum);
             if (Numbers(NumNum) < 0.0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be greater than or equal to 0 m");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be greater than or equal to 0 m");
                 ErrorsFound = true;
             }
 
             if (RefrigCase(CaseNum).Height <= 0.0 && RefrigCase(CaseNum).AntiSweatControlType == iASHtrCtrlType::HeatBalance) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be greater than 0 when " + cAlphaFieldNames(7) + " is Heat Balance Method.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be greater than 0 when " + cAlphaFieldNames(7) + " is Heat Balance Method.");
                 ShowContinueError(state, format("..given {} was: {:.3R}", cNumericFieldNames(NumNum), RefrigCase(CaseNum).Height));
                 ErrorsFound = true;
             }
@@ -916,8 +916,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             RefrigCase(CaseNum).ASHeaterFractionToCase = Numbers(NumNum);
             if (Numbers(NumNum) < 0.0 || Numbers(NumNum) > 1.0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be >= 0 and <= 1");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be >= 0 and <= 1");
                 ErrorsFound = true;
             }
 
@@ -952,8 +952,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).DefrostPower = Numbers(NumNum);
                 if (Numbers(NumNum) < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                        " must be greater than or equal to 0 W/m");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                        cNumericFieldNames(NumNum) + " must be greater than or equal to 0 W/m");
                     ErrorsFound = true;
                 }
                 //   disregard defrost power for Off-Cycle or None defrost types
@@ -972,16 +972,16 @@ void GetRefrigerationInput(EnergyPlusData &state)
                  DefType == iRefCaseDefrostType::Electric || DefType == iRefCaseDefrostType::ElectricTerm) &&
                 RefrigCase(CaseNum).DefrostPower <= 0.0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be greater than 0 W/m for " + cAlphaFieldNames(8) + ' ' + Alphas(8));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be greater than 0 W/m for " + cAlphaFieldNames(8) + ' ' + Alphas(8));
                 ErrorsFound = true;
             }
 
             RefrigCase(CaseNum).DefrostSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(9)); // convert schedule name to pointer
             if (RefrigCase(CaseNum).DefrostSchedPtr == 0 && RefrigCase(CaseNum).DefrostType != iRefCaseDefrostType::None) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(9) +
-                                    " not found: " + Alphas(9));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(9) + " not found: " + Alphas(9));
                 ShowContinueError(state, "required when " + cAlphaFieldNames(8) + "=\"" + Alphas(8) + "\".");
                 ErrorsFound = true;
             }
@@ -1031,8 +1031,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ScheduleManager::GetScheduleIndex(state, Alphas(10)); // convert schedule name to pointer
                 if (RefrigCase(CaseNum).DefrostDripDownSchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(10) +
-                                        " not found: " + Alphas(10));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                        cAlphaFieldNames(10) + " not found: " + Alphas(10));
                     ErrorsFound = true;
                 }
             } else {
@@ -1059,8 +1059,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).DefrostEnergyCurveType = iEnergyEqnForm::None;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(11) +
-                                    "=\"" + Alphas(11) + "\".");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(11) + "=\"" + Alphas(11) + "\".");
                 ErrorsFound = true;
             }
 
@@ -1069,8 +1069,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                  RefrigCase(CaseNum).DefrostType == iRefCaseDefrostType::HotFluidTerm) &&
                 (RefrigCase(CaseNum).DefCapCurvePtr == 0)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(12) +
-                                    " not found:" + Alphas(12));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(12) + " not found:" + Alphas(12));
                 ErrorsFound = true;
             }
 
@@ -1099,8 +1099,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             RefrigCase(CaseNum).RAFrac = Numbers(NumNum);
             if (Numbers(NumNum) < 0.0 || Numbers(NumNum) > 1.0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be >= 0 or <= 1 ");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be >= 0 or <= 1 ");
                 ErrorsFound = true;
             }
 
@@ -1119,8 +1119,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (RefrigCase(CaseNum).ActualZoneNum >= 0) {
                 if (RefrigCase(CaseNum).ZoneNodeNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", System Node Number not found for " +
-                                        cAlphaFieldNames(3) + " = " + Alphas(3));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name +
+                                        "\", System Node Number not found for " + cAlphaFieldNames(3) + " = " + Alphas(3));
                     ShowContinueError(state,
                                       "..Refrigerated cases must reference a controlled Zone (appear in a ZoneHVAC:EquipmentConnections object).");
                     ErrorsFound = true;
@@ -1158,8 +1158,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (!lAlphaBlanks(13)) {
                 if (RefrigCase(CaseNum).StockingSchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(13) +
-                                        " not found: " + Alphas(13));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                        cAlphaFieldNames(13) + " not found: " + Alphas(13));
                     ErrorsFound = true;
                 }
             } else {
@@ -1192,8 +1192,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (!lAlphaBlanks(14)) {
                 if (RefrigCase(CaseNum).CaseCreditFracSchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " + cAlphaFieldNames(14) +
-                                        " not found: " + Alphas(14));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\", invalid  " +
+                                        cAlphaFieldNames(14) + " not found: " + Alphas(14));
                     ErrorsFound = true;
                 }
             } else {
@@ -1223,8 +1223,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).EvapTempDesign = Numbers(NumNum);
                 if (RefrigCase(CaseNum).EvapTempDesign >= RefrigCase(CaseNum).Temperature) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\" " + cNumericFieldNames(NumNum) +
-                                        " must be below " + cNumericFieldNames(7));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\" " +
+                                        cNumericFieldNames(NumNum) + " must be below " + cNumericFieldNames(7));
                     ErrorsFound = true;
                 }
             } else {
@@ -1238,8 +1238,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 RefrigCase(CaseNum).DesignRefrigInventory = RefrigCase(CaseNum).RefrigInventory * RefrigCase(CaseNum).Length;
                 if (RefrigCase(CaseNum).RefrigInventory < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\" " + cNumericFieldNames(NumNum) +
-                                        " must be a positive number.");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigCase(CaseNum).Name + "\" " +
+                                        cNumericFieldNames(NumNum) + " must be a positive number.");
                     ErrorsFound = true;
                 }
             } else {
@@ -1274,8 +1274,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WalkIn(WalkInID).SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (WalkIn(WalkInID).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(2) +
-                                        " not found: " + Alphas(2));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
+                                        cAlphaFieldNames(2) + " not found: " + Alphas(2));
                     ErrorsFound = true;
                 }    // ptr == 0
             } else { // no schedule specified
@@ -1303,24 +1303,27 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (!lNumericBlanks(2)) {
                 WalkIn(WalkInID).Temperature = Numbers(2);
             } else {
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(2) + " must be input ");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(2) +
+                                    " must be input ");
                 ErrorsFound = true;
             }
 
             if (!lNumericBlanks(3)) {
                 WalkIn(WalkInID).TEvapDesign = Numbers(3);
             } else {
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(3) + " must be input");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(3) +
+                                    " must be input");
                 ErrorsFound = true;
             }
 
             if (!lNumericBlanks(4)) {
                 WalkIn(WalkInID).HeaterPower = Numbers(4);
             } else {
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(4) + " must be input ");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(4) +
+                                    " must be input ");
                 ErrorsFound = true;
             }
 
@@ -1330,8 +1333,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ScheduleManager::GetScheduleIndex(state, Alphas(AlphaNum)); // convert heater schedule name to pointer
                 if (WalkIn(WalkInID).HeaterSchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
-                                        " not found: " + Alphas(AlphaNum));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
+                                        cAlphaFieldNames(AlphaNum) + " not found: " + Alphas(AlphaNum));
                     ErrorsFound = true;
                 }    // ptr == 0
             } else { // no schedule specified
@@ -1372,8 +1375,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (!lNumericBlanks(7)) {
                 WalkIn(WalkInID).DesignLighting = Numbers(7);
             } else {
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\" " + cNumericFieldNames(7) + " must be input ");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\" " + cNumericFieldNames(7) +
+                                    " must be input ");
                 ErrorsFound = true;
             }
 
@@ -1383,8 +1387,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ScheduleManager::GetScheduleIndex(state, Alphas(AlphaNum)); // convert lighting schedule name to pointer
                 if (WalkIn(WalkInID).LightingSchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
-                                        " not found: " + Alphas(AlphaNum));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
+                                        cAlphaFieldNames(AlphaNum) + " not found: " + Alphas(AlphaNum));
                     ErrorsFound = true;
                 }    // ptr == 0
             } else { // no schedule specified
@@ -1412,8 +1416,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WalkIn(WalkInID).DefrostType = WalkinClrDefrostType::OffCycle;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
-                                    "=\"" + Alphas(AlphaNum) + "\".");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
+                                    cAlphaFieldNames(AlphaNum) + "=\"" + Alphas(AlphaNum) + "\".");
                 ErrorsFound = true;
             }
 
@@ -1424,8 +1428,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WalkIn(WalkInID).DefrostControlType = iDefrostCtrlType::TempTerm;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
-                                    " not found: " + Alphas(AlphaNum));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
+                                    cAlphaFieldNames(AlphaNum) + " not found: " + Alphas(AlphaNum));
                 ErrorsFound = true;
             } // defrost control type
 
@@ -1434,8 +1438,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             WalkIn(WalkInID).DefrostSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(AlphaNum));
             if (WalkIn(WalkInID).DefrostSchedPtr == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
-                                    " not found: " + Alphas(AlphaNum));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
+                                    cAlphaFieldNames(AlphaNum) + " not found: " + Alphas(AlphaNum));
                 ErrorsFound = true;
             }
             //   check defrost schedule for values between 0 and 1
@@ -1455,8 +1459,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WalkIn(WalkInID).DefrostDripDownSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(AlphaNum));
                 if (WalkIn(WalkInID).DefrostDripDownSchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
-                                        " not found: " + Alphas(AlphaNum));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
+                                        cAlphaFieldNames(AlphaNum) + " not found: " + Alphas(AlphaNum));
                     ErrorsFound = true;
                 }
                 // check schedule for values between 0 and 1
@@ -1492,8 +1496,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (!lNumericBlanks(9)) {
                     if ((Numbers(9) > 1.0) || (Numbers(9) < 0.0)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(9) +
-                                             " must be between 0 and 1, default values will be used.");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " +
+                                             cNumericFieldNames(9) + " must be between 0 and 1, default values will be used.");
                     } else {
                         WalkIn(WalkInID).DefEnergyFraction = Numbers(9);
                     } // number out of range
@@ -1508,8 +1512,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WalkIn(WalkInID).StockingSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(AlphaNum));
                 if (WalkIn(WalkInID).StockingSchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
-                                        " not found: " + Alphas(AlphaNum));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
+                                        cAlphaFieldNames(AlphaNum) + " not found: " + Alphas(AlphaNum));
                     ErrorsFound = true;
                 }
             } // blank
@@ -1520,8 +1524,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (!lNumericBlanks(11)) {
                 WalkIn(WalkInID).FloorArea = Numbers(11);
             } else {
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(11) + " must be input");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(11) +
+                                    " must be input");
                 ErrorsFound = true;
             }
 
@@ -1530,8 +1535,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
             } else {
                 WalkIn(WalkInID).FloorUValue = Numbers(12);
                 if (Numbers(12) <= 0.0) {
-                    ShowSevereError(
-                        state, std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(12) + " must be > 0.");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(12) +
+                                        " must be > 0.");
                     ErrorsFound = true;
                 }
             }
@@ -1582,8 +1588,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
                 if (WalkIn(WalkInID).ZoneNum(ZoneID) == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " + cAlphaFieldNames(AStart) +
-                                        " not valid: " + Alphas(AStart));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", invalid  " +
+                                        cAlphaFieldNames(AStart) + " not valid: " + Alphas(AStart));
                     ErrorsFound = true;
                 } else {
                     state.dataRefrigCase->RefrigPresentInZone(WalkIn(WalkInID).ZoneNum(ZoneID)) = true;
@@ -1592,8 +1598,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (WalkIn(WalkInID).ZoneNum(ZoneID) >= 0) {
                     if (WalkIn(WalkInID).ZoneNodeNum(ZoneID) == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\" System Node Number not found for " +
-                                            cAlphaFieldNames(AStart) + " = " + Alphas(AStart));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name +
+                                            "\" System Node Number not found for " + cAlphaFieldNames(AStart) + " = " + Alphas(AStart));
                         ShowContinueError(state, ".. Walk Ins must reference a controlled Zone (appear in a ZoneHVAC:EquipmentConnections object.");
                         ErrorsFound = true;
                     }
@@ -1603,8 +1609,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     WalkIn(WalkInID).SurfaceArea(ZoneID) = Numbers(NStart);
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " + cNumericFieldNames(NStart) +
-                                        " must be input for Zone: " + WalkIn(WalkInID).ZoneName(ZoneID));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WalkIn(WalkInID).Name + "\", " +
+                                        cNumericFieldNames(NStart) + " must be input for Zone: " + WalkIn(WalkInID).ZoneName(ZoneID));
                     ErrorsFound = true;
                 }
 
@@ -1822,8 +1828,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).UnitLoadFactorSens = Numbers(NumNum);
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W/C");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W/C");
                         ErrorsFound = true;
                     }
                     break;
@@ -1847,8 +1853,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         }
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1860,8 +1866,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 1;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1874,8 +1880,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 1;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1887,8 +1893,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 2;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1901,8 +1907,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 2;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1914,8 +1920,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 3;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1928,8 +1934,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 3;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1941,8 +1947,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 4;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1955,8 +1961,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 4;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1968,8 +1974,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 5;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                     break;
@@ -1982,8 +1988,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         WarehouseCoil(CoilID).SCIndex = 5;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                            " must be input and be greater than 0 W");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                            cNumericFieldNames(NumNum) + " must be input and be greater than 0 W");
                         ErrorsFound = true;
                     }
                 default:
@@ -1997,8 +2003,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WarehouseCoil(CoilID).TEvapDesign = Numbers(NumNum); // also used to rep inlet brine T later when add that option
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be input");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be input");
                 ErrorsFound = true;
             }
 
@@ -2008,8 +2014,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 // INLET temperature - evaporating temperature, NOT room temp - evap temp
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be input");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be input");
                 ErrorsFound = true;
             }
 
@@ -2021,8 +2027,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             } else {
                 WarehouseCoil(CoilID).MaxTemperatureDif = 1.3 * WarehouseCoil(CoilID).RatedTemperatureDif;
                 ShowWarningError(state,
-                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                     " not entered, default 1.3 times rated temperature difference will be used.");
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                     cNumericFieldNames(NumNum) + " not entered, default 1.3 times rated temperature difference will be used.");
             }
 
             // Correction factor from manufacturer's rating for coil material, default 1.0
@@ -2160,8 +2166,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WarehouseCoil(CoilID).HeaterPower = Numbers(NumNum);
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " must be input ");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " must be input ");
                 ErrorsFound = true;
             }
 
@@ -2208,8 +2214,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WarehouseCoil(CoilID).RatedFanPower = Numbers(NumNum);
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " was not input or was less than 0 ");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " was not input or was less than 0 ");
                 ErrorsFound = true;
             } // coil fan power
 
@@ -2218,8 +2224,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 WarehouseCoil(CoilID).RatedAirVolumeFlow = Numbers(NumNum);
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                    " is required and was not input or was less than 0  ");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                    cNumericFieldNames(NumNum) + " is required and was not input or was less than 0  ");
             } // air volume flow
 
             ++NumNum;                                       // N13
@@ -2301,8 +2307,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
             } else { // have electric or hot gas/brine defrost
                 if ((lNumericBlanks(NumNum)) || (Numbers(NumNum) <= 0.0)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " + cNumericFieldNames(NumNum) +
-                                        " must be input and greater than or equal to 0 W for " + cAlphaFieldNames(AlphaNum) + ' ' + Alphas(AlphaNum));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + WarehouseCoil(CoilID).Name + "\", " +
+                                        cNumericFieldNames(NumNum) + " must be input and greater than or equal to 0 W for " +
+                                        cAlphaFieldNames(AlphaNum) + ' ' + Alphas(AlphaNum));
                     ErrorsFound = true;
                 } else {
                     WarehouseCoil(CoilID).DefrostCapacity = Numbers(NumNum);
@@ -2400,15 +2407,15 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
             if (AirChillerSet(SetID).ZoneNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AirChillerSet(SetID).Name + "\", invalid  " + cAlphaFieldNames(AlphaNum) +
-                                    " not valid: " + Alphas(AlphaNum));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AirChillerSet(SetID).Name + "\", invalid  " +
+                                    cAlphaFieldNames(AlphaNum) + " not valid: " + Alphas(AlphaNum));
                 ErrorsFound = true;
             }
             AirChillerSet(SetID).ZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, AirChillerSet(SetID).ZoneName);
             if (AirChillerSet(SetID).ZoneNodeNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AirChillerSet(SetID).Name + "\" System Node Number not found for " +
-                                    cAlphaFieldNames(AlphaNum) + " = " + Alphas(AlphaNum));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + AirChillerSet(SetID).Name +
+                                    "\" System Node Number not found for " + cAlphaFieldNames(AlphaNum) + " = " + Alphas(AlphaNum));
                 ShowContinueError(state,
                                   ".. Refrigeration chillers must reference a controlled Zone (appear in a ZoneHVAC:EquipmentConnections object.");
                 ErrorsFound = true;
@@ -2506,13 +2513,13 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         LoadCoilNum = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), WarehouseCoil);
                     if ((LoadWalkInNum == 0) && (LoadCaseNum == 0) && (LoadCoilNum == 0)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFieldNames(AlphaListNum) + "\", has an invalid value of " +
-                                            Alphas(AlphaListNum));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFieldNames(AlphaListNum) +
+                                            "\", has an invalid value of " + Alphas(AlphaListNum));
                         ErrorsFound = true;
                     } else if ((LoadWalkInNum != 0) && (LoadCaseNum != 0) && (LoadCoilNum != 0)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFieldNames(AlphaListNum) + "\", " + Alphas(AlphaListNum) +
-                                            " Case and WalkIns and Refrigerated Coils cannot have the same name.");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFieldNames(AlphaListNum) + "\", " +
+                                            Alphas(AlphaListNum) + " Case and WalkIns and Refrigerated Coils cannot have the same name.");
                         ErrorsFound = true;
                     } else if (LoadWalkInNum != 0) {
                         ++NumWalkInsOnList;
@@ -2592,8 +2599,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             RefrigRack(RackNum).COPFTempPtr = CurveManager::GetCurveIndex(state, Alphas(3)); // convert curve name to number
             if (RefrigRack(RackNum).COPFTempPtr == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " + cAlphaFieldNames(3) +
-                                    " not found:" + Alphas(3));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(3) + " not found:" + Alphas(3));
                 ErrorsFound = true;
             }
 
@@ -2616,8 +2623,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             RefrigRack(RackNum).TotCondFTempPtr = CurveManager::GetCurveIndex(state, Alphas(4)); // convert curve name to number
             if ((!lAlphaBlanks(4)) && RefrigRack(RackNum).TotCondFTempPtr == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " + cAlphaFieldNames(4) +
-                                    " not found:" + Alphas(4));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(4) + " not found:" + Alphas(4));
                 ErrorsFound = true;
             }
 
@@ -2681,8 +2688,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     RefrigRack(RackNum).FlowType = iCndsrFlowType::ConstantFlow;
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " + cAlphaFieldNames(8) +
-                                        " not recognized: " + Alphas(8));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
+                                        cAlphaFieldNames(8) + " not recognized: " + Alphas(8));
                     ShowContinueError(state, "Check input value choices.");
                     ErrorsFound = true;
                 }
@@ -2696,8 +2703,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     }
                     if (RefrigRack(RackNum).OutletTempSchedPtr == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " + cAlphaFieldNames(9) +
-                                            " : " + Alphas(9));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
+                                            cAlphaFieldNames(9) + " : " + Alphas(9));
                         ShowContinueError(state, "A schedule with this name is not defined in this input data file.");
                         ErrorsFound = true;
                     }
@@ -2713,8 +2720,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 // Check constant flow for max violation, if applicable
                 if (RefrigRack(RackNum).FlowType == iCndsrFlowType::ConstantFlow && RefrigRack(RackNum).VolFlowRate > Numbers(4)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\" " + cNumericFieldNames(3) + " > " +
-                                        cNumericFieldNames(4) + '.');
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\" " +
+                                        cNumericFieldNames(3) + " > " + cNumericFieldNames(4) + '.');
                     ShowContinueError(state, "Revise flow rates.");
                     ErrorsFound = true;
                 }
@@ -2740,8 +2747,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     }
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " + cAlphaFieldNames(10) +
-                                        " = " + Alphas(10));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", invalid  " +
+                                        cAlphaFieldNames(10) + " = " + Alphas(10));
                     ShowContinueError(state, "A schedule with this name is not defined in this input data file.");
                     ErrorsFound = true;
                 }
@@ -2767,8 +2774,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
             //   Basin heater power as a function of temperature must be greater than or equal to 0
             RefrigRack(RackNum).BasinHeaterPowerFTempDiff = Numbers(9);
             if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && Numbers(9) < 0.0) {
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cNumericFieldNames(9) + " must be >= 0");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cNumericFieldNames(9) +
+                                    " must be >= 0");
                 ErrorsFound = true;
             }
 
@@ -2818,8 +2826,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                                             DataLoopNode::ObjectIsParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, RefrigRack(RackNum).OutsideAirNodeNum)) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cAlphaFieldNames(12) +
-                                        " not found: " + Alphas(12));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " +
+                                        cAlphaFieldNames(12) + " not found: " + Alphas(12));
                     ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                     ErrorsFound = true;
                 }
@@ -3038,8 +3046,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 Condenser(CondNum).CapCurvePtr = CurveManager::GetCurveIndex(state, Alphas(2)); // convert curve name to number
                 if (Condenser(CondNum).CapCurvePtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " + cAlphaFieldNames(2) +
-                                        " not found:" + Alphas(2));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " +
+                                        cAlphaFieldNames(2) + " not found:" + Alphas(2));
                     ErrorsFound = true;
                 }
 
@@ -3127,8 +3135,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Condenser(CondNum).InletAirNodeNum)) {
                             // not outside and not a zone
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", " + cAlphaFieldNames(4) +
-                                                " not found: " + Alphas(4));
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", " +
+                                                cAlphaFieldNames(4) + " not found: " + Alphas(4));
                             ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node or as a Zone.");
                             ErrorsFound = true;
                         } // checkoutairnodenumber
@@ -3301,8 +3309,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                                                                              DataLoopNode::ObjectIsParent);
                     if (!OutAirNodeManager::CheckOutAirNodeNumber(state, Condenser(CondNum).InletAirNodeNum)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", " + cAlphaFieldNames(3) +
-                                            " not found: " + Alphas(3));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", " +
+                                            cAlphaFieldNames(3) + " not found: " + Alphas(3));
                         ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
                         ErrorsFound = true;
                     }
@@ -3318,8 +3326,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 Condenser(CondNum).BasinHeaterPowerFTempDiff = Numbers(NumNum);
                 if (Numbers(NumNum) < 0.0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", " + cNumericFieldNames(NumNum) +
-                                        " must be >= 0");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", " +
+                                        cNumericFieldNames(NumNum) + " must be >= 0");
                     ErrorsFound = true;
                 }
 
@@ -3367,8 +3375,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         }
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " + cAlphaFieldNames(5) +
-                                            " = " + Alphas(5));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " +
+                                            cAlphaFieldNames(5) + " = " + Alphas(5));
                         ShowContinueError(state, "A schedule with this name is not defined in this input data file.");
                         ErrorsFound = true;
                     }
@@ -3441,8 +3449,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         Condenser(CondNum).RatedSubcool = Numbers(3);
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " + cNumericFieldNames(3) +
-                                            " must be greater than or equal to zero.");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " +
+                                            cNumericFieldNames(3) + " must be greater than or equal to zero.");
                         ErrorsFound = true;
                     }
                 } else {
@@ -3486,8 +3494,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     Condenser(CondNum).FlowType = iCndsrFlowType::ConstantFlow;
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " + cAlphaFieldNames(4) +
-                                        " not recognized: " + Alphas(4));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " +
+                                        cAlphaFieldNames(4) + " not recognized: " + Alphas(4));
                     ShowContinueError(state, "Check input value choices.");
                     ErrorsFound = true;
                 } // Set FlowType
@@ -3502,8 +3510,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     }
                     if (Condenser(CondNum).OutletTempSchedPtr == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " + cAlphaFieldNames(5) +
-                                            " = " + Alphas(5));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " +
+                                            cAlphaFieldNames(5) + " = " + Alphas(5));
                         ShowContinueError(state, "A schedule with this name is not defined in this input data file.");
                         ErrorsFound = true;
                     }
@@ -3516,8 +3524,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         Condenser(CondNum).VolFlowRate = Numbers(5);
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " + cNumericFieldNames(5) +
-                                            " must be greater than zero.");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " +
+                                            cNumericFieldNames(5) + " must be greater than zero.");
                         ShowContinueError(state, "Revise flow rates.");
                         ErrorsFound = true;
                     }
@@ -3530,8 +3538,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     // Check constant flow for max violation, if applicable
                     if (Condenser(CondNum).FlowType == iCndsrFlowType::ConstantFlow && Condenser(CondNum).VolFlowRate > Numbers(6)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " + cNumericFieldNames(5) + " > " +
-                                            cNumericFieldNames(6) + " .");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " +
+                                            cNumericFieldNames(5) + " > " + cNumericFieldNames(6) + " .");
                         ShowContinueError(state, "Revise flow rates.");
                         ErrorsFound = true;
                     } // Error check on max flow rate
@@ -3606,8 +3614,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         Condenser(CondNum).RatedApproachT = Numbers(2);
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " + cNumericFieldNames(2) +
-                                            " must be greater than or equal to zero.");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\" " +
+                                            cNumericFieldNames(2) + " must be greater than or equal to zero.");
                         ErrorsFound = true;
                     }
                 } else {
@@ -3631,8 +3639,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         Condenser(CondNum).CascadeTempControl = iCascadeCndsrTempCtrlType::TempFloat;
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " + cAlphaFieldNames(2) +
-                                            " not recognized: " + Alphas(2));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Condenser(CondNum).Name + "\", invalid  " +
+                                            cAlphaFieldNames(2) + " not recognized: " + Alphas(2));
                         ShowContinueError(state, "Check input value choices.");
                         ErrorsFound = true;
                     }    // string comparison to key choices
@@ -3678,8 +3686,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 GasCooler(GCNum).CapCurvePtr = CurveManager::GetCurveIndex(state, Alphas(2)); // convert curve name to number
                 if (GasCooler(GCNum).CapCurvePtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + GasCooler(GCNum).Name + "\", invalid " + cAlphaFieldNames(2) +
-                                        " not found:" + Alphas(2));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + GasCooler(GCNum).Name + "\", invalid " +
+                                        cAlphaFieldNames(2) + " not found:" + Alphas(2));
                     ErrorsFound = true;
                 }
 
@@ -3811,8 +3819,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         if (!OutAirNodeManager::CheckOutAirNodeNumber(state, GasCooler(GCNum).InletAirNodeNum)) {
                             // not outside and not a zone
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + GasCooler(GCNum).Name + "\", " + cAlphaFieldNames(4) +
-                                                " not found: " + Alphas(4));
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + GasCooler(GCNum).Name + "\", " +
+                                                cAlphaFieldNames(4) + " not found: " + Alphas(4));
                             ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node or as a Zone.");
                             ErrorsFound = true;
                         } // checkoutairnodenumber
@@ -3894,8 +3902,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         ErrorsFound = true;
                         if (NumNameMatches == 0) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", has an invalid " +
-                                                cAlphaFieldNames(AlphaNum) + ": " + Alphas(AlphaNum));
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
+                                                "\", has an invalid " + cAlphaFieldNames(AlphaNum) + ": " + Alphas(AlphaNum));
                         } else if (NumNameMatches > 1) {
                             ShowSevereError(state,
                                             std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
@@ -4000,8 +4008,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     } // Set FluidType
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\" " + cAlphaFieldNames(AlphaNum) +
-                                        " must be specified.");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\" " +
+                                        cAlphaFieldNames(AlphaNum) + " must be specified.");
                     ErrorsFound = true;
                 } // blank on cir fluid type
 
@@ -4016,8 +4024,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     Secondary(SecondaryNum).TEvapDesign = Numbers(3);
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\" " + cNumericFieldNames(3) +
-                                        " must be specified.");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\" " +
+                                        cNumericFieldNames(3) + " must be specified.");
                     ErrorsFound = true;
                 } // blank on N3
 
@@ -4025,8 +4033,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     Secondary(SecondaryNum).TApproachDifRated = Numbers(4);
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\" " + cNumericFieldNames(4) +
-                                        " must be specified.");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\" " +
+                                        cNumericFieldNames(4) + " must be specified.");
                     ErrorsFound = true;
                 } // blank on N4
 
@@ -4049,8 +4057,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         Secondary(SecondaryNum).TRangeDifRated = Numbers(5);
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " + cNumericFieldNames(5) +
-                                            " must be specified.");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " +
+                                            cNumericFieldNames(5) + " must be specified.");
                         ShowContinueError(state, "...when " + cAlphaFieldNames(3) + "=\"FluidAlwaysLiquid\".");
                         ErrorsFound = true;
                     } // blank on N5
@@ -4320,13 +4328,14 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     }
                 } else if (!lNumericBlanks(NumNum) && lAlphaBlanks(AlphaNum)) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " + cAlphaFieldNames(AlphaNum) +
-                                         " not found even though " + cNumericFieldNames(NumNum) +
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " +
+                                         cAlphaFieldNames(AlphaNum) + " not found even though " + cNumericFieldNames(NumNum) +
                                          " is greater than zero. Distribution piping heat gain will not be calculated unless a Zone is defined to "
                                          "deterimine the environmental temperature surrounding the piping.");
                 } else if (lNumericBlanks(NumNum) && !lAlphaBlanks(AlphaNum)) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " + cAlphaFieldNames(AlphaNum) +
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " +
+                                         cAlphaFieldNames(AlphaNum) +
                                          " will not be used and distribution piping heat gain will not be calculated because " +
                                          cNumericFieldNames(NumNum) + " was blank.");
                 } // distribution piping
@@ -4364,15 +4373,15 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     }
                 } else if (!lNumericBlanks(NumNum) && lAlphaBlanks(AlphaNum)) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " + cAlphaFieldNames(AlphaNum) +
-                                         " not found even though " + cNumericFieldNames(NumNum) +
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " +
+                                         cAlphaFieldNames(AlphaNum) + " not found even though " + cNumericFieldNames(NumNum) +
                                          " is greater than zero. Receiver heat gain will not be calculated unless a Zone is defined to deterimine "
                                          "the environmental temperature surrounding the Receiver.");
                 } else if (lNumericBlanks(NumNum) && !lAlphaBlanks(AlphaNum)) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " + cAlphaFieldNames(AlphaNum) +
-                                         " will not be used and Receiver heat gain will not be calculated because " + cNumericFieldNames(NumNum) +
-                                         " was blank.");
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", " +
+                                         cAlphaFieldNames(AlphaNum) + " will not be used and Receiver heat gain will not be calculated because " +
+                                         cNumericFieldNames(NumNum) + " was blank.");
                 } // Receiver
 
                 NumNum = 14;
@@ -4381,8 +4390,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (Secondary(SecondaryNum).ChillerRefInventory < 0.0) {
                     Secondary(SecondaryNum).ChillerRefInventory = 0.0;
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name + "\", The value specified for " +
-                                         cNumericFieldNames(NumNum) + " is less than zero. The default value of zero will be used.");
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Secondary(SecondaryNum).Name +
+                                         "\", The value specified for " + cNumericFieldNames(NumNum) +
+                                         " is less than zero. The default value of zero will be used.");
                 }
 
                 AlphaNum = 9;
@@ -4496,16 +4506,16 @@ void GetRefrigerationInput(EnergyPlusData &state)
             Compressor(CompNum).ElecPowerCurvePtr = CurveManager::GetCurveIndex(state, Alphas(2)); // convert curve name to number
             if ((!lAlphaBlanks(2)) && Compressor(CompNum).ElecPowerCurvePtr == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Compressor(CompNum).Name + "\", invalid  " + cAlphaFieldNames(2) +
-                                    " not found = " + Alphas(2));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Compressor(CompNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(2) + " not found = " + Alphas(2));
                 ErrorsFound = true;
             }
 
             Compressor(CompNum).CapacityCurvePtr = CurveManager::GetCurveIndex(state, Alphas(3)); // convert curve name to number
             if ((!lAlphaBlanks(3)) && Compressor(CompNum).CapacityCurvePtr == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Compressor(CompNum).Name + "\", invalid  " + cAlphaFieldNames(3) +
-                                    " not found = " + Alphas(3));
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Compressor(CompNum).Name + "\", invalid  " +
+                                    cAlphaFieldNames(3) + " not found = " + Alphas(3));
                 ErrorsFound = true;
             }
 
@@ -4548,13 +4558,15 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 Compressor(CompNum).TransElecPowerCurvePtr = CurveManager::GetCurveIndex(state, Alphas(6)); // convert curve name to number
                 if (lAlphaBlanks(6) && Compressor(CompNum).TransElecPowerCurvePtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + '=' + Compressor(CompNum).Name + ": " + cAlphaFieldNames(6) + " not found.");
+                                    std::string{RoutineName} + CurrentModuleObject + '=' + Compressor(CompNum).Name + ": " + cAlphaFieldNames(6) +
+                                        " not found.");
                     ErrorsFound = true;
                 }
                 Compressor(CompNum).TransCapacityCurvePtr = CurveManager::GetCurveIndex(state, Alphas(7)); // convert curve name to number
                 if (lAlphaBlanks(7) && Compressor(CompNum).TransCapacityCurvePtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + '=' + Compressor(CompNum).Name + ": " + cAlphaFieldNames(7) + " not found.");
+                                    std::string{RoutineName} + CurrentModuleObject + '=' + Compressor(CompNum).Name + ": " + cAlphaFieldNames(7) +
+                                        " not found.");
                     ErrorsFound = true;
                 }
             } else if ((UtilityRoutines::SameString(Alphas(5), "Subcritical")) || (lAlphaBlanks(5))) { // Mode of Operation = Subcritical
@@ -4569,8 +4581,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 }
             } else { // Invalid Mode of Operation
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFieldNames(5) + " for " + Compressor(CompNum).Name + '=' +
-                                    Alphas(5) + R"( is invalid. Valid choices are "Subcritical" or "Transcritical".)");
+                                std::string{RoutineName} + CurrentModuleObject + ": " + cAlphaFieldNames(5) + " for " + Compressor(CompNum).Name +
+                                    '=' + Alphas(5) + R"( is invalid. Valid choices are "Subcritical" or "Transcritical".)");
                 ErrorsFound = true;
             }
 
@@ -4608,8 +4620,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     Subcooler(SubcoolerNum).SubcoolerType = iSubcoolerType::LiquidSuction;
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\", " + cAlphaFieldNames(2) +
-                                        " not recognized = " + Alphas(2));
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\", " +
+                                        cAlphaFieldNames(2) + " not recognized = " + Alphas(2));
                     ShowContinueError(state, "Check input value choices.");
                     ErrorsFound = true;
                 } // Set Subcooler Type
@@ -4622,8 +4634,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         if (!lNumericBlanks(1)) Subcooler(SubcoolerNum).LiqSuctDesignDelT = Numbers(1);
                         if (Subcooler(SubcoolerNum).LiqSuctDesignDelT < 0.0) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " + cNumericFieldNames(1) +
-                                                " cannot be less than zero.");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " +
+                                                cNumericFieldNames(1) + " cannot be less than zero.");
                             ErrorsFound = true;
                         }
 
@@ -4631,8 +4643,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                             Subcooler(SubcoolerNum).LiqSuctDesignTliqIn = Numbers(2);
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " + cNumericFieldNames(2) +
-                                                " must be specified.");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " +
+                                                cNumericFieldNames(2) + " must be specified.");
                             ErrorsFound = true;
                         }
 
@@ -4640,14 +4652,14 @@ void GetRefrigerationInput(EnergyPlusData &state)
                             Subcooler(SubcoolerNum).LiqSuctDesignTvapIn = Numbers(3);
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " + cNumericFieldNames(3) +
-                                                " must be specified.");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " +
+                                                cNumericFieldNames(3) + " must be specified.");
                             ErrorsFound = true;
                         }
                         if (Subcooler(SubcoolerNum).LiqSuctDesignTvapIn > Subcooler(SubcoolerNum).LiqSuctDesignTliqIn) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " + cNumericFieldNames(3) +
-                                                " cannot be greater than " + cNumericFieldNames(2) + '.');
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " +
+                                                cNumericFieldNames(3) + " cannot be greater than " + cNumericFieldNames(2) + '.');
                             ErrorsFound = true;
                         } // error check
 
@@ -4659,8 +4671,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                             Subcooler(SubcoolerNum).MechControlTliqOut = Numbers(4);
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " + cNumericFieldNames(4) +
-                                                " must be specified.");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Subcooler(SubcoolerNum).Name + "\" " +
+                                                cNumericFieldNames(4) + " must be specified.");
                             ErrorsFound = true;
                         } // error check
                     }
@@ -4710,8 +4722,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         LoadSecondaryNum = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), Secondary);
                     if ((LoadCascadeNum == 0) && (LoadSecondaryNum == 0)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFieldNames(AlphaListNum) + "\" : has an invalid value of " +
-                                            Alphas(AlphaListNum));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + cAlphaFieldNames(AlphaListNum) +
+                                            "\" : has an invalid value of " + Alphas(AlphaListNum));
                         ErrorsFound = true;
                     } else if ((LoadCascadeNum != 0) && (LoadSecondaryNum != 0)) {
                         ShowSevereError(state,
@@ -4769,8 +4781,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     CompressorLists(ListNum).CompItemNum(CompIndex) = UtilityRoutines::FindItemInList(Alphas(AlphaListNum), Compressor);
                     if (CompressorLists(ListNum).CompItemNum(CompIndex) == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + CompressorLists(ListNum).Name + "\", has an invalid " +
-                                            cAlphaFieldNames(AlphaListNum) + " defined as " + Alphas(AlphaListNum));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + CompressorLists(ListNum).Name +
+                                            "\", has an invalid " + cAlphaFieldNames(AlphaListNum) + " defined as " + Alphas(AlphaListNum));
                         ErrorsFound = true;
                     }
                 }
@@ -5177,8 +5189,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 }
                 if ((ListNum == 0) && (CompNum == 0)) { // name doesn't match either a compressor or a compressor list
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ' ' + cAlphaFieldNames(AlphaNum) + ", has an invalid or undefined value=\"" +
-                                        Alphas(AlphaNum) + "\".");
+                                    std::string{RoutineName} + CurrentModuleObject + ' ' + cAlphaFieldNames(AlphaNum) +
+                                        ", has an invalid or undefined value=\"" + Alphas(AlphaNum) + "\".");
                     ErrorsFound = true;
                 } else if ((ListNum != 0) && (CompNum != 0)) { // have compressor list and compressor with same name
                     ShowSevereError(state,
@@ -5303,8 +5315,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 System(RefrigSysNum).SuctionPipeZoneNodeNum = DataZoneEquipment::GetSystemNodeNumberForZone(state, Alphas(AlphaNum));
                 if (System(RefrigSysNum).SuctionPipeZoneNodeNum == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", System Node Number not found for " +
-                                        cAlphaFieldNames(AlphaNum) + " = " + Alphas(AlphaNum) + " even though " + cNumericFieldNames(2) +
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
+                                        "\", System Node Number not found for " + cAlphaFieldNames(AlphaNum) + " = " + Alphas(AlphaNum) +
+                                        " even though " + cNumericFieldNames(2) +
                                         " is greater than zero. Suction piping heat gain cannot be calculated unless a Zone is defined to deterimine "
                                         "the environmental temperature surrounding the piping.");
                     ErrorsFound = true;
@@ -5313,15 +5326,15 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 }
             } else if (!lNumericBlanks(2) && lAlphaBlanks(AlphaNum)) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\" " + cAlphaFieldNames(AlphaNum) +
-                                     " not found even though " + cNumericFieldNames(2) +
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\" " +
+                                     cAlphaFieldNames(AlphaNum) + " not found even though " + cNumericFieldNames(2) +
                                      " is greater than zero. Suction piping heat gain will not be calculated unless a Zone is defined to determine "
                                      "the environmental temperature surrounding the piping.");
             } else if (lNumericBlanks(2) && !lAlphaBlanks(AlphaNum)) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\" " + cAlphaFieldNames(AlphaNum) +
-                                     " will not be used and suction piping heat gain will not be calculated because " + cNumericFieldNames(2) +
-                                     " was blank.");
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\" " +
+                                     cAlphaFieldNames(AlphaNum) + " will not be used and suction piping heat gain will not be calculated because " +
+                                     cNumericFieldNames(2) + " was blank.");
             } // suction piping heat gains
 
             AlphaNum = 11;
@@ -5332,8 +5345,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 System(RefrigSysNum).NumStages = Numbers(3);
                 if (System(RefrigSysNum).NumStages < 1 || System(RefrigSysNum).NumStages > 2) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " + cNumericFieldNames(3) +
-                                        R"( has an invalid value.  Only \"1\" or \"2\" compressor stages are allowed.)");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " +
+                                        cNumericFieldNames(3) + R"( has an invalid value.  Only \"1\" or \"2\" compressor stages are allowed.)");
                     ErrorsFound = true;
                 }
             } else {
@@ -5364,12 +5377,14 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
             if (System(RefrigSysNum).NumStages == 1 && (System(RefrigSysNum).IntercoolerType == 1 || System(RefrigSysNum).IntercoolerType == 2)) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", A single-stage compression system");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
+                                    "\", A single-stage compression system");
                 ShowContinueError(state, "has been specified with an intercooler.  Verify that the number of compressor stages");
                 ShowContinueError(state, "and the intercooler type are consistent.");
                 ErrorsFound = true;
             } else if (System(RefrigSysNum).NumStages == 2 && System(RefrigSysNum).IntercoolerType == 0) {
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", A two-stage compression system");
+                ShowSevereError(
+                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", A two-stage compression system");
                 ShowContinueError(state, "has been specified without an intercooler.  Verify that the number of compressor stages");
                 ShowContinueError(state, "and the intercooler type are consistent.");
                 ErrorsFound = true;
@@ -5380,7 +5395,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 System(RefrigSysNum).IntercoolerEffectiveness = Numbers(4);
                 if (System(RefrigSysNum).IntercoolerEffectiveness < 0.0 || System(RefrigSysNum).IntercoolerEffectiveness > 1.0) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", The specified value for the");
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
+                                         "\", The specified value for the");
                     ShowContinueError(
                         state,
                         format("{} = {:.2R} is invalid.  This value must be", cNumericFieldNames(4), System(RefrigSysNum).IntercoolerEffectiveness));
@@ -5398,20 +5414,21 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (lAlphaBlanks(AlphaNum)) {
                     // blank input where must have high-stage compressor or compressor list input.
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " + cAlphaFieldNames(AlphaNum) +
-                                        " must be input for two-stage compression systems.");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " +
+                                        cAlphaFieldNames(AlphaNum) + " must be input for two-stage compression systems.");
                     ErrorsFound = true;
                 } else { //     Entry for Alphas(AlphaNum) can be either a compressor name or a compressorlist name
                     int ListNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), CompressorLists);
                     int CompNum = UtilityRoutines::FindItemInList(Alphas(AlphaNum), Compressor);
                     if ((ListNum == 0) && (CompNum == 0)) { // name doesn't match either a compressor or a compressor list
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " + cAlphaFieldNames(AlphaNum) +
-                                            " has an invalid or undefined value=\"" + Alphas(AlphaNum) + "\".");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " +
+                                            cAlphaFieldNames(AlphaNum) + " has an invalid or undefined value=\"" + Alphas(AlphaNum) + "\".");
                         ErrorsFound = true;
                     } else if ((ListNum != 0) && (CompNum != 0)) { // have compressor list and compressor with same name
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " + cAlphaFieldNames(AlphaNum) +
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", " +
+                                            cAlphaFieldNames(AlphaNum) +
                                             " has a non-unique name used for both Compressor and CompressorList name: \"" + Alphas(AlphaNum) + "\".");
                         ErrorsFound = true;
                     } else if (ListNum != 0) {
@@ -5464,8 +5481,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
                         ++Compressor(CompNum).NumSysAttach;
                     }    // NumStages
                 } else { //  Transcritical compressor attached to subcritical refigeration cycle
-                    ShowSevereError(
-                        state, std::string{RoutineName} + CurrentModuleObject + ". A transcritical compressor is attached to a subcritical refrigeration system.");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject +
+                                        ". A transcritical compressor is attached to a subcritical refrigeration system.");
                     ShowContinueError(state,
                                       "Check input to ensure that subcritical compressors are connected only to subcritical systems and "
                                       "transcritical compressors are connected only to transcritical systems.");
@@ -5665,8 +5683,9 @@ void GetRefrigerationInput(EnergyPlusData &state)
             // Read Transcritical System Type:  SingleStage or TwoStage
             if (lAlphaBlanks(2)) {
                 // No system type specified
-                ShowSevereError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name + "\", has no system type specified.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
+                                    "\", has no system type specified.");
                 ShowContinueError(state, R"(  System type must be specified as "SingleStage" or "TwoStage".)");
                 ErrorsFound = true;
             }
@@ -5685,7 +5704,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             // Read all loads (display cases and walk-ins) on this Transcritical System
             if (lAlphaBlanks(3) && lAlphaBlanks(4)) {
                 // No loads specified - display error
-                ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name + "\", has no loads.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name + "\", has no loads.");
                 ShowContinueError(
                     state, "  The system must have at least one of: " + cAlphaFieldNames(3) + " or " + cAlphaFieldNames(4) + " objects attached.");
                 ErrorsFound = true;
@@ -5742,8 +5762,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ErrorsFound = true;
                     if (NumNameMatches == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name + "\", has an invalid " +
-                                            cAlphaFieldNames(AlphaNum) + ": " + Alphas(AlphaNum));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
+                                            "\", has an invalid " + cAlphaFieldNames(AlphaNum) + ": " + Alphas(AlphaNum));
                     } else if (NumNameMatches > 1) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
@@ -5847,8 +5867,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
                     ErrorsFound = true;
                     if (NumNameMatches == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name + "\", has an invalid " +
-                                            cAlphaFieldNames(AlphaNum) + ": " + Alphas(AlphaNum));
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
+                                            "\", has an invalid " + cAlphaFieldNames(AlphaNum) + ": " + Alphas(AlphaNum));
                     } else if (NumNameMatches > 1) {
                         ShowSevereError(state,
                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + TransSystem(TransRefrigSysNum).Name +
@@ -6293,7 +6313,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (RefrigCase(CaseNum).NumSysAttach > 1) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + ": Refrigeration:Case=\"" + RefrigCase(CaseNum).Name + "\", Same refrigerated case name referenced ");
+                                std::string{RoutineName} + ": Refrigeration:Case=\"" + RefrigCase(CaseNum).Name +
+                                    "\", Same refrigerated case name referenced ");
                 ShowContinueError(state, " by more than one refrigeration system and/or compressor rack.");
             } // if looking for same case attached to multiple systems/racks
         }     // NumSimulationCases
@@ -6362,7 +6383,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (WalkIn(WalkInNum).NumSysAttach > 1) {
                 ErrorsFound = true;
                 ShowSevereError(state,
-                                std::string{RoutineName} + ": Refrigeration:WalkIn=\"" + WalkIn(WalkInNum).Name + "\", Same Refrigeration WalkIn name referenced");
+                                std::string{RoutineName} + ": Refrigeration:WalkIn=\"" + WalkIn(WalkInNum).Name +
+                                    "\", Same Refrigeration WalkIn name referenced");
                 ShowContinueError(state, " by more than one refrigeration system and/or compressor rack.");
             } // if looking for same walk in attached to multiple systems/racks
         }     // NumSimulationWalkIns
@@ -13409,58 +13431,74 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
     auto &WarehouseCoil(state.dataRefrigCase->WarehouseCoil);
     auto &AirChillerSet(state.dataRefrigCase->AirChillerSet);
 
-    static constexpr fmt::string_view Format_104("! <Refrigeration Compressor Rack>,Compressor Rack Name, # Refrigerated Cases Connected,# WalkIn Coolers "
-                                     "Connected, Heat Rejection Location, Condenser Type, COP");
-    static constexpr fmt::string_view Format_105("!  <Refrigeration Case>,Refrigeration Case Number, Refrigeration Case Name,Zone Name,Zone Node #,Zone "
-                                     "Node Name,Capacity (W/m),LHR,Temperature (C),Length (m),Fan (W/m),Installed Lighting (W/m),Anti-Sweat "
-                                     "(W/m),Defrost (W/m)");
+    static constexpr fmt::string_view Format_104(
+        "! <Refrigeration Compressor Rack>,Compressor Rack Name, # Refrigerated Cases Connected,# WalkIn Coolers "
+        "Connected, Heat Rejection Location, Condenser Type, COP");
+    static constexpr fmt::string_view Format_105(
+        "!  <Refrigeration Case>,Refrigeration Case Number, Refrigeration Case Name,Zone Name,Zone Node #,Zone "
+        "Node Name,Capacity (W/m),LHR,Temperature (C),Length (m),Fan (W/m),Installed Lighting (W/m),Anti-Sweat "
+        "(W/m),Defrost (W/m)");
     static constexpr fmt::string_view Format_108("!  <Refrigeration Compressor>,Compressor Number,Compressor Name,Nominal Capacity (W)");
     static constexpr fmt::string_view Format_109("! <#Refrigeration Compressor Racks>,Number of Refrigeration Compressor Racks");
     static constexpr fmt::string_view Format_117("! <#Detailed Refrigeration Systems>,Number of Detailed Refrigeration Systems");
-    static constexpr fmt::string_view Format_118("! <Detailed Refrigeration System>,Refrigeration System Name,Refrigerant Used, # Refrigerated Cases "
-                                     "Connected, # WalkInCoolers Connected, #Air Chillers Connected, # Secondary Loops Served, # Cascade Condensers "
-                                     "Served, # Mechanical Subcoolers Served, # Compressors Connected, # Compression Stages, Intercooler Type, "
-                                     "Intercooler Effectiveness, # Subcoolers Connected, Minimum Condensing Temperature (C)");
-    static constexpr fmt::string_view Format_119("!  <Refrigeration Walk In Cooler>, Walk In Number, Walk In Name,Capacity (W),Temperature (C),Coil Fan "
-                                     "(W), Circulating Fan (W), Lighting (W),Heaters (W),Defrost (W), # Zones");
-    static constexpr fmt::string_view Format_120("! <#Detailed Transcritical Refrigeration Systems>,Number of Detailed Transcritical Refrigeration Systems");
-    static constexpr fmt::string_view Format_121("! <Detailed Transcritical Refrigeration System>,Transcritical Refrigeration System Name,Refrigerant Used, # "
-                                     "Medium Temperature Refrigerated Cases Connected, # Low Temperature Refrigerated Cases Connected, # Medium "
-                                     "Temperature WalkInCoolers Connected, # Low Temperature WalkInCoolers Connected, # High Pressure Compressors "
-                                     "Connected, # Low Pressure Compressors Connected, Minimum Condensing Temperature (C)");
+    static constexpr fmt::string_view Format_118(
+        "! <Detailed Refrigeration System>,Refrigeration System Name,Refrigerant Used, # Refrigerated Cases "
+        "Connected, # WalkInCoolers Connected, #Air Chillers Connected, # Secondary Loops Served, # Cascade Condensers "
+        "Served, # Mechanical Subcoolers Served, # Compressors Connected, # Compression Stages, Intercooler Type, "
+        "Intercooler Effectiveness, # Subcoolers Connected, Minimum Condensing Temperature (C)");
+    static constexpr fmt::string_view Format_119(
+        "!  <Refrigeration Walk In Cooler>, Walk In Number, Walk In Name,Capacity (W),Temperature (C),Coil Fan "
+        "(W), Circulating Fan (W), Lighting (W),Heaters (W),Defrost (W), # Zones");
+    static constexpr fmt::string_view Format_120(
+        "! <#Detailed Transcritical Refrigeration Systems>,Number of Detailed Transcritical Refrigeration Systems");
+    static constexpr fmt::string_view Format_121(
+        "! <Detailed Transcritical Refrigeration System>,Transcritical Refrigeration System Name,Refrigerant Used, # "
+        "Medium Temperature Refrigerated Cases Connected, # Low Temperature Refrigerated Cases Connected, # Medium "
+        "Temperature WalkInCoolers Connected, # Low Temperature WalkInCoolers Connected, # High Pressure Compressors "
+        "Connected, # Low Pressure Compressors Connected, Minimum Condensing Temperature (C)");
     static constexpr fmt::string_view Format_123("!  <Secondary Load>, Secondary System Served Name, Secondary Number");
-    static constexpr fmt::string_view Format_126("!  <Refrigeration Mechanical Subcooler>, Subcooler Number, Subcooler Name, Name of System Providing "
-                                     "Cooling, Design Outlet Temperature (C)");
+    static constexpr fmt::string_view Format_126(
+        "!  <Refrigeration Mechanical Subcooler>, Subcooler Number, Subcooler Name, Name of System Providing "
+        "Cooling, Design Outlet Temperature (C)");
     static constexpr fmt::string_view Format_127("!  <Refrigeration Liquid Suction Subcooler>, Subcooler Number, Subcooler Name, Design Subcooling "
-                                     "(DeltaC),Design liquid inlet temperature (C), Design vapor inlet temperature (C)");
+                                                 "(DeltaC),Design liquid inlet temperature (C), Design vapor inlet temperature (C)");
     static constexpr fmt::string_view Format_128("!  <Cascade Load>, System Name Connected, Condenser Number, Condenser Name");
-    static constexpr fmt::string_view Format_129("!  <Refrigeration Condenser:Air-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
-                                     "(C),Rated Capacity (W), Rated Fan Power (W)");
-    static constexpr fmt::string_view Format_130("!  <Refrigeration Condenser:Water-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
-                                     "(C),Rated Capacity (W), Rated Water Inlet Temperature (C), Rated Water Flow Rate (m3/s)");
+    static constexpr fmt::string_view Format_129(
+        "!  <Refrigeration Condenser:Air-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
+        "(C),Rated Capacity (W), Rated Fan Power (W)");
+    static constexpr fmt::string_view Format_130(
+        "!  <Refrigeration Condenser:Water-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature "
+        "(C),Rated Capacity (W), Rated Water Inlet Temperature (C), Rated Water Flow Rate (m3/s)");
     static constexpr fmt::string_view Format_131(
         "!  <Refrigeration Condenser:Evaporative-Cooled>,Condenser Number,Condenser Name,Rated Capacity (W), Rated Fan Power (W)");
-    static constexpr fmt::string_view Format_132("!  <Refrigeration Condenser:Cascade>, Condenser Number, Condenser Name, Condensing Temperature Control "
-                                     "Type, Rated Condensing Temperature (C), Capacity (W), Approach Temperature Difference (DeltaC)");
-    static constexpr fmt::string_view Format_133("! <Secondary Refrigeration System: Fluid Always Liquid>, Secondary Number, Secondary Name, # Refrigerated "
-                                     "Cases Connected, # WalkIn Coolers Connected, Fluid Name, Capacity (W),Evap Temperature in Secondary "
-                                     "Evaporator (C), Approach Temperature Difference (DeltaC), Temperature Range (DeltaC), TotalPumpPower (W)");
-    static constexpr fmt::string_view Format_134("!      <Walk-In Surfaces Facing Zone>, ZoneName, Wall/Ceiling Area (m2), UValue (W/m2-C), AreaStockDoors "
-                                     "(m2), HeightStockDoors, UValueStockDoors (W/m2-C), AreaGlassDoors (m2), HeightGlassDoors (m),  "
-                                     "UValueGlassDoors (W/m2-C)");
+    static constexpr fmt::string_view Format_132(
+        "!  <Refrigeration Condenser:Cascade>, Condenser Number, Condenser Name, Condensing Temperature Control "
+        "Type, Rated Condensing Temperature (C), Capacity (W), Approach Temperature Difference (DeltaC)");
+    static constexpr fmt::string_view Format_133(
+        "! <Secondary Refrigeration System: Fluid Always Liquid>, Secondary Number, Secondary Name, # Refrigerated "
+        "Cases Connected, # WalkIn Coolers Connected, Fluid Name, Capacity (W),Evap Temperature in Secondary "
+        "Evaporator (C), Approach Temperature Difference (DeltaC), Temperature Range (DeltaC), TotalPumpPower (W)");
+    static constexpr fmt::string_view Format_134(
+        "!      <Walk-In Surfaces Facing Zone>, ZoneName, Wall/Ceiling Area (m2), UValue (W/m2-C), AreaStockDoors "
+        "(m2), HeightStockDoors, UValueStockDoors (W/m2-C), AreaGlassDoors (m2), HeightGlassDoors (m),  "
+        "UValueGlassDoors (W/m2-C)");
     static constexpr fmt::string_view Format_141("!  <Mechanical Subcooler Load>, Subcooler Number, Subcooler Name");
     static constexpr fmt::string_view Format_142("! <#Secondary Refrigeration Systems>,Number of Secondary Refrigeration Systems");
-    static constexpr fmt::string_view Format_146("! <Secondary Refrigeration System: Liquid Overfeed>, Secondary Number, Secondary Name, # Refrigerated Cases "
-                                     "Connected, # WalkIn Coolers Connected, #Air Coils Connected Fluid Name, Capacity (W),Evap Temperature in "
-                                     "Secondary Evaporator (C), Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)");
+    static constexpr fmt::string_view Format_146(
+        "! <Secondary Refrigeration System: Liquid Overfeed>, Secondary Number, Secondary Name, # Refrigerated Cases "
+        "Connected, # WalkIn Coolers Connected, #Air Coils Connected Fluid Name, Capacity (W),Evap Temperature in "
+        "Secondary Evaporator (C), Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)");
     static constexpr fmt::string_view Format_148("! <#ZoneHVAC/Refrigeration Air Chiller Sets>,Number of ZoneHVAC/Refrigeration Air Chiller Sets");
-    static constexpr fmt::string_view Format_149("! <ZoneHVAC/Refrigeration Air Chiller Set>,Chiller Set Name, # Air Chillers Connected, Zone Location");
-    static constexpr fmt::string_view Format_151("!  <Refrigeration Air Chiller>,Refrigeration Chiller Number, Refrigeration Chiller Name,Zone Name,Zone "
-                                     "Node #,Zone Node Name,Sensible Capacity (W/C),Sensible Capacity (W),Evaporating Temperature (C),DT1 (C),Fan "
-                                     "Power (W),Heater (W),Defrost (W), Air Flow Rate (m3/s)");
+    static constexpr fmt::string_view Format_149(
+        "! <ZoneHVAC/Refrigeration Air Chiller Set>,Chiller Set Name, # Air Chillers Connected, Zone Location");
+    static constexpr fmt::string_view Format_151(
+        "!  <Refrigeration Air Chiller>,Refrigeration Chiller Number, Refrigeration Chiller Name,Zone Name,Zone "
+        "Node #,Zone Node Name,Sensible Capacity (W/C),Sensible Capacity (W),Evaporating Temperature (C),DT1 (C),Fan "
+        "Power (W),Heater (W),Defrost (W), Air Flow Rate (m3/s)");
     static constexpr fmt::string_view Format_152("!  <Air Chiller Load>, Air Chiller Name, Air Chiller Number, Zone Name,");
-    static constexpr fmt::string_view Format_160("!  <Refrigeration GasCooler:Air-Cooled>,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure "
-                                     "(Pa),Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)");
+    static constexpr fmt::string_view Format_160(
+        "!  <Refrigeration GasCooler:Air-Cooled>,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure "
+        "(Pa),Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)");
 
     // write all headers applicable to this simulation
     if (state.dataRefrigCase->NumRefrigeratedRacks > 0) {

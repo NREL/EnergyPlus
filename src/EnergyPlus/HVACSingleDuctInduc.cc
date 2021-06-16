@@ -108,7 +108,7 @@ namespace HVACSingleDuctInduc {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     void SimIndUnit(EnergyPlusData &state,
-                    std::string_view CompName,   // name of the terminal unit
+                    std::string_view CompName,     // name of the terminal unit
                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                     int const ZoneNum,             // index of zone served by the terminal unit
                     int const ZoneNodeNum,         // zone node number of zone served by the terminal unit
@@ -297,8 +297,8 @@ namespace HVACSingleDuctInduc {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }

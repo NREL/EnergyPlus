@@ -1822,7 +1822,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     CurveInput += 0.01;
                 }
                 if (MinCurveVal < 0.7) {
-                    ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError(state, "..." + cAlphaFieldNames(12) + "=\"" + cAlphaArgs(12) + "\" has out of range values.");
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
@@ -1831,7 +1832,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 if (MaxCurveVal > 1.0) {
-                    ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError(state, "..." + cAlphaFieldNames(12) + " = " + cAlphaArgs(12) + " has out of range value.");
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
@@ -2028,7 +2030,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     CurveInput += 0.01;
                 }
                 if (MinCurveVal < 0.7) {
-                    ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError(state, "..." + cAlphaFieldNames(23) + "=\"" + cAlphaArgs(23) + "\" has out of range values.");
                     ShowContinueError(state,
                                       format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
@@ -2037,7 +2040,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 if (MaxCurveVal > 1.0) {
-                    ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                    ShowWarningError(
+                        state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError(state, "..." + cAlphaFieldNames(23) + " = " + cAlphaArgs(23) + " has out of range value.");
                     ShowContinueError(state,
                                       format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
@@ -2054,7 +2058,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR1 > 0) {
             CurveManager::GetCurveMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
             if (minEIRfLowPLRXInput > state.dataHVACVarRefFlow->VRF(VRFNum).MinPLR) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                ShowWarningError(
+                    state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state, "..." + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) + " has out of range value.");
                 ShowContinueError(state,
                                   format("...Curve minimum value of X = {:.3T} must be <= Minimum Heat Pump Part-Load Ratio = {:.3T}.",
@@ -2063,7 +2068,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ErrorsFound = true;
             }
             if (maxEIRfLowPLRXInput < 1.0) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", suspicious");
+                ShowWarningError(
+                    state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", suspicious");
                 ShowContinueError(state, "..." + cAlphaFieldNames(9) + " = " + cAlphaArgs(9) + " has unexpected value.");
                 ShowContinueError(state,
                                   format("...Curve maximum value of X = {:.3T} should be 1 and will result in lower energy use than expected.",
@@ -2075,7 +2081,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR1 > 0) {
             CurveManager::GetCurveMinMaxValues(state, state.dataHVACVarRefFlow->VRF(VRFNum).HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
             if (minEIRfLowPLRXInput > state.dataHVACVarRefFlow->VRF(VRFNum).MinPLR) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                ShowWarningError(
+                    state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state, "..." + cAlphaFieldNames(20) + " = " + cAlphaArgs(20) + " has out of range value.");
                 ShowContinueError(state,
                                   format("...Curve minimum value of X = {:.3T} must be <= Minimum Heat Pump Part-Load Ratio = {:.3T}.",
@@ -2084,7 +2091,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ErrorsFound = true;
             }
             if (maxEIRfLowPLRXInput < 1.0) {
-                ShowWarningError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", suspicious");
+                ShowWarningError(
+                    state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", suspicious");
                 ShowContinueError(state, "..." + cAlphaFieldNames(20) + " = " + cAlphaArgs(20) + " has unexpected value.");
                 ShowContinueError(state,
                                   format("...Curve maximum value of X = {:.3T} should be 1 and will result in lower energy use than expected.",
@@ -2687,10 +2695,12 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         // Verify curve name and type
         if (indexOUEvapTempCurve == 0) {
             if (lAlphaFieldBlanks(6)) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
                 ShowContinueError(state, "...required " + cAlphaFieldNames(6) + " is blank.");
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state, "...not found " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
             }
             ErrorsFound = true;
@@ -2702,7 +2712,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataHVACVarRefFlow->VRF(VRFNum).C3Te = state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).Coeff3;
 
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                    ShowSevereError(
+                        state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError(state,
                                       "...illegal " + cAlphaFieldNames(6) +
                                           " type for this object = " + state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).ObjectType);
@@ -2717,10 +2728,12 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         // Verify curve name and type
         if (indexOUCondTempCurve == 0) {
             if (lAlphaFieldBlanks(7)) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
                 ShowContinueError(state, "...required " + cAlphaFieldNames(7) + " is blank.");
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state, "...not found " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
             }
             ErrorsFound = true;
@@ -2732,7 +2745,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     state.dataHVACVarRefFlow->VRF(VRFNum).C3Tc = state.dataCurveManager->PerfCurve(indexOUCondTempCurve).Coeff3;
 
                 } else {
-                    ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                    ShowSevereError(
+                        state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                     ShowContinueError(state,
                                       "...illegal " + cAlphaFieldNames(7) +
                                           " type for this object = " + state.dataCurveManager->PerfCurve(indexOUCondTempCurve).ObjectType);
@@ -2891,11 +2905,13 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 if (indexOUEvapCapCurve == 0) {                                                           // Verify curve name and type
                     if (lAlphaFieldBlanks(Count2Index + 2 * NumCompSpd)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name +
+                                            "\", missing");
                         ShowContinueError(state, "...required " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd) + " is blank.");
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name +
+                                            "\", invalid");
                         ShowContinueError(state,
                                           "...not found " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd) + "=\"" +
                                               cAlphaArgs(Count2Index + 2 * NumCompSpd) + "\".");
@@ -2922,11 +2938,13 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 if (indexOUCompPwrCurve == 0) {                                                               // Verify curve name and type
                     if (lAlphaFieldBlanks(Count2Index + 2 * NumCompSpd + 1)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name +
+                                            "\", missing");
                         ShowContinueError(state, "...required " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1) + " is blank.");
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name +
+                                            "\", invalid");
                         ShowContinueError(state,
                                           "...not found " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1) + "=\"" +
                                               cAlphaArgs(Count2Index + 2 * NumCompSpd + 1) + "\".");
@@ -3167,10 +3185,12 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         // Verify curve name and type
         if (indexOUEvapTempCurve == 0) {
             if (lAlphaFieldBlanks(6)) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
                 ShowContinueError(state, "...required " + cAlphaFieldNames(6) + " is blank.");
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state, "...not found " + cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\".");
             }
             ErrorsFound = true;
@@ -3180,7 +3200,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataHVACVarRefFlow->VRF(VRFNum).C2Te = state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).Coeff2;
                 state.dataHVACVarRefFlow->VRF(VRFNum).C3Te = state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).Coeff3;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state,
                                   "...illegal " + cAlphaFieldNames(6) +
                                       " type for this object = " + state.dataCurveManager->PerfCurve(indexOUEvapTempCurve).ObjectType);
@@ -3194,10 +3215,12 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         // Verify curve name and type
         if (indexOUCondTempCurve == 0) {
             if (lAlphaFieldBlanks(7)) {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
                 ShowContinueError(state, "...required " + cAlphaFieldNames(7) + " is blank.");
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state, "...not found " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
             }
             ErrorsFound = true;
@@ -3207,7 +3230,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 state.dataHVACVarRefFlow->VRF(VRFNum).C2Tc = state.dataCurveManager->PerfCurve(indexOUCondTempCurve).Coeff2;
                 state.dataHVACVarRefFlow->VRF(VRFNum).C3Tc = state.dataCurveManager->PerfCurve(indexOUCondTempCurve).Coeff3;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                ShowSevereError(state,
+                                std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
                 ShowContinueError(state,
                                   "...illegal " + cAlphaFieldNames(7) +
                                       " type for this object = " + state.dataCurveManager->PerfCurve(indexOUCondTempCurve).ObjectType);
@@ -3354,11 +3378,13 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 if (indexOUEvapCapCurve == 0) {                                                           // Verify curve name and type
                     if (lAlphaFieldBlanks(Count2Index + 2 * NumCompSpd)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name +
+                                            "\", missing");
                         ShowContinueError(state, "...required " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd) + " is blank.");
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name +
+                                            "\", invalid");
                         ShowContinueError(state,
                                           "...not found " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd) + "=\"" +
                                               cAlphaArgs(Count2Index + 2 * NumCompSpd) + "\".");
@@ -3385,11 +3411,13 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 if (indexOUCompPwrCurve == 0) {                                                               // Verify curve name and type
                     if (lAlphaFieldBlanks(Count2Index + 2 * NumCompSpd + 1)) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", missing");
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name +
+                                            "\", missing");
                         ShowContinueError(state, "...required " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1) + " is blank.");
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name + "\", invalid");
+                                        std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataHVACVarRefFlow->VRF(VRFNum).Name +
+                                            "\", invalid");
                         ShowContinueError(state,
                                           "...not found " + cAlphaFieldNames(Count2Index + 2 * NumCompSpd + 1) + "=\"" +
                                               cAlphaArgs(Count2Index + 2 * NumCompSpd + 1) + "\".");

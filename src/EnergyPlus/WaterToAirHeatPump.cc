@@ -103,7 +103,7 @@ namespace WaterToAirHeatPump {
     static constexpr std::string_view fluidNameWater("WATER");
 
     void SimWatertoAirHP(EnergyPlusData &state,
-                         std::string_view CompName,   // component name
+                         std::string_view CompName,     // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
                          int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
@@ -384,8 +384,8 @@ namespace WaterToAirHeatPump {
 
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
-                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
+                                    std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." +
+                                        CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
                     ErrorsFound = true;
                 }
             }
@@ -571,8 +571,8 @@ namespace WaterToAirHeatPump {
 
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." + CurrentModuleObject + '=' +
-                                        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
+                                    std::string{RoutineName} + "Invalid " + cAlphaFields(2) + " (" + AlphArray(2) + ") entered." +
+                                        CurrentModuleObject + '=' + state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name);
                     ErrorsFound = true;
                 }
             }

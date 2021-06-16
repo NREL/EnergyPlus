@@ -636,8 +636,9 @@ namespace WeatherManager {
             AllocateWeatherData(state);
             if (state.dataWeatherManager->NumIntervalsPerHour != 1) {
                 if (state.dataWeatherManager->NumIntervalsPerHour != state.dataGlobal->NumOfTimeStepInHour) {
-                    ShowSevereError(
-                        state, std::string{RoutineName} + "Number of intervals per hour on Weather file does not match specified number of Time Steps Per Hour");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} +
+                                        "Number of intervals per hour on Weather file does not match specified number of Time Steps Per Hour");
                     ErrorsFound = true;
                 }
             }
@@ -816,8 +817,9 @@ namespace WeatherManager {
                                 int runEndJulian = dataperiod.DataEnJDay;
                                 if (!dataperiod.HasYearData) {
                                     ShowSevereError(state,
-                                                    std::string{RoutineName} + "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
-                                                                  "does not have year included in start/end date.");
+                                                    std::string{RoutineName} +
+                                                        "Actual weather runperiod has been entered but weatherfile DATA PERIOD "
+                                                        "does not have year included in start/end date.");
                                     ShowContinueError(state, "...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
                                     ShowContinueError(state, R"(...set "Treat Weather as Actual" to "No".)");
                                 }
@@ -981,20 +983,23 @@ namespace WeatherManager {
                                                                             state.dataWeatherManager->LeapYearAdd);
                                         if (RunEnJDay - RunStJDay + 1 != 365) {
                                             ShowSevereError(state,
-                                                            std::string{RoutineName} + "AdaptiveComfort Reporting does not work correctly with weather files "
-                                                                          "that do not contain 365 days.");
+                                                            std::string{RoutineName} +
+                                                                "AdaptiveComfort Reporting does not work correctly with weather files "
+                                                                "that do not contain 365 days.");
                                             ErrorsFound = true;
                                         }
                                     } else {
                                         ShowSevereError(state,
-                                                        std::string{RoutineName} + "AdaptiveComfort Reporting does not work correctly with weather files that "
-                                                                      "do not start on 1 January.");
+                                                        std::string{RoutineName} +
+                                                            "AdaptiveComfort Reporting does not work correctly with weather files that "
+                                                            "do not start on 1 January.");
                                         ErrorsFound = true;
                                     }
                                     if (state.dataWeatherManager->NumIntervalsPerHour != 1) {
                                         ShowSevereError(state,
-                                                        std::string{RoutineName} + "AdaptiveComfort Reporting does not work correctly with weather files that "
-                                                                      "have multiple interval records per hour.");
+                                                        std::string{RoutineName} +
+                                                            "AdaptiveComfort Reporting does not work correctly with weather files that "
+                                                            "have multiple interval records per hour.");
                                         ErrorsFound = true;
                                     }
                                 }
@@ -3797,8 +3802,9 @@ namespace WeatherManager {
                 "Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind "
                 "Speed {m/s}, Clearness, Rain, Snow");
             print(state.files.eio, "{}\n", EnvDDHdFormat);
-            static constexpr fmt::string_view DDayMiscHdFormat("! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar "
-                                                   "Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model");
+            static constexpr fmt::string_view DDayMiscHdFormat(
+                "! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar "
+                "Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model");
             print(state.files.eio, "{}\n", DDayMiscHdFormat);
             state.dataWeatherManager->PrintDDHeader = false;
         }
@@ -4787,8 +4793,9 @@ namespace WeatherManager {
             state.dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(
                 state, state.dataEnvrn->StdBaroPress, DataPrecisionGlobals::constant_twenty, DataPrecisionGlobals::constant_zero);
             // Write Final Location Information to the initialization output file
-            static constexpr fmt::string_view LocHdFormat("! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number "
-                                              "{GMT+/-}, Elevation {m},  Standard Pressure at Elevation {Pa}, Standard RhoAir at Elevation\n");
+            static constexpr fmt::string_view LocHdFormat(
+                "! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg},  Time Zone Number "
+                "{GMT+/-}, Elevation {m},  Standard Pressure at Elevation {Pa}, Standard RhoAir at Elevation\n");
             print(state.files.eio, "{}", LocHdFormat);
 
             static constexpr fmt::string_view LocFormat("Site:Location,{},{:.2R},{:.2R},{:.2R},{:.2R},{:.0R},{:.4R}\n");
@@ -5033,7 +5040,8 @@ namespace WeatherManager {
                 }
                 if (state.dataGlobal->DoOutputReporting) {
                     std::string const &Title(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).Title);
-                    static constexpr fmt::string_view EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+                    static constexpr fmt::string_view EnvironmentStampFormatStr(
+                        "{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           state.dataWeatherManager->EnvironmentReportChr,
@@ -7347,8 +7355,8 @@ namespace WeatherManager {
                     if (state.dataWeatherManager->Environment(j).KindOfEnvrn != DataGlobalConstants::KindOfSim::RunPeriodWeather) continue;
                     if (state.dataWeatherManager->Environment(j).WP_Type1 != 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\", indicated Environment Name already assigned.");
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", indicated Environment Name already assigned.");
                         if (!state.dataWeatherManager->Environment(j).Title.empty()) {
                             ShowContinueError(state,
                                               "...Environment=\"" + state.dataWeatherManager->Environment(j).Title + "\", already using " +
@@ -7378,16 +7386,16 @@ namespace WeatherManager {
                 envFound = Found;
                 if (Found == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        "\", invalid Environment Name referenced.");
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid Environment Name referenced.");
                     ShowContinueError(state, "...remainder of object not processed.");
                     ErrorsFound = true;
                     continue;
                 } else {
                     if (state.dataWeatherManager->Environment(Found).WP_Type1 != 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\", indicated Environment Name already assigned.");
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", indicated Environment Name already assigned.");
                         ShowContinueError(state,
                                           "...Environment=\"" + state.dataWeatherManager->Environment(Found).Title + "\", already using " +
                                               state.dataIPShortCut->cCurrentModuleObject + "=\"" +
@@ -7455,8 +7463,8 @@ namespace WeatherManager {
                     Found = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (Found == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
                         ShowContinueError(state, "...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                         ShowContinueError(state,
                                           "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
@@ -7470,8 +7478,8 @@ namespace WeatherManager {
                     Found = ScheduleManager::GetDayScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
                     if (Found == 0) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                            "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
+                                        std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(3) + '.');
                         ShowContinueError(state, "...Entered name=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\".");
                         ShowContinueError(
                             state,
@@ -7507,8 +7515,8 @@ namespace WeatherManager {
                     state.dataWeatherManager->WPSkyTemperature(i).UseWeatherFileHorizontalIR = false;
                 } else {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
-                                        "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '.');
+                                    std::string{RoutineName} + state.dataIPShortCut->cCurrentModuleObject + "=\"" +
+                                        state.dataIPShortCut->cAlphaArgs(1) + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(4) + '.');
                     ShowContinueError(state, "...entered value=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\", should be Yes or No.");
                     ErrorsFound = true;
                 }
@@ -8829,7 +8837,8 @@ namespace WeatherManager {
             Line = state.files.inputWeatherFile.readLine();
             if (Line.eof) {
                 ShowFatalError(state,
-                               "Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + std::string{Header},
+                               "Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" +
+                                   std::string{Header},
                                OptionalOutputFileRef{state.files.eso});
             }
             uppercase(Line.data);
@@ -8933,20 +8942,17 @@ namespace WeatherManager {
         missedHeaderCheck(state.dataWeatherManager->Missed.LiquidPrecip, "Liquid Precipitation Depth");
 
         bool OutOfRangeHeader = false;
-        auto outOfRangeHeaderCheck{[&](Real64 const value,
-                                       std::string_view description,
-                                       std::string_view rangeLow,
-                                       std::string_view rangeHigh,
-                                       std::string_view extraMsg) {
-            if (value > 0) {
-                if (!OutOfRangeHeader) {
-                    ShowWarningError(state, std::string{RangeString});
-                    OutOfRangeHeader = true;
+        auto outOfRangeHeaderCheck{
+            [&](Real64 const value, std::string_view description, std::string_view rangeLow, std::string_view rangeHigh, std::string_view extraMsg) {
+                if (value > 0) {
+                    if (!OutOfRangeHeader) {
+                        ShowWarningError(state, std::string{RangeString});
+                        OutOfRangeHeader = true;
+                    }
+                    ShowMessage(state, EnergyPlus::format(rgFmt, description, rangeLow, rangeHigh, value));
+                    if (!extraMsg.empty()) ShowMessage(state, std::string{extraMsg});
                 }
-                ShowMessage(state, EnergyPlus::format(rgFmt, description, rangeLow, rangeHigh, value));
-                if (!extraMsg.empty()) ShowMessage(state, std::string{extraMsg});
-            }
-        }};
+            }};
         outOfRangeHeaderCheck(state.dataWeatherManager->OutOfRange.DryBulb, "Dry Bulb Temperatures", ">=-90", "<=70", "");
         outOfRangeHeaderCheck(
             state.dataWeatherManager->OutOfRange.StnPres, "Atmospheric Pressure", ">31000", "<=120000", "Out of Range values set to last good value");

@@ -208,7 +208,7 @@ void ManageSizing(EnergyPlusData &state)
             } else {
                 ShowWarningError(state,
                                  std::string{RoutineName} + "The ZoneComponentLoadSummary report was requested but no SizingPeriod:DesignDay or "
-                                               "SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
+                                                            "SizingPeriod:WeatherFileDays objects were found so that report cannot be generated.");
             }
         }
     }
@@ -221,7 +221,8 @@ void ManageSizing(EnergyPlusData &state)
     if ((state.dataGlobal->DoZoneSizing) && (state.dataSize->NumZoneSizingInput == 0)) {
         ShowWarningError(
             state,
-            std::string{RoutineName} + "For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.");
+            std::string{RoutineName} +
+                "For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.");
     }
 
     if ((state.dataSize->NumZoneSizingInput > 0) &&
@@ -409,7 +410,8 @@ void ManageSizing(EnergyPlusData &state)
                 UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
                 state.dataSize->ZoneSizingRunDone = true;
             } else {
-                ShowSevereError(state, std::string{RoutineName} + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
+                ShowSevereError(state,
+                                std::string{RoutineName} + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
                 ErrorsFound = true;
             }
 
@@ -573,7 +575,8 @@ void ManageSizing(EnergyPlusData &state)
             UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndSysSizingCalc);
             state.dataSize->SysSizingRunDone = true;
         } else {
-            ShowSevereError(state, std::string{RoutineName} + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
+            ShowSevereError(state,
+                            std::string{RoutineName} + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
             ErrorsFound = true;
         }
     } else if ((state.dataSize->NumZoneSizingInput > 0) &&
@@ -773,16 +776,16 @@ void ManageSizing(EnergyPlusData &state)
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcClAir, curName, CalcSysSizing(AirLoopNum).DesCoolVolFlow);
             if (std::abs(CalcSysSizing(AirLoopNum).DesCoolVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName +
-                                     " is zero.");
+                                 std::string{RoutineName} +
+                                     "Calculated Cooling Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName + " is zero.");
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserClAir, curName, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcHtAir, curName, CalcSysSizing(AirLoopNum).DesHeatVolFlow);
             if (std::abs(CalcSysSizing(AirLoopNum).DesHeatVolFlow) <= 1.e-8) {
                 ShowWarningError(state,
-                                 std::string{RoutineName} + "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName +
-                                     " is zero.");
+                                 std::string{RoutineName} +
+                                     "Calculated Heating Design Air Flow Rate for System=" + FinalSysSizing(AirLoopNum).AirPriLoopName + " is zero.");
                 ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
             }
             std::string coolPeakLoadKind;
@@ -2431,7 +2434,8 @@ void ProcessInputOARequirements(EnergyPlusData &state,
             state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr = GetScheduleIndex(state, Alphas(3));
             if (state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr > 0) {
                 if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements(OAIndex).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0)) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
                     ShowContinueError(state, "Error found in " + cAlphaFields(3) + " = " + Alphas(3));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
@@ -2449,7 +2453,8 @@ void ProcessInputOARequirements(EnergyPlusData &state,
             state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr = GetScheduleIndex(state, Alphas(4));
             if (state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr > 0) {
                 if (!CheckScheduleValueMinMax(state, state.dataSize->OARequirements(OAIndex).OAPropCtlMinRateSchPtr, ">=", 0.0, "<=", 1.0)) {
-                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->OARequirements(OAIndex).Name + "\",");
                     ShowContinueError(state, "Error found in " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
                     ErrorsFound = true;
@@ -2576,14 +2581,16 @@ void GetZoneAirDistribution(EnergyPlusData &state)
                     if (state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr > 0) {
                         if (!CheckScheduleValueMinMax(state, state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, ">", 0.0)) {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->ZoneAirDistribution(ZADIndex).Name + "\",");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                                state.dataSize->ZoneAirDistribution(ZADIndex).Name + "\",");
                             ShowContinueError(state, "Error found in " + cAlphaFields(2) + " = " + Alphas(2));
                             ShowContinueError(state, "Schedule values must be >0.0)");
                             ErrorsFound = true;
                         }
                     } else {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->ZoneAirDistribution(ZADIndex).Name + "\",");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataSize->ZoneAirDistribution(ZADIndex).Name +
+                                            "\",");
                         ShowContinueError(state, "...Not Found " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
                         ErrorsFound = true;
                     }

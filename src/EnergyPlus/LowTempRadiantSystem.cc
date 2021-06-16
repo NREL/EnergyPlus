@@ -159,7 +159,7 @@ namespace LowTempRadiantSystem {
     // Object Data
 
     void SimLowTempRadiantSystem(EnergyPlusData &state,
-                                 std::string_view CompName,   // name of the low temperature radiant system
+                                 std::string_view CompName,     // name of the low temperature radiant system
                                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                  Real64 &LoadMet,               // load met by the radiant system, in Watts
                                  int &CompIndex)

@@ -685,8 +685,9 @@ namespace ScheduleManager {
                 } else {
                     if (Alphas(2) != "CONTINUOUS" && Alphas(2) != "REAL") {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + state.dataScheduleMgr->ScheduleType(LoopIndex).Name +
-                                             "\", invalid " + cAlphaFields(2) + '=' + Alphas(2));
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" +
+                                             state.dataScheduleMgr->ScheduleType(LoopIndex).Name + "\", invalid " + cAlphaFields(2) + '=' +
+                                             Alphas(2));
                         ErrorsFound = true;
                     }
                     state.dataScheduleMgr->ScheduleType(LoopIndex).IsReal = true;
@@ -698,8 +699,8 @@ namespace ScheduleManager {
                         UtilityRoutines::FindItem(Alphas(3), ScheduleTypeLimitUnitTypes, NumScheduleTypeLimitUnitTypes);
                     if (state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType == 0) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                             "\" is invalid.");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" +
+                                             Alphas(3) + "\" is invalid.");
                     }
                 }
             }
@@ -762,8 +763,8 @@ namespace ScheduleManager {
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                             "\" not found -- will not be validated");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                             Alphas(2) + "\" not found -- will not be validated");
                     } else {
                         ShowWarningError(state,
                                          std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
@@ -835,8 +836,8 @@ namespace ScheduleManager {
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                             "\" not found -- will not be validated");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                             Alphas(2) + "\" not found -- will not be validated");
                     } else {
                         ShowWarningError(state,
                                          std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
@@ -850,7 +851,8 @@ namespace ScheduleManager {
             // check to see if numfield=0
             if (NumFields == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
+                                    "\", Insufficient data entered for a full schedule day.");
                 ShowContinueError(state, format("...Number of interval fields = = [{}].", NumFields));
                 ErrorsFound = true;
             }
@@ -864,8 +866,8 @@ namespace ScheduleManager {
                 state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Linear;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(3) + "\" field=\"" +
-                                    Alphas(3) + "\"");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(3) +
+                                    "\" field=\"" + Alphas(3) + "\"");
                 ErrorsFound = true;
             }
             ProcessIntervalFields(state,
@@ -947,8 +949,8 @@ namespace ScheduleManager {
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                             "\" not found -- will not be validated");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                             Alphas(2) + "\" not found -- will not be validated");
                     } else {
                         ShowWarningError(state,
                                          std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
@@ -968,22 +970,24 @@ namespace ScheduleManager {
                 state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Linear;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(3) + "\" field=\"" +
-                                    Alphas(3) + "\"");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(3) +
+                                    "\" field=\"" + Alphas(3) + "\"");
                 ErrorsFound = true;
             }
 
             // check to see if there are any fields
             if (Numbers(1) <= 0.0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
+                                    "\", Insufficient data entered for a full schedule day.");
                 ShowContinueError(state, format("...Minutes per Item field = [{}].", Numbers(1)));
                 ErrorsFound = true;
                 continue;
             }
             if (NumNumbers < 25) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Insufficient data entered for a full schedule day.");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
+                                    "\", Insufficient data entered for a full schedule day.");
                 ShowContinueError(state,
                                   format("...Minutes per Item field = [{}] and only [{}] to apply to list fields.", Numbers(1), NumNumbers - 1));
                 ErrorsFound = true;
@@ -1097,8 +1101,8 @@ namespace ScheduleManager {
                 DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
                 if (DayIndex == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
-                                        Alphas(InLoopIndex + 1) + "\" not Found",
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) +
+                                        " \"" + Alphas(InLoopIndex + 1) + "\" not Found",
                                     OptionalOutputFileRef{state.files.audit});
                     ErrorsFound = true;
                 } else {
@@ -1135,8 +1139,8 @@ namespace ScheduleManager {
                 DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
                 if (DayIndex == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) + " \"" +
-                                        Alphas(InLoopIndex + 1) + "\" not Found",
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(InLoopIndex + 1) +
+                                        " \"" + Alphas(InLoopIndex + 1) + "\" not Found",
                                     OptionalOutputFileRef{state.files.audit});
                     ShowContinueError(state, "ref: " + cAlphaFields(InLoopIndex) + " \"" + Alphas(InLoopIndex) + "\"");
                     ErrorsFound = true;
@@ -1193,8 +1197,8 @@ namespace ScheduleManager {
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                             "\" not found -- will not be validated");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                             Alphas(2) + "\" not found -- will not be validated");
                     } else {
                         ShowWarningError(state,
                                          std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
@@ -1322,8 +1326,8 @@ namespace ScheduleManager {
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                         "\" not found -- will not be validated");
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                         Alphas(2) + "\" not found -- will not be validated");
                 } else {
                     ShowWarningError(state,
                                      std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
@@ -1446,8 +1450,8 @@ namespace ScheduleManager {
                             state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Linear;
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(NumField) +
-                                                "\" field=\"" + Alphas(NumField) + "\"");
+                                            std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" +
+                                                cAlphaFields(NumField) + "\" field=\"" + Alphas(NumField) + "\"");
                             ErrorsFound = true;
                         }
                         ++NumField;
@@ -1460,8 +1464,9 @@ namespace ScheduleManager {
                             } else if (has(Alphas(NumField), "LINEAR")) {
                                 state.dataScheduleMgr->DaySchedule(AddDaySch).IntervalInterpolated = ScheduleInterpolation::Linear;
                             } else {
-                                ShowSevereError(
-                                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Illegal Field entered =" + Alphas(NumField));
+                                ShowSevereError(state,
+                                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
+                                                    "\", Illegal Field entered =" + Alphas(NumField));
                                 ErrorsFound = true;
                             }
                             ++NumField;
@@ -1707,8 +1712,8 @@ namespace ScheduleManager {
                 ColumnSep = CharSpace;
             } else {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(4) + " illegal value=\"" + Alphas(4) +
-                                    "\".");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(4) + " illegal value=\"" +
+                                    Alphas(4) + "\".");
                 ShowContinueError(state, "..must be Comma, Semicolon, Tab, or Space.");
                 ErrorsFound = true;
                 continue;
@@ -1719,8 +1724,8 @@ namespace ScheduleManager {
             if (lAlphaBlanks(5)) Alphas(5) = "NO";
             if (Alphas(5) != "NO" && Alphas(5) != "YES") {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(5) + "\" field=\"" +
-                                    Alphas(5) + "\"");
+                                std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "Invalid value for \"" + cAlphaFields(5) +
+                                    "\" field=\"" + Alphas(5) + "\"");
                 ErrorsFound = true;
             } else if (Alphas(5) != "YES") { // No validation done on the value of the interpolation field
                 FileIntervalInterpolated = false;
@@ -1792,8 +1797,8 @@ namespace ScheduleManager {
                 auto SchdFile = state.files.TempFullFilePath.try_open();
                 if (!SchdFile.good()) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                        "\" cannot be opened.");
+                                    std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" +
+                                        Alphas(3) + "\" cannot be opened.");
                     ShowContinueError(state, "... It may be open in another program (such as Excel).  Please close and try again.");
                     ShowFatalError(state, "Program terminates due to previous condition.");
                 }
@@ -1803,8 +1808,8 @@ namespace ScheduleManager {
                 if (endLine > 0) {
                     if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
                         ShowSevereError(state,
-                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
-                                            " appears to be a Unicode or binary file.");
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" +
+                                            Alphas(3) + " appears to be a Unicode or binary file.");
                         ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
                         ShowFatalError(state, "Program terminates due to previous condition.");
                     }
@@ -1900,7 +1905,8 @@ namespace ScheduleManager {
                 }
                 if (rowCnt < rowLimitCount) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\" less than specified hourly values read from file.");
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
+                                         "\" less than specified hourly values read from file.");
                     ShowContinueError(state,
                                       format("..Specified Number of Hourly Values={} Actual number of hourly values included={}",
                                              numHourlyValues,
@@ -2077,8 +2083,8 @@ namespace ScheduleManager {
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
-                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                             "\" not found -- will not be validated");
+                                         std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                             Alphas(2) + "\" not found -- will not be validated");
                     } else {
                         ShowWarningError(state,
                                          std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
@@ -2142,8 +2148,8 @@ namespace ScheduleManager {
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                         "\" not found -- will not be validated");
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                         Alphas(2) + "\" not found -- will not be validated");
                 } else {
                     ShowWarningError(state,
                                      std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
@@ -2168,8 +2174,9 @@ namespace ScheduleManager {
             //   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
             //   It will be overwritten during run time stepping after the warm up period
             if (NumNumbers < 1) {
-                ShowWarningError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", initial value is not numeric or is missing. Fix idf file.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
+                                     "\", initial value is not numeric or is missing. Fix idf file.");
                 NumErrorFlag = true;
             }
             ExternalInterfaceSetSchedule(state, AddDaySch, Numbers(1));
@@ -2214,8 +2221,8 @@ namespace ScheduleManager {
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                         "\" not found -- will not be validated");
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                         Alphas(2) + "\" not found -- will not be validated");
                 } else {
                     ShowWarningError(state,
                                      std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
@@ -2240,8 +2247,9 @@ namespace ScheduleManager {
             //   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
             //   It will be overwritten during run time stepping after the warm up period
             if (NumNumbers < 1) {
-                ShowWarningError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", initial value is not numeric or is missing. Fix idf file.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
+                                     "\", initial value is not numeric or is missing. Fix idf file.");
                 NumErrorFlag = true;
             }
             ExternalInterfaceSetSchedule(state, AddDaySch, Numbers(1));
@@ -2287,8 +2295,8 @@ namespace ScheduleManager {
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
-                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" + Alphas(2) +
-                                         "\" not found -- will not be validated");
+                                     std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(2) + "=\"" +
+                                         Alphas(2) + "\" not found -- will not be validated");
                 } else {
                     ShowWarningError(state,
                                      std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", Blank " + cAlphaFields(2) +
@@ -2313,8 +2321,9 @@ namespace ScheduleManager {
             //   Initialize the ExternalInterface day schedule for the ExternalInterface compact schedule.
             //   It will be overwritten during run time stepping after the warm up period
             if (NumNumbers < 1) {
-                ShowWarningError(
-                    state, std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) + "\", initial value is not numeric or is missing. Fix idf file.");
+                ShowWarningError(state,
+                                 std::string{RoutineName} + CurrentModuleObject + "=\"" + Alphas(1) +
+                                     "\", initial value is not numeric or is missing. Fix idf file.");
                 NumErrorFlag = true;
             }
             ExternalInterfaceSetSchedule(state, AddDaySch, Numbers(1));

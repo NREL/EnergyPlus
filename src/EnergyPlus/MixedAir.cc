@@ -1506,7 +1506,8 @@ void GetOAControllerInputs(EnergyPlusData &state)
                     state.dataMixedAir->DesignSpecOAObjIndex(groupNum) = ObjIndex;
 
                     if (ObjIndex == 0) {
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid");
                         ShowContinueError(state,
                                           "... not found " + cAlphaFields((groupNum - 1) * 3 + 6) + "=\"" +
                                               state.dataMixedAir->DesignSpecOAObjName(groupNum) + "\".");
@@ -1523,7 +1524,8 @@ void GetOAControllerInputs(EnergyPlusData &state)
 
                     if (ObjIndex == 0) {
                         // Cannot find the design specification Zone Air Distribution object
-                        ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid");
+                        ShowSevereError(state,
+                                        std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid");
                         ShowContinueError(state,
                                           "... not found " + cAlphaFields((groupNum - 1) * 3 + 7) + "=\"" +
                                               state.dataMixedAir->DesignSpecZoneADObjName(groupNum) + "\".");
@@ -1907,9 +1909,10 @@ void GetOAControllerInputs(EnergyPlusData &state)
         }
 
         // write to .eio file
-        static constexpr fmt::string_view Format_700("!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-                                         "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-                                         "Name,DSZAD Name");
+        static constexpr fmt::string_view Format_700(
+            "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+            "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+            "Name,DSZAD Name");
         print(state.files.eio, "{}\n", Format_700);
         for (VentMechNum = 1; VentMechNum <= state.dataMixedAir->NumVentMechControllers; ++VentMechNum) {
             print(state.files.eio,
@@ -3710,8 +3713,9 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
             if (this->CountMechVentFrac == 0) {
                 ++this->CountMechVentFrac;
                 ShowWarningError(state,
-                                 std::string{RoutineName} + "Minimum OA fraction > Mechanical Ventilation Controller request for Controller:OutdoorAir=" +
-                                     this->Name + ", Min OA fraction is used.");
+                                 std::string{RoutineName} +
+                                     "Minimum OA fraction > Mechanical Ventilation Controller request for Controller:OutdoorAir=" + this->Name +
+                                     ", Min OA fraction is used.");
                 ShowContinueError(state,
                                   "This may be overriding desired ventilation controls. Check inputs for Minimum Outdoor Air Flow Rate, Minimum "
                                   "Outdoor Air Schedule Name and Controller:MechanicalVentilation");
@@ -4243,7 +4247,8 @@ void VentilationMechanicalProps::CalcMechVentController(
                                             ++this->CO2MaxMinLimitErrorCount;
                                             if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc) {
                                                 if (this->CO2MaxMinLimitErrorCount < 2) {
-                                                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state,
+                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                     ShowContinueError(
                                                         state,
                                                         format("For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, "
@@ -4268,7 +4273,8 @@ void VentilationMechanicalProps::CalcMechVentController(
                                             }
                                             if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
                                                 if (this->CO2MaxMinLimitErrorCount < 2) {
-                                                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state,
+                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                     ShowContinueError(
                                                         state,
                                                         format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, "
@@ -4293,7 +4299,8 @@ void VentilationMechanicalProps::CalcMechVentController(
                                             }
                                             if (this->SystemOAMethod == SOAM_ProportionalControlDesOARate) {
                                                 if (this->CO2MaxMinLimitErrorCount < 2) {
-                                                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state,
+                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                     ShowContinueError(
                                                         state,
                                                         format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum "
@@ -4340,7 +4347,8 @@ void VentilationMechanicalProps::CalcMechVentController(
                                             ++this->CO2GainErrorCount;
                                             if (this->SystemOAMethod == SOAM_ProportionalControlSchOcc) {
                                                 if (this->CO2GainErrorCount < 2) {
-                                                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state,
+                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                     ShowContinueError(state,
                                                                       "For System Outdoor Air Method = "
                                                                       "ProportionalControlBasedOnOccupancySchedule, CO2 generation from people "
@@ -4362,7 +4370,8 @@ void VentilationMechanicalProps::CalcMechVentController(
                                             }
                                             if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
                                                 if (this->CO2GainErrorCount < 2) {
-                                                    ShowSevereError(state, std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
+                                                    ShowSevereError(state,
+                                                                    std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\".");
                                                     ShowContinueError(state,
                                                                       "For System Outdoor Air Method = "
                                                                       "ProportionalControlBasedOnDesignOccupancy, CO2 generation from people is "

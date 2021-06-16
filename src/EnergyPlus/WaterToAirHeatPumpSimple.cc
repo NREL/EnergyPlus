@@ -129,7 +129,7 @@ namespace WaterToAirHeatPumpSimple {
     using DataPlant::TypeOf_CoilWAHPHeatingEquationFit;
 
     void SimWatertoAirHPSimple(EnergyPlusData &state,
-                               std::string_view CompName,   // Coil Name
+                               std::string_view CompName,     // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
                                Real64 const LatentLoad,       // Latent demand load [W]
@@ -2107,7 +2107,8 @@ namespace WaterToAirHeatPumpSimple {
                                      "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType +
                                          ":WATERTOAIRHEATPUMP:EQUATIONFIT \"" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name +
                                          "\"");
-                    ShowContinueError(state, std::string{RoutineName} + ": Heating coil could not be autosized since cooling coil was not previously sized.");
+                    ShowContinueError(
+                        state, std::string{RoutineName} + ": Heating coil could not be autosized since cooling coil was not previously sized.");
                     ShowContinueError(state, "... Cooling coil must be upstream of heating coil.");
                     ShowContinueError(state, "... Manually sizing this heating coil will be required.");
                 }

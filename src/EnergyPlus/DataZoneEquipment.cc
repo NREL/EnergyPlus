@@ -340,8 +340,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum = GetScheduleIndex(state, AlphArray(7));
             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnFlowSchedPtrNum == 0) {
                 ShowSevereError(state,
-                                std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(7) + " entered =" + AlphArray(7) + " for " +
-                                    cAlphaFields(1) + '=' + AlphArray(1));
+                                std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(7) + " entered =" + AlphArray(7) +
+                                    " for " + cAlphaFields(1) + '=' + AlphArray(1));
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             }
         }
@@ -658,8 +658,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             }
 
         } else {
-            ShowSevereError(
-                state, std::string{RoutineName} + CurrentModuleObject + " not found = " + state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName);
+            ShowSevereError(state,
+                            std::string{RoutineName} + CurrentModuleObject +
+                                " not found = " + state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListName);
             ShowContinueError(
                 state, "In ZoneHVAC:EquipmentConnections object, for Zone = " + state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneName);
             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;

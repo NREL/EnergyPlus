@@ -72,7 +72,7 @@ namespace EnergyPlus::IntegratedHeatPump {
 using namespace DataLoopNode;
 
 void SimIHP(EnergyPlusData &state,
-            std::string_view CompName,   // Coil Name
+            std::string_view CompName,     // Coil Name
             int &CompIndex,                // Index for Component name
             int const CyclingScheme,       // Continuous fan OR cycling compressor
             Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -1969,7 +1969,9 @@ void GetIHPInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination.");
+        ShowFatalError(state,
+                       std::string{RoutineName} + "Errors found in getting " + CurrentModuleObject +
+                           " input.  Preceding condition(s) causes termination.");
     } else {
         // set up output variables, not reported in the individual coil models
 

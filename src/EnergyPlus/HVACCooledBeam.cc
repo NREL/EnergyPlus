@@ -111,7 +111,7 @@ namespace HVACCooledBeam {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     void SimCoolBeam(EnergyPlusData &state,
-                     std::string_view CompName,   // name of the cooled beam unit
+                     std::string_view CompName,     // name of the cooled beam unit
                      bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                      int const ZoneNum,             // index of zone served by the unit
                      int const ZoneNodeNum,         // zone node number of zone served by the unit
@@ -291,8 +291,8 @@ namespace HVACCooledBeam {
                 CoolBeam(CBNum).SchedPtr = GetScheduleIndex(state, Alphas(2)); // convert schedule name to pointer
                 if (CoolBeam(CBNum).SchedPtr == 0) {
                     ShowSevereError(state,
-                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) + " for " +
-                                        cAlphaFields(1) + '=' + Alphas(1));
+                                    std::string{RoutineName} + CurrentModuleObject + ": invalid " + cAlphaFields(2) + " entered =" + Alphas(2) +
+                                        " for " + cAlphaFields(1) + '=' + Alphas(1));
                     ErrorsFound = true;
                 }
             }
@@ -445,8 +445,9 @@ namespace HVACCooledBeam {
             }
             // one assumes if there isn't one assigned, it's an error?
             if (CoolBeam(CBNum).ADUNum == 0) {
-                ShowSevereError(
-                    state, std::string{RoutineName} + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' + CoolBeam(CBNum).Name + "].");
+                ShowSevereError(state,
+                                std::string{RoutineName} + "No matching Air Distribution Unit, for Unit = [" + CurrentModuleObject + ',' +
+                                    CoolBeam(CBNum).Name + "].");
                 ShowContinueError(state, "...should have outlet node=" + state.dataLoopNodes->NodeID(CoolBeam(CBNum).AirOutNode));
                 ErrorsFound = true;
             } else {

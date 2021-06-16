@@ -902,7 +902,7 @@ int EndEnergyPlus(EnergyPlusData &state)
 }
 
 void ConvertCaseToUpper(std::string_view InputString, // Input string
-                        std::string &OutputString       // Output string (in UpperCase)
+                        std::string &OutputString     // Output string (in UpperCase)
 )
 {
 
@@ -936,7 +936,7 @@ void ConvertCaseToUpper(std::string_view InputString, // Input string
 }
 
 void ConvertCaseToLower(std::string_view InputString, // Input string
-                        std::string &OutputString       // Output string (in LowerCase)
+                        std::string &OutputString     // Output string (in LowerCase)
 )
 {
 

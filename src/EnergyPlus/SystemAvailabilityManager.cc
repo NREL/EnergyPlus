@@ -625,7 +625,8 @@ namespace SystemAvailabilityManager {
                                 state.dataSystemAvailabilityManager->ThermostatWithMinimumRunTime;
                         } else {
                             ShowSevereError(state, std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid");
-                            ShowSevereError(state, std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
+                            ShowSevereError(state,
+                                            std::string{RoutineName} + "incorrect value: " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\".");
                             ErrorsFound = true;
                         }
                     }
@@ -653,8 +654,8 @@ namespace SystemAvailabilityManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + "=\"" +
-                                                cAlphaArgs(6) + "\" not found.");
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
+                                                cAlphaFieldNames(6) + "=\"" + cAlphaArgs(6) + "\" not found.");
                             ErrorsFound = true;
                         }
                     }
@@ -682,8 +683,8 @@ namespace SystemAvailabilityManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(7) + "=\"" +
-                                                cAlphaArgs(7) + "\" not found.");
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
+                                                cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\" not found.");
                             ErrorsFound = true;
                         }
                     }
@@ -711,8 +712,8 @@ namespace SystemAvailabilityManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(8) + "=\"" +
-                                                cAlphaArgs(8) + "\" not found.");
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
+                                                cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\" not found.");
                             ErrorsFound = true;
                         }
                     }
@@ -740,8 +741,8 @@ namespace SystemAvailabilityManager {
                             }
                         } else {
                             ShowSevereError(state,
-                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(9) + "=\"" +
-                                                cAlphaArgs(9) + "\" not found.");
+                                            std::string{RoutineName} + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " +
+                                                cAlphaFieldNames(9) + "=\"" + cAlphaArgs(9) + "\" not found.");
                             ErrorsFound = true;
                         }
                     }

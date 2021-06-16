@@ -1777,15 +1777,17 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                  state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
                 ++Count;
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    ShowSevereError(
-                        state, std::string{RoutineName} + "Surface=\"" + state.dataSurface->UserExtConvectionCoeffs(Loop).SurfaceName + "\", mixed algorithms.");
+                    ShowSevereError(state,
+                                    std::string{RoutineName} + "Surface=\"" + state.dataSurface->UserExtConvectionCoeffs(Loop).SurfaceName +
+                                        "\", mixed algorithms.");
                     ShowContinueError(
                         state, "Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for this surface.");
                 }
             }
         }
         if (Count > 0) {
-            ShowSevereMessage(state, std::string{RoutineName} + format("{} surfaces had different outside convection algorithms specified when", Count));
+            ShowSevereMessage(state,
+                              std::string{RoutineName} + format("{} surfaces had different outside convection algorithms specified when", Count));
             ShowContinueError(state,
                               "the Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for these surfaces.");
             if (!state.dataGlobal->DisplayExtraWarnings) {
@@ -4085,7 +4087,8 @@ void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
             } else {
                 YesNo2 = "No";
             }
-            static constexpr fmt::string_view Format_901("Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
+            static constexpr fmt::string_view Format_901(
+                "Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
             print(state.files.eio,
                   Format_901,
                   Surface(SurfLoop).Name,

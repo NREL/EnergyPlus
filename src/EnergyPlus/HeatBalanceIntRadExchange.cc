@@ -2023,16 +2023,18 @@ namespace HeatBalanceIntRadExchange {
         if (radSysEnclNum == 0) {
             // This should never happen - but it does in some simple unit tests that are designed to throw errors
             ShowSevereError(state,
-                            std::string{routineName} + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName);
+                            std::string{routineName} + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " +
+                                RadSysName);
             ErrorsFound = true;
         } else if (surfRadEnclNum == 0) {
             // This should never happen
             ShowSevereError(state,
-                            std::string{routineName} + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName +
-                                " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
+                            std::string{routineName} + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " +
+                                RadSysName + " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
             ErrorsFound = true;                                   // LCOV_EXCL_LINE
         } else if (surfRadEnclNum != radSysEnclNum) {
-            ShowSevereError(state, std::string{routineName} + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
+            ShowSevereError(
+                state, std::string{routineName} + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");
             ShowContinueError(state, "Surface zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(surfRadEnclNum).Name);
             ShowContinueError(state, "Radiant equipment zone or enclosure = " + state.dataViewFactor->ZoneRadiantInfo(radSysEnclNum).Name);
             ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + RadSysName);

@@ -173,7 +173,7 @@ namespace ZoneAirLoopEquipmentManager {
         using DualDuct::GetDualDuctOutdoorAirRecircUse;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("GetZoneAirLoopEquipment: ");            // include trailing blank space
+        static constexpr std::string_view RoutineName("GetZoneAirLoopEquipment: ");   // include trailing blank space
         static std::string const CurrentModuleObject("ZoneHVAC:AirDistributionUnit"); // Object type for getting and error messages
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
