@@ -490,36 +490,8 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // init for PVT
 
-        static std::string const RoutineName("InitPVTcollectors");
-
         // Do the one time initializations
-        if (this->MyOneTimeFlag) {
-            this->setupReportVars(state);
-            this->MyOneTimeFlag = false;
-        }
-
-        if (this->SetLoopIndexFlag) {
-            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
-                bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->TypeNum,
-                                                        this->WLoopNum,
-                                                        this->WLoopSideNum,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
-                if (errFlag) {
-                    ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
-                }
-                this->SetLoopIndexFlag = false;
-            }
-        }
+        this->oneTimeInit(state);
 
         // finish set up of PV, because PV get-input follows PVT's get input.
         if (!this->PVfound) {
@@ -1121,8 +1093,38 @@ namespace PhotovoltaicThermalCollectors {
             }
         }
     }
-    void PVTCollectorStruct::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    void PVTCollectorStruct::oneTimeInit(EnergyPlusData &state)
     {
+
+        static std::string const RoutineName("InitPVTcollectors");
+
+        if (this->MyOneTimeFlag) {
+            this->setupReportVars(state);
+            this->MyOneTimeFlag = false;
+        }
+
+        if (this->SetLoopIndexFlag) {
+            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
+                bool errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->TypeNum,
+                                                        this->WLoopNum,
+                                                        this->WLoopSideNum,
+                                                        this->WLoopBranchNum,
+                                                        this->WLoopCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
+                }
+                this->SetLoopIndexFlag = false;
+            }
+        }
     }
 
     void GetPVTThermalPowerProduction(EnergyPlusData &state, int const PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy)
