@@ -282,7 +282,7 @@ This field specifies the temperature difference between the air leaving the zone
 
 \paragraph{Field Set Zeta and Temperature Difference}\label{field-set-zeta-and-temperature-difference}
 
-The remaining fields contain pairs of values that define a lookup table for the temperature pattern in the vertical direction. The first value is Zeta and the second value is DeltaTai. This object is extensible, by duplicating the last two fields and revising the IDD -- note that you will have to replace ``inner'' semi-colons with commas.
+The remaining fields contain pairs of values that define a lookup table for the temperature pattern in the vertical direction. The first value is Zeta and the second value is DeltaTai.
 
 \paragraph{Field: Pair \textless{}\#\textgreater{} Zeta non-dimensional Height}\label{field-pair-zeta-non-dimensional-height}
 
@@ -292,7 +292,7 @@ Zeta is the normalized height and should be a fractional value from 0.0 to 1.0. 
 
 DeltaT\(_{ai}\) is the temperature difference between the air temperature at the associated Zeta (T\(_{ai}\)) and the mean air temperature and is given in degrees Celsius.
 
-An example of this object corresponding to the figure above is:
+This object is extensible by repeating the last two fields -- note that you will have to replace ``inner'' semi-colons with commas.  An example of this object corresponding to the figure above is:
 
 \begin{lstlisting}
 RoomAir:TemperaturePattern:NondimensionalHeight,
@@ -347,7 +347,7 @@ This field specifies the temperature difference between the air leaving the zone
 
 \paragraph{Fields (6 and on): Pairs of Surface Names and Temperature Differences}\label{fields-6-and-on-pairs-of-surface-names-and-temperature-differences}
 
-The remaining fields contain pairs that define a lookup table for the temperature pattern on a surface-by-surface basis. This object is extensible, by duplicating the last two fields and revising the IDD -- note that you will have to replace ``inner'' semi-colons with commas.
+The remaining fields contain pairs that define a lookup table for the temperature pattern on a surface-by-surface basis.
 
 \paragraph{Field: Surface Name Pair \textless{}\#\textgreater{}}\label{field-surface-name-pair}
 
@@ -357,7 +357,7 @@ The name of a surface defined elsewhere in the input file.
 
 DeltaT\(_{ai}\) is the temperature difference between the air temperature adjacent to the associated surface (T\(_{ai}\)) and the mean air temperature and is given in degrees Celsius.
 
-An example of this object, which might be used to elevate temperatures near west windows in the afternoon, is:
+This object is extensible by repeating the last two fields -- note that you will have to replace ``inner'' semi-colons with commas.  An example of this object, which might be used to elevate temperatures near west windows in the afternoon, is:
 
 \begin{lstlisting}
 

@@ -1745,8 +1745,6 @@ If the Convection type was ``Value'', then this field is filled and contains the
 
 If the Convection type was ``Schedule'', then this field contains the name of a schedule describing the value to be used during the time intervals for the schedule.
 
-The complete IDD definition for the ConvectionCoefficients object follows:
-
 \paragraph{Field: Convection Coefficient 1 User Curve Name}\label{field-convection-coefficient-1-user-curve-name}
 
 \paragraph{Field: Convection Coefficient 2 User Curve Name}\label{field-convection-coefficient-2-user-curve-name}
@@ -2294,7 +2292,7 @@ where \(\Delta {H_{NPL}}\) is the value input into the field above for the heigh
 
 \paragraph{Field(s): Surface \textless{}1 thru x\textgreater{} Name}\label{fields-surface-1-thru-x-name}
 
-The remaining fields are used to name the \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects that are associated with the exterior naturally vented cavity. These are the underlying heat transfer surfaces and are defined elsewhere in the input file. These surfaces should all specify OtherSideConditionsModel as their exterior environment. The input object can currently accommodate up to ten surfaces, but it is extensible by modifying the Energy+.idd entry.
+The remaining fields are used to name the \textbf{\hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}} objects that are associated with the exterior naturally vented cavity. These are the underlying heat transfer surfaces and are defined elsewhere in the input file. These surfaces should all specify OtherSideConditionsModel as their exterior environment. The input object can currently accommodate up to ten surfaces.
 
 An example IDF entry is
 

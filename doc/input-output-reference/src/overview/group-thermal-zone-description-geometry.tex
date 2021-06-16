@@ -358,9 +358,9 @@ Zone lists are not exclusive. A zone can be referenced be more than one ZoneList
 
 The name of the ZoneList object. Must be unique across ZoneLists.
 
-\paragraph{Field: Zone 1 - Zone 20 Name}\label{field-zone-1---zone-20-name}
+\paragraph{Field: Zone \textless{}\#\textgreater{} Name}\label{field-zone-1---zone-20-name}
 
-Reference to a Zone object. This field is extensible; for greater than 20 zones, edit the IDD to add more \emph{Zone Name} fields.
+Reference to a Zone object. This field is extensible, so additional fields of this type can be added to the end of this object.
 
 \begin{lstlisting}
 
@@ -1604,7 +1604,7 @@ Each of the following surfaces:
   \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed}
 \end{itemize}
 
-use the same vertex input. The numeric parameters indicated below are taken from the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} definition; the others may not be exactly the same but are identical in configuration. They are also ``extensible'' -- so, if you want more vertices for these surfaces, you may add to the IDD definition as indicated in the ``extensible'' comment or, as EnergyPlus is ``auto-extensible'' just add the number of vertices into your input file.. Note that \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} is not extensible and is limited to 4 (max) vertices. If you leave the Number of Surface Vertex groups blank or enter \textbf{autocalculate}, EnergyPlus looks at the number of groups entered and figures out how many coordinate groups are entered.
+use the same vertex input. The numeric parameters indicated below are taken from the \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} definition; the others may not be exactly the same but are identical in configuration. They are also ``extensible'' -- so, to define more vertices for these surfaces, simply add the required number of vertices (X, Y, and Z coordinates for each vertex) to the input file. Note that \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} is not extensible and is limited to 4 (max) vertices. If the Number of Surface Vertex groups is left blank or entered as \textbf{autocalculate}, EnergyPlus looks at the number of groups entered and figures out how many coordinate groups are entered.
 
 \begin{callout}
 \warning{Note that the resolution on the surface vertex input is 1 millimeter (.001 meter). Therefore, using vertices that are very close together (\textless{} 1 mm) may result in invalid dot product and fatal errors during shading calculations.}
