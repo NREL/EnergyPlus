@@ -81,7 +81,8 @@ namespace ExteriorEnergyUse {
         DistrictCoolUse = 11,
         DistrictHeatUse = 12,
         OtherFuel1Use = 13,
-        OtherFuel2Use = 14
+        OtherFuel2Use = 14,
+        DistrictHeatSteamUse = 15
     };
 
     enum class LightControlType

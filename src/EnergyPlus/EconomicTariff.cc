@@ -4031,6 +4031,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
     int gasFacilMeter;
     int distCoolFacilMeter;
     int distHeatFacilMeter;
+    int distHeatSteamFacilMeter;
     Real64 elecTotalEne;
     Real64 gasTotalEne;
     Real64 distCoolTotalEne;
@@ -4065,6 +4066,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
         gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
         distCoolFacilMeter = GetMeterIndex(state, "DISTRICTCOOLING:FACILITY");
         distHeatFacilMeter = GetMeterIndex(state, "DISTRICTHEATING:FACILITY");
+        distHeatSteamFacilMeter = GetMeterIndex(state, "DISTRICTHEATINGSTEAM:FACILITY");
         elecTotalEne = 0.0;
         gasTotalEne = 0.0;
         distCoolTotalEne = 0.0;
@@ -4108,7 +4110,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
                     distCoolTariffNames += ' ' + tariff(iTariff).tariffName;
                     distCoolUnits = tariff(iTariff).convChoice;
                     distCoolDemWindowUnits = tariff(iTariff).demandWindow;
-                } else if (tariff(iTariff).reportMeterIndx == distHeatFacilMeter) {
+                } else if (tariff(iTariff).reportMeterIndx == distHeatFacilMeter || tariff(iTariff).reportMeterIndx == distHeatSteamFacilMeter) {
                     if (tariff(iTariff).totalAnnualEnergy > distHeatTotalEne) distHeatTotalEne = tariff(iTariff).totalAnnualEnergy;
                     distHeatTotalCost += tariff(iTariff).totalAnnualCost;
                     distHeatTariffNames += ' ' + tariff(iTariff).tariffName;

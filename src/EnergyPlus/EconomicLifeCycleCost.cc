@@ -1307,6 +1307,7 @@ void ExpressAsCashFlows(EnergyPlusData &state)
             case DataGlobalConstants::ResourceType::Steam:
             case DataGlobalConstants::ResourceType::DistrictCooling:
             case DataGlobalConstants::ResourceType::DistrictHeating:
+            case DataGlobalConstants::ResourceType::DistrictHeatingSteam:
             case DataGlobalConstants::ResourceType::ElectricityProduced:
             case DataGlobalConstants::ResourceType::ElectricityPurchased:
             case DataGlobalConstants::ResourceType::ElectricityNet:

@@ -1202,7 +1202,7 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, TypeOf_PurchHotWater, CompNames(CompNum));
                     } else if (UtilityRoutines::SameString(this_comp_type, "DistrictHeatingSteam")) {
                         this_comp.TypeOf_Num = TypeOf_PurchSteam;
-                        this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, TypeOf_PurchHotWater, CompNames(CompNum));
+                        this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, TypeOf_PurchSteam, CompNames(CompNum));
                     } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                         this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                         this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(state, CompNames(CompNum));

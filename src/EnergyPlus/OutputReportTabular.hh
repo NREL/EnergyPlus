@@ -162,7 +162,7 @@ namespace OutputReportTabular {
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
-    constexpr int numResourceTypes(14);
+    constexpr int numResourceTypes(15);
     constexpr int numSourceTypes(12);
 
     constexpr const char *validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
@@ -999,6 +999,7 @@ struct OutputReportTabularData : BaseGlobalStruct
     Real64 sourceFactorNaturalGas = 0.0;
     Real64 efficiencyDistrictCooling = 0.0;
     Real64 efficiencyDistrictHeating = 0.0;
+    Real64 efficiencyDistrictHeatingSteam = 0.0;
     Real64 sourceFactorSteam = 0.0;
     Real64 sourceFactorGasoline = 0.0;
     Real64 sourceFactorDiesel = 0.0;

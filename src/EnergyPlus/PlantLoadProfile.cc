@@ -579,7 +579,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                                                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                                                                     DataLoopNode::NodeFluidType::Steam,
                                                                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                    1,
+                                                                                                    NodeInputManager::compFluidStream::Primary,
                                                                                                     ObjectIsNotParent);
             state.dataPlantLoadProfile->PlantProfile(ProfileSteamNum).OutletNode = GetOnlySingleNode(state,
                                                                                                      state.dataIPShortCut->cAlphaArgs(3),
@@ -588,7 +588,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                                                                                      state.dataIPShortCut->cAlphaArgs(1),
                                                                                                      DataLoopNode::NodeFluidType::Steam,
                                                                                                      DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                     1,
+                                                                                                     NodeInputManager::compFluidStream::Primary,
                                                                                                      ObjectIsNotParent);
 
             state.dataPlantLoadProfile->PlantProfile(ProfileSteamNum).LoadSchedule = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));

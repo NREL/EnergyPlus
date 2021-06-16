@@ -1725,6 +1725,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->resourceTypeNames(12) = "Propane";
         ort->resourceTypeNames(13) = "OtherFuel1";
         ort->resourceTypeNames(14) = "OtherFuel2";
+        ort->resourceTypeNames(15) = "DistrictHeatingSteam";
 
         ort->sourceTypeNames(1) = "Electricity";
         ort->sourceTypeNames(2) = "NaturalGas";
@@ -2197,6 +2198,8 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "DistrictCooling:Facility", "", iAggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "DistrictHeating:Facility", "", iAggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "DistrictHeating:Facility", "", iAggType::Maximum);
+        AddMonthlyFieldSetInput(state, curReport, "DistrictHeatingSteam:Facility", "", iAggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "DistrictHeatingSteam:Facility", "", iAggType::Maximum);
     }
     if (ort->namedMonthly(11).show) {
         curReport = AddMonthlyReport(state, "EnergyConsumptionCoalGasolineMonthly", 2);
@@ -2806,6 +2809,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
     // the following should be kept consistent with the assumptions in the pollution calculation routines
     ort->efficiencyDistrictCooling = 3.0;
     ort->efficiencyDistrictHeating = 0.3;
+    ort->efficiencyDistrictHeatingSteam = 1.35;
 
     //  TotalSourceEnergyUse = (gatherTotalsSource(1) & !total source from electricity
     //                  +  gatherTotalsSource(2)   & !natural gas
@@ -2978,6 +2982,16 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->fuelFactorSchedulesUsed = true;
         ort->ffSchedUsed(14) = true;
         ort->ffSchedIndex(14) = ffScheduleIndex;
+    }
+    
+    GetFuelFactorInfo(state, "DistrictHeatingSteam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    if (fuelFactorUsed) {
+        ort->ffUsed(15) = true;
+    }
+    ort->SourceFactors(15) = curSourceFactor;
+    if (fFScheduleUsed) {
+        ort->ffSchedUsed(15) = true;
+        ort->ffSchedIndex(15) = ffScheduleIndex;
     }
 
     GetEnvironmentalImpactFactorInfo(state, ort->efficiencyDistrictHeating, ort->efficiencyDistrictCooling, ort->sourceFactorSteam);

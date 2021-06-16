@@ -129,6 +129,9 @@ ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar)
         } else if (SELECT_CASE_var == "DISTRICTHEATING") {
             return ResourceType::DistrictHeating;
 
+        } else if (SELECT_CASE_var == "DISTRICTHEATINGSTEAM") {
+            return ResourceType::DistrictHeatingSteam;
+
         } else if (SELECT_CASE_var == "ELECTRICITYPRODUCED") {
             return ResourceType::ElectricityProduced;
 
@@ -287,6 +290,9 @@ std::string GetResourceTypeChar(ResourceType const ResourceTypeNum)
 
         } else if (SELECT_CASE_var == ResourceType::DistrictHeating) {
             return "DistrictHeating";
+
+        } else if (SELECT_CASE_var == ResourceType::DistrictHeatingSteam) {
+            return "DistrictHeatingSteam";
 
         } else if (SELECT_CASE_var == ResourceType::ElectricityProduced) {
             return "ElectricityProduced";
