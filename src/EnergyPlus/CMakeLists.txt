@@ -885,9 +885,20 @@ if(LINK_WITH_PYTHON)
     # In case you have both release and debug Python libraries on your system, Python_LIBRARIES might be "optimized;C:/.../python38.lib;debug;C:/.../python38_d.lib"
     # so it can't be used directly, we could use a generator expression to find the $<TARGET_FILE:Python::Python> library used and that'd point directly
     # to the DLL. But it won't work nicely for the install(code ...) command below... so we do a hack, get the optimized one always...
-    list(LENGTH RESOLVED_PYTHON_LIBRARY _LEN)
+    list(LENGTH Python_LIBRARIES _LEN)
     if (_LEN GREATER 1)
-      list(GET RESOLVED_PYTHON_LIBRARY 1 RESOLVED_PYTHON_LIBRARY)
+      set (_Python_DOING_RELEASE FALSE)
+      foreach(_currentArg ${Python_LIBRARIES})
+        message("_currentArg=${_currentArg}")
+        if ("x${_currentArg}" STREQUAL "xoptimized")
+          set(_Python_DOING_RELEASE TRUE)
+        elseif(_Python_DOING_RELEASE)
+          get_filename_component(RESOLVED_PYTHON_LIBRARY "${_currentArg}" REALPATH)
+          break()
+        endif()
+      endforeach()
+    # else()
+      # No-op, already done above
     endif()
 
     # Windows is being ugly and linking against the Python DLL but not running
