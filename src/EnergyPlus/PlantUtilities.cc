@@ -1850,9 +1850,9 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
 
 void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
                               std::string_view const &CallerName, // really used for error messages
-                              int const NodeNum,             // index in Node structure of node to be scanned
-                              int &LoopNum,                  // return value for plant loop
-                              int &LoopSideNum,              // return value for plant loop side
+                              int const NodeNum,                  // index in Node structure of node to be scanned
+                              int &LoopNum,                       // return value for plant loop
+                              int &LoopSideNum,                   // return value for plant loop side
                               int &BranchNum,
                               Optional_int CompNum)
 {
@@ -1919,9 +1919,9 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
         ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
         ShowContinueError(state, "Node Name=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\"");
         if (!state.dataGlobal->DoingSizing) {
-            ShowContinueError(state, format("called by {}",CallerName));
+            ShowContinueError(state, format("called by {}", CallerName));
         } else {
-            ShowContinueError(state, format("during sizing: called by {}",CallerName));
+            ShowContinueError(state, format("during sizing: called by {}", CallerName));
         }
         if (outFoundCount > 0) ShowContinueError(state, format("Node was found as outlet node (for component) {} time(s).", outFoundCount));
         ShowContinueError(state, "Possible error in Branch inputs.  For more information, look for other error messages related to this node name.");

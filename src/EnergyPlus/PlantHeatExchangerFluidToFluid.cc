@@ -2404,7 +2404,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
         }
 
         if (errFlag) {
-            ShowFatalError(state, format ("{} Program terminated due to previous condition(s).", RoutineName));
+            ShowFatalError(state, format("{} Program terminated due to previous condition(s).", RoutineName));
         }
         this->MyFlag = false;
     }
