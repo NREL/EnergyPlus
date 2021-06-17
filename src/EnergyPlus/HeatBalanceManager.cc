@@ -4885,29 +4885,11 @@ namespace HeatBalanceManager {
         // METHODOLOGY EMPLOYED:
         // The GetObjectItem routines are employed to retrieve the data.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace SurfaceGeometry;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         GetZoneData(state, ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(state, ErrorsFound);
+        GetSpaceData(state, ErrorsFound);
+
+        SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     }
 
     void GetZoneData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
@@ -5522,7 +5504,7 @@ namespace HeatBalanceManager {
                 if (extensibles != objectFields.end()) {
                     auto extensiblesArray = extensibles.value();
                     for (auto extensibleInstance : extensiblesArray) {
-                        std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space");
+                        std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
                         int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->Space);
                         if (thisSpaceNum > 0) {
                             thisSpaceList.Spaces.emplace_back(thisSpaceNum);
