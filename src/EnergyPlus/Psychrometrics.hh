@@ -1101,7 +1101,7 @@ namespace Psychrometrics {
     )
     {
 
-        Int64 constexpr Grid_Shift(28);                         // Tuned This is a hot spot
+        Int64 constexpr Grid_Shift(28);                     // Tuned This is a hot spot
         assert(Grid_Shift == 64 - 12 - tsatprecision_bits); // Force Grid_Shift updates when precision bits changes
         Int64 const Pb_tag(*reinterpret_cast<Int64 const *>(&Press) >> Grid_Shift);
 
