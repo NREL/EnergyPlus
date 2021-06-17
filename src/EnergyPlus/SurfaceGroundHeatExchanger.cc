@@ -1429,15 +1429,15 @@ namespace SurfaceGroundHeatExchanger {
     }
     void SurfaceGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
     {
+        using DataPlant::TypeOf_GrndHtExchgSurface;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using PlantUtilities::ScanPlantLoopsForObject;
-        using DataPlant::TypeOf_GrndHtExchgSurface;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
-        Real64 rho;        // local fluid density
+        Real64 rho;                       // local fluid density
         bool errFlag;
         static std::string const RoutineName("InitSurfaceGroundHeatExchanger");
 
