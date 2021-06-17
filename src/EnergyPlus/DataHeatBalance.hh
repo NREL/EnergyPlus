@@ -335,18 +335,17 @@ namespace DataHeatBalance {
 
     struct SpaceData
     {
-        std::string Name;           // Space name
-        std::string ZoneName;       // Name of Zone which contains this space
-        int ZoneNum;                // Pointer to Zone wich contains this space
-        std::string SpaceType;      // Space type tag
+        std::string Name = "";      // Space name
+        int ZoneNum = 0;            // Pointer to Zone wich contains this space
+        std::string SpaceType = ""; // Space type tag
         EPVector<std::string> Tags; // Optional tags for reporting
     };
 
     struct SpaceListData
     {
-        std::string Name;                          // Space List name
-        std::string::size_type MaxSpaceNameLength; // Max Name length of Spaces in the list
-        EPVector<int> Spaces;                      // Pointers to Spaces in the list
+        std::string Name = "";                          // Space List name
+        std::string::size_type MaxSpaceNameLength = 0u; // Max Name length of Spaces in the list
+        EPVector<int> Spaces;                           // Pointers to Spaces in the list
     };
 
     struct ZoneData

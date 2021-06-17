@@ -5471,13 +5471,13 @@ namespace HeatBalanceManager {
                 auto &thisSpace = state.dataHeatBal->Space(spaceNum);
                 thisSpace.Name = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
-                thisSpace.ZoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
-                int zoneNum = UtilityRoutines::FindItemInList(thisSpace.ZoneName, state.dataHeatBal->Zone);
+                std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
+                int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
                 if (zoneNum > 0) {
                     thisSpace.ZoneNum = zoneNum;
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpace.Name);
-                    ShowContinueError(state, "Zone Name =" + thisSpace.ZoneName + "not found.");
+                    ShowContinueError(state, "Zone Name =" + zoneName + "not found.");
                     ErrorsFound = true;
                 }
                 thisSpace.SpaceType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_type");
@@ -5531,6 +5531,7 @@ namespace HeatBalanceManager {
                             ShowContinueError(state, "Space Name =" + thisSpaceName + "not found.");
                             ErrorsFound = true;
                         }
+                        thisSpaceList.MaxSpaceNameLength = max(thisSpaceList.MaxSpaceNameLength, len(thisSpaceName));
                         // Check for duplicate spaces
                         for (int loop = 1; loop <= int(thisSpaceList.Spaces.size()) - 1; ++loop) {
                             if (thisSpaceNum == thisSpaceList.Spaces(loop)) {
