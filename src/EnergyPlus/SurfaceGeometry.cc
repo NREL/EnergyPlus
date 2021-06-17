@@ -3586,17 +3586,17 @@ namespace SurfaceGeometry {
 
             state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, Loop, SurfaceNumAlpha, SurfaceNumProp);
             if (Item == 1) {
+                if (SurfaceNumAlpha != 9) {
+                    ShowSevereError(
+                        state,
+                        format("{}: Object Definition indicates not = 9 Alpha Objects, Number Indicated={}", cCurrentModuleObject, SurfaceNumAlpha));
+                    ErrorsFound = true;
+                }
+            } else {
                 if (SurfaceNumAlpha != 8) {
                     ShowSevereError(
                         state,
                         format("{}: Object Definition indicates not = 8 Alpha Objects, Number Indicated={}", cCurrentModuleObject, SurfaceNumAlpha));
-                    ErrorsFound = true;
-                }
-            } else {
-                if (SurfaceNumAlpha != 7) {
-                    ShowSevereError(
-                        state,
-                        format("{}: Object Definition indicates not = 7 Alpha Objects, Number Indicated={}", cCurrentModuleObject, SurfaceNumAlpha));
                     ErrorsFound = true;
                 }
             }
@@ -3688,6 +3688,22 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = "Unknown Zone";
                     ErrorsFound = true;
+                }
+
+                ++ArgPointer;
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(ArgPointer)) {
+                    int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(ArgPointer), state.dataHeatBal->Space);
+
+                    if (spaceNum != 0) {
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Space = spaceNum;
+                    } else {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                            state.dataIPShortCut->cAlphaFieldNames(ArgPointer) + "=\"" +
+                                            state.dataIPShortCut->cAlphaArgs(ArgPointer) + "\".");
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
+                        ErrorsFound = true;
+                    }
                 }
                 // Get the ExteriorBoundaryCondition flag from input There are 4 conditions that
                 // can take place. The conditions are set with a 0, -1, or -2, or all of the
@@ -4146,7 +4162,7 @@ namespace SurfaceGeometry {
             } else if (Item == 3) {
                 ItemsToGet = TotRectIZWalls;
                 GettingIZSurfaces = true;
-                OtherSurfaceField = 4;
+                OtherSurfaceField = 5;
                 ExtBoundCondition = state.dataSurfaceGeometry->UnreconciledZoneSurface;
                 ClassItem = 1;
             } else if (Item == 4) {
@@ -4170,7 +4186,7 @@ namespace SurfaceGeometry {
             } else if (Item == 7) {
                 ItemsToGet = TotRectIZCeilings;
                 GettingIZSurfaces = false;
-                OtherSurfaceField = 4;
+                OtherSurfaceField = 5;
                 ExtBoundCondition = state.dataSurfaceGeometry->UnreconciledZoneSurface;
                 ClassItem = 3;
             } else if (Item == 8) {
@@ -4188,7 +4204,7 @@ namespace SurfaceGeometry {
             } else { // IF (Item == 10) THEN
                 ItemsToGet = TotRectIZFloors;
                 GettingIZSurfaces = true;
-                OtherSurfaceField = 4;
+                OtherSurfaceField = 5;
                 ExtBoundCondition = state.dataSurfaceGeometry->UnreconciledZoneSurface;
                 ClassItem = 2;
             }
@@ -4266,6 +4282,20 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = "Unknown Zone";
                     ErrorsFound = true;
+                }
+
+                if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                    int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->Space);
+
+                    if (spaceNum != 0) {
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Space = spaceNum;
+                    } else {
+                        ShowSevereError(state,
+                                        cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                            state.dataIPShortCut->cAlphaFieldNames(4) + "=\"" + state.dataIPShortCut->cAlphaArgs(4) + "\".");
+                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
+                        ErrorsFound = true;
+                    }
                 }
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = ExtBoundCondition;
@@ -6853,6 +6883,34 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName = "Unknown Zone";
                 ErrorsFound = true;
                 errFlag = true;
+            }
+
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+                state.dataSurface->IntMassObjects(Item).SpaceOrSpaceListName = state.dataIPShortCut->cAlphaArgs(4);
+                int Item1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->Space);
+                int SLItem = 0;
+                if (Item1 == 0 && int(state.dataHeatBal->SpaceList.size()) > 0)
+                    SLItem = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->SpaceList);
+                if (Item1 > 0) {
+                    ++NumIntMassSurfaces;
+                    state.dataSurface->IntMassObjects(Item).NumOfSpaces = 1;
+                    state.dataSurface->IntMassObjects(Item).SpaceListActive = false;
+                    state.dataSurface->IntMassObjects(Item).SpaceOrSpaceListPtr = Item1;
+                } else if (SLItem > 0) {
+                    int numOfSpaces = int(state.dataHeatBal->SpaceList(SLItem).Spaces.size());
+                    NumIntMassSurfaces += numOfSpaces;
+                    state.dataSurface->IntMassObjects(Item).NumOfSpaces = numOfSpaces;
+                    state.dataSurface->IntMassObjects(Item).SpaceListActive = true;
+                    state.dataSurface->IntMassObjects(Item).SpaceOrSpaceListPtr = SLItem;
+                } else {
+                    ShowSevereError(state,
+                                    cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" invalid " +
+                                        state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3) + "\" not found.");
+                    ++SurfNum;
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
+                    ErrorsFound = true;
+                    errFlag = true;
+                }
             }
 
             if (errFlag) {
