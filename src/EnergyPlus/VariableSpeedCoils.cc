@@ -6417,8 +6417,8 @@ namespace VariableSpeedCoils {
                 UtilityRoutines::SameString(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).StorageType, "ThermalStorage:Ice:Detailed") ||
                 UtilityRoutines::SameString(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).StorageType, "ThermalStorage:Pcm:Simple")) 
             {
-                const double dNormCapacity =
-                    CoolCapAtPeak * state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PeakStoreHours * 3600.0 ; // J
+                const double dNormCapacity = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal *
+                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PeakStoreHours * 3600.0; // J
                 IceThermalStorage::SetIceStoreNormCapacity(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).StorageType,
                                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).StorageName,
                                                            dNormCapacity);
