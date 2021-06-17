@@ -2236,7 +2236,7 @@ Real64 HeatExchangerStruct::demandSideFlowResidual(EnergyPlusData &state,
 void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 {
 
-    static std::string const RoutineName("InitFluidHeatExchanger: ");
+    static constexpr std::string_view RoutineName("InitFluidHeatExchanger: ");
 
     if (this->MyOneTimeFlag) {
         this->setupOutputVars(state);
@@ -2264,8 +2264,10 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 
         if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
             ShowSevereError(state,
-                            RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) +
-                            " name = \"" + this->Name + "\"");
+                            format("{} Invalid connections for {} name = \"{}\"",
+                                   RoutineName,
+                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   this->Name));
             ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
             errFlag = true;
         }
@@ -2286,8 +2288,10 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
 
         if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
             ShowSevereError(state,
-                            RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) +
-                            " name = \"" + this->Name + "\"");
+                            format("{} Invalid connections for {} name = \"{}\"",
+                                   RoutineName,
+                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   this->Name));
             ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
             errFlag = true;
         }
@@ -2295,8 +2299,10 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
         // make sure it is not the same loop on both sides.
         if (this->SupplySideLoop.loopNum == this->DemandSideLoop.loopNum) { // user is being too tricky, don't allow
             ShowSevereError(state,
-                            RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) +
-                            " name = \"" + this->Name + "\"");
+                            format("{} Invalid connections for {} name = \"{}\"",
+                                   RoutineName,
+                                   DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg),
+                                   this->Name));
             ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
             errFlag = true;
         } else {
@@ -2398,7 +2404,7 @@ void HeatExchangerStruct::oneTimeInit(EnergyPlusData &state)
         }
 
         if (errFlag) {
-            ShowFatalError(state, RoutineName + "Program terminated due to previous condition(s).");
+            ShowFatalError(state, format ("{} Program terminated due to previous condition(s).", RoutineName));
         }
         this->MyFlag = false;
     }

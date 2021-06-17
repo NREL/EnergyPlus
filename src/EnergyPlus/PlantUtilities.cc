@@ -1848,6 +1848,87 @@ void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
     }
 }
 
+void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
+                              std::string_view const &CallerName, // really used for error messages
+                              int const NodeNum,             // index in Node structure of node to be scanned
+                              int &LoopNum,                  // return value for plant loop
+                              int &LoopSideNum,              // return value for plant loop side
+                              int &BranchNum,
+                              Optional_int CompNum)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         B. Griffith
+    //       DATE WRITTEN   Feb. 2010
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // Get routine to return plant loop index and plant loop side
+    // based on node number.  for one time init routines only.
+
+    // METHODOLOGY EMPLOYED:
+    // Loop thru plant data structure and find matching node.
+
+    int LoopCtr;
+    int LoopSideCtr;
+    int BranchCtr;
+    int CompCtr;
+    bool FoundNode;
+    int inFoundCount;
+    int outFoundCount;
+
+    inFoundCount = 0;
+    outFoundCount = 0;
+    if (present(CompNum)) {
+        CompNum = 0;
+    }
+    FoundNode = false;
+
+    for (LoopCtr = 1; LoopCtr <= state.dataPlnt->TotNumLoops; ++LoopCtr) {
+        auto &this_loop(state.dataPlnt->PlantLoop(LoopCtr));
+        for (LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr) {
+            auto &this_loop_side(this_loop.LoopSide(LoopSideCtr));
+            for (BranchCtr = 1; BranchCtr <= this_loop_side.TotalBranches; ++BranchCtr) {
+                auto &this_branch(this_loop_side.Branch(BranchCtr));
+                for (CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr) {
+                    auto &this_comp(this_branch.Comp(CompCtr));
+                    if (NodeNum == this_comp.NodeNumIn) {
+                        FoundNode = true;
+                        ++inFoundCount;
+                        LoopNum = LoopCtr;
+                        LoopSideNum = LoopSideCtr;
+                        BranchNum = BranchCtr;
+                        if (present(CompNum)) {
+                            CompNum = CompCtr;
+                        }
+                    }
+
+                    if (NodeNum == this_comp.NodeNumOut) {
+                        ++outFoundCount;
+                        LoopNum = LoopCtr;
+                        LoopSideNum = LoopSideCtr;
+                        BranchNum = BranchCtr;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!FoundNode) {
+        ShowSevereError(state, "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops");
+        ShowContinueError(state, "Node Name=\"" + state.dataLoopNodes->NodeID(NodeNum) + "\"");
+        if (!state.dataGlobal->DoingSizing) {
+            ShowContinueError(state, format("called by {}",CallerName));
+        } else {
+            ShowContinueError(state, format("during sizing: called by {}",CallerName));
+        }
+        if (outFoundCount > 0) ShowContinueError(state, format("Node was found as outlet node (for component) {} time(s).", outFoundCount));
+        ShowContinueError(state, "Possible error in Branch inputs.  For more information, look for other error messages related to this node name.");
+        // fatal?
+    }
+}
+
 bool AnyPlantLoopSidesNeedSim(EnergyPlusData &state)
 {
 
@@ -1989,7 +2070,7 @@ int MyPlantSizingIndex(EnergyPlusData &state,
         PrintErrorFlag = true;
     }
 
-    ScanPlantLoopsForNodeNum(state, "MyPlantSizingIndex", NodeNumIn, PlantLoopNum, DummyLoopSideNum, DummyBranchNum);
+    ScanPlantLoopsForNodeNum(state, std::string_view("MyPlantSizingIndex"), NodeNumIn, PlantLoopNum, DummyLoopSideNum, DummyBranchNum);
 
     if (PlantLoopNum > 0) {
         MyPltLoopNum = PlantLoopNum;
