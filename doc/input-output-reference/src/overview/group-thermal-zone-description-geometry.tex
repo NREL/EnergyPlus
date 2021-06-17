@@ -4653,10 +4653,21 @@ The depth of the inside reveal surfaces other than the sill, measured from the i
 
 The solar absorptance of the inside reveal surfaces other than the sill.
 
+\paragraph{Field: NFRC Product Type for Assembly Calculations}\label{field-nfrc-product-type-for-assembly-calculations}
+
+The selection made for this field corresponds to NFRC 100 "Procedure for Determining Fenestration Product U-factors" product types which are used when computing the overall u-factor, SHGC, and visual transmittance. The default is CurtainWall. The options are: CasementDouble, CasementSingle, DualAction, Fixed, Garage, Greenhouse, HingedEscape, HorizontalSlider, Jal, Pivoted, Projecting, DoorSidelite, Skylight, SlidingPatioDoor, CurtainWall, SpandrelPanel, SideHingedDoor, DoorTransom, TropicalAwning, TubularDaylightingDevice, and VerticalSlider. The sizes used in the calculation of the overall u-factor, overall SHGC, and overall VT are based on NFRC 100 Table 4-3 (see Figure~\ref{fig:nfrc100-product-types} ). 
+
+
 \begin{figure}[hbtp] % fig 38
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image064.png}
 \caption{(a) Vertical section through a window (with frame) showing outside and inside reveal surfaces and inside sill. (b) Perspective view looking from the outside of a window (without frame) showing reveal surfaces. Note that “Outside Reveal Depth” is not a user input; it is calculated by the program from the window and wall vertices. \protect \label{fig:a-vertical-section-through-a-window-with}}
+\end{figure}
+
+\begin{figure}[hbtp] % fig 41
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/NFRC100-Table4-3.PNG}
+\caption{NFRC 100 Product Types and Model Sizes. \protect \label{fig:nfrc100-product-types}}
 \end{figure}
 
 An IDF example:
