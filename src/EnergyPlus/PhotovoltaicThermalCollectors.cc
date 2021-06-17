@@ -60,6 +60,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -1454,19 +1455,19 @@ namespace PhotovoltaicThermalCollectors {
 
         // boundary conditions parameters
         int InletNode = this->HVACInletNodeNum;
-        Real64 tfin = state.dataLoopNodes->Node(InletNode).Temp;                   // inlet fluid temperature (DegC)
-        Real64 w_in = state.dataLoopNodes->Node(InletNode).HumRat;                 // inlet air humidity ratio (kgda/kg)
-        Real64 cp_in = Psychrometrics::PsyCpAirFnW(w_in);                          // inlet air specific heat (J/kg-K)
-        Real64 tamb = state.dataEnvrn->OutDryBulbTemp;                             // ambient temperature (DegC)
-        Real64 tsky = state.dataEnvrn->SkyTemp;                                    // sky temperature (DegC)
-        Real64 t2 = state.dataSurface->Surface(this->SurfNum).OutDryBulbTemp, t2K; // temperature of bldg surface (DegC)
-        Real64 HrGround(0.0);                                                      // radiation heat transfer coefficient to ground (W/m2-K)
-        Real64 HrAir(0.0);                                                         // radiation heat transfer coefficient to atmosphere (W/m2-K)
-        Real64 HcExt(0.0);                                                         // exterior convection heat transfer coefficient (W/m2-K)
-        Real64 HrSky(0.0);                                                         // radiation heat transfer coefficien to sky (W/m2-K)
-        Real64 mdot = this->MassFlowRate;                                          // fluid mass flow rate (kg/s)
-        Real64 mdot_bipvt(mdot), mdot_bipvt_new(mdot);                             // mass flow rate through the bipvt duct (kg/s)
-        Real64 s(0.0);                                                             // solar radiation gain at pv surface (W/m2)
+        Real64 tfin = state.dataLoopNodes->Node(InletNode).Temp;         // inlet fluid temperature (DegC)
+        Real64 w_in = state.dataLoopNodes->Node(InletNode).HumRat;       // inlet air humidity ratio (kgda/kg)
+        Real64 cp_in = Psychrometrics::PsyCpAirFnW(w_in);                // inlet air specific heat (J/kg-K)
+        Real64 tamb = state.dataEnvrn->OutDryBulbTemp;                   // ambient temperature (DegC)
+        Real64 tsky = state.dataEnvrn->SkyTemp;                          // sky temperature (DegC)
+        Real64 t2 = state.dataHeatBalSurf->TH(1, 1, this->SurfNum), t2K; // temperature of bldg surface (DegC)
+        Real64 HrGround(0.0);                                            // radiation heat transfer coefficient to ground (W/m2-K)
+        Real64 HrAir(0.0);                                               // radiation heat transfer coefficient to atmosphere (W/m2-K)
+        Real64 HcExt(0.0);                                               // exterior convection heat transfer coefficient (W/m2-K)
+        Real64 HrSky(0.0);                                               // radiation heat transfer coefficien to sky (W/m2-K)
+        Real64 mdot = this->MassFlowRate;                                // fluid mass flow rate (kg/s)
+        Real64 mdot_bipvt(mdot), mdot_bipvt_new(mdot);                   // mass flow rate through the bipvt duct (kg/s)
+        Real64 s(0.0);                                                   // solar radiation gain at pv surface (W/m2)
         Real64 s1(0.0);
         Real64 k_taoalpha_beam(0.0);
         Real64 k_taoalpha_sky(0.0);
@@ -1486,7 +1487,7 @@ namespace PhotovoltaicThermalCollectors {
         Real64 k_glass = this->BIPVT.ECoffGlass;                                      // extinction coefficient pv glass
         Real64 slope = (pi / 180.0) * state.dataSurface->Surface(this->SurfNum).Tilt; // surface tilt in rad
         Real64 beta(0); // surface tilt for calculating internal convective coefficient for stagnation condition
-        Real64 taoaplha_back = this->BIPVT.PVBackTransAbsProduct;  // tao-alpha product normal back of PV panel
+        Real64 taoalpha_back = this->BIPVT.BackMatTranAbsProduct;  // tao-alpha product normal back of PV panel
         Real64 taoalpha_pv = this->BIPVT.PVCellTransAbsProduct;    // tao-aplha product normal PV cells
         Real64 taoaplha_cladding = this->BIPVT.CladTranAbsProduct; // tao-alpha product normal cladding
         Real64 g(0.0);                                             // Solar incident on surface
@@ -1553,10 +1554,12 @@ namespace PhotovoltaicThermalCollectors {
 
             eff_pv = state.dataPhotovoltaic->PVarray(this->PVnum).SNLPVCalc.EffMax;
 
-            g = state.dataHeatBal->SurfQRadSWOutIncident(this->SurfNum);
+            g = state.dataHeatBal->SurfQRadSWOutIncidentBeam(SurfNum) * iam_pv_beam +
+                state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * iam_pv_sky +
+                state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(SurfNum) * iam_pv_ground;
             // s1 = DataHeatBalance::QRadSWOutIncident(this->SurfNum) * (1.0 - this->BIPVT.PVAreaFract) * IAM_bs;
             s = g * taoalpha_pv * fcell * area_pv / area_wall_total - g * eff_pv * area_pv / area_wall_total;
-            s1 = taoaplha_back * g * (1.0 - fcell) * (area_pv / area_wall_total) + taoaplha_cladding * g * (1 - area_pv / area_wall_total);
+            s1 = taoalpha_back * g * (1.0 - fcell) * (area_pv / area_wall_total) + taoaplha_cladding * g * (1 - area_pv / area_wall_total);
 
             // Properties of air required for convective heat transfer coefficient calculations inside channel - function of temperature and
             // velocity (except for Cp_in, which is function of humidity ratio) (not moisture)
@@ -1564,8 +1567,8 @@ namespace PhotovoltaicThermalCollectors {
             mu = 0.0000171 * (std::pow(((tfavg + 273.15) / 273.0), 1.5)) * ((273.0 + 110.4) / ((tfavg + 273.15) + 110.4));
             k_air = 0.000000000015207 * std::pow(tfavg + 273.15, 3.0) - 0.000000048574 * std::pow(tfavg + 273.15, 2.0) +
                     0.00010184 * (tfavg + 273.15) - 0.00039333;
-            prandtl = (-9.8398e-10) * std::pow(tfavg, 4.0) + (1.8486e-7) * std::pow(tfavg, 3.0) - (8.5713e-6) * std::pow(tfavg, 2.0) +
-                      (2.2359e-4) * tfavg + 7.15735e-1;
+            prandtl = (-2.1415e-12) * std::pow(tfavg, 4.0) + (1.6785e-9) * std::pow(tfavg, 3.0) + (4.8260e-8) * std::pow(tfavg, 2.0) -
+                      (2.4939e-4) * tfavg + 7.3506e-1;
             density_air = 101.3 / (0.287 * (tfavg + 273.15));
             diffusivity = k_air / (cp_in * density_air);
             kin_viscosity = mu / density_air;
@@ -2045,7 +2048,7 @@ namespace PhotovoltaicThermalCollectors {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         if (state.dataPhotovoltaicThermalCollector->PVT(PVTNum).PVTModelType == BIPVTmodel) {
-            TsColl = state.dataPhotovoltaicThermalCollector->PVT(PVTNum).BIPVT.CollectorTemp;
+            TsColl = state.dataPhotovoltaicThermalCollector->PVT(PVTNum).BIPVT.LastCollectorTemp;
         }
     }
 
