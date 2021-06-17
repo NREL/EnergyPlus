@@ -103,8 +103,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataSurface->SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->SurfWinBackSurfaces.allocate(24, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
     state->dataHeatBal->SurfWinOverlapAreas.allocate(24, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
-
+    state->dataSurface->SurfSunCosHourly.allocate(24);
+    for (int hour = 1; hour <= 24; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour).dimension(3, 0.0);
+    }
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
@@ -1063,9 +1065,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     state->dataSolarShading->CalcSkyDifShading = false;
 
     ScheduleManager::UpdateScheduleValues(*state);
-    state->dataBSDFWindow->SUNCOSTS(4, 9, 1) = 0.1;
-    state->dataBSDFWindow->SUNCOSTS(4, 9, 2) = 0.1;
-    state->dataBSDFWindow->SUNCOSTS(4, 9, 3) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(1) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(2) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(3) = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
     EXPECT_TRUE(state->dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);

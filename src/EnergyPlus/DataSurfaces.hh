@@ -1223,22 +1223,22 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfHighTempErrCount;
 
     // Surface solar arrays
-    Array1D<Real64> SurfAirSkyRadSplit;     // Fractional split between the air and the sky for radiation from the surface
-                                            // Fraction of sky IR coming from sky itself; 1-SurfAirSkyRadSplit comes from the atmosphere.
-    Array2D<Real64> SurfSunCosHourly;       // Hourly values of SUNCOS (solar direction cosines)
-                                            // Autodesk: Init Zero-initialization added to avoid use uninitialized
-    Array1D<Real64> SurfSunlitArea;         // Sunlit area by surface number
-    Array1D<Real64> SurfSunlitFrac;         // Sunlit fraction by surface number
-    Array1D<Real64> SurfSkySolarInc;        // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse
-                                            // and beam solar from exterior obstructions [W/m2]
-    Array1D<Real64> SurfGndSolarInc;        // Incident diffuse solar from ground; if CalcSolRefl is true,
-                                            // accounts for shadowing of ground by building and obstructions [W/m2]
-    Array1D<Real64> SurfBmToBmReflFacObs;   // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> SurfBmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> SurfBmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
-    Array1D<Real64> SurfSkyDiffReflFacGnd;  // sky diffuse reflection view factors from ground
-    Array1D<Real64> SurfOpaqAI;             // Time step value of factor for beam absorbed on inside of opaque surface
-    Array1D<Real64> SurfOpaqAO;             // Time step value of factor for beam absorbed on outside of opaque surface
+    Array1D<Real64> SurfAirSkyRadSplit;        // Fractional split between the air and the sky for radiation from the surface
+                                               // Fraction of sky IR coming from sky itself; 1-SurfAirSkyRadSplit comes from the atmosphere.
+    Array1D<Array1D<Real64>> SurfSunCosHourly; // Hourly values of SUNCOS (solar direction cosines)
+                                               // Autodesk: Init Zero-initialization added to avoid use uninitialized
+    Array1D<Real64> SurfSunlitArea;            // Sunlit area by surface number
+    Array1D<Real64> SurfSunlitFrac;            // Sunlit fraction by surface number
+    Array1D<Real64> SurfSkySolarInc;           // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse
+                                               // and beam solar from exterior obstructions [W/m2]
+    Array1D<Real64> SurfGndSolarInc;           // Incident diffuse solar from ground; if CalcSolRefl is true,
+                                               // accounts for shadowing of ground by building and obstructions [W/m2]
+    Array1D<Real64> SurfBmToBmReflFacObs;      // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
+    Array1D<Real64> SurfBmToDiffReflFacObs;    // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
+    Array1D<Real64> SurfBmToDiffReflFacGnd;    // Factor for incident solar from diffuse beam refl from ground
+    Array1D<Real64> SurfSkyDiffReflFacGnd;     // sky diffuse reflection view factors from ground
+    Array1D<Real64> SurfOpaqAI;                // Time step value of factor for beam absorbed on inside of opaque surface
+    Array1D<Real64> SurfOpaqAO;                // Time step value of factor for beam absorbed on outside of opaque surface
     Array1D<int> SurfPenumbraID;
 
     // Surface reflectance

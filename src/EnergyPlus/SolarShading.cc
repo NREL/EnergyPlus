@@ -804,7 +804,10 @@ void AllocateModuleArrays(EnergyPlusData &state)
     state.dataSolarShading->XTEMP1.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
     state.dataSolarShading->YTEMP1.dimension(2 * (state.dataSurface->MaxVerticesPerSurface + 1), 0.0);
 
-    state.dataSurface->SurfSunCosHourly.dimension(HoursInDay, 3, 0.0);
+    state.dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state.dataSurface->SurfSunCosHourly(hour).dimension(3, 0.0);
+    }
     state.dataSurface->SurfSunlitArea.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfSunlitFrac.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfSkySolarInc.dimension(state.dataSurface->TotSurfaces, 0);
@@ -4910,12 +4913,12 @@ void FigureSunCosines(EnergyPlusData &state,
 
     // Save hourly values for use in DaylightingManager
     if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-        if (iTimeStep == state.dataGlobal->NumOfTimeStepInHour) state.dataSurface->SurfSunCosHourly(iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
+        if (iTimeStep == state.dataGlobal->NumOfTimeStepInHour) state.dataSurface->SurfSunCosHourly(iHour) = state.dataSolarShading->SUNCOS;
     } else {
-        state.dataSurface->SurfSunCosHourly(iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
+        state.dataSurface->SurfSunCosHourly(iHour) = state.dataSolarShading->SUNCOS;
     }
     // Save timestep values for use in WindowComplexManager
-    state.dataBSDFWindow->SUNCOSTS(iTimeStep, iHour, {1, 3}) = state.dataSolarShading->SUNCOS;
+    state.dataBSDFWindow->SUNCOSTS(iTimeStep, iHour) = state.dataSolarShading->SUNCOS;
 }
 
 void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const iTimeStep)
@@ -4939,7 +4942,7 @@ void FigureSolarBeamAtTimestep(EnergyPlusData &state, int const iHour, int const
     Real64 FracIlluminated; // Fraction of surface area illuminated by a sky patch
 
     // Recover the sun direction from the array stored in previous loop
-    state.dataSolarShading->SUNCOS = state.dataBSDFWindow->SUNCOSTS(iTimeStep, iHour, {1, 3});
+    state.dataSolarShading->SUNCOS = state.dataBSDFWindow->SUNCOSTS(iTimeStep, iHour);
 
     state.dataSolarShading->SurfSunCosTheta = 0.0;
 

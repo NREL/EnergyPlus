@@ -513,14 +513,14 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             state.dataDaylightingManager->GILSK = 0.0;
             state.dataDaylightingManager->GILSU = 0.0;
             for (IHR = 1; IHR <= 24; ++IHR) {
-                if (state.dataSurface->SurfSunCosHourly(IHR, 3) < DataEnvironment::SunIsUpValue)
+                if (state.dataSurface->SurfSunCosHourly(IHR)(3) < DataEnvironment::SunIsUpValue)
                     continue; // Skip if sun is below horizon //Autodesk SurfSunCosHourly was uninitialized here
-                state.dataDaylightingManager->PHSUN = DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(IHR, 3));
+                state.dataDaylightingManager->PHSUN = DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(IHR)(3));
                 state.dataDaylightingManager->PHSUNHR(IHR) = state.dataDaylightingManager->PHSUN;
                 state.dataDaylightingManager->SPHSUNHR(IHR) = std::sin(state.dataDaylightingManager->PHSUN);
                 state.dataDaylightingManager->CPHSUNHR(IHR) = std::cos(state.dataDaylightingManager->PHSUN);
                 state.dataDaylightingManager->THSUNHR(IHR) =
-                    std::atan2(state.dataSurface->SurfSunCosHourly(IHR, 2), state.dataSurface->SurfSunCosHourly(IHR, 1));
+                    std::atan2(state.dataSurface->SurfSunCosHourly(IHR)(2), state.dataSurface->SurfSunCosHourly(IHR)(1));
                 // Get exterior horizontal illuminance from sky and sun
                 state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(IHR);
                 state.dataDaylightingManager->SPHSUN = state.dataDaylightingManager->SPHSUNHR(IHR);
@@ -540,15 +540,15 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay) = 0.0;
         state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay, {1, 4}) = 0.0;
         state.dataDaylightingManager->GILSU(state.dataGlobal->HourOfDay) = 0.0;
-        if (!(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay, 3) < DataEnvironment::SunIsUpValue)) { // Skip if sun is below horizon
+        if (!(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay)(3) < DataEnvironment::SunIsUpValue)) { // Skip if sun is below horizon
             state.dataDaylightingManager->PHSUN =
-                DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay, 3));
+                DataGlobalConstants::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay)(3));
             state.dataDaylightingManager->PHSUNHR(state.dataGlobal->HourOfDay) = state.dataDaylightingManager->PHSUN;
             state.dataDaylightingManager->SPHSUNHR(state.dataGlobal->HourOfDay) = std::sin(state.dataDaylightingManager->PHSUN);
             state.dataDaylightingManager->CPHSUNHR(state.dataGlobal->HourOfDay) = std::cos(state.dataDaylightingManager->PHSUN);
             state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay) =
-                std::atan2(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay, 2),
-                           state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay, 1));
+                std::atan2(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay)(2),
+                           state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay)(1));
             // Get exterior horizontal illuminance from sky and sun
             state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay);
             state.dataDaylightingManager->SPHSUN = state.dataDaylightingManager->SPHSUNHR(state.dataGlobal->HourOfDay);
@@ -3232,7 +3232,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     // switch as need to serve both reference points and map points based on calledFrom
     using General::POLYF;
 
-    if (state.dataSurface->SurfSunCosHourly(iHour, 3) < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSurface->SurfSunCosHourly(iHour)(3) < DataEnvironment::SunIsUpValue) return;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static Vector3<Real64> const RREF(0.0); // Location of a reference point in absolute coordinate system //Autodesk Was used uninitialized:
@@ -3479,7 +3479,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             Real64 const TVISB_ObTrans(TVISB * ObTrans);
             Real64 const AVWLSU_add(TVISB_ObTrans * state.dataDaylightingManager->GILSU(iHour) *
                                     (state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi));
-            Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SurfSunCosHourly(iHour, {1, 3}));
+            Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SurfSunCosHourly(iHour));
             assert(equal_dimensions(state.dataDaylightingManager->EDIRSK, state.dataDaylightingManager->AVWLSK));
             auto l(state.dataDaylightingManager->EDIRSK.index(iHour, 1, 1));
             for (ISky = 1; ISky <= 4; ++ISky, ++l) { // [ l ] == ( iHour, 1, ISky )
@@ -3946,7 +3946,7 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     int JSH;    // Shading index: J=1 is unshaded window, J=2 is shaded window
     Real64 VTR; // For switchable glazing, ratio of visible transmittance of fully-switched state to that of the unswitched state
 
-    if (state.dataSurface->SurfSunCosHourly(iHour, 3) < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSurface->SurfSunCosHourly(iHour)(3) < DataEnvironment::SunIsUpValue) return;
 
     ++ISunPos;
 
@@ -4085,7 +4085,7 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     Real64 VTR; // For switchable glazing, ratio of visible transmittance of
     //  fully-switched state to that of the unswitched state
 
-    if (state.dataSurface->SurfSunCosHourly(iHour, 3) < DataEnvironment::SunIsUpValue) return;
+    if (state.dataSurface->SurfSunCosHourly(iHour)(3) < DataEnvironment::SunIsUpValue) return;
 
     // Altitude of sun (degrees)
     state.dataDaylightingManager->PHSUN = state.dataDaylightingManager->PHSUNHR(iHour);
@@ -7750,7 +7750,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     DPH = (PHMAX - PHMIN) / double(NPHMAX);
 
     // Sky/ground element altitude integration
-    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR, {1, 3}));
+    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR));
     for (IPH = 1; IPH <= NPHMAX; ++IPH) {
         PH = PHMIN + (double(IPH) - 0.5) * DPH;
 
@@ -8284,7 +8284,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
                 if (BlindOn)
                     ProfileAngle(
-                        state, IWin, state.dataSurface->SurfSunCosHourly(IHR, {1, 3}), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
+                        state, IWin, state.dataSurface->SurfSunCosHourly(IHR), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                 for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
@@ -8596,7 +8596,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
     } else {
         NGnd = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).NGnd(WinEl);
     }
-    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR, {1, 3}));
+    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR));
     for (iGndElem = 1; iGndElem <= NGnd; ++iGndElem) {
         // case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
         // were hit in the process
@@ -9334,7 +9334,7 @@ void DayltgSurfaceLumFromSun(EnergyPlusData &state,
         }
     }
     // Cosine of angle of incidence of sun at HitPt if sun were to reach HitPt
-    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR, {1, 3}));
+    Vector3<Real64> const SUNCOS_IHR(state.dataSurface->SurfSunCosHourly(IHR));
     CosIncAngAtHitPt = dot(DayltgSurfaceLumFromSunReflNorm, SUNCOS_IHR);
     // Require that the sun be in front of this surface relative to window element
     if (CosIncAngAtHitPt <= 0.0) return; // Sun is in back of reflecting surface

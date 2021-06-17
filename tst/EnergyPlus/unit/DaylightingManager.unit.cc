@@ -884,7 +884,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
 
-    state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= 24; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour).dimension(3, 0.0);
+    }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -2162,7 +2165,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
-    state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= 24; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour).dimension(3, 0.0);
+    }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -2855,8 +2861,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-    state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
-
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= 24; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour).dimension(3, 0.0);
+    }
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
 
