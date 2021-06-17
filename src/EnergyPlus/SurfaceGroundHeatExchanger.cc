@@ -461,17 +461,8 @@ namespace SurfaceGroundHeatExchanger {
 
         // Using/Aliasing
         using namespace DataEnvironment;
-        using DataPlant::TypeOf_GrndHtExchgSurface;
-        using FluidProperties::GetDensityGlycol;
-        using PlantUtilities::InitComponentNodes;
-        using PlantUtilities::RegisterPlantCompDesignFlow;
         using PlantUtilities::RegulateCondenserCompFlowReqOp;
-        using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
-        static std::string const RoutineName("InitSurfaceGroundHeatExchanger");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -479,49 +470,8 @@ namespace SurfaceGroundHeatExchanger {
         int Cons;          // construction counter
         int LayerNum;      // material layer number for bottom
         Real64 OutDryBulb; // Height Dependent dry bulb.
-        Real64 rho;        // local fluid density
-        bool errFlag;
 
-        // Init more variables
-        if (this->MyFlag) {
-            // Locate the hx on the plant loops for later usage
-            errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    this->Name,
-                                    TypeOf_GrndHtExchgSurface,
-                                    this->LoopNum,
-                                    this->LoopSideNum,
-                                    this->BranchNum,
-                                    this->CompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
-
-            if (errFlag) {
-                ShowFatalError(state, "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");
-            }
-            rho = GetDensityGlycol(state,
-                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                   DataPrecisionGlobals::constant_zero,
-                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                   RoutineName);
-            this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
-            InitComponentNodes(state,
-                               0.0,
-                               this->DesignMassFlowRate,
-                               this->InletNodeNum,
-                               this->OutletNodeNum,
-                               this->LoopNum,
-                               this->LoopSideNum,
-                               this->BranchNum,
-                               this->CompNum);
-            RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
-
-            this->MyFlag = false;
-        }
+        this->oneTimeInit(state); // Init more variables
 
         // get QTF data - only once
         if (this->InitQTF) {
@@ -1477,8 +1427,59 @@ namespace SurfaceGroundHeatExchanger {
         this->SurfEnergy = SurfaceArea * (state.dataSurfaceGroundHeatExchangers->TopSurfFlux + state.dataSurfaceGroundHeatExchangers->BtmSurfFlux) *
                            TimeStepSys * DataGlobalConstants::SecInHour;
     }
-    void SurfaceGroundHeatExchangerData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    void SurfaceGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
     {
+        using FluidProperties::GetDensityGlycol;
+        using PlantUtilities::InitComponentNodes;
+        using PlantUtilities::RegisterPlantCompDesignFlow;
+        using PlantUtilities::ScanPlantLoopsForObject;
+        using DataPlant::TypeOf_GrndHtExchgSurface;
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        Real64 const DesignVelocity(0.5); // Hypothetical design max pipe velocity [m/s]
+        Real64 rho;        // local fluid density
+        bool errFlag;
+        static std::string const RoutineName("InitSurfaceGroundHeatExchanger");
+
+        if (this->MyFlag) {
+            // Locate the hx on the plant loops for later usage
+            errFlag = false;
+            ScanPlantLoopsForObject(state,
+                                    this->Name,
+                                    TypeOf_GrndHtExchgSurface,
+                                    this->LoopNum,
+                                    this->LoopSideNum,
+                                    this->BranchNum,
+                                    this->CompNum,
+                                    errFlag,
+                                    _,
+                                    _,
+                                    _,
+                                    _,
+                                    _);
+
+            if (errFlag) {
+                ShowFatalError(state, "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s).");
+            }
+            rho = GetDensityGlycol(state,
+                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                   DataPrecisionGlobals::constant_zero,
+                                   state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                   RoutineName);
+            this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
+            InitComponentNodes(state,
+                               0.0,
+                               this->DesignMassFlowRate,
+                               this->InletNodeNum,
+                               this->OutletNodeNum,
+                               this->LoopNum,
+                               this->LoopSideNum,
+                               this->BranchNum,
+                               this->CompNum);
+            RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
+
+            this->MyFlag = false;
+        }
     }
 
 } // namespace SurfaceGroundHeatExchanger
