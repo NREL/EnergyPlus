@@ -2124,6 +2124,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2155,6 +2156,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2186,6 +2188,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ptn_other:unit_s_g,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2202,6 +2205,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2218,6 +2222,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ptn_other:unit_n_g,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2234,6 +2239,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2265,6 +2271,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2296,6 +2303,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2312,6 +2320,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2328,6 +2337,7 @@
     Ceiling,                 !- Surface Type
     susp_ceil,               !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2344,6 +2354,7 @@
     Floor,                   !- Surface Type
     ExtSlab,                 !- Construction Name
     units_gr_lf,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2359,7 +2370,8 @@
     units_gr_lf_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     units_gr_lf,             !- Zone or ZoneList Name
-    499.4097;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    499.4097;                !- Extended Field
 
   ZoneInfiltration:EffectiveLeakageArea,
     units_gr_lf_Infiltration,!- Name
@@ -2622,6 +2634,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2653,6 +2666,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2684,6 +2698,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2700,6 +2715,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2731,6 +2747,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2747,6 +2764,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2763,6 +2781,7 @@
     Floor,                   !- Surface Type
     ExtSlab,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2779,6 +2798,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2810,6 +2830,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2841,6 +2862,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2872,6 +2894,7 @@
     Ceiling,                 !- Surface Type
     susp_ceil,               !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2888,6 +2911,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     units_gr_rt,             !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2903,7 +2927,8 @@
     units_gr_rt_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     units_gr_rt,             !- Zone or ZoneList Name
-    749.1145;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    749.1145;                !- Extended Field
 
   ZoneInfiltration:EffectiveLeakageArea,
     units_gr_rt_Infiltration,!- Name
@@ -3166,6 +3191,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     unit_s_g,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3197,6 +3223,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     unit_s_g,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3213,6 +3240,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     unit_s_g,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3229,6 +3257,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     unit_s_g,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ptn_unita:units_gr_lf,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3245,6 +3274,7 @@
     Ceiling,                 !- Surface Type
     susp_ceil,               !- Construction Name
     unit_s_g,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3261,6 +3291,7 @@
     Floor,                   !- Surface Type
     ExtSlab,                 !- Construction Name
     unit_s_g,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3276,7 +3307,8 @@
     unit_s_g_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     unit_s_g,                !- Zone or ZoneList Name
-    111.8807;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    111.8807;                !- Extended Field
 
   ZoneInfiltration:FlowCoefficient,
     unit_s_g_Infiltration,   !- Name
@@ -3541,6 +3573,7 @@
     Wall,                    !- Surface Type
     ExtWall,                 !- Construction Name
     unit_n_g,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3572,6 +3605,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     unit_n_g,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3588,6 +3622,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     unit_n_g,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3604,6 +3639,7 @@
     Wall,                    !- Surface Type
     IntWall,                 !- Construction Name
     unit_n_g,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ptn_unitb:units_gr_lf,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3620,6 +3656,7 @@
     Ceiling,                 !- Surface Type
     susp_ceil,               !- Construction Name
     unit_n_g,                !- Zone Name
+    ,                        !- Space Name
     adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3636,6 +3673,7 @@
     Floor,                   !- Surface Type
     ExtSlab,                 !- Construction Name
     unit_n_g,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3651,7 +3689,8 @@
     unit_n_g_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
     unit_n_g,                !- Zone or ZoneList Name
-    111.8807;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    111.8807;                !- Extended Field
 
   ZoneInfiltration:FlowCoefficient,
     unit_n_g_Infiltration,   !- Name

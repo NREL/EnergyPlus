@@ -662,6 +662,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Bakery,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -678,6 +679,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Bakery,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -694,6 +696,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Bakery,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -710,6 +713,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Bakery,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -726,6 +730,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Bakery,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bakery_Wall__4-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -742,6 +747,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Sales,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Bakery_Wall__4,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -758,6 +764,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Deli,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -774,6 +781,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Deli,                    !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -790,6 +798,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Deli,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -806,6 +815,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Deli,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Deli_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -822,6 +832,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Bakery,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Deli_Wall_South,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -838,6 +849,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Deli,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Deli_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -854,6 +866,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Sales,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Deli_Wall_West,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -870,6 +883,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     DryStorage,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -886,6 +900,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     DryStorage,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -902,6 +917,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     DryStorage,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -918,6 +934,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     DryStorage,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -934,6 +951,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -950,6 +968,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -966,6 +985,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -982,6 +1002,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -998,6 +1019,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office_Wall_South-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1014,6 +1036,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Deli,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office_Wall_South,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1030,6 +1053,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Office,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1046,6 +1070,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     DryStorage,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Office_Wall_West,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1062,6 +1087,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Produce,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1078,6 +1104,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Produce,                 !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1094,6 +1121,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Produce,                 !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Produce_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1110,6 +1138,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     DryStorage,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Produce_Wall_North,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1126,6 +1155,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Produce,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1142,6 +1172,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Produce,                 !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1158,6 +1189,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     Sales,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1174,6 +1206,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     Sales,                   !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1190,6 +1223,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Sales,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Sales_Wall_North-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1206,6 +1240,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     DryStorage,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Sales_Wall_North,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1222,6 +1257,7 @@
     Wall,                    !- Surface Type
     Mass Non-res Ext Wall,   !- Construction Name
     Sales,                   !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1238,6 +1274,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Sales,                   !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Sales_Wall_West-PPAutoCreateOther,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1254,6 +1291,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     Produce,                 !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Sales_Wall_West,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1738,37 +1776,43 @@
     Bakery Internal Mass,    !- Name
     InteriorFurnishings,     !- Construction Name
     Bakery,                  !- Zone or ZoneList Name
-    418.0818;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    418.0818;                !- Extended Field
 
   InternalMass,
     Deli Internal Mass,      !- Name
     InteriorFurnishings,     !- Construction Name
     Deli,                    !- Zone or ZoneList Name
-    449.4372;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    449.4372;                !- Extended Field
 
   InternalMass,
     DryStorage Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
     DryStorage,              !- Zone or ZoneList Name
-    1243.7788;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    1243.7788;               !- Extended Field
 
   InternalMass,
     Office Internal Mass,    !- Name
     InteriorFurnishings,     !- Construction Name
     Office,                  !- Zone or ZoneList Name
-    177.6835;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    177.6835;                !- Extended Field
 
   InternalMass,
     Produce Internal Mass,   !- Name
     InteriorFurnishings,     !- Construction Name
     Produce,                 !- Zone or ZoneList Name
-    1422.7283;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    1422.7283;               !- Extended Field
 
   InternalMass,
     Sales Internal Mass,     !- Name
     InteriorFurnishings,     !- Construction Name
     Sales,                   !- Zone or ZoneList Name
-    4649.8781;               !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    4649.8781;               !- Extended Field
 
 ! ***INTERNAL GAINS SCHEDULES***
 

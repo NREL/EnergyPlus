@@ -1011,6 +1011,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
     BackRoom,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1027,6 +1028,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
     BackRoom,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1043,6 +1045,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
     SalesFloor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1059,6 +1062,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
     SalesFloor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1075,6 +1079,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
     SalesFloor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1091,6 +1096,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
     BackRoom,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1107,6 +1113,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     BackRoom,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_mirror,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1123,6 +1130,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     SalesFloor,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1139,6 +1147,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-11,  !- Construction Name
     BackRoom,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1155,6 +1164,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-11,  !- Construction Name
     SalesFloor,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1171,6 +1181,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     BackRoom,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1187,6 +1198,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     SalesFloor,              !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1251,25 +1263,29 @@
     BackRoom_Furniture1,     !- Name
     FurnitureConstruction,   !- Construction Name
     BackRoom,                !- Zone or ZoneList Name
-    95.0;                    !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    95.0;                    !- Extended Field
 
   InternalMass,
     BackRoom_Furniture2,     !- Name
     FurnitureConstruction,   !- Construction Name
     BackRoom,                !- Zone or ZoneList Name
-    95.0;                    !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    95.0;                    !- Extended Field
 
   InternalMass,
     SalesFloor_Furniture1,   !- Name
     FurnitureConstruction,   !- Construction Name
     SalesFloor,              !- Zone or ZoneList Name
-    845.0;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    845.0;                   !- Extended Field
 
   InternalMass,
     SalesFloor_Furniture2,   !- Name
     FurnitureConstruction,   !- Construction Name
     SalesFloor,              !- Zone or ZoneList Name
-    845.0;                   !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    845.0;                   !- Extended Field
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
 
