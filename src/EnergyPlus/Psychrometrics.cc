@@ -542,38 +542,88 @@ namespace Psychrometrics {
         // Initializing  value for iter
         iter = 0;
 
+        bool debugWanted = (state.dataGlobal->DayOfSim == 1) && (state.dataGlobal->HourOfDay == 9) && (state.dataGlobal->TimeStep == 2);
+
+        if (debugWanted) {
+            std::cerr << "\n\nInitial Conditions:\n"
+                      << " TDB  =" << TDB << '\n'
+                      << "   W  =" << W << '\n'
+                      << "Patm  =" << Patm << '\n'
+                      << "tBoil =" << tBoil << '\n'
+                      << " WBT  =" << WBT << '\n';
+        }
+
         // Begin iteration loop
         for (iter = 1; iter <= itmax; ++iter) {
 
+            if (debugWanted) {
+                std::cerr << "\n\nStarting iteration " << iter << ", current WBT = " << WBT << '\n';
+            }
+
             // Assigning a value to WBT
-            if (WBT >= (tBoil - 0.09)) WBT = tBoil - 0.1;
+            if (WBT >= (tBoil - 0.09)) {
+                if (debugWanted) {
+                    std::cerr << "WBT over tBoil - 0.09\n";
+                }
+                WBT = tBoil - 0.1;
+            }
 
             // Determine the saturation pressure for wet bulb temperature
             PSatstar = PsyPsatFnTemp(state, WBT, (CalledFrom.empty() ? RoutineName : CalledFrom));
+            if (debugWanted) {
+                std::cerr << "PSatstar=" << PSatstar << ", Patm=" << Patm << '\n';
+            }
 
             // Determine humidity ratio for given saturation pressure
             Wstar = 0.62198 * PSatstar / (Patm - PSatstar);
+            if (debugWanted) {
+                std::cerr << "Wstar=" << Wstar << '\n';
+            }
 
             // Calculate new humidity ratio and determine difference from known
             // humidity ratio which is wStar calculated earlier
             if (WBT >= 0.0) {
                 newW = ((2501.0 - 2.326 * WBT) * Wstar - 1.006 * (TDB - WBT)) / (2501.0 + 1.86 * TDB - 4.186 * WBT);
+                if (debugWanted) {
+                    auto deNum = (2501.0 + 1.86 * TDB - 4.186 * WBT);
+                    std::cerr << "WBT >= 0,  newW = star=" << Wstar << ", deNum = " << deNum << '\n';
+                }
             } else {
                 newW = ((2830.0 - 0.24 * WBT) * Wstar - 1.006 * (TDB - WBT)) / (2830.0 + 1.86 * TDB - 2.1 * WBT);
+                if (debugWanted) {
+                    auto deNum = (2830.0 + 1.86 * TDB - 2.1 * WBT);
+                    std::cerr << "WBT < 0,  newW = star=" << Wstar << ", deNum = " << deNum << '\n';
+                }
             }
 
             // Check error, if not satisfied, calculate new guess and iterate
             error = W - newW;
+            if (debugWanted) {
+                std::cerr << "error = " << error << '\n';
+            }
 
             // Using Iterative Procedure to Calculate WetBulb
             Iterate(ResultX, state.dataPsychrometrics->iconvTol, WBT, error, X1, Y1, iter, icvg);
             WBT = ResultX;
+            if (debugWanted) {
+                std::cerr << "WBT = " << WBT << '\n';
+            }
 
             // If converged, leave iteration loop.
-            if (icvg == 1) break;
+            if (icvg == 1) {
+                if (debugWanted) {
+                    std::cerr << "Converged. breaking.\n";
+                }
+                break;
+            }
 
             // Error Trap for the Discontinuous nature of PsyPsatFnTemp function (Sat Press Curve) at ~0 Deg C.
-            if ((PSatstar > 611.000) && (PSatstar < 611.25) && (std::abs(error) <= 0.0001) && (iter > 4)) break;
+            if ((PSatstar > 611.000) && (PSatstar < 611.25) && (std::abs(error) <= 0.0001) && (iter > 4)) {
+                if (debugWanted) {
+                    std::cerr << "Error Trap for the Discontinuous nature of PsyPsatFnTemp function (Sat Press Curve) at ~0 Deg C\n";
+                }
+                break;
+            }
 
         } // End of Iteration Loop
 
