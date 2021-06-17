@@ -643,8 +643,7 @@ namespace Psychrometrics {
 
         // FUNCTION PARAMETER DEFINITIONS:
         //  integer(i64), parameter :: Grid_Mask=NOT(ISHFT(1_i64, Grid_Shift)-1)
-        Int64 constexpr Grid_Shift(28);                     // Tuned This is a hot spot
-        assert(Grid_Shift == 64 - 12 - psatprecision_bits); // Force Grid_Shift updates when precision bits changes
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - psatprecision_bits; // Force Grid_Shift updates when precision bits changes
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyPsatFnTemp_cache);
@@ -688,7 +687,7 @@ namespace Psychrometrics {
 
         Real64 Tsat_result; // result=> Sat-Temp {C}
 
-        Int64 constexpr Grid_Shift(64 - 12 - tsat_hbp_precision_bits);
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - tsat_hbp_precision_bits;
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1101,8 +1100,7 @@ namespace Psychrometrics {
     )
     {
 
-        Int64 constexpr Grid_Shift(28);                     // Tuned This is a hot spot
-        assert(Grid_Shift == 64 - 12 - tsatprecision_bits); // Force Grid_Shift updates when precision bits changes
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - tsatprecision_bits; // Force Grid_Shift updates when precision bits changes
         Int64 const Pb_tag(*reinterpret_cast<Int64 const *>(&Press) >> Grid_Shift);
 
         Int64 const hash(Pb_tag & tsatcache_mask);

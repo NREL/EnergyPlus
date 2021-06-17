@@ -510,8 +510,7 @@ namespace FluidProperties {
                                         std::string_view const CalledFrom // routine this function was called from (error messages)
     )
     {
-        std::uint64_t constexpr Grid_Shift(28);
-        assert(Grid_Shift == 64 - 12 - t_sh_precision_bits);
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - t_sh_precision_bits;
 
         double const t(Temperature + 1000 * GlycolIndex);
         std::uint64_t const T_tag(*reinterpret_cast<std::uint64_t const *>(&t) >> Grid_Shift);

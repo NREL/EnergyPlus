@@ -61,7 +61,7 @@ set(src
   src/ObjexxFCL/ArrayS.hh
   src/ObjexxFCL/BArray.fwd.hh
   src/ObjexxFCL/BArray.hh
-        src/ObjexxFCL/CArray.fwd.hh
+  src/ObjexxFCL/CArray.fwd.hh
   src/ObjexxFCL/CArray.hh
   src/ObjexxFCL/CArrayA.fwd.hh
   src/ObjexxFCL/CArrayA.hh
@@ -131,7 +131,7 @@ set( test_src
   tst/unit/Array4.unit.cc
   tst/unit/Array5.unit.cc
   tst/unit/ArrayS.unit.cc
-        tst/unit/CArray.unit.cc
+  tst/unit/CArray.unit.cc
   tst/unit/CArrayA.unit.cc
   tst/unit/char.functions.unit.cc
   tst/unit/command.unit.cc

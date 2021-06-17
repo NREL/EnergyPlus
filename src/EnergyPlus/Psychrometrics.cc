@@ -357,7 +357,7 @@ namespace Psychrometrics {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Int64 constexpr Grid_Shift((64 - 12 - twbprecision_bits));
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - twbprecision_bits;
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -443,7 +443,7 @@ namespace Psychrometrics {
 
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(100); // Maximum No of Iterations
-        static std::string const RoutineName("PsyTwbFnTdbWPb");
+        static constexpr std::string_view RoutineName("PsyTwbFnTdbWPb");
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 tBoil;    // Boiling temperature of water at given pressure
@@ -1328,7 +1328,7 @@ namespace Psychrometrics {
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(50); // Maximum number of iterations
         Real64 constexpr convTol(0.0001);
-        const char *RoutineName("PsyTsatFnPb");
+        static constexpr std::string_view RoutineName("PsyTsatFnPb");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
