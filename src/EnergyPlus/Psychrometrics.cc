@@ -371,9 +371,12 @@ namespace Psychrometrics {
         ++state.dataPsychrometrics->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
 
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
         std::uint64_t Tdb_tag = *reinterpret_cast<std::uint64_t const *>(&Tdb) >> Grid_Shift;
         std::uint64_t W_tag = *reinterpret_cast<std::uint64_t const *>(&W) >> Grid_Shift;
         std::uint64_t Pb_tag = *reinterpret_cast<std::uint64_t const *>(&Pb) >> Grid_Shift;
+        DISABLE_WARNING_POP
 
         std::uint64_t hash = (Tdb_tag ^ (W_tag ^ Pb_tag)) & std::uint64_t(twbcache_size - 1);
 
@@ -384,6 +387,8 @@ namespace Psychrometrics {
             cached_Twb(hash).iW = W_tag;
             cached_Twb(hash).iPb = Pb_tag;
 
+            DISABLE_WARNING_PUSH
+            DISABLE_WARNING_STRICT_ALIASING
             Tdb_tag <<= Grid_Shift;
             Real64 Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
 
@@ -392,6 +397,7 @@ namespace Psychrometrics {
 
             Pb_tag <<= Grid_Shift;
             Real64 Pb_tag_r = *reinterpret_cast<Real64 const *>(&Pb_tag);
+            DISABLE_WARNING_POP
 
             cached_Twb(hash).Twb = PsyTwbFnTdbWPb_raw(state, Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom);
         }

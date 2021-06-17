@@ -81,6 +81,25 @@ struct EnergyPlusData;
 #define EP_cache_PsyTsatFnHPb
 #endif
 
+// Adapted from: https://www.fluentcpp.com/2019/08/30/how-to-disable-a-warning-in-cpp/
+// clang-format off
+#if defined(_MSC_VER)
+#define DISABLE_WARNING_PUSH __pragma(warning(push))
+#define DISABLE_WARNING_POP __pragma(warning(pop))
+#define DISABLE_WARNING(warningNumber) __pragma(warning(disable : warningNumber))
+
+// purposfully doing nothing here - does MSVC not have a strict-aliasing warning?
+#define DISABLE_WARNING_STRICT_ALIASING
+#elif defined(__GNUC__) || defined(__clang__)
+#define DO_PRAGMA(X) _Pragma(#X)
+#define DISABLE_WARNING_PUSH DO_PRAGMA(GCC diagnostic push)
+#define DISABLE_WARNING_POP DO_PRAGMA(GCC diagnostic pop)
+#define DISABLE_WARNING(warningName) DO_PRAGMA(GCC diagnostic ignored #warningName)
+
+#define DISABLE_WARNING_STRICT_ALIASING DISABLE_WARNING(-Wstrict-aliasing)
+#endif
+// clang-format on
+
 namespace Psychrometrics {
 
     // Data
@@ -643,20 +662,26 @@ namespace Psychrometrics {
 
         // FUNCTION PARAMETER DEFINITIONS:
         //  integer(i64), parameter :: Grid_Mask=NOT(ISHFT(1_i64, Grid_Shift)-1)
-        std::uint64_t constexpr Grid_Shift = 64 - 12 - psatprecision_bits; // Force Grid_Shift updates when precision bits changes
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - psatprecision_bits;
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyPsatFnTemp_cache);
 #endif
 
-        Int64 Tdb_tag(*reinterpret_cast<Int64 const *>(&T) >> Grid_Shift); // Note that 2nd arg to TRANSFER is not used: Only type matters
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
+        Int64 Tdb_tag(*reinterpret_cast<Int64 const *>(&T) >> Grid_Shift);
+        DISABLE_WARNING_POP
         Int64 const hash(Tdb_tag & psatcache_mask);
         auto &cPsat(state.dataPsychCache->cached_Psat(hash));
 
         if (cPsat.iTdb != Tdb_tag) {
             cPsat.iTdb = Tdb_tag;
             Tdb_tag <<= Grid_Shift;
+            DISABLE_WARNING_PUSH
+            DISABLE_WARNING_STRICT_ALIASING
             Real64 Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
+            DISABLE_WARNING_POP
             cPsat.Psat = PsyPsatFnTemp_raw(state, Tdb_tag_r, CalledFrom);
         }
 
@@ -700,9 +725,11 @@ namespace Psychrometrics {
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
-
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
         Int64 H_tag = *reinterpret_cast<Int64 const *>(&H) >> Grid_Shift;
         Int64 Pb_tag = *reinterpret_cast<Int64 const *>(&Pb) >> Grid_Shift;
+        DISABLE_WARNING_POP
         Int64 hash = (H_tag ^ Pb_tag) & Int64(tsat_hbp_cache_size - 1);
         auto &cached_Tsat_HPb = state.dataPsychCache->cached_Tsat_HPb;
         if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
@@ -1100,8 +1127,11 @@ namespace Psychrometrics {
     )
     {
 
-        std::uint64_t constexpr Grid_Shift = 64 - 12 - tsatprecision_bits; // Force Grid_Shift updates when precision bits changes
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - tsatprecision_bits;
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
         Int64 const Pb_tag(*reinterpret_cast<Int64 const *>(&Press) >> Grid_Shift);
+        DISABLE_WARNING_POP
 
         Int64 const hash(Pb_tag & tsatcache_mask);
         auto &cTsat(state.dataPsychCache->cached_Tsat(hash));

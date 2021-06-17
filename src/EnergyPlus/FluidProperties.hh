@@ -60,6 +60,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {
 
@@ -513,7 +514,11 @@ namespace FluidProperties {
         std::uint64_t constexpr Grid_Shift = 64 - 12 - t_sh_precision_bits;
 
         double const t(Temperature + 1000 * GlycolIndex);
+
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
         std::uint64_t const T_tag(*reinterpret_cast<std::uint64_t const *>(&t) >> Grid_Shift);
+        DISABLE_WARNING_POP
 
         std::uint64_t const hash(T_tag & t_sh_cache_mask);
         auto &cTsh(cached_t_sh(hash));
