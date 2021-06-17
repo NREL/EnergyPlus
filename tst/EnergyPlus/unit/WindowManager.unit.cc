@@ -2773,6 +2773,10 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
 
+    // initialize simple glazing adjustment ratio
+    state->dataWindowManager->coeffAdjRatioOut = 1.0024;
+    state->dataWindowManager->coeffAdjRatioIn = 1.0024;
+
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
     state->dataHeatBalFanSys->QHTRadSysSurf.allocate(3);
