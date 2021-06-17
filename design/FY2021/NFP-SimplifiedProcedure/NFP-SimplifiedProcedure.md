@@ -6,7 +6,7 @@ June 2021
 ## Justification for New Feature
 The latest version of ASHRAE Standard 62.1 introduces a new approach to calculate a multi-zone system's design outdoor air (OA) intake and corresponding minimum primary zone air flows. This new approach is a simplification of the previous method, the Ventilation Rate Procedure (VRP). Language from the standard is provided below.
 
-![ASHRAE 62.1 Simplified Procedure](NFP-SimplifiedProcedure\code_language.png)
+![ASHRAE 62.1 Simplified Procedure](code_language.png)
 
 The Simplified Procedure (SP) is required by ASHRAE Standard 90.1 to calculate the zone air flow rate in dead band when zones with thermostatic DDC controls are served by terminal boxes that re-heat and/or re-cool the air delivered to the zone (see section 6.5.2.1, exception 2.a.(1)).
 
@@ -33,7 +33,7 @@ The occupant diversity, `D`, is currently calculated by EnergyPlus using user-in
 
 Letting EnergyPlus calculate `D` can potentially lead to some issues. For instance, if user-input occupancy schedules are normalized. Below is an example where two cases are compared: one using non-normalized schedules (regular case, actual occupancy fractions) and a case using normalized schedules. In both cases the actual modeled occupancies are the same. Each case leads to a different value of `D`.
 
-![Occupancy Fraction](NFP-SimplifiedProcedure\occupancy_fraction.png)
+![Occupancy Fraction](occupancy_fraction.png)
 
 | Regular   Case | Number of People | Peak Occupancy Fraction | Number of People - Peak |
 |----------------|------------------|-------------------------|-------------------------|
@@ -47,7 +47,7 @@ Letting EnergyPlus calculate `D` can potentially lead to some issues. For instan
 | Zone 2            | 4.75             | 1                       | 4.75                    |
 | Zone 3            | 9.5              | 1                       | 9.5                     |
 
-![Occupancy Fraction](NFP-SimplifiedProcedure\actual_nb_ppl_zone1.png)
+![Occupancy Fraction](actual_nb_ppl_zone1.png)
 
 The "regular case" lead to a `D` of 0.95 while the normalized case lead to a `D` of 1.0.
 
@@ -142,7 +142,53 @@ The zone minimum air flow of the `AirTerminal:DualDuct:VAV`, `AirTerminal:Single
 - `AirTerminal:SingleDuct:SeriesPIU:Reheat`
 - `AirTerminal:SingleDuct:ParallelPIU:Reheat`
 
-Instead of adding a new `Zone Minimum Air Flow Input Method` for all terminal listed above, their zone minimum (primary) air flow will be calculated following the SP if the `Sizing:System`'s `System Outdoor Air Method` is set to `SimplifiedProcedure`.
+Instead of adding a new `Zone Minimum Air Flow Input Method` for all terminal listed above, their zone minimum (primary) air flow will be calculated following the SP if the `Sizing:System`'s `System Outdoor Air Method` is set to `SimplifiedProcedure`. A note in the `Constant Minimum Air Flow Fraction`, `Fixed Minimum Air Flow Rate`, and `Minimum Primary Air Flow Fraction` will be added to specify that, see below.
+
+```
+  N2 , \field Constant Minimum Air Flow Fraction
+       \type real
+       \autosizable
+       \default autosize
+       \note This field is used if the field Zone Minimum Air Flow Input Method is Constant
+       \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
+       \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
+       \note If both this field and the following field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
+       \note To calculate the constant minimum air flow fraction based on the ASHRAE 62.1 Simplified Procedure,
+       \note set this field to autosize and this object's air loop's Sizing:System's System Outdoor Air Method
+       \note field to SimplifiedProcedure.
+  N3 , \field Fixed Minimum Air Flow Rate
+       \type real
+       \units m3/s
+       \autosizable
+       \default autosize
+       \note This field is used if the field Zone Minimum Air Flow Input Method is FixedFlowRate.
+       \note If the field Zone Minimum Air Flow Input Method is Scheduled, then this field
+       \note is optional; if a value is entered, then it is used for sizing normal-action reheat coils.
+       \note If both this field and the previous field are entered, the larger result is used.
+       \note The values for autosizing are picked up from the Sizing:Zone input fields
+       \note "Cooling Minimum Air Flow per Zone Floor Area", "Cooling Minimum Air Flow", and
+       \note "Cooling Minimum Air Flow Fraction". If there is no sizing calculation a default of
+       \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
+       \note To calculate the fixed minimum air flow rate based on the ASHRAE 62.1 Simplified Procedure,
+       \note set this field to autosize and this object's air loop's Sizing:System's System Outdoor Air Method
+       \note field to SimplifiedProcedure.
+```
+
+```
+  N3,  \field Minimum Primary Air Flow Fraction
+       \required-field
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \autosizable
+       \note To calculate the minimum primary air flow fraction based on the ASHRAE 62.1 Simplified Procedure,
+       \note set this field to autosize and this object's air loop's Sizing:System's System Outdoor Air Method
+       \note field to SimplifiedProcedure.
+```
 
 ## Outputs Description
 The existing output summary report will be used. The proposal does not include any new outputs.
