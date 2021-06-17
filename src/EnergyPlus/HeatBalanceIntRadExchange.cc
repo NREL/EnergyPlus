@@ -1560,7 +1560,7 @@ namespace HeatBalanceIntRadExchange {
         // view factors where either reciprocity or completeness is not satisfied.  However, when
         // the largest surface is just slightly smaller than the rest of the surface areas in the
         // zone, it has been shown that there can still be problems.  The correction below can
-        // be helpful in avoiding these problems.  So, the criteria below (with the 0.9 term added
+        // be helpful in avoiding these problems.  So, the criteria below (with the 0.99 term added
         // into the comparison in the next line of code) intends to capture more cases that are
         // "unbalanced" in surface area distribution so other strange cases can take advantage of
         // this correction.  The use of 0.99 is simply to provide some reasonable boundary numerically
