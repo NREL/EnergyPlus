@@ -208,3 +208,52 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     // clean up the file
     fs::remove(state->dataStrGlobals->outputPerfLogFilePath);
 }
+
+TEST_F(EnergyPlusFixture, UtilityRoutines_ProcessNumber)
+{
+    // acceptable strings
+    std::string goodString{"3.14159"};
+    double expectedVal{3.14159};
+    bool expectedError{false};
+    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_EQ(expectedError, false);
+
+    goodString = "3.14159+E0";
+    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_EQ(expectedError, false);
+
+    goodString = "3.14159+e0";
+    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_EQ(expectedError, false);
+
+    goodString = "3.14159+D0";
+    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_EQ(expectedError, false);
+
+    goodString = "3.14159+d0";
+    EXPECT_NEAR(UtilityRoutines::ProcessNumber(goodString, expectedError), expectedVal, 1E-5);
+    EXPECT_EQ(expectedError, false);
+
+    // invalid strings
+    std::string badString{"É.14159"};
+    expectedVal = 0.0;
+    EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
+    EXPECT_EQ(expectedError, true);
+
+    badString = "3.14159É0";
+    expectedVal = 0.0;
+    EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
+    EXPECT_EQ(expectedError, true);
+
+    badString = "3.14159 0";
+    expectedVal = 0.0;
+    EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
+    EXPECT_EQ(expectedError, true);
+
+    // out of range
+    badString = "1E5000";
+    expectedVal = 0.0;
+    EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
+    EXPECT_EQ(expectedError, true);
+}
+``
