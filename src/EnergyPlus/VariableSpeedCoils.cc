@@ -3289,7 +3289,7 @@ namespace VariableSpeedCoils {
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                 _,
                                 "Electricity",
-                                "Heating",
+                                "Cooling",
                                 _,
                                 "System");
             SetupOutputVariable(state,
@@ -3314,8 +3314,8 @@ namespace VariableSpeedCoils {
                                 "Summed",
                                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                 _,
-                                "PLANTLOOPHEATINGDEMAND",
-                                "HEATINGCOILS",
+                                "PLANTLOOPCOOLINGDEMAND",
+                                "COOLINGCOILS",
                                 _,
                                 "System");
 

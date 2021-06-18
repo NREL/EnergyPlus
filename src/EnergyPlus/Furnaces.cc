@@ -10267,6 +10267,7 @@ namespace Furnaces {
         Real64 FullOutput;         // unit full output when compressor is operating [W]
         Real64 LowOutput;          // unit full output at low speed [W]
         Real64 TempOutput;         // unit output when iteration limit exceeded [W]
+        Real64 TempOutput1;        // temporary outputs 
         Real64 NoCompOutput;       // output when no active compressor [W]
         Real64 LatOutput;          // latent capacity output
         Real64 ErrorToler;         // error tolerance
@@ -10542,8 +10543,24 @@ namespace Furnaces {
                             }
                         }
                     } else if (SolFla == -2) {
-                        ShowFatalError(state, "VS WSHP unit compressor speed calculation failed: speed limits exceeded, for unit=" +
-                                       state.dataFurnaces->Furnace(FurnaceNum).Name);
+                        //ShowFatalError(state,
+                          //             "VS WSHP unit compressor speed calculation failed: speed limits exceeded, for unit=" +
+                          //                 state.dataFurnaces->Furnace(FurnaceNum).Name);
+                        CalcVarSpeedHeatPump(state,
+                                             FurnaceNum,
+                                             FirstHVACIteration,
+                                             CompOp,
+                                             SpeedNum - 1,
+                                             1.0,
+                                             PartLoadFrac,
+                                             TempOutput1,
+                                             LatOutput,
+                                             QZnReq,
+                                             QLatReq,
+                                             OnOffAirFlowRatio,
+                                             SupHeaterLoad);                 
+
+                        SpeedRatio = (QZnReq - TempOutput1) / (TempOutput - TempOutput1);
                     }
 
                     // update LatOutput
@@ -10636,7 +10653,23 @@ namespace Furnaces {
                         }
                     }
                 } else if (SolFla == -2) {
-                    ShowFatalError(state, "VS WSHP unit compressor speed calculation failed: speed limits exceeded, for unit=" + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                    //ShowFatalError(state, "VS WSHP unit compressor speed calculation failed: speed limits exceeded, for unit=" + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                    CalcVarSpeedHeatPump(state,
+                                         FurnaceNum,
+                                         FirstHVACIteration,
+                                         CompOp,
+                                         SpeedNum - 1,
+                                         1.0,
+                                         PartLoadFrac,
+                                         TempOutput,
+                                         TempOutput1,
+                                         QZnReq,
+                                         QLatReq,
+                                         OnOffAirFlowRatio,
+                                         SupHeaterLoad,
+                                         true);
+                    SpeedRatio = (QLatReq - TempOutput1) / (LatOutput - TempOutput1);
+
                 }
             }
         }
