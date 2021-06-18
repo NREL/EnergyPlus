@@ -472,6 +472,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
         "    Wall,                    !- Surface Type",
         "    EXTWALLdemo,             !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -487,6 +488,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
         "    Wall,                    !- Surface Type",
         "    EXTWALL09,               !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -502,6 +504,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -517,6 +520,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
         "    Wall,                    !- Surface Type",
         "    EXTWALL09,               !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -532,6 +536,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -547,6 +552,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
         "    Floor,                   !- Surface Type",
         "    SLAB FLOOR,              !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -855,6 +861,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
         "    Wall,                    !- Surface Type",
         "    EXTWALLdemo,             !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -870,6 +877,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
         "    Wall,                    !- Surface Type",
         "    EXTWALL09,               !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -885,6 +893,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -900,6 +909,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
         "    Wall,                    !- Surface Type",
         "    EXTWALL09,               !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -915,6 +925,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -943,6 +954,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
         "    Floor,                   !- Surface Type",
         "    SLAB FLOOR,              !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1269,6 +1281,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
         "    Wall,                    !- Surface Type",
         "    EXTWALLdemo,             !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1284,6 +1297,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
         "    Wall,                    !- Surface Type",
         "    EXTWALL09,               !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1299,6 +1313,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1314,6 +1329,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
         "    Wall,                    !- Surface Type",
         "    EXTWALL09,               !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1329,6 +1345,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1351,6 +1368,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
         "    Floor,                   !- Surface Type",
         "    SLAB FLOOR,              !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1646,6 +1664,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
         "    Wall,                    !- Surface Type",
         "    EXTWALLdemo,             !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1661,6 +1680,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
         "    Wall,                    !- Surface Type",
         "    EXTWALL09,               !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1676,6 +1696,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
         "    Wall,                    !- Surface Type",
         "    R13WALL,                 !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1691,6 +1712,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
         "    Wall,                    !- Surface Type",
         "    EXTWALL09,               !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1706,6 +1728,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
         "    Roof,                    !- Surface Type",
         "    ROOF31,                  !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1721,6 +1744,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
         "    Floor,                   !- Surface Type",
         "    SLAB FLOOR,              !- Construction Name",
         "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",
@@ -1991,6 +2015,7 @@ BuildingSurface:Detailed,
     Floor,                    !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     NoSun,                    !- Sun Exposure
@@ -2007,6 +2032,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2025,6 +2051,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2043,6 +2070,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2059,6 +2087,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2075,6 +2104,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2091,6 +2121,7 @@ BuildingSurface:Detailed,
     Roof,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2107,6 +2138,7 @@ BuildingSurface:Detailed,
     Roof,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2303,6 +2335,7 @@ BuildingSurface:Detailed,
     Floor,                    !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     NoSun,                    !- Sun Exposure
@@ -2319,6 +2352,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2337,6 +2371,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2355,6 +2390,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2371,6 +2407,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2387,6 +2424,7 @@ BuildingSurface:Detailed,
     Wall,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2403,6 +2441,7 @@ BuildingSurface:Detailed,
     Roof,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
@@ -2419,6 +2458,7 @@ BuildingSurface:Detailed,
     Roof,                     !- Surface Type
     Exterior Wall,            !- Construction Name
     Zone A,                   !- Zone Name
+    ,                         !- Space Name
     Outdoors,                 !- Outside Boundary Condition
     ,                         !- Outside Boundary Condition Object
     SunExposed,               !- Sun Exposure
