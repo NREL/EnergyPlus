@@ -2843,7 +2843,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     EXPECT_NEAR(-24.9342, state->dataHeatBalSurf->QHeatEmiReport(surfNum2), 3);
 }
 
-TEST_F(EnergyPlusFixture, WindowManager_QrepWithAdjRatio) {
+TEST_F(EnergyPlusFixture, WindowManager_QrepWithAdjRatio)
+{
     // GitHub issue 6037
     bool ErrorsFound(false);
 
@@ -3088,18 +3089,17 @@ TEST_F(EnergyPlusFixture, WindowManager_QrepWithAdjRatio) {
     state->dataWindowManager->coeffAdjRatioOut = 1.0;
     state->dataWindowManager->coeffAdjRatioIn = 1.0;
     Real64 HextConvCoeff = state->dataHeatBal->HConvIn(surfNum2);
-    WindowManager::CalcWindowHeatBalance(*state, surfNum2, HextConvCoeff , inSurfTemp, outSurfTemp);
+    WindowManager::CalcWindowHeatBalance(*state, surfNum2, HextConvCoeff, inSurfTemp, outSurfTemp);
     oldValueConvOutRep = state->dataHeatBalSurf->QdotConvOutRep(surfNum2);
     oldValueConvOutRepPerArea = state->dataHeatBalSurf->QdotConvOutRepPerArea(surfNum2);
     oldValueHeatEmiRep = state->dataHeatBalSurf->QHeatEmiReport(surfNum2);
     state->dataWindowManager->coeffAdjRatioOut = 1.5;
     state->dataWindowManager->coeffAdjRatioIn = 1.5;
-    WindowManager::CalcWindowHeatBalance(*state, surfNum2,HextConvCoeff, inSurfTemp, outSurfTemp);
+    WindowManager::CalcWindowHeatBalance(*state, surfNum2, HextConvCoeff, inSurfTemp, outSurfTemp);
     ASSERT_NEAR(oldValueConvOutRep * 1.5, state->dataHeatBalSurf->QdotConvOutRep(surfNum2), 0.1);
     ASSERT_NEAR(oldValueConvOutRepPerArea * 1.5, state->dataHeatBalSurf->QdotConvOutRepPerArea(surfNum2), 0.1);
     // fixme: figure out the reason for Tsout difference
     ASSERT_NEAR(oldValueHeatEmiRep * 1.5, state->dataHeatBalSurf->QHeatEmiReport(surfNum2), 100);
-
 }
 
 TEST_F(EnergyPlusFixture, WindowManager_CalcNominalWindowCondAdjRatioTest)
