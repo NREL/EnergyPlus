@@ -645,7 +645,9 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test_Discontinuity)
     // Test for #8599
     InitializePsychRoutines(*state);
 
-    // Test when wet bulb temperature is approaching zero. PsyPsatFnTemp has a discontinuity in Psat around 0.0 that makes the calculation blow up
+    state->dataGlobal->WarmupFlag = true;
+
+    // Test when wet bulb temperature is approaching zero. PsyPsatFnTemp used to have a discontinuity in Psat around 0.0°C that makes the calculation blow up. Before:
     // PsyPsatFnTemp(-0.0001) = 611.1485382610978
     // PsyPsatFnTemp(+0.0001) = 611.2173076397495
     //                  diff  = 0.06876937865172295
@@ -654,7 +656,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test_Discontinuity)
     Real64 Pb = 101400.00000000001;
 
     Real64 result = PsyTwbFnTdbWPb(*state, TDB, W, Pb);
-    Real64 expected_result = 0.0; // expected result from psychrometrics chart
+    Real64 expected_result = -0.1027; // expected result from psychrometrics chart
     EXPECT_NEAR(result, expected_result, 0.001);
 
     EXPECT_FALSE(has_err_output());
