@@ -638,13 +638,14 @@
     Zn001:Roof001,           !- Name
     CEILING34,               !- Construction Name
     ZONE 1,                  !- Zone Name
-    180,                     !- Space Name
-    0,                       !- Azimuth Angle {deg}
+    ,                        !- Space Name
+    180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
-    10,                      !- Starting Y Coordinate {m}
-    20,                      !- Starting Z Coordinate {m}
-    20;                      !- Length {m}
+    0,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
+    20,                      !- Length {m}
+    20;                      !- Width {m}
 
   Wall:Exterior,
     Zn002:Wall001,           !- Name
@@ -746,13 +747,14 @@
     Zn002:Roof001,           !- Name
     CEILING34,               !- Construction Name
     ZONE 2,                  !- Zone Name
-    180,                     !- Space Name
-    0,                       !- Azimuth Angle {deg}
+    ,                        !- Space Name
+    180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
-    10,                      !- Starting Y Coordinate {m}
-    20,                      !- Starting Z Coordinate {m}
-    20;                      !- Length {m}
+    0,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
+    20,                      !- Length {m}
+    20;                      !- Width {m}
 
   Wall:Exterior,
     Zn003:Wall001,           !- Name

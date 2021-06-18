@@ -395,6 +395,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   CurArgs = CurArgs + 1
 
               ! If your original object starts with C, insert the rules here
+              CASE('CEILING:ADIABATIC')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:3)=InArgs(1:3)
+                  OutArgs(4) = ''
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+
               CASE('CEILING:INTERZONE')
                   CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                   nodiff=.false.
