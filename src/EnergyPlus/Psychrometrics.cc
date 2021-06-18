@@ -524,10 +524,9 @@ namespace Psychrometrics {
             WBT = ResultX;
 
             // If converged, leave iteration loop.
-            if (icvg == 1) break;
-
-            // Error Trap for the Discontinuous nature of PsyPsatFnTemp function (Sat Press Curve) at ~0 Deg C.
-            if ((PSatstar > 611.000) && (PSatstar < 611.25) && (std::abs(error) <= 0.0001) && (iter > 4)) break;
+            if (icvg == 1) {
+                break;
+            }
 
         } // End of Iteration Loop
 
