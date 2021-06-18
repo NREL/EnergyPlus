@@ -115,9 +115,9 @@ namespace HeatBalanceIntRadExchange {
                                  Array1D<Real64> &NetLWRadToSurf,     // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
 #ifdef EP_Count_Calls
-                                 std::string const &CalledFrom)
+                                 std::string_view const CalledFrom)
 #else
-                                 [[maybe_unused]] std::string const &CalledFrom)
+                                 [[maybe_unused]] std::string_view const CalledFrom)
 #endif
     {
 
