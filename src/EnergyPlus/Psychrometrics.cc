@@ -746,9 +746,12 @@ namespace Psychrometrics {
             Real64 const C6(-0.9484024e-12);                 // Coefficient for TKel < KelvinConvK
             Real64 const C7(4.1635019);                      // Coefficient for TKel < KelvinConvK
             Pascal = std::exp(C1 / Tkel + C2 + Tkel * (C3 + Tkel * (C4 + Tkel * (C5 + C6 * Tkel))) + C7 * std::log(Tkel));
-            // Smooth out the discontinuity at 0C
+            // Smooth out the discontinuity at 0C: in two linear segment, passing via 0°C (which is given in Table 3)
+        } else if (Tkel < DataGlobalConstants::KelvinConv) {
+            Pascal = -13246.032835945458 + 50.73126744791011 * Tkel;
         } else if (Tkel < (DataGlobalConstants::KelvinConv + 0.1)) {
-            Pascal = -12401.4579936261 + 47.6381532112526 * Tkel;
+            Pascal = -11556.264528465383 + 44.54503897461677 * Tkel;
+
             // If above freezing, calculate saturation pressure over liquid water.
         } else if (Tkel <= 473.15) { // Tkel >= 173.15 // Tkel >= KelvinConv
 #ifndef EP_IF97
