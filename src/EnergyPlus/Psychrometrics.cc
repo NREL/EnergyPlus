@@ -499,7 +499,9 @@ namespace Psychrometrics {
         for (iter = 1; iter <= itmax; ++iter) {
 
             // Assigning a value to WBT
-            if (WBT >= (tBoil - 0.09)) WBT = tBoil - 0.1;
+            if (WBT >= (tBoil - 0.09)) {
+                WBT = tBoil - 0.1;
+            }
 
             // Determine the saturation pressure for wet bulb temperature
             PSatstar =
