@@ -762,6 +762,11 @@ namespace Psychrometrics {
             Real64 constexpr C12(-0.14452093e-7); // Coefficient for TKel >= KelvinConvK
             Real64 constexpr C13(6.5459673);      // Coefficient for TKel >= KelvinConvK
             Pascal = std::exp(C8 / Tkel + C9 + Tkel * (C10 + Tkel * (C11 + Tkel * C12)) + C13 * std::log(Tkel));
+
+            // If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
+        } else { // Tkel >= 173.15 // Tkel >= KelvinConv // Tkel > 473.15
+            Pascal = 1555073.745636215;
+        }
 #else
             // Table 34 in IF97
             Real64 constexpr N1(0.11670521452767e04);
@@ -781,12 +786,12 @@ namespace Psychrometrics {
             Real64 const B = N3 * phi2 + N4 * phi + N5;
             Real64 const C = N6 * phi2 + N7 * phi + N8;
             Pascal = 1000000.0 * pow_4((2.0 * C) / (-B + std::sqrt((B * B) - 4.0 * A * C)));
-#endif
+
             // If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
         } else { // Tkel >= 173.15 // Tkel >= KelvinConv // Tkel > 473.15
-            Pascal = 1555073.745636215;
+            Pascal = 1554671.8682698254;
         }
-
+#endif
         return Pascal;
     }
 
