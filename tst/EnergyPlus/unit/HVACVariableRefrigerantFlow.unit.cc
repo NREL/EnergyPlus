@@ -529,8 +529,6 @@ protected:
 
 TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
 {
-
-    static constexpr std::string_view RoutineName("VRF_SysModel_inAirloop");
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     int curSysNum = state->dataSize->CurSysNum = 1;
     int curZoneNum = 1;

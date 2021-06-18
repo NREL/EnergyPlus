@@ -3593,7 +3593,6 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcOAController: ");
-    static std::string const &CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::OAController)));
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -4529,7 +4528,6 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     using General::SolveRoot;
     using SetPointManager::GetCoilFreezingCheckFlag;
 
-    static std::string const &CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::OAController)));
     int const MaxIte(500);                 // Maximum number of iterations
     Real64 const Acc(0.0001);              // Accuracy of result
     bool AirLoopEconoLockout;              // Economizer lockout flag
