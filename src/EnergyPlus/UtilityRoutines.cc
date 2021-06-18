@@ -135,9 +135,9 @@ namespace UtilityRoutines {
             // then parse as a normal floating point value
             try {
                 rProcessNumber = std::stod(PString, nullptr);
-            } catch (std::invalid_argument &e) { // LCOV_EXCL_LINE
-                rProcessNumber = 0.0;            // LCOV_EXCL_LINE
-                ErrorFlag = true;                // LCOV_EXCL_LINE
+            } catch (std::invalid_argument &e) {
+                rProcessNumber = 0.0;
+                ErrorFlag = true;
             } catch (std::out_of_range &e) {
                 rProcessNumber = 0.0;
                 ErrorFlag = true;
