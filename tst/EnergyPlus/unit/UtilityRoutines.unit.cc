@@ -256,4 +256,3 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_ProcessNumber)
     EXPECT_NEAR(UtilityRoutines::ProcessNumber(badString, expectedError), expectedVal, 1E-5);
     EXPECT_EQ(expectedError, true);
 }
-``
