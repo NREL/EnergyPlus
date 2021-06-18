@@ -55,6 +55,7 @@
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -682,6 +683,11 @@ namespace Psychrometrics {
         // Compared to Table 3 values (August 2007) with average error of 0.00%, max .30%,
         // min -.39%.  (Spreadsheet available on request - Lawrie).
 
+        // Note: the ASHRAE Handbook of Fundamentals  is being slightly inaccurate in its wording,
+        // and referring to Eq 5 applying to -100°C to 0°C and Eq 6 applying to 0°C to 200°C
+        // In fact, it is **not** 0°C, but the triple-point of water, which is 0.01°C. Evaluating the Eq 5 and 6 up to and from the triple-point
+        // is removing the discontinuity altogether.
+
         // USE STATEMENTS:
 
         // Return value
@@ -737,7 +743,7 @@ namespace Psychrometrics {
             Pascal = 0.001405102123874164;
 
             // If below freezing, calculate saturation pressure over ice.
-        } else if (Tkel < (DataGlobalConstants::KelvinConv - 0.1)) { // Tkel >= 173.15
+        } else if (Tkel < DataGlobalConstants::TriplePointOfWaterTempKelvin) { // Tkel >= 173.15, Tkel < 273.16 (0.01°C)
             Real64 const C1(-5674.5359);                     // Coefficient for TKel < KelvinConvK
             Real64 const C2(6.3925247);                      // Coefficient for TKel < KelvinConvK
             Real64 const C3(-0.9677843e-2);                  // Coefficient for TKel < KelvinConvK
@@ -746,14 +752,9 @@ namespace Psychrometrics {
             Real64 const C6(-0.9484024e-12);                 // Coefficient for TKel < KelvinConvK
             Real64 const C7(4.1635019);                      // Coefficient for TKel < KelvinConvK
             Pascal = std::exp(C1 / Tkel + C2 + Tkel * (C3 + Tkel * (C4 + Tkel * (C5 + C6 * Tkel))) + C7 * std::log(Tkel));
-            // Smooth out the discontinuity at 0C: in two linear segment, passing via 0°C (which is given in Table 3)
-        } else if (Tkel < DataGlobalConstants::KelvinConv) {
-            Pascal = -13246.032835945458 + 50.73126744791011 * Tkel;
-        } else if (Tkel < (DataGlobalConstants::KelvinConv + 0.1)) {
-            Pascal = -11556.264528465383 + 44.54503897461677 * Tkel;
 
             // If above freezing, calculate saturation pressure over liquid water.
-        } else if (Tkel <= 473.15) { // Tkel >= 173.15 // Tkel >= KelvinConv
+        } else if (Tkel <= 473.15) { // Tkel >= 173.15 // Tkel >= TriplePointOfWaterTempKelvin
 #ifndef EP_IF97
             Real64 constexpr C8(-5800.2206);      // Coefficient for TKel >= KelvinConvK
             Real64 constexpr C9(1.3914993);       // Coefficient for TKel >= KelvinConvK
