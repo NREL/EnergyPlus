@@ -4123,7 +4123,8 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
         if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopHeatingDemand) ||
             (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
             state.dataSysRpts->SysHCCompH2OHOT(AirLoopNum) += CompEnergy;
-        } else if (EnergyType == DataGlobalConstants::ResourceType::Steam) {
+        } else if ((EnergyType == DataGlobalConstants::ResourceType::Steam) ||
+                   (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingSteam)) {
             state.dataSysRpts->SysHCCompSteam(AirLoopNum) += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             state.dataSysRpts->SysHCCompElec(AirLoopNum) += CompEnergy;
@@ -4158,7 +4159,8 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
         } else if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
                    (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
             state.dataSysRpts->SysCCCompH2OCOLD(AirLoopNum) += CompEnergy;
-        } else if (EnergyType == DataGlobalConstants::ResourceType::Steam) {
+        } else if ((EnergyType == DataGlobalConstants::ResourceType::Steam) ||
+                   (EnergyType == DataGlobalConstants::ResourceType::DistrictHeatingSteam)) {
             state.dataSysRpts->SysHCCompSteam(AirLoopNum) += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             if (CompLoad > 0.0) {
@@ -4325,7 +4327,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
         } else if ((EnergyType == DataGlobalConstants::ResourceType::PlantLoopCoolingDemand) ||
                    (EnergyType == DataGlobalConstants::ResourceType::DistrictCooling)) {
             state.dataSysRpts->SysCCCompH2OCOLD(AirLoopNum) += CompEnergy;
-        } else if (EnergyType == DataGlobalConstants::ResourceType::Steam) {
+        } else if ((EnergyType == DataGlobalConstants::ResourceType::Steam) || (EnergyType == DataGlobalConstants::ResourceType::DistrictHeating)) {
             state.dataSysRpts->SysHCCompSteam(AirLoopNum) += CompEnergy;
         } else if (EnergyType == DataGlobalConstants::ResourceType::Electricity) {
             if (CompLoad > 0.0) {

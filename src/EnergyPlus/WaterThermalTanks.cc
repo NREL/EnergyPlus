@@ -2955,6 +2955,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 Tank.FuelType = "Steam";
             } else if (SELECT_CASE_var == "DISTRICTHEATING") {
                 Tank.FuelType = "DistrictHeating";
+            } else if (SELECT_CASE_var == "DISTRICTHEATINGSTEAM") {
+                Tank.FuelType = "DistrictHeatingSteam";
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -2987,6 +2989,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 Tank.OffCycParaFuelType = "Steam";
             } else if (SELECT_CASE_var == "DISTRICTHEATING") {
                 Tank.OffCycParaFuelType = "DistrictHeating";
+            } else if (SELECT_CASE_var == "DISTRICTHEATINGSTEAM") {
+                Tank.OffCycParaFuelType = "DistrictHeatingSteam";
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -3013,6 +3017,8 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
                 Tank.OnCycParaFuelType = "Steam";
             } else if (SELECT_CASE_var == "DISTRICTHEATING") {
                 Tank.OnCycParaFuelType = "DistrictHeating";
+            } else if (SELECT_CASE_var == "DISTRICTHEATING") {
+                Tank.OnCycParaFuelType = "DistrictHeatingSteam";
             } else {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataIPShortCut->cAlphaArgs(1) +
@@ -10810,6 +10816,8 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
                 FuelTypeIsLikeGas = true;
             } else if (UtilityRoutines::SameString(this->FuelType, "DistrictHeating")) {
                 FuelTypeIsLikeGas = true;
+            } else if (UtilityRoutines::SameString(this->FuelType, "DistrictHeatingSteam")) {
+                FuelTypeIsLikeGas = true;
             }
 
             if (this->Sizing.NumberOfBedrooms == 1) {
@@ -11528,6 +11536,8 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
                 } else if (UtilityRoutines::SameString(this->FuelType, "OtherFuel2")) {
                     FuelTypeIsLikeGas = true;
                 } else if (UtilityRoutines::SameString(this->FuelType, "DistrictHeating")) {
+                    FuelTypeIsLikeGas = true;
+                } else if (UtilityRoutines::SameString(this->FuelType, "DistrictHeatingSteam")) {
                     FuelTypeIsLikeGas = true;
                 }
 

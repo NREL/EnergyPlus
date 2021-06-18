@@ -2983,7 +2983,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedUsed(14) = true;
         ort->ffSchedIndex(14) = ffScheduleIndex;
     }
-    
+
     GetFuelFactorInfo(state, "DistrictHeatingSteam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->ffUsed(15) = true;
@@ -2994,7 +2994,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(15) = ffScheduleIndex;
     }
 
-    GetEnvironmentalImpactFactorInfo(state, ort->efficiencyDistrictHeating, ort->efficiencyDistrictCooling, ort->sourceFactorSteam);
+    GetEnvironmentalImpactFactorInfo(state, ort->efficiencyDistrictHeating, ort->efficiencyDistrictCooling, ort->efficiencyDistrictHeatingSteam, ort->sourceFactorSteam);
 }
 
 //======================================================================================================================
@@ -4036,6 +4036,7 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
     //          Steam 5
     //          DistrictCooling 3
     //          DistrictHeating 4
+    //          DistrictHeatingSteam 15
 
     //          sourceTypeNames(1)='Electric'
     //          sourceTypeNames(2)='NaturalGas'
@@ -4168,6 +4169,7 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     //          Steam
     //          DistrictCooling
     //          DistrictHeating
+    //          DistrictHeatingSteam
 
     // REFERENCES:
     // na
@@ -7797,12 +7799,12 @@ void WriteBEPSTable(EnergyPlusData &state)
     Array2D_string tableBody;
 
     // all arrays are in the format: (row, columnm)
-    Array2D<Real64> useVal(13, 15);
-    Array2D<Real64> normalVal(13, 4);
-    Array1D<Real64> collapsedTotal(13);
-    Array2D<Real64> collapsedEndUse(13, state.dataGlobalConst->iEndUse.size());
-    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 13);
-    Array2D<Real64> endUseSubOther(13, state.dataGlobalConst->iEndUse.size());
+    Array2D<Real64> useVal(14, 15);
+    Array2D<Real64> normalVal(14, 4);
+    Array1D<Real64> collapsedTotal(15);
+    Array2D<Real64> collapsedEndUse(14, state.dataGlobalConst->iEndUse.size());
+    Array3D<Real64> collapsedEndUseSub(state.dataOutputProcessor->MaxNumSubcategories, state.dataGlobalConst->iEndUse.size(), 14);
+    Array2D<Real64> endUseSubOther(14, state.dataGlobalConst->iEndUse.size());
     Real64 totalOnsiteHeat;
     Real64 totalOnsiteWater;
     Real64 totalWater;
@@ -7895,6 +7897,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 collapsedEndUse(12, jEndUse) =
                     ort->gatherEndUseBEPS(4, jEndUse) + ort->gatherEndUseBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
                 collapsedEndUse(13, jEndUse) = ort->gatherEndUseBEPS(7, jEndUse);          // water
+                collapsedEndUse(14, jEndUse) = ort->gatherEndUseBEPS(15, jEndUse);         // district heating steam
             }
             // repeat with totals
             collapsedTotal(1) = ort->gatherTotalsBEPS(1);                             // electricity
@@ -7910,7 +7913,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             collapsedTotal(11) = ort->gatherTotalsBEPS(3);                            // district cooling <- purchased cooling
             collapsedTotal(12) = ort->gatherTotalsBEPS(4) + ort->gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
             collapsedTotal(13) = ort->gatherTotalsBEPS(7);                            // water
-
+            collapsedTotal(14) = ort->gatherTotalsBEPS(15);                           // distrcit heating steam
             if (produceTabular) {
                 if (state.dataGlobal->createPerfLog) {
                     UtilityRoutines::appendPerfLog(state, "Electricity ABUPS Total [J]", format("{:.3R}", collapsedTotal(1)));
@@ -7926,6 +7929,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                     UtilityRoutines::appendPerfLog(state, "District Cooling ABUPS Total [J]", format("{:.3R}", collapsedTotal(11)));
                     UtilityRoutines::appendPerfLog(state, "District Heating ABUPS Total [J]", format("{:.3R}", collapsedTotal(12)));
                     UtilityRoutines::appendPerfLog(state, "Water ABUPS Total [m3]", format("{:.3R}", collapsedTotal(13)));
+                    UtilityRoutines::appendPerfLog(state, "District Heating Steam ABUPS Total [J]", format("{:.3R}", collapsedTotal(14)));
                     UtilityRoutines::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", ort->gatherElapsedTimeBEPS));
                     UtilityRoutines::appendPerfLog(state,
                                                    "Facility Any Zone Oscillating Temperatures Time [hours]",
@@ -7955,7 +7959,8 @@ void WriteBEPSTable(EnergyPlusData &state)
                     collapsedEndUseSub(kEndUseSub, jEndUse, 12) =
                         ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 4) +
                         ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 5); // district heating <- purch heating | <- steam
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 7); // water
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 7);  // water
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 14) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 15); // district heating steam
                 }
             }
 
@@ -8046,7 +8051,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             // determine which resource is the primary heating resourse
             resourcePrimaryHeating = 0;
             heatingMaximum = 0.0;
-            for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
+            for (iResource = 1; iResource <= 13; ++iResource) { // don't do water
                 if (collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating)) > heatingMaximum) {
                     heatingMaximum = collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::Heating));
                     resourcePrimaryHeating = iResource;
@@ -8089,23 +8094,25 @@ void WriteBEPSTable(EnergyPlusData &state)
             // previously these variables were converted into GJ so now we don't need
             // to do any conversion
             // water is not included   gatherTotalsBEPS(7)    !water
-            totalSiteEnergyUse = (ort->gatherTotalsBEPS(1) + ort->gatherTotalsBEPS(2) + ort->gatherTotalsBEPS(3) + ort->gatherTotalsBEPS(4) +
-                                  ort->gatherTotalsBEPS(5) + ort->gatherTotalsBEPS(6) + ort->gatherTotalsBEPS(8) + ort->gatherTotalsBEPS(9) +
-                                  ort->gatherTotalsBEPS(10) + ort->gatherTotalsBEPS(11) + ort->gatherTotalsBEPS(12) + ort->gatherTotalsBEPS(13) +
-                                  ort->gatherTotalsBEPS(14)) /
-                                 largeConversionFactor; // electricity | natural gas | district cooling | district heating | steam | gasoline |
-                                                        // diesel | coal | Fuel Oil No1 | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
+            totalSiteEnergyUse =
+                (ort->gatherTotalsBEPS(1) + ort->gatherTotalsBEPS(2) + ort->gatherTotalsBEPS(3) + ort->gatherTotalsBEPS(4) +
+                 ort->gatherTotalsBEPS(5) + ort->gatherTotalsBEPS(6) + ort->gatherTotalsBEPS(8) + ort->gatherTotalsBEPS(9) +
+                 ort->gatherTotalsBEPS(10) + ort->gatherTotalsBEPS(11) + ort->gatherTotalsBEPS(12) + ort->gatherTotalsBEPS(13) +
+                 ort->gatherTotalsBEPS(14) + ort->gatherTotalsBEPS(15)) /
+                largeConversionFactor; // electricity | natural gas | district cooling | district heating | steam | gasoline |
+                                       // diesel | coal | Fuel Oil No1 | Fuel Oil No2 | propane | otherfuel1 | otherfuel2 | district heating steam
 
             netElecPurchasedSold = ort->gatherElecPurchased - ort->gatherElecSurplusSold;
 
             // water is not included   gatherTotalsBEPS(7)    !water
-            netSiteEnergyUse = netElecPurchasedSold +
-                               (ort->gatherTotalsBEPS(2) + ort->gatherTotalsBEPS(3) + ort->gatherTotalsBEPS(4) + ort->gatherTotalsBEPS(5) +
-                                ort->gatherTotalsBEPS(6) + ort->gatherTotalsBEPS(8) + ort->gatherTotalsBEPS(9) + ort->gatherTotalsBEPS(10) +
-                                ort->gatherTotalsBEPS(11) + ort->gatherTotalsBEPS(12) + ort->gatherTotalsBEPS(13) + ort->gatherTotalsBEPS(14)) /
-                                   largeConversionFactor; // electricity (already in GJ) | natural gas | district cooling |
-                                                          // district heating | steam | gasoline | diesel | coal | Fuel Oil No1
-                                                          // | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
+            netSiteEnergyUse =
+                netElecPurchasedSold + (ort->gatherTotalsBEPS(2) + ort->gatherTotalsBEPS(3) + ort->gatherTotalsBEPS(4) + ort->gatherTotalsBEPS(5) +
+                                        ort->gatherTotalsBEPS(6) + ort->gatherTotalsBEPS(8) + ort->gatherTotalsBEPS(9) + ort->gatherTotalsBEPS(10) +
+                                        ort->gatherTotalsBEPS(11) + ort->gatherTotalsBEPS(12) + ort->gatherTotalsBEPS(13) +
+                                        ort->gatherTotalsBEPS(14) + ort->gatherTotalsBEPS(15)) /
+                                           largeConversionFactor; // electricity (already in GJ) | natural gas | district cooling |
+                                                                  // district heating | steam | gasoline | diesel | coal | Fuel Oil No1
+                                                                  // | Fuel Oil No2 | propane | otherfuel1 | otherfuel2 | district heating steam
 
             if (ort->efficiencyDistrictCooling == 0) ort->efficiencyDistrictCooling = 1.0;
             if (ort->efficiencyDistrictHeating == 0) ort->efficiencyDistrictHeating = 1.0;
@@ -8175,8 +8182,8 @@ void WriteBEPSTable(EnergyPlusData &state)
 
             totalSourceEnergyUse = (totalSourceEnergyUse + ort->gatherTotalsBEPS(3) * ort->sourceFactorElectric / ort->efficiencyDistrictCooling +
                                     ort->gatherTotalsBEPS(4) * ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeating +
-                                    ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam) /
-                                   largeConversionFactor; // district cooling | district heating | steam
+                                    ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam + ort->gatherTotalsBEPS(15) * ort->efficiencyDistrictHeatingSteam) /
+                                   largeConversionFactor; // district cooling | district heating | steam | district heating steam
 
             // now determine "net" source from purchased and surplus sold (still in J)
 
@@ -8246,7 +8253,8 @@ void WriteBEPSTable(EnergyPlusData &state)
                 (netSourceEnergyUse + netSourceElecPurchasedSold +
                  ort->gatherTotalsBEPS(3) * ort->sourceFactorElectric / ort->efficiencyDistrictCooling +
                  ort->gatherTotalsBEPS(4) * ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeating +
-                 ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam) /
+                 ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam +
+                 ort->gatherTotalsBEPS(15) * ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeatingSteam) /
                 largeConversionFactor; // from other fuels | net source from electricity | district cooling | district heating | steam
 
             // show annual values
@@ -8295,11 +8303,11 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
 
             //---- Source and Site Energy Sub-Table
-            rowHead.allocate(13);
+            rowHead.allocate(14);
             columnHead.allocate(1);
             columnWidth.allocate(1);
             columnWidth = 50; // array assignment
-            tableBody.allocate(1, 13);
+            tableBody.allocate(1, 14);
 
             columnHead(1) = "Site=>Source Conversion Factor";
 
@@ -8316,6 +8324,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(11) = "Propane";
             rowHead(12) = "Other Fuel 1";
             rowHead(13) = "Other Fuel 2";
+            rowHead(14) = "District Heating Steam";
 
             tableBody = "";
 
@@ -8457,6 +8466,8 @@ void WriteBEPSTable(EnergyPlusData &state)
                     }
                 }
             }
+
+            tableBody(1, 15) = RealToStr(ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeatingSteam, 3); // District Heating Steam
 
             //---- Building Area Sub-Table
             rowHead.allocate(3);
@@ -13539,10 +13550,10 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
     //   For each step of sequence from each design day, compute the
     //   contributions from previous timesteps multiplied by the decay
     //   curve. Rather than store every internal load's radiant contribution
-    //   to each surface, the EnclRadThermAbsMult and ITABSF sequences were also stored
+    //   to each surface, the TMULT and ITABSF sequences were also stored
     //   which allocates the total radiant to each surface in the zone. The
     //   formula used is:
-    //       QRadThermInAbs(SurfNum) = QL(NZ) * EnclRadThermAbsMult(NZ) * SurfAbsThermalInt(SurfNum)
+    //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
 
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 

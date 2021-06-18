@@ -1328,6 +1328,7 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->sourceFactorNaturalGas = 0.0;
         this->efficiencyDistrictCooling = 0.0;
         this->efficiencyDistrictHeating = 0.0;
+        this->efficiencyDistrictHeatingSteam = 0.0;
         this->sourceFactorSteam = 0.0;
         this->sourceFactorGasoline = 0.0;
         this->sourceFactorDiesel = 0.0;

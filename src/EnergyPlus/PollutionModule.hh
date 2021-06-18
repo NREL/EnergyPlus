@@ -282,12 +282,13 @@ namespace PollutionModule {
         Real64 PurchHeatEffic;
         Real64 PurchCoolCOP;
         Real64 SteamConvEffic;
+        Real64 PurchHeatSteamEffic;
 
         // Default Constructor
         PollutionProps()
             : N2OPollutTotal(0.0), CH4PollutTotal(0.0), CO2PollutTotal(0.0), TotCarbonEquivFromN2O(0.0), TotCarbonEquivFromCH4(0.0),
               TotCarbonEquivFromCO2(0.0), CarbonEquivN2O(0.0), CarbonEquivCH4(0.0), CarbonEquivCO2(0.0), PurchHeatEffic(0.0), PurchCoolCOP(0.0),
-              SteamConvEffic(0.0)
+              SteamConvEffic(0.0), PurchHeatSteamEffic(0.0)
         {
         }
 
@@ -362,6 +363,7 @@ namespace PollutionModule {
         int DieselFacilityIndex;
         int PurchCoolFacilityIndex;
         int PurchHeatFacilityIndex;
+        int PurchHeatSteamFacilityIndex;
         int NatGasFacilityIndex;
         int GasolineFacilityIndex;
         int CoalFacilityIndex;
@@ -379,6 +381,7 @@ namespace PollutionModule {
         Real64 DieselFacility;
         Real64 PurchCoolFacility;
         Real64 PurchHeatFacility;
+        Real64 PurchHeatSteamFacility;
         Real64 NatGasFacility;
         Real64 GasolineFacility;
         Real64 CoalFacility;
@@ -396,13 +399,13 @@ namespace PollutionModule {
         FuelTypeProps()
             : FuelTypeNames({1, static_cast<int>(PollFactor::NUM)}), Elec(0.0), NatGas(0.0), FuelOil1(0.0), FuelOil2(0.0), Coal(0.0), Gasoline(0.0),
               Propane(0.0), Diesel(0.0), OtherFuel1(0.0), OtherFuel2(0.0), ElecPurch(0.0), ElecSold(0.0), ElecFacilityIndex(0),
-              DieselFacilityIndex(0), PurchCoolFacilityIndex(0), PurchHeatFacilityIndex(0), NatGasFacilityIndex(0), GasolineFacilityIndex(0),
-              CoalFacilityIndex(0), FuelOil1FacilityIndex(0), FuelOil2FacilityIndex(0), PropaneFacilityIndex(0), OtherFuel1FacilityIndex(0),
-              OtherFuel2FacilityIndex(0), ElecProducedFacilityIndex(0), SteamFacilityIndex(0), ElecPurchasedFacilityIndex(0),
-              ElecSurplusSoldFacilityIndex(0), ElecFacility(0.0), DieselFacility(0.0), PurchCoolFacility(0.0), PurchHeatFacility(0.0),
-              NatGasFacility(0.0), GasolineFacility(0.0), CoalFacility(0.0), FuelOil1Facility(0.0), FuelOil2Facility(0.0), PropaneFacility(0.0),
-              OtherFuel1Facility(0.0), OtherFuel2Facility(0.0), ElecProducedFacility(0.0), SteamFacility(0.0), ElecPurchasedFacility(0.0),
-              ElecSurplusSoldFacility(0.0)
+              DieselFacilityIndex(0), PurchCoolFacilityIndex(0), PurchHeatFacilityIndex(0), PurchHeatSteamFacilityIndex(0), NatGasFacilityIndex(0),
+              GasolineFacilityIndex(0), CoalFacilityIndex(0), FuelOil1FacilityIndex(0), FuelOil2FacilityIndex(0), PropaneFacilityIndex(0),
+              OtherFuel1FacilityIndex(0), OtherFuel2FacilityIndex(0), ElecProducedFacilityIndex(0), SteamFacilityIndex(0),
+              ElecPurchasedFacilityIndex(0), ElecSurplusSoldFacilityIndex(0), ElecFacility(0.0), DieselFacility(0.0), PurchCoolFacility(0.0),
+              PurchHeatFacility(0.0), NatGasFacility(0.0), GasolineFacility(0.0), CoalFacility(0.0), FuelOil1Facility(0.0), FuelOil2Facility(0.0),
+              PropaneFacility(0.0), OtherFuel1Facility(0.0), OtherFuel2Facility(0.0), ElecProducedFacility(0.0), SteamFacility(0.0),
+              ElecPurchasedFacility(0.0), ElecSurplusSoldFacility(0.0)
         {
         }
     };
@@ -439,9 +442,10 @@ namespace PollutionModule {
     );
 
     void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,
-                                          Real64 &efficiencyDistrictHeating, // if entered, the efficiency of District Heating
-                                          Real64 &efficiencyDistrictCooling, // if entered, the efficiency of District Cooling
-                                          Real64 &sourceFactorSteam          // if entered, the source factor for Steam
+                                          Real64 &efficiencyDistrictHeating,      // if entered, the efficiency of District Heating
+                                          Real64 &efficiencyDistrictCooling,      // if entered, the efficiency of District Cooling
+                                          Real64 &efficiencyDistrictHeatingSteam, // if entered, the efficiency of District Heating Steam
+                                          Real64 &sourceFactorSteam               // if entered, the source factor for Steam
     );
 
 } // namespace PollutionModule
