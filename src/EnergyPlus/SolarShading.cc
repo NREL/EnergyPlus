@@ -8585,7 +8585,6 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace MultiLayerOptics;
 
-
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
