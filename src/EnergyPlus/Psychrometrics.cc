@@ -737,16 +737,18 @@ namespace Psychrometrics {
             Pascal = 0.0017;
 
             // If below freezing, calculate saturation pressure over ice.
-        } else if (Tkel < DataGlobalConstants::KelvinConv) { // Tkel >= 173.15
-            Real64 constexpr C1(-5674.5359);                 // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C2(6.3925247);                  // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C3(-0.9677843e-2);              // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C4(0.62215701e-6);              // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C5(0.20747825e-8);              // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C6(-0.9484024e-12);             // Coefficient for TKel < KelvinConvK
-            Real64 constexpr C7(4.1635019);                  // Coefficient for TKel < KelvinConvK
+        } else if (Tkel < (DataGlobalConstants::KelvinConv - 0.1)) { // Tkel >= 173.15
+            Real64 const C1(-5674.5359);                     // Coefficient for TKel < KelvinConvK
+            Real64 const C2(6.3925247);                      // Coefficient for TKel < KelvinConvK
+            Real64 const C3(-0.9677843e-2);                  // Coefficient for TKel < KelvinConvK
+            Real64 const C4(0.62215701e-6);                  // Coefficient for TKel < KelvinConvK
+            Real64 const C5(0.20747825e-8);                  // Coefficient for TKel < KelvinConvK
+            Real64 const C6(-0.9484024e-12);                 // Coefficient for TKel < KelvinConvK
+            Real64 const C7(4.1635019);                      // Coefficient for TKel < KelvinConvK
             Pascal = std::exp(C1 / Tkel + C2 + Tkel * (C3 + Tkel * (C4 + Tkel * (C5 + C6 * Tkel))) + C7 * std::log(Tkel));
-
+            // Smooth out the discontinuity at 0C
+        } else if (Tkel < (DataGlobalConstants::KelvinConv + 0.1)) {
+            Pascal = -12401.4579936261 + 47.6381532112526 * Tkel;
             // If above freezing, calculate saturation pressure over liquid water.
         } else if (Tkel <= 473.15) { // Tkel >= 173.15 // Tkel >= KelvinConv
 #ifndef EP_IF97
