@@ -5446,7 +5446,8 @@ namespace HeatBalanceManager {
             auto &instancesValue = instances.value();
             int numSpaces = instancesValue.size();
             int spaceNum = 0;
-            state.dataHeatBal->Space.allocate(numSpaces);
+            // Allow for one additional Space per zone if some surfaces do not have a Space assigned in input
+            state.dataHeatBal->Space.allocate(numSpaces + state.dataGlobal->NumOfZones);
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++spaceNum;
                 auto const &objectFields = instance.value();
@@ -5457,6 +5458,7 @@ namespace HeatBalanceManager {
                 int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
                 if (zoneNum > 0) {
                     thisSpace.ZoneNum = zoneNum;
+                    state.dataHeatBal->Zone(zoneNum).Spaces.emplace_back(spaceNum);
                 } else {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpace.Name);
                     ShowContinueError(state, "Zone Name =" + zoneName + "not found.");
@@ -5472,6 +5474,10 @@ namespace HeatBalanceManager {
                     }
                 }
             }
+            state.dataGlobal->NumOfSpaces = spaceNum;
+        } else {
+            // If no Spaces are defined, the allow for one Space per zone
+            state.dataHeatBal->Space.allocate(state.dataGlobal->NumOfZones);
         }
 
         cCurrentModuleObject = "SpaceList";

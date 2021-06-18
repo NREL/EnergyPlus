@@ -335,10 +335,10 @@ namespace DataHeatBalance {
 
     struct SpaceData
     {
-        std::string Name = "";      // Space name
-        int ZoneNum = 0;            // Pointer to Zone wich contains this space
-        std::string SpaceType = ""; // Space type tag
-        EPVector<std::string> Tags; // Optional tags for reporting
+        std::string Name = "";             // Space name
+        int ZoneNum = 0;                   // Pointer to Zone wich contains this space
+        std::string SpaceType = "General"; // Space type tag
+        EPVector<std::string> Tags;        // Optional tags for reporting
     };
 
     struct SpaceListData
@@ -490,6 +490,11 @@ namespace DataHeatBalance {
         Real64 delta_T;                               // Indoor and outdoor temperature
         Real64 delta_HumRat;                          // Indoor and outdoor humidity ratio delta
 
+        // Spaces
+        bool AnySurfacesWithoutSpace; // True if any surfaces in a zone do not have a space assigned in input
+        bool AnySurfacesWithSpace;    // True if any surfaces in a zone have a space assigned in input
+        EPVector<int> Spaces;         // Pointers to spaces in this zone
+
         // Default Constructor
         ZoneData()
             : Multiplier(1), ListMultiplier(1), ListGroup(0), RelNorth(0.0), OriginX(0.0), OriginY(0.0), OriginZ(0.0),
@@ -519,7 +524,7 @@ namespace DataHeatBalance {
               ZonePeopleActivityLevel(0.0), ZonePeopleSensibleHeatFraction(0.0), ZonePeopleRadiantHeatFraction(0.0), ZoneVolCapMultpSens(1.0),
               ZoneVolCapMultpMoist(1.0), ZoneVolCapMultpCO2(1.0), ZoneVolCapMultpGenContam(1.0), ZoneVolCapMultpSensHM(1.0),
               ZoneVolCapMultpSensHMSum(0.0), ZoneVolCapMultpSensHMCountSum(0.0), ZoneVolCapMultpSensHMAverage(1.0), MCPIHM(0.0),
-              InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0)
+              InfilOAAirChangeRateHM(0.0), NumOccHM(0.0), delta_T(0.0), delta_HumRat(0.0), AnySurfacesWithoutSpace(false), AnySurfacesWithSpace(false)
         {
         }
 

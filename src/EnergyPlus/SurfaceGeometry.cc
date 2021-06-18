@@ -1554,6 +1554,8 @@ namespace SurfaceGeometry {
         } // ...end of the Surface DO loop for finding BaseSurf
         //**********************************************************************************
 
+        CreateMissingSpaces(state, ErrorsFound);
+
         // The surfaces need to be hierarchical by zone.  Input is allowed to be in any order.  In
         // this section the surfaces are reordered into:
         //    All shadowing surfaces (if mirrored, Mir- surface follows immediately after original)
@@ -2744,6 +2746,48 @@ namespace SurfaceGeometry {
         }
     }
 
+    void CreateMissingSpaces(EnergyPlusData &state, bool &ErrorsFound)
+    {
+        // Scan surfaces to see if Space was assigned in input
+        for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
+            auto &thisSurf = state.dataSurface->Surface(surfNum);
+            if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
+            if (thisSurf.Space > 0) {
+                state.dataHeatBal->Zone(thisSurf.Zone).AnySurfacesWithSpace = true;
+            } else {
+                state.dataHeatBal->Zone(thisSurf.Zone).AnySurfacesWithoutSpace = true;
+            }
+        }
+
+        // Create any missing Spaces
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+            if (thisZone.AnySurfacesWithoutSpace) {
+                // If any surfaces in the zone are not assigned to a space, create a new space
+                ++state.dataGlobal->NumOfSpaces;
+                state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).ZoneNum = zoneNum;
+                // Add to zone's list of spaces
+                thisZone.Spaces.emplace_back(state.dataGlobal->NumOfSpaces);
+                if (thisZone.AnySurfacesWithSpace) {
+                    // If some surfaces in the zone are assigned to a space, the new space if the remainder of the zone
+                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).Name = thisZone.Name + "-Remainder";
+                } else {
+                    state.dataHeatBal->Space(state.dataGlobal->NumOfSpaces).Name = thisZone.Name + "-All";
+                }
+            }
+        }
+
+        // Assign Spaces to surfaces without one
+        for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
+            auto &thisSurf = state.dataSurface->Surface(surfNum);
+            if (!thisSurf.HeatTransSurf) continue; // ignore shading surfaces
+            if (thisSurf.Space == 0) {
+                int lastSpace = state.dataHeatBal->Zone(thisSurf.Zone).Spaces.size();
+                thisSurf.Space = state.dataHeatBal->Zone(thisSurf.Zone).Spaces(lastSpace);
+            }
+        }
+    }
+
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -3696,11 +3740,19 @@ namespace SurfaceGeometry {
 
                     if (spaceNum != 0) {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Space = spaceNum;
+                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone != state.dataHeatBal->Space(spaceNum).ZoneNum) {
+                            ShowSevereError(state,
+                                            cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                                state.dataIPShortCut->cAlphaFieldNames(ArgPointer) + "=\"" +
+                                                state.dataIPShortCut->cAlphaArgs(ArgPointer) + "\" is not in the same zone as the surface.");
+                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
+                            ErrorsFound = true;
+                        }
                     } else {
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                             state.dataIPShortCut->cAlphaFieldNames(ArgPointer) + "=\"" +
-                                            state.dataIPShortCut->cAlphaArgs(ArgPointer) + "\".");
+                                            state.dataIPShortCut->cAlphaArgs(ArgPointer) + "\" not found.");
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::INVALID;
                         ErrorsFound = true;
                     }
