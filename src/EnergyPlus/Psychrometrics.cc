@@ -734,7 +734,7 @@ namespace Psychrometrics {
 
         // If below -100C,set value of Pressure corresponding to Saturation Temperature of -100C.
         if (Tkel < 173.15) {
-            Pascal = 0.0017;
+            Pascal = 0.001405102123874164;
 
             // If below freezing, calculate saturation pressure over ice.
         } else if (Tkel < (DataGlobalConstants::KelvinConv - 0.1)) { // Tkel >= 173.15
@@ -784,7 +784,7 @@ namespace Psychrometrics {
 #endif
             // If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
         } else { // Tkel >= 173.15 // Tkel >= KelvinConv // Tkel > 473.15
-            Pascal = 1555000.0;
+            Pascal = 1555073.745636215;
         }
 
         return Pascal;
