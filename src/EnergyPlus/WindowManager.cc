@@ -3387,20 +3387,24 @@ namespace WindowManager {
 
                 if (SELECT_CASE_var == 1) {
                     Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                               state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
+                               state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * state.dataWindowManager->tout +
+                               state.dataWindowManager->AbsRadGlassFace(1);
                     Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
-                               state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(2);
+                               state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn * state.dataWindowManager->tin +
+                               state.dataWindowManager->AbsRadGlassFace(2);
 
-                    Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
+                    Aface(1, 1) =
+                        hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut;
                     Aface(2, 1) = -state.dataWindowManager->scon(1);
                     Aface(1, 2) = -state.dataWindowManager->scon(1);
-                    Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin;
+                    Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn;
 
                     if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                         Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
                                    state.dataWindowManager->AbsRadGlassFace(2);
                         Bface(3) = state.dataWindowManager->Rmir * TauShIR * RhoGlIR2 * EpsShIR1 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(1);
-                        Bface(4) = state.dataWindowManager->Rmir * EpsShIR2 + state.dataWindowManager->hcin * state.dataWindowManager->tin +
+                        Bface(4) = state.dataWindowManager->Rmir * EpsShIR2 +
+                                   state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn * state.dataWindowManager->tin +
                                    AbsRadShadeFace(2);
 
                         Aface(2, 2) = hr(2) * (1 - RhoShIR1) / ShGlReflFacIR + state.dataWindowManager->scon(1) + hcv;
@@ -3409,20 +3413,20 @@ namespace WindowManager {
                         Aface(3, 3) = hr(3) * (1 - RhoGlIR2 * (EpsShIR1 + RhoShIR1)) / ShGlReflFacIR + sconsh + hcv;
                         Aface(4, 3) = -sconsh;
                         Aface(3, 4) = -sconsh;
-                        Aface(4, 4) = hr(4) + sconsh + state.dataWindowManager->hcin;
+                        Aface(4, 4) = hr(4) + sconsh + state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn;
                     }
 
                     if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
                                    state.dataWindowManager->AbsRadGlassFace(1);
-                        Bface(3) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout +
+                        Bface(3) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * state.dataWindowManager->tout +
                                    AbsRadShadeFace(1);
                         Bface(4) =
                             state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
 
                         Aface(1, 1) = hr(1) * (1 - RhoShIR2) / ShGlReflFacIR + state.dataWindowManager->scon(1) + hcv;
                         Aface(4, 1) = -state.dataWindowManager->emis(1) * hr(4) / ShGlReflFacIR;
-                        Aface(3, 3) = hr(3) + sconsh + state.dataWindowManager->hcout;
+                        Aface(3, 3) = hr(3) + sconsh + state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut;
                         Aface(4, 3) = -sconsh;
                         Aface(1, 4) = -hr(1) * EpsShIR2 / ShGlReflFacIR;
                         Aface(3, 4) = -sconsh;
@@ -7088,14 +7092,17 @@ namespace WindowManager {
 
                 if (SELECT_CASE_var == 1) {
                     Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                               state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
+                               state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * state.dataWindowManager->tout +
+                               state.dataWindowManager->AbsRadGlassFace(1);
                     Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
-                               state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(2);
+                               state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn * state.dataWindowManager->tin +
+                               state.dataWindowManager->AbsRadGlassFace(2);
 
-                    Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
+                    Aface(1, 1) =
+                        hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut;
                     Aface(2, 1) = -state.dataWindowManager->scon(1);
                     Aface(1, 2) = -state.dataWindowManager->scon(1);
-                    Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin;
+                    Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn;
 
                 } else if (SELECT_CASE_var == 2) {
                     WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
