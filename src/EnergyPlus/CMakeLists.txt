@@ -719,7 +719,7 @@ if(LINK_WITH_PYTHON)
   # to match up bitwise if we aren't, then the identified interpreter can be
   # whatever bit it wants
   if(MSVC)
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
+    execute_process(COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
     # PYTHON_BIT_SIZE will be either "32" or "64"
     # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:x64
     # CMAKE_EXE_LINKER_FLAGS:STRING=/machine:X86
@@ -740,10 +740,9 @@ if(LINK_WITH_PYTHON)
     endif()
   endif()
 
-  # now we need to get the Python libs and add the include path for further
-  # compiling
-  find_package(PythonLibs 3 REQUIRED)
-  include_directories("${PYTHON_INCLUDE_DIRS}")
+  # now we need to get the Python libs and add the include path for further compiling
+  # The Development (libs) was already found in the root level CMakeLists.txt
+  include_directories("${Python_INCLUDE_DIRS}")
 endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
@@ -800,7 +799,7 @@ if(UNIX AND NOT APPLE)
   endif()
 endif()
 if(LINK_WITH_PYTHON)
-  target_link_libraries(energypluslib PUBLIC ${PYTHON_LIBRARIES})
+  target_link_libraries(energypluslib PUBLIC ${Python_LIBRARIES})
 endif()
 # See https://en.cppreference.com/w/cpp/filesystem#Notes
 if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
@@ -880,7 +879,7 @@ install(TARGETS energyplus energyplusapi DESTINATION ./)
 
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
-  get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
+  get_filename_component(RESOLVED_PYTHON_LIBRARY "${Python_LIBRARIES}" REALPATH)
   if(WIN32)
     # Windows is being ugly and linking against the Python DLL but not running
     # unless it's close by Force it here.
@@ -912,7 +911,7 @@ if(LINK_WITH_PYTHON)
     TARGET energyplusapi
     POST_BUILD # TODO: I don't think we want to quote the generator expression
                # here
-    COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib")
+    COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib")
 endif()
 
 if(BUILD_PACKAGE)
@@ -981,7 +980,7 @@ if(BUILD_TESTING)
     configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.py" "${API_TEST_TARGET_DIR}/TestFunctional.py")
     add_test(
       NAME "API.TestFunctionalPython"
-      COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestFunctional.py"
+      COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestFunctional.py"
       WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime_python")
@@ -989,7 +988,7 @@ if(BUILD_TESTING)
     configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" "${API_TEST_TARGET_DIR}/TestRuntime.py")
     add_test(
       NAME "API.TestRuntimePython"
-      COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+      COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
       WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange_python")
@@ -997,14 +996,14 @@ if(BUILD_TESTING)
     configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.py" "${API_TEST_TARGET_DIR}/TestDataTransfer.py")
     add_test(
       NAME "API.TestDataTransferPython"
-      COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
+      COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
       WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     # set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing_python")
     # file(MAKE_DIRECTORY ${TEST_DIR}) configure_file(
     # "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestAutosizing.py"
     # "${API_TEST_TARGET_DIR}/TestAutosizing.py" ) add_test(NAME
-    # "API.TestAutosizingPython" COMMAND "${PYTHON_EXECUTABLE}"
+    # "API.TestAutosizingPython" COMMAND "${Python_EXECUTABLE}"
     # "${API_TEST_TARGET_DIR}/TestAutosizing.py" -d "${TEST_DIR}" -w
     # "${EPW_FILE}" -D "${IDF_FILE}" WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
@@ -1013,25 +1012,25 @@ if(BUILD_TESTING)
     configure_file("${PROJECT_SOURCE_DIR}/src/EnergyPlus/api/plugin_tester.py" "${API_TEST_TARGET_DIR}/plugin_tester.py")
     add_test(
       NAME "API.PluginTesterTester"
-      COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${PROJECT_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
+      COMMAND "${Python_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${PROJECT_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
       WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_DataTransferTypes.py" "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py" COPYONLY)
     add_test(
       NAME "API.test_DataTransferTypes"
-      COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py"
+      COMMAND "${Python_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py"
       WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_SysExit.py" "${API_TEST_TARGET_DIR}/test_SysExit.py" COPYONLY)
     add_test(
       NAME "API.test_SysExit"
-      COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_SysExit.py"
+      COMMAND "${Python_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_SysExit.py"
       WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_OutputFiles.py" "${API_TEST_TARGET_DIR}/test_OutputFiles.py" @ONLY)
     add_test(
       NAME "API.test_OutputFiles"
-      COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_OutputFiles.py"
+      COMMAND "${Python_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_OutputFiles.py"
       WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
   endif()
