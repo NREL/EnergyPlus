@@ -639,3 +639,23 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CSpline_Test)
     // check error
     EXPECT_LE(error, 1E-5);
 }
+
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test_Discontinuity)
+{
+    // Test for #8599
+    InitializePsychRoutines(*state);
+
+    // Test when wet bulb temperature is approaching zero. PsyPsatFnTemp has a discontinuity in Psat around 0.0 that makes the calculation blow up
+    // PsyPsatFnTemp(-0.0001) = 611.1485382610978
+    // PsyPsatFnTemp(+0.0001) = 611.2173076397495
+    //                  diff  = 0.06876937865172295
+    Real64 TDB = 1.4333333333333331;   // C
+    Real64 W = 0.0031902374172088472; // Kg.water/Kg.dryair
+    Real64 Pb = 101400.00000000001;
+
+    Real64 result = PsyTwbFnTdbWPb(*state, TDB, W, Pb);
+    Real64 expected_result = 0.0; // expected result from psychrometrics chart
+    EXPECT_NEAR(result, expected_result, 0.001);
+
+    EXPECT_FALSE(has_err_output());
+}
