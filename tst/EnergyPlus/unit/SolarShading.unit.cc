@@ -88,28 +88,29 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     Real64 AvgEqOfTime(0.0);       // Average value of Equation of Time for period
     Real64 AvgSinSolarDeclin(1.0); // Average value of Sine of Solar Declination for period
     Real64 AvgCosSolarDeclin(0.0); // Average value of Cosine of Solar Declination for period
-    int NumTimeSteps(6);
+    int const NumTimeSteps(6);
+    int const HoursInDay(24);
 
     state->dataGlobal->TimeStep = 1;
     state->dataSurface->TotSurfaces = 3;
     state->dataBSDFWindow->MaxBkSurf = 3;
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SurfSunlitFracHR.allocate(24, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SurfSunlitFrac.allocate(24, NumTimeSteps, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SurfSunlitFracWithoutReveal.allocate(24, NumTimeSteps, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfSunlitFracHR.allocate(HoursInDay, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfSunlitFrac.allocate(HoursInDay, NumTimeSteps, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfSunlitFracWithoutReveal.allocate(HoursInDay, NumTimeSteps, state->dataSurface->TotSurfaces);
     state->dataSolarShading->SurfSunCosTheta.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SurfCosIncAngHR.allocate(24, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SurfCosIncAng.allocate(24, NumTimeSteps, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfCosIncAngHR.allocate(HoursInDay, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfCosIncAng.allocate(HoursInDay, NumTimeSteps, state->dataSurface->TotSurfaces);
     state->dataSurface->SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SurfWinBackSurfaces.allocate(24, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SurfWinOverlapAreas.allocate(24, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfSunCosHourly.allocate(24);
-    for (int hour = 1; hour <= 24; hour++) {
-        state->dataSurface->SurfSunCosHourly(hour).dimension(3, 0.0);
+    state->dataHeatBal->SurfWinBackSurfaces.allocate(HoursInDay, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfWinOverlapAreas.allocate(HoursInDay, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
     }
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        for (int Hour = 1; Hour <= 24; ++Hour) {
+        for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 999.0;
             state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 888.0;
         }
@@ -119,7 +120,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     CalcPerSolarBeam(*state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        for (int Hour = 1; Hour <= 24; ++Hour) {
+        for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
             EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
         }
@@ -128,7 +129,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     // Test integrated option, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 only for the specified hour
     // Re-initialize to new values
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        for (int Hour = 1; Hour <= 24; ++Hour) {
+        for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 555.0;
             state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 444.0;
         }
@@ -139,7 +140,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     CalcPerSolarBeam(*state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        for (int Hour = 1; Hour <= 24; ++Hour) {
+        for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             if (Hour == state->dataGlobal->HourOfDay) {
                 EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
                 EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));

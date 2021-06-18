@@ -4795,7 +4795,7 @@ void CalcPerSolarBeam(EnergyPlusData &state,
             int firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
             int lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-                state.dataSurface->SurfOpaqAO = 0.0;
+                state.dataSurface->SurfOpaqAO(surfNum) = 0.0;
             }
             firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
             lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
@@ -8585,16 +8585,22 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace MultiLayerOptics;
 
-    // TODO - allocation
-    state.dataHeatBal->EnclSolDB = 0.0;
-    state.dataHeatBal->EnclSolDBIntWin = 0.0;
-    state.dataSurface->SurfOpaqAI = 0.0;
-    state.dataSurface->SurfOpaqAO = 0.0;
+
+    for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+        int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+        int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+            state.dataSurface->SurfOpaqAI(surfNum) = 0.0;
+            state.dataSurface->SurfOpaqAO(surfNum) = 0.0;
+        }
+    }
 
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
 
         Real64 BABSZone = 0;
         Real64 BTOTZone = 0;
+        state.dataHeatBal->EnclSolDB(enclosureNum) = 0.0;
+        state.dataHeatBal->EnclSolDBIntWin(enclosureNum) = 0.0;
         state.dataHeatBal->ZoneTransSolar(enclosureNum) = 0;
         state.dataHeatBal->ZoneTransSolarEnergy(enclosureNum) = 0;
         state.dataHeatBal->ZoneBmSolFrExtWinsRep(enclosureNum) = 0;

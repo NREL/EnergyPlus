@@ -119,7 +119,6 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfTempInRep;       // Temperature of the Inside Surface for each heat transfer surface
     Array1D<Real64> SurfTempInMovInsRep; // Temperature of interior movable insulation on the side facing the zone
 
-    // todo: to SurfRep arrays
     Array1D<Real64> QConvInReport;        // Surface convection heat gain at inside face [J]
     Array1D<Real64> QdotConvInRep;        // Surface convection heat transfer rate at inside face surface [W] (report)
     Array1D<Real64> QdotConvInRepPerArea; // Surface conv heat transfer rate per m2 at inside face surf (report){w/m2]
