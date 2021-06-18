@@ -442,7 +442,7 @@ struct BSDFWindowData : BaseGlobalStruct
     int TotThermalModels = 0;    // Number of thermal models
 
     // calculation
-    Array2D<Array1D<Real64>> SUNCOSTS = Array2D<Array1D<Real64>>(60, 24); // Timestep values of solar direction cosines
+    Array2D<Vector3<Real64>> SUNCOSTS = Array2D<Vector3<Real64>>(60, 24); // Timestep values of solar direction cosines
     Array2D<Real64> BSDFTempMtrx;                                         // Temporary matrix for holding axisymmetric input
     EPVector<DataBSDFWindow::BSDFWindowGeomDescr> ComplexWind;            // Window geometry structure: set in CalcPerSolarBeam/SolarShading
 
@@ -452,7 +452,7 @@ struct BSDFWindowData : BaseGlobalStruct
         this->FirstBSDF = 0;
         this->MaxBkSurf = 20;
         this->TotThermalModels = 0;
-        this->SUNCOSTS = Array2D<Array1D<Real64>>(60, 24);
+        this->SUNCOSTS = Array2D<Vector3<Real64>>(60, 24);
         this->BSDFTempMtrx.deallocate();
         this->ComplexWind.deallocate();
     }

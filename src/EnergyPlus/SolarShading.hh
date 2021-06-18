@@ -421,7 +421,7 @@ struct SolarShadingData : BaseGlobalStruct
     int NumTooManyFigures = 0;
     int NumTooManyVertices = 0;
     int NumBaseSubSurround = 0;
-    Array1D<Real64> SUNCOS;   // Direction cosines of solar position
+    Vector3<Real64> SUNCOS;   // Direction cosines of solar position
     Real64 XShadowProjection; // X projection of a shadow (formerly called C)
     Real64 YShadowProjection; // Y projection of a shadow (formerly called S)
     Array1D<Real64> XTEMP;    // Temporary 'X' values for HC vertices of the overlap
@@ -504,13 +504,13 @@ struct SolarShadingData : BaseGlobalStruct
                                             // current time (m2)
     Array1D<Real64> SurfWinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone
                                             // at current time (m2)
-    Real64 ThetaBig = 0.0;   // Larger of ThetaBlock1 and ThetaBlock2     //Autodesk Used uninitialized in some runs
-    Real64 ThetaSmall = 0.0; // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
-    Real64 ThetaMin = 0.0;   // Minimum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
-    Real64 ThetaMax = 0.0;   // Maximum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
-    Array1D<Real64> XVertex; // X,Y,Z coordinates of vertices of
-    Array1D<Real64> YVertex; // back surfaces projected into system
-    Array1D<Real64> ZVertex; // relative to receiving surface
+    Real64 ThetaBig = 0.0;                  // Larger of ThetaBlock1 and ThetaBlock2     //Autodesk Used uninitialized in some runs
+    Real64 ThetaSmall = 0.0;                // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
+    Real64 ThetaMin = 0.0;                  // Minimum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
+    Real64 ThetaMax = 0.0;                  // Maximum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
+    Array1D<Real64> XVertex;                // X,Y,Z coordinates of vertices of
+    Array1D<Real64> YVertex;                // back surfaces projected into system
+    Array1D<Real64> ZVertex;                // relative to receiving surface
     std::vector<Real64> sin_Phi;
     std::vector<Real64> cos_Phi;
     std::vector<Real64> sin_Theta;

@@ -1225,7 +1225,7 @@ struct SurfacesData : BaseGlobalStruct
     // Surface solar arrays
     Array1D<Real64> SurfAirSkyRadSplit;        // Fractional split between the air and the sky for radiation from the surface
                                                // Fraction of sky IR coming from sky itself; 1-SurfAirSkyRadSplit comes from the atmosphere.
-    Array1D<Array1D<Real64>> SurfSunCosHourly; // Hourly values of SUNCOS (solar direction cosines)
+    Array1D<Vector3<Real64>> SurfSunCosHourly; // Hourly values of SUNCOS (solar direction cosines)
                                                // Autodesk: Init Zero-initialization added to avoid use uninitialized
     Array1D<Real64> SurfSunlitArea;            // Sunlit area by surface number
     Array1D<Real64> SurfSunlitFrac;            // Sunlit fraction by surface number

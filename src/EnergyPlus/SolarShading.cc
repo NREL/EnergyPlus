@@ -753,7 +753,6 @@ void AllocateModuleArrays(EnergyPlusData &state)
     int NumOfLayers;
     int constexpr HoursInDay(24);
 
-    // TODO - check allocation here
     state.dataSolarShading->SurfSunCosTheta.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSolarShading->SurfSunlitArea.dimension(state.dataSurface->TotSurfaces, 0.0);
     if (!state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() || !state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
@@ -806,7 +805,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
 
     state.dataSurface->SurfSunCosHourly.allocate(HoursInDay);
     for (int hour = 1; hour <= HoursInDay; hour++) {
-        state.dataSurface->SurfSunCosHourly(hour).dimension(3, 0.0);
+        state.dataSurface->SurfSunCosHourly(hour) = 0.0;
     }
     state.dataSurface->SurfSunlitArea.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataSurface->SurfSunlitFrac.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -4791,11 +4790,15 @@ void CalcPerSolarBeam(EnergyPlusData &state,
 #endif
 
     // Initialize some values for the appropriate period
-    // Todo: initialization
     if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
-            int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+            int firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+            for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+                state.dataSurface->SurfOpaqAO = 0.0;
+            }
+            firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+            lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                 state.dataSolarShading->SurfSunCosTheta(surfNum) = 0.0;
             }
@@ -4825,7 +4828,7 @@ void CalcPerSolarBeam(EnergyPlusData &state,
                 }
             }
         }
-        state.dataSurface->SurfOpaqAO = 0.0;
+
         for (auto &e : state.dataSurface->SurfaceWindow) {
             e.OutProjSLFracMult = 1.0;
             e.InOutProjSLFracMult = 1.0;
@@ -4836,6 +4839,7 @@ void CalcPerSolarBeam(EnergyPlusData &state,
             int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                 state.dataSolarShading->SurfSunCosTheta(surfNum) = 0.0;
+                state.dataSurface->SurfOpaqAO(surfNum) = 0.0;
                 state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, surfNum) = 0.0;
                 state.dataHeatBal->SurfSunlitFracWithoutReveal(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, surfNum) = 0.0;
                 state.dataHeatBal->SurfSunlitFracHR(state.dataGlobal->HourOfDay, surfNum) = 0.0;
@@ -4849,7 +4853,7 @@ void CalcPerSolarBeam(EnergyPlusData &state,
                 }
             }
         }
-        state.dataSurface->SurfOpaqAO({1, state.dataSurface->TotSurfaces}) = 0.0;
+
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(state.dataGlobal->HourOfDay) = 1.0;
             state.dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(state.dataGlobal->HourOfDay) = 1.0;
@@ -10658,12 +10662,12 @@ void CalcFrameDividerShadow(EnergyPlusData &state,
     Real64 FracShFDin; // Fraction of glazing that illuminates frame and divider
     //  inside projections with beam radiation
 
-    Array1D<Real64> WinNorm(3);  // Window outward normal unit vector
+    Vector3<Real64> WinNorm(3);  // Window outward normal unit vector
     Real64 ThWin;                // Azimuth angle of WinNorm
-    Array1D<Real64> SunPrime(3); // Projection of sun vector onto plane (perpendicular to
+    Vector3<Real64> SunPrime(3); // Projection of sun vector onto plane (perpendicular to
     //  window plane) determined by WinNorm and vector along
     //  baseline of window
-    Array1D<Real64> WinNormCrossBase(3); // Cross product of WinNorm and vector along window baseline
+    Vector3<Real64> WinNormCrossBase(3); // Cross product of WinNorm and vector along window baseline
 
     if (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionOut == 0.0 && state.dataSurface->FrameDivider(FrDivNum).FrameProjectionIn == 0.0 &&
         state.dataSurface->FrameDivider(FrDivNum).DividerProjectionOut == 0.0 && state.dataSurface->FrameDivider(FrDivNum).DividerProjectionIn == 0.0)

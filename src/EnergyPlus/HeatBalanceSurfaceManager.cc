@@ -2637,9 +2637,9 @@ void InitSolarHeatGains(EnergyPlusData &state)
         }
     }
     if (resetSolar) {
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            state.dataHeatBal->EnclSolQD(zoneNum) = 0.0;
-            state.dataHeatBal->EnclSolQDforDaylight(zoneNum) = 0.0;
+        for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            state.dataHeatBal->EnclSolQD(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolQDforDaylight(enclosureNum) = 0.0;
         }
 
         // TTD domes are currently not considered in the window list of a zone

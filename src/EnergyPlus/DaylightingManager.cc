@@ -8283,8 +8283,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
                 // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
                 if (BlindOn)
-                    ProfileAngle(
-                        state, IWin, state.dataSurface->SurfSunCosHourly(IHR), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
+                    ProfileAngle(state, IWin, state.dataSurface->SurfSunCosHourly(IHR), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                 for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
