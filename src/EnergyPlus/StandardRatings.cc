@@ -672,8 +672,6 @@ namespace StandardRatings {
         Real64 const OAHighEWBTemp(24.0);    // Outdoor air wet-bulb temp in degrees C at full load capacity (75F)
         Real64 const LeavingWaterTemp(6.67); // Evaporator leaving water temperature in degrees C [44 F]
 
-        static constexpr std::string_view RoutineName("CheckCurveLimitsForIPLV: "); // Include trailing blank space
-
         //  Minimum and Maximum independent variable limits from Total Cooling Capacity Function of Temperature Curve
         Real64 CapacityLWTempMin(0.0);           // Capacity modifier Min value (leaving water temp), from the Curve:BiQuadratic object
         Real64 CapacityLWTempMax(0.0);           // Capacity modifier Max value (leaving water temp), from the Curve:BiQuadratic object

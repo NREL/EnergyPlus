@@ -2309,8 +2309,6 @@ void InverseModelCO2(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine inversely solve infiltration airflow rate or people count with zone air CO2 concentration measurements.
 
-    static constexpr std::string_view RoutineName("InverseModelCO2");
-
     Real64 AA(0.0);
     Real64 BB(0.0);
     Real64 CC(0.0);

@@ -4066,9 +4066,6 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
 
     bool ErrorsFound = false;
 
-    static constexpr std::string_view RoutineName("GetWaterThermalTankInput: ");
-    static constexpr std::string_view RoutineNameNoColon("GetWaterThermalTankInput");
-
     // Make sure refrigeration input is gotten before this input
     RefrigeratedCase::CheckRefrigerationInput(state);
 

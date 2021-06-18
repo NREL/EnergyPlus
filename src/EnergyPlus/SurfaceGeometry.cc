@@ -7829,9 +7829,6 @@ namespace SurfaceGeometry {
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("GetSurfaceSrdSurfsData: ");
-
         // INTERFACE BLOCK SPECIFICATIONS:na
         // DERIVED TYPE DEFINITIONS:na
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

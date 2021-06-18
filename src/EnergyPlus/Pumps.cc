@@ -1722,9 +1722,6 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
     using PlantUtilities::BoundValueToWithinTwoValues;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("PlantPumps:SetupPumpMinMaxFlows: ");
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int InletNode;  // pump inlet node number
     int OutletNode; // pump outlet node number

@@ -8495,9 +8495,8 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
     using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CalcVarSpeedHeatPump: "); // for error messages
-    Real64 const ErrTolerance(0.001);                               // convergence limit for hotwater coil
-    int const SolveMaxIter(50);
+    constexpr Real64 ErrTolerance(0.001);                               // convergence limit for hotwater coil
+    constexpr int SolveMaxIter(50);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int OutletNode;            // PTHP air outlet node

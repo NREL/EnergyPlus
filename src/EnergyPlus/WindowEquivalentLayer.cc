@@ -4932,7 +4932,6 @@ bool ASHWAT_ThermalRatings(EnergyPlusData &state,
     // FUNCTION PARAMETER DEFINITIONS:
     Real64 const Height(1.0); // Window height (m) for standard ratings calculation
     int const MaxIter(100);   // maximum number of iterations allowed
-    static constexpr std::string_view RoutineName("ASHWAT_ThermalRatings: ");
 
     Real64 ALPHA;
     Real64 HCOCFout;

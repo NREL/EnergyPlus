@@ -128,9 +128,6 @@ namespace OutdoorAirUnit {
     // component types addressed by this module
     std::string const cMO_OutdoorAirUnit("ZoneHVAC:OutdoorAirUnit");
 
-    static constexpr std::string_view fluidNameSteam("STEAM");
-    static constexpr std::string_view fluidNameWater("WATER");
-
     void SimOutdoorAirUnit(EnergyPlusData &state,
                            std::string_view CompName,     // name of the outdoor air unit
                            int const ZoneNum,             // number of zone being served
@@ -1499,9 +1496,6 @@ namespace OutdoorAirUnit {
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("SizeOutdoorAirUnit");
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop
         int PltSizCoolNum; // index of plant sizing object for 1st cooling loop
@@ -1783,7 +1777,6 @@ namespace OutdoorAirUnit {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static constexpr std::string_view CurrentModuleObject("ZoneHVAC:OutdoorAirUnit");
         Real64 DesOATemp;    // Design OA Temp degree C
         Real64 AirMassFlow;  // air mass flow rate [kg/s]
         int ControlNode;     // the hot water or cold water inlet node

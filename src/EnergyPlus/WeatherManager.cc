@@ -3416,7 +3416,6 @@ namespace WeatherManager {
         EP_SIZE_CHECK(WCodesArr, 9); // NOLINT(misc-static-assert)
 
         static constexpr std::string_view ValidDigits("0123456789");
-        static constexpr std::string_view fmt9I1("(9I1)");
 
         std::string::size_type Pos;
 

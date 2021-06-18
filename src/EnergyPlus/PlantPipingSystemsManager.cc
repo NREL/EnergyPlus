@@ -186,8 +186,6 @@ namespace PlantPipingSystemsManager {
         //       MODIFIED       by Sushobhit Acharya, March 2015
         //       RE-ENGINEERED  na
 
-        static constexpr std::string_view RoutineName("InitAndSimGroundDomain");
-
         // Read input if necessary
         if (state.dataPlantPipingSysMgr->GetInputFlag) {
             GetPipingSystemsAndGroundDomainsInput(state);
@@ -1814,9 +1812,6 @@ namespace PlantPipingSystemsManager {
         //       DATE WRITTEN   September 2012
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("ReadHorizontalTrenchInputs");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -5648,8 +5643,6 @@ namespace PlantPipingSystemsManager {
 
     void Domain::DoStartOfTimeStepInitializations(EnergyPlusData &state)
     {
-        static constexpr std::string_view RoutineName("PipingSystemCircuit::DoStartOfTimeStepInitializations");
-
         // Update environmental conditions
         this->Cur.CurAirTemp = state.dataEnvrn->OutDryBulbTemp;
         this->Cur.CurWindSpeed = state.dataEnvrn->WindSpeed;

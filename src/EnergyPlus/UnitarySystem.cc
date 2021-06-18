@@ -6809,9 +6809,6 @@ namespace UnitarySystems {
     void UnitarySys::getUnitarySystemInputData(
         EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
-
-        static constexpr std::string_view getUnitarySystemInput("getUnitarySystemInputData");
-
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
 
         auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);

@@ -139,8 +139,6 @@ namespace InternalHeatGains {
     int const ITEInletZoneAirNode(1);
     int const ITEInletRoomAirModel(2);
 
-    static constexpr std::string_view BlankString;
-
     void ManageInternalHeatGains(EnergyPlusData &state,
                                  Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {

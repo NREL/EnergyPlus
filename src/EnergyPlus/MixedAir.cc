@@ -3593,7 +3593,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcOAController: ");
-    static std::string const CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::OAController)));
+    static std::string const &CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::OAController)));
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -3930,7 +3930,7 @@ void VentilationMechanicalProps::CalcMechVentController(
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     static constexpr std::string_view RoutineName("CalcMechVentController: ");
-    static std::string const CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)));
+    static std::string const &CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::MechVentilation)));
 
     // new local variables for DCV
     Real64 ZoneOAPeople; // Zone OA flow rate based on number of occupants [m3/s]
@@ -4529,8 +4529,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     using General::SolveRoot;
     using SetPointManager::GetCoilFreezingCheckFlag;
 
-    static constexpr std::string_view RoutineName("CalcOAEconomizer: ");
-    static std::string const CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::OAController)));
+    static std::string const &CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::OAController)));
     int const MaxIte(500);                 // Maximum number of iterations
     Real64 const Acc(0.0001);              // Accuracy of result
     bool AirLoopEconoLockout;              // Economizer lockout flag
@@ -5010,7 +5009,7 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
     using WaterCoils::SetCoilDesFlow;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::OAController)));
+    static std::string const &CurrentModuleObject(CurrentModuleObjects(static_cast<int>(CMO::OAController)));
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 OAFlowRatio;   // Used for error checking
@@ -6279,7 +6278,6 @@ void CheckControllerLists(EnergyPlusData &state, bool &ErrFound)
     // Using/Aliasing
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CheckControllerLists");
     static std::string const CurrentModuleObject("AirLoopHVAC:ControllerList");
     static std::string const AirLoopObject("AirLoopHVAC");
 

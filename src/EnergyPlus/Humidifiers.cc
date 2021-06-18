@@ -652,9 +652,6 @@ namespace Humidifiers {
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view CalledFrom("Humidifier:InitHumidifier");
-
         // do sizing calculation once
         if (MySizeFlag) {
             SizeHumidifier(state);

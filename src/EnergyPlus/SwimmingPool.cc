@@ -921,9 +921,6 @@ void SwimmingPoolData::update(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine does any updating that needs to be done for the swimming pool model.
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("UpdateSwimmingPool");
-
     int SurfNum = this->SurfacePtr; // surface number/pointer
 
     if (this->LastSysTimeElapsed(SurfNum) == state.dataHVACGlobal->SysTimeElapsed) {

@@ -2293,7 +2293,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
     using PlantUtilities::RegisterPlantCompDesignFlow;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view InitWaterCoil("InitWaterCoil");
     static constexpr std::string_view RoutineName("SizeWaterCoil");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

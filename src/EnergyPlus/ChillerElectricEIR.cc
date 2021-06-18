@@ -1249,8 +1249,6 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
 
-    static constexpr std::string_view RoutineName("InitElectricEIRChiller");
-
     // Init more variables
     if (this->oneTimeFlag) {
         this->oneTimeInit(state);

@@ -477,9 +477,8 @@ namespace ICEngineElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // curve fit of performance data:
 
-        Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
-        Real64 const KJtoJ(1000.0);    // convert Kjoules to joules
-        static constexpr std::string_view RoutineName("CalcICEngineGeneratorModel");
+        constexpr Real64 ExhaustCP(1.047); // Exhaust Gas Specific Heat (J/kg-K)
+        constexpr Real64 KJtoJ(1000.0);    // convert Kjoules to joules
 
         // Heat Recovery Fluid Mass FlowRate (kg/s)
         Real64 HeatRecMdot;

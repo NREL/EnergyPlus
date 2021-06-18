@@ -166,7 +166,6 @@ namespace SimulationManager {
     using namespace ExternalInterface;
 
     // MODULE PARAMETER DEFINITIONS:
-    static constexpr std::string_view BlankString;
 
     void ManageSimulation(EnergyPlusData &state)
     {

@@ -496,7 +496,6 @@ void DetermineDateTokens(EnergyPlusData &state,
                                             {"ST ", "ND ", "RD ", "TH ", "OF ", "IN "}); // Need trailing spaces: Want thse only at end of words
     static Array1D_string const Months(12, {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"});
     static Array1D_string const Weekdays(7, {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"});
-    static constexpr std::string_view Numbers("0123456789");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CurrentString;

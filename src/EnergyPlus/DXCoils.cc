@@ -88,7 +88,6 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/StandardRatings.hh>
@@ -8885,9 +8884,6 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
     auto &HPWHInletDBTemp = state.dataHVACGlobal->HPWHInletDBTemp;
     auto &HPWHInletWBTemp = state.dataHVACGlobal->HPWHInletWBTemp;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CalcHPWHDXCoil");
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 RatedHeatingCapacity;     // Water heating rated capacity with or without condenser water pump heat (W)
     Real64 RatedHeatingCOP;          // Water heating rated COP with or without evap fan and cond water pump heat (W/W)
@@ -11068,7 +11064,6 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
     using CurveManager::CurveValue;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CalcDXHeatingCoil");
     static constexpr std::string_view RoutineNameFullLoad("CalcDXHeatingCoil:fullload");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -11561,7 +11556,6 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
     // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CalcMultiSpeedDXCoil");
     static constexpr std::string_view RoutineNameHighSpeedOutlet("CalcMultiSpeedDXCoil:highspeedoutlet");
     static constexpr std::string_view RoutineNameLowSpeedOutlet("CalcMultiSpeedDXCoil:lowspeedoutlet");
     static constexpr std::string_view RoutineNameNewDewPointConditions("CalcMultiSpeedDXCoil:newdewpointconditions");
@@ -12674,11 +12668,10 @@ void CalcTotCapSHR(EnergyPlusData &state,
     // and outside drybulb
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CalcTotCapSHR");
-    int const MaxIter(30);               // Maximum number of iterations for dry evaporator calculations
-    Real64 const RF(0.4);                // Relaxation factor for dry evaporator iterations
-    Real64 const Tolerance(0.01);        // Error tolerance for dry evaporator iterations
-    Real64 const MinHumRatCalc(0.00001); // Error tolerance for dry evaporator iterations
+    constexpr int MaxIter(30);               // Maximum number of iterations for dry evaporator calculations
+    constexpr Real64 RF(0.4);                // Relaxation factor for dry evaporator iterations
+    constexpr Real64 Tolerance(0.01);        // Error tolerance for dry evaporator iterations
+    constexpr Real64 MinHumRatCalc(0.00001); // Error tolerance for dry evaporator iterations
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 InletWetBulbCalc; // calculated inlet wetbulb temperature used for finding dry coil point [C]
@@ -12798,10 +12791,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcMultiSpeedDXCoilCooling");
-    static constexpr std::string_view RoutineNameHighSpeed("CalcMultiSpeedDXCoilCooling:highspeed");
     static constexpr std::string_view RoutineNameHighSpeedAlt("CalcMultiSpeedDXCoilCooling highspeed");
-    static constexpr std::string_view RoutineNameHighSpeedOutlet("CalcMultiSpeedDXCoilCooling:highspeedoutlet");
-    static constexpr std::string_view RoutineNameLowSpeedOutlet("CalcMultiSpeedDXCoilCooling:lowspeedoutlet");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 AirMassFlow;         // dry air mass flow rate through coil [kg/s]
@@ -16491,10 +16481,6 @@ Real64 CalcSHRUserDefinedCurves(EnergyPlusData &state,
     // Return value
     Real64 SHRopr; // operating SHR, corrected for Temp and Flow Fraction
 
-    // Locals
-    // FUNCTION PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CalcSHRUserDefinedCurves");
-
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 SHRTempModFac; // Sensible Heat Ratio modifier (function of entering wetbulb, entering drybulb)
     Real64 SHRFlowModFac; // Sensible Heat Ratio modifier (function of actual vs rated flow)
@@ -16962,9 +16948,6 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     using General::CreateSysTimeIntervalString;
 
     using namespace HVACVariableRefrigerantFlow;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static constexpr std::string_view RoutineName("CalcVRFCoolingCoil_FluidTCtrl");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
