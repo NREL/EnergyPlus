@@ -1128,6 +1128,8 @@ namespace OutputReportPredefined {
         s->pdchLeedPerfDisClDem = newPreDefColumn(state, s->pdstLeedPerf, "District Cooling Demand [W]");
         s->pdchLeedPerfDisHtEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Use [GJ]");
         s->pdchLeedPerfDisHtDem = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Demand [W]");
+        s->pdchLeedPerfDisHtStEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Steam Use [GJ]");
+        s->pdchLeedPerfDisHtStDem = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Steam Demand [W]");
 
         s->pdstLeedEneUseSum = newPreDefSubTable(state, s->pdrLeed, "EAp2-6. Energy Use Summary");
         // Multiple columns with rows of:

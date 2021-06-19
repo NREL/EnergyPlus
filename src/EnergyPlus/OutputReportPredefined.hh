@@ -1049,6 +1049,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchLeedPerfDisClDem = 0;
     int pdchLeedPerfDisHtEneUse = 0;
     int pdchLeedPerfDisHtDem = 0;
+    int pdchLeedPerfDisHtStEneUse = 0;
+    int pdchLeedPerfDisHtStDem = 0;
 
     int pdstLeedEneUseSum = 0;
     int pdchLeedEusUnt = 0;
@@ -1957,6 +1959,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
         this->pdchLeedPerfDisClDem = 0;
         this->pdchLeedPerfDisHtEneUse = 0;
         this->pdchLeedPerfDisHtDem = 0;
+        this->pdchLeedPerfDisHtStEneUse = 0;
+        this->pdchLeedPerfDisHtStDem = 0;
         this->pdstLeedEneUseSum = 0;
         this->pdchLeedEusUnt = 0;
         this->pdchLeedEusProc = 0;
