@@ -4034,26 +4034,31 @@ void LEEDtariffReporting(EnergyPlusData &state)
     Real64 gasTotalEne;
     Real64 distCoolTotalEne;
     Real64 distHeatTotalEne;
+    Real64 distHeatSteamTotalEne;
     Real64 otherTotalEne;
     Real64 elecTotalCost;
     Real64 gasTotalCost;
     Real64 otherTotalCost;
     Real64 distCoolTotalCost;
     Real64 distHeatTotalCost;
+    Real64 distHeatSteamTotalCost;
     Real64 allTotalCost;
     std::string elecTariffNames;
     std::string gasTariffNames;
     std::string distCoolTariffNames;
     std::string distHeatTariffNames;
+    std::string distHeatSteamTariffNames;
     std::string othrTariffNames;
     iEconConv elecUnits;
     iEconConv gasUnits;
     iEconConv distCoolUnits;
     iEconConv distHeatUnits;
+    iEconConv distHeatSteamUnits;
     iEconConv othrUnits;
     iDemandWindow gasDemWindowUnits;
     iDemandWindow distCoolDemWindowUnits;
     iDemandWindow distHeatDemWindowUnits;
+    iDemandWindow distHeatSteamDemWindowUnits;
     iDemandWindow othrDemWindowUnits;
     int iTariff;
 
@@ -4067,17 +4072,20 @@ void LEEDtariffReporting(EnergyPlusData &state)
         gasTotalEne = 0.0;
         distCoolTotalEne = 0.0;
         distHeatTotalEne = 0.0;
+        distHeatSteamTotalEne = 0.0;
         otherTotalEne = 0.0;
         elecTotalCost = 0.0;
         gasTotalCost = 0.0;
         distCoolTotalCost = 0.0;
         distHeatTotalCost = 0.0;
+        distHeatSteamTotalCost = 0.0;
         otherTotalCost = 0.0;
         allTotalCost = 0.0;
         elecUnits = iEconConv::USERDEF;
         gasUnits = iEconConv::USERDEF;
         distCoolUnits = iEconConv::USERDEF;
         distHeatUnits = iEconConv::USERDEF;
+        distHeatSteamUnits = iEconConv::USERDEF;
         othrUnits = iEconConv::USERDEF;
         gasDemWindowUnits = iDemandWindow::Unassigned;
         othrDemWindowUnits = iDemandWindow::Unassigned;
@@ -4085,6 +4093,7 @@ void LEEDtariffReporting(EnergyPlusData &state)
         gasTariffNames = "";
         distCoolTariffNames = "";
         distHeatTariffNames = "";
+        distHeatSteamTariffNames = "";
         othrTariffNames = "";
         for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
             if (tariff(iTariff).isSelected) {
@@ -4106,12 +4115,18 @@ void LEEDtariffReporting(EnergyPlusData &state)
                     distCoolTariffNames += ' ' + tariff(iTariff).tariffName;
                     distCoolUnits = tariff(iTariff).convChoice;
                     distCoolDemWindowUnits = tariff(iTariff).demandWindow;
-                } else if (tariff(iTariff).reportMeterIndx == distHeatFacilMeter || tariff(iTariff).reportMeterIndx == distHeatSteamFacilMeter) {
+                } else if (tariff(iTariff).reportMeterIndx == distHeatFacilMeter) {
                     if (tariff(iTariff).totalAnnualEnergy > distHeatTotalEne) distHeatTotalEne = tariff(iTariff).totalAnnualEnergy;
                     distHeatTotalCost += tariff(iTariff).totalAnnualCost;
                     distHeatTariffNames += ' ' + tariff(iTariff).tariffName;
                     distHeatUnits = tariff(iTariff).convChoice;
                     distHeatDemWindowUnits = tariff(iTariff).demandWindow;
+                } else if (tariff(iTariff).reportMeterIndx == distHeatSteamFacilMeter) {
+                    if (tariff(iTariff).totalAnnualEnergy > distHeatTotalEne) distHeatTotalEne = tariff(iTariff).totalAnnualEnergy;
+                    distHeatSteamTotalCost += tariff(iTariff).totalAnnualCost;
+                    distHeatSteamTariffNames += ' ' + tariff(iTariff).tariffName;
+                    distHeatSteamUnits = tariff(iTariff).convChoice;
+                    distHeatSteamDemWindowUnits = tariff(iTariff).demandWindow;
                 } else if (tariff(iTariff).kindWaterMtr == kindMeterNotWater) {
                     if (tariff(iTariff).totalAnnualEnergy > otherTotalEne) otherTotalEne = tariff(iTariff).totalAnnualEnergy;
                     otherTotalCost += tariff(iTariff).totalAnnualCost;
@@ -4127,6 +4142,8 @@ void LEEDtariffReporting(EnergyPlusData &state)
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Natural Gas", gasTariffNames);
         if (distCoolTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Cooling", distCoolTariffNames);
         if (distHeatTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating", distHeatTariffNames);
+        if (distHeatSteamTotalEne != 0)
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "District Heating Steam", distHeatSteamTariffNames);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsRtNm, "Other", othrTariffNames);
         // virtual rate
         if (elecTotalEne != 0) PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEtsVirt, "Electricity", elecTotalCost / elecTotalEne, 3);
@@ -4168,14 +4185,25 @@ void LEEDtariffReporting(EnergyPlusData &state)
                              format("{}{}", convDemStrings(distHeatUnits), demWindowStrings(distHeatDemWindowUnits)));
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatTotalCost, 2);
         }
+        if (distHeatSteamTotalEne != 0) {
+            PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsVirt, "District Heating Steam", distHeatSteamTotalCost / distHeatSteamTotalEne, 3);
+            PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchLeedEtsEneUnt, "District Heating Steam", format("{}", convEneStrings(distHeatSteamUnits)));
+            PreDefTableEntry(state,
+                             state.dataOutRptPredefined->pdchLeedEtsDemUnt,
+                             "District Heating Steam",
+                             format("{}{}", convDemStrings(distHeatSteamUnits), demWindowStrings(distHeatSteamDemWindowUnits)));
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsTotal, "District Heating", distHeatSteamTotalCost, 2);
+        }
         // save the total costs for later to compute process fraction
         state.dataOutRptPredefined->LEEDelecCostTotal = elecTotalCost;
         state.dataOutRptPredefined->LEEDgasCostTotal = gasTotalCost;
-        state.dataOutRptPredefined->LEEDothrCostTotal = distCoolTotalCost + distHeatTotalCost + otherTotalCost;
+        state.dataOutRptPredefined->LEEDothrCostTotal = distCoolTotalCost + distHeatTotalCost + distHeatSteamTotalCost + otherTotalCost;
         PreDefTableEntry(state,
                          state.dataOutRptPredefined->pdchLeedEcsTotal,
                          "Total",
-                         elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + otherTotalCost,
+                         elecTotalCost + gasTotalCost + distCoolTotalCost + distHeatTotalCost + distHeatSteamTotalCost + otherTotalCost,
                          2);
     }
 }
