@@ -378,6 +378,12 @@ namespace IntegratedHeatPump {
                 bool const bEnhancedDehum = false           // whether it requires enhanced dehumidification
     );
 
+    Real64 CalSupCoolCoil(EnergyPlusData &state,
+                        int &CompIndex,              // Index for Component name
+                        bool const FirstHVACIteration, // TRUE if First iteration of simulation
+                        Real64 SenLoad //sensible load
+    );
+
     void SimIHPLiquidDesiccantStorage(EnergyPlusData &state,
                 int &CompIndex,                // Index for Component name
                 int const CyclingScheme,       // Continuous fan OR cycling compressor

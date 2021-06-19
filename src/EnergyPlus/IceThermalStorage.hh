@@ -382,6 +382,8 @@ namespace IceThermalStorage {
     void SetIceStoreNormCapacity(EnergyPlusData &state, 
         std::string sType, std::string sName, const Real64 dNormCapacity); 
 
+    Real64 GetTankNormCapacity(EnergyPlusData &state, std::string sType, const int IndexNum); 
+
     PlantComponent *IceTankReference(EnergyPlusData &state, std::string sType, std::string sName);
 
     int GetTankIndex(EnergyPlusData &state, std::string sType, std::string sName); 

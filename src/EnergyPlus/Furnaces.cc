@@ -10764,6 +10764,7 @@ namespace Furnaces {
         // Using/Aliasing
         using Fans::SimulateFanComponents;
         using IntegratedHeatPump::SimIHP;
+        using IntegratedHeatPump::CalSupCoolCoil;
         using VariableSpeedCoils::CompareGridSpeed;
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::IsGridResponsiveMode; 
@@ -11410,7 +11411,7 @@ namespace Furnaces {
 
         // If the fan runs continually do not allow coils to set OnOffFanPartLoadRatio.
         if (state.dataFurnaces->Furnace(FurnaceNum).OpMode == ContFanCycCoil) OnOffFanPartLoadFraction = 1.0;
-
+          
         auto &outNode = Node(OutletNode);
         auto &zoneNode = Node(state.dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone);
         Real64 zoneEnthalpy = PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat);
@@ -11420,6 +11421,15 @@ namespace Furnaces {
             AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(outNode.Temp, outNode.HumRat, zoneNode.Temp, zoneNode.HumRat); // sensible {W};
         LatentLoadMet = totalLoadMet - SensibleLoadMet;
         state.dataFurnaces->Furnace(FurnaceNum).LatentLoadMet = LatentLoadMet;
+
+        if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
+            //correct sensible load matched in IHP object if there is a supplemental water cooling coil.
+            Real64 Tset = CalSupCoolCoil(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, FirstHVACIteration, QZnReq);
+
+            if (Tset > 0) {
+                SensibleLoadMet = SensibleLoadMet + AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Tset, outNode.HumRat, outNode.Temp, outNode.HumRat);
+            }
+        }
     }
 
     //******************************************************************************

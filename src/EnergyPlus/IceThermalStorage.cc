@@ -2806,6 +2806,29 @@ namespace IceThermalStorage {
         }
     }
 
+    Real64 GetTankNormCapacity(EnergyPlusData &state, std::string sType, const int IndexNum)
+    {
+        Real64 RetCapacity = 0.0; 
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) {
+            
+            if (IndexNum != 0) {
+                RetCapacity = state.dataIceThermalStorage->SimpleIceStorage(IndexNum).ITSNomCap ;
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+
+            if (IndexNum != 0) {
+                RetCapacity = state.dataIceThermalStorage->DetailedIceStorage(IndexNum).NomCapacity * 3600.0; // w-hr to J
+            }
+        } else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+            if (IndexNum != 0) {
+                RetCapacity = state.dataIceThermalStorage->SimplePcmStorage(IndexNum).PcmTSNomCap ;
+            }
+        }
+
+        return (RetCapacity);
+    }
+
     int GetTankIndex(EnergyPlusData &state, std::string sType, std::string sName)
     {
         if (state.dataIceThermalStorage->getITSInput) {
