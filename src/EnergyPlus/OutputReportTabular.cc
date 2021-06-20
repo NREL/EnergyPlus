@@ -8441,6 +8441,8 @@ void WriteBEPSTable(EnergyPlusData &state)
                 tableBody(1, 13) = "N/A";
             }
 
+            tableBody(1, 14) = RealToStr(ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeatingSteam, 3); // District Heating Steam
+
             // heading for the entire sub-table
             if (ort->displayTabularBEPS) {
                 if (produceTabular) {
@@ -8469,8 +8471,6 @@ void WriteBEPSTable(EnergyPlusData &state)
                     }
                 }
             }
-
-            tableBody(1, 14) = RealToStr(ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeatingSteam, 3); // District Heating Steam
 
             //---- Building Area Sub-Table
             rowHead.allocate(3);
