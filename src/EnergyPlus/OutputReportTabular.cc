@@ -2809,7 +2809,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
     // the following should be kept consistent with the assumptions in the pollution calculation routines
     ort->efficiencyDistrictCooling = 3.0;
     ort->efficiencyDistrictHeating = 0.3;
-    ort->efficiencyDistrictHeatingSteam = 1.35;
+    ort->efficiencyDistrictHeatingSteam = 0.74;
 
     //  TotalSourceEnergyUse = (gatherTotalsSource(1) & !total source from electricity
     //                  +  gatherTotalsSource(2)   & !natural gas
@@ -7992,7 +7992,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             convBldgCondFloorArea = ort->buildingConditionedFloorArea / areaConversionFactor;
 
             // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
-            for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
+            for (iResource = 1; iResource <= 13; ++iResource) { // don't do water
                 for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
@@ -8003,13 +8003,13 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
             // do water
             for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(13, jEndUse) /= waterConversionFactor;
+                collapsedEndUse(14, jEndUse) /= waterConversionFactor;
                 for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 14) /= waterConversionFactor;
                 }
             }
 
-            collapsedTotal(13) = WaterConversionFunct(collapsedTotal(13), waterConversionFactor);
+            collapsedTotal(14) = WaterConversionFunct(collapsedTotal(14), waterConversionFactor);
 
             if (iUnitSystem == 0) {
                 gtPowerFuelFireGen = ort->gatherPowerFuelFireGen;
@@ -8470,7 +8470,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 }
             }
 
-            tableBody(1, 15) = RealToStr(ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeatingSteam, 3); // District Heating Steam
+            tableBody(1, 14) = RealToStr(ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeatingSteam, 3); // District Heating Steam
 
             //---- Building Area Sub-Table
             rowHead.allocate(3);
@@ -8967,10 +8967,10 @@ void WriteBEPSTable(EnergyPlusData &state)
             }
 
             rowHead.allocate(numRows);
-            columnHead.allocate(14);
-            columnWidth.allocate(14);
+            columnHead.allocate(15);
+            columnWidth.allocate(15);
             columnWidth = 10;                // array assignment - same for all columns
-            tableBody.allocate(14, numRows); // TODO: this appears to be (column, row)...
+            tableBody.allocate(15, numRows); // TODO: this appears to be (column, row)...
             rowHead = "";
             tableBody = "";
 
@@ -9046,7 +9046,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 }
             }
 
-            for (iResource = 1; iResource <= 13; ++iResource) {
+            for (iResource = 1; iResource <= 14; ++iResource) {
                 i = 1;
                 for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
@@ -9127,9 +9127,9 @@ void WriteBEPSTable(EnergyPlusData &state)
             resource_entry_map(10) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel2EneUse; // other fuel 2
             resource_entry_map(11) = state.dataOutRptPredefined->pdchLeedPerfDisClEneUse;      // district cooling
             resource_entry_map(12) = state.dataOutRptPredefined->pdchLeedPerfDisHtEneUse;      // district heating
-            resource_entry_map(13) = state.dataOutRptPredefined->pdchLeedPerfDisHtStEneUse;    // district heating
+            resource_entry_map(13) = state.dataOutRptPredefined->pdchLeedPerfDisHtStEneUse;    // district heating Steam
 
-            for (iResource = 1; iResource <= 12; ++iResource) {
+            for (iResource = 1; iResource <= 13; ++iResource) {
                 i = 1;
                 for (size_t jEndUse = 1; jEndUse <= state.dataGlobalConst->iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
@@ -9168,11 +9168,11 @@ void WriteBEPSTable(EnergyPlusData &state)
             //---- Normalized by Conditioned Area Sub-Table
             // Calculations for both normalized tables are first
             rowHead.allocate(4);
-            columnHead.allocate(13);
-            columnWidth.allocate(13);
+            columnHead.allocate(14);
+            columnWidth.allocate(14);
             columnWidth = 7; // array assignment - same for all columns
-            tableBody.allocate(13, 4);
-            for (iResource = 1; iResource <= 13; ++iResource) {
+            tableBody.allocate(14, 4);
+            for (iResource = 1; iResource <= 14; ++iResource) {
                 normalVal(iResource, 1) =
                     collapsedEndUse(iResource, state.dataGlobalConst->iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) +
                     collapsedEndUse(iResource,
@@ -9206,7 +9206,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                 normalVal(iResource, 4) = collapsedTotal(iResource); // totals
             }
             // convert the normalized end use values to MJ from GJ if using J
-            for (iResource = 1; iResource <= 12; ++iResource) { // not including resource=13 water
+            for (iResource = 1; iResource <= 13; ++iResource) { // not including resource=14 water
                 for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
                     normalVal(iResource, jEndUse) *= kConversionFactor;
                 }
@@ -9274,7 +9274,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             // write the conditioned area based table
             tableBody = "";
             if (convBldgCondFloorArea > 0) {
-                for (iResource = 1; iResource <= 13; ++iResource) {
+                for (iResource = 1; iResource <= 14; ++iResource) {
                     for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
                         tableBody(iResource, jEndUse) = RealToStr(normalVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
                     }
@@ -9311,7 +9311,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             //---- Normalized by Total Area Sub-Table
             tableBody = "";
             if (convBldgGrossFloorArea > 0) {
-                for (iResource = 1; iResource <= 13; ++iResource) {
+                for (iResource = 1; iResource <= 14; ++iResource) {
                     for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
                         tableBody(iResource, jEndUse) = RealToStr(normalVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
                     }
@@ -10458,7 +10458,7 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
                         columnHead(12) = "Steam [W]";
                     }
                 }
-                columnHead(13) = "District Steam Heating [m3/s]";
+                columnHead(13) = "District Heating Steam [m3/s]";
                 columnHead(14) = "Water [m3/s]";
             }
 
