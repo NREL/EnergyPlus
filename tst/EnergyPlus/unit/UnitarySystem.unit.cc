@@ -9564,12 +9564,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXHeatingCoilOnly)
 
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
 
-    ASSERT_NEAR(thisSys->m_DesignHeatingCapacity, 1303.091, 0.001);
+    ASSERT_NEAR(thisSys->m_DesignHeatingCapacity, 1303.097, 0.001);
     ASSERT_EQ(thisSys->m_DesignCoolingCapacity, 0.0);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 325.773, 0.001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 651.545, 0.001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(3), 977.318, 0.001);
-    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(4), 1303.091, 0.001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(1), 325.774, 0.001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(2), 651.549, 0.001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(3), 977.323, 0.001);
+    ASSERT_NEAR(state->dataDXCoils->DXCoil(1).MSRatedTotCap(4), 1303.097, 0.001);
     ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[1], 0.0131, 0.0001);
     ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[2], 0.0262, 0.0001);
     ASSERT_NEAR(thisSys->m_HeatVolumeFlowRate[3], 0.0393, 0.0001);
