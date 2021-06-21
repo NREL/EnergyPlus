@@ -6832,7 +6832,7 @@ namespace HeatBalanceManager {
             MullionWidth = 0.0;
             MullionOrientation = "Vertical";
             if (NGlSys == 2) {
-                bool error = false;
+                error = false;
                 MullionWidth = UtilityRoutines::ProcessNumber(DataLine(10).substr(19), error);
                 if (error) {
                     ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Width.");
@@ -7314,9 +7314,7 @@ namespace HeatBalanceManager {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    bool error = false;
-                    AbsSol(_, IGlass) = UtilityRoutines::ProcessNumber(NextLine.data.substr(5), error);
-                    if (error) {
+                    if (!readItem(NextLine.data.substr(5), AbsSol(_, IGlass))) {
                         ShowSevereError(state,
                                         format("HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. For Glass={}", IGlass));
                         ShowContinueError(state,
