@@ -33,13 +33,13 @@ jobs:
         ./miktexsetup_standalone --verbose \
             --local-package-repository=C:/MiKTeX-Repo \
             --remote-package-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" \
-            --package-set=basic \
+            --package-set=essential \
             download
 
         echo "Installing from the local package directory previously set up"
         ./miktexsetup_standalone --verbose \
             --local-package-repository=C:/MiKTeX-Repo \
-            --package-set=basic \
+            --package-set=essential \
             --shared=yes \
             install
 
