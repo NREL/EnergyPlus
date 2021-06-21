@@ -647,11 +647,10 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test_Discontinuity)
 
     state->dataGlobal->WarmupFlag = true;
 
-    // Test when wet bulb temperature is approaching zero. PsyPsatFnTemp used to have a discontinuity in Psat around 0.0°C that makes the calculation blow up. Before:
-    // PsyPsatFnTemp(-0.0001) = 611.1485382610978
-    // PsyPsatFnTemp(+0.0001) = 611.2173076397495
+    // Test when wet bulb temperature is approaching zero. PsyPsatFnTemp used to have a discontinuity in Psat around 0.0°C that makes the calculation
+    // blow up. Before: PsyPsatFnTemp(-0.0001) = 611.1485382610978 PsyPsatFnTemp(+0.0001) = 611.2173076397495
     //                  diff  = 0.06876937865172295
-    Real64 TDB = 1.4333333333333331;   // C
+    Real64 TDB = 1.4333333333333331;  // C
     Real64 W = 0.0031902374172088472; // Kg.water/Kg.dryair
     Real64 Pb = 101400.00000000001;
 
