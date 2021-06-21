@@ -326,7 +326,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation)
         std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     } else {
         EXPECT_NEAR(10000, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
-        EXPECT_NEAR(10.247, evapOutletNode.Temp, 0.01);
+        EXPECT_NEAR(10.247, evapOutletNode.Temp, 0.02);
         EXPECT_NEAR(0.00774, evapOutletNode.HumRat, 0.0001);
     }
 

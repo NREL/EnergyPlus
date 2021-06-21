@@ -3851,7 +3851,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
     ASSERT_NEAR(-17.300, state->dataHeatRecovery->ExchCond(1).SupInTemp, 0.001); // Heat Recovery Exchanger Primary Air Inlet Temp
     ASSERT_GT(state->dataHeatRecovery->ExchCond(1).SupOutTemp,
               state->dataHeatRecovery->ExchCond(1).SupInTemp);                  // Heat Recovery Exchanger is On in heating mode
-    ASSERT_NEAR(23.000, state->dataHeatRecovery->ExchCond(1).SecInTemp, 0.001); // Heat Recovery Exchanger Secondary Air Inlet Temp
+    ASSERT_NEAR(23.000, state->dataHeatRecovery->ExchCond(1).SecInTemp, 0.03); // Heat Recovery Exchanger Secondary Air Inlet Temp
     ASSERT_LT(state->dataHeatRecovery->ExchCond(1).SecOutTemp,
               state->dataHeatRecovery->ExchCond(1).SecInTemp); // Heat Recovery Exchanger is On in heating mode
 

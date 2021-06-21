@@ -1344,7 +1344,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     // input not needed for sizing
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
     EXPECT_NEAR(
-        state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9595.0, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
+        state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9595.0, 2.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
     // input not needed for sizing
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRateWasAutoSized);
@@ -1763,7 +1763,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     // input not needed for sizing (NOT WasAutoSized)
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
     EXPECT_NEAR(
-        state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9595.55, 1.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
+        state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUA, 9595.55, 3.0); // nominal capacity input was 100 kW, approach, 3.9K, range 5.5K
 
     // input not needed for sizing (NOT WasAutoSized)
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).DesignWaterFlowRateWasAutoSized);

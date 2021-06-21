@@ -1771,7 +1771,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
     EXPECT_NEAR(state->dataLoopNodes->Node(1).MassFlowRate, 0.36165246721684446, 0.00001);
-    EXPECT_NEAR(state->dataLoopNodes->Node(15).Temp, 17.835648923740127, 0.00001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(15).Temp, 17.835648923740127, 0.00002);
     EXPECT_NEAR(state->dataLoopNodes->Node(15).MassFlowRate, 0.053404403026239548, 0.00001);
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).Temp, 45.0);
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).MassFlowRate, 0.0);
@@ -1808,7 +1808,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     NonAirSysOutput = 0.0;
     state->dataDefineEquipment->AirDistUnit(1).airTerminalPtr->simulate(*state, FirstHVACIteration, NonAirSysOutput);
 
-    EXPECT_NEAR(state->dataLoopNodes->Node(15).Temp, 18.549803918626715, 0.00001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(15).Temp, 18.549803918626715, 0.00002);
     EXPECT_NEAR(state->dataLoopNodes->Node(15).MassFlowRate, 0.22613768427540518, 0.00001);
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).Temp, 45.0);
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(39).MassFlowRate, 0.0);

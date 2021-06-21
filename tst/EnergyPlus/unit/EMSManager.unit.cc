@@ -1284,7 +1284,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(21).Operand(3).Type, Value::Number); // argument was passed to EMS function
     index = 21 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR21");
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 5.573987554, 0.00000001); // TdpFnTdbTwbPb 30.0 16.0 101325 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 5.573987554, 0.005); // TdpFnTdbTwbPb 30.0 16.0 101325 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).Operator, ErlFunc::TdpFnWPb);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).NumOperands, 2);
@@ -1292,7 +1292,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(22).Operand(2).Type, Value::Number); // argument was passed to EMS function
     index = 22 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR22");                            // verified at sugartech site as 14.0439
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 14.044515576, 0.00000001); // TdpFnWPb 0.01 101325 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 14.044515576, 0.003); // TdpFnWPb 0.01 101325 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(23).Operator, ErlFunc::HFnTdbW);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(23).NumOperands, 2);
@@ -1308,7 +1308,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(24).Operand(3).Type, Value::Number); // argument was passed to EMS function
     index = 24 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR24");
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 64177.426349195, 0.00000001); // HFnTdbRhPb 30.0 0.5 101325.0 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 64177.426349195, 10.0); // HFnTdbRhPb 30.0 0.5 101325.0 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(25).Operator, ErlFunc::TdbFnHW);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(25).NumOperands, 2);
@@ -1324,7 +1324,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(26).Operand(2).Type, Value::Number); // argument was passed to EMS function
     index = 26 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR26");
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.015174171, 0.00000001); // RhovFnTdbRh 30.0 0.5 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.015174171, 0.000005); // RhovFnTdbRh 30.0 0.5 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(27).Operator,
               ErlFunc::RhovFnTdbRhLBnd0C); // fails before #5284, returns FuncRhovFnTdbRh( 41 )
@@ -1352,7 +1352,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(29).Operand(2).Type, Value::Number); // argument was passed to EMS function
     index = 29 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR29");
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.3295072808, 0.00000001); // RhFnTdbRhov 30.0 0.01 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.3295072808, 0.0001); // RhFnTdbRhov 30.0 0.01 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(30).Operator,
               ErlFunc::RhFnTdbRhovLBnd0C); // fails before #5284, returns int const FuncRhFnTdbRhov( 44 )
@@ -1369,7 +1369,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(31).Operand(3).Type, Value::Number); // argument was passed to EMS function
     index = 31 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR31");
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.377598442, 0.00000001); // RhFnTdbWPb 30.0 0.01 101325.0 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.377598442, 0.0001); // RhFnTdbWPb 30.0 0.01 101325.0 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(32).Operator, ErlFunc::TwbFnTdbWPb);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(32).NumOperands, 3);
@@ -1378,7 +1378,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     index = 32 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name,
               "VAR32"); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 19.60933534, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 19.60933534, 0.002); // TwbFnTdbWPb 30.0 0.01 101325.0 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(33).Operator, ErlFunc::VFnTdbWPb);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(33).NumOperands, 3);
@@ -1395,7 +1395,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(34).Operand(2).Type, Value::Number); // argument was passed to EMS function
     index = 34 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR34");                            // verified at sugartech site as 0.011366881 kg/kg
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.0113664167, 0.00000001); // WFnTdpPb 16.0 101325.0 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.0113664167, 0.000005); // WFnTdpPb 16.0 101325.0 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(35).Operator, ErlFunc::WFnTdbH);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(35).NumOperands, 2);
@@ -1412,7 +1412,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(36).Operand(3).Type, Value::Number); // argument was passed to EMS function
     index = 36 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR36"); // http://www.sugartech.co.za/psychro/ 30 C db, 16 C wb = 0.00559757 kg/kg
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.005624362, 0.00000001); // WFnTdbTwbPb 30.0 16.0 101325.0 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.005624362, 0.000005); // WFnTdbTwbPb 30.0 16.0 101325.0 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(37).Operator, ErlFunc::WFnTdbRhPb);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(37).NumOperands, 4); // why is this 4?
@@ -1421,7 +1421,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(37).Operand(4).Type, Value::Null);   // 4th argument not passed to EMS function
     index = 37 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR37"); // http://www.sugartech.co.za/psychro/ 30 C db, 50% rh = 0.01331149 kg/kg
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.0133109528, 0.00000001); // WFnTdbRhPb 30.0 0.5 101325.0 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 0.0133109528, 0.000005); // WFnTdbRhPb 30.0 0.5 101325.0 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(38).Operator, ErlFunc::PsatFnTemp);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(38).NumOperands, 1);
@@ -1430,7 +1430,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     index = 38 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name,
               "VAR38"); // http://www.sugartech.co.za/psychro/ 30 C db, 100% rh = 42.46019 mbar = 4246.019 Pa
-    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 4246.030243592, 0.00000001); // PsatFnTemp 30.0 =
+    EXPECT_NEAR(state->dataRuntimeLang->ErlVariable(index).Value.Number, 4246.030243592, 1.0); // PsatFnTemp 30.0 =
 
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(39).Operator, ErlFunc::TsatFnHPb);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(39).NumOperands, 2);

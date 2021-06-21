@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{78EB3940-F42F-4A62-BCEF-8418FCAB79AF}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>IF97</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;IF97_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Mathcad\Mathcad 15\userefi\microsft\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Mathcad\Mathcad 15\userefi\microsft\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>mcaduser.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(TargetPath)" ..\..\..\ /rqky</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy release DLL </Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;IF97_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Mathcad\Mathcad 15\userefi\microsft\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <Version>0.1</Version>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Mathcad\Mathcad 15\userefi\microsft\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <EntryPointSymbol>DllEntryPoint</EntryPointSymbol>
+      <AdditionalDependencies>mcaduser.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(TargetPath)" "C:\Program Files (x86)\Mathcad\Mathcad 15\userefi" /rqky</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy the resulting DLL file to the Mathcad\userefi directory</Message>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>xcopy "$(ProjectDir)if97_EN.xml" "C:\Program Files (x86)\Mathcad\Mathcad 15\doc\funcdoc" /rqky</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy funcdoc XML file to appropriate installation directory</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="IF97.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\IF97.h" />
+    <ClInclude Include="includes\cpf.h" />
+    <ClInclude Include="includes\cpg.h" />
+    <ClInclude Include="includes\cptp.h" />
+    <ClInclude Include="includes\cvf.h" />
+    <ClInclude Include="includes\cvg.h" />
+    <ClInclude Include="includes\cvtp.h" />
+    <ClInclude Include="includes\drhodp.h" />
+    <ClInclude Include="includes\h13.h" />
+    <ClInclude Include="includes\h2ab.h" />
+    <ClInclude Include="includes\h2bc.h" />
+    <ClInclude Include="includes\h3ab.h" />
+    <ClInclude Include="includes\hf.h" />
+    <ClInclude Include="includes\hg.h" />
+    <ClInclude Include="includes\hmaxs.h" />
+    <ClInclude Include="includes\hmins.h" />
+    <ClInclude Include="includes\hsats.h" />
+    <ClInclude Include="includes\htp.h" />
+    <ClInclude Include="includes\kf.h" />
+    <ClInclude Include="includes\kg.h" />
+    <ClInclude Include="includes\ktp.h" />
+    <ClInclude Include="includes\muf.h" />
+    <ClInclude Include="includes\mug.h" />
+    <ClInclude Include="includes\mutp.h" />
+    <ClInclude Include="includes\mutrho.h" />
+    <ClInclude Include="includes\p23.h" />
+    <ClInclude Include="includes\pcrit.h" />
+    <ClInclude Include="includes\phs.h" />
+    <ClInclude Include="includes\prf.h" />
+    <ClInclude Include="includes\prg.h" />
+    <ClInclude Include="includes\prtp.h" />
+    <ClInclude Include="includes\psatt.h" />
+    <ClInclude Include="includes\ptrip.h" />
+    <ClInclude Include="includes\regionph.h" />
+    <ClInclude Include="includes\regionps.h" />
+    <ClInclude Include="includes\rhof.h" />
+    <ClInclude Include="includes\rhog.h" />
+    <ClInclude Include="includes\rhoph.h" />
+    <ClInclude Include="includes\rhops.h" />
+    <ClInclude Include="includes\rhotp.h" />
+    <ClInclude Include="includes\sf.h" />
+    <ClInclude Include="includes\sg.h" />
+    <ClInclude Include="includes\sigma.h" />
+    <ClInclude Include="includes\stp.h" />
+    <ClInclude Include="includes\t23.h" />
+    <ClInclude Include="includes\tcrit.h" />
+    <ClInclude Include="includes\ths.h" />
+    <ClInclude Include="includes\tph.h" />
+    <ClInclude Include="includes\tps.h" />
+    <ClInclude Include="includes\tsatp.h" />
+    <ClInclude Include="includes\ttrip.h" />
+    <ClInclude Include="includes\uf.h" />
+    <ClInclude Include="includes\ug.h" />
+    <ClInclude Include="includes\utp.h" />
+    <ClInclude Include="includes\version.h" />
+    <ClInclude Include="includes\vf.h" />
+    <ClInclude Include="includes\vg.h" />
+    <ClInclude Include="includes\vtp.h" />
+    <ClInclude Include="includes\wf.h" />
+    <ClInclude Include="includes\wg.h" />
+    <ClInclude Include="includes\wtp.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
