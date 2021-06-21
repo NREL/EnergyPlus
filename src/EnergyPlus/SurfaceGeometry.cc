@@ -414,7 +414,8 @@ namespace SurfaceGeometry {
                 state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
                 state.dataHeatBal->Zone(ZoneNum).HasWindow = true;
             }
-            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) ZoneCeilingArea(ZoneNum) += state.dataSurface->Surface(SurfNum).Area;
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof)
+                ZoneCeilingArea(ZoneNum) += state.dataSurface->Surface(SurfNum).GrossArea;
             if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) {
                 if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment ||
                     state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
@@ -505,14 +506,14 @@ namespace SurfaceGeometry {
                       state.dataHeatBal->Zone(ZoneNum).ExtWindowArea);
             }
             // Use AllSurfaceFirst which includes air boundaries
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) {
                     // Use Average Z for surface, more important for roofs than floors...
                     ++CeilCount;
                     Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
                     Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
                     //        ZCeilAvg=ZCeilAvg+(Z1+Z2)/2.d0
-                    ZCeilAvg += ((Z1 + Z2) / 2.0) * (state.dataSurface->Surface(SurfNum).Area / ZoneCeilingArea(ZoneNum));
+                    ZCeilAvg += ((Z1 + Z2) / 2.0) * (state.dataSurface->Surface(SurfNum).GrossArea / ZoneCeilingArea(ZoneNum));
                 }
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor) {
                     // Use Average Z for surface, more important for roofs than floors...
