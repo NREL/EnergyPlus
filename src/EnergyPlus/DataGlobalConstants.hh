@@ -165,16 +165,16 @@ namespace DataGlobalConstants {
         100;                              // Maximum Name Length in Characters -- should be the same as MaxAlphaArgLength in InputProcessor module
     Real64 constexpr KelvinConv = 273.15; // Conversion factor for C to K and K to C
     Real64 constexpr TriplePointOfWaterTempKelvin = 273.16; // The triple point of water, in Kelvin
-    Real64 constexpr InitConvTemp = 5.05; // [deg C], standard init vol to mass flow conversion temp
-    Real64 constexpr AutoCalculate = -99999.0;        // automatically calculate some fields.
-    Real64 constexpr CWInitConvTemp = 5.05;           // [deg C], standard init chilled water vol to mass flow conversion temp
-    Real64 constexpr HWInitConvTemp = 60.0;           // [deg C], standard init hot water vol to mass flow conversion temp
-    Real64 constexpr SteamInitConvTemp = 100.0;       // [deg C], standard init steam vol to mass flow conversion temp
-    Real64 constexpr StefanBoltzmann = 5.6697E-8;     // Stefan-Boltzmann constant in W/(m2*K4)
-    Real64 constexpr UniversalGasConst = 8314.462175; // Universal Gas Constant (J/mol*K)
-    Real64 constexpr convertJtoGJ = 1.0E-9;           // Conversion factor for J to GJ
-    int constexpr MaxSpeedLevels = 10;                // Maximum number of speed that supports
-    int constexpr ScheduleAlwaysOn = -1;              // Value when passed to schedule routines gives back 1.0 (on)
+    Real64 constexpr InitConvTemp = 5.05;                   // [deg C], standard init vol to mass flow conversion temp
+    Real64 constexpr AutoCalculate = -99999.0;              // automatically calculate some fields.
+    Real64 constexpr CWInitConvTemp = 5.05;                 // [deg C], standard init chilled water vol to mass flow conversion temp
+    Real64 constexpr HWInitConvTemp = 60.0;                 // [deg C], standard init hot water vol to mass flow conversion temp
+    Real64 constexpr SteamInitConvTemp = 100.0;             // [deg C], standard init steam vol to mass flow conversion temp
+    Real64 constexpr StefanBoltzmann = 5.6697E-8;           // Stefan-Boltzmann constant in W/(m2*K4)
+    Real64 constexpr UniversalGasConst = 8314.462175;       // Universal Gas Constant (J/mol*K)
+    Real64 constexpr convertJtoGJ = 1.0E-9;                 // Conversion factor for J to GJ
+    int constexpr MaxSpeedLevels = 10;                      // Maximum number of speed that supports
+    int constexpr ScheduleAlwaysOn = -1;                    // Value when passed to schedule routines gives back 1.0 (on)
     int constexpr MaxCTFTerms = 19; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
 
     ResourceType AssignResourceTypeNum(std::string const &ResourceTypeChar);

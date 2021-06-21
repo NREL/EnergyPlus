@@ -745,13 +745,13 @@ namespace Psychrometrics {
 
             // If below freezing, calculate saturation pressure over ice.
         } else if (Tkel < DataGlobalConstants::TriplePointOfWaterTempKelvin) { // Tkel >= 173.15, Tkel < 273.16 (0.01°C)
-            Real64 const C1(-5674.5359);                     // Coefficient for TKel < KelvinConvK
-            Real64 const C2(6.3925247);                      // Coefficient for TKel < KelvinConvK
-            Real64 const C3(-0.9677843e-2);                  // Coefficient for TKel < KelvinConvK
-            Real64 const C4(0.62215701e-6);                  // Coefficient for TKel < KelvinConvK
-            Real64 const C5(0.20747825e-8);                  // Coefficient for TKel < KelvinConvK
-            Real64 const C6(-0.9484024e-12);                 // Coefficient for TKel < KelvinConvK
-            Real64 const C7(4.1635019);                      // Coefficient for TKel < KelvinConvK
+            Real64 const C1(-5674.5359);                                       // Coefficient for TKel < KelvinConvK
+            Real64 const C2(6.3925247);                                        // Coefficient for TKel < KelvinConvK
+            Real64 const C3(-0.9677843e-2);                                    // Coefficient for TKel < KelvinConvK
+            Real64 const C4(0.62215701e-6);                                    // Coefficient for TKel < KelvinConvK
+            Real64 const C5(0.20747825e-8);                                    // Coefficient for TKel < KelvinConvK
+            Real64 const C6(-0.9484024e-12);                                   // Coefficient for TKel < KelvinConvK
+            Real64 const C7(4.1635019);                                        // Coefficient for TKel < KelvinConvK
             Pascal = std::exp(C1 / Tkel + C2 + Tkel * (C3 + Tkel * (C4 + Tkel * (C5 + C6 * Tkel))) + C7 * std::log(Tkel));
 
             // If above freezing, calculate saturation pressure over liquid water.
