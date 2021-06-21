@@ -3419,7 +3419,8 @@ namespace WindowManager {
                     if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
                                    state.dataWindowManager->AbsRadGlassFace(1);
-                        Bface(3) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * state.dataWindowManager->tout +
+                        Bface(3) = state.dataWindowManager->Outir * EpsShIR1 +
+                                   state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * state.dataWindowManager->tout +
                                    AbsRadShadeFace(1);
                         Bface(4) =
                             state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
@@ -6557,6 +6558,10 @@ namespace WindowManager {
         // EPTeam - believe that is done on input.
         state.dataWindowManager->nglface = 2 * state.dataWindowManager->ngllayer;
         state.dataWindowManager->tilt = 90.0; // Assume vertical window
+        if (state.dataWindowManager->coeffAdjRatioIn <= 0) {
+            state.dataWindowManager->coeffAdjRatioIn = 1.0;
+            state.dataWindowManager->coeffAdjRatioOut = 1.0;
+        }
 
         // for debugging
         // state.dataWindowManager->coeffAdjRatioIn = Real64(1.0);
