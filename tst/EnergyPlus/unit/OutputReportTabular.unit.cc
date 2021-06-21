@@ -9808,8 +9808,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_SigDigits_Forc
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizMeasVdot, "MyPlant Sizing Pass 1", value, 1);
     EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizMeasVdot, "MyPlant Sizing Pass 1"));
 
-
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1", value, 0);
     EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1"));
-
 }
