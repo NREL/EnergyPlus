@@ -31,14 +31,14 @@ jobs:
 
         echo "Setting up the local package directory via download"
         ./miktexsetup_standalone --verbose \
-            --local-package-repository=C:/ProgramData/MiKTeX-Repo \
+            --local-package-repository=C:/MiKTeX-Repo \
             --remote-package-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" \
             --package-set=basic \
             download
 
         echo "Installing from the local package directory previously set up"
         ./miktexsetup_standalone --verbose \
-            --local-package-repository=C:/ProgramData/MiKTeX-Repo \
+            --local-package-repository=C:/MiKTeX-Repo \
             --package-set=basic \
             --shared=yes \
             install
@@ -84,7 +84,7 @@ jobs:
         [ "$npages" -le "2800" ] && echo "TOC is missing" && exit 1
 
     - name: Upload InputOutputReference
-      if: always
+      if: ${{ always() }}
       uses: actions/upload-artifact@v2
       with:
         name: InputOutputReference
