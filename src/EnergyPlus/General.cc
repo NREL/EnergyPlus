@@ -972,7 +972,9 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
 
         // New guess calculated from LINEAR FIT of most recent two points
         DY = Y0 - Y1;
-        if (std::abs(DY) < small) DY = small;
+        if (std::abs(DY) < small) {
+            DY = small;
+        }
         // new estimation
 
         ResultX = (Y0 * X1 - Y1 * X0) / DY;

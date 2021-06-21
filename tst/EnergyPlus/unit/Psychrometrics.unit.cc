@@ -433,3 +433,24 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
     EXPECT_DOUBLE_EQ(CpAirOut, 1.00484e3 + W2 * 1.85895e3);
     EXPECT_DOUBLE_EQ(CpAir_result, CpAir_average);
 }
+
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test_Discontinuity)
+{
+    // Test for #8599
+    InitializePsychRoutines(*state);
+
+    state->dataGlobal->WarmupFlag = true;
+
+    // Test when wet bulb temperature is approaching zero. PsyPsatFnTemp used to have a discontinuity in Psat around 0.0°C that makes the calculation
+    // blow up. Before: PsyPsatFnTemp(-0.0001) = 611.1485382610978 PsyPsatFnTemp(+0.0001) = 611.2173076397495
+    //                  diff  = 0.06876937865172295
+    Real64 TDB = 1.4333333333333331;  // C
+    Real64 W = 0.0031902374172088472; // Kg.water/Kg.dryair
+    Real64 Pb = 101400.00000000001;
+
+    Real64 result = PsyTwbFnTdbWPb(*state, TDB, W, Pb);
+    Real64 expected_result = -0.1027; // expected result from psychrometrics chart
+    EXPECT_NEAR(result, expected_result, 0.001);
+
+    EXPECT_FALSE(has_err_output());
+}
