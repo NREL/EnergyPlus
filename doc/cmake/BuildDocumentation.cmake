@@ -10,11 +10,69 @@ if ("${TEX_INTERACTION}" STREQUAL "")
 else()
   set(THIS_TEX_INTERACTION "${TEX_INTERACTION}")
 endif()
-message("================ RUNNING XELATEX THE FIRST TIME =====================")
-execute_process( COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex TIMEOUT 600 )
-message("================ RUNNING XELATEX THE SECOND TIME =====================")
-execute_process( COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex TIMEOUT 600 )
-message("================ RUNNING XELATEX THE THIRD TIME =====================")
-execute_process( COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex TIMEOUT 600 )
+
+
+if(DOCS_TESTING)
+  string(REPLACE xelatex pdftotext PDFTOTEXT ${XELATEX})
+
+  message("================ RUNNING XELATEX THE FIRST TIME =====================")
+endif()
+
+execute_process(
+  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex
+  TIMEOUT 600
+  RESULT_VARIABLE ERRCODE
+)
+
+if(DOCS_TESTING)
+  message("PASS 1: ERRCODE=${ERRCODE}")
+  execute_process(
+    COMMAND ${PDFTOTEXT} -f 2 -l 2 ${INNAME}.pdf -
+    OUTPUT_VARIABLE TOC_PAGE1_CONTENT
+  )
+  string(LENGTH ${TOC_PAGE1_CONTENT} TOC_PAGE1_CONTENT_LEN)
+  message("PASS 1: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
+endif()
+
+if(DOCS_TESTING)
+  message("================ RUNNING XELATEX THE SECOND TIME =====================")
+endif()
+
+execute_process(
+  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex
+  TIMEOUT 600
+  RESULT_VARIABLE ERRCODE
+)
+
+if(DOCS_TESTING)
+  message("PASS 2: ERRCODE=${ERRCODE}")
+  execute_process(
+    COMMAND ${PDFTOTEXT} -f 2 -l 2 ${INNAME}.pdf -
+    OUTPUT_VARIABLE TOC_PAGE1_CONTENT
+  )
+  string(LENGTH ${TOC_PAGE1_CONTENT} TOC_PAGE1_CONTENT_LEN)
+  message("PASS 2: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
+endif()
+
+if(DOCS_TESTING)
+  message("================ RUNNING XELATEX THE THIRD TIME =====================")
+endif()
+
+execute_process(
+  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex
+  TIMEOUT 600
+  RESULT_VARIABLE ERRCODE
+)
+
+if(DOCS_TESTING)
+  message("PASS 3: ERRCODE=${ERRCODE}")
+  execute_process(
+    COMMAND ${PDFTOTEXT} -f 2 -l 2 ${INNAME}.pdf -
+    OUTPUT_VARIABLE TOC_PAGE1_CONTENT
+  )
+  string(LENGTH ${TOC_PAGE1_CONTENT} TOC_PAGE1_CONTENT_LEN)
+  message("PASS 3: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
+endif()
+
 file( COPY "${INNAME}.pdf" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/" )
 file( RENAME "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}.pdf" "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${OUTNAME}.pdf")
