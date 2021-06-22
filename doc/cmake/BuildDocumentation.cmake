@@ -14,7 +14,12 @@ endif()
 message("XELATEX_MEM_FLAGS=${XELATEX_MEM_FLAGS}")
 
 if(DOCS_TESTING)
-  string(REPLACE xelatex pdftotext PDFTOTEXT ${XELATEX})
+
+  get_filename_component(XELATEX_BIN_DIR ${XELATEX} DIRECTORY)
+  find_program(PDFTOTEXT NAME pdftotext HINTS ${XELATEX_BIN_DIR})
+  if(NOT PDFTOTEXT)
+    message(AUTHOR_WARNING "pdftotext should be in your path to test whether the Table of Contents worked. On Windows it should be installed via miktex already, on ubuntu it's apt install poppler-utils, on mac brew install poppler")
+  endif()
 
   message("================ RUNNING XELATEX THE FIRST TIME =====================")
 endif()
@@ -26,13 +31,15 @@ execute_process(
 )
 
 if(DOCS_TESTING)
-  message("PASS 1: ERRCODE=${ERRCODE}")
-  execute_process(
-    COMMAND ${PDFTOTEXT} -f 2 -l 2 ${INNAME}.pdf -
-    OUTPUT_VARIABLE TOC_PAGE1_CONTENT
-  )
-  string(LENGTH ${TOC_PAGE1_CONTENT} TOC_PAGE1_CONTENT_LEN)
-  message("PASS 1: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
+  if (PDFTOTEXT)
+    message("PASS 1: ERRCODE=${ERRCODE}")
+    execute_process(
+      COMMAND ${PDFTOTEXT} -f 2 -l 2 ${INNAME}.pdf -
+      OUTPUT_VARIABLE TOC_PAGE1_CONTENT
+    )
+    string(LENGTH ${TOC_PAGE1_CONTENT} TOC_PAGE1_CONTENT_LEN)
+    message("PASS 1: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
+  endif()
 
   file( COPY "${INNAME}.pdf" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}_Pass1.pdf" )
   file( COPY "${INNAME}.toc" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}_Pass1.toc" )
@@ -52,13 +59,15 @@ execute_process(
 )
 
 if(DOCS_TESTING)
-  message("PASS 2: ERRCODE=${ERRCODE}")
-  execute_process(
-    COMMAND ${PDFTOTEXT} -f 2 -l 2 ${INNAME}.pdf -
-    OUTPUT_VARIABLE TOC_PAGE1_CONTENT
-  )
-  string(LENGTH ${TOC_PAGE1_CONTENT} TOC_PAGE1_CONTENT_LEN)
-  message("PASS 2: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
+  if(PDFTOTEXT)
+    message("PASS 2: ERRCODE=${ERRCODE}")
+    execute_process(
+      COMMAND ${PDFTOTEXT} -f 2 -l 2 ${INNAME}.pdf -
+      OUTPUT_VARIABLE TOC_PAGE1_CONTENT
+    )
+    string(LENGTH ${TOC_PAGE1_CONTENT} TOC_PAGE1_CONTENT_LEN)
+    message("PASS 2: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
+  endif()
 
   file( COPY "${INNAME}.pdf" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}_Pass2.pdf" )
   file( COPY "${INNAME}.toc" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}_Pass2.toc" )
@@ -79,19 +88,28 @@ execute_process(
 )
 
 if(DOCS_TESTING)
-  message("PASS 3: ERRCODE=${ERRCODE}")
-  execute_process(
-    COMMAND ${PDFTOTEXT} -f 2 -l 2 ${INNAME}.pdf -
-    OUTPUT_VARIABLE TOC_PAGE1_CONTENT
-  )
-  string(LENGTH ${TOC_PAGE1_CONTENT} TOC_PAGE1_CONTENT_LEN)
-  message("PASS 3: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
+  if(PDFTOTEXT)
+    message("PASS 3: ERRCODE=${ERRCODE}")
+    execute_process(
+      COMMAND ${PDFTOTEXT} -f 2 -l 2 ${INNAME}.pdf -
+      OUTPUT_VARIABLE TOC_PAGE1_CONTENT
+    )
+    string(LENGTH ${TOC_PAGE1_CONTENT} TOC_PAGE1_CONTENT_LEN)
+    message("PASS 3: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
+
+      # At this point I do expect the TOC to have worked
+    if(${TOC_PAGE1_CONTENT_LEN} LESS_THAN 10)
+      message(WARNING "The TOC for '${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${OUTNAME}.pdf' appears broken!")
+    endif()
+
+  endif()
 
   file( COPY "${INNAME}.pdf" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}_Pass3.pdf" )
   file( COPY "${INNAME}.toc" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}_Pass3.toc" )
   file( COPY "${INNAME}.log" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}_Pass3.log" )
   file( COPY "${INNAME}.aux" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}_Pass3.aux" )
   file( COPY "${INNAME}.out" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${INNAME}_Pass3.out" )
+
 endif()
 
 file( COPY "${INNAME}.pdf" DESTINATION "${ORIGINAL_CMAKE_BINARY_DIR}/pdf/" )

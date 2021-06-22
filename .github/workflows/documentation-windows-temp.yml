@@ -116,6 +116,7 @@ jobs:
         npages=$(pdfinfo InputOutputReference.pdf | /bin/grep "Pages:" | sed 's/[^0-9]*//')
         echo "Found $npages pages in the I/O Ref"
         nwords_in_toc=$(pdftotext -f 2 -l 2 InputOutputReference.pdf - | wc -l)
+        set +x
         [ "$npages" -le "2800" ] && (echo "TOC is missing" && exit 1) || echo "Length of PDF appears ok"
         [ "$nwords_in_toc" -le "100" ] && (echo "TOC is empty" && exit 1) || echo "TOC appears ok"
 
