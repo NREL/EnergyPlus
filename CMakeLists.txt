@@ -9,7 +9,7 @@ cmake_policy(SET CMP0048 NEW) # handling project_version_* variables
 
 project(EnergyPlus)
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.17)
 
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
   cmake_policy(SET CMP0054 NEW) # CMake 3.1 added this policy
