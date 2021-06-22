@@ -11,9 +11,10 @@ else()
   set(THIS_TEX_INTERACTION "${TEX_INTERACTION}")
 endif()
 
-message("XELATEX_MEM_FLAGS=${XELATEX_MEM_FLAGS}")
-
 if(DOCS_TESTING)
+  if (XELATEX_MEM_FLAGS)
+    message("XELATEX_MEM_FLAGS=${XELATEX_MEM_FLAGS}")
+  endif()
 
   get_filename_component(XELATEX_BIN_DIR ${XELATEX} DIRECTORY)
   find_program(PDFTOTEXT NAME pdftotext HINTS ${XELATEX_BIN_DIR})
