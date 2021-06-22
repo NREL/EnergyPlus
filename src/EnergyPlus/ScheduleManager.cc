@@ -156,9 +156,6 @@ namespace ScheduleManager {
 
         // Using/Aliasing
         using DataStringGlobals::CharComma;
-        using DataStringGlobals::CharSemicolon;
-        using DataStringGlobals::CharSpace;
-        using DataStringGlobals::CharTab;
         using DataSystemVariables::CheckForActualFileName;
         using General::ProcessDateString;
 
@@ -259,7 +256,6 @@ namespace ScheduleManager {
         std::string subString;
         Real64 columnValue;
         int iDay;
-        int hDay;
         int jHour;
         int kDayType;
         Real64 curHrVal;
@@ -269,11 +265,7 @@ namespace ScheduleManager {
         int MaxNums1;
         std::string ColumnSep;
         bool firstLine;
-        bool FileIntervalInterpolated;
         int rowLimitCount;
-        int skiprowCount;
-        int curcolCount;
-        int numHourlyValues;
         int numerrors;
         int ifld;
         int hrLimitCount;
@@ -5227,14 +5219,14 @@ namespace ScheduleManager {
 
             std::string ColumnSep;
             if (lAlphaBlanks(4) || EnergyPlus::UtilityRoutines::SameString(Alphas(4), "comma")) {
-                ColumnSep = CharComma;
+                ColumnSep = DataStringGlobals::CharComma;
                 Alphas(4) = "comma";
             } else if (EnergyPlus::UtilityRoutines::SameString(Alphas(4), "semicolon")) {
-                ColumnSep = CharSemicolon;
+                ColumnSep = DataStringGlobals::CharSemicolon;
             } else if (EnergyPlus::UtilityRoutines::SameString(Alphas(4), "tab")) {
-                ColumnSep = CharTab;
+                ColumnSep = DataStringGlobals::CharTab;
             } else if (EnergyPlus::UtilityRoutines::SameString(Alphas(4), "space")) {
-                ColumnSep = CharSpace;
+                ColumnSep = DataStringGlobals::CharSpace;
             } else {
                 ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(4) + " illegal value=\"" + Alphas(4) +
@@ -5262,7 +5254,6 @@ namespace ScheduleManager {
             int MinutesPerItem = 60;
             if (NumNumbers > 3) {
                 MinutesPerItem = int(Numbers(4));
-                int NumExpectedItems = 1440 / MinutesPerItem;
                 if (mod(60, MinutesPerItem) != 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1));
                     ShowContinueError(state, format("Requested {} field value ({}) not evenly divisible into 60", cNumericFields(4), MinutesPerItem));
