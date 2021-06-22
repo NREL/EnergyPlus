@@ -572,6 +572,21 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataSize->ZoneEqSizing(1).AirVolFlow);
     EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate,
               max(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow));
+
+    // Issue 8812 - Verify zone sizing check if airflow is Autosized to prevent hard crash
+    state->dataSize->ZoneSizingRunDone = false;
+    state->dataPTHP->PTUnit(1).HVACSizingIndex = 0;
+    state->dataPTHP->PTUnit(1).CoolOutAirVolFlow = AutoSize;
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** Autosizing of water flow requires a loop Sizing:Plant object",
+        "   **   ~~~   ** Autosizing also requires physical connection to a plant or condenser loop.",
+        "   **   ~~~   ** Occurs in COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT Object=LOBBY_ZN_1_FLR_2 WSHP COOLING MODE",
+        "   ** Severe  ** Autosizing of water flow requires a loop Sizing:Plant object",
+        "   **   ~~~   ** Autosizing also requires physical connection to a plant or condenser loop.",
+        "   **   ~~~   ** Occurs in COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT Object=LOBBY_ZN_1_FLR_2 WSHP HEATING MODE",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
