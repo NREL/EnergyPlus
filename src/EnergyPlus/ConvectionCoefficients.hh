@@ -474,7 +474,7 @@ namespace ConvectionCoefficients {
                                  Real64 Perimeter,     // Surface perimeter length {m}
                                  Real64 CosTilt,       // Cosine of the Surface Tilt Angle
                                  Real64 Azimuth,       // Facing angle (degrees) of the surface outward normal
-                                 int Roughness,        // Surface roughness index (6=very smooth, 5=smooth, 4=medium smooth,
+                                 DataHeatBalance::SurfaceRoughness Roughness, // Surface roughness index
                                  Real64 WindDirection  // Wind (compass) direction (degrees)
     );
 
@@ -832,13 +832,15 @@ namespace ConvectionCoefficients {
                                                       int ZoneNum                // for messages
     );
 
-    Real64 CalcSparrowWindward(int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
+    Real64 CalcSparrowWindward(DataHeatBalance::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
-    Real64 CalcSparrowWindward(EnergyPlusData &state, int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+    Real64 CalcSparrowWindward(
+        EnergyPlusData &state, DataHeatBalance::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
-    Real64 CalcSparrowLeeward(int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
+    Real64 CalcSparrowLeeward(DataHeatBalance::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
-    Real64 CalcSparrowLeeward(EnergyPlusData &state, int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+    Real64 CalcSparrowLeeward(
+        EnergyPlusData &state, DataHeatBalance::SurfaceRoughness RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
     Real64 CalcMoWITTNatural(Real64 DeltaTemp);
 
@@ -850,11 +852,11 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMoWITTLeeward(Real64 DeltaTemp, Real64 WindAtZ);
 
-    Real64 CalcDOE2Forced(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 HfSmooth, int RoughnessIndex);
+    Real64 CalcDOE2Forced(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 HfSmooth, DataHeatBalance::SurfaceRoughness RoughnessIndex);
 
-    Real64 CalcDOE2Windward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, int RoughnessIndex);
+    Real64 CalcDOE2Windward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, DataHeatBalance::SurfaceRoughness RoughnessIndex);
 
-    Real64 CalcDOE2Leeward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, int RoughnessIndex);
+    Real64 CalcDOE2Leeward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, DataHeatBalance::SurfaceRoughness RoughnessIndex);
 
     Real64 CalcNusseltJurges(Real64 WindAtZ);
 
@@ -887,7 +889,7 @@ namespace ConvectionCoefficients {
                          Real64 WindDirect, // Wind direction measured clockwise from geographic North
                          Real64 RoofArea,
                          Real64 RoofPerimeter,
-                         int RoughnessIndex);
+                         DataHeatBalance::SurfaceRoughness RoughnessIndex);
 
     Real64 CalcClearRoof(EnergyPlusData &state,
                          int SurfNum,
