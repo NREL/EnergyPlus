@@ -360,7 +360,7 @@ The name of the ZoneList object. Must be unique across ZoneLists.
 
 \paragraph{Field: Zone \textless{}\#\textgreater{} Name}\label{field-zone-1---zone-20-name}
 
-Reference to a Zone object. This field is extensible, so additional fields of this type can be added to the end of this object.
+Reference to a Zone object. This object is extensible, so additional fields of this type can be added to the end of this object.
 
 \begin{lstlisting}
 
@@ -4322,7 +4322,7 @@ The field can have one of two options:
 
 \paragraph{Field: Fenestration Surface <n> Name}\label{field-fenestration-surface1-name}
 
-The name of a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed}, Window, or \hyperref[glazeddoor]{GlazedDoor} object controlled by this WindowShadingControl. This field can be repeated to apply the same shading control to more than one fenestration surface. When Multiple Surface Control Type is set to Sequential, the order of the Fenestration Surface Names is the order that the shades will be deployed. The object is extensible so that additional fields of fenestration surface names can be added to the object. All of the fenestration surfaces must be either in the zone specified in the Zone Name field or in an adjacent zone connected by an interior window.
+The name of a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed}, Window, or \hyperref[glazeddoor]{GlazedDoor} object controlled by this WindowShadingControl. This field can be repeated to apply the same shading control to more than one fenestration surface. When Multiple Surface Control Type is set to Sequential, the order of the Fenestration Surface Names is the order that the shades will be deployed. The object is extensible so additional fields of fenestration surface names can be added to the object. All of the fenestration surfaces must be either in the zone specified in the Zone Name field or in an adjacent zone connected by an interior window.
 
 An IDF example: window with interior roll shade that is deployed when solar incident on the window exceeds 50 W/m\(^{2}\).
 

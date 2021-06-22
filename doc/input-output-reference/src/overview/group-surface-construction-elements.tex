@@ -722,7 +722,7 @@ An IDF example using hysteresis in conjunction with an actual Material definitio
 
 The \hyperref[materialpropertyphasechangehysteresis]{MaterialProperty:PhaseChangeHysteresis} object also includes the following outputs.  The Conduction Finite Difference solution algorithm uses a finite difference solution technique where the surfaces are divided into a nodal arrangement. These outputs are specific to Conduction Finite Difference solution.
 
-The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference.  Note that the "X" in the list and descriptions below must be replaced by a number that indicates the node at which the variables are being reported.  So, for example, to report the surface temperature for node 7, one would use "CondFD Surface Temperature Node 7".
+The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference.  Note that the ``X'' in the list and descriptions below must be replaced by a number that indicates the node at which the variables are being reported.  So, for example, to report the surface temperature for node 7, one would use ``CondFD Surface Temperature Node 7''.
 
 \begin{itemize}
 \item
@@ -834,7 +834,7 @@ HeatBalanceAlgorithm,
 
 The Conduction Finite Difference solution algorithm uses a finite difference solution technique where the surfaces are divided into a nodal arrangement. These outputs are specific to Conduction Finite Difference solution.
 
-The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference.  Note that the "X" in the list and descriptions below must be replaced by a number that indicates the Node at which the variables are being reported.  So, for example, to report the surface temperature for node 7, one would use "CondFD Surface Temperature Node 7".
+The following output variables are applicable to all opaque heat transfer surfaces when using Solution Algorithms ConductionFiniteDifference.  Note that the ``X'' in the list and descriptions below must be replaced by a number that indicates the Node at which the variables are being reported.  So, for example, to report the surface temperature for node 7, one would use ``CondFD Surface Temperature Node 7''.
 
 \begin{itemize}
 \item
@@ -1605,7 +1605,9 @@ This object specifies a layer of thermochromic glass, part of a thermochromic wi
 
 A unique user assigned name for a particular thermochromic glass material.
 
-\paragraph{Field Set (Optical Data Temperature, Window Material Glazing Name) is extensible.}\label{field-set-optical-data-temperature-window-material-glazing-name-is-extensible.}
+\paragraph{Field Set (Optical Data Temperature, Window Material Glazing Name)}\label{field-set-optical-data-temperature-window-material-glazing-name-is-extensible.}
+
+This object is extensible, so additional sets of the next two fields can be added to the end of this object.
 
 \paragraph{Field:Optical Data Temperature \textless{}N\textgreater{}}\label{fieldoptical-data-temperature-n}
 
