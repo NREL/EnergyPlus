@@ -181,7 +181,7 @@ namespace CurveManager {
         // Return value
         Real64 CurveValue(0.0);
 
-        // need to be careful on where and how resetting curve outputs to some "iactive value" is done
+        // need to be careful on where and how resetting curve outputs to some "inactive value" is done
         // EMS can intercept curves and modify output
         if (state.dataGlobal->BeginEnvrnFlag && state.dataCurveManager->CurveValueMyBeginTimeStepFlag) {
             ResetPerformanceCurveOutput(state);
@@ -196,15 +196,17 @@ namespace CurveManager {
             ShowFatalError(state, "CurveValue: Invalid curve passed.");
         }
 
-        {
-            auto const SELECT_CASE_var(state.dataCurveManager->PerfCurve(CurveIndex).InterpolationType);
-            if (SELECT_CASE_var == InterpTypeEnum::EvaluateCurveToLimits) {
-                CurveValue = PerformanceCurveObject(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
-            } else if (SELECT_CASE_var == InterpTypeEnum::BtwxtMethod) {
-                CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
-            } else {
-                ShowFatalError(state, "CurveValue: Invalid Interpolation Type");
-            }
+        switch (state.dataCurveManager->PerfCurve(CurveIndex).InterpolationType) {
+        case InterpTypeEnum::EvaluateCurveToLimits: {
+            CurveValue = PerformanceCurveObject(state, CurveIndex, Var1, Var2, Var3, Var4, Var5);
+            break;
+        }
+        case InterpTypeEnum::BtwxtMethod: {
+            CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
+            break;
+        }
+        default:
+            ShowFatalError(state, "CurveValue: Invalid Interpolation Type");
         }
 
         if (state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideOn)
@@ -1340,7 +1342,7 @@ namespace CurveManager {
             }
         }
 
-        // Loop over Fan Pressure Rise curves and load data - udated 15Sep2010 for unit types
+        // Loop over Fan Pressure Rise curves and load data
         CurrentModuleObject = "Curve:FanPressureRise";
         for (CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -2551,13 +2553,12 @@ namespace CurveManager {
     }
 
     Real64 PerformanceCurveObject(EnergyPlusData &state,
-                                  int const CurveIndex,                        // index of curve in curve array
-                                  Real64 const Var1,                           // 1st independent variable
-                                  Optional<Real64 const> Var2,                 // 2nd independent variable
-                                  Optional<Real64 const> Var3,                 // 3rd independent variable
-                                  Optional<Real64 const> Var4,                 // 4th independent variable
-                                  Optional<Real64 const> Var5,                 // 5th independent variable
-                                  [[maybe_unused]] Optional<Real64 const> Var6 // 6th independent variable
+                                  int const CurveIndex,        // index of curve in curve array
+                                  Real64 const Var1,           // 1st independent variable
+                                  Optional<Real64 const> Var2, // 2nd independent variable
+                                  Optional<Real64 const> Var3, // 3rd independent variable
+                                  Optional<Real64 const> Var4, // 4th independent variable
+                                  Optional<Real64 const> Var5  // 5th independent variable
     )
     {
 
@@ -2593,7 +2594,6 @@ namespace CurveManager {
         Real64 const V3(Var3.present() ? max(min(Var3, Curve.Var3Max), Curve.Var3Min) : 0.0); // 3rd independent variable after limits imposed
         Real64 const V4(Var4.present() ? max(min(Var4, Curve.Var4Max), Curve.Var4Min) : 0.0); // 4th independent variable after limits imposed
         Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
-        // Real64 const V6(Var6.present() ? max(min(Var6, Curve.Var6Max), Curve.Var6Min) : 0.0); // 6th independent variable after limits imposed
 
         {
             auto const SELECT_CASE_var(Curve.CurveType);

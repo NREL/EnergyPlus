@@ -357,7 +357,7 @@ namespace Psychrometrics {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        Int64 const Grid_Shift((64 - 12 - twbprecision_bits));
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - twbprecision_bits;
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -366,26 +366,19 @@ namespace Psychrometrics {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Int64 Tdb_tag;
-        Int64 W_tag;
-        Int64 Pb_tag;
-        Int64 hash;
-        Real64 Tdb_tag_r;
-        Real64 W_tag_r;
-        Real64 Pb_tag_r;
 
 #ifdef EP_psych_stats
         ++state.dataPsychrometrics->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
 
-        Tdb_tag = bit_transfer(Tdb, Tdb_tag);
-        W_tag = bit_transfer(W, W_tag);
-        Pb_tag = bit_transfer(Pb, Pb_tag);
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
+        std::uint64_t Tdb_tag = *reinterpret_cast<std::uint64_t const *>(&Tdb) >> Grid_Shift;
+        std::uint64_t W_tag = *reinterpret_cast<std::uint64_t const *>(&W) >> Grid_Shift;
+        std::uint64_t Pb_tag = *reinterpret_cast<std::uint64_t const *>(&Pb) >> Grid_Shift;
+        DISABLE_WARNING_POP
 
-        Tdb_tag = bit_shift(Tdb_tag, -Grid_Shift);
-        W_tag = bit_shift(W_tag, -Grid_Shift);
-        Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
-        hash = bit_and(bit_xor(Tdb_tag, bit_xor(W_tag, Pb_tag)), Int64(twbcache_size - 1));
+        std::uint64_t hash = (Tdb_tag ^ (W_tag ^ Pb_tag)) & std::uint64_t(twbcache_size - 1);
 
         auto &cached_Twb = state.dataPsychCache->cached_Twb;
 
@@ -394,9 +387,17 @@ namespace Psychrometrics {
             cached_Twb(hash).iW = W_tag;
             cached_Twb(hash).iPb = Pb_tag;
 
-            Tdb_tag_r = bit_transfer(bit_shift(Tdb_tag, Grid_Shift), Tdb_tag_r);
-            W_tag_r = bit_transfer(bit_shift(W_tag, Grid_Shift), W_tag_r);
-            Pb_tag_r = bit_transfer(bit_shift(Pb_tag, Grid_Shift), Pb_tag_r);
+            DISABLE_WARNING_PUSH
+            DISABLE_WARNING_STRICT_ALIASING
+            Tdb_tag <<= Grid_Shift;
+            Real64 Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
+
+            W_tag <<= Grid_Shift;
+            Real64 W_tag_r = *reinterpret_cast<Real64 const *>(&W_tag);
+
+            Pb_tag <<= Grid_Shift;
+            Real64 Pb_tag_r = *reinterpret_cast<Real64 const *>(&Pb_tag);
+            DISABLE_WARNING_POP
 
             cached_Twb(hash).Twb = PsyTwbFnTdbWPb_raw(state, Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom);
         }
@@ -784,37 +785,37 @@ namespace Psychrometrics {
 
             // If below freezing, calculate saturation pressure over ice.
         } else if (Tkel < DataGlobalConstants::KelvinConv) { // Tkel >= 173.15
-            Real64 const C1(-5674.5359);                     // Coefficient for TKel < KelvinConvK
-            Real64 const C2(6.3925247);                      // Coefficient for TKel < KelvinConvK
-            Real64 const C3(-0.9677843e-2);                  // Coefficient for TKel < KelvinConvK
-            Real64 const C4(0.62215701e-6);                  // Coefficient for TKel < KelvinConvK
-            Real64 const C5(0.20747825e-8);                  // Coefficient for TKel < KelvinConvK
-            Real64 const C6(-0.9484024e-12);                 // Coefficient for TKel < KelvinConvK
-            Real64 const C7(4.1635019);                      // Coefficient for TKel < KelvinConvK
+            Real64 constexpr C1(-5674.5359);                 // Coefficient for TKel < KelvinConvK
+            Real64 constexpr C2(6.3925247);                  // Coefficient for TKel < KelvinConvK
+            Real64 constexpr C3(-0.9677843e-2);              // Coefficient for TKel < KelvinConvK
+            Real64 constexpr C4(0.62215701e-6);              // Coefficient for TKel < KelvinConvK
+            Real64 constexpr C5(0.20747825e-8);              // Coefficient for TKel < KelvinConvK
+            Real64 constexpr C6(-0.9484024e-12);             // Coefficient for TKel < KelvinConvK
+            Real64 constexpr C7(4.1635019);                  // Coefficient for TKel < KelvinConvK
             Pascal = std::exp(C1 / Tkel + C2 + Tkel * (C3 + Tkel * (C4 + Tkel * (C5 + C6 * Tkel))) + C7 * std::log(Tkel));
 
             // If above freezing, calculate saturation pressure over liquid water.
         } else if (Tkel <= 473.15) { // Tkel >= 173.15 // Tkel >= KelvinConv
 #ifndef EP_IF97
-            Real64 const C8(-5800.2206);      // Coefficient for TKel >= KelvinConvK
-            Real64 const C9(1.3914993);       // Coefficient for TKel >= KelvinConvK
-            Real64 const C10(-0.048640239);   // Coefficient for TKel >= KelvinConvK
-            Real64 const C11(0.41764768e-4);  // Coefficient for TKel >= KelvinConvK
-            Real64 const C12(-0.14452093e-7); // Coefficient for TKel >= KelvinConvK
-            Real64 const C13(6.5459673);      // Coefficient for TKel >= KelvinConvK
+            Real64 constexpr C8(-5800.2206);      // Coefficient for TKel >= KelvinConvK
+            Real64 constexpr C9(1.3914993);       // Coefficient for TKel >= KelvinConvK
+            Real64 constexpr C10(-0.048640239);   // Coefficient for TKel >= KelvinConvK
+            Real64 constexpr C11(0.41764768e-4);  // Coefficient for TKel >= KelvinConvK
+            Real64 constexpr C12(-0.14452093e-7); // Coefficient for TKel >= KelvinConvK
+            Real64 constexpr C13(6.5459673);      // Coefficient for TKel >= KelvinConvK
             Pascal = std::exp(C8 / Tkel + C9 + Tkel * (C10 + Tkel * (C11 + Tkel * C12)) + C13 * std::log(Tkel));
 #else
             // Table 34 in IF97
-            Real64 const N1(0.11670521452767e04);
-            Real64 const N2(-0.72421316703206e06);
-            Real64 const N3(-0.17073846940092e02);
-            Real64 const N4(0.12020824702470e05);
-            Real64 const N5(-0.32325550322333e07);
-            Real64 const N6(0.14915108613530e02);
-            Real64 const N7(-0.48232657361591e04);
-            Real64 const N8(0.40511340542057e06);
-            Real64 const N9(-0.23855557567849);
-            Real64 const N10(0.65017534844798e03);
+            Real64 constexpr N1(0.11670521452767e04);
+            Real64 constexpr N2(-0.72421316703206e06);
+            Real64 constexpr N3(-0.17073846940092e02);
+            Real64 constexpr N4(0.12020824702470e05);
+            Real64 constexpr N5(-0.32325550322333e07);
+            Real64 constexpr N6(0.14915108613530e02);
+            Real64 constexpr N7(-0.48232657361591e04);
+            Real64 constexpr N8(0.40511340542057e06);
+            Real64 constexpr N9(-0.23855557567849);
+            Real64 constexpr N10(0.65017534844798e03);
             //         !IF97 equations
             Real64 const phi = Tkel + N9 / (Tkel - N10); // IF97 equation 29b
             Real64 const phi2 = phi * phi;               // phi squared
@@ -1332,8 +1333,8 @@ namespace Psychrometrics {
 
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(50); // Maximum number of iterations
-        Real64 const convTol(0.0001);
-        const char *RoutineName("PsyTsatFnPb");
+        Real64 constexpr convTol(0.0001);
+        static constexpr std::string_view RoutineName("PsyTsatFnPb");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

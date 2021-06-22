@@ -1090,7 +1090,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
             // interior surfaces
             isExterior = false;
             if ((Surface(iSurf).Class == SurfaceClass::Wall) || (Surface(iSurf).Class == SurfaceClass::Floor) ||
-                (Surface(iSurf).Class == SurfaceClass::Roof)) {
+                (Surface(iSurf).Class == SurfaceClass::Roof) || (Surface(iSurf).Class == SurfaceClass::IntMass)) {
                 surfName = Surface(iSurf).Name;
                 curCons = Surface(iSurf).Construction;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchIntOpCons, surfName, state.dataConstruction->Construct(curCons).Name);
