@@ -7260,15 +7260,21 @@ namespace SurfaceGeometry {
 
             Roughness = state.dataIPShortCut->cAlphaArgs(3);
             // Select the correct Number for the associated ascii name for the roughness type
-            if (UtilityRoutines::SameString(Roughness, "VeryRough")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = VeryRough;
-            if (UtilityRoutines::SameString(Roughness, "Rough")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Rough;
-            if (UtilityRoutines::SameString(Roughness, "MediumRough")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = MediumRough;
-            if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = MediumSmooth;
-            if (UtilityRoutines::SameString(Roughness, "Smooth")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Smooth;
-            if (UtilityRoutines::SameString(Roughness, "VerySmooth")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = VerySmooth;
+            if (UtilityRoutines::SameString(Roughness, "VeryRough"))
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataHeatBalance::SurfaceRoughness::VeryRough;
+            if (UtilityRoutines::SameString(Roughness, "Rough"))
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataHeatBalance::SurfaceRoughness::Rough;
+            if (UtilityRoutines::SameString(Roughness, "MediumRough"))
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            if (UtilityRoutines::SameString(Roughness, "MediumSmooth"))
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataHeatBalance::SurfaceRoughness::MediumSmooth;
+            if (UtilityRoutines::SameString(Roughness, "Smooth"))
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataHeatBalance::SurfaceRoughness::Smooth;
+            if (UtilityRoutines::SameString(Roughness, "VerySmooth"))
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
 
             // Was it set?
-            if (state.dataSurface->ExtVentedCavity(Item).BaffleRoughness == 0) {
+            if (state.dataSurface->ExtVentedCavity(Item).BaffleRoughness == DataHeatBalance::SurfaceRoughness::Unassigned) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + state.dataSurface->ExtVentedCavity(Item).Name + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3));
@@ -13103,7 +13109,7 @@ namespace SurfaceGeometry {
             //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
             state.dataConstruction->Construct(ConstrNewSh).InsideAbsorpThermal =
                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld)).AbsorpThermalBack;
-            state.dataConstruction->Construct(ConstrNewSh).OutsideRoughness = VerySmooth;
+            state.dataConstruction->Construct(ConstrNewSh).OutsideRoughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
             state.dataConstruction->Construct(ConstrNewSh).DayltPropPtr = 0;
             state.dataConstruction->Construct(ConstrNewSh).CTFCross = 0.0;
             state.dataConstruction->Construct(ConstrNewSh).CTFFlux = 0.0;
@@ -13347,7 +13353,7 @@ namespace SurfaceGeometry {
                 state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideAbsorpThermal =
                 state.dataMaterial->Material(stormMaterial).AbsorpThermalFront;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideRoughness = VerySmooth;
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideRoughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).DayltPropPtr = 0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFCross = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFFlux = 0.0;

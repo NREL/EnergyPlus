@@ -88,11 +88,10 @@ namespace Construction {
         Real64 OutsideAbsorpSolar;  // Outside Layer solar absorptance of an opaque surface; not used for windows.
         Real64 InsideAbsorpThermal; // Inside Layer Thermal absorptance for opaque surfaces or windows;
         // for windows, applies to innermost glass layer
-        Real64 OutsideAbsorpThermal; // Outside Layer Thermal absorptance
-        int OutsideRoughness;        // Outside Surface roughness index (6=very smooth, 5=smooth,
-        // 4=medium smooth, 3=medium rough, 2=rough, 1=very rough)
-        int DayltPropPtr;   // Pointer to Daylight Construction Properties
-        int W5FrameDivider; // FrameDivider number for window construction from Window5 data file;
+        Real64 OutsideAbsorpThermal;                        // Outside Layer Thermal absorptance
+        DataHeatBalance::SurfaceRoughness OutsideRoughness; // Outside Surface roughness index
+        int DayltPropPtr;                                   // Pointer to Daylight Construction Properties
+        int W5FrameDivider;                                 // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
         // Conductive properties for the construction
         Array1D<Real64> CTFCross;     // Cross or Y terms of the CTF equation
@@ -273,23 +272,23 @@ namespace Construction {
         ConstructionProps()
             : TotLayers(0), TotSolidLayers(0), TotGlassLayers(0), LayerPoint(MaxLayersInConstruct, 0), IsUsed(false), IsUsedCTF(false),
               InsideAbsorpVis(0.0), OutsideAbsorpVis(0.0), InsideAbsorpSolar(0.0), OutsideAbsorpSolar(0.0), InsideAbsorpThermal(0.0),
-              OutsideAbsorpThermal(0.0), OutsideRoughness(0), DayltPropPtr(0), W5FrameDivider(0), CTFCross({0, MaxCTFTerms - 1}, 0.0),
-              CTFFlux(MaxCTFTerms - 1, 0.0), CTFInside({0, MaxCTFTerms - 1}, 0.0), CTFOutside({0, MaxCTFTerms - 1}, 0.0),
-              CTFSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0),
-              CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0),
-              CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), NumHistories(0), NumCTFTerms(0), UValue(0.0),
-              SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), userTemperatureLocationPerpendicular(0.0),
-              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiffShade(0.0), AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0),
-              AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0),
-              AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0), ShadeAbsorpThermal(0.0), AbsBeamShadeCoef(6, 0.0), TransDiff(0.0),
-              BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0),
-              BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0), BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0),
-              ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
-              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
-              ReflectVisDiffFront(0.0), BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0),
-              ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0), tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0),
-              rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0), abBareSolDiff(5, 0.0),
-              FromWindow5DataFile(false), W5FileMullionWidth(0.0), W5FileMullionOrientation(0), W5FileGlazingSysWidth(0.0),
+              OutsideAbsorpThermal(0.0), OutsideRoughness(DataHeatBalance::SurfaceRoughness::Unassigned), DayltPropPtr(0), W5FrameDivider(0),
+              CTFCross({0, MaxCTFTerms - 1}, 0.0), CTFFlux(MaxCTFTerms - 1, 0.0), CTFInside({0, MaxCTFTerms - 1}, 0.0),
+              CTFOutside({0, MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, MaxCTFTerms - 1}, 0.0),
+              CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0),
+              CTFTUserOut({0, MaxCTFTerms - 1}, 0.0), CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0),
+              NumHistories(0), NumCTFTerms(0), UValue(0.0), SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0),
+              userTemperatureLocationPerpendicular(0.0), AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiffShade(0.0),
+              AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0),
+              AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0),
+              ShadeAbsorpThermal(0.0), AbsBeamShadeCoef(6, 0.0), TransDiff(0.0), BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0),
+              BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0),
+              BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
+              ReflectSolDiffFront(0.0), BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0),
+              BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffFront(0.0), BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0),
+              TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0),
+              tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0),
+              abBareSolDiff(5, 0.0), FromWindow5DataFile(false), W5FileMullionWidth(0.0), W5FileMullionOrientation(0), W5FileGlazingSysWidth(0.0),
               W5FileGlazingSysHeight(0.0), SummerSHGC(0.0), VisTransNorm(0.0), SolTransNorm(0.0), SourceSinkPresent(false), TypeIsWindow(false),
               WindowTypeBSDF(false), TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false), TypeIsFfactorFloor(false), TCFlag(0),
               TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),

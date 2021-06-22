@@ -329,15 +329,15 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 }
 
 void InitExteriorConvectionCoeff(EnergyPlusData &state,
-                                 int const SurfNum,      // Surface number (in Surface derived type)
-                                 Real64 const HMovInsul, // Equivalent convection coefficient of movable insulation
-                                 int const Roughness,    // Roughness index (1-6), see DataHeatBalance parameters
-                                 Real64 const AbsExt,    // Exterior thermal absorptance
-                                 Real64 const TempExt,   // Exterior surface temperature (C)
-                                 Real64 &HExt,           // Convection coefficient to exterior air
-                                 Real64 &HSky,           // "Convection" coefficient to sky temperature
-                                 Real64 &HGround,        // "Convection" coefficient to ground temperature
-                                 Real64 &HAir            // Radiation to Air Component
+                                 int const SurfNum,                                 // Surface number (in Surface derived type)
+                                 Real64 const HMovInsul,                            // Equivalent convection coefficient of movable insulation
+                                 DataHeatBalance::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                 Real64 const AbsExt,                               // Exterior thermal absorptance
+                                 Real64 const TempExt,                              // Exterior surface temperature (C)
+                                 Real64 &HExt,                                      // Convection coefficient to exterior air
+                                 Real64 &HSky,                                      // "Convection" coefficient to sky temperature
+                                 Real64 &HGround,                                   // "Convection" coefficient to ground temperature
+                                 Real64 &HAir                                       // Radiation to Air Component
 )
 {
 
@@ -2446,8 +2446,9 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
     }
 }
 
-Real64 CalcASHRAESimpExtConvectCoeff(int const Roughness,       // Integer index for roughness, relates to parameter array indices
-                                     Real64 const SurfWindSpeed // Current wind speed, m/s
+Real64
+CalcASHRAESimpExtConvectCoeff(DataHeatBalance::SurfaceRoughness const Roughness, // Integer index for roughness, relates to parameter array indices
+                              Real64 const SurfWindSpeed                         // Current wind speed, m/s
 )
 {
 

@@ -110,13 +110,16 @@ namespace DataHeatBalance {
 
     // Parameters to indicate surface roughness for use with the Material
     // derived type (see below):
-
-    constexpr int VeryRough(1);
-    constexpr int Rough(2);
-    constexpr int MediumRough(3);
-    constexpr int MediumSmooth(4);
-    constexpr int Smooth(5);
-    constexpr int VerySmooth(6);
+    enum class SurfaceRoughness
+    {
+        Unassigned = -1,
+        VeryRough,
+        Rough,
+        MediumRough,
+        MediumSmooth,
+        Smooth,
+        VerySmooth
+    };
 
     // Parameters to indicate blind orientation for use with the Material
     // derived type (see below):
@@ -1916,7 +1919,7 @@ namespace DataHeatBalance {
                                  Optional_int_const ScreenNumber = _ // Optional screen number
     );
 
-    std::string DisplayMaterialRoughness(int Roughness); // Roughness String
+    std::string DisplayMaterialRoughness(SurfaceRoughness Roughness); // Roughness String
 
     Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
                                          int numSurf,  // index for Surface array.
