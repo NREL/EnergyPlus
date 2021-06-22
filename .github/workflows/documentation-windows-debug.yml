@@ -65,29 +65,14 @@ jobs:
       run: |
         mpm --verbose --admin --require=@energyplus_packages_windows.lst
 
-    - name: Build Test package - Pass Number 1
-      shell: bash
-      working-directory: ./doc/test/
-      run: |
-        xelatex dependencies.tex
-        nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
-        [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 1" || echo "TOC IS available for pass NO. 1"
-
-    - name: Build Test package - Pass Number 2
-      shell: bash
-      working-directory: ./doc/test/
-      run: |
-        xelatex dependencies.tex
-        nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
-        [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 2" || echo "TOC IS available for pass NO. 2"
-
-    - name: Build Test package - Pass Number 3
-      shell: bash
-      working-directory: ./doc/test/
-      run: |
-        xelatex dependencies.tex
-        nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
-        [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 3" || echo "TOC IS available for pass NO. 3"
+# For quick debugging this could be useful, but note that it does not exhibit the main memory size exceeded error
+#   - name: Build Test package - Pass Number 1
+#     shell: bash
+#     working-directory: ./doc/test/
+#     run: |
+#       xelatex dependencies.tex
+#       nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
+#       [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 1" || echo "TOC IS available for pass NO. 1"
 
     - name: Create Build Directory
       run: cmake -E make_directory ./doc/build/
@@ -97,28 +82,30 @@ jobs:
       shell: bash
       run: |
         set -x
-        cmake -G "Visual Studio 16 2019" -A x64 \
-              -DTEX_INTERACTION=batchmode -DDOCS_TESTING=ON ../
+        cmake -G "Visual Studio 16 2019" -A x64 -DTEX_INTERACTION=batchmode -DDOCS_TESTING=ON ../
 
     - name: Add problem matcher
       run: echo "::add-matcher::.github/workflows/doc-problem-match.json"
 
     - name: Build Docs
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
-      run: cmake --build . -j 2 --target zPDF_InputOutputReference
-
-    - name: Test InputOutputReference
-      shell: bash
-      working-directory: ./doc/build/pdf/
       run: |
-        set -x
-        pdfinfo InputOutputReference.pdf || true
-        npages=$(pdfinfo InputOutputReference.pdf | /bin/grep "Pages:" | sed 's/[^0-9]*//')
-        echo "Found $npages pages in the I/O Ref"
-        nwords_in_toc=$(pdftotext -f 2 -l 2 InputOutputReference.pdf - | wc -l)
-        set +x
-        [ "$npages" -le "2800" ] && (echo "TOC is missing" && exit 1) || echo "Length of PDF appears ok"
-        [ "$nwords_in_toc" -le "100" ] && (echo "TOC is empty" && exit 1) || echo "TOC appears ok"
+        cmake --build . -j 2
+
+    # I made the BuildDOcumentation.cmake throw a FATAL_ERROR already on pass 2 and 3 of xelatex, so this is redundant now
+    # but if you want to just build `--target zPDF_InputOutputReference` and test it here, I'm leaving it as an example
+#    - name: Test InputOutputReference
+#      shell: bash
+#      working-directory: ./doc/build/pdf/
+#      run: |
+#        set -x
+#        pdfinfo InputOutputReference.pdf || true
+#        npages=$(pdfinfo InputOutputReference.pdf | /bin/grep "Pages:" | sed 's/[^0-9]*//')
+#        echo "Found $npages pages in the I/O Ref"
+#        nwords_in_toc=$(pdftotext -f 2 -l 2 InputOutputReference.pdf - | wc -l)
+#        set +x
+#        [ "$npages" -le "2800" ] && (echo "TOC is missing" && exit 1) || echo "Length of PDF appears ok"
+#        [ "$nwords_in_toc" -le "100" ] && (echo "TOC is empty" && exit 1) || echo "TOC appears ok"
 
     - name: Upload entire pdf folder
       if: ${{ always() }}
