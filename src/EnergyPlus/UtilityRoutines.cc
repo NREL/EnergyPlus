@@ -119,7 +119,7 @@ namespace UtilityRoutines {
         // List directed Fortran input/output.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const ValidNumerics("0123456789.+-EeDd");
+        static constexpr std::string_view ValidNumerics("0123456789.+-EeDd");
 
         Real64 rProcessNumber = 0.0;
         //  Make sure the string has all what we think numerics should have
@@ -143,6 +143,62 @@ namespace UtilityRoutines {
                 ErrorFlag = true;
             }
         } else {
+            rProcessNumber = 0.0;
+            ErrorFlag = true;
+        }
+
+        return rProcessNumber;
+    }
+
+    Real64 ProcessNumber(std::basic_string_view<char> const &String_view, bool &ErrorFlag)
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Linda K. Lawrie
+        //       DATE WRITTEN   September 1997
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function processes a string that should be numeric and
+        // returns the real value of the string.
+
+        // METHODOLOGY EMPLOYED:
+        // FUNCTION ProcessNumber translates the argument (a string)
+        // into a real number.  The string should consist of all
+        // numeric characters (except a decimal point).  Numerics
+        // with exponentiation (i.e. 1.2345E+03) are allowed but if
+        // it is not a valid number an error message along with the
+        // string causing the error is printed out and 0.0 is returned
+        // as the value.
+
+        // REFERENCES:
+        // List directed Fortran input/output.
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static constexpr std::string_view ValidNumerics("0123456789.+-EeDd");
+
+        Real64 rProcessNumber = 0.0;
+        //  Make sure the string has all what we think numerics should have
+        std::string_view PString(stripped(String_view));
+        std::string::size_type const StringLen(PString.length());
+        ErrorFlag = false;
+        if (StringLen == 0) return rProcessNumber;
+        bool parseFailed = false;
+        if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
+
+            // std::replace_if - > moved to readItem
+            // is this not working because string_view is acting like a const variable? // Do we need to convert/cast it here? -> move this to the
+            // 'deepest' function so that the copying can be minimized
+
+            // then parse as a normal floating point value
+            parseFailed = !readItem(PString, rProcessNumber);
+            ErrorFlag = false;
+        } else {
+            rProcessNumber = 0.0;
+            ErrorFlag = true;
+        }
+        if (parseFailed) {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }

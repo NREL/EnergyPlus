@@ -229,7 +229,7 @@ namespace ScheduleManager {
         Array1D_bool AllDays(MaxDayTypes);
         Array1D_bool TheseDays(MaxDayTypes);
         bool ErrorHere;
-        int SchNum;
+        int SchNum{};
         int WkCount;
         int DyCount;
         int NumField;
@@ -266,7 +266,7 @@ namespace ScheduleManager {
         std::string ColumnSep;
         bool firstLine;
         int rowLimitCount;
-        int numerrors;
+        int numerrors{0};
         int ifld;
         int hrLimitCount;
 
@@ -640,58 +640,6 @@ namespace ScheduleManager {
         print(state.files.audit.ensure_open(state, "ProcessScheduleInput", state.files.outputControl.audit),
               "{}\n",
               "  Processing Schedule Input -- Start");
-
-        std::string curName;
-        Array1D<Real64> timestepColumnValues;
-        for (auto &NameValue : CSVAllColumnNames) {
-            curName = NameValue.first + "_shading";
-            timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
-            GlobalNames::VerifyUniqueInterObjectName(
-                state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
-            ++SchNum;
-            state.dataScheduleMgr->Schedule(SchNum).Name = curName;
-            state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
-
-            iDay = 0;
-            ifld = 0;
-            while (true) {
-                // create string of which day of year
-                ++iDay;
-                if (iDay > 366) {
-                    break;
-                }
-                ExtraField = fmt::to_string(iDay);
-                // increment both since a week schedule is being defined for each day so that a day is valid
-                // no matter what the day type that is used in a design day.
-                ++AddWeekSch;
-                ++AddDaySch;
-                // define week schedule
-                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = curName + "_shading_wk_" + ExtraField;
-                // for all day types point the week schedule to the newly defined day schedule
-                for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
-                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
-                }
-                // day schedule
-                state.dataScheduleMgr->DaySchedule(AddDaySch).Name = curName + "_shading_dy_" + ExtraField;
-                state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
-                // schedule is pointing to the week schedule
-                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
-
-                for (jHour = 1; jHour <= 24; ++jHour) {
-                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                        ++ifld;
-                        curHrVal = timestepColumnValues(ifld);
-                        state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
-                    }
-                }
-                if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
-                    // Dup 28 Feb to 29 Feb (60)
-                    ++iDay;
-                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) =
-                        state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
-                }
-            }
-        }
 
         //!! Get Schedule Types
 
@@ -1685,22 +1633,18 @@ namespace ScheduleManager {
         if (NumCommaFileSchedules > 0) {
             hourlyFileValues.allocate(8784 * 60); // sized to accomodate any interval for schedule file.
         }
+
         CurrentModuleObject = "Schedule:File";
 
-        std::set<std::string> setOfFilenames;
-
+        // Runs getObjectItem for Schedule:File and saves it to vector in state: allIdfSchedData
         PreProcessIDF(state, SchNum, NumCommaFileSchedules);
+
+        // Because we are focusing on saving performance by decreasing number of file open-close operations, get set of filenames
+        std::set<std::string> setOfFilenames;
         PopulateSetOfFilenames(state.dataScheduleMgr->allIdfSchedData, setOfFilenames);
 
-        //        for (const std::string &item : setOfFilenames) {
-        //            std::cout << (item) << ", Cols: " << state.dataScheduleMgr->maxColByFile[item] << " set \n";
-        //        }
-
-        // for item in allIdfSchedData, emplace_back in columnarData, calling constructor forPreProcessedColumn which will take information
-
-        // reserving vector space and assign attributes to each columnarData object
-
-        // we use fileName in the outer loop so that the columnarData vector is easy to populate later
+        // we create a new vector of data with the pre-processed data, arranged according to filenames
+        // we use fileName in the outer loop so as to minimize opening and closing files
         for (const std::string &fileNameItem : setOfFilenames) {
             for (schedInputIdfPreprocessObject &item : state.dataScheduleMgr->allIdfSchedData) {
                 if (item.fileName == fileNameItem) {
@@ -1736,78 +1680,87 @@ namespace ScheduleManager {
         for (const std::string &fileNameItem : setOfFilenames) {
             // go through all in allIdfSchedData, filter which sched belong to this file
             // get their column map
-            std::map<int, int> colNumToColDataIndex;
-            std::vector<int> vectorOfCSVColNumbers;
+            std::multimap<int, int> colNumToColDataIndex;
+            std::set<int> setCSVColNums;
+            std::set<int> setOfDuplicateCSVColNumbers;
+
             for (const schedInputIdfPreprocessObject &item : state.dataScheduleMgr->allIdfSchedData) {
                 if (item.fileName == fileNameItem) {
-                    colNumToColDataIndex[item.columnOfInterest] = item.columnarDataIndex;
-                    vectorOfCSVColNumbers.push_back(item.columnOfInterest);
+                    // if item not in set, add to set: if not, add to other container and remove from set
+                    if (setCSVColNums.find(item.columnOfInterest) == setCSVColNums.end()) { // if not in present
+                        setCSVColNums.insert(item.columnOfInterest);
+                        colNumToColDataIndex.insert(std::pair<int, int>(item.columnOfInterest, item.columnarDataIndex));
+                    } else {
+                        setOfDuplicateCSVColNumbers.insert(item.columnOfInterest);
+                        colNumToColDataIndex.insert(std::pair<int, int>(item.columnOfInterest, item.columnarDataIndex));
+                    }
                 }
             }
-
-            // find if there is a many to one mapping
-            std::sort(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // sorting to use std::adjacent_find
-            const auto duplicate =
-                std::adjacent_find(vectorOfCSVColNumbers.begin(), vectorOfCSVColNumbers.end()); // what if there are multiple last elements?
-            if (duplicate != vectorOfCSVColNumbers.end()) std::cout << "Duplicate element = " << *duplicate << "\n";
-
-            // what if there are multiple last elements? - remove last element and check if duplicate is still the same
-
-            // if vector not empty - flag to do these elements separately
-            // remove from the main map
-            // get maps for these elements
-
-            // what if rows to be skipped?
-            // find min of rows to be skipped
-            // skip em and subtract from columnarData element.rowstoskip
 
             std::ifstream file(fileNameItem);
             CSVRow row;
-            // TODO : Fix delimiter issue
-            row.delimiter = state.dataScheduleMgr->columnarData[colNumToColDataIndex[vectorOfCSVColNumbers[0]]]
+            // TODO : Fix delimiter issue: check if there are other delimiters specified, if yes, throw error
+            row.delimiter = state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(*setCSVColNums.begin())->second]
                                 .delimiter; // all schedules in one file will have the same delimiter
 
-            while (file >> row)
-            // find which columns of this csv map to which schedule - not needed
-            //  How to do this? Make a mapOfMaps which has for each fileName, a map of scheduleNames, ColumnNumbers
+            while (file >> row) {
+                for (int colNum : setCSVColNums) {
+                    // skip if row needs to be skipped
+                    if (state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].rowsToSkip) {
+                        --state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].rowsToSkip;
+                        continue;
+                    } // TODO : Add check if the number of rows skipped were correct (What if the user input was wrong?)
 
-            // find schedules to be filled with columns from this file
-            // if column is important, check if this row needs to be skipped
-            // Else add to the right cell
-            {
-                for (int colNum : vectorOfCSVColNumbers) {
+                    columnValue = UtilityRoutines::ProcessNumber(row[colNum], errFlag);
+                    if (errFlag) {
+                        ++state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].numerrors;
+                        columnValue = 0.0;
+                    }
 
-                    std::string x = static_cast<std::string>(row[colNum]);
-
-                    Real64 a = UtilityRoutines::ProcessNumber(x, ErrorsFound);
-
-                    state.dataScheduleMgr->columnarData[colNumToColDataIndex[colNum]].vals.emplace_back(a); // row[colNum]
-
-                    // TODO : if there are multiple common elements in vectorOfCSVColNumbers, there is an error.
+                    state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].vals.emplace_back(columnValue);
+                    ++state.dataScheduleMgr->columnarData[colNumToColDataIndex.find(colNum)->second].rowCnt;
                 }
-            }
-        }
 
-        // schedule values have been filled into the columnarData.vals vectors.
+                for (int colNum : setOfDuplicateCSVColNumbers) {
 
-        // skip rows when needed
-        for (auto &schedule : state.dataScheduleMgr->columnarData) {
-            if (schedule.rowsToSkip != -1) {
-                schedule.vals.erase(schedule.vals.begin(), schedule.vals.begin() + schedule.rowsToSkip);
+                    // here
+                    auto range = colNumToColDataIndex.equal_range(colNum);
+
+                    for (auto iterator = range.first++; // skip the first value since it is already in the earlier loop
+                         iterator != range.second;
+                         ++iterator) {
+
+                        // skip if row needs to be skipped
+                        if (state.dataScheduleMgr->columnarData[iterator->second].rowsToSkip) {
+                            --state.dataScheduleMgr->columnarData[iterator->second].rowsToSkip;
+                            continue;
+                        } // TODO : Add check if the number of rows skipped were correct (What if the user input was wrong?)
+
+                        columnValue = UtilityRoutines::ProcessNumber(row[colNum], errFlag);
+                        if (errFlag) {
+                            ++state.dataScheduleMgr->columnarData[iterator->second].numerrors;
+                            columnValue = 0.0;
+                        }
+
+                        state.dataScheduleMgr->columnarData[iterator->second].vals.emplace_back(columnValue); // row[colNum]
+                        ++state.dataScheduleMgr->columnarData[iterator->second].rowCnt;
+                    }
+                }
             }
         }
 
         for (const PreProcessedColumn &schedule : state.dataScheduleMgr->columnarData) {
-            if (numerrors > 0) {
+            rowLimitCount = (schedule.numHourlyValues * 60) / schedule.MinutesPerItem;
+            if (schedule.numerrors > 0) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\" {} records had errors - these values are set to 0.",
                                         RoutineName,
                                         CurrentModuleObject,
                                         schedule.name,
-                                        numerrors));
+                                        schedule.numerrors));
                 ShowContinueError(state, "Use Output:Diagnostics,DisplayExtraWarnings; to see individual records in error.");
             }
-            if (rowCnt < rowLimitCount) {
+            if (schedule.rowCnt < rowLimitCount) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\" less than {} hourly values read from file.",
                                         RoutineName,
@@ -1852,8 +1805,8 @@ namespace ScheduleManager {
                     for (int jHour = 1; jHour <= 24; ++jHour) {
                         for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                             state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = schedule.vals[rowCountFld];
-                            ++rowCountFld; // hourlyFileValues((hDay - 1) * 24 + jHour)
                         }
+                        ++rowCountFld; // hourlyFileValues((hDay - 1) * 24 + jHour)
                     }
                 } else { // Minutes Per Item < 60
                     if (schedule.FileIntervalInterpolated) {
@@ -1911,6 +1864,58 @@ namespace ScheduleManager {
         }
         if (NumCommaFileSchedules > 0) {
             hourlyFileValues.deallocate();
+        }
+
+        std::string curName;
+        Array1D<Real64> timestepColumnValues;
+        for (auto &NameValue : CSVAllColumnNames) {
+            curName = NameValue.first + "_shading";
+            timestepColumnValues = CSVAllColumnNameAndValues[NameValue.second];
+            GlobalNames::VerifyUniqueInterObjectName(
+                state, state.dataScheduleMgr->UniqueScheduleNames, curName, CurrentModuleObject, cAlphaFields(1), ErrorsFound);
+            ++SchNum;
+            state.dataScheduleMgr->Schedule(SchNum).Name = curName;
+            state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_file;
+
+            iDay = 0;
+            ifld = 0;
+            while (true) {
+                // create string of which day of year
+                ++iDay;
+                if (iDay > 366) {
+                    break;
+                }
+                ExtraField = fmt::to_string(iDay);
+                // increment both since a week schedule is being defined for each day so that a day is valid
+                // no matter what the day type that is used in a design day.
+                ++AddWeekSch;
+                ++AddDaySch;
+                // define week schedule
+                state.dataScheduleMgr->WeekSchedule(AddWeekSch).Name = curName + "_shading_wk_" + ExtraField;
+                // for all day types point the week schedule to the newly defined day schedule
+                for (kDayType = 1; kDayType <= MaxDayTypes; ++kDayType) {
+                    state.dataScheduleMgr->WeekSchedule(AddWeekSch).DaySchedulePointer(kDayType) = AddDaySch;
+                }
+                // day schedule
+                state.dataScheduleMgr->DaySchedule(AddDaySch).Name = curName + "_shading_dy_" + ExtraField;
+                state.dataScheduleMgr->DaySchedule(AddDaySch).ScheduleTypePtr = state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr;
+                // schedule is pointing to the week schedule
+                state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) = AddWeekSch;
+
+                for (jHour = 1; jHour <= 24; ++jHour) {
+                    for (TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
+                        ++ifld;
+                        curHrVal = timestepColumnValues(ifld);
+                        state.dataScheduleMgr->DaySchedule(AddDaySch).TSValue(TS, jHour) = curHrVal;
+                    }
+                }
+                if (iDay == 59 && !state.dataEnvrn->CurrentYearIsLeapYear) { // 28 Feb
+                    // Dup 28 Feb to 29 Feb (60)
+                    ++iDay;
+                    state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay) =
+                        state.dataScheduleMgr->Schedule(SchNum).WeekSchedulePointer(iDay - 1);
+                }
+            }
         }
 
         MinuteValue.deallocate();
@@ -5124,9 +5129,9 @@ namespace ScheduleManager {
         // Function: This function returns the number of Columns in the CSV file
         return m_data.size();
     }
-    std::string_view CSVRow::operator[](std::size_t index) const
+    std::string CSVRow::operator[](std::size_t index) const
     {
-        return std::string_view(&m_line[m_data[index] + 1], m_data[index + 1] - (m_data[index] + 1));
+        return std::string(&m_line[m_data[index] + 1], m_data[index + 1] - (m_data[index] + 1));
     }
 
     void PreProcessIDF(EnergyPlus::EnergyPlusData &state, int &SchNum, int NumCommaFileSchedules)

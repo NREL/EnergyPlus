@@ -333,7 +333,7 @@ namespace ScheduleManager {
 
     struct CSVRow
     {
-        std::string_view operator[](std::size_t index) const;
+        std::string operator[](std::size_t index) const;
         std::size_t rowEnd();
         std::string delimiter{'*'}; // eg. comma in CSV
         void readNextRow(std::istream &str);
@@ -402,6 +402,8 @@ namespace ScheduleManager {
         bool FileIntervalInterpolated = false;
         int ScheduleTypePtr = -1;
         int SchNum = -1;
+        int rowCnt = 0;
+        int numerrors = 0;
         std::string fileName;
         std::string delimiter;
         std::vector<Real64> vals; // rows to skip + number of hours*items/hour

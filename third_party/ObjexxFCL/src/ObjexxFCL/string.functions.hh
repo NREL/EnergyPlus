@@ -1557,6 +1557,9 @@ rstripped( std::string const & s, std::string const & chars );
 std::string
 stripped( std::string const & s );
 
+std::string_view
+stripped( std::string_view const & s );
+
 // Space Stripped from a string's Left Tail Copy of a string
 std::string
 lstripped( std::string const & s );

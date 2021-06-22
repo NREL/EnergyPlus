@@ -58,16 +58,29 @@ TEST_F(EnergyPlusFixture, readItem)
     int i = 0;
 
     // should read just 12
-    EXPECT_TRUE(EnergyPlus::readItem("12", i));
+    EXPECT_TRUE(EnergyPlus::readItem(static_cast<std::string>("12"), i));
     EXPECT_EQ(i, 12);
 
     // should fail if unable to process entire input string
-    EXPECT_FALSE(EnergyPlus::readItem("1234fgq", i));
+    EXPECT_FALSE(EnergyPlus::readItem(static_cast<std::string>("1234fgq"), i));
     // value is in an unknown state if read failed
     // EXPECT_EQ(i, 12);
 
     // should read nothing
-    EXPECT_FALSE(EnergyPlus::readItem("abc123", i));
+    EXPECT_FALSE(EnergyPlus::readItem(static_cast<std::string>("abc123"), i));
+    EXPECT_EQ(i, 0);
+
+    // should read just 12
+    EXPECT_TRUE(EnergyPlus::readItem(static_cast<std::string_view>("12"), i));
+    EXPECT_EQ(i, 12);
+
+    // should fail if unable to process entire input string
+    EXPECT_FALSE(EnergyPlus::readItem(static_cast<std::string_view>("1234fgq"), i));
+    // value is in an unknown state if read failed
+    // EXPECT_EQ(i, 12);
+
+    // should read nothing
+    EXPECT_FALSE(EnergyPlus::readItem(static_cast<std::string_view>("abc123"), i));
     EXPECT_EQ(i, 0);
 }
 
