@@ -114,11 +114,14 @@ jobs:
         set -x
         pdfinfo InputOutputReference.pdf || true
         npages=$(pdfinfo InputOutputReference.pdf | /bin/grep "Pages:" | sed 's/[^0-9]*//')
-        [ "$npages" -le "2800" ] && echo "TOC is missing" && exit 1
+        echo "Found $npages pages in the I/O Ref"
+        nwords_in_toc=$(pdftotext -f 2 -l 2 InputOutputReference.pdf - | wc -l)
+        [ "$npages" -le "2800" ] && (echo "TOC is missing" && exit 1) || echo "Length of PDF appears ok"
+        [ "$nwords_in_toc" -le "100" ] && (echo "TOC is empty" && exit 1) || echo "TOC appears ok"
 
-    - name: Upload InputOutputReference
+    - name: Upload entire pdf folder
       if: ${{ always() }}
       uses: actions/upload-artifact@v2
       with:
         name: InputOutputReference
-        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/InputOutputReference.pdf
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/
