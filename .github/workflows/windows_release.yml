@@ -84,7 +84,7 @@ jobs:
       shell: bash
       working-directory: ./doc/
       run: |
-        mpm --verbose --admin --require=@energyplus_packages.lst
+        mpm --verbose --admin --require=@energyplus_packages_windows.lst
 
     - name: Install IFW
       shell: bash
