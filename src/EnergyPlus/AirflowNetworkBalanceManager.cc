@@ -527,8 +527,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompExhaustFanData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -602,8 +601,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompOutdoorAirData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -676,8 +674,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompReliefAirData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -977,8 +974,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompDetOpeningData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1021,8 +1017,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompSimpleOpeningData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1067,8 +1062,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneCompHorOpeningData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1118,8 +1112,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneSurfaceELAData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1156,8 +1149,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompLeakData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1198,8 +1190,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompELRData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1276,8 +1267,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompDuctData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1409,8 +1399,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[fan_name] = &state.dataAirflowNetwork->DisSysCompCVFData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + fan_name);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1451,8 +1440,7 @@ namespace AirflowNetworkBalanceManager {
                     ShowSevereError(state,
                                     std::string{RoutineName} +
                                         "Duplicated airflow element names are found = " + state.dataAirflowNetwork->DisSysCompCoilData(i).name);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1495,8 +1483,7 @@ namespace AirflowNetworkBalanceManager {
                     ShowSevereError(state,
                                     std::string{RoutineName} +
                                         "Duplicated airflow element names are found = " + state.dataAirflowNetwork->DisSysCompHXData(i).name);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
                 ++i;
@@ -1537,8 +1524,7 @@ namespace AirflowNetworkBalanceManager {
                     ShowSevereError(state,
                                     std::string{RoutineName} +
                                         "Duplicated airflow element names are found = " + state.dataAirflowNetwork->DisSysCompTermUnitData(i).name);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -1571,8 +1557,7 @@ namespace AirflowNetworkBalanceManager {
                     solver.elements[thisObjectName] = &state.dataAirflowNetwork->DisSysCompCPDData(i); // Yet another workaround
                 } else {
                     ShowSevereError(state, std::string{RoutineName} + "Duplicated airflow element names are found = " + thisObjectName);
-                    // ShowContinueError(state, "A unique component name is required in both objects " + std::string{CompName}(1) + " and " +
-                    // std::string{CompName}(2));
+                    // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
                     success = false;
                 }
 
@@ -5190,7 +5175,7 @@ namespace AirflowNetworkBalanceManager {
         "AirflowNetwork:MultiZone:Surface:Crack"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
         iComponentTypeNum::SEL) CompName(2) = "AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea"; ShowSevereError(state, RoutineName
         + "Duplicated component names are found = " + state.dataAirflowNetwork->AirflowNetworkCompData(i).Name); ShowContinueError(state,
-        "A unique component name is required in both objects " + std::string{CompName}(1) + " and " + std::string{CompName}(2)); ErrorsFound = true;
+        "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2)); ErrorsFound = true;
                     }
                     // Distribution component
                     if (i > 4 && j > 4) {
@@ -5222,7 +5207,7 @@ namespace AirflowNetworkBalanceManager {
         "AirflowNetwork:Distribution:Component:TerminalUnit"; if (state.dataAirflowNetwork->AirflowNetworkCompData(j).CompTypeNum ==
         iComponentTypeNum::HEX) CompName(2) = "AirflowNetwork:Distribution:Component:HeatExchanger"; ShowSevereError(state, std::string{RoutineName} +
         "Duplicated component names are found = " + state.dataAirflowNetwork->AirflowNetworkCompData(i).Name); ShowContinueError(state, "A
-        unique component name is required in both objects " + std::string{CompName}(1) + " and " + std::string{CompName}(2)); ErrorsFound = true;
+        unique component name is required in both objects " + CompName(1) + " and " + CompName(2)); ErrorsFound = true;
                     }
                 }
             }
