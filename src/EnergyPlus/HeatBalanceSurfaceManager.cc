@@ -6181,7 +6181,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         continue;
                     }
                     // Roughness index of the exterior surface
-                    int RoughSurf = state.dataHeatBalSurf->SurfRoughnessExt(SurfNum);
+                    DataHeatBalance::SurfaceRoughness RoughSurf = state.dataHeatBalSurf->SurfRoughnessExt(SurfNum);
                     // Thermal absoptance of the exterior surface
                     Real64 AbsThermSurf = state.dataHeatBalSurf->SurfAbsThermalExt(SurfNum);
                     HMovInsul = 0;
@@ -6360,7 +6360,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     }
 
                 } else if (SELECT_CASE_var == KivaFoundation) {
-                    int RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
+                    DataHeatBalance::SurfaceRoughness RoughSurf =
+                        state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
                     Real64 AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
 
                     // Set Kiva exterior convection algorithms
@@ -7170,7 +7171,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     // (HeatBalanceSurfaceManager USEing and WindowManager and
                     // WindowManager USEing HeatBalanceSurfaceManager)
                     if (surface.ExtBoundCond == ExternalEnvironment) {
-                        int RoughSurf = state.dataMaterial->Material(construct.LayerPoint(1)).Roughness;           // Outside surface roughness
+                        DataHeatBalance::SurfaceRoughness RoughSurf =
+                            state.dataMaterial->Material(construct.LayerPoint(1)).Roughness;                       // Outside surface roughness
                         Real64 EmisOut = state.dataMaterial->Material(construct.LayerPoint(1)).AbsorpThermalFront; // Glass outside surface emissivity
                         auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
                         if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(shading_flag)) {
@@ -7926,7 +7928,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         // (HeatBalanceSurfaceManager USEing and WindowManager and
                         // WindowManager USEing HeatBalanceSurfaceManager)
                         if (surface.ExtBoundCond == ExternalEnvironment) {
-                            int RoughSurf = state.dataMaterial->Material(construct.LayerPoint(1)).Roughness; // Outside surface roughness
+                            DataHeatBalance::SurfaceRoughness RoughSurf =
+                                state.dataMaterial->Material(construct.LayerPoint(1)).Roughness; // Outside surface roughness
                             Real64 EmisOut =
                                 state.dataMaterial->Material(construct.LayerPoint(1)).AbsorpThermalFront; // Glass outside surface emissivity
                             auto const shading_flag(state.dataSurface->SurfWinShadingFlag(surfNum));

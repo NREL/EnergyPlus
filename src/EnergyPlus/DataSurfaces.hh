@@ -62,6 +62,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
@@ -1012,19 +1013,19 @@ namespace DataSurfaces {
         // Members
         // from input data
         std::string Name;
-        std::string OSCMName;                              // OtherSideConditionsModel
-        int OSCMPtr;                                       // OtherSideConditionsModel index
-        Real64 Porosity;                                   // fraction of absorber plate [--]
-        Real64 LWEmitt;                                    // Thermal Emissivity of Baffle Surface [dimensionless]
-        Real64 SolAbsorp;                                  // Solar Absorbtivity of Baffle Surface [dimensionless]
+        std::string OSCMName;                                          // OtherSideConditionsModel
+        int OSCMPtr;                                                   // OtherSideConditionsModel index
+        Real64 Porosity;                                               // fraction of absorber plate [--]
+        Real64 LWEmitt;                                                // Thermal Emissivity of Baffle Surface [dimensionless]
+        Real64 SolAbsorp;                                              // Solar Absorbtivity of Baffle Surface [dimensionless]
         DataHeatBalance::SurfaceRoughness BaffleRoughness; // surface roughness for exterior convection calcs.
-        Real64 PlenGapThick;                               // Depth of Plenum Behind Baffle [m]
-        int NumSurfs;                                      // a single baffle can have multiple surfaces underneath it
-        Array1D_int SurfPtrs;                              // = 0  ! array of pointers for participating underlying surfaces
-        Real64 HdeltaNPL;                                  // Height scale for Cavity bouyancy  [m]
-        Real64 AreaRatio;                                  // Ratio of actual surface are to projected surface area [dimensionless]
-        Real64 Cv;                                         // volume-based effectiveness of openings for wind-driven vent when Passive
-        Real64 Cd;                                         // discharge coefficient of openings for bouyancy-driven vent when Passive
+        Real64 PlenGapThick;                                           // Depth of Plenum Behind Baffle [m]
+        int NumSurfs;                                                  // a single baffle can have multiple surfaces underneath it
+        Array1D_int SurfPtrs;                                          // = 0  ! array of pointers for participating underlying surfaces
+        Real64 HdeltaNPL;                                              // Height scale for Cavity bouyancy  [m]
+        Real64 AreaRatio;                                              // Ratio of actual surface are to projected surface area [dimensionless]
+        Real64 Cv;                                                     // volume-based effectiveness of openings for wind-driven vent when Passive
+        Real64 Cd;                                                     // discharge coefficient of openings for bouyancy-driven vent when Passive
         // data from elswhere and calculated
         Real64 ActualArea;  // Overall Area of Collect with surface corrugations.
         Real64 ProjArea;    // Overall Area of Collector projected, as if flat [m2]

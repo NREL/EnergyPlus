@@ -50,6 +50,7 @@
 
 #include "../../Data/EnergyPlusData.hh"
 #include "../../DataAirLoop.hh"
+#include "../../DataHeatBalance.hh"
 #include "../../DataHVACGlobals.hh"
 #include "../../DataLoopNode.hh"
 #include "../../DataSurfaces.hh"

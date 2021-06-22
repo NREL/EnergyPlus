@@ -265,7 +265,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfAbsSolarExt;   // Solar Absorptivity of surface inside face or interior movable insulation if present
     Array1D<Real64> SurfAbsThermalExt; // Thermal Absorptivity of surface inside face or interior movable insulation if present
     Array1D<Real64> SurfAbsSolarInt;   // Solar absorptivity of surface outside face or exterior movable insulation if present
-    Array1D<Real64> SurfRoughnessExt;  // Roughness of surface inside face or interior movable insulation if present
+    Array1D<DataHeatBalance::SurfaceRoughness> SurfRoughnessExt; // Roughness of surface inside face or interior movable insulation if present
     Array1D<Real64> SurfAbsThermalInt; // Thermal absorptivity of surface outside face or exterior movable insulation if present
     std::vector<int> SurfMovInsulIndexList;
     std::vector<int> SurfMovSlatsIndexList;
