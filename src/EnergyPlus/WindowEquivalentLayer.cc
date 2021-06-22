@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
@@ -206,18 +207,11 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
         MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
 
-        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
-                DataHeatBalance::MaterialGroup::GlassEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
-                DataHeatBalance::MaterialGroup::ShadeEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
-                DataHeatBalance::MaterialGroup::DrapeEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
-                DataHeatBalance::MaterialGroup::ScreenEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
-                DataHeatBalance::MaterialGroup::BlindEquivalentLayer &&
-            state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group !=
-                DataHeatBalance::MaterialGroup::GapEquivalentLayer)
+        if BITF_TEST_NONE (BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group),
+                           BITF(DataHeatBalance::MaterialGroup::GlassEquivalentLayer) | BITF(DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) |
+                               BITF(DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) |
+                               BITF(DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) |
+                               BITF(DataHeatBalance::MaterialGroup::BlindEquivalentLayer) | BITF(DataHeatBalance::MaterialGroup::GapEquivalentLayer))
             continue;
 
         if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::GapEquivalentLayer) {

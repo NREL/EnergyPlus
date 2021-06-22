@@ -48,6 +48,7 @@
 #include <cassert>
 
 // EnergyPlus headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -188,10 +189,10 @@ namespace WindowManager {
             if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
                     auto &material(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
-                    if (material.Group != DataHeatBalance::MaterialGroup::WindowGas &&
-                        material.Group != DataHeatBalance::MaterialGroup::WindowGasMixture &&
-                        material.Group != DataHeatBalance::MaterialGroup::ComplexWindowGap &&
-                        material.Group != DataHeatBalance::MaterialGroup::ComplexWindowShade) {
+                    if BITF_TEST_NONE (BITF(material.Group),
+                                       BITF(DataHeatBalance::MaterialGroup::WindowGas) | BITF(DataHeatBalance::MaterialGroup::WindowGasMixture) |
+                                           BITF(DataHeatBalance::MaterialGroup::ComplexWindowGap) |
+                                           BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
                         // property is >0.

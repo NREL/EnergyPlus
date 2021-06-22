@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -342,9 +343,10 @@ namespace WindowManager {
 
         auto matGroup = material->Group;
 
-        if (matGroup == DataHeatBalance::MaterialGroup::WindowGlass || matGroup == DataHeatBalance::MaterialGroup::WindowSimpleGlazing ||
-            matGroup == DataHeatBalance::MaterialGroup::WindowBlind || matGroup == DataHeatBalance::MaterialGroup::Shade ||
-            matGroup == DataHeatBalance::MaterialGroup::Screen || matGroup == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
+        if BITF_TEST_ANY (BITF(matGroup),
+                          BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing) |
+                              BITF(DataHeatBalance::MaterialGroup::WindowBlind) | BITF(DataHeatBalance::MaterialGroup::Shade) |
+                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
             aLayer = getSolidLayer(state, m_Surface, *material, m_SolidLayerIndex, m_SurfNum);
         } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
