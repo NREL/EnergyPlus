@@ -57,13 +57,13 @@ jobs:
         ./miktexsetup_standalone --verbose \
             --local-package-repository=C:/ProgramData/MiKTeX-Repo \
             --remote-package-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" \
-            --package-set=basic \
+            --package-set=essential \
             download
 
         echo "Installing from the local package directory previously set up"
         ./miktexsetup_standalone --verbose \
             --local-package-repository=C:/ProgramData/MiKTeX-Repo \
-            --package-set=basic \
+            --package-set=essential \
             --shared \
             install
 
@@ -79,6 +79,12 @@ jobs:
         # Avoid annoying warning: "xelatex: major issue: So far, you have not checked for updates as a MiKTeX user."
         mpm --find-updates
         mpm --admin --find-updates
+
+    - name: Install required packages
+      shell: bash
+      working-directory: ./doc/
+      run: |
+        mpm --verbose --admin --require=@energyplus_packages_windows.lst
 
     - name: Install IFW
       shell: bash
