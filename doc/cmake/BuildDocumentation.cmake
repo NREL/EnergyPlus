@@ -11,6 +11,7 @@ else()
   set(THIS_TEX_INTERACTION "${TEX_INTERACTION}")
 endif()
 
+message("XELATEX_MEM_FLAGS=${XELATEX_MEM_FLAGS}")
 
 if(DOCS_TESTING)
   string(REPLACE xelatex pdftotext PDFTOTEXT ${XELATEX})
@@ -19,7 +20,7 @@ if(DOCS_TESTING)
 endif()
 
 execute_process(
-  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex
+  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${XELATEX_MEM_FLAGS} ${INNAME}.tex
   TIMEOUT 600
   RESULT_VARIABLE ERRCODE
 )
@@ -45,7 +46,7 @@ if(DOCS_TESTING)
 endif()
 
 execute_process(
-  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex
+  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${XELATEX_MEM_FLAGS} ${INNAME}.tex
   TIMEOUT 600
   RESULT_VARIABLE ERRCODE
 )
@@ -72,7 +73,7 @@ if(DOCS_TESTING)
 endif()
 
 execute_process(
-  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${INNAME}.tex
+  COMMAND ${XELATEX} -interaction=${THIS_TEX_INTERACTION} ${XELATEX_MEM_FLAGS} ${INNAME}.tex
   TIMEOUT 600
   RESULT_VARIABLE ERRCODE
 )
