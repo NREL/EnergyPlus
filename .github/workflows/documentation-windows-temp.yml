@@ -71,7 +71,7 @@ jobs:
       run: |
         xelatex dependencies.tex
         nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
-        [ "$nwords" -lt "1" ] && echo "TOC isn't available for pass NO. 1" || echo "TOC IS available for pass NO. 1"
+        [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 1" || echo "TOC IS available for pass NO. 1"
 
     - name: Build Test package - Pass Number 2
       shell: bash
@@ -79,7 +79,7 @@ jobs:
       run: |
         xelatex dependencies.tex
         nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
-        [ "$nwords" -lt "1" ] && echo "TOC isn't available for pass NO. 2" || echo "TOC IS available for pass NO. 2"
+        [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 2" || echo "TOC IS available for pass NO. 2"
 
     - name: Build Test package - Pass Number 3
       shell: bash
@@ -87,7 +87,7 @@ jobs:
       run: |
         xelatex dependencies.tex
         nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
-        [ "$nwords" -lt "1" ] && echo "TOC isn't available for pass NO. 3" || echo "TOC IS available for pass NO. 3"
+        [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 3" || echo "TOC IS available for pass NO. 3"
 
     - name: Create Build Directory
       run: cmake -E make_directory ./doc/build/
