@@ -52,9 +52,42 @@ jobs:
 
         echo "Configure default mirror for packages"
         mpm --admin --set-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/"
+        # If later we pre-package into a zip/tar.gz all the packages we need, we can preinstall them via
+        # mpm --admin --set-repository=C:/MiKTeX-Repo
+        # mpm --verbose --admin --repository=C:\MiKTeX-Repo --require=@C:\MiKTeX-Repo\energyplus_packages.lst
         # Avoid annoying warning: "xelatex: major issue: So far, you have not checked for updates as a MiKTeX user."
         mpm --find-updates
         mpm --admin --find-updates
+
+    - name: Install required packages
+      shell: bash
+      working-directory: ./doc/
+      run: |
+        mpm --verbose --admin --require=./energyplus_packages.lst
+
+    - name: Build Test package - Pass Number 1
+      shell: bash
+      working-directory: ./doc/test/
+      run: |
+        xelatex dependencies.tex
+        nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
+        [ "$nwords" -lt "1" ] && echo "TOC isn't available for pass NO. 1" || echo "TOC IS available for pass NO. 1"
+
+    - name: Build Test package - Pass Number 2
+      shell: bash
+      working-directory: ./doc/test/
+      run: |
+        xelatex dependencies.tex
+        nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
+        [ "$nwords" -lt "1" ] && echo "TOC isn't available for pass NO. 2" || echo "TOC IS available for pass NO. 2"
+
+    - name: Build Test package - Pass Number 3
+      shell: bash
+      working-directory: ./doc/test/
+      run: |
+        xelatex dependencies.tex
+        nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
+        [ "$nwords" -lt "1" ] && echo "TOC isn't available for pass NO. 3" || echo "TOC IS available for pass NO. 3"
 
     - name: Create Build Directory
       run: cmake -E make_directory ./doc/build/
