@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     state->dataSize->ZoneSizingRunDone = false;
     state->dataPTHP->PTUnit(1).HVACSizingIndex = 0;
     state->dataPTHP->PTUnit(1).CoolOutAirVolFlow = AutoSize;
-    EXPECT_THROW(SizePTUnit(*state, 1),std::runtime_error);
+    EXPECT_THROW(SizePTUnit(*state, 1), std::runtime_error);
     std::string const error_string = delimited_string({
         "   ** Severe  ** For autosizing of ZoneHVAC:WaterToAirHeatPump ZONE WSHP, a zone sizing run must be done.",
         "   **   ~~~   ** No \"Sizing:Zone\" objects were entered.",
