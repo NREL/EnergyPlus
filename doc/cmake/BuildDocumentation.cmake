@@ -99,7 +99,7 @@ if(DOCS_TESTING)
     message("PASS 3: TOC_PAGE1_CONTENT_LEN=${TOC_PAGE1_CONTENT_LEN}, TOC_PAGE1_CONTENT=${TOC_PAGE1_CONTENT}")
 
       # At this point I do expect the TOC to have worked
-    if(${TOC_PAGE1_CONTENT_LEN} LESS_THAN 10)
+    if(TOC_PAGE1_CONTENT_LEN LESS 10)
       message(WARNING "The TOC for '${ORIGINAL_CMAKE_BINARY_DIR}/pdf/${OUTNAME}.pdf' appears broken!")
     endif()
 
