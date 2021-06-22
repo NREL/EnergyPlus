@@ -126,7 +126,6 @@ namespace PlantManager {
 struct PlantMgrData : BaseGlobalStruct
 {
 
-    bool InitLoopEquip = true;
     bool GetCompSizFac = true;
     bool SupplyEnvrnFlag = true;
     bool MySetPointCheckFlag = true;
@@ -140,7 +139,6 @@ struct PlantMgrData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->InitLoopEquip = true;
         this->GetCompSizFac = true;
         this->SupplyEnvrnFlag = true;
         this->MySetPointCheckFlag = true;

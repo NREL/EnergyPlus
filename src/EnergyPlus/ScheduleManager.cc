@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -156,7 +157,7 @@ namespace ScheduleManager {
 
         // Using/Aliasing
         using DataStringGlobals::CharComma;
-        using DataSystemVariables::CheckForActualFileName;
+        using DataSystemVariables::CheckForActualFilePath;
         using General::ProcessDateString;
 
         // Locals
@@ -243,7 +244,6 @@ namespace ScheduleManager {
         std::string LastFor;
         std::string errmsg;
         int kdy;
-        bool FileExists;
         // for SCHEDULE:FILE
         Array1D<Real64> hourlyFileValues;
         std::map<std::string, int> CSVAllColumnNames;
@@ -459,13 +459,13 @@ namespace ScheduleManager {
             std::string ShadingSunlitFracFileName = Alphas(1);
 
             std::string contextString = CurrentModuleObject + ", " + cAlphaFields(1) + ": ";
-            CheckForActualFileName(state, ShadingSunlitFracFileName, FileExists, state.files.TempFullFileName.fileName, contextString);
+            state.files.TempFullFilePath.filePath = CheckForActualFilePath(state, ShadingSunlitFracFileName, contextString);
 
-            if (!FileExists) {
+            if (state.files.TempFullFilePath.filePath.empty()) {
                 ShowFatalError(state, "Program terminates due to previous condition.");
             }
 
-            auto SchdFile = state.files.TempFullFileName.try_open();
+            auto SchdFile = state.files.TempFullFilePath.try_open();
             if (!SchdFile.good()) {
                 ShowSevereError(state, format("{}:\"{}\" cannot be opened.", RoutineName, ShadingSunlitFracFileName));
                 ShowContinueError(state, "... It may be open in another program (such as Excel).  Please close and try again.");
@@ -5266,12 +5266,10 @@ namespace ScheduleManager {
 
             std::string contextString = CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + ": ";
 
-            bool FileExists;
-
-            CheckForActualFileName(state, Alphas(3), FileExists, state.files.TempFullFileName.fileName, contextString);
+            state.files.TempFullFilePath.filePath = CheckForActualFilePath(state, Alphas(3), contextString);
 
             state.dataScheduleMgr->allIdfSchedData.emplace_back(Alphas(1),
-                                                                state.files.TempFullFileName.fileName,
+                                                                state.files.TempFullFilePath.filePath,
                                                                 state.dataScheduleMgr->Schedule(SchNum).ScheduleTypePtr,
                                                                 curcolCount,
                                                                 numHourlyValues,
