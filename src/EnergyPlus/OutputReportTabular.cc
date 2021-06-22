@@ -13525,10 +13525,10 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
     //   For each step of sequence from each design day, compute the
     //   contributions from previous timesteps multiplied by the decay
     //   curve. Rather than store every internal load's radiant contribution
-    //   to each surface, the TMULT and ITABSF sequences were also stored
+    //   to each surface, the EnclRadThermAbsMult and ITABSF sequences were also stored
     //   which allocates the total radiant to each surface in the zone. The
     //   formula used is:
-    //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
+    //       QRadThermInAbs(SurfNum) = QL(NZ) * EnclRadThermAbsMult(NZ) * SurfAbsThermalInt(SurfNum)
 
     auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 

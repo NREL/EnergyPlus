@@ -89,3 +89,31 @@ TEST_F(EnergyPlusFixture, FluidProperties_GetDensityGlycol)
     EXPECT_NEAR(972.03, GetDensityGlycol(*state, "GLHXFLUID", 105.0, FluidIndex, "UnitTest"), 0.01);
     EXPECT_NEAR(953.41, GetDensityGlycol(*state, "GLHXFLUID", 125.0, FluidIndex, "UnitTest"), 0.01);
 }
+
+TEST_F(EnergyPlusFixture, FluidProperties_GetSpecificHeatGlycol)
+{
+
+    std::string const idf_objects = delimited_string({"FluidProperties:GlycolConcentration,",
+                                                      "  GLHXFluid,       !- Name",
+                                                      "  PropyleneGlycol, !- Glycol Type",
+                                                      "  ,                !- User Defined Glycol Name",
+                                                      "  0.3;             !- Glycol Concentration",
+                                                      " "});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+
+    int FluidIndex = 0;
+
+    EXPECT_NEAR(3779, GetSpecificHeatGlycol(*state, "GLHXFLUID", -35.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(3779, GetSpecificHeatGlycol(*state, "GLHXFLUID", -15.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(3807, GetSpecificHeatGlycol(*state, "GLHXFLUID", 5.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(3834, GetSpecificHeatGlycol(*state, "GLHXFLUID", 15.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(3862, GetSpecificHeatGlycol(*state, "GLHXFLUID", 25.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(3889, GetSpecificHeatGlycol(*state, "GLHXFLUID", 35.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(3917, GetSpecificHeatGlycol(*state, "GLHXFLUID", 45.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(3972, GetSpecificHeatGlycol(*state, "GLHXFLUID", 65.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(4027, GetSpecificHeatGlycol(*state, "GLHXFLUID", 85.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(4082, GetSpecificHeatGlycol(*state, "GLHXFLUID", 105.0, FluidIndex, "UnitTest"), 0.01);
+    EXPECT_NEAR(4137, GetSpecificHeatGlycol(*state, "GLHXFLUID", 125.0, FluidIndex, "UnitTest"), 0.01);
+}
