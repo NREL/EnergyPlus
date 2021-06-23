@@ -13258,7 +13258,7 @@ namespace SurfaceGeometry {
             state.dataHeatBal->NominalR.redimension(state.dataHeatBal->TotMaterials);
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Name = MatNameStAir;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Group = DataHeatBalance::MaterialGroup::WindowGas;
-            state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Roughness = 3;
+            state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Conductivity = 0.0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Density = 0.0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).IsoMoistCap = 0.0;
