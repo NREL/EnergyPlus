@@ -37,14 +37,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
 
-    - name: Install IFW
-      shell: bash
-      run: |
-        set -x
-        out_dir=${{ runner.workspace }}/Qt
-        aqt tool linux tools_ifw 4.0 qt.tools.ifw.40 --outputdir="$out_dir"
-        echo "$out_dir/Tools/QtInstallerFramework/4.0/bin" >> $GITHUB_PATH
-
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
 
@@ -67,15 +59,6 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: build/EnergyPlus-*-x86_64.tar.gz
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
-
-    - name: Upload IFW to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/EnergyPlus-*-x86_64.run
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
