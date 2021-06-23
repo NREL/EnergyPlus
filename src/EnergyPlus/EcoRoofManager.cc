@@ -146,9 +146,9 @@ namespace EcoRoofManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EcoLoop; // an integer loop variable for the simultaneous solution iteration
 
-        Real64 AbsThermSurf;                         // Thermal absoptance of the exterior surface
+        Real64 AbsThermSurf;                      // Thermal absoptance of the exterior surface
         DataSurfaces::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
-        Real64 HMovInsul;                            // "Convection" coefficient of movable insulation
+        Real64 HMovInsul;                         // "Convection" coefficient of movable insulation
         //  REAL(r64)    :: HSky                ! "Convection" coefficient from sky to surface
         //  REAL(r64)    :: HAir                ! "Convection" coefficient from air to surface (radiation)
         //  INTEGER :: OPtr

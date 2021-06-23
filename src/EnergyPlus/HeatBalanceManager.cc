@@ -4378,8 +4378,7 @@ namespace HeatBalanceManager {
         // Select the correct Number for the associated ascii name for the roughness type
         if (UtilityRoutines::SameString(Roughness, "VeryRough"))
             state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
-        if (UtilityRoutines::SameString(Roughness, "Rough"))
-            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::Rough;
+        if (UtilityRoutines::SameString(Roughness, "Rough")) state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::Rough;
         if (UtilityRoutines::SameString(Roughness, "MediumRough"))
             state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
         if (UtilityRoutines::SameString(Roughness, "MediumSmooth"))

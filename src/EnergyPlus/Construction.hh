@@ -88,10 +88,10 @@ namespace Construction {
         Real64 OutsideAbsorpSolar;  // Outside Layer solar absorptance of an opaque surface; not used for windows.
         Real64 InsideAbsorpThermal; // Inside Layer Thermal absorptance for opaque surfaces or windows;
         // for windows, applies to innermost glass layer
-        Real64 OutsideAbsorpThermal;                        // Outside Layer Thermal absorptance
+        Real64 OutsideAbsorpThermal;                     // Outside Layer Thermal absorptance
         DataSurfaces::SurfaceRoughness OutsideRoughness; // Outside Surface roughness index
-        int DayltPropPtr;                                   // Pointer to Daylight Construction Properties
-        int W5FrameDivider;                                 // FrameDivider number for window construction from Window5 data file;
+        int DayltPropPtr;                                // Pointer to Daylight Construction Properties
+        int W5FrameDivider;                              // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
         // Conductive properties for the construction
         Array1D<Real64> CTFCross;     // Cross or Y terms of the CTF equation

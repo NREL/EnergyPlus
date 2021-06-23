@@ -144,32 +144,32 @@ namespace PipeHeatTransfer {
         Array1D<Real64> TentativePipeTemp;
         Array1D<Real64> PipeTemp;
         Array1D<Real64> PreviousPipeTemp;
-        int NumDepthNodes;                               // number of soil grid points in the depth direction
-        int PipeNodeDepth;                               // soil depth grid point where pipe is located
-        int PipeNodeWidth;                               // soil width grid point where pipe is located
-        Real64 PipeDepth;                                // pipe burial depth [m]
-        Real64 DomainDepth;                              // soil grid depth [m]
-        Real64 dSregular;                                // grid spacing in cartesian domain [m]
-        Real64 OutdoorConvCoef;                          // soil to air convection coefficient [W/m2.K]
-        std::string SoilMaterial;                        // name of soil material:regular object
-        int SoilMaterialNum;                             // soil material index in material data structure
-        int MonthOfMinSurfTemp;                          // month of minimum ground surface temperature
-        Real64 MinSurfTemp;                              // minimum annual surface temperature [C]
-        Real64 SoilDensity;                              // density of soil [kg/m3]
-        Real64 SoilDepth;                                // thickness of soil [m]
-        Real64 SoilCp;                                   // specific heat of soil [J/kg.K]
-        Real64 SoilConductivity;                         // thermal conductivity of soil [W/m.K]
+        int NumDepthNodes;                            // number of soil grid points in the depth direction
+        int PipeNodeDepth;                            // soil depth grid point where pipe is located
+        int PipeNodeWidth;                            // soil width grid point where pipe is located
+        Real64 PipeDepth;                             // pipe burial depth [m]
+        Real64 DomainDepth;                           // soil grid depth [m]
+        Real64 dSregular;                             // grid spacing in cartesian domain [m]
+        Real64 OutdoorConvCoef;                       // soil to air convection coefficient [W/m2.K]
+        std::string SoilMaterial;                     // name of soil material:regular object
+        int SoilMaterialNum;                          // soil material index in material data structure
+        int MonthOfMinSurfTemp;                       // month of minimum ground surface temperature
+        Real64 MinSurfTemp;                           // minimum annual surface temperature [C]
+        Real64 SoilDensity;                           // density of soil [kg/m3]
+        Real64 SoilDepth;                             // thickness of soil [m]
+        Real64 SoilCp;                                // specific heat of soil [J/kg.K]
+        Real64 SoilConductivity;                      // thermal conductivity of soil [W/m.K]
         DataSurfaces::SurfaceRoughness SoilRoughness; // ground surface roughness
-        Real64 SoilThermAbs;                             // ground surface thermal absorptivity
-        Real64 SoilSolarAbs;                             // ground surface solar absorptivity
-        Real64 CoefA1;                                   // soil finite difference coefficient
-        Real64 CoefA2;                                   // soil finite difference coefficient
-        Real64 FourierDS;                                // soil Fourier number based on grid spacing
-        Real64 SoilDiffusivity;                          // soil thermal diffusivity [m2/s]
-        Real64 SoilDiffusivityPerDay;                    // soil thermal diffusivity [m2/day]
-        Array4D<Real64> T;                               // soil temperature array
-        bool BeginSimInit;                               // begin sim and begin environment flag
-        bool BeginSimEnvrn;                              // begin sim and begin environment flag
+        Real64 SoilThermAbs;                          // ground surface thermal absorptivity
+        Real64 SoilSolarAbs;                          // ground surface solar absorptivity
+        Real64 CoefA1;                                // soil finite difference coefficient
+        Real64 CoefA2;                                // soil finite difference coefficient
+        Real64 FourierDS;                             // soil Fourier number based on grid spacing
+        Real64 SoilDiffusivity;                       // soil thermal diffusivity [m2/s]
+        Real64 SoilDiffusivityPerDay;                 // soil thermal diffusivity [m2/day]
+        Array4D<Real64> T;                            // soil temperature array
+        bool BeginSimInit;                            // begin sim and begin environment flag
+        bool BeginSimEnvrn;                           // begin sim and begin environment flag
         bool FirstHVACupdateFlag;
         bool BeginEnvrnupdateFlag;
         bool SolarExposed;       // Flag to determine if solar is included at ground surface

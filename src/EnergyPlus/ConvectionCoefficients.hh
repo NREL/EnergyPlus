@@ -458,24 +458,24 @@ namespace ConvectionCoefficients {
     );
 
     void InitExteriorConvectionCoeff(EnergyPlusData &state,
-                                     int SurfNum,                                 // Surface number (in Surface derived type)
-                                     Real64 HMovInsul,                            // Equivalent convection coefficient of movable insulation
+                                     int SurfNum,                              // Surface number (in Surface derived type)
+                                     Real64 HMovInsul,                         // Equivalent convection coefficient of movable insulation
                                      DataSurfaces::SurfaceRoughness Roughness, // Roughness index (1-6), see DataHeatBalance parameters
-                                     Real64 AbsExt,                               // Exterior thermal absorptance
-                                     Real64 TempExt,                              // Exterior surface temperature (C)
-                                     Real64 &HExt,                                // Convection coefficient to exterior air
-                                     Real64 &HSky,                                // "Convection" coefficient to sky temperature
-                                     Real64 &HGround,                             // "Convection" coefficient to ground temperature
-                                     Real64 &HAir                                 // Radiation to Air Component
+                                     Real64 AbsExt,                            // Exterior thermal absorptance
+                                     Real64 TempExt,                           // Exterior surface temperature (C)
+                                     Real64 &HExt,                             // Convection coefficient to exterior air
+                                     Real64 &HSky,                             // "Convection" coefficient to sky temperature
+                                     Real64 &HGround,                          // "Convection" coefficient to ground temperature
+                                     Real64 &HAir                              // Radiation to Air Component
     );
 
-    Real64 CalcHfExteriorSparrow(Real64 SurfWindSpeed, // Local wind speed at height of the heat transfer surface (m/s)
-                                 Real64 GrossArea,     // Gross surface area {m2}
-                                 Real64 Perimeter,     // Surface perimeter length {m}
-                                 Real64 CosTilt,       // Cosine of the Surface Tilt Angle
-                                 Real64 Azimuth,       // Facing angle (degrees) of the surface outward normal
+    Real64 CalcHfExteriorSparrow(Real64 SurfWindSpeed,                     // Local wind speed at height of the heat transfer surface (m/s)
+                                 Real64 GrossArea,                         // Gross surface area {m2}
+                                 Real64 Perimeter,                         // Surface perimeter length {m}
+                                 Real64 CosTilt,                           // Cosine of the Surface Tilt Angle
+                                 Real64 Azimuth,                           // Facing angle (degrees) of the surface outward normal
                                  DataSurfaces::SurfaceRoughness Roughness, // Surface roughness index
-                                 Real64 WindDirection  // Wind (compass) direction (degrees)
+                                 Real64 WindDirection                      // Wind (compass) direction (degrees)
     );
 
     bool Windward(Real64 CosTilt,      // Cosine of the surface tilt angle
@@ -487,9 +487,8 @@ namespace ConvectionCoefficients {
 
     void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
 
-    Real64
-    CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness Roughness, // Integer index for roughness, relates to parameter array indices
-                                  Real64 SurfWindSpeed                         // Current wind speed, m/s
+    Real64 CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness Roughness, // Integer index for roughness, relates to parameter array indices
+                                         Real64 SurfWindSpeed                      // Current wind speed, m/s
     );
 
     Real64 CalcASHRAESimpleIntConvCoeff(Real64 Tsurf, Real64 Tamb, Real64 cosTilt);

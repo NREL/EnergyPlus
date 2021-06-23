@@ -189,9 +189,9 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Real64 const AspRat,           // aspect ratio of gap  Height/gap [--]
                                   Real64 const GapThick,         // Thickness of air space between baffle and underlying heat transfer surface
                                   DataSurfaces::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
-                                  Real64 const QdotSource, // Source/sink term, e.g. electricity exported from solar cell [W]
-                                  Real64 &TsBaffle,        // Temperature of baffle (both sides) use lagged value on input [C]
-                                  Real64 &TaGap,           // Temperature of air gap (assumed mixed) use lagged value on input [C]
+                                  Real64 const QdotSource,                        // Source/sink term, e.g. electricity exported from solar cell [W]
+                                  Real64 &TsBaffle,                               // Temperature of baffle (both sides) use lagged value on input [C]
+                                  Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
                                   Optional<Real64> HcGapRpt = _,
                                   Optional<Real64> HrGapRpt = _,
                                   Optional<Real64> IscRpt = _,

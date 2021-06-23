@@ -72,31 +72,31 @@ namespace TranspiredCollector {
         // Members
         // from input data
         std::string Name;
-        std::string OSCMName;                            // OtherSideConditionsModel
-        int OSCMPtr;                                     // OtherSideConditionsModel index
-        int SchedPtr;                                    // Availablity schedule
-        Array1D_int InletNode;                           // Air system node "pointer", should be set to outdoor air
-        Array1D_int OutletNode;                          // Air system node "pointer", outlet from UTSC
-        Array1D_int ControlNode;                         // Air system node "pointer", should have mixed air setpoint
-        Array1D_int ZoneNode;                            // Air system node "pointer", should have zone node
-        int Layout;                                      // 'Square' or 'Triangle'
-        int Correlation;                                 // which heat exchanger effectiveness model
-        Real64 HoleDia;                                  // Diameter of Perforations in Collector [m]
-        Real64 Pitch;                                    // Distance between Perforations in Collector [m]
-        Real64 LWEmitt;                                  // Thermal Emissivity of Collector Surface [dimensionless]
-        Real64 SolAbsorp;                                // Solar Absorbtivity of Collector Surface [dimensionless]
+        std::string OSCMName;                         // OtherSideConditionsModel
+        int OSCMPtr;                                  // OtherSideConditionsModel index
+        int SchedPtr;                                 // Availablity schedule
+        Array1D_int InletNode;                        // Air system node "pointer", should be set to outdoor air
+        Array1D_int OutletNode;                       // Air system node "pointer", outlet from UTSC
+        Array1D_int ControlNode;                      // Air system node "pointer", should have mixed air setpoint
+        Array1D_int ZoneNode;                         // Air system node "pointer", should have zone node
+        int Layout;                                   // 'Square' or 'Triangle'
+        int Correlation;                              // which heat exchanger effectiveness model
+        Real64 HoleDia;                               // Diameter of Perforations in Collector [m]
+        Real64 Pitch;                                 // Distance between Perforations in Collector [m]
+        Real64 LWEmitt;                               // Thermal Emissivity of Collector Surface [dimensionless]
+        Real64 SolAbsorp;                             // Solar Absorbtivity of Collector Surface [dimensionless]
         DataSurfaces::SurfaceRoughness CollRoughness; // surface roughness for exterior convection calcs.
-        Real64 PlenGapThick;                             // Depth of Plenum Behind Collector [m]
-        Real64 PlenCrossArea;                            // cross section area of plenum behind collector [m2]
-        int NumSurfs;                                    // a single collector can have multiple surfaces underneath it
-        Array1D_int SurfPtrs;                            // = 0  ! array of pointers for participating underlying surfaces
-        Real64 Height;                                   // Overall Height of Collector  [m]
-        Real64 AreaRatio;                                // Ratio of actual surface are to projected surface area [dimensionless]
-        Real64 CollectThick;                             // Thickness of collector absorber plate material.  [m]
-        Real64 Cv;                                       // volume-based effectiveness of openings for wind-driven vent when Passive
-        Real64 Cd;                                       // discharge coefficient of openings for bouyancy-driven vent when Passive
-        int NumOASysAttached;                            // =1 if no splitter, other wise set by Splitter object
-        int FreeHeatSetPointSchedPtr;                    // used for controlling seperately from usual setpoint managers.
+        Real64 PlenGapThick;                          // Depth of Plenum Behind Collector [m]
+        Real64 PlenCrossArea;                         // cross section area of plenum behind collector [m2]
+        int NumSurfs;                                 // a single collector can have multiple surfaces underneath it
+        Array1D_int SurfPtrs;                         // = 0  ! array of pointers for participating underlying surfaces
+        Real64 Height;                                // Overall Height of Collector  [m]
+        Real64 AreaRatio;                             // Ratio of actual surface are to projected surface area [dimensionless]
+        Real64 CollectThick;                          // Thickness of collector absorber plate material.  [m]
+        Real64 Cv;                                    // volume-based effectiveness of openings for wind-driven vent when Passive
+        Real64 Cd;                                    // discharge coefficient of openings for bouyancy-driven vent when Passive
+        int NumOASysAttached;                         // =1 if no splitter, other wise set by Splitter object
+        int FreeHeatSetPointSchedPtr;                 // used for controlling seperately from usual setpoint managers.
         int VsucErrIndex;
         // data from elswhere and calculated
         Real64 ActualArea; // Overall Area of Collect with surface corrugations.
