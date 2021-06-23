@@ -70,15 +70,10 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
 struct cached_twb_t
 {
     // Members
-    Int64 iTdb;
-    Int64 iW;
-    Int64 iPb;
-    Real64 Twb;
-
-    // Default Constructor
-    cached_twb_t() : iTdb(0), iW(0), iPb(0), Twb(0.0)
-    {
-    }
+    std::uint64_t iTdb{0};
+    std::uint64_t iW{0};
+    std::uint64_t iPb{0};
+    Real64 Twb{0};
 };
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
