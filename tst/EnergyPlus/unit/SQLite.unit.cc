@@ -622,7 +622,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     auto const &materialData1 = std::unique_ptr<Material::MaterialProperties>(new Material::MaterialProperties());
     materialData1->Name = "test material 2";
     materialData1->Group = DataHeatBalance::MaterialGroup::Shade;
-    materialData1->Roughness = DataSurfaces::SurfaceRoughness::Rough;
+    materialData1->Roughness = DataSurfaces::SurfaceRoughness::Rough; // 1
     materialData1->Conductivity = 2;
     materialData1->Density = 2;
     materialData1->IsoMoistCap = 2;
@@ -647,7 +647,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     constructData1->OutsideAbsorpSolar = 2;
     constructData1->InsideAbsorpThermal = 2;
     constructData1->OutsideAbsorpThermal = 2;
-    constructData1->OutsideRoughness = DataSurfaces::SurfaceRoughness::Rough;
+    constructData1->OutsideRoughness = DataSurfaces::SurfaceRoughness::Rough; // 1 
     constructData1->TypeIsWindow = true;
     constructData1->LayerPoint.allocate(2);
     constructData1->LayerPoint(1) = 2;
@@ -920,14 +920,14 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     EXPECT_EQ(schedule1, schedules[1]);
 
     ASSERT_EQ(2ul, materials.size());
-    std::vector<std::string> material0{"1", "test material 1", "1", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0", "0.0", "0.0", "0.0", "0.0"};
-    std::vector<std::string> material1{"2", "test material 2", "2", "2", "2.0", "2.0", "2.0", "2.0", "2.0", "1", "2.0", "2.0", "2.0", "2.0"};
+    std::vector<std::string> material0{"1", "test material 1", "1", "-1", "0.0", "0.0", "0.0", "0.0", "0.0", "0", "0.0", "0.0", "0.0", "0.0"};
+    std::vector<std::string> material1{"2", "test material 2", "2", "1", "2.0", "2.0", "2.0", "2.0", "2.0", "1", "2.0", "2.0", "2.0", "2.0"};
     EXPECT_EQ(material0, materials[0]);
     EXPECT_EQ(material1, materials[1]);
 
     ASSERT_EQ(2ul, constructions.size());
-    std::vector<std::string> construction0{"1", "test construction 1", "0", "0", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0", "0", "0.0"};
-    std::vector<std::string> construction1{"2", "test construction 2", "2", "2", "2", "2.0", "2.0", "2.0", "2.0", "2.0", "2.0", "2", "1", "2.0"};
+    std::vector<std::string> construction0{"1", "test construction 1", "0", "0", "0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "-1", "0", "0.0"};
+    std::vector<std::string> construction1{"2", "test construction 2", "2", "2", "2", "2.0", "2.0", "2.0", "2.0", "2.0", "2.0", "1", "1", "2.0"};
     EXPECT_EQ(construction0, constructions[0]);
     EXPECT_EQ(construction1, constructions[1]);
 
