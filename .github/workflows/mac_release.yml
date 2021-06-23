@@ -37,14 +37,6 @@ jobs:
         brew install --cask mactex
         echo "/Library/TeX/texbin" >> $GITHUB_PATH
 
-    - name: Install IFW
-      shell: bash
-      run: |
-        set -x
-        out_dir=${{ runner.workspace }}/Qt
-        aqt tool mac tools_ifw 4.0 qt.tools.ifw.40 --outputdir="$out_dir"
-        echo "$out_dir/Tools/QtInstallerFramework/4.0/bin" >> $GITHUB_PATH
-
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
 
