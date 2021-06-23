@@ -1628,7 +1628,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).Conductivity = 1.95; // W/mK
             state.dataMaterial->Material(MaterNum).Density = 2240.0;    // kg/m3
             state.dataMaterial->Material(MaterNum).SpecHeat = 900.0;    // J/kgK
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
             state.dataMaterial->Material(MaterNum).AbsorpSolar = 0.7;
             state.dataMaterial->Material(MaterNum).AbsorpThermal = 0.9;
             state.dataMaterial->Material(MaterNum).AbsorpVisible = 0.7;
@@ -1706,7 +1706,7 @@ namespace HeatBalanceManager {
                 state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
                 state.dataMaterial->Material(MaterNum).Name = format("~FC_Insulation_{}", Loop);
                 state.dataMaterial->Material(MaterNum).ROnly = true;
-                state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+                state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
                 state.dataMaterial->Material(MaterNum).AbsorpSolar = 0.0;
                 state.dataMaterial->Material(MaterNum).AbsorpThermal = 0.0;
                 state.dataMaterial->Material(MaterNum).AbsorpVisible = 0.0;
@@ -1746,7 +1746,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::Air;
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
 
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
             state.dataMaterial->Material(MaterNum).Resistance = MaterialProps(1);
             state.dataMaterial->Material(MaterNum).ROnly = true;
@@ -1833,7 +1833,7 @@ namespace HeatBalanceManager {
             // Load the material derived type from the input data.
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
             state.dataMaterial->Material(MaterNum).ROnly = true;
             state.dataMaterial->Material(MaterNum).Thickness = MaterialProps(1);
             if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) {
@@ -2301,7 +2301,7 @@ namespace HeatBalanceManager {
             // Load the material derived type from the input data.
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
             state.dataMaterial->Material(MaterNum).Thickness = MaterialProps(1);
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
@@ -2394,7 +2394,7 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
             state.dataMaterial->Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
@@ -2507,7 +2507,7 @@ namespace HeatBalanceManager {
                                       "\" should be Air, Argon, Krypton, Xenon or Custom.");
             }
 
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
             state.dataMaterial->Material(MaterNum).Thickness = MaterialProps(1);
             state.dataMaterial->Material(MaterNum).ROnly = true;
@@ -2626,7 +2626,7 @@ namespace HeatBalanceManager {
                     state, state.dataIPShortCut->cAlphaFieldNames(2) + " entered value=\"" + TypeOfGas + "\" should be Air, Argon, Krypton, Xenon");
             }
 
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
 
             state.dataMaterial->Material(MaterNum).Thickness = MaterialProps(1);
             state.dataMaterial->Material(MaterNum).ROnly = true;
@@ -2754,7 +2754,7 @@ namespace HeatBalanceManager {
                 }
             }
 
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough; // Unused
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
 
             state.dataMaterial->Material(MaterNum).Thickness = MaterialProps(1);
             if (state.dataMaterial->Material(MaterNum).Thickness <= 0.0) {
@@ -2819,7 +2819,7 @@ namespace HeatBalanceManager {
             // Load the material derived type from the input data.
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
             state.dataMaterial->Material(MaterNum).Trans = MaterialProps(1);
             state.dataMaterial->Material(MaterNum).ReflectShade = MaterialProps(2);
             state.dataMaterial->Material(MaterNum).TransVis = MaterialProps(3);
@@ -2903,7 +2903,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::ShadeEquivalentLayer;
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
             //  Front side and back side have the same beam-Beam Transmittance
@@ -2994,7 +2994,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::DrapeEquivalentLayer;
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
             //  Front side and back side have the same properties
@@ -3092,7 +3092,7 @@ namespace HeatBalanceManager {
                                   state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + MaterialNames(2) +
                                       "\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.");
             }
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
             state.dataMaterial->Material(MaterNum).ReflectShade = MaterialProps(1);
             if (state.dataMaterial->Material(MaterNum).ReflectShade < 0.0 || state.dataMaterial->Material(MaterNum).ReflectShade > 1.0) {
                 ErrorsFound = true;
@@ -3278,7 +3278,7 @@ namespace HeatBalanceManager {
             // Load the material derived type from the input data.
             // WindowMaterial:Screen:EquivalentLayer,
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
             state.dataMaterial->Material(MaterNum).ROnly = true;
             state.dataMaterial->Material(MaterNum).TausFrontBeamBeam = MaterialProps(1);
             state.dataMaterial->Material(MaterNum).TausBackBeamBeam = MaterialProps(1);
@@ -3425,7 +3425,7 @@ namespace HeatBalanceManager {
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
             state.dataHeatBal->Blind(Loop).Name = MaterialNames(1);
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::Rough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::Rough;
             state.dataMaterial->Material(MaterNum).BlindDataPtr = Loop;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
@@ -3717,7 +3717,7 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::BlindEquivalentLayer;
 
             state.dataMaterial->Material(MaterNum).Name = MaterialNames(1);
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::Rough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::Rough;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
             if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
@@ -4377,20 +4377,20 @@ namespace HeatBalanceManager {
 
         // Select the correct Number for the associated ascii name for the roughness type
         if (UtilityRoutines::SameString(Roughness, "VeryRough"))
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::VeryRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
         if (UtilityRoutines::SameString(Roughness, "Rough"))
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::Rough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::Rough;
         if (UtilityRoutines::SameString(Roughness, "MediumRough"))
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
         if (UtilityRoutines::SameString(Roughness, "MediumSmooth"))
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumSmooth;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
         if (UtilityRoutines::SameString(Roughness, "Smooth"))
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::Smooth;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::Smooth;
         if (UtilityRoutines::SameString(Roughness, "VerySmooth"))
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
 
         // Was it set?
-        if (state.dataMaterial->Material(MaterNum).Roughness == DataHeatBalance::SurfaceRoughness::Unassigned) {
+        if (state.dataMaterial->Material(MaterNum).Roughness == DataSurfaces::SurfaceRoughness::Unassigned) {
             ShowSevereError(state, "Material=" + state.dataMaterial->Material(MaterNum).Name + ",Illegal Roughness=" + Roughness);
             ErrorsFound = true;
         }
@@ -7026,7 +7026,7 @@ namespace HeatBalanceManager {
             for (loop = TotMaterialsPrev + 1; loop <= state.dataHeatBal->TotMaterials; ++loop) {
                 state.dataMaterial->Material(loop).Name = "";
                 state.dataMaterial->Material(loop).Group = DataHeatBalance::MaterialGroup::Unassigned;
-                state.dataMaterial->Material(loop).Roughness = DataHeatBalance::SurfaceRoughness::Unassigned;
+                state.dataMaterial->Material(loop).Roughness = DataSurfaces::SurfaceRoughness::Unassigned;
                 state.dataMaterial->Material(loop).Conductivity = 0.0;
                 state.dataMaterial->Material(loop).Density = 0.0;
                 state.dataMaterial->Material(loop).IsoMoistCap = 0.0;
@@ -7121,7 +7121,7 @@ namespace HeatBalanceManager {
                         state.dataMaterial->Material(MaterNum).Name =
                             "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GLASS" + NumName(IGlass);
                     }
-                    state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
+                    state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
                     state.dataMaterial->Material(MaterNum).AbsorpThermal = state.dataMaterial->Material(MaterNum).AbsorpThermalBack;
                     if (state.dataMaterial->Material(MaterNum).Thickness <= 0.0) {
                         ShowSevereError(state,
@@ -7152,7 +7152,7 @@ namespace HeatBalanceManager {
                             "W5:" + DesiredConstructionName + ':' + NumName(IGlSys) + ":GAP" + NumName(IGap);
                     }
                     state.dataMaterial->Material(MaterNum).Thickness *= 0.001;
-                    state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::MediumRough; // Unused
+                    state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::MediumRough; // Unused
                 }
             }
 
@@ -7283,7 +7283,7 @@ namespace HeatBalanceManager {
                     if (IGlass < NGlass(IGlSys)) state.dataConstruction->Construct(ConstrNum).LayerPoint(2 * IGlass) = MaterNumSysGap(IGlass, IGlSys);
                 }
 
-                state.dataConstruction->Construct(ConstrNum).OutsideRoughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
+                state.dataConstruction->Construct(ConstrNum).OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
                 state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal =
                     state.dataMaterial->Material(TotMaterialsPrev + NGlass(IGlSys)).AbsorpThermalBack;
                 state.dataConstruction->Construct(ConstrNum).OutsideAbsorpThermal =
@@ -8387,7 +8387,7 @@ namespace HeatBalanceManager {
         // first fill out defaults
         state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = 0;
         state.dataMaterial->Material(MaterNum).SolarDiffusing = false;
-        state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
+        state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::VerySmooth;
         state.dataMaterial->Material(MaterNum).TransThermal = 0.0;
         state.dataMaterial->Material(MaterNum).AbsorpThermalBack = 0.84;
         state.dataMaterial->Material(MaterNum).AbsorpThermalFront = 0.84;
@@ -8692,7 +8692,7 @@ namespace HeatBalanceManager {
 
             ++MaterNum;
             state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::ComplexWindowGap;
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::Rough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::Rough;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
             state.dataMaterial->Material(MaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -8769,7 +8769,7 @@ namespace HeatBalanceManager {
 
             ++MaterNum;
             state.dataMaterial->Material(MaterNum).Group = DataHeatBalance::MaterialGroup::ComplexWindowShade;
-            state.dataMaterial->Material(MaterNum).Roughness = DataHeatBalance::SurfaceRoughness::Rough;
+            state.dataMaterial->Material(MaterNum).Roughness = DataSurfaces::SurfaceRoughness::Rough;
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
             // Assign pointer to ComplexShade

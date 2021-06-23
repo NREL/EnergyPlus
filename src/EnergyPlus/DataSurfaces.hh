@@ -62,7 +62,6 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
@@ -170,10 +169,22 @@ namespace DataSurfaces {
         OnHiZoneTemp_HiHorzSolar = 21
     };
 
+    // Parameters to indicate surface roughness for use with the Material
+    // derived type (see below):
+    enum class SurfaceRoughness
+    {
+        Unassigned = -1,
+        VeryRough,
+        Rough,
+        MediumRough,
+        MediumSmooth,
+        Smooth,
+        VerySmooth
+    };
+
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
-
     constexpr int ExternalEnvironment(0);
     constexpr int Ground(-1);
     constexpr int OtherSideCoefNoCalcExt(-2);
@@ -1018,7 +1029,7 @@ namespace DataSurfaces {
         Real64 Porosity;                                   // fraction of absorber plate [--]
         Real64 LWEmitt;                                    // Thermal Emissivity of Baffle Surface [dimensionless]
         Real64 SolAbsorp;                                  // Solar Absorbtivity of Baffle Surface [dimensionless]
-        DataHeatBalance::SurfaceRoughness BaffleRoughness; // surface roughness for exterior convection calcs.
+        SurfaceRoughness BaffleRoughness; // surface roughness for exterior convection calcs.
         Real64 PlenGapThick;                               // Depth of Plenum Behind Baffle [m]
         int NumSurfs;                                      // a single baffle can have multiple surfaces underneath it
         Array1D_int SurfPtrs;                              // = 0  ! array of pointers for participating underlying surfaces
@@ -1049,7 +1060,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         ExtVentedCavityStruct()
-            : OSCMPtr(0), Porosity(0.0), LWEmitt(0.0), SolAbsorp(0.0), BaffleRoughness(DataHeatBalance::SurfaceRoughness::VeryRough),
+            : OSCMPtr(0), Porosity(0.0), LWEmitt(0.0), SolAbsorp(0.0), BaffleRoughness(SurfaceRoughness::VeryRough),
               PlenGapThick(0.0), NumSurfs(0), HdeltaNPL(0.0), AreaRatio(0.0), Cv(0.0), Cd(0.0), ActualArea(0.0), ProjArea(0.0),
               Centroid(0.0, 0.0, 0.0), TAirCav(0.0), Tbaffle(0.0), TairLast(20.0), TbaffleLast(20.0), HrPlen(0.0), HcPlen(0.0), MdotVent(0.0),
               Tilt(0.0), Azimuth(0.0), QdotSource(0.0), Isc(0.0), PassiveACH(0.0), PassiveMdotVent(0.0), PassiveMdotWind(0.0), PassiveMdotTherm(0.0)

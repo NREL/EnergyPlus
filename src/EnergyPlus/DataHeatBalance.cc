@@ -1376,7 +1376,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     }
 }
 
-std::string DisplayMaterialRoughness(SurfaceRoughness const Roughness) // Roughness String
+std::string DisplayMaterialRoughness(DataSurfaces::SurfaceRoughness const Roughness) // Roughness String
 {
 
     // SUBROUTINE INFORMATION:
@@ -1394,17 +1394,17 @@ std::string DisplayMaterialRoughness(SurfaceRoughness const Roughness) // Roughn
     // Select the correct Number for the associated ascii name for the roughness type
     {
         auto const SELECT_CASE_var(Roughness);
-        if (SELECT_CASE_var == SurfaceRoughness::VeryRough) {
+        if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::VeryRough) {
             cRoughness = "VeryRough";
-        } else if (SELECT_CASE_var == SurfaceRoughness::Rough) {
+        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::Rough) {
             cRoughness = "Rough";
-        } else if (SELECT_CASE_var == SurfaceRoughness::MediumRough) {
+        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::MediumRough) {
             cRoughness = "MediumRough";
-        } else if (SELECT_CASE_var == SurfaceRoughness::MediumSmooth) {
+        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::MediumSmooth) {
             cRoughness = "MediumSmooth";
-        } else if (SELECT_CASE_var == SurfaceRoughness::Smooth) {
+        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::Smooth) {
             cRoughness = "Smooth";
-        } else if (SELECT_CASE_var == SurfaceRoughness::VerySmooth) {
+        } else if (SELECT_CASE_var == DataSurfaces::SurfaceRoughness::VerySmooth) {
             cRoughness = "VerySmooth";
         } else {
             cRoughness = "";

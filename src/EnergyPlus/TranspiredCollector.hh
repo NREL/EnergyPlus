@@ -85,7 +85,7 @@ namespace TranspiredCollector {
         Real64 Pitch;                                    // Distance between Perforations in Collector [m]
         Real64 LWEmitt;                                  // Thermal Emissivity of Collector Surface [dimensionless]
         Real64 SolAbsorp;                                // Solar Absorbtivity of Collector Surface [dimensionless]
-        DataHeatBalance::SurfaceRoughness CollRoughness; // surface roughness for exterior convection calcs.
+        DataSurfaces::SurfaceRoughness CollRoughness; // surface roughness for exterior convection calcs.
         Real64 PlenGapThick;                             // Depth of Plenum Behind Collector [m]
         Real64 PlenCrossArea;                            // cross section area of plenum behind collector [m2]
         int NumSurfs;                                    // a single collector can have multiple surfaces underneath it
@@ -141,7 +141,7 @@ namespace TranspiredCollector {
         // Default Constructor
         UTSCDataStruct()
             : OSCMPtr(0), SchedPtr(0), Layout(0), Correlation(0), HoleDia(0.0), Pitch(0.0), LWEmitt(0.0), SolAbsorp(0.0),
-              CollRoughness(DataHeatBalance::SurfaceRoughness::VeryRough), PlenGapThick(0.0), PlenCrossArea(0.0), NumSurfs(0), Height(0.0),
+              CollRoughness(DataSurfaces::SurfaceRoughness::VeryRough), PlenGapThick(0.0), PlenCrossArea(0.0), NumSurfs(0), Height(0.0),
               AreaRatio(0.0), CollectThick(0.0), Cv(0.0), Cd(0.0), NumOASysAttached(0), FreeHeatSetPointSchedPtr(0), VsucErrIndex(0), ActualArea(0.0),
               ProjArea(0.0), Centroid(0.0, 0.0, 0.0), Porosity(0.0), IsOn(false), Tplen(0.0), Tcoll(0.0), TplenLast(22.5), TcollLast(22.0),
               HrPlen(0.0), HcPlen(0.0), MdotVent(0.0), HdeltaNPL(0.0), TairHX(0.0), InletMDot(0.0), InletTempDB(0.0), Tilt(0.0), Azimuth(0.0),

@@ -159,7 +159,7 @@ namespace PipeHeatTransfer {
         Real64 SoilDepth;                                // thickness of soil [m]
         Real64 SoilCp;                                   // specific heat of soil [J/kg.K]
         Real64 SoilConductivity;                         // thermal conductivity of soil [W/m.K]
-        DataHeatBalance::SurfaceRoughness SoilRoughness; // ground surface roughness
+        DataSurfaces::SurfaceRoughness SoilRoughness; // ground surface roughness
         Real64 SoilThermAbs;                             // ground surface thermal absorptivity
         Real64 SoilSolarAbs;                             // ground surface solar absorptivity
         Real64 CoefA1;                                   // soil finite difference coefficient
@@ -204,7 +204,7 @@ namespace PipeHeatTransfer {
               InsulationThickness(0.0), InsulationResistance(0.0), CurrentSimTime(0.0), PreviousSimTime(0.0), NumDepthNodes(0), PipeNodeDepth(0),
               PipeNodeWidth(0), PipeDepth(0.0), DomainDepth(0.0), dSregular(0.0), OutdoorConvCoef(0.0), SoilMaterialNum(0), MonthOfMinSurfTemp(0),
               MinSurfTemp(0.0), SoilDensity(0.0), SoilDepth(0.0), SoilCp(0.0), SoilConductivity(0.0),
-              SoilRoughness(DataHeatBalance::SurfaceRoughness::Unassigned), SoilThermAbs(0.0), SoilSolarAbs(0.0), CoefA1(0.0), CoefA2(0.0),
+              SoilRoughness(DataSurfaces::SurfaceRoughness::Unassigned), SoilThermAbs(0.0), SoilSolarAbs(0.0), CoefA1(0.0), CoefA2(0.0),
               FourierDS(0.0), SoilDiffusivity(0.0), SoilDiffusivityPerDay(0.0), BeginSimInit(true), BeginSimEnvrn(true), FirstHVACupdateFlag(true),
               BeginEnvrnupdateFlag(true), SolarExposed(true), SumTK(0.0), ZoneHeatGainRate(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
               CheckEquipName(true), OneTimeInit(true), FluidInletTemp(0.0), FluidOutletTemp(0.0), MassFlowRate(0.0), FluidHeatLossRate(0.0),

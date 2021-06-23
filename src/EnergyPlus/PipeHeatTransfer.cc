@@ -1369,7 +1369,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     Real64 PastNodeTempAbs(0.0); // Placeholder for absolute temperature (K) version of NodePast
     Real64 Ttemp(0.0);           // Placeholder for a current temperature node in convergence check
     Real64 SkyTempAbs(0.0);      // Placeholder for current sky temperature in Kelvin
-    DataHeatBalance::SurfaceRoughness TopRoughness(DataHeatBalance::SurfaceRoughness::Unassigned); // Placeholder for soil surface roughness
+    DataSurfaces::SurfaceRoughness TopRoughness(DataSurfaces::SurfaceRoughness::Unassigned); // Placeholder for soil surface roughness
     Real64 TopThermAbs(0.0); // Placeholder for soil thermal radiation absorptivity
     Real64 TopSolarAbs(0.0); // Placeholder for soil solar radiation absorptivity
     Real64 kSoil(0.0);       // Placeholder for soil conductivity

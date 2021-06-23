@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
 
     state->dataMaterial->Material.allocate(1);
     state->dataMaterial->Material(1).Resistance = 1.25;
-    state->dataMaterial->Material(1).Roughness = 1;
+    state->dataMaterial->Material(1).Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
     state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
     state->dataMaterial->Material(1).AbsorpSolar = 0.75;
     state->dataMaterial->Material(1).AbsorpThermal = 0.75;
@@ -103,7 +103,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
     EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsSolarExt(1));
     EXPECT_EQ(0.8, state->dataHeatBalSurf->SurfMovInsulHExt(1));
-    EXPECT_EQ(1, state->dataHeatBalSurf->SurfRoughnessExt(1));
+    EXPECT_EQ(DataSurfaces::SurfaceRoughness::VeryRough, state->dataHeatBalSurf->SurfRoughnessExt(1));
     EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsThermalExt(1));
 
     state->dataHeatBalSurf->SurfAbsSolarExt(1) = 0.0;
@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
 
     state->dataMaterial->Material.allocate(1);
     state->dataMaterial->Material(1).Resistance = 1.25;
-    state->dataMaterial->Material(1).Roughness = 1;
+    state->dataMaterial->Material(1).Roughness = DataSurfaces::SurfaceRoughness::VeryRough;
     state->dataMaterial->Material(1).Group = DataHeatBalance::MaterialGroup::RegularMaterial;
     state->dataMaterial->Material(1).AbsorpSolar = 0.75;
     state->dataMaterial->Material(1).AbsorpThermal = 0.75;

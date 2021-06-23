@@ -512,20 +512,20 @@ namespace TranspiredCollector {
             Roughness = Alphas(11);
             // Select the correct Number for the associated ascii name for the roughness type
             if (UtilityRoutines::SameString(Roughness, "VeryRough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataHeatBalance::SurfaceRoughness::VeryRough;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::VeryRough;
             if (UtilityRoutines::SameString(Roughness, "Rough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataHeatBalance::SurfaceRoughness::Rough;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::Rough;
             if (UtilityRoutines::SameString(Roughness, "MediumRough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataHeatBalance::SurfaceRoughness::MediumRough;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::MediumRough;
             if (UtilityRoutines::SameString(Roughness, "MediumSmooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataHeatBalance::SurfaceRoughness::MediumSmooth;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
             if (UtilityRoutines::SameString(Roughness, "Smooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataHeatBalance::SurfaceRoughness::Smooth;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::Smooth;
             if (UtilityRoutines::SameString(Roughness, "VerySmooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataHeatBalance::SurfaceRoughness::VerySmooth;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
 
             // Was it set?
-            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == DataHeatBalance::SurfaceRoughness::Unassigned) {
+            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == DataSurfaces::SurfaceRoughness::Unassigned) {
                 ShowSevereError(state,
                                 state.dataIPShortCut->cAlphaFieldNames(11) + " has incorrect entry of " + Alphas(11) + " in " + CurrentModuleObject +
                                     " =" + state.dataTranspiredCollector->UTSC(Item).Name);
@@ -1001,7 +1001,7 @@ namespace TranspiredCollector {
         Real64 QdotSource;                           // energy flux for source/sink inside collector surface (for hybrid PV UTSC)
         int ThisSurf;                                // do loop counter
         int NumSurfs;                                // number of underlying HT surfaces associated with UTSC
-        DataHeatBalance::SurfaceRoughness Roughness; // parameters for surface roughness, defined in DataHeatBalance
+        DataSurfaces::SurfaceRoughness Roughness; // parameters for surface roughness, defined in DataHeatBalance
         Real64 SolAbs;                               // solar absorptivity of collector
         Real64 AbsExt;                               // thermal emmittance of collector
         Real64 TempExt;                              // collector temperature

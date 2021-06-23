@@ -578,7 +578,7 @@ private:
         int const number;
         std::string const &name;
         DataHeatBalance::MaterialGroup const &group;
-        DataHeatBalance::SurfaceRoughness const &roughness;
+        DataSurfaces::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;
         double const &isoMoistCap;
@@ -629,7 +629,7 @@ private:
         double const &outsideAbsorpSolar;
         double const &insideAbsorpThermal;
         double const &outsideAbsorpThermal;
-        DataHeatBalance::SurfaceRoughness const &outsideRoughness;
+        DataSurfaces::SurfaceRoughness const &outsideRoughness;
         bool const &typeIsWindow;
         double const &uValue;
 

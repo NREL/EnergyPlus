@@ -85,8 +85,8 @@ namespace SurfaceGroundHeatExchanger {
         int ConstructionNum;                            // construction index number
         int InletNodeNum;                               // inlet node number
         int OutletNodeNum;                              // oulet node number
-        DataHeatBalance::SurfaceRoughness TopRoughness; // roughness of top layer
-        DataHeatBalance::SurfaceRoughness BtmRoughness; // roughness of bottom layer
+        DataSurfaces::SurfaceRoughness TopRoughness; // roughness of top layer
+        DataSurfaces::SurfaceRoughness BtmRoughness; // roughness of bottom layer
         int FrozenErrIndex1;                            // recurring error index
         int FrozenErrIndex2;                            // recurring error index
         int ConvErrIndex1;                              // recurring error index
@@ -155,7 +155,7 @@ namespace SurfaceGroundHeatExchanger {
         SurfaceGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), TubeDiameter(0.0), TubeSpacing(0.0), SurfaceLength(0.0), SurfaceWidth(0.0), TopThermAbs(0.0), TopSolarAbs(0.0),
               BtmThermAbs(0.0), LowerSurfCond(0), TubeCircuits(0), ConstructionNum(0), InletNodeNum(0), OutletNodeNum(0),
-              TopRoughness(DataHeatBalance::SurfaceRoughness::Unassigned), BtmRoughness(DataHeatBalance::SurfaceRoughness::Unassigned),
+              TopRoughness(DataSurfaces::SurfaceRoughness::Unassigned), BtmRoughness(DataSurfaces::SurfaceRoughness::Unassigned),
               FrozenErrIndex1(0), FrozenErrIndex2(0), ConvErrIndex1(0), ConvErrIndex2(0), ConvErrIndex3(0), LoopNum(0), LoopSideNum(0), BranchNum(0),
               CompNum(0), TsrcConstCoef(0.0), TsrcVarCoef(0.0), QbtmConstCoef(0.0), QbtmVarCoef(0.0), QtopConstCoef(0.0), QtopVarCoef(0.0),
               NumCTFTerms(0), CTFin({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0), CTFout({0, DataGlobalConstants::MaxCTFTerms - 1}, 0.0),

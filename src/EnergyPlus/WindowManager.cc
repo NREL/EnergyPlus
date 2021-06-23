@@ -7314,7 +7314,7 @@ namespace WindowManager {
         using WindowComplexManager::CalcComplexWindowThermal;
         using WindowComplexManager::UpdateComplexWindows;
 
-        static Array1D_string const Roughness(6, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
+        static Array1D_string const Roughness({0, 5}, {"VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"});
         static Array1D_string const GasTypeName({0, 4}, {"Custom", "Air", "Argon", "Krypton", "Xenon"});
 
         Real64 TempVar(0.0); // just temporary usage for complex fenestration
@@ -7533,7 +7533,7 @@ namespace WindowManager {
                               state.dataConstruction->Construct(ThisNum).Name,
                               ThisNum,
                               state.dataConstruction->Construct(ThisNum).TotLayers,
-                              Roughness(state.dataConstruction->Construct(ThisNum).OutsideRoughness),
+                              Roughness(static_cast<int>(state.dataConstruction->Construct(ThisNum).OutsideRoughness)),
                               NominalConductanceWinter,
                               SHGCSummer,
                               TransSolNorm,

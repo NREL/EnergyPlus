@@ -50,7 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
 
@@ -66,7 +66,7 @@ namespace Material {
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)
-        DataHeatBalance::SurfaceRoughness Roughness; // Surface roughness index (See Surface Roughness parameters
+        DataSurfaces::SurfaceRoughness Roughness; // Surface roughness index (See Surface Roughness parameters
         // above.  Current: VerySmooth, Smooth, MediumSmooth,
         // MediumRough, Rough, VeryRough)
         // Thermo-physical material properties
@@ -251,7 +251,7 @@ namespace Material {
 
         // Default Constructor
         MaterialProperties()
-            : Group(DataHeatBalance::MaterialGroup::Unassigned), Roughness(DataHeatBalance::SurfaceRoughness::Unassigned), Conductivity(0.0),
+            : Group(DataHeatBalance::MaterialGroup::Unassigned), Roughness(DataSurfaces::SurfaceRoughness::Unassigned), Conductivity(0.0),
               Density(0.0), IsoMoistCap(0.0), Porosity(0.0), Resistance(0.0), ROnly(false), SpecHeat(0.0), ThermGradCoef(0.0), Thickness(0.0),
               VaporDiffus(0.0), GasType(5, 0), GlassSpectralDataPtr(0), NumberOfGasesInMixture(0), GasCon(3, 5, 0.0), GasVis(3, 5, 0.0),
               GasCp(3, 5, 0.0), GasWght(5, 0.0), GasSpecHeatRatio(5, 0.0), GasFract(5, 0.0), AbsorpSolar(0.0), AbsorpSolarInput(0.0),

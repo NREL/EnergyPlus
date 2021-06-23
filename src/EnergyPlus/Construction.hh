@@ -89,7 +89,7 @@ namespace Construction {
         Real64 InsideAbsorpThermal; // Inside Layer Thermal absorptance for opaque surfaces or windows;
         // for windows, applies to innermost glass layer
         Real64 OutsideAbsorpThermal;                        // Outside Layer Thermal absorptance
-        DataHeatBalance::SurfaceRoughness OutsideRoughness; // Outside Surface roughness index
+        DataSurfaces::SurfaceRoughness OutsideRoughness; // Outside Surface roughness index
         int DayltPropPtr;                                   // Pointer to Daylight Construction Properties
         int W5FrameDivider;                                 // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
@@ -272,7 +272,7 @@ namespace Construction {
         ConstructionProps()
             : TotLayers(0), TotSolidLayers(0), TotGlassLayers(0), LayerPoint(MaxLayersInConstruct, 0), IsUsed(false), IsUsedCTF(false),
               InsideAbsorpVis(0.0), OutsideAbsorpVis(0.0), InsideAbsorpSolar(0.0), OutsideAbsorpSolar(0.0), InsideAbsorpThermal(0.0),
-              OutsideAbsorpThermal(0.0), OutsideRoughness(DataHeatBalance::SurfaceRoughness::Unassigned), DayltPropPtr(0), W5FrameDivider(0),
+              OutsideAbsorpThermal(0.0), OutsideRoughness(DataSurfaces::SurfaceRoughness::Unassigned), DayltPropPtr(0), W5FrameDivider(0),
               CTFCross({0, MaxCTFTerms - 1}, 0.0), CTFFlux(MaxCTFTerms - 1, 0.0), CTFInside({0, MaxCTFTerms - 1}, 0.0),
               CTFOutside({0, MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, MaxCTFTerms - 1}, 0.0),
               CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0),
