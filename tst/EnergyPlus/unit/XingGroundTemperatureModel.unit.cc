@@ -76,7 +76,7 @@ TEST_F(EnergyPlusFixture, XingGroundTempsModelTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    std::string const CurrentModuleObject = CurrentModuleObjects(objectType_XingGroundTemp);
+    std::string const CurrentModuleObject = state->dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::XingGroundTemp));
 
     auto thisModel = GetGroundTempModelAndInit(*state, CurrentModuleObject, "TEST");
 

@@ -68,42 +68,47 @@ namespace DataRoomAirModel {
     auto constexpr cTempPatternSurfMapObject("RoomAir:TemperaturePattern:SurfaceMapping");
 
     // Parameters to indicate room air model selected
-    enum class RoomAirModel : int {
-        UserDefined = 1,    // user defined patterns
-        Mixing = 2,         // mixing air model
-        Mundt = 3,          // Mundt nodal model
-        UCSDDV = 4,         // UCSD Displacement Ventilation model
-        UCSDCV = 5,         // UCSD-CV
-        UCSDUFI = 6,        // UCSD UFAD interior zone model
-        UCSDUFE = 7,        // UCSD UFAD exterior zone model
-        AirflowNetwork = 8  // RoomAirModel_AirflowNetwork interior zone model
+    enum class RoomAirModel : int
+    {
+        Unassigned = -1,
+        UserDefined,   // user defined patterns
+        Mixing,        // mixing air model
+        Mundt,         // Mundt nodal model
+        UCSDDV,        // UCSD Displacement Ventilation model
+        UCSDCV,        // UCSD-CV
+        UCSDUFI,       // UCSD UFAD interior zone model
+        UCSDUFE,       // UCSD UFAD exterior zone model
+        AirflowNetwork // RoomAirModel_AirflowNetwork interior zone model
     };
-    constexpr const char * ChAirModel[] = {"*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
+    constexpr const char *ChAirModel[] = {
+        "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
 
     // Parameters to indicate air temperature coupling scheme
-    enum class CouplingScheme : int {
-        Direct = 1, Indirect = 2
+    enum class CouplingScheme : int
+    {
+        Unassigned = -1,
+        Direct,
+        Indirect
     };
 
     // Parameters to indicate type of air node, which is dependent on air models
-    extern int const InletAirNode;              // air node at inlet (for Mundt and Rees&Haves Models)
-    extern int const FloorAirNode;              // air node at floor (for Mundt and Rees&Haves Models)
-    extern int const ControlAirNode;            // air node at control point (for Mundt Model)
-    extern int const CeilingAirNode;            // air node at ceiling (for Mundt Model)
-    extern int const MundtRoomAirNode;          // air node for vertical walls (for Mundt Model)
-    extern int const ReturnAirNode;             // air node for return (for Mundt and Rees&Haves Models)
-    extern int const AirflowNetworkRoomAirNode; // air node for airflow network based room air model
-    extern int const PlumeAirNode1;             // air node for plume load (for Rees&Haves Model)
-    extern int const PlumeAirNode2;             // air node for plume load (for Rees&Haves Model)
-    extern int const PlumeAirNode3;             // air node for plume load (for Rees&Haves Model)
-    extern int const PlumeAirNode4;             // air node for plume load (for Rees&Haves Model)
-    extern int const RoomAirNode1;              // air node for vertical walls (for Rees&Haves Model)
-    extern int const RoomAirNode2;              // air node for vertical walls (for Rees&Haves Model)
-    extern int const RoomAirNode3;              // air node for vertical walls (for Rees&Haves Model)
-    extern int const RoomAirNode4;              // air node for vertical walls (for Rees&Haves Model)
+    enum class AirNodeType
+    {
+        Unassigned = -1,
+        InletAirNode,              // air node at inlet (for Mundt and Rees&Haves Models)
+        FloorAirNode,              // air node at floor (for Mundt and Rees&Haves Models)
+        ControlAirNode,            // air node at control point (for Mundt Model)
+        CeilingAirNode,            // air node at ceiling (for Mundt Model)
+        MundtRoomAirNode,          // air node for vertical walls (for Mundt Model)
+        ReturnAirNode,             // air node for return (for Mundt and Rees&Haves Models)
+        AirflowNetworkRoomAirNode, // air node for airflow network based room air model
+        PlumeAirNode,              // air node for plume load (for Rees&Haves Model)
+        RoomAirNode                // air node for vertical walls (for Rees&Haves Model)
+    };
 
     // user-defined pattern two gradient interpolation modes
-    enum class UserDefinedPatternMode {
+    enum class UserDefinedPatternMode
+    {
         Unassigned,
         OutdoorDryBulbMode,  // by outdoor air bulb.
         SensibleCoolingMode, // by sensible cooling load
@@ -113,16 +118,18 @@ namespace DataRoomAirModel {
     };
 
     // user defined temperature pattern types
-    enum class UserDefinedPatternType {
+    enum class UserDefinedPatternType
+    {
         Unassigned,
         ConstGradTempPattern,  // constant gradient in vertical direction
         TwoGradInterpPattern,  // two gradient interpolation
         NonDimenHeightPattern, // non-dimensionalized height
-        SurfMapTempPattern    // arbitrary surface mappings
+        SurfMapTempPattern     // arbitrary surface mappings
     };
 
     // parameters to indicate diffuser type
-    enum class Diffuser {
+    enum class Diffuser
+    {
         Unassigned,
         Swirl,
         VarArea,
@@ -131,7 +138,8 @@ namespace DataRoomAirModel {
         Custom
     };
 
-    enum class Comfort {
+    enum class Comfort
+    {
         VComfort_Invalid,
         VComfort_Jet,
         VComfort_Recirculation
@@ -142,7 +150,7 @@ namespace DataRoomAirModel {
         // Members
         std::string AirModelName;
         std::string ZoneName;
-        int ZonePtr;      // Pointer to the zone number for this statement
+        int ZonePtr;               // Pointer to the zone number for this statement
         RoomAirModel AirModelType; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
         // 4 = UCSDDV, 5 = UCSDCV, -1 = user defined
         // 6 = UCSDUFI, 7 = UCSDUFE, 8 = AirflowNetwork
@@ -163,14 +171,14 @@ namespace DataRoomAirModel {
         std::string Name; // name
         std::string ZoneName;
         int ZonePtr;               // Pointer to the zone number for this statement
-        int ClassType;             // depending on type of model
+        AirNodeType ClassType;     // depending on type of model
         Real64 Height;             // height
         Real64 ZoneVolumeFraction; // portion of zone air volume associated with this node
         Array1D_bool SurfMask;     // limit of 60 surfaces at current sizing
         bool IsZone;               // TRUE if this node is zone node
 
         // Default Constructor
-        AirNodeData() : ZonePtr(0), ClassType(0), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
+        AirNodeData() : ZonePtr(0), ClassType(AirNodeType::Unassigned), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
         {
         }
     };
@@ -200,7 +208,7 @@ namespace DataRoomAirModel {
         int ZonePtr;                // Pointer to the zone number for this statement
         int SchedGainsPtr;          // Schedule for internal gain fraction to occupied zone
         std::string SchedGainsName; // Gains Schedule name
-        Comfort VforComfort;            // Use Recirculation or Jet velocity and temperatures
+        Comfort VforComfort;        // Use Recirculation or Jet velocity and temperatures
         // for comfort models
 
         // Default Constructor
@@ -263,20 +271,20 @@ namespace DataRoomAirModel {
         // comfort purposes [m]
         Real64 TempTrigger; // Minimum temperature difference between TOC TMX
         // for stratification [deltaC]
-        Diffuser DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
-        Real64 TransHeight;   // user specified transition height [m]
-        bool CalcTransHeight; // flag to calc trans height or use user specified input
-        Real64 A_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 B_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 C_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 D_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 E_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Diffuser DiffuserType; // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
+        Real64 TransHeight;    // user specified transition height [m]
+        bool CalcTransHeight;  // flag to calc trans height or use user specified input
+        Real64 A_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 B_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 C_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 D_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 E_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
 
         // Default Constructor
         UFIData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
-              B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0),
+              CalcTransHeight(false), A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
         {
         }
     };
@@ -297,23 +305,23 @@ namespace DataRoomAirModel {
         // comfort purposes [m]
         Real64 TempTrigger; // Minimum temperature difference between TOC TMX
         // for stratification [deltaC]
-        Diffuser DiffuserType;     // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
-        Real64 TransHeight;   // user specified transition height [m]
-        bool CalcTransHeight; // flag to calc trans height or use user specified input
-        Real64 A_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 B_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 C_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 D_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 E_Kc;          // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 WinWidth;      // sum of widths of exterior windows in zone
-        Real64 NumExtWin;     // number of exterior windows in the zone
-        bool ShadeDown;       // signals shade up or down
+        Diffuser DiffuserType; // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
+        Real64 TransHeight;    // user specified transition height [m]
+        bool CalcTransHeight;  // flag to calc trans height or use user specified input
+        Real64 A_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 B_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 C_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 D_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 E_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 WinWidth;       // sum of widths of exterior windows in zone
+        Real64 NumExtWin;      // number of exterior windows in the zone
+        bool ShadeDown;        // signals shade up or down
 
         // Default Constructor
         UFEData()
             : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0), CalcTransHeight(false), A_Kc(0.0),
-              B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
+              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Unassigned), TransHeight(0.0),
+              CalcTransHeight(false), A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
         {
         }
     };
@@ -351,22 +359,23 @@ namespace DataRoomAirModel {
     {
         // Members
         // user variables
-        std::string Name;               // name
-        Real64 TstatHeight;             // Height of thermostat/ temperature control sensor
-        Real64 TleavingHeight;          // height of return air node where leaving zone
-        Real64 TexhaustHeight;          // height of exhaust air node where leaving zone
-        Real64 LowGradient;             // lower value of vertical gradient [C/m]
-        Real64 HiGradient;              // upper value of vertical gradient [C/m]
-        DataRoomAirModel::UserDefinedPatternMode InterpolationMode;          // control for interpolation mode
-        Real64 UpperBoundTempScale;     // temperature value for HiGradient
-        Real64 LowerBoundTempScale;     // temperature value for LowGradient
-        Real64 UpperBoundHeatRateScale; // load value for HiGradient
-        Real64 LowerBoundHeatRateScale; // load value for lowGradient
+        std::string Name;                                           // name
+        Real64 TstatHeight;                                         // Height of thermostat/ temperature control sensor
+        Real64 TleavingHeight;                                      // height of return air node where leaving zone
+        Real64 TexhaustHeight;                                      // height of exhaust air node where leaving zone
+        Real64 LowGradient;                                         // lower value of vertical gradient [C/m]
+        Real64 HiGradient;                                          // upper value of vertical gradient [C/m]
+        DataRoomAirModel::UserDefinedPatternMode InterpolationMode; // control for interpolation mode
+        Real64 UpperBoundTempScale;                                 // temperature value for HiGradient
+        Real64 LowerBoundTempScale;                                 // temperature value for LowGradient
+        Real64 UpperBoundHeatRateScale;                             // load value for HiGradient
+        Real64 LowerBoundHeatRateScale;                             // load value for lowGradient
 
         // Default Constructor
         TwoVertGradInterpolPattern()
-            : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0), InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Unassigned),
-              UpperBoundTempScale(0.0), LowerBoundTempScale(0.0), UpperBoundHeatRateScale(0.0), LowerBoundHeatRateScale(0.0)
+            : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0),
+              InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Unassigned), UpperBoundTempScale(0.0), LowerBoundTempScale(0.0),
+              UpperBoundHeatRateScale(0.0), LowerBoundHeatRateScale(0.0)
         {
         }
     };
@@ -388,7 +397,7 @@ namespace DataRoomAirModel {
         // Members
         std::string Name;                        // unique identifier
         int PatrnID;                             // control ID for referencing in Schedules
-        UserDefinedPatternType PatternMode;                         // Control for what type of calcs in this pattern
+        UserDefinedPatternType PatternMode;      // Control for what type of calcs in this pattern
         ConstGradPattern GradPatrn;              // Constant gradient pattern
         TwoVertGradInterpolPattern TwoGradPatrn; // Two gradient interpolation pattern
         TempVsHeightPattern VertPatrn;           // Vertical gradient profile pattern
@@ -398,7 +407,8 @@ namespace DataRoomAirModel {
         Real64 DeltaTexhaust;                    // (Texhaust - MAT) deg C
 
         // Default Constructor
-        TemperaturePatternStruct() : PatrnID(0), PatternMode(UserDefinedPatternType::Unassigned), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
+        TemperaturePatternStruct()
+            : PatrnID(0), PatternMode(UserDefinedPatternType::Unassigned), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
         {
         }
     };
@@ -684,7 +694,8 @@ namespace DataRoomAirModel {
 
 } // namespace DataRoomAirModel
 
-struct RoomAirModelData : BaseGlobalStruct {
+struct RoomAirModelData : BaseGlobalStruct
+{
 
     int TotNumOfAirNodes = 0;
     int TotNumOfRoomAFNNodes = 0;
@@ -692,7 +703,7 @@ struct RoomAirModelData : BaseGlobalStruct {
     Array1D<Real64> ConvectiveFloorSplit;
     Array1D<Real64> InfiltratFloorSplit;
     // UCSD
-    int TotUCSDDV = 0;             // Total number of UCSDDV zones
+    int TotUCSDDV = 0; // Total number of UCSDDV zones
     Array1D<Real64> DVHcIn;
     Array1D_bool IsZoneDV;        // Is the air model for the zone UCSDDV?
     Array1D<Real64> ZTOC;         // Temperature of occupied (lower) zone
@@ -759,8 +770,8 @@ struct RoomAirModelData : BaseGlobalStruct {
     Array1D<Real64> ZoneMXMX;    // [C] difference equation's Mixed  air temp at t minus 1
     Array1D<Real64> ZoneM2MX;    // [C] difference equation's Mixed  air temp at t minus 2
     // UCSD-CV
-    int TotUCSDCV = 0;                // Total number of UCSDDV zones
-    int CVNumAirflowNetworkSurfaces = 0;      // total number of AirFlowNetwork surfaces.
+    int TotUCSDCV = 0;                   // Total number of UCSDDV zones
+    int CVNumAirflowNetworkSurfaces = 0; // total number of AirFlowNetwork surfaces.
     Array1D<Real64> CVHcIn;
     Array1D_bool IsZoneCV;           // Is the air model for the zone UCSDDV?
     Array1D<Real64> ZoneCVisMixing;  // Zone set to CV is actually using a mixing model
@@ -786,8 +797,8 @@ struct RoomAirModelData : BaseGlobalStruct {
     bool UCSDModelUsed = false;
     bool MundtModelUsed = false;
     // UCSD-UF
-    int TotUCSDUI = 0;      // total number of UCSDUI zones
-    int TotUCSDUE = 0;      // total number of UCSDUE zones
+    int TotUCSDUI = 0;     // total number of UCSDUI zones
+    int TotUCSDUE = 0;     // total number of UCSDUE zones
     Array1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
     Array1D_int ZoneUFPtr;
     Array1D<Real64> UFHcIn;
@@ -805,7 +816,7 @@ struct RoomAirModelData : BaseGlobalStruct {
     int NumTwoGradientInterp = 0;    // count of two gradient interp patterns in input
     int NumNonDimensionalHeight = 0; // count of ND height profile patterns in input
     int NumSurfaceMapping = 0;       // count of generic surface map patterns in input
-    bool UserDefinedUsed = false; // true if user-defined model used anywhere
+    bool UserDefinedUsed = false;    // true if user-defined model used anywhere
     // End User-defined patterns
 
     // RoomAirflowNetwork
@@ -832,9 +843,9 @@ struct RoomAirModelData : BaseGlobalStruct {
         ConvectiveFloorSplit.clear();
         InfiltratFloorSplit.clear();
         // UCSD
-        TotUCSDDV = 0;             // Total number of UCSDDV zones
+        TotUCSDDV = 0; // Total number of UCSDDV zones
         DVHcIn.clear();
-        IsZoneDV.clear();        // Is the air model for the zone UCSDDV?
+        IsZoneDV.clear();     // Is the air model for the zone UCSDDV?
         ZTOC.clear();         // Temperature of occupied (lower) zone
         AvgTempGrad.clear();  // vertical Average Temperature Gradient in the room
         ZTMX.clear();         // Temperature of the mixing(upper) layer
@@ -899,10 +910,10 @@ struct RoomAirModelData : BaseGlobalStruct {
         ZoneMXMX.clear();    // [C] difference equation's Mixed  air temp at t minus 1
         ZoneM2MX.clear();    // [C] difference equation's Mixed  air temp at t minus 2
         // UCSD-CV
-        TotUCSDCV = 0;                // Total number of UCSDDV zones
-        CVNumAirflowNetworkSurfaces = 0;      // total number of AirFlowNetwork surfaces.
+        TotUCSDCV = 0;                   // Total number of UCSDDV zones
+        CVNumAirflowNetworkSurfaces = 0; // total number of AirFlowNetwork surfaces.
         CVHcIn.clear();
-        IsZoneCV.clear();           // Is the air model for the zone UCSDDV?
+        IsZoneCV.clear();        // Is the air model for the zone UCSDDV?
         ZoneCVisMixing.clear();  // Zone set to CV is actually using a mixing model
         ZTJET.clear();           // Jet Temperatures
         ZTREC.clear();           // Recirculation Temperatures
@@ -914,11 +925,11 @@ struct RoomAirModelData : BaseGlobalStruct {
         Qtot.clear();           // Total volumetric inflow rate through all active aperatures [m3/s]
         RecInflowRatio.clear(); // Ratio of the recirculation volumetric flow rate to the total inflow flow rate []
         Uhc.clear();
-        Ain.clear();                     // Inflow aperture area
-        Droom.clear();                   // CV Zone average length
-        Dstar.clear();                   // CV Zone average length, wind direction corrected
-        Tin.clear();                     // Inflow air temperature
-        TotArea.clear();                 // Sum of the areas of all apertures in the zone
+        Ain.clear();                         // Inflow aperture area
+        Droom.clear();                       // CV Zone average length
+        Dstar.clear();                       // CV Zone average length, wind direction corrected
+        Tin.clear();                         // Inflow air temperature
+        TotArea.clear();                     // Sum of the areas of all apertures in the zone
         AirflowNetworkSurfaceUCSDCV.clear(); // table for AirflowNetwork surfaces organization
         // Interzone surfaces counts twice.
         Rfr.clear();          // Ration between inflow and recirculation air flows
@@ -926,8 +937,8 @@ struct RoomAirModelData : BaseGlobalStruct {
         UCSDModelUsed = false;
         MundtModelUsed = false;
         // UCSD-UF
-        TotUCSDUI = 0;      // total number of UCSDUI zones
-        TotUCSDUE = 0;      // total number of UCSDUE zones
+        TotUCSDUI = 0;    // total number of UCSDUI zones
+        TotUCSDUE = 0;    // total number of UCSDUE zones
         IsZoneUI.clear(); // controls program flow, for interior or exterior UFAD model
         ZoneUFPtr.clear();
         UFHcIn.clear();
@@ -945,7 +956,7 @@ struct RoomAirModelData : BaseGlobalStruct {
         NumTwoGradientInterp = 0;    // count of two gradient interp patterns in input
         NumNonDimensionalHeight = 0; // count of ND height profile patterns in input
         NumSurfaceMapping = 0;       // count of generic surface map patterns in input
-        UserDefinedUsed = false; // true if user-defined model used anywhere
+        UserDefinedUsed = false;     // true if user-defined model used anywhere
         // End User-defined patterns
 
         // RoomAirflowNetwork
@@ -958,10 +969,10 @@ struct RoomAirModelData : BaseGlobalStruct {
         ZoneUCSDCV.clear();
         ZoneUCSDUI.clear();
         ZoneUCSDUE.clear();
-        CVJetRecFlows.clear();                                          // Jet and recirculation zone flows and properties
-        SurfParametersCVDV.clear();                             // Surface parameters
-        RoomAirPattern.clear();                       // user defined patterns ,various types
-        AirPatternZoneInfo.clear();                 // added zone information for user defined patterns
+        CVJetRecFlows.clear();              // Jet and recirculation zone flows and properties
+        SurfParametersCVDV.clear();         // Surface parameters
+        RoomAirPattern.clear();             // user defined patterns ,various types
+        AirPatternZoneInfo.clear();         // added zone information for user defined patterns
         RoomAirflowNetworkZoneInfo.clear(); // added zone info
     }
 };

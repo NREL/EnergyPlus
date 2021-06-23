@@ -351,6 +351,8 @@ Note that the key value for these outputs is the AirLoopHVAC name, not the name 
 \item
   HVAC,Average,Air System Outdoor Air High Humidity Control Status {[]}
 \item
+  HVAC,Average,Air System Outdoor Air Limiting Factor {[]}
+\item
   HVAC,Average,Air System Outdoor Air Flow Fraction {[]}
 \item
   HVAC,Average,Air System Outdoor Air Minimum Flow Fraction {[]}
@@ -390,6 +392,23 @@ Reports the outdoor air mixer's mixed air node temperature at minimum outdoor ai
 
 Reports the average operating status of the controller's high humidity control over the reporting interval. The high humidity control status is set to 1 when the controller determines that a zone high humidity condition exists \emph{according to the settings specified in the controller}. This variable is set to 0 if conditions disable high humidity control operation or High Humidity Control is specified as No.
 
+\paragraph{Air System Outdoor Air Limiting Factor {[]}}\label{air-system-outdoor-air-limiting-factor}
+
+Reports the average current limiting factor controlling the outdoor air flow rate as one of the following integer values. This variable is used to produce the Outdoor Air Details summary report subtables for Outdoor Air Controller Limiting Factors by AirLoop and Average Outdoor Air for Limiting Factors During Occupancy. Given the nature of this output, it is most useful at the detailed (HVAC timestep) reporting frequency. Averages over time may not be meaningful.
+\begin{description}
+  \item[0 = No Limiting Factor] None of the other limiting factors is active.
+  \item[1 = Limits and Scheduled Limits] Fixed limits such as Controller:OutdoorAir Minimum Outdoor Air Flow Rate, Maximum Outdoor Air Flow Rate, Minimum Fraction of Outdoor Air Schedule Name, Maximum Fraction of Outdoor Air Schedule Name.
+  \item[2 = Economizer] Economizer is active and sets the flow greater than the minimum outdoor air fraction.
+  \item[3 = Exhaust Flow] Outdoor air flow rate equals the total zone exhaust flow rate.
+  \item[4 = Mixed Air Flow] Outdoor air flow rate is limited by the current mixed air flow rate.
+  \item[5 = High Humidity] Controller:OutdoorAir High Humidity Control.
+  \item[6 = Demand Controlled Ventilation] Controller:MechanicalVentilation requested more than the minimum outdoor air fraction.
+  \item[7 = Night Ventilation] AvailabilityManager:NightVentilation is active.
+  \item[8 = Demand Limiting] DemandManager:Ventilation has reduced the outdoor air flow rate.
+  \item[9 = Energy Management System] An EnergyManagementSyste:Actuator has overridden the outdoor air flow rate.
+\end{description}
+
+
 \paragraph{Air System Outdoor Air Flow Fraction {[]}}\label{air-system-outdoor-air-flow-fraction}
 
 Reports the average actual outdoor air fraction for the outdoor air controller over the reporting interval.
@@ -428,7 +447,7 @@ This object is used in conjunction with an outdoor air controller (Ref. \hyperre
 
 Ventilation standards provide guidance on appropriate levels of outdoor ventilation air required for acceptable indoor air quality. The Ventilation Rate Procedure (VRP) of ASHRAE Standard 62.1-2007/2010 (\href{http://www.ashrae.org}{www.ashrae.org}) requires outdoor ventilation rates to be determined based on the floor area of each occupied zone plus the number of people in each zone and considers the zone air distribution effectiveness and system ventilation efficiency. The outdoor air ventilation rate can be reset dynamically as operating conditions change (e.g., variations in occupancy). The Controller:MechanicalVentilation object implements the VRP for calculating these outdoor air ventilation requirements and resetting them based on varying occupancy levels and zone diversification. This is particularly useful for large air distribution systems that serve a number of different zone types with varying occupancy levels. This object can also be used to model the Indoor Air Quality Procedure (IAQP) as defined in Standard 62.1
 
-The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible
+The first five inputs for this object are the name, the availability schedule, the zone outdoor air method, the system outdoor air method, and the zone maximum outdoor air fraction. The next three input fields define the zone name (or zone list name), the design specification outdoor air object name, and the design specification zone air distribution object name to be applied to this zone (or zone list). The last three fields are extensible.
 
 \subsubsection{Inputs}\label{inputs-2-007}
 

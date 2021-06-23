@@ -11,12 +11,25 @@
 \usepackage{listings}
 \usepackage{enumitem}
 \usepackage[per-mode=symbol]{siunitx}
+\PassOptionsToPackage{hyphens}{url}\usepackage[breaklinks=true]{hyperref}
 
 \title{Test Build with Dependencies}
 \author{Probably CI}
 \date{\today}
 
 \begin{document}
+
+% Reference for making your own Title Page:
+% http://tex.stackexchange.com/questions/10130/use-the-values-of-title-author-and-date-on-a-custom-title-page
+\makeatletter
+\begin{titlepage}
+  \begin{center}
+    {\scshape\LARGE EnergyPlus\texttrademark{} Test Documentation \par}
+    \vspace{1.5cm}
+    {\bfseries\huge \@title \par}
+    \vspace{1.5cm}
+    {\Large\itshape \@author \par}
+    \vspace{2.5cm}
 
     This document is a test to make sure the build system can build the rest of the documentation.
     It should be built with XeTeX, which is the core dependency for building the E+ docs.
@@ -28,5 +41,31 @@
     In any case, when a developer attempts to build this on a machine, it will have a nice benefit of installing the missing packages (if the install is set up to do that).
     This is especially nice for CI package builds because miktex is acting weird while trying to build all the documents in multiple threads.
     I think the package update manager is getting confused occasionally with everything going on.
+    \vfill
+
+
+
+    % Bottom of the page
+    {\large \today \par}
+    \vspace{1.5cm}
+    {\large Build: 7d8b8c6b02 \par}
+  \end{center}
+  {\small
+  }
+\end{titlepage}
+\makeatother
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+
+\hypertarget{generated-toc}{}
+
+\chapter{A chapter}\label{chapter-1}
+
+\section{A section}\label{chapter-1-section-1}
+
+An example section
 
 \end{document}

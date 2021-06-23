@@ -396,15 +396,18 @@ namespace SystemAvailabilityManager {
                             Optional_int_const CompNum = _        // Index of ZoneHVAC:* equipment component
     );
 
-    void CalcSchedSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // number of the current scheduled system availability manager
+    void CalcSchedSysAvailMgr(EnergyPlusData &state,
+                              int const SysAvailNum, // number of the current scheduled system availability manager
                               int &AvailStatus       // System status indicator
     );
 
-    void CalcSchedOnSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // number of the current scheduled on system availability manager
+    void CalcSchedOnSysAvailMgr(EnergyPlusData &state,
+                                int const SysAvailNum, // number of the current scheduled on system availability manager
                                 int &AvailStatus       // System status indicator
     );
 
-    void CalcSchedOffSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // number of the current scheduled off system availability manager
+    void CalcSchedOffSysAvailMgr(EnergyPlusData &state,
+                                 int const SysAvailNum, // number of the current scheduled off system availability manager
                                  int &AvailStatus       // System status indicator
     );
 
@@ -416,12 +419,14 @@ namespace SystemAvailabilityManager {
                              Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
     );
 
-    bool CoolingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool CoolingZoneOutOfTolerance(EnergyPlusData &state,
+                                   Array1D_int const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     );
 
-    bool HeatingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool HeatingZoneOutOfTolerance(EnergyPlusData &state,
+                                   Array1D_int const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     );
@@ -441,24 +446,29 @@ namespace SystemAvailabilityManager {
                               Optional_int_const ZoneEquipType = _ // Type of zone equipment component
     );
 
-    void CalcDiffTSysAvailMgr(EnergyPlusData &state, int const SysAvailNum,    // Number of the current scheduled system availability manager
+    void CalcDiffTSysAvailMgr(EnergyPlusData &state,
+                              int const SysAvailNum,    // Number of the current scheduled system availability manager
                               int const PreviousStatus, // System status for the previous timestep
                               int &AvailStatus          // System status indicator
     );
 
-    void CalcHiTurnOffSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // Number of the current scheduled system availability manager
+    void CalcHiTurnOffSysAvailMgr(EnergyPlusData &state,
+                                  int const SysAvailNum, // Number of the current scheduled system availability manager
                                   int &AvailStatus       // System status indicator
     );
 
-    void CalcHiTurnOnSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // Number of the current scheduled system availability manager
+    void CalcHiTurnOnSysAvailMgr(EnergyPlusData &state,
+                                 int const SysAvailNum, // Number of the current scheduled system availability manager
                                  int &AvailStatus       // System status indicator
     );
 
-    void CalcLoTurnOffSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // Number of the current scheduled system availability manager
+    void CalcLoTurnOffSysAvailMgr(EnergyPlusData &state,
+                                  int const SysAvailNum, // Number of the current scheduled system availability manager
                                   int &AvailStatus       // System status indicator
     );
 
-    void CalcLoTurnOnSysAvailMgr(EnergyPlusData &state, int const SysAvailNum, // Number of the current scheduled system availability manager
+    void CalcLoTurnOnSysAvailMgr(EnergyPlusData &state,
+                                 int const SysAvailNum, // Number of the current scheduled system availability manager
                                  int &AvailStatus       // System status indicator
     );
 
@@ -479,7 +489,8 @@ namespace SystemAvailabilityManager {
 
 } // namespace SystemAvailabilityManager
 
-struct SystemAvailabilityManagerData : BaseGlobalStruct {
+struct SystemAvailabilityManagerData : BaseGlobalStruct
+{
 
     int const MaxDayTypes = 12;
     int const StayOff = 0;
@@ -556,26 +567,34 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct {
     Array1D<Real64> OptStart_AdaTempGradTrdHeat; // Heating temp gradient for previous days - used in CalcOptStartSysAvailMgr
     Array1D<Real64> OptStart_AdaTempGradTrdCool; // Cooling temp gradient for previous days - used in CalcOptStartSysAvailMgr
 
-    Array1D<SystemAvailabilityManager::DefineSchedSysAvailManager> SchedSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineSchedOnSysAvailManager> SchedOnSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineSchedOffSysAvailManager> SchedOffSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineNightCycSysAvailManager> NCycSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineDiffTSysAvailManager> DiffTSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineHiLoSysAvailManager> HiTurnOffSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineHiLoSysAvailManager> HiTurnOnSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineHiLoSysAvailManager> LoTurnOffSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineHiLoSysAvailManager> LoTurnOnSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineNightVentSysAvailManager> NVentSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineHybridVentSysAvailManager> HybridVentSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::SysAvailManagerList> SysAvailMgrListData;
-    Array1D<SystemAvailabilityManager::DefineOptStartSysAvailManager> OptStartSysAvailMgrData;
-    Array1D<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
-    Array1D<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
+    EPVector<SystemAvailabilityManager::DefineSchedSysAvailManager> SchedSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineSchedOnSysAvailManager> SchedOnSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineSchedOffSysAvailManager> SchedOffSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineNightCycSysAvailManager> NCycSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineDiffTSysAvailManager> DiffTSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHiLoSysAvailManager> HiTurnOffSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHiLoSysAvailManager> HiTurnOnSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHiLoSysAvailManager> LoTurnOffSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHiLoSysAvailManager> LoTurnOnSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineNightVentSysAvailManager> NVentSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineHybridVentSysAvailManager> HybridVentSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::SysAvailManagerList> SysAvailMgrListData;
+    EPVector<SystemAvailabilityManager::DefineOptStartSysAvailManager> OptStartSysAvailMgrData;
+    EPVector<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffCooling;
+    EPVector<SystemAvailabilityManager::DefineASHRAEAdaptiveOptimumStartCoeffs> ASHRAEOptSCoeffHeating;
 
     bool BeginOfDayResetFlag = true;
 
     Array1D_string const cValidSysAvailManagerTypes;
     Array1D_int const ValidSysAvailManagerTypes;
+
+    Array1D_bool ZoneCompNCControlType;
+    bool MyOneTimeFlag = true; // One time flag
+    bool MyEnvrnFlag = true;
+
+    Real64 CurrentEndTime = 0.0;     // Current end time
+    Real64 CurrentEndTimeLast = 0.0; // last end time
+    Real64 TimeStepSysLast = 0.0;    // last system time step
 
     void clear_state() override
     {
@@ -614,36 +633,41 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct {
         BeginOfDayResetFlag = true;
         OptStart_AdaTempGradTrdHeat.deallocate();
         OptStart_AdaTempGradTrdCool.deallocate();
+        MyOneTimeFlag = true;
+        MyEnvrnFlag = true;
+        CurrentEndTime = 0.0;
+        CurrentEndTimeLast = 0.0;
+        TimeStepSysLast = 0.0;
     }
 
     // Default Constructor
-    SystemAvailabilityManagerData() :
-        cValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
-            {"AvailabilityManager:Scheduled",
-            "AvailabilityManager:ScheduledOn",
-            "AvailabilityManager:ScheduledOff",
-            "AvailabilityManager:NightCycle",
-            "AvailabilityManager:DifferentialThermostat",
-            "AvailabilityManager:HighTemperatureTurnOff",
-            "AvailabilityManager:HighTemperatureTurnOn",
-            "AvailabilityManager:LowTemperatureTurnOff",
-            "AvailabilityManager:LowTemperatureTurnOn",
-            "AvailabilityManager:NightVentilation",
-            "AvailabilityManager:HybridVentilation",
-            "AvailabilityManager:OptimumStart"}),
-        ValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
-            {SysAvailMgr_Scheduled,
-            SysAvailMgr_ScheduledOn,
-            SysAvailMgr_ScheduledOff,
-            SysAvailMgr_NightCycle,
-            SysAvailMgr_DiffThermo,
-            SysAvailMgr_HiTempTOff,
-            SysAvailMgr_HiTempTOn,
-            SysAvailMgr_LoTempTOff,
-            SysAvailMgr_LoTempTOn,
-            SysAvailMgr_NightVent,
-            SysAvailMgr_HybridVent,
-            SysAvailMgr_OptimumStart})
+    SystemAvailabilityManagerData()
+        : cValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
+                                     {"AvailabilityManager:Scheduled",
+                                      "AvailabilityManager:ScheduledOn",
+                                      "AvailabilityManager:ScheduledOff",
+                                      "AvailabilityManager:NightCycle",
+                                      "AvailabilityManager:DifferentialThermostat",
+                                      "AvailabilityManager:HighTemperatureTurnOff",
+                                      "AvailabilityManager:HighTemperatureTurnOn",
+                                      "AvailabilityManager:LowTemperatureTurnOff",
+                                      "AvailabilityManager:LowTemperatureTurnOn",
+                                      "AvailabilityManager:NightVentilation",
+                                      "AvailabilityManager:HybridVentilation",
+                                      "AvailabilityManager:OptimumStart"}),
+          ValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
+                                    {SysAvailMgr_Scheduled,
+                                     SysAvailMgr_ScheduledOn,
+                                     SysAvailMgr_ScheduledOff,
+                                     SysAvailMgr_NightCycle,
+                                     SysAvailMgr_DiffThermo,
+                                     SysAvailMgr_HiTempTOff,
+                                     SysAvailMgr_HiTempTOn,
+                                     SysAvailMgr_LoTempTOff,
+                                     SysAvailMgr_LoTempTOn,
+                                     SysAvailMgr_NightVent,
+                                     SysAvailMgr_HybridVent,
+                                     SysAvailMgr_OptimumStart})
     {
     }
 };

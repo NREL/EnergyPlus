@@ -3,7 +3,7 @@
 #include "lib_util.h"
 #include "lib_battery_capacity.h"
 #include "lib_battery_voltage.h"
-#include "lib_battery_lifetime.h"
+#include "lib_battery_lifetime_calendar_cycle.h"
 #include "lib_battery.h"
 
 /**
@@ -88,9 +88,9 @@ std::ostream &operator<<(std::ostream &os, const capacity_params &p) {
 
 std::ostream &operator<<(std::ostream &os, const cycle_state &p) {
     char buf[1024];
-    sprintf(buf, "\"cycle_state\": { \"q_relative_cycle\": %.3f, \"n_cycles\": %d, \"range\": %.3f, \"average_range\": %.3f, "
+    sprintf(buf, "\"cycle_state\": { \"q_relative_cycle\": %.3f, "
                  "\"rainflow_Xlt\": %.3f, \"rainflow_Ylt\": %.3f, \"rainflow_jlt\": %d, \"rainflow_peaks\": ",
-            p.q_relative_cycle, p.n_cycles, p.range, p.average_range,
+            p.q_relative_cycle,
             p.rainflow_Xlt, p.rainflow_Ylt, p.rainflow_jlt);
     os << buf << p.rainflow_peaks << " }";
     return os;
@@ -98,29 +98,54 @@ std::ostream &operator<<(std::ostream &os, const cycle_state &p) {
 
 std::ostream &operator<<(std::ostream &os, const calendar_state &p) {
     char buf[1024];
-    sprintf(buf, "\"calendar_state\": { \"q_relative_calendar\": %.3f, \"day_age_of_battery\": %d, "
+    sprintf(buf, "\"calendar_state\": { \"q_relative_calendar\": %.3f, "
                  "\"dq_relative_calendar_old\": %.3f }",
-            p.q_relative_calendar, p.day_age_of_battery, p.dq_relative_calendar_old);
+            p.q_relative_calendar, p.dq_relative_calendar_old);
     os << buf;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const lifetime_nmc_state& p) {
+    char buf[1024];
+    sprintf(buf, "\"lifetime_nmc_state\": { \"q_relative_li\": %.3f, "
+        "\"q_relative_neg\": %.3f, \"dq_relative_li_old\": %.3f, \"dq_relative_neg_old\": %.3f, "
+        "\"DOD_max\": %f, \"n_cycles_prev_day\": %d, \"cum_dt\": %.3f, \"b1_dt\": %.3f, "
+        "\"b2_dt\": %.3f, \"b3_dt\": %.3f, \"c0_dt\": %.3f, \"c2_dt\": %.3f }",
+        p.q_relative_li, p.q_relative_neg, p.dq_relative_li_old, p.dq_relative_neg_old, p.DOD_max, p.n_cycles_prev_day,
+        p.cum_dt, p.b1_dt, p.b2_dt, p.b3_dt, p.c0_dt, p.c2_dt);
+    os << buf ;
     return os;
 }
 
 std::ostream &operator<<(std::ostream &os, const lifetime_state &p) {
     os.precision(3);
-    os << R"("lifetime_state" : { "q_relative": )" << p.q_relative << ", " << *p.cycle << ", " << *p.calendar << " }";
+    char buf[1024];
+    sprintf(buf, R"("lifetime_state": { "q_relative": %f, "n_cycles": %d, "range": %.3f, "average_range": %.3f,
+                 "day_age_of_battery": %.3f, )",
+            p.q_relative, p.n_cycles, p.range, p.average_range, p.day_age_of_battery);
+    os << buf << *p.cycle << ", " << *p.calendar << ", " << *p.nmc_li_neg << " }";
+    return os;
+}
+
+std::ostream &operator<<(std::ostream &os, const calendar_cycle_params &p) {
+    os << R"("calendar_cycle_params": { "cycling_matrix": )" << p.cycling_matrix;
+
+    char buf[1024];
+    sprintf(buf, ", \"calendar_choice\": %d, \"calendar_q0\": %.3f, "
+                 "\"calendar_a\": %.3f, \"calendar_b\": %.3f, "
+                 "\"calendar_c\": %.3f, ", p.calendar_choice, p.calendar_q0,
+            p.calendar_a, p.calendar_b, p.calendar_c);
+    os << buf;
+    os << R"("calendar_matrix": )" << p.calendar_matrix << " }";
     return os;
 }
 
 std::ostream &operator<<(std::ostream &os, const lifetime_params &p) {
-    os << R"("lifetime_params": { "cycling_matrix": )" << p.cycling_matrix;
-
+    os.precision(3);
     char buf[1024];
-    sprintf(buf, ", \"calendar_choice\": %d, \"dt_hour\": %.3f, \"calendar_q0\": %.3f, "
-                 "\"calendar_a\": %.3f, \"calendar_b\": %.3f, "
-                 "\"calendar_c\": %.3f, ", p.calendar_choice, p.dt_hour, p.calendar_q0,
-            p.calendar_a, p.calendar_b, p.calendar_c);
+    sprintf(buf, R"("lifetime_params": { "dt_hr": %.3f, "model_choice": %d, )", p.dt_hr, p.model_choice);
     os << buf;
-    os << R"("calendar_matrix": )" << p.calendar_matrix << " }";
+    os << *p.cal_cyc << " }";
     return os;
 }
 
@@ -150,10 +175,10 @@ std::ostream &operator<<(std::ostream &os, const thermal_state &p) {
 
 std::ostream &operator<<(std::ostream &os, const thermal_params &p) {
     char buf[1024];
-    sprintf(buf, "\"thermal_params\": { \"dt_hour\": %.3f, \"mass\": %.3f, \"surface_area\": %.3f, "
-                 "\"Cp\": %.3f, \"h\": %.3f, \"resistance\": %.3e, \"cap_vs_temp\": ",
-                 p.dt_hour, p.mass, p.surface_area,
-                 p.Cp, p.h, p.resistance);
+    sprintf(buf, "\"thermal_params\": { \"dt_hr\": %.3f, \"mass\": %.3f, \"surface_area\": %.3f, "
+                 "\"Cp\": %.3f, \"h\": %.3f, \"resistance\": %.3e, \"en_cap_vs_temp\": %d, \"cap_vs_temp\": ",
+            p.dt_hr, p.mass, p.surface_area,
+            p.Cp, p.h, p.resistance, p.en_cap_vs_temp);
     os << buf << p.cap_vs_temp;
     os.precision(3);
     os << R"(, "option": )" << p.option;
@@ -198,8 +223,8 @@ std::ostream &operator<<(std::ostream &os, const battery_state &p) {
 
 std::ostream &operator<<(std::ostream &os, const battery_params &p) {
     char buf[1024];
-    sprintf(buf, R"("battery_params": { "chem": %u, "dt_hour": %.3f, "nominal_voltage": %.3f, "nominal_energy": %.3f)",
-            p.chem, p.dt_hour, p.nominal_voltage, p.nominal_energy);
+    sprintf(buf, R"("battery_params": { "chem": %u, "dt_hr": %.3f, "nominal_voltage": %.3f, "nominal_energy": %.3f)",
+            p.chem, p.dt_hr, p.nominal_voltage, p.nominal_energy);
     os << buf << ", ";
     os << *p.capacity << ", ";
     os << *p.voltage << ", ";

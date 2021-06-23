@@ -91,8 +91,9 @@ namespace ThermalEN673Calc {
 
     // Functions
 
-    void Calc_EN673(TARCOGOutput::Files &files,
-                    int const standard,
+    void Calc_EN673(EnergyPlusData &state,
+                    TARCOGOutput::Files &files,
+                    TARCOGGassesParams::Stdrd const standard,
                     int const nlayer,
                     Real64 const tout,
                     Real64 const tind,
@@ -184,7 +185,8 @@ namespace ThermalEN673Calc {
         rtot = 0.0;
         sft = 0.0;
         if (GoAhead(nperr)) {
-            EN673ISO10292(nlayer,
+            EN673ISO10292(state,
+                          nlayer,
                           tout,
                           tind,
                           emis,
@@ -221,13 +223,15 @@ namespace ThermalEN673Calc {
                 solar_EN673(dir, totsol, rtot, rs, nlayer, asol, sft, standard, nperr, ErrorMessage);
                 if (GoAhead(nperr)) {
                     shgc = sft;
-                    if (files.WriteDebugOutput) WriteOutputEN673(files.DebugOutputFile, files.DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
+                    if (files.WriteDebugOutput)
+                        WriteOutputEN673(files.DebugOutputFile, files.DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
                 } // GoAhead after solar
             }     // GoAhead after EN673ISO10292
         }         // GopAhead after propcon90
     }
 
-    void EN673ISO10292(int const nlayer,
+    void EN673ISO10292(EnergyPlusData &state,
+                       int const nlayer,
                        Real64 const tout,
                        Real64 const tind,
                        const Array1D<Real64> &emis,
@@ -244,7 +248,7 @@ namespace ThermalEN673Calc {
                        const Array1D<Real64> &presure,
                        const Array1D_int &nmix,
                        Array1D<Real64> &theta,
-                       int const standard,
+                       TARCOGGassesParams::Stdrd const standard,
                        Array1D<Real64> &hg,
                        Array1D<Real64> &hr,
                        Array1D<Real64> &hs,
@@ -390,7 +394,8 @@ namespace ThermalEN673Calc {
                         ipropg(j) = iprop(i + 1, j);
                         frctg(j) = frct(i + 1, j);
                     }
-                    GASSES90(Tm,
+                    GASSES90(state,
+                             Tm,
                              ipropg,
                              frctg,
                              presure(i + 1),
@@ -443,13 +448,13 @@ namespace ThermalEN673Calc {
                 sumRsold = sumRs;
                 sumRs = 0.0;
 
-                if ((standard == EN673) && (nlayer == 2)) {
+                if ((standard == TARCOGGassesParams::Stdrd::EN673) && (nlayer == 2)) {
                     return; // If EN673 declared values path and glazing has 2 layers, end claculations and return
                 } else {
                     if (tind > tout) {
                         for (i = 1; i <= nlayer - 1; ++i) {
                             dT(i) = 15.0 * (1.0 / hs(i)) / sumRsold; // updated temperature distribution
-                            if (standard == EN673) {
+                            if (standard == TARCOGGassesParams::Stdrd::EN673) {
                                 Tm = 283.0;
                             } else {
                                 Tm = (theta(2 * i) + theta(2 * i + 1)) / 2.0;
@@ -458,7 +463,8 @@ namespace ThermalEN673Calc {
                                 ipropg(j) = iprop(i + 1, j);
                                 frctg(j) = frct(i + 1, j);
                             } // j, gas mix
-                            GASSES90(Tm,
+                            GASSES90(state,
+                                     Tm,
                                      ipropg,
                                      frctg,
                                      presure(i + 1),
@@ -527,7 +533,7 @@ namespace ThermalEN673Calc {
                      int const nlayer,
                      const Array1D<Real64> &absol,
                      Real64 &sf,
-                     int const standard,
+                     TARCOGGassesParams::Stdrd const standard,
                      int &nperr,
                      std::string &ErrorMessage)
     {
@@ -558,7 +564,7 @@ namespace ThermalEN673Calc {
         sf = 0.0;
 
         // evaluate inward flowing fraction of absorbed radiation:
-        if ((standard == EN673) || (standard == EN673Design)) {
+        if ((standard == TARCOGGassesParams::Stdrd::EN673) || (standard == TARCOGGassesParams::Stdrd::EN673Design)) {
             if (nlayer == 1) {
                 fract = dir * absol(1) * (rs(1) * rs(3)) / (rs(1) * (rs(1) + rs(3)));
             } else {

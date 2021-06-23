@@ -111,13 +111,14 @@ var_info vtab_battery_inputs[] = {
         { SSC_INPUT,        SSC_NUMBER,      "batt_minimum_modetime",                      "Minimum time at charge state",                            "min",     "",                     "BatteryCell",       "",                           "",                              "" },
 
         // lifetime inputs
-        { SSC_INPUT,		SSC_MATRIX,     "batt_lifetime_matrix",                        "Cycles vs capacity at different depths-of-discharge",    "",         "",                     "BatteryCell",       "",                           "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_choice",                        "Calendar life degradation input option",                 "0/1/2",    "0=NoCalendarDegradation,1=LithiomIonModel,2=InputLossTable",                     "BatteryCell",       "",                           "",                             "" },
-        { SSC_INPUT,        SSC_MATRIX,     "batt_calendar_lifetime_matrix",               "Days vs capacity",                                       "",         "",                     "BatteryCell",       "",                           "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_q0",                            "Calendar life model initial capacity cofficient",        "",         "",                     "BatteryCell",       "",                           "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_a",                             "Calendar life model coefficient",                        "1/sqrt(day)","",                   "BatteryCell",       "",                           "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_b",                             "Calendar life model coefficient",                        "K",        "",                     "BatteryCell",       "",                           "",                             "" },
-        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_c",                             "Calendar life model coefficient",                        "K",        "",                     "BatteryCell",       "",                           "",                             "" },
+        { SSC_INPUT,		SSC_NUMBER,     "batt_life_model",                             "Battery life model specifier",                           "0/1",      "0=calendar/cycle,1=NMC", "BatteryCell",       "?=0",                           "",                             "" },
+        { SSC_INPUT,		SSC_MATRIX,     "batt_lifetime_matrix",                        "Cycles vs capacity at different depths-of-discharge",    "",         "",                     "BatteryCell",       "en_batt=1&batt_life_model=0",                           "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_choice",                        "Calendar life degradation input option",                 "0/1/2",    "0=NoCalendarDegradation,1=LithiomIonModel,2=InputLossTable", "BatteryCell",       "en_batt=1&batt_life_model=0",                           "",                             "" },
+        { SSC_INPUT,        SSC_MATRIX,     "batt_calendar_lifetime_matrix",               "Days vs capacity",                                       "",         "",                     "BatteryCell",       "en_batt=1&batt_life_model=0&batt_calendar_choice=2", "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_q0",                            "Calendar life model initial capacity cofficient",        "",         "",                     "BatteryCell",       "en_batt=1&batt_life_model=0&batt_calendar_choice=1",  "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_a",                             "Calendar life model coefficient",                        "1/sqrt(day)","",                   "BatteryCell",       "en_batt=1&batt_life_model=0&batt_calendar_choice=1",  "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_b",                             "Calendar life model coefficient",                        "K",        "",                     "BatteryCell",       "en_batt=1&batt_life_model=0&batt_calendar_choice=1",  "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,     "batt_calendar_c",                             "Calendar life model coefficient",                        "K",        "",                     "BatteryCell",       "en_batt=1&batt_life_model=0&batt_calendar_choice=1",  "",                             "" },
 
         // replacement inputs
         { SSC_INPUT,        SSC_NUMBER,     "batt_replacement_capacity",                   "Capacity degradation at which to replace battery",       "%",        "",                     "BatterySystem",       "",                           "",                             "" },
@@ -160,8 +161,8 @@ var_info vtab_battery_inputs[] = {
         { SSC_INPUT,        SSC_ARRAY,      "batt_pv_ac_forecast",                         "PV ac power forecast",                                   "kW",       "",                     "BatteryDispatch",       "",  "",          "" },
 
         //  cycle cost inputs
-        { SSC_INPUT,        SSC_NUMBER,     "batt_cycle_cost_choice",                      "Use SAM cost model for degradaton penalty or input custom via batt_cycle_cost", "0/1",     "0=UseCostModel,1=InputCost", "BatterySystem", "",                           "",                             "" },
-        { SSC_INPUT,        SSC_ARRAY,      "batt_cycle_cost",                             "Input battery cycle degradaton penalty per year",                      "$/cycle-kWh","length 1 or analysis_period, length 1 will be extended using inflation", "BatterySystem",       "",                           "",                             "" },
+        { SSC_INPUT,        SSC_NUMBER,     "batt_cycle_cost_choice",                      "Use SAM cost model for degradaton penalty or input custom via batt_cycle_cost", "0/1",     "0=UseCostModel,1=InputCost", "BatterySystem", "?=0",                           "",                             "" },
+        { SSC_INPUT,        SSC_ARRAY,      "batt_cycle_cost",                             "Input battery cycle degradaton penalty per year",                      "$/cycle-kWh","length 1 or analysis_period, length 1 will be extended using inflation", "BatterySystem",       "batt_cycle_cost_choice=1",                           "",                             "" },
 
         { SSC_INPUT,        SSC_NUMBER,     "inflation_rate",                              "Inflation rate",                                          "%", "", "Lifetime", "?=0", "MIN=-99", "" },
         { SSC_INPUT,        SSC_ARRAY,      "load_escalation",                             "Annual load escalation",                                  "%/year", "",                                                                                                                                                                                      "Load",                                               "?=0",                                "",                    "" },
@@ -373,29 +374,32 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
 
             // compute utility rate out-years escalation multipliers
             std::vector<ssc_number_t> cycle_cost(nyears);
-            ssc_number_t* parr = vt.as_array("batt_cycle_cost", &cnt);
-            if (cnt == 1)
+            if (batt_vars->batt_cycle_cost_choice == 1)
             {
-                for (i = 0; i < nyears; i++)
-                    cycle_cost[i] = parr[0] * (ssc_number_t)pow((double)(inflation_rate + 1), (double)i);
-            }
-            else if (cnt < nyears)
-            {
-                throw exec_error("battery", "invalid number for batt_cycle_cost, must be 1 or equal to analysis_period");
-            }
-            else
-            {
-                for (i = 0; i < nyears; i++)
-                    cycle_cost[i] = parr[i];
+                ssc_number_t* parr = vt.as_array("batt_cycle_cost", &cnt);
+                if (cnt == 1)
+                {
+                    for (i = 0; i < nyears; i++)
+                        cycle_cost[i] = parr[0] * (ssc_number_t)pow((double)(inflation_rate + 1), (double)i);
+                }
+                else if (cnt < nyears)
+                {
+                    throw exec_error("battery", "Invalid number for batt_cycle_cost, must be 1 or equal to analysis_period.");
+                }
+                else
+                {
+                    for (i = 0; i < nyears; i++)
+                        cycle_cost[i] = parr[i];
+                }
             }
             batt_vars->batt_cycle_cost = cycle_cost;
 
-            
+
             // Battery bank replacement
             if (vt.is_assigned("om_replacement_cost1"))
             {
                 std::vector<ssc_number_t> replacement_cost(nyears);
-                parr = vt.as_array("om_replacement_cost1", &cnt);
+                ssc_number_t*  parr = vt.as_array("om_replacement_cost1", &cnt);
                 if (cnt == 1)
                 {
                     for (i = 0; i < nyears; i++)
@@ -403,7 +407,7 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
                 }
                 else if (cnt < nyears)
                 {
-                    throw exec_error("battery", "invalid number for om_replacement_cost1, must be 1 or equal to analysis_period");
+                    throw exec_error("battery", "Invalid number for om_replacement_cost1, must be 1 or equal to analysis_period.");
                 }
                 else {
                     for (i = 0; i < nyears; i++)
@@ -467,7 +471,7 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
                 if (vt.is_assigned("ur_ec_tou_mat")) { // Some tests don't have this assigned, ensure it is before setting up forecast rate
                     batt_vars->ec_rate_defined = true;
                 }
-                    
+
 
                 if (batt_vars->batt_dispatch == dispatch_t::MAINTAIN_TARGET)
                 {
@@ -495,7 +499,7 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
                         target_power = batt_vars->target_power;
 
                     if (target_power.size() != nrec)
-                        throw exec_error("battery", "invalid number of target powers, must be equal to number of records in weather file");
+                        throw exec_error("battery", "Invalid number of target powers, must be equal to number of records in weather file.");
 
                     // extend target power to lifetime internally
                     for (size_t y = 1; y < nyears; y++) {
@@ -552,14 +556,21 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
             }
 
             // Battery lifetime
-            batt_vars->batt_calendar_choice = vt.as_integer("batt_calendar_choice");
-            batt_vars->batt_lifetime_matrix = vt.as_matrix("batt_lifetime_matrix");
-            batt_vars->batt_calendar_lifetime_matrix = vt.as_matrix("batt_calendar_lifetime_matrix");
-            batt_vars->batt_voltage_matrix = vt.as_matrix("batt_voltage_matrix");
-            batt_vars->batt_calendar_q0 = vt.as_double("batt_calendar_q0");
-            batt_vars->batt_calendar_a = vt.as_double("batt_calendar_a");
-            batt_vars->batt_calendar_b = vt.as_double("batt_calendar_b");
-            batt_vars->batt_calendar_c = vt.as_double("batt_calendar_c");
+            batt_vars->batt_life_model = vt.as_integer("batt_life_model");
+
+            if (batt_vars->batt_life_model == 1 && batt_vars->batt_chem != 1)
+                throw exec_error("battery", "NMC life model (batt_life_model=1) can only be used with Li-Ion chemistries (batt_chem=1).");
+
+            if (batt_vars->batt_life_model == 0) {
+                batt_vars->batt_calendar_choice = vt.as_integer("batt_calendar_choice");
+                batt_vars->batt_lifetime_matrix = vt.as_matrix("batt_lifetime_matrix");
+                batt_vars->batt_calendar_lifetime_matrix = vt.as_matrix("batt_calendar_lifetime_matrix");
+                batt_vars->batt_voltage_matrix = vt.as_matrix("batt_voltage_matrix");
+                batt_vars->batt_calendar_q0 = vt.as_double("batt_calendar_q0");
+                batt_vars->batt_calendar_a = vt.as_double("batt_calendar_a");
+                batt_vars->batt_calendar_b = vt.as_double("batt_calendar_b");
+                batt_vars->batt_calendar_c = vt.as_double("batt_calendar_c");
+            }
 
             // Thermal behavior
             batt_vars->batt_surface_area = vt.as_double("batt_surface_area");
@@ -677,7 +688,7 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
 
     if (!batt_vars->system_use_lifetime_output){
         if (batt_vars->batt_replacement_option > 0)
-            throw exec_error("battery", "Replacements are enabled without running lifetime simulation, please run over lifetime to consider battery replacements");
+            throw exec_error("battery", "Battery replacements are enabled with single year simulation. You must enable lifetime simulations to model battery replacements.");
     }
     total_steps = nyears * 8760 * step_per_hour;
     chem = batt_vars->batt_chem;
@@ -787,12 +798,13 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
     capacity_t* capacity_model = 0;
     losses_t* losses_model = 0;
 
-    if ((chem == battery_params::LEAD_ACID || chem == battery_params::LITHIUM_ION) && batt_vars->batt_voltage_choice == voltage_params::MODEL)
+    if ((chem == battery_params::LEAD_ACID || chem == battery_params::LITHIUM_ION) && batt_vars->batt_voltage_choice == voltage_params::MODEL) {
         voltage_model = new voltage_dynamic_t(batt_vars->batt_computed_series, batt_vars->batt_computed_strings,
                                               batt_vars->batt_Vnom_default, batt_vars->batt_Vfull, batt_vars->batt_Vexp,
                                               batt_vars->batt_Vnom, batt_vars->batt_Qfull, batt_vars->batt_Qexp,
                                               batt_vars->batt_Qnom, batt_vars->batt_C_rate, batt_vars->batt_resistance,
                                               dt_hr);
+    }
     else if ((chem == battery_params::VANADIUM_REDOX) && batt_vars->batt_voltage_choice == voltage_params::MODEL)
         voltage_model = new voltage_vanadium_redox_t(batt_vars->batt_computed_series, batt_vars->batt_computed_strings,
                                                      batt_vars->batt_Vnom_default, batt_vars->batt_resistance,
@@ -803,22 +815,43 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
                                             batt_vars->batt_voltage_matrix, batt_vars->batt_resistance,
                                             dt_hr);
 
-    if (batt_vars->batt_calendar_choice == lifetime_params::CALENDAR_CHOICE::MODEL) {
-        lifetime_model = new lifetime_t(batt_vars->batt_lifetime_matrix, dt_hr,
-                                        batt_vars->batt_calendar_q0, batt_vars->batt_calendar_a, batt_vars->batt_calendar_b, batt_vars->batt_calendar_c);
+    if (batt_vars->batt_life_model == 0) {
+        if (batt_vars->batt_calendar_choice == calendar_cycle_params::CALENDAR_CHOICE::MODEL) {
+            lifetime_model = new lifetime_calendar_cycle_t(batt_vars->batt_lifetime_matrix, dt_hr,
+                                                           batt_vars->batt_calendar_q0, batt_vars->batt_calendar_a, batt_vars->batt_calendar_b, batt_vars->batt_calendar_c);
+        }
+        else if (batt_vars->batt_calendar_choice == calendar_cycle_params::CALENDAR_CHOICE::TABLE) {
+            lifetime_model = new lifetime_calendar_cycle_t(batt_vars->batt_lifetime_matrix, dt_hr, batt_vars->batt_calendar_lifetime_matrix);
+        }
+        else {
+            lifetime_model = new lifetime_calendar_cycle_t(batt_vars->batt_lifetime_matrix, dt_hr);
+        }
     }
-    else if (batt_vars->batt_calendar_choice == lifetime_params::CALENDAR_CHOICE::TABLE) {
-        lifetime_model = new lifetime_t(batt_vars->batt_lifetime_matrix, dt_hr, batt_vars->batt_calendar_lifetime_matrix);
+    else if (batt_vars->batt_life_model == 1) {
+        lifetime_model = new lifetime_nmc_t(dt_hr);
     }
     else {
-        lifetime_model = new lifetime_t(batt_vars->batt_lifetime_matrix, dt_hr);
+        throw exec_error("battery", "Unrecognized `batt_life_model` option. Valid options are 0 for separate calendar & cycle models; "
+                                    "1 for NMC (Smith 2017) life model.");
     }
 
     if (batt_vars->T_room.size() != nrec) {
-        throw exec_error("battery", "Environment temperature input length must equal number of weather file records");
+        throw exec_error("battery", "Environment temperature input length must equal number of weather file records.");
     }
 
-    thermal_model = new thermal_t(
+    if (batt_vars->batt_life_model == 1) {
+        thermal_model = new thermal_t(
+            dt_hr,
+            batt_vars->batt_mass, // [kg]
+            batt_vars->batt_surface_area, // [m]
+            batt_vars->batt_resistance, // [J/kgK]
+            batt_vars->batt_Cp,
+            batt_vars->batt_h_to_ambient,
+            batt_vars->T_room
+        );
+    }
+    else {
+        thermal_model = new thermal_t(
             dt_hr,
             batt_vars->batt_mass, // [kg]
             batt_vars->batt_surface_area, // [m]
@@ -827,7 +860,9 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
             batt_vars->batt_h_to_ambient,
             batt_vars->cap_vs_temp,
             batt_vars->T_room
-    );
+        );
+    }
+
 
     if (chem == battery_params::LEAD_ACID)
     {
@@ -858,7 +893,7 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
     }
     else if (batt_vars->batt_loss_choice == losses_params::SCHEDULE) {
         if (!(batt_vars->batt_losses.size() == 1 || batt_vars->batt_losses.size() == nrec)) {
-            throw exec_error("battery", "system loss input length must be 1 or equal to weather file length for time series input mode");
+            throw exec_error("battery", "System loss input length must be 1 or equal to weather file length for time series input mode.");
         }
         losses_model = new losses_t(batt_vars->batt_losses);
     }
@@ -883,28 +918,28 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
     {
         /*! Generic manual dispatch model inputs */
         if (batt_vars->batt_can_charge.size() != 6 || batt_vars->batt_can_discharge.size() != 6 || batt_vars->batt_can_gridcharge.size() != 6)
-            throw exec_error("battery", "invalid manual dispatch control vector lengths, must be length 6");
+            throw exec_error("battery", "Invalid manual dispatch control vector length, must be length 6.");
 
         if (batt_vars->batt_discharge_schedule_weekday.nrows() != 12 || batt_vars->batt_discharge_schedule_weekday.ncols() != 24)
-            throw exec_error("battery", "invalid manual dispatch schedule matrix dimensions, must be 12 x 24");
+            throw exec_error("battery", "Invalid manual dispatch schedule matrix dimensions, must be 12 x 24.");
 
         size_t max_period = 6;
         size_t* discharge_schedule_vec = batt_vars->batt_discharge_schedule_weekday.data();
         size_t* period_num = std::find_if(discharge_schedule_vec, discharge_schedule_vec + batt_vars->batt_discharge_schedule_weekday.ncells() - 1, [max_period](double element) { return (max_period < element); });
         if (*period_num > max_period)
-            throw exec_error("battery", "invalid manual dispatch period in weekday schedule. Period numbers must be less than or equal to 6");
+            throw exec_error("battery", "Invalid manual dispatch period in weekday schedule. Period numbers must be less than or equal to 6.");
 
         if (batt_vars->batt_discharge_schedule_weekend.nrows() != 12 || batt_vars->batt_discharge_schedule_weekend.ncols() != 24)
-            throw exec_error("battery", "invalid weekend manual dispatch schedule matrix dimensions, must be 12 x 24");
+            throw exec_error("battery", "Invalid weekend manual dispatch schedule matrix dimensions, must be 12 x 24.");
 
         discharge_schedule_vec = batt_vars->batt_discharge_schedule_weekend.data();
         period_num = std::find_if(discharge_schedule_vec, discharge_schedule_vec + batt_vars->batt_discharge_schedule_weekend.ncells() - 1, [max_period](double element) { return (max_period < element); });
         if (*period_num > max_period)
-            throw exec_error("battery", "invalid manual dispatch period in weekend schedule. Period numbers must be less than or equal to 6");
+            throw exec_error("battery", "Invalid manual dispatch period in weekend schedule. Period numbers must be less than or equal to 6.");
 
         if (batt_vars->en_fuelcell) {
             if (batt_vars->batt_can_fuelcellcharge.size() != 6)
-                throw exec_error("fuelcell", "invalid manual dispatch control vector lengths, must be length 6");
+                throw exec_error("fuelcell", "Invalid manual dispatch control vector lengths, must be length 6.");
         }
 
 
@@ -969,7 +1004,7 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
             if (dispatch_automatic_front_of_meter_t * dispatch_fom = dynamic_cast<dispatch_automatic_front_of_meter_t*>(dispatch_model))
             {
                 if (batt_vars->batt_custom_dispatch.size() != 8760 * step_per_hour) {
-                    throw exec_error("battery", "invalid custom dispatch, must be 8760 * steps_per_hour");
+                    throw exec_error("battery", "Invalid custom dispatch length, must be 8760 * steps_per_hour.");
                 }
                 dispatch_fom->set_custom_dispatch(batt_vars->batt_custom_dispatch);
             }
@@ -999,7 +1034,7 @@ battstor::battstor(var_table& vt, bool setup_model, size_t nrec, double dt_hr, c
             if (dispatch_automatic_behind_the_meter_t * dispatch_btm = dynamic_cast<dispatch_automatic_behind_the_meter_t*>(dispatch_model))
             {
                 if (batt_vars->batt_custom_dispatch.size() != 8760 * step_per_hour) {
-                    throw exec_error("battery", "invalid custom dispatch, must be 8760 * steps_per_hour");
+                    throw exec_error("battery", "Invalid custom dispatch, must be 8760 * steps_per_hour.");
                 }
                 dispatch_btm->set_custom_dispatch(batt_vars->batt_custom_dispatch);
             }
@@ -1391,10 +1426,10 @@ void battstor::outputs_fixed()
     outCurrent[index] = (ssc_number_t)(state.capacity->cell_current);
     outBatteryVoltage[index] = (ssc_number_t)(battery_model->V());
 
-    outCycles[index] = (ssc_number_t)(state.lifetime->cycle->n_cycles);
+    outCycles[index] = (ssc_number_t)(state.lifetime->n_cycles);
     outSOC[index] = (ssc_number_t)(state.capacity->SOC);
-    outDOD[index] = (ssc_number_t)(state.lifetime->cycle->range);
-    outDODCycleAverage[index] = (ssc_number_t)(state.lifetime->cycle->average_range);
+    outDOD[index] = (ssc_number_t)(state.lifetime->range);
+    outDODCycleAverage[index] = (ssc_number_t)(state.lifetime->average_range);
     outCapacityPercent[index] = (ssc_number_t)(state.lifetime->q_relative);
     outCapacityPercentCycle[index] = (ssc_number_t)(state.lifetime->cycle->q_relative_cycle);
     outCapacityPercentCalendar[index] = (ssc_number_t)(state.lifetime->calendar->q_relative_calendar);
@@ -1573,7 +1608,7 @@ public:
             size_t analysis_period = (size_t)as_integer("analysis_period");
 
             if (use_lifetime && (double)(util::hours_per_year * analysis_period) / n_rec_lifetime > 1)
-                throw exec_error("battery", "`gen` input must be lifetime when system_use_lifetime_output=1.");
+                throw exec_error("battery", "Input gen must be from lifetime simulation when system_use_lifetime_output=1.");
 
             size_t n_rec_single_year;
             double dt_hour_gen;
@@ -1603,10 +1638,10 @@ public:
             batt->initialize_automated_dispatch(power_input_lifetime, load_lifetime);
 
             if (load_lifetime.size() != n_rec_lifetime) {
-                throw exec_error("battery", "Load length does not match system generation length");
+                throw exec_error("battery", "Load length does not match system generation length.");
             }
             if (batt->batt_vars->batt_topology == ChargeController::DC_CONNECTED) {
-                throw exec_error("battery", "Generic System must be AC connected to battery");
+                throw exec_error("battery", "Generic System must be AC connected to battery.");
             }
 
             // resilience metrics for battery
@@ -1616,7 +1651,7 @@ public:
                 p_crit_load = as_vector_ssc_number_t("crit_load");
                 size_t nload = p_crit_load.size();
                 if (nload != n_rec_single_year)
-                    throw exec_error("battery", "electric load profile must have same number of values as weather file, or 8760");
+                    throw exec_error("battery", "Electric load profile must have same number of values as weather file, or 8760.");
                 if (!p_crit_load.empty() && *std::max_element(p_crit_load.begin(), p_crit_load.end()) > 0){
                     resilience = std::unique_ptr<resilience_runner>(new resilience_runner(batt));
                     auto logs = resilience->get_logs();
@@ -1662,7 +1697,7 @@ public:
                         float techs = 3;
                         percent = percent_complete + 100.0f * ((float)lifetime_idx + 1) / ((float)n_rec_lifetime) / techs;
                         if (!update("", percent, (float)hour)) {
-                            throw exec_error("battery", "simulation canceled at hour " + util::to_string(hour + 1.0));
+                            throw exec_error("battery", "Simulation canceled at hour " + util::to_string(hour + 1.0));
                         }
                     }
 

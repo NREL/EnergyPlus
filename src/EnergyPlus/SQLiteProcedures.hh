@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
@@ -79,8 +80,8 @@ protected:
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream, std::shared_ptr<sqlite3> const &db);
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream,
                      bool writeOutputToSQLite,
-                     std::string const &dbName,
-                     std::string const &errorFileName);
+                     fs::path const &dbName,
+                     fs::path const &errorFilePath);
 
     int sqliteExecuteCommand(const std::string &commandBuffer);
     int sqlitePrepareStatement(sqlite3_stmt *&stmt, const std::string &stmtBuffer);
@@ -136,8 +137,8 @@ public:
     // Open the DB and prepare for writing data
     // Create all of the tables on construction
     SQLite(std::shared_ptr<std::ostream> errorStream,
-           std::string const &dbName,
-           std::string const &errorFileName,
+           fs::path const &dbName,
+           fs::path const &errorFilePath,
            bool writeOutputToSQLite = false,
            bool writeTabularDataToSQLite = false);
 
@@ -999,17 +1000,16 @@ private:
     std::vector<std::unique_ptr<SQLite::RoomAirModel>> roomAirModels;
 };
 
-extern std::unique_ptr<SQLite> sqlite;
-
 std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 
 void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
 
-struct SQLiteProceduresData : BaseGlobalStruct {
-
+struct SQLiteProceduresData : BaseGlobalStruct
+{
+    std::unique_ptr<SQLite> sqlite;
     void clear_state() override
     {
-
+        sqlite.reset(); // probably not necessary, as it is recreated in ManageSimulation, but it should be fine to delete it here
     }
 };
 

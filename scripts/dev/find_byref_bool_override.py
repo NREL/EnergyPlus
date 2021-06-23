@@ -165,13 +165,6 @@ CHECKED_AND_OKED = {
         ]
     },
 
-    # Could be changed to just return a string
-    "DataSystemVariables.cc": {
-        "CheckForActualFileName": [
-            "FileFound"
-        ]
-    },
-
     "DaylightingManager.cc": {
         "CheckForGeometricTransform": [
             "doTransform",
@@ -189,6 +182,10 @@ CHECKED_AND_OKED = {
             "discharging"
         ],
         "simulateSimpleBucketModel": [
+            "charging",
+            "discharging"
+        ],
+        "simulateLiIonNmcBatteryModel": [
             "charging",
             "discharging"
         ]
@@ -341,6 +338,10 @@ CHECKED_AND_OKED = {
             "heatingDesignlinepassed",
             "coolingDesignlinepassed",
             "desConditionlinepassed"
+        ],
+        "produceDualUnitsFlags": [
+            "produce_Sql",
+            "produce_Tab"
         ]
     },
     "PackagedTerminalHeatPump.cc": {

@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -104,7 +105,8 @@ namespace BaseboardElectric {
         BaseboardNumericFieldData() = default;
     };
 
-    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
+    void SimElectricBaseboard(
+        EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
 
     void GetBaseboardInput(EnergyPlusData &state);
 
@@ -116,24 +118,27 @@ namespace BaseboardElectric {
 
 } // namespace BaseboardElectric
 
-    struct BaseboardElectricData : BaseGlobalStruct {
-        int NumBaseboards = 0;
-        bool getInputFlag = true;
-        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
-        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
-        bool MyOneTimeFlag = true;
-        bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+struct BaseboardElectricData : BaseGlobalStruct
+{
+    int NumBaseboards = 0;
+    bool getInputFlag = true;
+    EPVector<BaseboardElectric::BaseboardParams> Baseboard;
+    EPVector<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
+    Array1D_bool MyEnvrnFlag;
 
-        void clear_state() override
-        {
-            this->NumBaseboards = 0;
-            this->getInputFlag = true;
-            this->Baseboard.deallocate();
-            this->BaseboardNumericFields.deallocate();
-            this->MyOneTimeFlag = true;
-            this->ZoneEquipmentListChecked = false;
-        }
-    };
+    void clear_state() override
+    {
+        this->NumBaseboards = 0;
+        this->getInputFlag = true;
+        this->Baseboard.deallocate();
+        this->BaseboardNumericFields.deallocate();
+        this->MyOneTimeFlag = true;
+        this->ZoneEquipmentListChecked = false;
+        this->MyEnvrnFlag.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

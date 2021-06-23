@@ -61,9 +61,6 @@ namespace EnergyPlus {
 
 namespace DataViewFactorInformation {
 
-    extern int NumOfRadiantEnclosures; // Number of radiant enclosures
-    extern int NumOfSolarEnclosures;   // Number of solar enclosures
-
     struct ZoneViewFactorInformation
     {
         // Members
@@ -93,18 +90,22 @@ namespace DataViewFactorInformation {
         }
     };
 
-    extern Array1D<ZoneViewFactorInformation> ZoneRadiantInfo;
-    extern Array1D<ZoneViewFactorInformation> ZoneSolarInfo;
-
-    void clear_state();
-
 } // namespace DataViewFactorInformation
 
-struct ViewFactorInfoData : BaseGlobalStruct {
+struct ViewFactorInfoData : BaseGlobalStruct
+{
+
+    int NumOfRadiantEnclosures = 0; // Number of radiant enclosures
+    int NumOfSolarEnclosures = 0;   // Number of solar enclosures
+    Array1D<DataViewFactorInformation::ZoneViewFactorInformation> ZoneRadiantInfo;
+    Array1D<DataViewFactorInformation::ZoneViewFactorInformation> ZoneSolarInfo;
 
     void clear_state() override
     {
-
+        NumOfRadiantEnclosures = 0;
+        NumOfSolarEnclosures = 0;
+        ZoneRadiantInfo.clear();
+        ZoneSolarInfo.clear();
     }
 };
 

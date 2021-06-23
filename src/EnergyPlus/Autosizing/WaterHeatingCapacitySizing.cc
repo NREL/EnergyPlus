@@ -105,10 +105,10 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
                 } else {
                     DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
-                CoilInTemp =
-                    this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                                                              this->zoneEqSizing(this->curZoneEqNum),
-                                                              this->finalZoneSizing(this->curZoneEqNum));
+                CoilInTemp = this->setHeatCoilInletTempForZoneEqSizing(
+                    this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->zoneEqSizing(this->curZoneEqNum),
+                    this->finalZoneSizing(this->curZoneEqNum));
                 // Real64 CoilInHumRat =
                 //    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                 //                                                this->zoneEqSizing(this->curZoneEqNum),
@@ -160,8 +160,8 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
     }
     this->selectSizerOutput(state, errorsFound);
     if (this->isCoilReportObject)
-        coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(state,
-            this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(
+            state, this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
     return this->autoSizedValue;
 }
 

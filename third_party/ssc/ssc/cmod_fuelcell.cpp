@@ -46,7 +46,7 @@ var_info vtab_fuelcell_input[] = {
 	{ SSC_INPUT,        SSC_NUMBER,      "fuelcell_degradation_restart_schedule","Fuel cell enable scheduled restarts",  "0/1",      "",                 "Fuel Cell",                  "",                        "",                              "" },
 	{ SSC_INPUT,        SSC_NUMBER,      "fuelcell_degradation_restarts_per_year","Fuel cell scheduled restarts per year","",         "",                "Fuel Cell",                  "",                        "",                              "" },
 	{ SSC_INPUT,        SSC_NUMBER,      "fuelcell_fixed_pct",				  "Fuel cell fixed operation percent",     "%",          "",                 "Fuel Cell",                  "",                        "",                              "" },
-	{ SSC_INPUT,        SSC_NUMBER,      "fuelcell_dynamic_response_up",      "Fuel cell ramp rate limit up",          "kW/h",       "",                 "Fuel Cell",                  "",                        "",                              "" },		
+	{ SSC_INPUT,        SSC_NUMBER,      "fuelcell_dynamic_response_up",      "Fuel cell ramp rate limit up",          "kW/h",       "",                 "Fuel Cell",                  "",                        "",                              "" },
 	{ SSC_INPUT,        SSC_NUMBER,      "fuelcell_dynamic_response_down",    "Fuel cell ramp rate limit down",        "kW/h",       "",                 "Fuel Cell",                  "",                        "",                              "" },
 	{ SSC_INPUT,        SSC_MATRIX,      "fuelcell_efficiency",               "Fuel cell efficiency table ",           "",           "",                 "Fuel Cell",                  "",                        "",                              "" },
 	{ SSC_INPUT,        SSC_NUMBER,      "fuelcell_efficiency_choice",        "Fuel cell efficiency definition choice ","0/1",       "0=OriginalNameplate,1=DegradedNameplate",  "Fuel Cell",                  "",                        "",                              "" },
@@ -106,7 +106,7 @@ cm_fuelcell::cm_fuelcell()
 	add_var_info(vtab_fuelcell_output);
 	add_var_info(vtab_technology_outputs);
 }
-  
+
 // Have to add this since compute module isn't actually fully constructed until compute is called with
 // a vartable.
 void cm_fuelcell::construct()
@@ -116,8 +116,8 @@ void cm_fuelcell::construct()
 
 	std::unique_ptr<FuelCell> tmp2(new FuelCell(fcVars->unitPowerMax_kW, fcVars->unitPowerMin_kW,
 		fcVars->startup_hours, fcVars->is_started, fcVars->shutdown_hours,
-		fcVars->dynamicResponseUp_kWperHour, fcVars->dynamicResponseDown_kWperHour, 
-		fcVars->degradation_kWperHour, fcVars->degradationRestart_kW, 
+		fcVars->dynamicResponseUp_kWperHour, fcVars->dynamicResponseDown_kWperHour,
+		fcVars->degradation_kWperHour, fcVars->degradationRestart_kW,
 		fcVars->replacementOption, fcVars->replacement_percent, fcVars->replacementSchedule,
 		fcVars->shutdownTable, fcVars->efficiencyChoice, fcVars->efficiencyTable,
 		fcVars->lowerHeatingValue_BtuPerFt3, fcVars->higherHeatingValue_BtuPerFt3, fcVars->availableFuel_MCf,
@@ -126,7 +126,7 @@ void cm_fuelcell::construct()
 
 	std::unique_ptr<FuelCellDispatch> tmp3(new FuelCellDispatch(fuelCell.get(), fcVars->numberOfUnits,
 		fcVars->dispatchOption, fcVars->shutdownOption, fcVars->dt_hour, fcVars->fixed_percent, fcVars->dispatch_kW,
-		fcVars->canCharge, fcVars->canDischarge, fcVars->discharge_percentByPeriod, fcVars->discharge_unitsByPeriod, 
+		fcVars->canCharge, fcVars->canDischarge, fcVars->discharge_percentByPeriod, fcVars->discharge_unitsByPeriod,
 		fcVars->scheduleWeekday,fcVars->scheduleWeekend));
 	fuelCellDispatch = std::move(tmp3);
 
@@ -138,7 +138,7 @@ void cm_fuelcell::exec()
 	double annual_energy = 0.0;
 	double annual_fuel = 0.0;
 	// float percent_complete = 0.0;
-	float percent = 0.0;
+//	float percent = 0.0;
 	// size_t nStatusUpdates = 50;
 
 /*
@@ -150,7 +150,7 @@ void cm_fuelcell::exec()
 	construct();
 	size_t idx = 0;
  	for (size_t y = 0; y < fcVars->numberOfYears; y++) {
-		
+
 		size_t idx_year = 0;
 		size_t annual_index;
 		fcVars->numberOfYears > 1 ? annual_index = y + 1 : annual_index = 0;
@@ -161,7 +161,7 @@ void cm_fuelcell::exec()
 			if (h % (8760 / nStatusUpdates) == 0)
 			{
 				// assume that anyone using this module is chaining with two techs
-				float techs = 3;  
+				float techs = 3;
 				percent = percent_complete + 100.0f * ((float)idx + 1) / ((float)fcVars->numberOfLifetimeRecords) / techs;
 				if (!update("", percent, (float)h)) {
 					throw exec_error("fuelcell", "simulation canceled at hour " + util::to_string(h + 1.0));
@@ -184,7 +184,7 @@ void cm_fuelcell::exec()
 				if (y == 0) {
 					annual_energy += p_gen_kW[idx] * fcVars->dt_hour;
 				}
-				 
+
 				idx++;
 				idx_year++;
 			}
@@ -197,7 +197,7 @@ void cm_fuelcell::exec()
 		p_fuelCellReplacements[annual_index] = (ssc_number_t)(fuelCell->getTotalReplacements());
 		fuelCell->resetReplacements();
 	}
-	 
+
 	// capacity factor update
 	double capacity_factor_in, annual_energy_in, nameplate_in;
 	capacity_factor_in = annual_energy_in = nameplate_in = 0;

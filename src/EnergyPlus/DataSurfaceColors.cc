@@ -51,168 +51,75 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::DataSurfaceColors {
 
-namespace DataSurfaceColors {
+// Module containing the data dealing with the coloring of surfaces for
+// various outputs (such as DXF)
 
-    // Module containing the data dealing with the coloring of surfaces for
-    // various outputs (such as DXF)
+// MODULE INFORMATION:
+//       AUTHOR         Linda Lawrie
+//       DATE WRITTEN   Aug 2007
+//       MODIFIED       na
+//       RE-ENGINEERED  na
 
-    // MODULE INFORMATION:
+// PURPOSE OF THIS MODULE:
+// Contain the data for surface colors and user settings for DXF and possibly
+// other surface reporting.
+
+bool MatchAndSetColorTextString(EnergyPlusData &state,
+                                std::string const &String,   // string to be matched
+                                int const SetValue,          // value to be used for the color
+                                std::string const &ColorType // for now, must be DXF
+)
+{
+
+    // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   Aug 2007
+    //       DATE WRITTEN   August 2007
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // Contain the data for surface colors and user settings for DXF and possibly
-    // other surface reporting.
+    bool WasSet = false;
+    int found = UtilityRoutines::FindItem(String, state.dataSurfColor->colorkeys, static_cast<int>(ColorNo::NUM));
+    if (found != 0) {
+        if (ColorType == "DXF") {
+            state.dataSurfColor->DXFcolorno(found) = SetValue;
+            WasSet = true;
+        }
+    }
+    return WasSet;
+}
+
+void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   August 2007
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This routine resets the colorno array(s) with the entered scheme name as
+    // required for reporting.
 
     // METHODOLOGY EMPLOYED:
-    // na
+    // This routine first sets the color arrays to default.  Then, attempts to find the
+    // scheme name in the Input File.  If found, processes that scheme and sets colors.
+    // Worst case: the colors remain as default.  Note -- this allocates and deallocates
+    // the alphas and numerics required to process the Report:SurfaceColorScheme object.
 
-    // REFERENCES:
-    // na
+    // SUBROUTINE PARAMETER DEFINITIONS:
+    constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
 
-    // OTHER NOTES:
-    // na
+    state.dataSurfColor->DXFcolorno = state.dataSurfColor->defaultcolorno;
 
-    // Using/Aliasing
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    int const NumColors(15);
-    int const ColorNo_Text(1);
-    int const ColorNo_Wall(2);
-    int const ColorNo_Window(3);
-    int const ColorNo_GlassDoor(4);
-    int const ColorNo_Door(5);
-    int const ColorNo_Floor(6);
-    int const ColorNo_Roof(7);
-    int const ColorNo_ShdDetBldg(8);
-    int const ColorNo_ShdDetFix(9);
-    int const ColorNo_ShdAtt(10);
-    int const ColorNo_PV(11);
-    int const ColorNo_TDDDome(12);
-    int const ColorNo_TDDDiffuser(13);
-    int const ColorNo_DaylSensor1(14);
-    int const ColorNo_DaylSensor2(15);
+    // first see if there is a scheme name
+    int numptr = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, CurrentModuleObject, SchemeName);
+    if (numptr > 0) {
 
-    Array1D_int const defaultcolorno(NumColors, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5}); // text | wall | window | glassdoor |
-                                                                                                                 // door | floor | roof | detached
-                                                                                                                 // building shade (moves with
-                                                                                                                 // building) | detached building
-                                                                                                                 // fixed | attached building shading
-                                                                                                                 // | PV | TDD:Dome | TDD:Diffuser |
-                                                                                                                 // Daylight Sensor 1 | Daylight
-                                                                                                                 // Sensor 2
-
-    Array1D_string const colorkeys(NumColors,
-                                   {"Text",
-                                    "Walls",
-                                    "Windows",
-                                    "GlassDoors",
-                                    "Doors",
-                                    "Roofs",
-                                    "Floors",
-                                    "DetachedBuildingShades",
-                                    "DetachedFixedShades",
-                                    "AttachedBuildingShades",
-                                    "Photovoltaics",
-                                    "TubularDaylightDomes",
-                                    "TubularDaylightDiffusers",
-                                    "DaylightReferencePoint1",
-                                    "DaylightReferencePoint2"});
-
-    Array1D_int const colorkeyptr(NumColors,
-                                  {ColorNo_Text,
-                                   ColorNo_Wall,
-                                   ColorNo_Window,
-                                   ColorNo_GlassDoor,
-                                   ColorNo_Door,
-                                   ColorNo_Floor,
-                                   ColorNo_Roof,
-                                   ColorNo_ShdDetBldg,
-                                   ColorNo_ShdDetFix,
-                                   ColorNo_ShdAtt,
-                                   ColorNo_PV,
-                                   ColorNo_TDDDome,
-                                   ColorNo_TDDDiffuser,
-                                   ColorNo_DaylSensor1,
-                                   ColorNo_DaylSensor2});
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    Array1D_int DXFcolorno(NumColors, defaultcolorno);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Functions
-
-    bool MatchAndSetColorTextString(std::string const &String,      // string to be matched
-                                    int const SetValue,             // value to be used for the color
-                                    Optional_string_const ColorType // for now, must be DXF
-    )
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   August 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // Return value
-        bool WasSet;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int found;
-
-        WasSet = false;
-        found = UtilityRoutines::FindItem(String, colorkeys, NumColors);
-
-        if (found != 0) {
-            if (present(ColorType)) {
-                if (ColorType() == "DXF") {
-                    DXFcolorno(colorkeyptr(found)) = SetValue;
-                    WasSet = true;
-                } else {
-                }
-            } else {
-                DXFcolorno(colorkeyptr(found)) = SetValue;
-                WasSet = true;
-            }
-        }
-
-        return WasSet;
-    }
-
-    void SetUpSchemeColors(EnergyPlusData &state, std::string const &SchemeName, Optional_string_const ColorType)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   August 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This routine resets the colorno array(s) with the entered scheme name as
-        // required for reporting.
-
-        // METHODOLOGY EMPLOYED:
-        // This routine first sets the color arrays to default.  Then, attempts to find the
-        // scheme name in the Input File.  If found, processes that scheme and sets colors.
-        // Worst case: the colors remain as default.  Note -- this allocates and deallocates
-        // the alphas and numerics required to process the Report:SurfaceColorScheme object.
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto CurrentModuleObject("OutputControl:SurfaceColorScheme");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
         int numNumbers;
-        int numptr;
         int numargs;
         int status;
         Array1D_string cAlphas;
@@ -221,64 +128,49 @@ namespace DataSurfaceColors {
         Array1D_bool lAlphaBlanks;
         Array1D_bool lNumericBlanks;
         Array1D<Real64> rNumerics;
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, numargs, NumAlphas, numNumbers);
 
-        DXFcolorno = defaultcolorno;
-        // first see if there is a scheme name
-        numptr = inputProcessor->getObjectItemNum(state, CurrentModuleObject, SchemeName);
+        cAlphas.allocate(NumAlphas);
+        cAlphaFields.allocate(NumAlphas);
+        lAlphaBlanks.allocate(NumAlphas);
+        rNumerics.allocate(numNumbers);
+        cNumericFields.allocate(numNumbers);
+        lNumericBlanks.allocate(numNumbers);
 
-        if (numptr > 0) {
+        cAlphas({1, NumAlphas}) = "";
+        rNumerics({1, numNumbers}) = 0.0;
 
-            inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, numargs, NumAlphas, numNumbers);
-
-            cAlphas.allocate(NumAlphas);
-            cAlphaFields.allocate(NumAlphas);
-            lAlphaBlanks.allocate(NumAlphas);
-            rNumerics.allocate(numNumbers);
-            cNumericFields.allocate(numNumbers);
-            lNumericBlanks.allocate(numNumbers);
-
-            cAlphas({1, NumAlphas}) = "";
-            rNumerics({1, numNumbers}) = 0.0;
-
-            inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          numptr,
-                                          cAlphas,
-                                          NumAlphas,
-                                          rNumerics,
-                                          numNumbers,
-                                          status,
-                                          lNumericBlanks,
-                                          lAlphaBlanks,
-                                          cAlphaFields,
-                                          cNumericFields);
-            for (numargs = 1; numargs <= numNumbers; ++numargs) {
-                numptr = rNumerics(numargs); // set to integer
-                if (lNumericBlanks(numargs)) {
-                    if (!lAlphaBlanks(numargs + 1)) {
-                        ShowWarningError(state, "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
+        state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                                 CurrentModuleObject,
+                                                                 numptr,
+                                                                 cAlphas,
+                                                                 NumAlphas,
+                                                                 rNumerics,
+                                                                 numNumbers,
+                                                                 status,
+                                                                 lNumericBlanks,
+                                                                 lAlphaBlanks,
+                                                                 cAlphaFields,
+                                                                 cNumericFields);
+        for (numargs = 1; numargs <= numNumbers; ++numargs) {
+            numptr = rNumerics(numargs); // set to integer
+            if (lNumericBlanks(numargs)) {
+                if (!lAlphaBlanks(numargs + 1)) {
+                    ShowWarningError(state,
+                                     "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
                                          cAlphas(numargs + 1) + ", " + cNumericFields(numargs) + " was blank.  Default color retained.");
-                    }
-                    continue;
                 }
-                if (!MatchAndSetColorTextString(cAlphas(numargs + 1), numptr, ColorType)) {
-                    ShowWarningError(state, "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
-                                     cAlphas(numargs + 1) + ", is invalid.  No color set.");
-                }
+                continue;
             }
-
-            cAlphas.deallocate();
-            cAlphaFields.deallocate();
-            lAlphaBlanks.deallocate();
-            rNumerics.deallocate();
-            cNumericFields.deallocate();
-            lNumericBlanks.deallocate();
-
-        } else {
-            ShowWarningError(state, "SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
+            if (!MatchAndSetColorTextString(state, cAlphas(numargs + 1), numptr, ColorType)) {
+                ShowWarningError(state,
+                                 "SetUpSchemeColors: " + cAlphaFields(1) + '=' + SchemeName + ", " + cAlphaFields(numargs + 1) + '=' +
+                                     cAlphas(numargs + 1) + ", is invalid.  No color set.");
+            }
         }
+    } else {
+        ShowWarningError(state, "SetUpSchemeColors: Name=" + SchemeName + " not on input file. Default colors will be used.");
     }
+}
 
-} // namespace DataSurfaceColors
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::DataSurfaceColors

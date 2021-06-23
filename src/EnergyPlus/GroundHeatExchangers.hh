@@ -352,8 +352,7 @@ namespace GroundHeatExchangers {
 
         Real64 integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
 
-        Real64
-        doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
+        Real64 doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime);
 
         void calcShortTimestepGFunctions(EnergyPlusData &state);
 
@@ -460,11 +459,10 @@ namespace GroundHeatExchangers {
     void GetGroundHeatExchangerInput(EnergyPlusData &state);
 
     std::shared_ptr<GLHEResponseFactors> BuildAndGetResponseFactorObjectFromArray(EnergyPlusData &state,
-                                                                                        std::shared_ptr<GLHEVertArray> const &arrayObjectPtr);
+                                                                                  std::shared_ptr<GLHEVertArray> const &arrayObjectPtr);
 
     std::shared_ptr<GLHEResponseFactors>
-    BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state,
-                                                  std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect);
+    BuildAndGetResponseFactorsObjectFromSingleBHs(EnergyPlusData &state, std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect);
 
     void SetupBHPointsForResponseFactorsObject(std::shared_ptr<GLHEResponseFactors> &thisRF);
 

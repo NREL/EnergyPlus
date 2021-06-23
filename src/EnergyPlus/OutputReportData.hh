@@ -94,8 +94,9 @@ public:
 
     // default constructor
     AnnualFieldSet()
-        : m_variMeter(""), m_colHead(""), m_aggregate(sumOrAvg), m_varUnits(OutputProcessor::Unit::None), m_typeOfVar(0), m_keyCount(0),
-          m_varAvgSum(OutputProcessor::StoreType::Averaged), m_bottomBinValue(0), m_topBinValue(0)
+        : m_variMeter(""), m_colHead(""), m_aggregate(sumOrAvg), m_varUnits(OutputProcessor::Unit::None),
+          m_typeOfVar(OutputProcessor::VariableType::NotFound), m_keyCount(0), m_varAvgSum(OutputProcessor::StoreType::Averaged), m_bottomBinValue(0),
+          m_topBinValue(0)
     {
     }
 
@@ -115,25 +116,32 @@ public:
         std::vector<Real64> m_timeInBin; // amount of time in each bin (usually 10 bins)
     };
 
-    int getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state, int &typeVar, OutputProcessor::StoreType &avgSumVar,
-                                            OutputProcessor::TimeStepType &stepTypeVar, OutputProcessor::Unit &unitsVar);
+    int getVariableKeyCountandTypeFromFldSt(EnergyPlusData &state,
+                                            OutputProcessor::VariableType &typeVar,
+                                            OutputProcessor::StoreType &avgSumVar,
+                                            OutputProcessor::TimeStepType &stepTypeVar,
+                                            OutputProcessor::Unit &unitsVar);
 
-    void getVariableKeysFromFldSt(EnergyPlusData &state, int &typeVar, int keyCount, std::vector<std::string> &namesOfKeys, std::vector<int> &indexesForKeyVar);
+    void getVariableKeysFromFldSt(EnergyPlusData &state,
+                                  OutputProcessor::VariableType &typeVar,
+                                  int keyCount,
+                                  std::vector<std::string> &namesOfKeys,
+                                  std::vector<int> &indexesForKeyVar);
 
-    std::string m_variMeter;          // the name of the variable or meter
-    std::string m_colHead;            // the column header to use instead of the variable name (only for predefined)
-    AggregationKind m_aggregate;      // the type of aggregation for the variable (see aggType parameters)
-    int m_showDigits;                 // the number of digits to be shown
-    OutputProcessor::Unit m_varUnits; // Units sting, may be blank
-    int m_typeOfVar;                  // 0=not found, 1=integer, 2=real, 3=meter
+    std::string m_variMeter;                   // the name of the variable or meter
+    std::string m_colHead;                     // the column header to use instead of the variable name (only for predefined)
+    AggregationKind m_aggregate;               // the type of aggregation for the variable (see aggType parameters)
+    int m_showDigits;                          // the number of digits to be shown
+    OutputProcessor::Unit m_varUnits;          // Units sting, may be blank
+    OutputProcessor::VariableType m_typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
     int m_keyCount;
-    OutputProcessor::StoreType m_varAvgSum; // Variable  is Averaged=1 or Summed=2
+    OutputProcessor::StoreType m_varAvgSum;      // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType m_varStepType; // Variable time step is Zone=1 or HVAC=2
-    std::vector<std::string> m_namesOfKeys; // stored version of name of keys from getVariableKeys
-    std::vector<int> m_indexesForKeyVar;    // stored version of name of keys from getVariableKeys
-    std::vector<AnnualCell> m_cell;         // for each row contains the results and details for one cell of the table
-    Real64 m_bottomBinValue;                // the bottom of the binning for a column
-    Real64 m_topBinValue;                   // the top of the binning for a column
+    std::vector<std::string> m_namesOfKeys;      // stored version of name of keys from getVariableKeys
+    std::vector<int> m_indexesForKeyVar;         // stored version of name of keys from getVariableKeys
+    std::vector<AnnualCell> m_cell;              // for each row contains the results and details for one cell of the table
+    Real64 m_bottomBinValue;                     // the bottom of the binning for a column
+    Real64 m_topBinValue;                        // the top of the binning for a column
     Real64 m_timeAboveTopBinTotal;
     Real64 m_timeBelowBottomBinTotal;
     std::vector<Real64> m_timeInBinTotal; // amount of time in each bin (usually 10 bins)

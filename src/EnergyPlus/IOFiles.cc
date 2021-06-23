@@ -50,11 +50,12 @@
 #include "Data/EnergyPlusData.hh"
 #include "DataStringGlobals.hh"
 #include "FileSystem.hh"
-#include "UtilityRoutines.hh"
-#include "InputProcessing/InputProcessor.hh"
 #include "InputProcessing/EmbeddedEpJSONSchema.hh"
+#include "InputProcessing/InputProcessor.hh"
+#include "UtilityRoutines.hh"
 
 #include "nlohmann/json.hpp"
+#include <algorithm>
 #include <fmt/format.h>
 #include <stdexcept>
 
@@ -66,7 +67,7 @@ InputFile &InputFile::ensure_open(EnergyPlusData &state, const std::string &call
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, filePath.string()));
     }
     return *this;
 }
@@ -99,7 +100,7 @@ InputFile::ReadResult<std::string> InputFile::readLine() noexcept
     }
 }
 
-InputFile::InputFile(std::string FileName) : fileName(std::move(FileName))
+InputFile::InputFile(fs::path FilePath) : filePath(std::move(FilePath))
 {
 }
 
@@ -110,7 +111,7 @@ std::ostream::pos_type InputFile::position() const noexcept
 
 void InputFile::open(bool, bool)
 {
-    is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::binary));
+    is = std::unique_ptr<std::istream>(new std::fstream(filePath.c_str(), std::ios_base::in | std::ios_base::binary));
     is->imbue(std::locale("C"));
 }
 
@@ -181,7 +182,7 @@ InputOutputFile &InputOutputFile::ensure_open(EnergyPlusData &state, const std::
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, filePath.string()));
     }
     return *this;
 }
@@ -206,7 +207,7 @@ void InputOutputFile::del()
 {
     if (os) {
         os.reset();
-        FileSystem::removeFile(fileName);
+        FileSystem::removeFile(filePath);
     }
 }
 
@@ -232,9 +233,7 @@ std::string InputOutputFile::get_output()
     }
 }
 
-InputOutputFile::InputOutputFile(std::string FileName, const bool DefaultToStdout)
-  : fileName{std::move(FileName)},
-    defaultToStdOut{DefaultToStdout}
+InputOutputFile::InputOutputFile(fs::path FilePath, const bool DefaultToStdout) : filePath{std::move(FilePath)}, defaultToStdOut{DefaultToStdout}
 {
 }
 
@@ -257,7 +256,7 @@ void InputOutputFile::open(const bool forAppend, bool output_to_file)
         os->imbue(std::locale("C"));
         print_to_dev_null = true;
     } else {
-        os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+        os = std::unique_ptr<std::iostream>(new std::fstream(filePath.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
         os->imbue(std::locale("C"));
         print_to_dev_null = false;
     }
@@ -287,22 +286,22 @@ std::vector<std::string> InputOutputFile::getLines()
 
 void IOFiles::OutputControl::getInput(EnergyPlusData &state)
 {
-    auto const instances = inputProcessor->epJSON.find("OutputControl:Files");
-    if (instances != inputProcessor->epJSON.end()) {
+    auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find("OutputControl:Files");
+    if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
 
-        auto find_input = [=, &state](nlohmann::json const & fields, std::string const & field_name) -> std::string {
+        auto find_input = [=, &state](nlohmann::json const &fields, std::string const &field_name) -> std::string {
             std::string input;
             auto found = fields.find(field_name);
             if (found != fields.end()) {
                 input = found.value().get<std::string>();
                 input = UtilityRoutines::MakeUPPERCase(input);
             } else {
-                inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
+                state.dataInputProcessing->inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }
             return input;
         };
 
-        auto boolean_choice = [=, &state](std::string const & input) -> bool {
+        auto boolean_choice = [=, &state](std::string const &input) -> bool {
             if (input == "YES") {
                 return true;
             } else if (input == "NO") {
@@ -413,24 +412,110 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
     }
 }
 
-IOFiles &IOFiles::getSingleton()
+void IOFiles::flushAll()
 {
-    assert(getSingletonInternal() != nullptr);
-    if (getSingletonInternal() == nullptr) {
-        throw std::runtime_error("Invalid impossible state of no outputfiles!?!?!");
+
+    audit.flush();
+    eio.flush();
+    eso.flush();
+    zsz.flush();
+    ssz.flush();
+    map.flush();
+    mtr.flush();
+    bnd.flush();
+    rdd.flush();
+    mdd.flush();
+    debug.flush();
+    dfs.flush();
+    mtd.flush();
+    edd.flush();
+    shade.flush();
+    csv.flush();
+
+    if (err_stream) {
+        err_stream->flush();
     }
-    return *getSingletonInternal();
-}
-
-void IOFiles::setSingleton(IOFiles *newSingleton) noexcept
-{
-    getSingletonInternal() = newSingleton;
-}
-
-IOFiles *&IOFiles::getSingletonInternal()
-{
-    static IOFiles *singleton{nullptr};
-    return singleton;
+    if (json.json_stream) {
+        json.json_stream->flush();
+    }
+    if (json.json_TSstream_Zone) {
+        json.json_TSstream_Zone->flush();
+    }
+    if (json.json_TSstream_HVAC) {
+        json.json_TSstream_HVAC->flush();
+    }
+    if (json.json_TSstream) {
+        json.json_TSstream->flush();
+    }
+    if (json.json_HRstream) {
+        json.json_HRstream->flush();
+    }
+    if (json.json_MNstream) {
+        json.json_MNstream->flush();
+    }
+    if (json.json_DYstream) {
+        json.json_DYstream->flush();
+    }
+    if (json.json_SMstream) {
+        json.json_SMstream->flush();
+    }
+    if (json.json_YRstream) {
+        json.json_YRstream->flush();
+    }
+    if (json.cbor_stream) {
+        json.cbor_stream->flush();
+    }
+    if (json.cbor_TSstream_Zone) {
+        json.cbor_TSstream_Zone->flush();
+    }
+    if (json.cbor_TSstream_HVAC) {
+        json.cbor_TSstream_HVAC->flush();
+    }
+    if (json.cbor_TSstream) {
+        json.cbor_TSstream->flush();
+    }
+    if (json.cbor_HRstream) {
+        json.cbor_HRstream->flush();
+    }
+    if (json.cbor_MNstream) {
+        json.cbor_MNstream->flush();
+    }
+    if (json.cbor_DYstream) {
+        json.cbor_DYstream->flush();
+    }
+    if (json.cbor_SMstream) {
+        json.cbor_SMstream->flush();
+    }
+    if (json.cbor_YRstream) {
+        json.cbor_YRstream->flush();
+    }
+    if (json.msgpack_stream) {
+        json.msgpack_stream->flush();
+    }
+    if (json.msgpack_TSstream_Zone) {
+        json.msgpack_TSstream_Zone->flush();
+    }
+    if (json.msgpack_TSstream_HVAC) {
+        json.msgpack_TSstream_HVAC->flush();
+    }
+    if (json.msgpack_TSstream) {
+        json.msgpack_TSstream->flush();
+    }
+    if (json.msgpack_HRstream) {
+        json.msgpack_HRstream->flush();
+    }
+    if (json.msgpack_MNstream) {
+        json.msgpack_MNstream->flush();
+    }
+    if (json.msgpack_DYstream) {
+        json.msgpack_DYstream->flush();
+    }
+    if (json.msgpack_SMstream) {
+        json.msgpack_SMstream->flush();
+    }
+    if (json.msgpack_YRstream) {
+        json.msgpack_YRstream->flush();
+    }
 }
 
 using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;
@@ -529,9 +614,15 @@ public:
                 // 0 pad the end
                 specs()->alt = true;
 
-                if (specs()->precision > 0) {
+                bool initialPrecisionWas1 = false;
+                if (specs()->precision > 1) {
                     // reduce the precision to get rounding behavior
                     --specs()->precision;
+                } else {
+                    // We need AT LEAST one in precision so we capture a '.' below
+                    initialPrecisionWas1 = true;
+                    specs()->precision = 1;
+                    ++specs()->width;
                 }
 
                 // multiply by 10 to get the exponent we want
@@ -543,6 +634,12 @@ public:
                 }
 
                 auto begin = std::find(std::begin(str), std::end(str), '.');
+                if (initialPrecisionWas1) {
+                    // 123.45 => 1.2E+03, except we asked for precision = 1. So we delete the thing after the dot
+                    // and this is why we manually increased the specs()->width by one above
+                    str.erase(std::next(begin));
+                }
+                // if (begin != std::end(str)) {
                 // ' -1.2345E15'
                 //     ^
                 std::swap(*begin, *std::prev(begin));
@@ -672,7 +769,7 @@ public:
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
-//    assert(os.good());
+    //    assert(os.good());
     fmt::memory_buffer buffer;
     try {
         // Pass custom argument formatter as a template arg to vformat_to.

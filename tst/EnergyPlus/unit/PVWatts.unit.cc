@@ -77,15 +77,19 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Constructor)
     EXPECT_DOUBLE_EQ(180.0, pvw.getAzimuth());
     EXPECT_DOUBLE_EQ(0.4, pvw.getGroundCoverageRatio());
 
-    ASSERT_THROW(
-        PVWattsGenerator pvw2(*state, "", -1000.0, ModuleType::PREMIUM, ArrayType::FIXED_OPEN_RACK, 1.1, GeometryType::TILT_AZIMUTH, 91.0, 360.0, 0, -0.1),
-        std::runtime_error);
-    std::string const error_string = delimited_string(
-        {"   ** Severe  ** PVWatts: name cannot be blank.", "   ** Severe  ** PVWatts: DC system capacity must be greater than zero.",
-         "   ** Severe  ** PVWatts: Invalid system loss value 1.10", "   ** Severe  ** PVWatts: Invalid tilt: 91.00",
-         "   ** Severe  ** PVWatts: Invalid azimuth: 360.00", "   ** Severe  ** PVWatts: Invalid ground coverage ratio: -0.10",
-         "   **  Fatal  ** Errors found in getting PVWatts input", "   ...Summary of Errors that led to program termination:",
-         "   ..... Reference severe error count=6", "   ..... Last severe error=PVWatts: Invalid ground coverage ratio: -0.10"});
+    ASSERT_THROW(PVWattsGenerator pvw2(
+                     *state, "", -1000.0, ModuleType::PREMIUM, ArrayType::FIXED_OPEN_RACK, 1.1, GeometryType::TILT_AZIMUTH, 91.0, 360.0, 0, -0.1),
+                 std::runtime_error);
+    std::string const error_string = delimited_string({"   ** Severe  ** PVWatts: name cannot be blank.",
+                                                       "   ** Severe  ** PVWatts: DC system capacity must be greater than zero.",
+                                                       "   ** Severe  ** PVWatts: Invalid system loss value 1.10",
+                                                       "   ** Severe  ** PVWatts: Invalid tilt: 91.00",
+                                                       "   ** Severe  ** PVWatts: Invalid azimuth: 360.00",
+                                                       "   ** Severe  ** PVWatts: Invalid ground coverage ratio: -0.10",
+                                                       "   **  Fatal  ** Errors found in getting PVWatts input",
+                                                       "   ...Summary of Errors that led to program termination:",
+                                                       "   ..... Reference severe error count=6",
+                                                       "   ..... Last severe error=PVWatts: Invalid ground coverage ratio: -0.10"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
@@ -139,25 +143,35 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
     EXPECT_DOUBLE_EQ(175.0, pvw3.getAzimuth());
     EXPECT_DOUBLE_EQ(21.0, pvw3.getTilt());
     EXPECT_DOUBLE_EQ(0.5, pvw3.getGroundCoverageRatio());
-    EXPECT_EQ(static_cast<int>(PVWattsGenerators.size()), 3);
+    EXPECT_EQ(static_cast<int>(state->dataPVWatts->PVWattsGenerators.size()), 3);
 }
 
 TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
 {
     using namespace PVWatts;
-    const std::string idfTxt = delimited_string({"Generator:PVWatts,", "PVWattsArray1,", "5,", "4000,",
+    const std::string idfTxt = delimited_string({"Generator:PVWatts,",
+                                                 "PVWattsArray1,",
+                                                 "5,",
+                                                 "4000,",
                                                  "Primo,",          // misspelled
                                                  "FixedRoofMount,", // misspelled
-                                                 ",", "asdf,", ",", ";", "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
+                                                 ",",
+                                                 "asdf,",
+                                                 ",",
+                                                 ";",
+                                                 "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     EXPECT_FALSE(process_idf(idfTxt, false));
     ASSERT_THROW(GetOrCreatePVWattsGenerator(*state, "PVWattsArray1"), std::runtime_error);
     std::string const error_string = delimited_string(
         {"   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_geometry_type] - \"asdf\" - Failed to match against any enum values.",
          "   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][array_type] - \"FixedRoofMount\" - Failed to match against any enum values.",
          "   ** Severe  ** <root>[Generator:PVWatts][PVWattsArray1][module_type] - \"Primo\" - Failed to match against any enum values.",
-         "   ** Severe  ** PVWatts: Invalid Module Type: PRIMO", "   ** Severe  ** PVWatts: Invalid Array Type: FIXEDROOFMOUNT",
-         "   ** Severe  ** PVWatts: Invalid Geometry Type: ASDF", "   **  Fatal  ** Errors found in getting PVWatts input",
-         "   ...Summary of Errors that led to program termination:", "   ..... Reference severe error count=6",
+         "   ** Severe  ** PVWatts: Invalid Module Type: PRIMO",
+         "   ** Severe  ** PVWatts: Invalid Array Type: FIXEDROOFMOUNT",
+         "   ** Severe  ** PVWatts: Invalid Geometry Type: ASDF",
+         "   **  Fatal  ** Errors found in getting PVWatts input",
+         "   ...Summary of Errors that led to program termination:",
+         "   ..... Reference severe error count=6",
          "   ..... Last severe error=PVWatts: Invalid Geometry Type: ASDF"});
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
@@ -169,7 +183,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     // 6/15 at 7am
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->TimeStepZone = 1.0;
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     state->dataGlobal->BeginTimeStepFlag = true;
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -207,7 +221,8 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     EXPECT_NEAR(generatorPower, 1609.812, 0.5);
     EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-    PVWattsGenerator pvwc(*state, "PVWattsArrayC", 1000.0, ModuleType::THIN_FILM, ArrayType::FIXED_OPEN_RACK, 0.1, GeometryType::TILT_AZIMUTH, 30.0, 140.);
+    PVWattsGenerator pvwc(
+        *state, "PVWattsArrayC", 1000.0, ModuleType::THIN_FILM, ArrayType::FIXED_OPEN_RACK, 0.1, GeometryType::TILT_AZIMUTH, 30.0, 140.);
     pvwc.setCellTemperature(33.764);
     pvwc.setPlaneOfArrayIrradiance(255.213);
     pvwc.calc(*state);
@@ -217,8 +232,8 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     EXPECT_NEAR(generatorPower, 433.109, 0.5);
     EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
-    PVWattsGenerator pvwd(*state, "PVWattsArrayD", 5500.0, ModuleType::STANDARD, ArrayType::ONE_AXIS_BACKTRACKING, 0.05, GeometryType::TILT_AZIMUTH, 34.0,
-                          180.);
+    PVWattsGenerator pvwd(
+        *state, "PVWattsArrayD", 5500.0, ModuleType::STANDARD, ArrayType::ONE_AXIS_BACKTRACKING, 0.05, GeometryType::TILT_AZIMUTH, 34.0, 180.);
     pvwd.setCellTemperature(29.205);
     pvwd.setPlaneOfArrayIrradiance(36.799);
     pvwd.calc(*state);
@@ -292,7 +307,7 @@ TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
     auto eplc(ElectPowerLoadCenter(*state, 1));
     ASSERT_TRUE(eplc.inverterPresent);
     EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
-    DataHVACGlobals::TimeStepSys = 1.0;
+    state->dataHVACGlobal->TimeStepSys = 1.0;
     eplc.inverterObj->simulate(*state, 884.018);
     EXPECT_NEAR(eplc.inverterObj->aCPowerOut(), 842.527, 0.001);
 }

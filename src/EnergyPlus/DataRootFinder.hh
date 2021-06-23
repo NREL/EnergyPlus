@@ -54,124 +54,105 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::DataRootFinder {
 
-namespace DataRootFinder {
+enum class Slope
+{
+    Unassigned = -1, // Undefined slope specification
+    Increasing,      // For overall increasing function F(X) between min and max points
+    Decreasing       // For overall decreasing function F(X) between min and max points
+};
 
-    // Using/Aliasing
+enum class iStatus
+{
+    ErrorSingular, // Error because the overall slope appears to be flat between the min and max points, implying that the
+                   // function might be singular over the interval: F(XMin) == F(XMax)
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
+    ErrorSlope, // Error because the overall slope assumption is not observed at the min and max points:
+                // - for an increasing function F(X), we expect F(XMin) < F(XMax)  otherwise error
+                // - for a decreasing function F(X),  we expect F(XMin) > F(XMax)  otherwise error
+                // Note that this error status does not detect strict monotonicity at points
+                // between the min and max points.
 
-    // MODULE PARAMETER DEFINITIONS
-    extern int const iSlopeNone;       // Undefined slope specification
-    extern int const iSlopeIncreasing; // For overall increasing function F(X) between min and max points
-    extern int const iSlopeDecreasing; // For overall decreasing function F(X) between min and max points
+    ErrorBracket, // Error because the current candidate X does not lie within the current lower an upper points:
+                  // X < XLower or X > XUpper
 
-    // Error because the overall slope appears to be flat between the min and max points,
-    // implying that the function might be singular over the interval:
-    // F(XMin) == F(XMax)
-    extern int const iStatusErrorSingular;
-    // Error because the overall slope assumption is not observed at the min and max points:
-    // - for an increasing function F(X), we expect F(XMin) < F(XMax)  otherwise error
-    // - for a decreasing function F(X),  we expect F(XMin) > F(XMax)  otherwise error
-    // Note that this error status does not detect strict monotonicity at points
-    // between the min and max points.
-    extern int const iStatusErrorSlope;
-    // Error because the current candidate X does not lie within the current lower an upper points:
-    // X < XLower or X > XUpper
-    extern int const iStatusErrorBracket;
-    // Error because the current candidate X does not lie within the min and max points:
-    // X < XMin or X > XMax
-    extern int const iStatusErrorRange;
+    ErrorRange, // Error because the current candidate X does not lie within the min and max points:
+                // X < XMin or X > XMax
 
-    extern int const iStatusNone; // Indeterminate error state (not converged), also default state
-    extern int const iStatusOK;   // Unconstrained convergence achieved with root solution so that:
-    // XMin < XRoot < XMax
-    extern int const iStatusOKMin;      // Constrained convergence achieved with solution XRoot==XMin
-    extern int const iStatusOKMax;      // Constrained convergence achieved with solution XRoot==XMax
-    extern int const iStatusOKRoundOff; // Reached requested tolerance in X variables although Y=F(X) does not
-    // satisfy unconstrained convergence check
+    None,                // Indeterminate error state (not converged), also default state
+    OK,                  // Unconstrained convergence achieved with root solution so that: XMin < XRoot < XMax
+    OKMin,               // Constrained convergence achieved with solution XRoot==XMin
+    OKMax,               // Constrained convergence achieved with solution XRoot==XMax
+    OKRoundOff,          // Reached requested tolerance in X variables although Y=F(X) does not satisfy unconstrained convergence check
+    WarningNonMonotonic, // Error because F(X) is not strictly monotonic between the lower and upper points
+    WarningSingular,     // Error because F(X) == YLower or F(X) == YUpper
+};
 
-    extern int const iStatusWarningNonMonotonic; // Error because F(X) is not strictly monotonic between the
-    // lower and upper points
-    extern int const iStatusWarningSingular; // Error because F(X) == YLower or F(X) == YUpper
+enum class iMethod
+{
+    None,          // No solution method (used internally only when root finder is reset)
+    Bracket,       // Bracketing mode (used internally only to bracket root)
+    Bisection,     // Step performed using bisection method (aka interval halving)
+    FalsePosition, // Step performed using false position method (aka regula falsi)
+    Secant,        // Step performed using secant method
+    Brent,         // Step performed using Brent's method
+};
 
-    extern int const iMethodNone;          // No solution method (used internally only when root finder is reset)
-    extern int const iMethodBracket;       // Bracketting mode (used internally only to bracket root)
-    extern int const iMethodBisection;     // Step performed using bisection method (aka interval halving)
-    extern int const iMethodFalsePosition; // Step performed using false position method (aka regula falsi)
-    extern int const iMethodSecant;        // Step performed using secant method
-    extern int const iMethodBrent;         // Step performed using Brent's method
-    // Names for each solution method type
-    extern Array1D_string const SolutionMethodTypes;
+struct ControlsType
+{
+    // Members
+    DataRootFinder::Slope SlopeType; // Set to any of the iSlope<...> codes
+    iMethod MethodType;              // Desired solution method.
+    // Set to any of the iMethod<...> codes except for iMethodNone and iMethodBracket
+    Real64 TolX;  // Relative tolerance for variable X
+    Real64 ATolX; // Absolute tolerance for variable X
+    Real64 ATolY; // Absolute tolerance for variable Y
 
-    // DERIVED TYPE DEFINITIONS
-    // Type declaration for the numerical controls.
-
-    // Type declaration for iterate tracking.
-
-    // Type declaration for the root finder solution technique.
-
-    // Types
-
-    struct ControlsType
+    // Default Constructor
+    ControlsType() : SlopeType(DataRootFinder::Slope::Unassigned), MethodType(iMethod::None), TolX(1.0e-3), ATolX(1.0e-3), ATolY(1.0e-3)
     {
-        // Members
-        int SlopeType;  // Set to any of the iSlope<...> codes
-        int MethodType; // Desired solution method.
-        // Set to any of the iMethod<...> codes except for iMethodNone and iMethodBracket
-        Real64 TolX;  // Relative tolerance for variable X
-        Real64 ATolX; // Absolute tolerance for variable X
-        Real64 ATolY; // Absolute tolerance for variable Y
+    }
+};
 
-        // Default Constructor
-        ControlsType() : SlopeType(iSlopeNone), MethodType(iMethodNone), TolX(1.0e-3), ATolX(1.0e-3), ATolY(1.0e-3)
-        {
-        }
-    };
+struct PointType
+{
+    // Members
+    bool DefinedFlag; // Set to true if point has been set; false otherwise
+    Real64 X;         // X value
+    Real64 Y;         // Y value = F(X)
 
-    struct PointType
+    // Default Constructor
+    PointType() : DefinedFlag(false), X(0.0), Y(0.0)
     {
-        // Members
-        bool DefinedFlag; // Set to true if point has been set; false otherwise
-        Real64 X;         // X value
-        Real64 Y;         // Y value = F(X)
+    }
+};
 
-        // Default Constructor
-        PointType() : DefinedFlag(false), X(0.0), Y(0.0)
-        {
-        }
-    };
+struct RootFinderDataType
+{
+    // Members
+    ControlsType Controls;
+    iStatus StatusFlag; // Current status of root finder
+    // Valid values are any of the STATUS_<code> constants
+    iMethod CurrentMethodType;  // Solution method used to perform current step
+    Real64 XCandidate;          // Candidate X value to use next when evaluating F(X)
+    Real64 ConvergenceRate;     // Convergence rate achieved over the last 2 successive iterations
+    PointType Increment;        // Increment between last 2 iterations
+    PointType MinPoint;         // Point { XMin, F(XMin) }
+    PointType MaxPoint;         // Point { XMax, F(XMax) }
+    PointType LowerPoint;       // Point { XLower, F(XLower) } so that XLower <= XRoot
+    PointType UpperPoint;       // Point { XUpper, F(XUpper) } so that XRoot <= YUpper
+    PointType CurrentPoint;     // Last evaluated point { X, F(X) }
+    int NumHistory;             // Number of points stored in History
+    Array1D<PointType> History; // Vector containing last 3 best iterates
 
-    struct RootFinderDataType
+    // Default Constructor
+    RootFinderDataType()
+        : StatusFlag(iStatus::None), CurrentMethodType(iMethod::None), XCandidate(0.0), ConvergenceRate(0.0), NumHistory(0), History(3)
     {
-        // Members
-        ControlsType Controls;
-        int StatusFlag; // Current status of root finder
-        // Valid values are any of the STATUS_<code> constants
-        int CurrentMethodType;      // Solution method used to perform current step
-        Real64 XCandidate;          // Candidate X value to use next when evaluating F(X)
-        Real64 ConvergenceRate;     // Convergence rate achieved over the last 2 successive iterations
-        PointType Increment;        // Increment between last 2 iterations
-        PointType MinPoint;         // Point { XMin, F(XMin) }
-        PointType MaxPoint;         // Point { XMax, F(XMax) }
-        PointType LowerPoint;       // Point { XLower, F(XLower) } so that XLower <= XRoot
-        PointType UpperPoint;       // Point { XUpper, F(XUpper) } so that XRoot <= YUpper
-        PointType CurrentPoint;     // Last evaluated point { X, F(X) }
-        int NumHistory;             // Number of points stored in History
-        Array1D<PointType> History; // Vector containing last 3 best iterates
+    }
+};
 
-        // Default Constructor
-        RootFinderDataType()
-            : StatusFlag(iStatusNone), CurrentMethodType(iMethodNone), XCandidate(0.0), ConvergenceRate(0.0), NumHistory(0), History(3)
-        {
-        }
-    };
-
-} // namespace DataRootFinder
-
-} // namespace EnergyPlus
+} // namespace EnergyPlus::DataRootFinder
 
 #endif
