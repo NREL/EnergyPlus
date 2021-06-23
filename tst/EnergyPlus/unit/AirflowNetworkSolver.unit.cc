@@ -170,7 +170,6 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Coil)
     state->dataAirflowNetwork->AirflowNetworkCompData.deallocate();
 }
 
-
 TEST_F(EnergyPlusFixture, AirflowNetwork_SolverTest_Crack)
 {
 

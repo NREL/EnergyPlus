@@ -97,7 +97,8 @@ namespace AirflowNetwork {
     AirProperties::AirProperties()
         : temperature(20.0), humidity_ratio(0.0), density(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0)),
           sqrt_density(std::sqrt(AIRDENSITY_CONSTEXPR(101325.0, 20.0, 0.0))), viscosity(AIRDYNAMICVISCOSITY(20.0))
-    {}
+    {
+    }
 
     void Solver::allocate(EnergyPlusData &state)
     {
@@ -1098,7 +1099,6 @@ namespace AirflowNetwork {
                 DF[0] = F[0] * exponent / pdrop;
             }
         }
-
     }
 
     int GenericDuct(Real64 const Length,        // Duct length
