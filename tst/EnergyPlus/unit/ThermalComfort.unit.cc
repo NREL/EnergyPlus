@@ -1580,7 +1580,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveCEN15251)
 {
-    state->files.inputWeatherFilePath.filePath = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/ThermalComfortCEN15251Test.epw";
 
     // test the initialisation
     state->dataEnvrn->DayOfYear = 1;
