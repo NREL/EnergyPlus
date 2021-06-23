@@ -69,16 +69,19 @@ namespace HVACInterfaceManager {
     constexpr int PrimaryRecirc(1);   // flow from Supply-outlet/Demand-inlet to Supply-inlet/demand-outlet
     constexpr int SecondaryRecirc(2); // flow from Supply-inlet/Demand-outlet to Supply-outlet/demand-inlet
 
-    constexpr int FlowTypeNotSet(9);
-    constexpr int ConstantFlow(10);
-    constexpr int VariableFlow(11);
+    enum class FlowType
+    {
+        Unassigned = -1,
+        Constant,
+        Variable
+    };
 
     struct CommonPipeData
     {
         // Members
         DataPlant::iCommonPipeType CommonPipeType; // type of common pipe used if any
-        int SupplySideInletPumpType;
-        int DemandSideInletPumpType;
+        FlowType SupplySideInletPumpType;
+        FlowType DemandSideInletPumpType;
         // Following report variables are used in uncontrolled common pipe
         int FlowDir; // Direction in which flow is in Common Pipe
         Real64 Flow; // Flow in the Common Pipe
@@ -100,10 +103,10 @@ namespace HVACInterfaceManager {
 
         // Default Constructor
         CommonPipeData()
-            : CommonPipeType(DataPlant::iCommonPipeType::No), SupplySideInletPumpType(FlowTypeNotSet), DemandSideInletPumpType(FlowTypeNotSet),
-              FlowDir(0), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0), PriCPLegFlow(0.0), SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0),
-              PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0), PriInletSetPoint(0.0), SecInletSetPoint(0.0), PriInletControlled(false),
-              SecInletControlled(false), PriFlowRequest(0.0)
+            : CommonPipeType(DataPlant::iCommonPipeType::No), SupplySideInletPumpType(FlowType::Unassigned),
+              DemandSideInletPumpType(FlowType::Unassigned), FlowDir(0), Flow(0.0), Temp(0.0), SecCPLegFlow(0.0), PriCPLegFlow(0.0),
+              SecToPriFlow(0.0), PriToSecFlow(0.0), PriInTemp(0.0), PriOutTemp(0.0), SecInTemp(0.0), SecOutTemp(0.0), PriInletSetPoint(0.0),
+              SecInletSetPoint(0.0), PriInletControlled(false), SecInletControlled(false), PriFlowRequest(0.0)
         {
         }
     };

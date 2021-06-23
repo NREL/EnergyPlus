@@ -165,13 +165,6 @@ CHECKED_AND_OKED = {
         ]
     },
 
-    # Could be changed to just return a string
-    "DataSystemVariables.cc": {
-        "CheckForActualFileName": [
-            "FileFound"
-        ]
-    },
-
     "DaylightingManager.cc": {
         "CheckForGeometricTransform": [
             "doTransform",

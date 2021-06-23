@@ -78,7 +78,7 @@ namespace OutputProcessor {
     {
         int const NumVariables = 2;
         Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-        Array1D_int VarTypes(NumVariables);                              // Variable Types (1=integer, 2=real, 3=meter)
+        Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
         std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
@@ -1335,47 +1335,47 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_determineMeterIPUnits)
     {
-        int ipUnits = -999999;
+        OutputProcessor::RT_IPUnits ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
         bool errorFound = false;
 
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(RT_IPUnits_Electricity, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Electricity, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "GAS", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(RT_IPUnits_Gas, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Gas, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "COOL", OutputProcessor::Unit::J, errorFound);
-        EXPECT_EQ(RT_IPUnits_Cooling, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Cooling, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "WATER", OutputProcessor::Unit::m3, errorFound);
-        EXPECT_EQ(RT_IPUnits_Water, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Water, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::m3, errorFound);
-        EXPECT_EQ(RT_IPUnits_OtherM3, ipUnits);
+        EXPECT_EQ(RT_IPUnits::OtherM3, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::kg, errorFound);
-        EXPECT_EQ(RT_IPUnits_OtherKG, ipUnits);
+        EXPECT_EQ(RT_IPUnits::OtherKG, ipUnits);
         EXPECT_FALSE(errorFound);
 
         DetermineMeterIPUnits(*state, ipUnits, "OTHER", OutputProcessor::Unit::L, errorFound);
-        EXPECT_EQ(RT_IPUnits_OtherL, ipUnits);
+        EXPECT_EQ(RT_IPUnits::OtherL, ipUnits);
         EXPECT_FALSE(errorFound);
 
         state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-        ipUnits = -999999;
+        ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
         DetermineMeterIPUnits(*state, ipUnits, "UNKONWN", OutputProcessor::Unit::unknown, errorFound); // was "badunits"
-        EXPECT_EQ(RT_IPUnits_OtherJ, ipUnits);
+        EXPECT_EQ(RT_IPUnits::OtherJ, ipUnits);
         EXPECT_TRUE(errorFound);
 
-        ipUnits = -999999;
+        ipUnits = OutputProcessor::RT_IPUnits::Unassigned;
         DetermineMeterIPUnits(*state, ipUnits, "ELEC", OutputProcessor::Unit::unknown, errorFound); // was "kWh"
-        EXPECT_EQ(RT_IPUnits_Electricity, ipUnits);
+        EXPECT_EQ(RT_IPUnits::Electricity, ipUnits);
         EXPECT_TRUE(errorFound);
 
         auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
@@ -3388,30 +3388,30 @@ namespace OutputProcessor {
                                 "Site Outdoor Air Drybulb Temperature",
                                 OutputProcessor::TimeStepType::TimeStepZone,
                                 StoreType::Averaged,
-                                2,
+                                VariableType::Real,
                                 OutputProcessor::Unit::C);
         AddToOutputVariableList(*state,
                                 "Site Outdoor Air Wetbulb Temperature",
                                 OutputProcessor::TimeStepType::TimeStepZone,
                                 StoreType::Averaged,
-                                2,
+                                VariableType::Real,
                                 OutputProcessor::Unit::C);
         AddToOutputVariableList(*state,
                                 "Site Outdoor Air Humidity Ratio",
                                 OutputProcessor::TimeStepType::TimeStepZone,
                                 StoreType::Averaged,
-                                2,
+                                VariableType::Real,
                                 OutputProcessor::Unit::kgWater_kgDryAir);
         AddToOutputVariableList(*state,
                                 "Site Outdoor Air Relative Humidity",
                                 OutputProcessor::TimeStepType::TimeStepZone,
                                 StoreType::Averaged,
-                                2,
+                                VariableType::Real,
                                 OutputProcessor::Unit::Perc);
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType);
-        EXPECT_EQ(2, state->dataOutputProcessor->DDVariableTypes(1).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(1).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->DDVariableTypes(1).VarNameOnly);
@@ -3419,7 +3419,7 @@ namespace OutputProcessor {
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(2).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(2).storeType);
-        EXPECT_EQ(2, state->dataOutputProcessor->DDVariableTypes(2).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(2).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(2).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(2).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Wetbulb Temperature", state->dataOutputProcessor->DDVariableTypes(2).VarNameOnly);
@@ -3427,7 +3427,7 @@ namespace OutputProcessor {
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(3).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(3).storeType);
-        EXPECT_EQ(2, state->dataOutputProcessor->DDVariableTypes(3).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(3).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(3).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(3).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Humidity Ratio", state->dataOutputProcessor->DDVariableTypes(3).VarNameOnly);
@@ -3435,7 +3435,7 @@ namespace OutputProcessor {
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(4).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(4).storeType);
-        EXPECT_EQ(2, state->dataOutputProcessor->DDVariableTypes(4).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(4).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(4).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(4).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Relative Humidity", state->dataOutputProcessor->DDVariableTypes(4).VarNameOnly);
@@ -3476,7 +3476,7 @@ namespace OutputProcessor {
 
         EXPECT_EQ(OutputProcessor::TimeStepType::TimeStepZone, state->dataOutputProcessor->DDVariableTypes(1).timeStepType);
         EXPECT_EQ(StoreType::Averaged, state->dataOutputProcessor->DDVariableTypes(1).storeType);
-        EXPECT_EQ(2, state->dataOutputProcessor->DDVariableTypes(1).VariableType);
+        EXPECT_EQ(VariableType::Real, state->dataOutputProcessor->DDVariableTypes(1).variableType);
         EXPECT_EQ(0, state->dataOutputProcessor->DDVariableTypes(1).Next);
         EXPECT_FALSE(state->dataOutputProcessor->DDVariableTypes(1).ReportedOnDDFile);
         EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->DDVariableTypes(1).VarNameOnly);
@@ -4004,7 +4004,7 @@ namespace OutputProcessor {
         });
 
         for (auto const &result : meters_result) {
-            EXPECT_EQ(std::get<0>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).TypeOfMeter);
+            EXPECT_EQ(std::get<0>(result.second), static_cast<int>(state->dataOutputProcessor->EnergyMeters(result.first).TypeOfMeter));
             EXPECT_EQ(std::get<1>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).Name);
             EXPECT_EQ(std::get<2>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).ResourceType);
             EXPECT_EQ(std::get<3>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).EndUse);
@@ -4054,7 +4054,7 @@ namespace OutputProcessor {
         });
 
         for (auto const &result : meters_result) {
-            EXPECT_EQ(std::get<0>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).TypeOfMeter);
+            EXPECT_EQ(std::get<0>(result.second), static_cast<int>(state->dataOutputProcessor->EnergyMeters(result.first).TypeOfMeter));
             EXPECT_EQ(std::get<1>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).Name);
             EXPECT_EQ(std::get<2>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).ResourceType);
             EXPECT_EQ(std::get<3>(result.second), state->dataOutputProcessor->EnergyMeters(result.first).EndUse);
@@ -5381,43 +5381,63 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_unitStringFromDDitem)
     {
 
-        AddToOutputVariableList(
-            *state, "energy variable 1", OutputProcessor::TimeStepType::TimeStepZone, StoreType::Averaged, 1, OutputProcessor::Unit::J);
-        AddToOutputVariableList(
-            *state, "energy variable 2", OutputProcessor::TimeStepType::TimeStepZone, StoreType::Averaged, 1, OutputProcessor::Unit::J);
-        AddToOutputVariableList(
-            *state, "energy variable 3", OutputProcessor::TimeStepType::TimeStepZone, StoreType::Averaged, 1, OutputProcessor::Unit::J);
+        AddToOutputVariableList(*state,
+                                "energy variable 1",
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged,
+                                VariableType::Integer,
+                                OutputProcessor::Unit::J);
+        AddToOutputVariableList(*state,
+                                "energy variable 2",
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged,
+                                VariableType::Integer,
+                                OutputProcessor::Unit::J);
+        AddToOutputVariableList(*state,
+                                "energy variable 3",
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged,
+                                VariableType::Integer,
+                                OutputProcessor::Unit::J);
 
         AddToOutputVariableList(*state,
                                 "humidity ratio variable 1",
                                 OutputProcessor::TimeStepType::TimeStepZone,
                                 StoreType::Averaged,
-                                1,
+                                VariableType::Integer,
                                 OutputProcessor::Unit::kgWater_kgDryAir);
         AddToOutputVariableList(*state,
                                 "humidity ratio variable 2",
                                 OutputProcessor::TimeStepType::TimeStepZone,
                                 StoreType::Averaged,
-                                1,
+                                VariableType::Integer,
                                 OutputProcessor::Unit::kgWater_kgDryAir);
 
-        AddToOutputVariableList(
-            *state, "flow variable 1", OutputProcessor::TimeStepType::TimeStepZone, StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_s);
-        AddToOutputVariableList(
-            *state, "flow variable 2", OutputProcessor::TimeStepType::TimeStepZone, StoreType::Averaged, 1, OutputProcessor::Unit::kgWater_s);
+        AddToOutputVariableList(*state,
+                                "flow variable 1",
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged,
+                                VariableType::Integer,
+                                OutputProcessor::Unit::kgWater_s);
+        AddToOutputVariableList(*state,
+                                "flow variable 2",
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                StoreType::Averaged,
+                                VariableType::Integer,
+                                OutputProcessor::Unit::kgWater_s);
 
         AddToOutputVariableList(*state,
                                 "user defined EMS variable 1",
                                 OutputProcessor::TimeStepType::TimeStepZone,
                                 StoreType::Averaged,
-                                1,
+                                VariableType::Integer,
                                 OutputProcessor::Unit::customEMS,
                                 "ergs/century");
         AddToOutputVariableList(*state,
                                 "user defined EMS variable 2",
                                 OutputProcessor::TimeStepType::TimeStepZone,
                                 StoreType::Averaged,
-                                1,
+                                VariableType::Integer,
                                 OutputProcessor::Unit::customEMS,
                                 "swamps/county");
 
