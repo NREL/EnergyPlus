@@ -2604,24 +2604,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
 
     EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(1, 1));
     EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(2, 2));
-    EXPECT_FALSE(state->dataHeatBalSurf->ZoneRecDifShortFromZ(1));
-    EXPECT_FALSE(state->dataHeatBalSurf->ZoneRecDifShortFromZ(2));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
 
     state->dataHeatBal->Zone(1).HasInterZoneWindow = true;
     state->dataHeatBal->Zone(2).HasInterZoneWindow = true;
 
     ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
 
-    EXPECT_TRUE(state->dataHeatBalSurf->ZoneRecDifShortFromZ(1));
-    EXPECT_TRUE(state->dataHeatBalSurf->ZoneRecDifShortFromZ(2));
+    EXPECT_TRUE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
+    EXPECT_TRUE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
 
     state->dataGlobal->KickOffSimulation = true;
     ComputeDifSolExcZonesWIZWindows(*state, state->dataGlobal->NumOfZones);
 
     EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(1, 1));
     EXPECT_EQ(1, state->dataHeatBalSurf->ZoneFractDifShortZtoZ(2, 2));
-    EXPECT_FALSE(state->dataHeatBalSurf->ZoneRecDifShortFromZ(1));
-    EXPECT_FALSE(state->dataHeatBalSurf->ZoneRecDifShortFromZ(2));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(1));
+    EXPECT_FALSE(state->dataHeatBalSurf->EnclSolRecDifShortFromZ(2));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)

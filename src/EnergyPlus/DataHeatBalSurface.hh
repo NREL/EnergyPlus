@@ -220,7 +220,7 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array2D<Real64> QsrcHistM;  // Master heat source/sink history for the surface (SurfNum,Term)
 
     Array2D<Real64> ZoneFractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
-    Array1D_bool ZoneRecDifShortFromZ;     // True if Zone gets short radiation from another
+    Array1D_bool EnclSolRecDifShortFromZ;  // True if Zone gets short radiation from another
 
     // Surface Heat Balance
     Array1D<bool> SurfMovInsulExtPresent;       // True when interior movable insulation is present
@@ -263,6 +263,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfHSkyExt.deallocate();
         this->SurfHGrdExt.deallocate();
         this->SurfHConvInt.deallocate();
+
         this->SurfTempSource.deallocate();
         this->SurfTempUserLoc.deallocate();
         this->SurfTempInRep.deallocate();
@@ -332,7 +333,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->TsrcHistM.deallocate();
         this->QsrcHistM.deallocate();
         this->ZoneFractDifShortZtoZ.deallocate();
-        this->ZoneRecDifShortFromZ.deallocate();
+        this->EnclSolRecDifShortFromZ.deallocate();
         this->InterZoneWindow = false;
         this->SumSurfaceHeatEmission = 0;
         this->SurfMovInsulExtPresent.deallocate();

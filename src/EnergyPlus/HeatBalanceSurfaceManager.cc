@@ -2216,8 +2216,8 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         if (firstSurfWin >= 0) {
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // Initialize window frame and divider temperatures
-                state.dataSurface->SurfWinFramerTempIn(SurfNum) = SurfInitialTemp;
-                state.dataSurface->SurfWinFramerTempInOld(SurfNum) = SurfInitialTemp;
+                state.dataSurface->SurfWinFrameTempIn(SurfNum) = SurfInitialTemp;
+                state.dataSurface->SurfWinFrameTempInOld(SurfNum) = SurfInitialTemp;
                 state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) = SurfInitialTemp;
                 state.dataSurface->SurfWinDividerTempIn(SurfNum) = SurfInitialTemp;
                 state.dataSurface->SurfWinDividerTempInOld(SurfNum) = SurfInitialTemp;
@@ -2768,18 +2768,17 @@ void InitSolarHeatGains(EnergyPlusData &state)
 
         // Flux of diffuse solar in each zone
 
-        //        state.dataHeatBal->EnclSolQSDifSol = 0.0;
         for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
             state.dataHeatBal->EnclSolQSDifSol(enclNum) = state.dataHeatBal->EnclSolQDforDaylight(enclNum);
         }
 
         if (state.dataHeatBalSurf->InterZoneWindow) {
             for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
-                if (state.dataHeatBalSurf->ZoneRecDifShortFromZ(enclNum)) {
+                if (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(enclNum)) {
                     Real64 EnclSolQSDifSol_sum(0.0);                                            // Accumulator
                     auto lZone(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.index(enclNum, 1)); // Tuned Linear indexing
                     for (int otherEnclNum = 1; otherEnclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++otherEnclNum, ++lZone) {
-                        if ((otherEnclNum != enclNum) && (state.dataHeatBalSurf->ZoneRecDifShortFromZ(otherEnclNum))) {
+                        if ((otherEnclNum != enclNum) && (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(otherEnclNum))) {
                             EnclSolQSDifSol_sum += state.dataHeatBalSurf->ZoneFractDifShortZtoZ[lZone] *
                                                    state.dataHeatBal->EnclSolQDforDaylight(otherEnclNum); // [ lZone ] == ( enclNum, otherEnclNum )
                         }
@@ -3557,11 +3556,11 @@ void InitIntSolarDistribution(EnergyPlusData &state)
 
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
 
-            if (state.dataHeatBalSurf->ZoneRecDifShortFromZ(enclosureNum)) {
+            if (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(enclosureNum)) {
 
                 for (int OtherenclosureNum = 1; OtherenclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++OtherenclosureNum) {
 
-                    if ((OtherenclosureNum != enclosureNum) && (state.dataHeatBalSurf->ZoneRecDifShortFromZ(OtherenclosureNum))) {
+                    if ((OtherenclosureNum != enclosureNum) && (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(OtherenclosureNum))) {
                         Real64 sumZoneQLTSW = 0.0;
                         for (int zoneNum : state.dataViewFactor->ZoneSolarInfo(OtherenclosureNum).ZoneNums) {
                             sumZoneQLTSW += state.dataHeatBal->ZoneIntGain(zoneNum).QLTSW;
@@ -4335,11 +4334,11 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
 
     if (!allocated(state.dataHeatBalSurf->ZoneFractDifShortZtoZ)) {
         state.dataHeatBalSurf->ZoneFractDifShortZtoZ.allocate(NumberOfEnclosures, NumberOfEnclosures);
-        state.dataHeatBalSurf->ZoneRecDifShortFromZ.allocate(NumberOfEnclosures);
+        state.dataHeatBalSurf->EnclSolRecDifShortFromZ.allocate(NumberOfEnclosures);
         state.dataHeatBalSurfMgr->DiffuseArray.allocate(NumberOfEnclosures, NumberOfEnclosures);
     }
 
-    state.dataHeatBalSurf->ZoneRecDifShortFromZ = false;
+    state.dataHeatBalSurf->EnclSolRecDifShortFromZ = false;
     state.dataHeatBalSurf->ZoneFractDifShortZtoZ.to_identity();
     state.dataHeatBalSurfMgr->DiffuseArray.to_identity();
 
@@ -4359,7 +4358,7 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
         int MZ = Surface(Surface(SurfNum).ExtBoundCond).SolarEnclIndex;
         state.dataHeatBalSurf->ZoneFractDifShortZtoZ(NZ, MZ) +=
             state.dataConstruction->Construct(Surface(SurfNum).Construction).TransDiff * state.dataHeatBal->EnclSolVMULT(NZ) * Surface(SurfNum).Area;
-        if (state.dataHeatBal->EnclSolVMULT(NZ) != 0.0) state.dataHeatBalSurf->ZoneRecDifShortFromZ(NZ) = true;
+        if (state.dataHeatBal->EnclSolVMULT(NZ) != 0.0) state.dataHeatBalSurf->EnclSolRecDifShortFromZ(NZ) = true;
     }
     //          Compute fractions for multiple passes.
 
@@ -4387,7 +4386,7 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
         for (int MZ = 1; MZ <= NumberOfEnclosures; ++MZ, ++l) {
             if (MZ == NZ) continue;
             if (state.dataHeatBalSurf->ZoneFractDifShortZtoZ[l] > 0.0) { // [ l ] == ( MZ, NZ )
-                state.dataHeatBalSurf->ZoneRecDifShortFromZ(NZ) = true;
+                state.dataHeatBalSurf->EnclSolRecDifShortFromZ(NZ) = true;
                 break;
             }
         }
@@ -4396,15 +4395,15 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
     //           Compute fractions for multiple zones.
 
     for (int IZ = 1; IZ <= NumberOfEnclosures; ++IZ) {
-        if (!state.dataHeatBalSurf->ZoneRecDifShortFromZ(IZ)) continue;
+        if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(IZ)) continue;
 
         for (int JZ = 1; JZ <= NumberOfEnclosures; ++JZ) {
-            if (!state.dataHeatBalSurf->ZoneRecDifShortFromZ(JZ)) continue;
+            if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(JZ)) continue;
             if (IZ == JZ) continue;
             if (state.dataHeatBalSurfMgr->DiffuseArray(IZ, JZ) == 0.0) continue;
 
             for (int KZ = 1; KZ <= NumberOfEnclosures; ++KZ) {
-                if (!state.dataHeatBalSurf->ZoneRecDifShortFromZ(KZ)) continue;
+                if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(KZ)) continue;
                 if (IZ == KZ) continue;
                 if (JZ == KZ) continue;
                 if (state.dataHeatBalSurfMgr->DiffuseArray(JZ, KZ) == 0.0) continue;
@@ -4412,7 +4411,7 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
                     state.dataHeatBalSurfMgr->DiffuseArray(JZ, KZ) * state.dataHeatBalSurfMgr->DiffuseArray(IZ, JZ);
 
                 for (int LZ = 1; LZ <= NumberOfEnclosures; ++LZ) {
-                    if (!state.dataHeatBalSurf->ZoneRecDifShortFromZ(LZ)) continue;
+                    if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(LZ)) continue;
                     if (IZ == LZ) continue;
                     if (JZ == LZ) continue;
                     if (KZ == LZ) continue;
@@ -4422,7 +4421,7 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
                                                                             state.dataHeatBalSurfMgr->DiffuseArray(IZ, JZ);
 
                     for (int MZ = 1; MZ <= NumberOfEnclosures; ++MZ) {
-                        if (!state.dataHeatBalSurf->ZoneRecDifShortFromZ(MZ)) continue;
+                        if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(MZ)) continue;
                         if (IZ == MZ) continue;
                         if (JZ == MZ) continue;
                         if (KZ == MZ) continue;

@@ -6112,7 +6112,7 @@ namespace LowTempRadiantSystem {
                 if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
                     // Window frame contribution
                     sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) * state.dataSurface->SurfWinFramerTempIn(surfNum);
+                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) * state.dataSurface->SurfWinFrameTempIn(surfNum);
                 }
 
                 if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0 &&

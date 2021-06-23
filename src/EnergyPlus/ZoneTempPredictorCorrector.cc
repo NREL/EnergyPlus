@@ -6753,7 +6753,7 @@ void CalcZoneSums(EnergyPlusData &state,
                 // Window frame contribution
                 Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
                                      (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)));
-                SumHATsurf += HA_surf * state.dataSurface->SurfWinFramerTempIn(SurfNum);
+                SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempIn(SurfNum);
                 HA += HA_surf;
             }
 
@@ -7095,7 +7095,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
 
                 SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
                                 (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
-                                (state.dataSurface->SurfWinFramerTempIn(SurfNum) - RefAirTemp);
+                                (state.dataSurface->SurfWinFrameTempIn(SurfNum) - RefAirTemp);
             }
 
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {

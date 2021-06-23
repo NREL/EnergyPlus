@@ -188,8 +188,8 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinFrameEmis.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio.dimension(NumSurfaces, 1.0);
         state.dataSurface->SurfWinFrameEdgeArea.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinFramerTempIn.dimension(NumSurfaces, 23.0);
-        state.dataSurface->SurfWinFramerTempInOld.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinFrameTempIn.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinFrameTempInOld.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinFrameTempSurfOut.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinProjCorrFrOut.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinProjCorrFrIn.dimension(NumSurfaces, 0);

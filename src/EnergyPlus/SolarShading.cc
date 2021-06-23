@@ -1474,7 +1474,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                     SetupOutputVariable(state,
                                         "Surface Window Frame Inside Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataSurface->SurfWinFramerTempIn(SurfLoop),
+                                        state.dataSurface->SurfWinFrameTempIn(SurfLoop),
                                         "Zone",
                                         "Average",
                                         state.dataSurface->Surface(SurfLoop).Name);
@@ -1942,7 +1942,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
                         SetupOutputVariable(state,
                                             "Surface Window Frame Inside Temperature",
                                             OutputProcessor::Unit::C,
-                                            state.dataSurface->SurfWinFramerTempIn(SurfLoop),
+                                            state.dataSurface->SurfWinFrameTempIn(SurfLoop),
                                             "Zone",
                                             "Average",
                                             state.dataSurface->Surface(SurfLoop).Name);

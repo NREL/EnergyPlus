@@ -1458,8 +1458,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio;  // Ratio of frame edge of glass conductance (without air films) to center of glass conductance
                                                        // (without air films)
     Array1D<Real64> SurfWinFrameEdgeArea;              // Area of glass near frame (m2)
-    Array1D<Real64> SurfWinFramerTempIn;               // Frame inside surface temperature (C)
-    Array1D<Real64> SurfWinFramerTempInOld;            // Previous value of frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempIn;                // Frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempInOld;             // Previous value of frame inside surface temperature (C)
     Array1D<Real64> SurfWinFrameTempSurfOut;           // Frame outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrFrOut;              // Correction factor to absorbed radiation due to frame outside projection
     Array1D<Real64> SurfWinProjCorrFrIn;               // Correction factor to absorbed radiation due to frame inside projection
@@ -1804,8 +1804,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinFrameEmis.deallocate();
         this->SurfWinFrEdgeToCenterGlCondRatio.deallocate();
         this->SurfWinFrameEdgeArea.deallocate();
-        this->SurfWinFramerTempIn.deallocate();
-        this->SurfWinFramerTempInOld.deallocate();
+        this->SurfWinFrameTempIn.deallocate();
+        this->SurfWinFrameTempInOld.deallocate();
         this->SurfWinFrameTempSurfOut.deallocate();
         this->SurfWinProjCorrFrOut.deallocate();
         this->SurfWinProjCorrFrIn.deallocate();
