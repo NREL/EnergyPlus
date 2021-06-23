@@ -80,14 +80,6 @@ jobs:
         mpm --find-updates
         mpm --admin --find-updates
 
-    - name: Install IFW
-      shell: bash
-      run: |
-        set -x
-        out_dir="C:/Qt"
-        aqt tool windows tools_ifw 4.0 qt.tools.ifw.40 --outputdir="$out_dir"
-        echo "$out_dir/Tools/QtInstallerFramework/4.0/bin" >> $GITHUB_PATH
-
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
 
@@ -111,15 +103,6 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.zip
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
-
-    - name: Upload IFW to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.exe
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
