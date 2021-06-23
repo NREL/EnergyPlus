@@ -207,6 +207,33 @@ namespace Psychrometrics {
         return rhoair;
     }
 
+    constexpr Real64 PsyRhoAirFnPbTdbW(Real64 const pb,  // barometric pressure (Pascals)
+                                       Real64 const tdb, // dry bulb temperature (Celsius)
+                                       Real64 const dw   // humidity ratio (kgWater/kgDryAir)
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. S. Wright
+        //       DATE WRITTEN   June 2, 1994
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function provides density of air as a function of barometric
+        // pressure, dry bulb temperature, and humidity ratio.
+
+        // METHODOLOGY EMPLOYED:
+        // ideal gas law
+        //    universal gas const for air 287 J/(kg K)
+        //    air/water molecular mass ratio 28.9645/18.01534
+
+        // REFERENCES:
+        // Wylan & Sontag, Fundamentals of Classical Thermodynamics.
+        // ASHRAE handbook 1985 Fundamentals, Ch. 6, eqn. (6),(26)
+
+        return (pb / (287.0 * (tdb + DataGlobalConstants::KelvinConv) * (1.0 + 1.6077687 * std::max(dw, 1.0e-5))));
+    }
+
     inline Real64 PsyRhoAirFnPbTdbW_fast([[maybe_unused]] EnergyPlusData &state,
                                          Real64 const pb,  // barometric pressure (Pascals)
                                          Real64 const tdb, // dry bulb temperature (Celsius)
