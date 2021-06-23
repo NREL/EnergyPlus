@@ -753,6 +753,11 @@ target_link_libraries(energyplusparser PRIVATE project_options project_fp_option
 if(WIN32)
   target_link_libraries(energyplusparser PUBLIC Shlwapi)
 endif()
+# See https://en.cppreference.com/w/cpp/filesystem#Notes
+if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
+    ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
+  target_link_libraries(energyplusparser PRIVATE stdc++fs)
+endif()
 
 # first we will create a static library of EnergyPlus this will be linked
 # statically to create the DLL and also the unit tests
@@ -796,6 +801,11 @@ if(UNIX AND NOT APPLE)
 endif()
 if(LINK_WITH_PYTHON)
   target_link_libraries(energypluslib PUBLIC ${PYTHON_LIBRARIES})
+endif()
+# See https://en.cppreference.com/w/cpp/filesystem#Notes
+if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
+    ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
+  target_link_libraries(energypluslib PRIVATE stdc++fs)
 endif()
 
 # second we will create the shared library that is actually packaged with

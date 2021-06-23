@@ -273,8 +273,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceLast = 1;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
@@ -282,17 +280,28 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataMaterial->Material.allocate(state->dataHeatBal->TotMaterials);
+    state->dataSurface->SurfaceWindow(1).EffShBlindEmiss(1) = 0.1;
+    state->dataSurface->SurfaceWindow(1).EffGlassEmiss(1) = 0.1;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).Construction = 1;
-    state->dataSurface->SurfWinShadingFlag(1) = DataSurfaces::WinShadingType::ShadeOff;
+    state->dataSurface->Surface(1).Area = 1;
+    state->dataSurface->SurfWinShadingFlag(1) = DataSurfaces::WinShadingType::IntBlind;
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
-    state->dataConstruction->Construct(1).TransDiff = 0.0;
     state->dataHeatBalSurf->SurfAbsThermalInt.allocate(1);
-    state->dataHeatBalSurf->SurfAbsThermalInt(1) = 0.2;
+
+    state->dataViewFactor->NumOfRadiantEnclosures = 1;
+    state->dataViewFactor->ZoneRadiantInfo.allocate(1);
+    state->dataHeatBal->EnclRadReCalc.allocate(1);
+    state->dataHeatBal->EnclRadReCalc(1) = true;
+    state->dataHeatBal->EnclRadThermAbsMult.allocate(1);
+    state->dataViewFactor->ZoneRadiantInfo(1).SurfacePtr.allocate(1);
+    state->dataViewFactor->ZoneRadiantInfo(1).SurfacePtr(1) = 1;
+
     ComputeIntThermalAbsorpFactors(*state);
 
-    EXPECT_EQ(0.2, state->dataHeatBal->ITABSF(1));
+    EXPECT_EQ(0.2, state->dataHeatBalSurf->SurfAbsThermalInt(1));
+    EXPECT_EQ(5, state->dataHeatBal->EnclRadThermAbsMult(1));
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
