@@ -52,7 +52,6 @@ extern "C" {
 
 // C++ Headers
 #include <cstdlib>
-#include <exception>
 #include <iostream>
 
 // ObjexxFCL Headers
@@ -75,7 +74,6 @@ extern "C" {
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
@@ -88,7 +86,6 @@ extern "C" {
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
-#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -130,20 +127,22 @@ namespace UtilityRoutines {
         std::string::size_type const StringLen(PString.length());
         ErrorFlag = false;
         if (StringLen == 0) return rProcessNumber;
-        bool parseFailed = false;
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
             // make FORTRAN floating point number (containing 'd' or 'D')
             // standardized by replacing 'd' or 'D' with 'e'
             std::replace_if(
                 std::begin(PString), std::end(PString), [](const char c) { return c == 'D' || c == 'd'; }, 'e');
             // then parse as a normal floating point value
-            parseFailed = !readItem(PString, rProcessNumber);
-            ErrorFlag = false;
+            try {
+                rProcessNumber = std::stod(PString, nullptr);
+            } catch (std::invalid_argument &e) {
+                rProcessNumber = 0.0;
+                ErrorFlag = true;
+            } catch (std::out_of_range &e) {
+                rProcessNumber = 0.0;
+                ErrorFlag = true;
+            }
         } else {
-            rProcessNumber = 0.0;
-            ErrorFlag = true;
-        }
-        if (parseFailed) {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }
@@ -437,22 +436,24 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!FileSystem::fileExists(state.dataStrGlobals->outputPerfLogFileName)) {
+            if (!FileSystem::fileExists(state.dataStrGlobals->outputPerfLogFilePath)) {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFileName, std::fstream::out); // open file normally
+                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::out); // open file normally
                     if (!fsPerfLog) {
-                        ShowFatalError(
-                            state, "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFileName + "\" for output (write).");
+                        ShowFatalError(state,
+                                       "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFilePath.string() +
+                                           "\" for output (write).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_headerRow << std::endl;
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
             } else {
                 if (state.files.outputControl.perflog) {
-                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFileName, std::fstream::app); // append to already existing file
+                    fsPerfLog.open(state.dataStrGlobals->outputPerfLogFilePath, std::fstream::app); // append to already existing file
                     if (!fsPerfLog) {
-                        ShowFatalError(
-                            state, "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFileName + "\" for output (append).");
+                        ShowFatalError(state,
+                                       "appendPerfLog: Could not open file \"" + state.dataStrGlobals->outputPerfLogFilePath.string() +
+                                           "\" for output (append).");
                     }
                     fsPerfLog << state.dataUtilityRoutines->appendPerfLog_valuesRow << std::endl;
                 }
@@ -723,7 +724,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
         auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
         if (!tempfl.good()) {
-            DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+            DisplayString(state, "AbortEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
         }
         print(
             tempfl, "EnergyPlus Terminated--Fatal Error Detected. {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
@@ -874,7 +875,7 @@ int EndEnergyPlus(EnergyPlusData &state)
     {
         auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
         if (!tempfl.good()) {
-            DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
+            DisplayString(state, "EndEnergyPlus: Could not open file " + tempfl.filePath.string() + " for output (write).");
         }
         print(tempfl, "EnergyPlus Completed Successfully-- {} Warning; {} Severe Errors; Elapsed Time={}\n", NumWarnings, NumSevere, Elapsed);
     }
@@ -887,7 +888,7 @@ int EndEnergyPlus(EnergyPlusData &state)
 #ifdef EP_Detailed_Timings
     epSummaryTimes(Time_Finish - Time_Start);
 #endif
-    std::cerr << "EnergyPlus Completed Successfully." << std::endl;
+    if (state.dataGlobal->printConsoleOutput) std::cerr << "EnergyPlus Completed Successfully." << std::endl;
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation
     if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
@@ -1604,7 +1605,7 @@ void ShowErrorMessage(EnergyPlusData &state, std::string const &ErrorMessage, Op
         // CacheIPErrorFile is never opened or closed
         // so this output would just go to stdout
         // ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
-        std::cout << ErrorMessage << '\n';
+        if (state.dataGlobal->printConsoleOutput) std::cout << ErrorMessage << '\n';
     }
     if (present(OutUnit1)) {
         print(OutUnit1(), "  {}", ErrorMessage);

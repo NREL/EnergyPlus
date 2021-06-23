@@ -3065,7 +3065,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-    state->dataPlantMgr->InitLoopEquip = true;
 
     // Fake having more than small load
     state->dataSize->PlantSizData(1).DesVolFlowRate = 1000.0;
@@ -3457,7 +3456,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-    state->dataPlantMgr->InitLoopEquip = true;
 
     // Fake having more than small load
 
@@ -3930,7 +3928,6 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-    state->dataPlantMgr->InitLoopEquip = true;
 
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;

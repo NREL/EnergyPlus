@@ -1523,7 +1523,7 @@ namespace SimulationManager {
                              state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         NumSizingDays = NumDesignDays + NumRunPeriodDesign;
 
-        WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
+        WeatherFileAttached = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
 
         if (state.dataSimulationManager->RunControlInInput) {
             if (state.dataGlobal->DoZoneSizing) {
@@ -1655,11 +1655,11 @@ namespace SimulationManager {
         }
     }
 
-    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const std::string &fileName)
+    std::unique_ptr<std::ostream> OpenStreamFile(EnergyPlusData &state, const fs::path &filePath)
     {
-        auto result = std::make_unique<std::ofstream>(fileName);
+        auto result = std::make_unique<std::ofstream>(filePath);
         if (!result->good()) {
-            ShowFatalError(state, "OpenOutputFiles: Could not open file " + fileName + " for output (write).");
+            ShowFatalError(state, "OpenOutputFiles: Could not open file " + filePath.string() + " for output (write).");
         }
         return result;
     }
@@ -1670,13 +1670,13 @@ namespace SimulationManager {
         //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
         if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
             if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                jsonOutputStreams.json_stream = OpenStreamFile(state, jsonOutputStreams.outputJsonFileName);
+                jsonOutputStreams.json_stream = OpenStreamFile(state, jsonOutputStreams.outputJsonFilePath);
             }
             if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                jsonOutputStreams.cbor_stream = OpenStreamFile(state, jsonOutputStreams.outputCborFileName);
+                jsonOutputStreams.cbor_stream = OpenStreamFile(state, jsonOutputStreams.outputCborFilePath);
             }
             if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                jsonOutputStreams.msgpack_stream = OpenStreamFile(state, jsonOutputStreams.outputMsgPackFileName);
+                jsonOutputStreams.msgpack_stream = OpenStreamFile(state, jsonOutputStreams.outputMsgPackFilePath);
             }
         }
         //// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
@@ -1685,13 +1685,13 @@ namespace SimulationManager {
             if (state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.rDataFrameEnabled() ||
                 state.dataResultsFramework->resultsFramework->RIDetailedZoneTSData.iDataFrameEnabled()) {
                 if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneJsonFileName);
+                    jsonOutputStreams.json_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneJsonFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneCborFileName);
+                    jsonOutputStreams.cbor_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneCborFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneMsgPackFileName);
+                    jsonOutputStreams.msgpack_TSstream_Zone = OpenStreamFile(state, jsonOutputStreams.outputTSZoneMsgPackFilePath);
                 }
             }
 
@@ -1699,13 +1699,13 @@ namespace SimulationManager {
             if (state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.iDataFrameEnabled() ||
                 state.dataResultsFramework->resultsFramework->RIDetailedHVACTSData.rDataFrameEnabled()) {
                 if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacJsonFileName);
+                    jsonOutputStreams.json_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacJsonFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacCborFileName);
+                    jsonOutputStreams.cbor_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacCborFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacMsgPackFileName);
+                    jsonOutputStreams.msgpack_TSstream_HVAC = OpenStreamFile(state, jsonOutputStreams.outputTSHvacMsgPackFilePath);
                 }
             }
 
@@ -1713,13 +1713,13 @@ namespace SimulationManager {
             if (state.dataResultsFramework->resultsFramework->RITimestepTSData.iDataFrameEnabled() ||
                 state.dataResultsFramework->resultsFramework->RITimestepTSData.rDataFrameEnabled()) {
                 if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSJsonFileName);
+                    jsonOutputStreams.json_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSJsonFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSCborFileName);
+                    jsonOutputStreams.cbor_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSCborFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSMsgPackFileName);
+                    jsonOutputStreams.msgpack_TSstream = OpenStreamFile(state, jsonOutputStreams.outputTSMsgPackFilePath);
                 }
             }
 
@@ -1727,13 +1727,13 @@ namespace SimulationManager {
             if (state.dataResultsFramework->resultsFramework->RIHourlyTSData.iDataFrameEnabled() ||
                 state.dataResultsFramework->resultsFramework->RIHourlyTSData.rDataFrameEnabled()) {
                 if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRJsonFileName);
+                    jsonOutputStreams.json_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRJsonFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRCborFileName);
+                    jsonOutputStreams.cbor_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRCborFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRMsgPackFileName);
+                    jsonOutputStreams.msgpack_HRstream = OpenStreamFile(state, jsonOutputStreams.outputHRMsgPackFilePath);
                 }
             }
 
@@ -1741,13 +1741,13 @@ namespace SimulationManager {
             if (state.dataResultsFramework->resultsFramework->RIDailyTSData.iDataFrameEnabled() ||
                 state.dataResultsFramework->resultsFramework->RIDailyTSData.rDataFrameEnabled()) {
                 if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYJsonFileName);
+                    jsonOutputStreams.json_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYJsonFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYCborFileName);
+                    jsonOutputStreams.cbor_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYCborFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYMsgPackFileName);
+                    jsonOutputStreams.msgpack_DYstream = OpenStreamFile(state, jsonOutputStreams.outputDYMsgPackFilePath);
                 }
             }
 
@@ -1755,13 +1755,13 @@ namespace SimulationManager {
             if (state.dataResultsFramework->resultsFramework->RIMonthlyTSData.iDataFrameEnabled() ||
                 state.dataResultsFramework->resultsFramework->RIMonthlyTSData.rDataFrameEnabled()) {
                 if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNJsonFileName);
+                    jsonOutputStreams.json_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNJsonFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNCborFileName);
+                    jsonOutputStreams.cbor_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNCborFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNMsgPackFileName);
+                    jsonOutputStreams.msgpack_MNstream = OpenStreamFile(state, jsonOutputStreams.outputMNMsgPackFilePath);
                 }
             }
 
@@ -1769,13 +1769,13 @@ namespace SimulationManager {
             if (state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.iDataFrameEnabled() ||
                 state.dataResultsFramework->resultsFramework->RIRunPeriodTSData.rDataFrameEnabled()) {
                 if (state.dataResultsFramework->resultsFramework->JSONEnabled()) {
-                    jsonOutputStreams.json_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMJsonFileName);
+                    jsonOutputStreams.json_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMJsonFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->CBOREnabled()) {
-                    jsonOutputStreams.cbor_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMCborFileName);
+                    jsonOutputStreams.cbor_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMCborFilePath);
                 }
                 if (state.dataResultsFramework->resultsFramework->MsgPackEnabled()) {
-                    jsonOutputStreams.msgpack_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMMsgPackFileName);
+                    jsonOutputStreams.msgpack_SMstream = OpenStreamFile(state, jsonOutputStreams.outputSMMsgPackFilePath);
                 }
             }
         }
@@ -2942,7 +2942,7 @@ namespace SimulationManager {
         Array1D_int VarIndexes;
         Array1D_int VarIDs;
         Array1D<OutputProcessor::TimeStepType> IndexTypes;
-        Array1D_int VarTypes;
+        Array1D<OutputProcessor::VariableType> VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D_string VarNames;
         std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;
@@ -3034,11 +3034,6 @@ namespace SimulationManager {
             ShowFatalError(state, "Preprocessor condition(s) cause termination.");
         }
 
-        // Set up more globals - process fluid input.
-        state.dataFluidProps->FluidIndex_Water = FindGlycol(state, "Water");
-        state.dataFluidProps->FluidIndex_EthyleneGlycol = FindGlycol(state, "EthyleneGlycol");
-        state.dataFluidProps->FluidIndex_PropoleneGlycol = FindGlycol(state, "PropoleneGlycol");
-
         state.dataInputProcessing->inputProcessor->preScanReportingVariables(state);
     }
 
@@ -3106,8 +3101,6 @@ void Resimulate(EnergyPlusData &state,
     //         ReportHeatBalance
 
     // Using/Aliasing
-    using DataHeatBalFanSys::iGetZoneSetPoints;
-    using DataHeatBalFanSys::iPredictStep;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
     using HeatBalanceAirManager::InitAirHeatBalance;
     using HeatBalanceSurfaceManager::InitSurfaceHeatBalance;
@@ -3142,14 +3135,22 @@ void Resimulate(EnergyPlusData &state,
 
     if (ResimHVAC) {
         // HVAC simulation
-        ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(state,
+                             DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints,
+                             ZoneTempChange,
+                             false,
+                             state.dataHVACGlobal->UseZoneTimeStepHistory,
+                             0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-            ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+            ManageZoneContaminanUpdates(
+                state, DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         CalcAirFlowSimple(
             state, 0, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneMixingFlow, state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
-        ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(
+            state, DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep, ZoneTempChange, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants)
-            ManageZoneContaminanUpdates(state, iPredictStep, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
+            ManageZoneContaminanUpdates(
+                state, DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep, false, state.dataHVACGlobal->UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 
         ++state.dataDemandManager->DemandManagerHVACIterations;

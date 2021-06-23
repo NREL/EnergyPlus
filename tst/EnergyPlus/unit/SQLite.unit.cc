@@ -1006,8 +1006,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     EXPECT_EQ(ventilation1, ventilations[1]);
 
     ASSERT_EQ(2ul, roomAirModels.size());
-    std::vector<std::string> roomAirModel0{"1", "test roomAirModel 1", "2", "1", "0"};
-    std::vector<std::string> roomAirModel1{"2", "test roomAirModel 2", "3", "1", "1"};
+    std::vector<std::string> roomAirModel0{"1", "test roomAirModel 1", "1", "0", "0"};
+    std::vector<std::string> roomAirModel1{"2", "test roomAirModel 2", "2", "0", "1"}; // RoomAirModel::Mundt and CouplingScheme::Direct
     EXPECT_EQ(roomAirModel0, roomAirModels[0]);
     EXPECT_EQ(roomAirModel1, roomAirModels[1]);
 }

@@ -692,7 +692,7 @@ The name of the AvailabilityManagerAssignmentList ~object. This is referenced by
 
 \paragraph{Field Set (Availability Manager Object Type, Name)}\label{field-set-availability-manager-object-type-name}
 
-Managers are listed by pairs of data items:~ \emph{Availability Manager Object Type} and \emph{Availability Manager Name}. The managers are simulated down the list and calculate a control status for use by the \hyperref[airloophvac]{AirLoopHVAC} or \hyperref[plantloop]{PlantLoop}. The priority of each manager used for a specific loop is based on the rules described above. Availability managers are not currently used for condenser loops. The availability managers, along with the \hyperref[airloophvac]{AirLoopHVAC} and \hyperref[plantloop]{PlantLoop} object, report the control status calculated each simulation timestep. These output variables can be used to prioritize the managers according to the required control strategy. Six managers are accomodated in the list by default, however, this IDD specification is extensible. Additional pairs may be added by directly editing the IDD.
+Managers are listed by pairs of data items:~ \emph{Availability Manager Object Type} and \emph{Availability Manager Name}. The managers are simulated down the list and calculate a control status for use by the \hyperref[airloophvac]{AirLoopHVAC} or \hyperref[plantloop]{PlantLoop}. The priority of each manager used for a specific loop is based on the rules described above. Availability managers are not currently used for condenser loops. The availability managers, along with the \hyperref[airloophvac]{AirLoopHVAC} and \hyperref[plantloop]{PlantLoop} object, report the control status calculated each simulation timestep. These output variables can be used to prioritize the managers according to the required control strategy. Six managers are accomodated in the list by default.  This object is extensible, so additional pairs of the next two fields may be added.
 
 \paragraph{Field: Availability Manager \textless{}x\textgreater{} Object Type}\label{field-availability-manager-x-object-type}
 
@@ -746,7 +746,7 @@ When this object is referred in \hyperref[airloophvacdedicatedoutdoorairsystem]{
 
 \paragraph{Field: Availability Manager List Name}\label{field-availability-manager-list-name-1}
 
-This field is the name of a \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} object. An Availability Manager List is a list of Availability Managers giving both Availability Manager Object Type and Name. \textbf{Use of this input is optional.} This field may be omitted; it is not currently used by the program.
+This field is the name of a \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} object. An Availability Manager List is a list of Availability Managers giving both Availability Manager Object Type and Name.  This field is not used by EnergyPlus, so it may be omitted or left blank.  If the user does provide a name for this field, keep in mind that it will not affect the simulation and it must be a valid Availability Manager name.
 
 An IDF example, including the \hyperref[airloophvac]{AirLoopHVAC}, and the controller and equipment lists.
 

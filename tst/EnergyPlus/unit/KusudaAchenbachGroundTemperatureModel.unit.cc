@@ -74,7 +74,7 @@ TEST_F(EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    std::string const CurrentModuleObject = state->dataGrndTempModelMgr->CurrentModuleObjects(objectType_KusudaGroundTemp);
+    std::string const CurrentModuleObject = state->dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::KusudaGroundTemp));
 
     auto thisModel = GetGroundTempModelAndInit(*state, CurrentModuleObject, "TEST");
 
@@ -116,7 +116,7 @@ TEST_F(EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2) // lNumericFieldB
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    std::string const CurrentModuleObject = state->dataGrndTempModelMgr->CurrentModuleObjects(objectType_KusudaGroundTemp);
+    std::string const CurrentModuleObject = state->dataGrndTempModelMgr->CurrentModuleObjects(static_cast<int>(GroundTempObjType::KusudaGroundTemp));
 
     auto thisModel = GetGroundTempModelAndInit(*state, CurrentModuleObject, "TEST");
 

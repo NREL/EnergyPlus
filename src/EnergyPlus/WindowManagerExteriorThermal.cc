@@ -243,10 +243,10 @@ namespace WindowManager {
         }
 
         auto TransDiff = construction.TransDiff;
-        state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
-        state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area * TransDiff;
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
-            state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
+            state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
 
         for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
             state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
@@ -647,7 +647,7 @@ namespace WindowManager {
         double tSky = state.dataEnvrn->SkyTempKelvin;
         double airSpeed = 0.0;
         if (m_Surface.ExtWind) {
-            airSpeed = m_Surface.WindSpeed;
+            airSpeed = state.dataSurface->SurfOutWindSpeed(m_SurfNum);
         }
         double fclr = 1 - state.dataEnvrn->CloudFraction;
         AirHorizontalDirection airDirection = AirHorizontalDirection::Windward;

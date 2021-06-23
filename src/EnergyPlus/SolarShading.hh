@@ -247,8 +247,6 @@ namespace SolarShading {
 
     void CalcAbsorbedOnExteriorOpaqueSurfaces(EnergyPlusData &state);
 
-    void CalcInteriorSolarDistributionWCE(EnergyPlusData &state);
-
     void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state);
 
     int WindowScheduledSolarAbs(EnergyPlusData &state,
@@ -291,6 +289,8 @@ namespace SolarShading {
     );
 
     void WindowShadingManager(EnergyPlusData &state);
+
+    void CheckGlazingShadingStatusChange(EnergyPlusData &state);
 
     DataSurfaces::WinShadingType findValueInEnumeration(Real64 controlValue);
 
@@ -430,7 +430,6 @@ struct SolarShadingData : BaseGlobalStruct
     std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
 #endif
 
-    bool MustAllocSolarShading = true;
     bool GetInputFlag = true;
     bool firstTime = true;
     bool debugging = false;
@@ -530,7 +529,6 @@ struct SolarShadingData : BaseGlobalStruct
         this->ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
         this->ShadowingDaysLeft = 0;      // Days left in current shadowing period
         this->debugging = false;
-        this->MustAllocSolarShading = true;
         this->GetInputFlag = true;
         this->firstTime = true;
         this->HCNS.deallocate();
