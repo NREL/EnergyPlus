@@ -48,11 +48,11 @@ RunPeriod,
        \key Yes
        \key No
        \default No
-  A9, First Hour Interpolation Starting Values
+  A9, \field First Hour Interpolation Starting Values
        \note When the weather data timestep is longer than the simulation timestep, weather data is interpolated. For the first hour of the
        \note simulation, this field specifies which values from the first day of the run period to use as the interpolation starting point.
        \note This same interpolation will be used for repeated warmup days.
-	   \key Hour1
+       \key Hour1
        \key Hour24
        \default Hour24
 
@@ -64,11 +64,11 @@ Test units will be developed to check the correct implementation of 1). the new 
 
 ## Input Output Reference Documentation ##
 
-An additional item describing the added field would be created, to explain how the options couild be used.
+An additional item describing the added field will be created to explain how the options can be used.
 
 ## Input Description ##
 
-Will add the description for the new field.
+Input descriptions will be added for the new fields.
 
 ## Outputs Description ##
 
