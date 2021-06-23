@@ -147,8 +147,12 @@ void cleanEPJSON(json &epjson)
     }
 }
 
-bool processInput(std::string const &inputFilePath, json const &schema, OutputTypes outputType, fs::path outputDirPath, std::string &outputTypeStr,bool convertHVACTemplate)
-{)
+bool processInput(std::string const &inputFilePath,
+                  json const &schema,
+                  OutputTypes outputType,
+                  fs::path outputDirPath,
+                  std::string &outputTypeStr,
+                  bool convertHVACTemplate)
 {
     auto validation(std::unique_ptr<Validation>(new Validation(&schema)));
     auto idf_parser(std::unique_ptr<IdfParser>(new IdfParser()));
@@ -372,13 +376,13 @@ int main(int argc, const char *argv[])
             "--format",                                                        // Flag token.
             outputTypeValidation);
 
-    opt.add("",                              // Default.
-            0,                               // Required?
-            0,                               // Number of args expected.
-            0,                               // Delimiter if expecting multiple args.
+    opt.add("",                                     // Default.
+            0,                                      // Required?
+            0,                                      // Number of args expected.
+            0,                                      // Delimiter if expecting multiple args.
             "Do not convert HVACTemplate objects.", // Help description.
-            "-n",                            // Flag token.
-            "--noHVACTemplate"               // Flag token.
+            "-n",                                   // Flag token.
+            "--noHVACTemplate"                      // Flag token.
     );
 
     opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
