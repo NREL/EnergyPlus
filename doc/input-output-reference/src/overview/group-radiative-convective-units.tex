@@ -288,7 +288,7 @@ This field is the name of the first surface to which radiant heat transfer from 
 
 This field is paired with the preceding surface name (previous field) to define the fraction of radiant heat transfer leaving the baseboard heater that is incident on a particular surface. Users should take into account the directionality of baseboard heaters and their location when defining the value for this input field.
 
-\paragraph{Note on Fraction of Radiant Energy Incident on People and to Surfaces}\label{note-on-fraction-of-radiant-energy-incident-on-people-and-to-surfaces}
+\textbf{\emph{Note on Fraction of Radiant Energy Incident on \hyperref[people]{People} and to Surfaces}}
 
 The radiant energy from the baseboard heater is defined by the total energy input to the baseboard heater from the steam loop times the fraction radiant field shown above. This radiant energy is distributed to surfaces and people using the surface and fraction pairs and the fraction to people input by the user. These fractions to people and surfaces must add up to 1.0. In other words, in an input file, the following relation should be maintained by the user input:
 
@@ -493,7 +493,7 @@ This field is the name of the first surface to which radiant heat transfer from 
 
 This field is paired with the preceding surface name (previous field) to define the fraction of radiant heat transfer leaving the baseboard heater that is incident on a particular surface. Users should take into account the directionality of baseboard heaters and their location when defining the value for this input field.
 
-\paragraph{Note on Fraction of Radiant Energy Incident on People and to Surfaces}\label{note-on-fraction-of-radiant-energy-incident-on-people-and-to-surfaces-1}
+\textbf{\emph{Note on Fraction of Radiant Energy Incident on \hyperref[people]{People} and to Surfaces}}
 
 The radiant energy from the baseboard heater is defined by the total energy input to the baseboard heater times the fraction radiant field shown above. This radiant energy is distributed to surfaces and people using the surface and fraction pairs and the fraction to people input by the user. These fractions to people and surfaces must add up to 1.0. In other words, in an input file, the following relation should be maintained by the user input:
 
@@ -741,6 +741,8 @@ ZoneHVAC:CoolingPanel:RadiantConvective:Water,
   Zone 1 South Wall,         !- Surface 3 Name
   0.25;                      !- Fraction of Radiant Energy to Surface 3
 \end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-radiant-convective-cooling-panel}
 
 \begin{itemize}
 \item
@@ -1041,7 +1043,7 @@ This is the electric power required by the baseboard to the zone it is serving i
 
 This low temperature radiant system (hydronic) is a component of zone equipment that is intended to model any ``radiant system'' where water is used to supply/remove energy to/from a building surface (wall, ceiling, or floor). The component is controlled to meet any remaining zone load not met by other equipment in the zone that have higher priority. The control is accomplished by throttling the hot or chilled water flow to the unit. Note that this system will only control based on the radiant system controls defined by this input syntax and not via a zone thermostat such as is used for forced air systems. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.~ If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
 
-This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantelectric]{ZoneHVAC:LowTemperatureRadiant:Electric}).
+This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantelectric]{ZoneHVAC:LowTemperatureRadiant:Electric}).  The key characteristic of this variable flow low temperature radiant system is that the actual fluid flow rate being supplied to the radiant system changes as conditions within the zone change.  While the fluid temperature is determined by the plant loops defined by other user input, this type of radiant system will control fluid flow in an attempt to meet the remaining zone heating or cooling load based on the controls outlined below.   Low temperature radiant systems that vary the inlet temperature while keeping the fluid flow rate through the radiant system constant should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantconstantflow]{ZoneHVAC:LowTemperatureRadiant:ConstantFlow}).
 
 \subsubsection{Inputs}\label{inputs-5-022}
 
@@ -1363,9 +1365,9 @@ This is the demand placed on the cooling fluid plant loop connection serving the
 
 This low temperature radiant system (hydronic) is a component of zone equipment that is intended to model any ``radiant system'' where water is used to supply/remove energy to/from a building surface (wall, ceiling, or floor). The component is controlled via control schedules as described in the syntax below and does not require a zone thermostat. Note that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.~ If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
 
-The constant flow system differs from the hydronic system describe above in what it controls. The hydronic system varies the flow rate through the radiant system based on some control temperature. The constant flow system keeps flow rate constant via a local circulation pump and varies the water temperature that is sent to the radiant system. This is accomplished with a mixing valve that is controlled by a sensor. This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantelectric]{ZoneHVAC:LowTemperatureRadiant:Electric}). Low temperature radiant systems that vary the flow rate through the radiant system should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantvariableflow]{ZoneHVAC:LowTemperatureRadiant:VariableFlow})
+The constant flow system differs from the variable flow system describe above in what it controls. The variable flow system varies the flow rate through the radiant system based on some control temperature. The constant flow system keeps flow rate through the radiant system constant.  In order to meet the zone load, the constant flow system will varies the water temperature that is sent to the radiant system. This is accomplished with a mixing valve that is controlled by a sensor and a local recirculation pump. This model covers a wide range of low temperature radiant systems: heating and/or cooling, panel or embedded pipes, etc. It is not intended to simulate high temperature electric or gas radiant heaters. Those devices will be handled by a separate model and different input syntax. Low temperature radiant systems that use electric resistance heating should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantelectric]{ZoneHVAC:LowTemperatureRadiant:Electric}). Low temperature radiant systems that vary the flow rate through the radiant system should also be defined using separate input syntax (ref: \hyperref[zonehvaclowtemperatureradiantvariableflow]{ZoneHVAC:LowTemperatureRadiant:VariableFlow}).
 
-One of the other differences between this model and the variable flow hydronic radiant system is that the constant flow radiant system has a built-in local secondary loop. It will recirculate flow coming out of the system and mix this with flow from the loop to arrive at the desired inlet temperature to the radiant system (note that this model has the temperature sensor AFTER the pump to insure proper inlet temperature to the radiant system). The local loop also contains a pump which is assumed to be upstream of the radiant system and after the mixing valve. So, the local loop can have some recirculation. The flow from the main loop may also bypass the radiant system if more than enough flow is available and the main loop is also a constant flow system.
+One of the other differences between this model and the variable flow low temperature radiant system is that the constant flow system has a built-in local secondary loop. It will recirculate flow coming out of the system and mix this with flow from the loop to arrive at the desired inlet temperature to the radiant system (note that this model has the temperature sensor AFTER the pump to insure proper inlet temperature to the radiant system). The local loop also contains a pump which is assumed to be upstream of the radiant system and after the mixing valve. So, the local loop can have some recirculation. The flow from the main loop may also bypass the radiant system if more than enough flow is available and the main loop is also a constant flow system.
 
 \subsubsection{Inputs}\label{inputs-6-019}
 
@@ -1902,7 +1904,7 @@ This field is an unique user assigned name for the list of surfaces that are act
 
 \paragraph{Field Set: Surface Name, Flow Fraction to Surface}\label{field-set-surface-name-flow-fraction-to-surface}
 
-The pairs of Surface Name, Flow Fraction to Surface are used in several objects. There can be up to 10 specified. The object is extensible so more can be added.
+The pairs of Surface Name, Flow Fraction to Surface are used in several objects. There can be up to 10 specified. This object is extensible, so additional pairs of these fields can be added to the end of this object.
 
 \paragraph{Field: Surface \textless{}x\textgreater{} Name}\label{field-surface-x-name-2}
 

@@ -7021,3 +7021,532 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(windowAtticSkylight, state->dataSurface->AllSurfaceListReportOrder[38]);
     EXPECT_EQ(roofWestRoof, state->dataSurface->AllSurfaceListReportOrder[39]);
 }
+
+TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "    ZONE ONE,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0, 0, 0,                            !- X,Y,Z  {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "Material:NoMass,",
+        "R13LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "2.290965,                !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+
+        "Material:NoMass,",
+        "R31LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "5.456,                   !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !-Visible Absorptance",
+
+        "Material,",
+        "C5 - 4 IN HW CONCRETE,   !- Name",
+        "MediumRough,             !- Roughness",
+        "0.1014984,               !- Thickness {m}",
+        "1.729577,                !- Conductivity {W/m-K}",
+        "2242.585,                !- Density {kg/m3}",
+        "836.8000,                !- Specific Heat {J/kg-K}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.6500000,               !- Solar Absorptance",
+        "0.6500000;               !- Visible Absorptance",
+
+        "Construction,",
+        "R13WALL,                 !- Name",
+        "R13LAYER;                !- Outside Layer",
+
+        "Construction,",
+        "FLOOR,                   !- Name",
+        "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+
+        "Construction,",
+        "ROOF31,                  !- Name",
+        "R31LAYER;                !- Outside Layer",
+
+        "BuildingSurface:Detailed,",
+        "    00_Floor,                !- Name",
+        "    Floor,                   !- Surface Type",
+        "    FLOOR,                   !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Adiabatic,               !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000000, 0, 0.0,                   !- X,Y,Z  1 {m}",
+        "    0, 4, 0.0,                          !- X,Y,Z  2 {m}",
+        "    8, 4, 0,                            !- X,Y,Z  3 {m}",
+        "    8, 0, 0;                            !- X,Y,Z  4 {m}",
+
+        "    BuildingSurface:Detailed,",
+        "    01Wall_E,                !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    8, 0, 2.5,                          !- X,Y,Z  1 {m}",
+        "    8, 0, 0,                            !- X,Y,Z  2 {m}",
+        "    8, 4, 0,                            !- X,Y,Z  3 {m}",
+        "    8, 4, 2.5;                          !- X,Y,Z  4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "02Wall_S, !-Name",
+        "Wall, !-Surface Type",
+        "R13WALL, !-Construction Name",
+        "ZONE ONE, !-Zone Name",
+        "Outdoors, !-Outside Boundary Condition",
+        ", !-Outside Boundary Condition Object",
+        "SunExposed, !-Sun Exposure",
+        "WindExposed, !-Wind Exposure",
+        "0.5000000, !-View Factor to Ground",
+        "6, !-Number of Vertices",
+        "0, 0, 2.5, !-X, Y, Z 1{m}",
+        "0, 0, 0, !-X, Y, Z 2{m}",
+        "8, 0, 0, !-X, Y, Z 3{m}",
+        "8, 0, 2.5, !-X, Y, Z 4{m}",
+        "6, 0, 4, !-X, Y, Z 5{m}",
+        "2, 0, 4; !-X, Y, Z 6{m}",
+
+        "BuildingSurface:Detailed,",
+        "    03Wall_W,                !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0, 4, 2.5,                          !- X,Y,Z  1 {m}",
+        "    0, 4, 0,                            !- X,Y,Z  2 {m}",
+        "    0, 0, 0,                            !- X,Y,Z  3 {m}",
+        "    0, 0, 2.5;                          !- X,Y,Z  4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "    04Wall_N,                !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    6,                       !- Number of Vertices",
+        "    8, 4, 2.5,                          !- X,Y,Z  1 {m}",
+        "    8, 4, 0,                            !- X,Y,Z  2 {m}",
+        "    0, 4, 0,                            !- X,Y,Z  3 {m}",
+        "    0, 4, 2.5,                          !- X,Y,Z  4 {m}",
+        "    2, 4, 4,                         !- X,Y,Z  5 {m}",
+        "    6, 4, 4;                         !- X,Y,Z  6 {m}",
+
+        "BuildingSurface:Detailed,",
+        "    05Roof_C,                !- Name",
+        "    Roof,                    !- Surface Type",
+        "    ROOF31,                  !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    2, 4, 4,                         !- X,Y,Z  1 {m}",
+        "    2, 0, 4,                         !- X,Y,Z  2 {m}",
+        "    6, 0, 4,                         !- X,Y,Z  3 {m}",
+        "    6, 4, 4;                         !- X,Y,Z  4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "06Roof_E,                !- Name",
+        "Roof,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "autocalculate,           !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "6, 0, 4,                         !- X,Y,Z  1 {m}",
+        "8, 0, 2.5,                          !- X,Y,Z  2 {m}",
+        "8, 4, 2.5,                          !- X,Y,Z  3 {m}",
+        "6, 4, 4;                         !- X,Y,Z  4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "07Roof_W,                !- Name",
+        "Roof,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "autocalculate,           !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "2, 4, 4,                         !- X,Y,Z  1 {m}",
+        "0, 4, 2.5,                          !- X,Y,Z  2 {m}",
+        "0, 0, 2.5,                          !- X,Y,Z  3 {m}",
+        "2, 0, 4;                         !- X,Y,Z  4 {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetSurfaceData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    // Center
+    EXPECT_NEAR(state->dataSurface->Surface(6).GrossArea, 16.0, 1e-6);
+    EXPECT_NEAR(state->dataSurface->Surface(6).Area, 16.0, 1e-6);
+
+    // East
+    EXPECT_NEAR(state->dataSurface->Surface(7).GrossArea, 10.0, 1e-6);
+    EXPECT_NEAR(state->dataSurface->Surface(7).Area, 10.0, 1e-6);
+
+    // West
+    EXPECT_NEAR(state->dataSurface->Surface(8).GrossArea, 10.0, 1e-6);
+    EXPECT_NEAR(state->dataSurface->Surface(8).Area, 10.0, 1e-6);
+
+    Real64 totalGrossCeilingArea = 0.0;
+    totalGrossCeilingArea =
+        state->dataSurface->Surface(6).GrossArea + state->dataSurface->Surface(7).GrossArea + state->dataSurface->Surface(8).GrossArea;
+
+    Real64 totalNetCeilingArea = 0.0;
+    totalNetCeilingArea = state->dataSurface->Surface(6).Area + state->dataSurface->Surface(7).Area + state->dataSurface->Surface(8).Area;
+
+    Real64 ceilingHeight_expected = 0.0;
+    ceilingHeight_expected = 3.25 * (state->dataSurface->Surface(7).GrossArea + state->dataSurface->Surface(8).GrossArea) / totalGrossCeilingArea +
+                             4.0 * state->dataSurface->Surface(6).GrossArea / totalGrossCeilingArea;
+
+    EXPECT_NEAR(state->dataHeatBal->Zone(1).CeilingHeight, ceilingHeight_expected, 1e-6);
+}
+
+TEST_F(EnergyPlusFixture, Use_Gross_Roof_Area_for_Averge_Height_with_Window)
+{
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "    ZONE ONE,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0, 0, 0,                            !- X,Y,Z  {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "Material:NoMass,",
+        "R13LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "2.290965,                !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !- Visible Absorptance",
+
+        "Material:NoMass,",
+        "R31LAYER,                !- Name",
+        "Rough,                   !- Roughness",
+        "5.456,                   !- Thermal Resistance {m2-K/W}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.7500000,               !- Solar Absorptance",
+        "0.7500000;               !-Visible Absorptance",
+
+        "Material,",
+        "C5 - 4 IN HW CONCRETE,   !- Name",
+        "MediumRough,             !- Roughness",
+        "0.1014984,               !- Thickness {m}",
+        "1.729577,                !- Conductivity {W/m-K}",
+        "2242.585,                !- Density {kg/m3}",
+        "836.8000,                !- Specific Heat {J/kg-K}",
+        "0.9000000,               !- Thermal Absorptance",
+        "0.6500000,               !- Solar Absorptance",
+        "0.6500000;               !- Visible Absorptance",
+
+        "WindowMaterial:Glazing,",
+        "    CLEAR 3MM,               !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.003,                   !- Thickness {m}",
+        "    0.837,                   !- Solar Transmittance at Normal Incidence",
+        "    0.075,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.075,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.898,                   !- Visible Transmittance at Normal Incidence",
+        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+
+        "WindowMaterial:Glazing,",
+        "    GREY 3MM,                !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.003,                   !- Thickness {m}",
+        "    0.626,                   !- Solar Transmittance at Normal Incidence",
+        "    0.061,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.061,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.611,                   !- Visible Transmittance at Normal Incidence",
+        "    0.061,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.061,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+
+        "WindowMaterial:Gas,",
+        "    AIR 13MM,                !- Name",
+        "    Air,                     !- Gas Type",
+        "    0.0127;                  !- Thickness {m}",
+
+        "Construction,",
+        "R13WALL,                 !- Name",
+        "R13LAYER;                !- Outside Layer",
+
+        "Construction,",
+        "FLOOR,                   !- Name",
+        "C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+
+        "Construction,",
+        "ROOF31,                  !- Name",
+        "R31LAYER;                !- Outside Layer",
+
+        "Construction,",
+        "    Dbl Clr 3mm/13mm Air,    !- Name",
+        "    CLEAR 3MM,               !- Outside Layer",
+        "    AIR 13MM,                !- Layer 2",
+        "    CLEAR 3MM;               !- Layer 3",
+
+        "BuildingSurface:Detailed,",
+        "    00_Floor,                !- Name",
+        "    Floor,                   !- Surface Type",
+        "    FLOOR,                   !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Adiabatic,               !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000000, 0, 0.0,                   !- X,Y,Z  1 {m}",
+        "    0, 4, 0.0,                          !- X,Y,Z  2 {m}",
+        "    8, 4, 0,                            !- X,Y,Z  3 {m}",
+        "    8, 0, 0;                            !- X,Y,Z  4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "    01Wall_E,                !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    8, 0, 2.5,                          !- X,Y,Z  1 {m}",
+        "    8, 0, 0,                            !- X,Y,Z  2 {m}",
+        "    8, 4, 0,                            !- X,Y,Z  3 {m}",
+        "    8, 4, 2.5;                          !- X,Y,Z  4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "02Wall_S, !-Name",
+        "Wall, !-Surface Type",
+        "R13WALL, !-Construction Name",
+        "ZONE ONE, !-Zone Name",
+        "Outdoors, !-Outside Boundary Condition",
+        ", !-Outside Boundary Condition Object",
+        "SunExposed, !-Sun Exposure",
+        "WindExposed, !-Wind Exposure",
+        "0.5000000, !-View Factor to Ground",
+        "6, !-Number of Vertices",
+        "0, 0, 2.5, !-X, Y, Z 1{m}",
+        "0, 0, 0, !-X, Y, Z 2{m}",
+        "8, 0, 0, !-X, Y, Z 3{m}",
+        "8, 0, 2.5, !-X, Y, Z 4{m}",
+        "6, 0, 4, !-X, Y, Z 5{m}",
+        "2, 0, 4; !-X, Y, Z 6{m}",
+
+        "BuildingSurface:Detailed,",
+        "    03Wall_W,                !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0, 4, 2.5,                          !- X,Y,Z  1 {m}",
+        "    0, 4, 0,                            !- X,Y,Z  2 {m}",
+        "    0, 0, 0,                            !- X,Y,Z  3 {m}",
+        "    0, 0, 2.5;                          !- X,Y,Z  4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "    04Wall_N,                !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    6,                       !- Number of Vertices",
+        "    8, 4, 2.5,                          !- X,Y,Z  1 {m}",
+        "    8, 4, 0,                            !- X,Y,Z  2 {m}",
+        "    0, 4, 0,                            !- X,Y,Z  3 {m}",
+        "    0, 4, 2.5,                          !- X,Y,Z  4 {m}",
+        "    2, 4, 4,                         !- X,Y,Z  5 {m}",
+        "    6, 4, 4;                         !- X,Y,Z  6 {m}",
+
+        "BuildingSurface:Detailed,",
+        "    05Roof_C,                !- Name",
+        "    Roof,                    !- Surface Type",
+        "    ROOF31,                  !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    2, 4, 4,                         !- X,Y,Z  1 {m}",
+        "    2, 0, 4,                         !- X,Y,Z  2 {m}",
+        "    6, 0, 4,                         !- X,Y,Z  3 {m}",
+        "    6, 4, 4;                         !- X,Y,Z  4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "06Roof_E,                !- Name",
+        "Roof,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "autocalculate,           !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "6, 0, 4,                         !- X,Y,Z  1 {m}",
+        "8, 0, 2.5,                          !- X,Y,Z  2 {m}",
+        "8, 4, 2.5,                          !- X,Y,Z  3 {m}",
+        "6, 4, 4;                         !- X,Y,Z  4 {m}",
+
+        "BuildingSurface:Detailed,",
+        "07Roof_W,                !- Name",
+        "Roof,                    !- Surface Type",
+        "R13WALL,                 !- Construction Name",
+        "ZONE ONE,                !- Zone Name",
+        "Outdoors,                !- Outside Boundary Condition",
+        ",                        !- Outside Boundary Condition Object",
+        "SunExposed,              !- Sun Exposure",
+        "WindExposed,             !- Wind Exposure",
+        "autocalculate,           !- View Factor to Ground",
+        "4,                       !- Number of Vertices",
+        "2, 4, 4,                         !- X,Y,Z  1 {m}",
+        "0, 4, 2.5,                          !- X,Y,Z  2 {m}",
+        "0, 0, 2.5,                          !- X,Y,Z  3 {m}",
+        "2, 0, 4;                         !- X,Y,Z  4 {m}",
+
+        "FenestrationSurface:Detailed,",
+        "    Skylight_C,              !- Name",
+        "    WINDOW,                  !- Surface Type",
+        "    Dbl Clr 3mm/13mm Air,    !- Construction Name",
+        "    05Roof_C,                !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    autocalculate,           !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1,                       !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2.2, 0.2, 4,                         !- X,Y,Z  1 {m}",
+        "    5.8, 0.2, 4,                         !- X,Y,Z  2 {m}",
+        "    5.8, 3.8, 4,                         !- X,Y,Z  3 {m}",
+        "    2.2, 3.8, 4;                         !- X,Y,Z  4 {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetProjectControlData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetMaterialData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetConstructData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetZoneData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    SetupZoneGeometry(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    GetSurfaceData(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    // Center
+    EXPECT_NEAR(state->dataSurface->Surface(6).GrossArea, 16.0, 1e-6);
+    EXPECT_NEAR(state->dataSurface->Surface(6).Area, 3.04, 1e-6);
+
+    // East
+    EXPECT_NEAR(state->dataSurface->Surface(7).GrossArea, 10.0, 1e-6);
+    EXPECT_NEAR(state->dataSurface->Surface(7).Area, 10.0, 1e-6);
+
+    // West
+    EXPECT_NEAR(state->dataSurface->Surface(8).GrossArea, 10.0, 1e-6);
+    EXPECT_NEAR(state->dataSurface->Surface(8).Area, 10.0, 1e-6);
+
+    Real64 totalGrossCeilingArea = 0.0;
+    totalGrossCeilingArea =
+        state->dataSurface->Surface(6).GrossArea + state->dataSurface->Surface(7).GrossArea + state->dataSurface->Surface(8).GrossArea;
+
+    Real64 totalNetCeilingArea = 0.0;
+    totalNetCeilingArea = state->dataSurface->Surface(6).Area + state->dataSurface->Surface(7).Area + state->dataSurface->Surface(8).Area;
+
+    Real64 ceilingHeight_expected = 0.0;
+    ceilingHeight_expected = 3.25 * (state->dataSurface->Surface(7).GrossArea + state->dataSurface->Surface(8).GrossArea) / totalGrossCeilingArea +
+                             4.0 * state->dataSurface->Surface(6).GrossArea / totalGrossCeilingArea;
+
+    Real64 ceilingHeight_old = 0.0;
+    ceilingHeight_old = 3.25 * (state->dataSurface->Surface(7).Area + state->dataSurface->Surface(8).Area) / totalNetCeilingArea +
+                        4.0 * state->dataSurface->Surface(6).Area / totalNetCeilingArea;
+
+    EXPECT_NEAR(state->dataHeatBal->Zone(1).CeilingHeight, ceilingHeight_expected, 1e-6);
+    EXPECT_NE(state->dataHeatBal->Zone(1).CeilingHeight, ceilingHeight_old);
+}

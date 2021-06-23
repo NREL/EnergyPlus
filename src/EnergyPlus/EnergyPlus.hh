@@ -139,7 +139,6 @@ using ObjexxFCL::Vector4;
 // ObjexxFCL Functions
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/bit.hh>
 #include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/numeric.hh>
@@ -201,9 +200,5 @@ using ObjexxFCL::trim;
 using ObjexxFCL::trimmed;
 using ObjexxFCL::uppercase;
 using ObjexxFCL::uppercased;
-using ObjexxFCL::bit::bit_and;
-using ObjexxFCL::bit::bit_shift;
-using ObjexxFCL::bit::bit_transfer;
-using ObjexxFCL::bit::bit_xor;
 
 #endif
