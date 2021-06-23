@@ -186,7 +186,7 @@ This factor is used in the timestep calculation to find the diffuse irradiance o
 
 \begin{equation}
 \begin{split}
-QRadSWOutIncBmToDiffReflGnd(RecSurfNum) = 
+QRadSWOutIncBmToDiffReflGnd(RecSurfNum) =
 \\BeamSolarRad * {\rho_{gnd}} * (WeightNow * SurfReflFacBmToDiffSolGnd(RecSurfNum,HourOfDay)
 \\+ WeightPreviousHour * SurfReflFacBmToDiffSolGnd(RecSurfNum,PreviousHour))
 \end{split}
@@ -194,7 +194,7 @@ QRadSWOutIncBmToDiffReflGnd(RecSurfNum) =
 
 \subsection{Beam Solar Radiation Specularly Reflected from Obstructions}\label{beam-solar-radiation-specularly-reflected-from-obstructions}
 
-Figure~\ref{fig:two-dimensional-schematic-showing-specular} shows schematically how specular (beam-to-beam) reflection from an obstruction is calculated. \footnote{The ground surface is assumed to be diffusely reflecting so there is no specular reflection from the ground. The program could be improved by adding a ground surface specular component, which could be important for snow-cover conditions.} 
+Figure~\ref{fig:two-dimensional-schematic-showing-specular} shows schematically how specular (beam-to-beam) reflection from an obstruction is calculated. \footnote{The ground surface is assumed to be diffusely reflecting so there is no specular reflection from the ground. The program could be improved by adding a ground surface specular component, which could be important for snow-cover conditions.}
 
 \begin{figure}[hbtp] % fig 56
 \centering
@@ -234,7 +234,7 @@ The factor for specular reflection of beam solar from obstruction onto a receivi
 
 \begin{equation}
 \begin{split}
-{{SurfReflFacBmToBmSolObs(RecSurfNum,IHr) } = 
+{SurfReflFacBmToBmSolObs(RecSurfNum,IHr) } =
 \\\sum\limits_{\scriptstyle \substack{specularly \, reflecting \, surfaces}} \left[ {\frac{1}{{{N_{rec}}}}\sum\limits_1^{{N_{rec}}} {{f_{C,glazed}}{\rho_{spec}}({\alpha_C})\cos {\alpha_D}} } \right]
 \end{split}
 \end{equation}
@@ -257,8 +257,8 @@ The above specular reflection factor is used in the timestep calculation to find
 
 \begin{equation}
 \begin{split}
-QRadSWOutIncBmToBmReflObsRecSurfNum) = 
-\\BeamSolarRad * (WeightNow * SurfReflFacBmToBmSolObs(RecSurfNum,HourOfDay) 
+QRadSWOutIncBmToBmReflObsRecSurfNum) =
+\\BeamSolarRad * (WeightNow * SurfReflFacBmToBmSolObs(RecSurfNum,HourOfDay)
 \\+ WeightPreviousHour * SurfReflFacBmToBmSolObs(RecSurfNum,PreviousHour))
 \end{split}
 \end{equation}
