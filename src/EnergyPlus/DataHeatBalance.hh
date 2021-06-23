@@ -339,6 +339,15 @@ namespace DataHeatBalance {
         int ZoneNum = 0;                   // Pointer to Zone wich contains this space
         std::string SpaceType = "General"; // Space type tag
         EPVector<std::string> Tags;        // Optional tags for reporting
+        EPVector<int> Surfaces;            // Pointers to surfaces in this space
+        bool EnforcedReciprocity;          // if zone required forced reciprocity --
+        //   less out of bounds temperature errors allowed
+        int RadiantEnclosureNum = 0; // Radiant exchange enclosure this space belongs to
+        int SolarEnclosureNum = 0;   // Solar distribution enclosure this space belongs to
+        Real64 FloorArea = 0.0;            // Floor area used for this space
+        Real64 ExtWindowArea = 0.0;        // Exterior Window Area for Zone
+        Real64 TotalSurfArea = 0.0;              // Total surface area for Zone
+        Real64 OriginZ = 0.0;                    // Z origin  [m]
     };
 
     struct SpaceListData
@@ -421,8 +430,6 @@ namespace DataHeatBalance {
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneExtSolarSurfaceList;    // List of exterior solar surfaces in a zone
-        int RadiantEnclosureNum;                     // Radiant exchange enclosure this zone belongs to (related to air boundaries)
-        int SolarEnclosureNum;                       // Solar distribution enclosure this zone belongs to (related to air boundaries)
 
         Real64 OutDryBulbTemp;                 // Zone outside dry bulb air temperature (C)
         bool OutDryBulbTempEMSOverrideOn;      // if true, EMS is calling to override the surface's outdoor air temp
@@ -454,12 +461,10 @@ namespace DataHeatBalance {
         bool HasLtsRetAirGain;       // TRUE means that zone lights return air heat > 0.0 calculated from plenum temperature
         bool HasAirFlowWindowReturn; // TRUE means that zone has return air flow from windows
         // from refrigeration cases for this zone
-        Real64 InternalHeatGains;     // internal loads (W)
-        Real64 NominalInfilVent;      // internal infiltration/ventilation
-        Real64 NominalMixing;         // internal mixing/cross mixing
-        bool TempOutOfBoundsReported; // if any temp out of bounds errors, first will show zone details.
-        bool EnforcedReciprocity;     // if zone required forced reciprocity --
-        //   less out of bounds temperature errors allowed
+        Real64 InternalHeatGains;           // internal loads (W)
+        Real64 NominalInfilVent;            // internal infiltration/ventilation
+        Real64 NominalMixing;               // internal mixing/cross mixing
+        bool TempOutOfBoundsReported;       // if any temp out of bounds errors, first will show zone details.
         int ZoneMinCO2SchedIndex;           // Index for the schedule the schedule which determines minimum CO2 concentration
         int ZoneMaxCO2SchedIndex;           // Index for the schedule the schedule which determines maximum CO2 concentration
         int ZoneContamControllerSchedIndex; // Index for this schedule
@@ -508,7 +513,7 @@ namespace DataHeatBalance {
               OpaqOrIntMassSurfaceLast(-1), WindowSurfaceFirst(0), WindowSurfaceLast(-1), OpaqOrWinSurfaceFirst(0), OpaqOrWinSurfaceLast(-1),
               TDDDomeFirst(0), TDDDomeLast(-1), InsideConvectionAlgo(ASHRAESimple), NumSurfaces(0), NumSubSurfaces(0), NumShadingSurfaces(0),
               OutsideConvectionAlgo(ASHRAESimple), Centroid(0.0, 0.0, 0.0), MinimumX(0.0), MaximumX(0.0), MinimumY(0.0), MaximumY(0.0), MinimumZ(0.0),
-              MaximumZ(0.0), RadiantEnclosureNum(0), SolarEnclosureNum(0),
+              MaximumZ(0.0),
 
               OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
               OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
@@ -516,8 +521,8 @@ namespace DataHeatBalance {
               LinkedOutAirNode(0.0), isPartOfTotalArea(true), isNominalOccupied(false), isNominalControlled(false), TotOccupants(0.0),
               AirHBimBalanceErrIndex(0), NoHeatToReturnAir(false), RefrigCaseRA(false), HasAdjustedReturnTempByITE(false),
               AdjustedReturnTempByITE(0.0), HasLtsRetAirGain(false), HasAirFlowWindowReturn(false), InternalHeatGains(0.0), NominalInfilVent(0.0),
-              NominalMixing(0.0), TempOutOfBoundsReported(false), EnforcedReciprocity(false), ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0),
-              ZoneContamControllerSchedIndex(0), FlagCustomizedZoneCap(false),
+              NominalMixing(0.0), TempOutOfBoundsReported(false), ZoneMinCO2SchedIndex(0), ZoneMaxCO2SchedIndex(0), ZoneContamControllerSchedIndex(0),
+              FlagCustomizedZoneCap(false),
               // Hybrid Modeling
               ZoneMeasuredTemperature(0.0), ZoneMeasuredHumidityRatio(0.0), ZoneMeasuredCO2Concentration(0.0), ZoneMeasuredSupplyAirTemperature(0.0),
               ZoneMeasuredSupplyAirFlowRate(0.0), ZoneMeasuredSupplyAirHumidityRatio(0.0), ZoneMeasuredSupplyAirCO2Concentration(0.0),

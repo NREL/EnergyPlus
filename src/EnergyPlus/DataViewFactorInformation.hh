@@ -61,12 +61,12 @@ namespace EnergyPlus {
 
 namespace DataViewFactorInformation {
 
-    struct ZoneViewFactorInformation
+    struct EnclosureViewFactorInformation
     {
         // Members
         std::string Name;                   // Enclosure name
-        std::vector<std::string> ZoneNames; // Zone names which are part of this enclosure
-        std::vector<int> ZoneNums;          // Zones which are part of this enclosure
+        std::vector<std::string> SpaceNames; // Space names which are part of this enclosure
+        std::vector<int> SpaceNums;          // Spaces which are part of this enclosure
         int NumOfSurfaces;                  // Number of surfaces in the enclosure
         Array2D<Real64> F;                  // View Factors
         Array2D<Real64> ScriptF;            // Hottel's Script F //Tuned Transposed
@@ -85,7 +85,7 @@ namespace DataViewFactorInformation {
         int TotalEnclosureDaylRefPoints;    // Total number of daylighting reference points in enclosure
 
         // Default Constructor
-        ZoneViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0), TotalEnclosureDaylRefPoints(0)
+        EnclosureViewFactorInformation() : NumOfSurfaces(0), FloorArea(0.0), ExtWindowArea(0.0), TotalSurfArea(0.0), TotalEnclosureDaylRefPoints(0)
         {
         }
     };
@@ -97,15 +97,15 @@ struct ViewFactorInfoData : BaseGlobalStruct
 
     int NumOfRadiantEnclosures = 0; // Number of radiant enclosures
     int NumOfSolarEnclosures = 0;   // Number of solar enclosures
-    Array1D<DataViewFactorInformation::ZoneViewFactorInformation> ZoneRadiantInfo;
-    Array1D<DataViewFactorInformation::ZoneViewFactorInformation> ZoneSolarInfo;
+    Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> EnclRadInfo;
+    Array1D<DataViewFactorInformation::EnclosureViewFactorInformation> EnclSolInfo;
 
     void clear_state() override
     {
         NumOfRadiantEnclosures = 0;
         NumOfSolarEnclosures = 0;
-        ZoneRadiantInfo.clear();
-        ZoneSolarInfo.clear();
+        EnclRadInfo.clear();
+        EnclSolInfo.clear();
     }
 };
 

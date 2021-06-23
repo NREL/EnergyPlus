@@ -4942,9 +4942,9 @@ namespace HeatBalanceManager {
         state.dataGlobal->NumOfZones = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         state.dataHeatBal->Zone.allocate(state.dataGlobal->NumOfZones);
-        state.dataViewFactor->ZoneRadiantInfo.allocate(state.dataGlobal->NumOfZones);
-        state.dataViewFactor->ZoneSolarInfo.allocate(state.dataGlobal->NumOfZones);
-        state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfZones);
+        state.dataViewFactor->EnclRadInfo.allocate(state.dataGlobal->NumOfSpaces);
+        state.dataViewFactor->EnclSolInfo.allocate(state.dataGlobal->NumOfSpaces);
+        state.dataDaylightingData->ZoneDaylight.allocate(state.dataGlobal->NumOfSpaces);
 
         ZoneLoop = 0;
 

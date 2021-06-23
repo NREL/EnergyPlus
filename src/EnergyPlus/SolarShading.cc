@@ -955,7 +955,7 @@ void AllocateModuleArrays(EnergyPlusData &state)
 
     DisplayString(state, "Initializing Zone and Enclosure Report Variables");
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-        auto &thisEnclosureName = state.dataViewFactor->ZoneSolarInfo(enclosureNum).Name;
+        auto &thisEnclosureName = state.dataViewFactor->EnclSolInfo(enclosureNum).Name;
         SetupOutputVariable(state,
                             "Zone Windows Total Transmitted Solar Radiation Rate",
                             OutputProcessor::Unit::W,
@@ -3134,7 +3134,7 @@ void ComputeIntSolarAbsorpFactors(EnergyPlusData &state)
     state.dataSolarShading->ISABSF = 0.0;
 
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-        auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
+        auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
 
         AreaSum = 0.0;
         TestFractSum = 0.0;
@@ -6324,7 +6324,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
         Real64 BABSZone = 0.0;
 
         // Loop over exterior surfaces in this zone
-        auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
+        auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
         // delete values from previous timestep
         if (state.dataHeatBal->AnyBSDF) state.dataSurface->SurfWinACFOverlap = 0.0;
 
@@ -8552,7 +8552,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
         state.dataHeatBal->ZoneDifSolFrExtWinsRep(enclosureNum) = 0;
         state.dataHeatBal->ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = 0;
         state.dataHeatBal->ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = 0;
-        auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
+        auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
 
         for (int const SurfNum : thisEnclosure.SurfacePtr) {
             if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Window) continue;
@@ -10058,7 +10058,7 @@ void CheckGlazingShadingStatusChange(EnergyPlusData &state)
     }
     if (!state.dataGlobal->AndShadingControlInModel) return;
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
-        for (int const SurfNum : state.dataViewFactor->ZoneRadiantInfo(enclosureNum).SurfacePtr) {
+        for (int const SurfNum : state.dataViewFactor->EnclRadInfo(enclosureNum).SurfacePtr) {
             bool surfShadingStatusChange =
                 state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum) != state.dataSurface->SurfWinShadingFlag(SurfNum) ||
                 state.dataSurface->Surface(SurfNum).activeShadedConstruction != state.dataSurface->Surface(SurfNum).activeShadedConstructionPrev ||
@@ -11623,7 +11623,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
 
     // Loop over all zones doing initial distribution of diffuse solar to interior heat transfer surfaces
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
-        auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(enclosureNum));
+        auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclosureNum));
         // Init Zone accumulators for debugging
         //            ZoneDifSolarTrans = 0.0;
         //            ZoneDifSolarDistAbsorbedTotl = 0.0;
@@ -11668,12 +11668,12 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
 
                 // View factor from current (sending) window DifTransSurfNum to current (receiving) surface HeatTransSurfNum
                 int const HTenclosureSurfNum =
-                    state.dataSurface->Surface(HeatTransSurfNum).SolarEnclSurfIndex; // HT surface index for ZoneSolarInfo.SurfacePtr and F arrays
-                int const enclosureNum = state.dataSurface->Surface(HeatTransSurfNum).SolarEnclIndex; // index for ZoneSolarInfo
+                    state.dataSurface->Surface(HeatTransSurfNum).SolarEnclSurfIndex; // HT surface index for EnclSolInfo.SurfacePtr and F arrays
+                int const enclosureNum = state.dataSurface->Surface(HeatTransSurfNum).SolarEnclIndex; // index for EnclSolInfo
                 int const DTenclSurfNum =
-                    state.dataSurface->Surface(DifTransSurfNum).SolarEnclSurfIndex; // Window surface index for ZoneSolarInfo.SurfacePtr and F arrays
+                    state.dataSurface->Surface(DifTransSurfNum).SolarEnclSurfIndex; // Window surface index for EnclSolInfo.SurfacePtr and F arrays
 
-                ViewFactor = state.dataViewFactor->ZoneSolarInfo(enclosureNum).F(HTenclosureSurfNum, DTenclSurfNum);
+                ViewFactor = state.dataViewFactor->EnclSolInfo(enclosureNum).F(HTenclosureSurfNum, DTenclSurfNum);
                 // debug ViewFactorTotal
                 //                    ViewFactorTotal += ViewFactor; // debug
 
@@ -12148,7 +12148,7 @@ void CalcInteriorWinTransDifSolInitialDistribution(
     ViewFactorTotal = 0.0;
     WinDifSolarTrans = IntWinDifSolarTransW;
 
-    auto &thisEnclosure(state.dataViewFactor->ZoneSolarInfo(IntWinEnclosureNum));
+    auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(IntWinEnclosureNum));
     // Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
     Real64 InitialZoneDifSolReflW_zone(0.0);
     for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
@@ -12159,12 +12159,12 @@ void CalcInteriorWinTransDifSolInitialDistribution(
 
         // View factor from current (sending) window IntWinSurfNum to current (receiving) surface HeatTransSurfNum
         int HTenclosureSurfNum =
-            state.dataSurface->Surface(HeatTransSurfNum).SolarEnclSurfIndex;            // HT surface index for ZoneSolarInfo.SurfacePtr and F arrays
-        int enclosureNum = state.dataSurface->Surface(HeatTransSurfNum).SolarEnclIndex; // index for ZoneSolarInfo
+            state.dataSurface->Surface(HeatTransSurfNum).SolarEnclSurfIndex;            // HT surface index for EnclSolInfo.SurfacePtr and F arrays
+        int enclosureNum = state.dataSurface->Surface(HeatTransSurfNum).SolarEnclIndex; // index for EnclSolInfo
         int IntWinEnclSurfNum =
-            state.dataSurface->Surface(IntWinSurfNum).SolarEnclSurfIndex; // Window surface index for ZoneSolarInfo.SurfacePtr and F arrays
+            state.dataSurface->Surface(IntWinSurfNum).SolarEnclSurfIndex; // Window surface index for EnclSolInfo.SurfacePtr and F arrays
 
-        ViewFactor = state.dataViewFactor->ZoneSolarInfo(enclosureNum).F(HTenclosureSurfNum, IntWinEnclSurfNum);
+        ViewFactor = state.dataViewFactor->EnclSolInfo(enclosureNum).F(HTenclosureSurfNum, IntWinEnclSurfNum);
         // debug ViewFactorTotal
         ViewFactorTotal += ViewFactor; // debug
 
