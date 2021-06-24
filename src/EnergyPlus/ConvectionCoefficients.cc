@@ -258,7 +258,7 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
         for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
             if (present(ZoneToResimulate)) {
-                if ((ZoneNum != ZoneToResimulate) && (state.dataSurface->AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
+                if ((ZoneNum != ZoneToResimulate) && (state.dataSurface->SurfAdjacentZone(SurfNum) != ZoneToResimulate)) {
                     continue; // skip surfaces that are not associated with this zone
                 }
             }
@@ -282,8 +282,8 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                 if (SELECT_CASE_var1 == ASHRAESimple) {
                     CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-                    if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
-                        state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+                    if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
+                        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 
                 } else if (SELECT_CASE_var1 == ASHRAETARP) {
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
@@ -293,8 +293,8 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     }
 
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-                    if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
-                        state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+                    if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
+                        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 
                 } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
 
@@ -311,14 +311,14 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     ShowFatalError(state, "Unhandled convection coefficient algorithm.");
                 }
             } else { // Interior convection has been set by the user with "value" or "schedule"
-                state.dataHeatBal->HConvIn(SurfNum) = SetIntConvectionCoeff(state, SurfNum);
+                state.dataHeatBalSurf->SurfHConvInt(SurfNum) = SetIntConvectionCoeff(state, SurfNum);
                 // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-                if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
-                    state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+                if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
+                    state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
             }
 
             if (state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum)) {
-                state.dataHeatBal->HConvIn(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
+                state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     Real64 hConst = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(hConst);
@@ -2556,11 +2556,12 @@ void CalcASHRAESimpleIntConvCoeff(EnergyPlusData &state,
             return CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, cosTilt);
         };
     } else {
-        state.dataHeatBal->HConvIn(SurfNum) = CalcASHRAESimpleIntConvCoeff(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
+            CalcASHRAESimpleIntConvCoeff(SurfaceTemperature, ZoneMeanAirTemperature, Surface(SurfNum).CosTilt);
     }
 
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-    state.dataHeatBal->HConvIn(SurfNum) = max(state.dataHeatBal->HConvIn(SurfNum), state.dataHeatBal->LowHConvLimit);
+    state.dataHeatBalSurf->SurfHConvInt(SurfNum) = max(state.dataHeatBalSurf->SurfHConvInt(SurfNum), state.dataHeatBal->LowHConvLimit);
 }
 
 Real64 CalcASHRAETARPNatural(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt)
@@ -2627,13 +2628,13 @@ void CalcASHRAEDetailedIntConvCoeff(EnergyPlusData &state,
             return CalcASHRAETARPNatural(Tsurf, Tamb, cosTilt);
         };
     } else {
-        state.dataHeatBal->HConvIn(SurfNum) = CalcASHRAETARPNatural(
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = CalcASHRAETARPNatural(
             SurfaceTemperature, ZoneMeanAirTemperature, -Surface(SurfNum).CosTilt); // negative CosTilt because CosTilt is relative to exterior
     }
 
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-    if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
-        state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+    if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 }
 
 void CalcDetailedHcInForDVModel(EnergyPlusData &state,
@@ -2885,7 +2886,7 @@ void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
                                                        state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
             };
         } else {
-            state.dataHeatBal->HConvIn(SurfNum) =
+            state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
                 CalcCeilingDiffuserIntConvCoeff(state,
                                                 ACH,
                                                 SurfaceTemperatures(SurfNum),
@@ -2895,8 +2896,8 @@ void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
                                                 Surface(SurfNum).Height,
                                                 state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow);
             // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-            if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
-                state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+            if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
+                state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
         }
     } // SurfNum
 }
@@ -2981,19 +2982,19 @@ void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
             // assume that reference air temp for user defined convection coefficient is the mean air temperature (=MAT)
             // Calculate the convection coefficient based on inlet (supply) air conditions
             if (Tilt < 45.0) {
-                state.dataHeatBal->HConvIn(SurfNum) = 0.49 * std::pow(ACH, 0.8); // Ceiling correlation
+                state.dataHeatBalSurf->SurfHConvInt(SurfNum) = 0.49 * std::pow(ACH, 0.8); // Ceiling correlation
             } else if (Tilt > 135.0) {
-                state.dataHeatBal->HConvIn(SurfNum) = 0.13 * std::pow(ACH, 0.8); // Floor correlation
+                state.dataHeatBalSurf->SurfHConvInt(SurfNum) = 0.13 * std::pow(ACH, 0.8); // Floor correlation
             } else {
-                state.dataHeatBal->HConvIn(SurfNum) = 0.19 * std::pow(ACH, 0.8); // Wall correlation
+                state.dataHeatBalSurf->SurfHConvInt(SurfNum) = 0.19 * std::pow(ACH, 0.8); // Wall correlation
             }
             // set flag for reference air temperature
             state.dataSurface->SurfTAirRef(SurfNum) = ZoneSupplyAirTemp;
         }
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-        if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
-            state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+        if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
+            state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 
     } // SurfNum
 
@@ -3130,12 +3131,12 @@ void CalcTrombeWallIntConvCoeff(EnergyPlusData &state,
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 ShowFatalError(state, "Trombe wall convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
             }
-            state.dataHeatBal->HConvIn(SurfNum) = 2.0 * HConvNet;
+            state.dataHeatBalSurf->SurfHConvInt(SurfNum) = 2.0 * HConvNet;
         }
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-        if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
-            state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+        if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
+            state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
     }
 }
 
@@ -3519,16 +3520,16 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
         ShowFatalError(state, "ISO15099 convection model not applicable for foundation surface =" + Surface(SurfNum).Name);
     }
 
-    state.dataHeatBal->HConvIn(SurfNum) =
+    state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
         CalcISO15099WindowIntConvCoeff(state, SurfaceTemperature, AirTemperature, AirHumRat, Height, TiltDeg, sineTilt);
 
     // EMS override point (Violates Standard 15099?  throw warning? scary.
     if (state.dataSurface->SurfEMSOverrideIntConvCoef(SurfNum))
-        state.dataHeatBal->HConvIn(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataSurface->SurfEMSValueForIntConvCoef(SurfNum);
 
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-    if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
-        state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+    if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 }
 
 void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state)
@@ -4364,7 +4365,7 @@ void ManageInsideAdaptiveConvectionAlgo(EnergyPlusData &state, int const SurfNum
     // simple worker routine takes surface classification and fills in model to use (IntConvHcModelEq) for that surface
     MapIntConvClassificationToHcModels(state, SurfNum);
 
-    EvaluateIntHcModels(state, SurfNum, state.dataSurface->SurfIntConvHcModelEq(SurfNum), state.dataHeatBal->HConvIn(SurfNum));
+    EvaluateIntHcModels(state, SurfNum, state.dataSurface->SurfIntConvHcModelEq(SurfNum), state.dataHeatBalSurf->SurfHConvInt(SurfNum));
     // if ( std::isnan( HConvIn( SurfNum ) ) ) { // Use IEEE_IS_NAN when GFortran supports it
     //// throw Error
     // ShowSevereError(state,  "Inside convection coefficient is out of bound = " + Surface( SurfNum ).Name );
@@ -4722,7 +4723,7 @@ void EvaluateIntHcModels(EnergyPlusData &state,
             state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_ISO15099Windows) {
             CalcISO15099WindowIntConvCoeff(state, SurfNum, Tsurface, Tzone);
-            tmpHc = state.dataHeatBal->HConvIn(SurfNum);
+            tmpHc = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
             state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
         } else if (SELECT_CASE_var == HcInt_GoldsteinNovoselacCeilingDiffuserWindow) {
             tmpHc = CalcGoldsteinNovoselacCeilingDiffuserWindow(state.dataSurface->SurfIntConvZonePerimLength(SurfNum),
@@ -8550,12 +8551,12 @@ void CalcASTMC1340ConvCoeff(EnergyPlusData &state,
     Real64 Volume = state.dataHeatBal->Zone(ZoneNum).Volume; // Volume of the zone in m3
     Real64 Vair = std::pow(Volume, OneThird) * CalcZoneSystemACH(state, ZoneNum) / 3600;
 
-    state.dataHeatBal->HConvIn(SurfNum) =
+    state.dataHeatBalSurf->SurfHConvInt(SurfNum) =
         CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperature, ZoneMeanAirTemperature, Vair, Surface(SurfNum).Tilt);
 
     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-    if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit)
-        state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
+    if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
+        state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 }
 
 Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt)

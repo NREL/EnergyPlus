@@ -154,8 +154,6 @@ namespace WindowComplexManager {
                               int &NBasis                         // Calculated Basis length
     );
 
-    void DetermineMaxBackSurfaces(EnergyPlusData &state);
-
     void ConstructBasis(EnergyPlusData &state,
                         int const IConst, // Index for accessing Construct array
                         BasisStruct &Basis);
