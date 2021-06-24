@@ -13397,7 +13397,7 @@ namespace SurfaceGeometry {
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FrameDivider = 0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).FromWindow5DataFile = false;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionWidth = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionOrientation = 0;
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionOrientation = DataSurfaces::Orientation::Unassigned;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysWidth = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysHeight = 0.0;
             for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
@@ -13789,7 +13789,7 @@ namespace SurfaceGeometry {
         // Assign vertices to the new window; modify vertices of original window.
         // In the following, vertices are numbered counter-clockwise with vertex #1 at the upper left.
 
-        if (state.dataConstruction->Construct(IConst).W5FileMullionOrientation == Vertical) {
+        if (state.dataConstruction->Construct(IConst).W5FileMullionOrientation == DataSurfaces::Orientation::Vertical) {
 
             // VERTICAL MULLION: original window is modified to become left-hand glazing (system #1);
             // new window is created to become right-hand glazing (system #2)

@@ -3052,7 +3052,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                 }
                                 state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum) = AbsDiffBlind * (SkySolarInc + GndSolarInc);
 
-                                if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
+                                if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
+                                    DataSurfaces::Orientation::Horizontal) {
                                     Real64 ACosTlt = std::abs(Surface(SurfNum).CosTilt);
                                     Real64 AbsDiffBlindGnd;
                                     Real64 AbsDiffBlindSky;
@@ -3100,7 +3101,8 @@ void InitSolarHeatGains(EnergyPlusData &state)
                             // SurfWinA is from InteriorSolarDistribution
                             if (ANY_BLIND(ShadeFlag)) {
                                 int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-                                if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
+                                if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
+                                    DataSurfaces::Orientation::Horizontal) {
                                     Real64 ACosTlt = std::abs(Surface(SurfNum).CosTilt); // Absolute value of cosine of surface tilt angle
                                     Real64 AbsDiffGlassLayGnd; // System glass layer ground diffuse solar absorptance with blind on
                                     Real64 AbsDiffGlassLaySky; // System glass layer sky diffuse solar absorptance with blind on

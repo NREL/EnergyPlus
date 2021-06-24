@@ -436,7 +436,7 @@ namespace DaylightingManager {
     void ProfileAngle(EnergyPlusData &state,
                       int const SurfNum,                // Surface number
                       Vector3<Real64> const &CosDirSun, // Solar direction cosines
-                      int const HorOrVert,              // If HORIZONTAL, calculates ProfileAngHor
+                      DataSurfaces::Orientation const HorOrVert, // If HORIZONTAL, calculates ProfileAngHor
                       Real64 &ProfileAng                // Solar profile angle (radians).
     );
 

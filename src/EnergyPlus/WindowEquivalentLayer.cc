@@ -229,9 +229,9 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
 
         if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) {
             CFS(EQLNum).VBLayerPtr = sLayer;
-            if (state.dataMaterial->Material(MaterNum).SlatOrientation == Horizontal) {
+            if (state.dataMaterial->Material(MaterNum).SlatOrientation == DataSurfaces::Orientation::Horizontal) {
                 CFS(EQLNum).L(sLayer).LTYPE = LayerType::VBHOR;
-            } else if (state.dataMaterial->Material(MaterNum).SlatOrientation == Vertical) {
+            } else if (state.dataMaterial->Material(MaterNum).SlatOrientation == DataSurfaces::Orientation::Vertical) {
                 CFS(EQLNum).L(sLayer).LTYPE = LayerType::VBVER;
             }
             CFS(EQLNum).L(sLayer).SWP_MAT.RHOSFBD = state.dataMaterial->Material(MaterNum).ReflFrontBeamDiff;
@@ -8217,9 +8217,9 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
         for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
             if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                 if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBHOR) {
-                    ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
+                    ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataSurfaces::Orientation::Horizontal, ProfAngVer);
                 } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBVER) {
-                    ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
+                    ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataSurfaces::Orientation::Vertical, ProfAngHor);
                 }
             }
         }
@@ -8233,9 +8233,9 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                     if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBHOR) {
-                        ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
+                        ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataSurfaces::Orientation::Horizontal, ProfAngVer);
                     } else if (CFS(EQLNum).L(Lay).LTYPE == LayerType::VBVER) {
-                        ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
+                        ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, DataSurfaces::Orientation::Vertical, ProfAngHor);
                     }
                 }
             }

@@ -203,44 +203,44 @@ namespace Material {
         bool SimpleWindowVTinputByUser; // false means not input, true means user provide VT input
         bool WarnedForHighDiffusivity;  // used to limit error messaging to just the first instance
         // Equivalent Layer (ASHWAT) Model
-        Real64 ReflFrontBeamBeam;    // Beam-Beam solar reflectance front at zero incident
-        Real64 ReflBackBeamBeam;     // Beam-Beam solar reflectance back at zero incident
-        Real64 TausFrontBeamBeam;    // Beam-Beam solar transmittance front at zero incident
-        Real64 TausBackBeamBeam;     // Beam-Beam solar transmittance back at zero incident
-        Real64 ReflFrontBeamBeamVis; // Beam-Beam visible reflectance front at zero incident
-        Real64 ReflBackBeamBeamVis;  // Beam-Beam visible reflectance back at zero incident
-        Real64 TausFrontBeamBeamVis; // Beam-Beam visible transmittance front at zero incident
-        Real64 TausBackBeamBeamVis;  // Beam-Beam visible transmittance back at zero incident
-        Real64 ReflFrontBeamDiff;    // Beam-Diffuse solar reflectance front at zero incident
-        Real64 ReflBackBeamDiff;     // Beam-Diffuse solar reflectance back at zero incident
-        Real64 TausFrontBeamDiff;    // Beam-Diffuse solar transmittance front at zero incident
-        Real64 TausBackBeamDiff;     // Beam-Diffuse solar transmittance back at zero incident
-        Real64 ReflFrontBeamDiffVis; // Beam-Diffuse visible reflectance front at zero incident
-        Real64 ReflBackBeamDiffVis;  // Beam-Diffuse visible reflectance back at zero incident
-        Real64 TausFrontBeamDiffVis; // Beam-Diffuse visible transmittance front at zero incident
-        Real64 TausBackBeamDiffVis;  // Beam-Diffuse visible transmittance back at zero incident
-        Real64 ReflFrontDiffDiff;    // Diffuse-Diffuse solar reflectance front
-        Real64 ReflBackDiffDiff;     // Diffuse-Diffuse solar reflectance back
-        Real64 TausDiffDiff;         // Diffuse-Diffuse solar transmittance (front and back)
-        Real64 ReflFrontDiffDiffVis; // Diffuse-Diffuse visible reflectance front
-        Real64 ReflBackDiffDiffVis;  // Diffuse-Diffuse visible reflectance back
-        Real64 TausDiffDiffVis;      // Diffuse-Diffuse visible transmittance (front and back)
-        Real64 EmissThermalFront;    // Front side thermal or infrared Emissivity
-        Real64 EmissThermalBack;     // Back side thermal or infrared Emissivity
-        Real64 TausThermal;          // Thermal transmittance (front and back)
-        int GapVentType;             // Gap Ven type for equivalent Layer window model
-        bool ISPleatedDrape;         // if pleated drape= true, if nonpleated drape = false
-        Real64 PleatedDrapeWidth;    // width of the pleated drape fabric section
-        Real64 PleatedDrapeLength;   // length of the pleated drape fabric section
-        Real64 ScreenWireSpacing;    // insect screen wire spacing
-        Real64 ScreenWireDiameter;   // insect screen wire diameter
-        Real64 SlatWidth;            // slat width
-        Real64 SlatSeparation;       // slat separation
-        Real64 SlatCrown;            // slat crown
-        Real64 SlatAngle;            // slat angle
-        int SlatAngleType;           // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
-        int SlatOrientation;         // horizontal or vertical
-        std::string GasName;         // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
+        Real64 ReflFrontBeamBeam;                  // Beam-Beam solar reflectance front at zero incident
+        Real64 ReflBackBeamBeam;                   // Beam-Beam solar reflectance back at zero incident
+        Real64 TausFrontBeamBeam;                  // Beam-Beam solar transmittance front at zero incident
+        Real64 TausBackBeamBeam;                   // Beam-Beam solar transmittance back at zero incident
+        Real64 ReflFrontBeamBeamVis;               // Beam-Beam visible reflectance front at zero incident
+        Real64 ReflBackBeamBeamVis;                // Beam-Beam visible reflectance back at zero incident
+        Real64 TausFrontBeamBeamVis;               // Beam-Beam visible transmittance front at zero incident
+        Real64 TausBackBeamBeamVis;                // Beam-Beam visible transmittance back at zero incident
+        Real64 ReflFrontBeamDiff;                  // Beam-Diffuse solar reflectance front at zero incident
+        Real64 ReflBackBeamDiff;                   // Beam-Diffuse solar reflectance back at zero incident
+        Real64 TausFrontBeamDiff;                  // Beam-Diffuse solar transmittance front at zero incident
+        Real64 TausBackBeamDiff;                   // Beam-Diffuse solar transmittance back at zero incident
+        Real64 ReflFrontBeamDiffVis;               // Beam-Diffuse visible reflectance front at zero incident
+        Real64 ReflBackBeamDiffVis;                // Beam-Diffuse visible reflectance back at zero incident
+        Real64 TausFrontBeamDiffVis;               // Beam-Diffuse visible transmittance front at zero incident
+        Real64 TausBackBeamDiffVis;                // Beam-Diffuse visible transmittance back at zero incident
+        Real64 ReflFrontDiffDiff;                  // Diffuse-Diffuse solar reflectance front
+        Real64 ReflBackDiffDiff;                   // Diffuse-Diffuse solar reflectance back
+        Real64 TausDiffDiff;                       // Diffuse-Diffuse solar transmittance (front and back)
+        Real64 ReflFrontDiffDiffVis;               // Diffuse-Diffuse visible reflectance front
+        Real64 ReflBackDiffDiffVis;                // Diffuse-Diffuse visible reflectance back
+        Real64 TausDiffDiffVis;                    // Diffuse-Diffuse visible transmittance (front and back)
+        Real64 EmissThermalFront;                  // Front side thermal or infrared Emissivity
+        Real64 EmissThermalBack;                   // Back side thermal or infrared Emissivity
+        Real64 TausThermal;                        // Thermal transmittance (front and back)
+        int GapVentType;                           // Gap Ven type for equivalent Layer window model
+        bool ISPleatedDrape;                       // if pleated drape= true, if nonpleated drape = false
+        Real64 PleatedDrapeWidth;                  // width of the pleated drape fabric section
+        Real64 PleatedDrapeLength;                 // length of the pleated drape fabric section
+        Real64 ScreenWireSpacing;                  // insect screen wire spacing
+        Real64 ScreenWireDiameter;                 // insect screen wire diameter
+        Real64 SlatWidth;                          // slat width
+        Real64 SlatSeparation;                     // slat separation
+        Real64 SlatCrown;                          // slat crown
+        Real64 SlatAngle;                          // slat angle
+        int SlatAngleType;                         // slat angle control type, 0=fixed, 1=maximize solar, 2=block beam
+        DataSurfaces::Orientation SlatOrientation; // horizontal or vertical
+        std::string GasName;                       // Name of gas type ("Air", "Argon", "Krypton", "Xenon")
         HysteresisPhaseChange::HysteresisPhaseChange *phaseChange = nullptr;
         bool GlassSpectralAndAngle;    // if SpectralAndAngle is an entered choice
         int GlassSpecAngTransDataPtr;  // Data set index of transmittance as a function of spectral and angle associated with a window glass material
@@ -277,8 +277,8 @@ namespace Material {
               ReflBackDiffDiff(0.0), TausDiffDiff(0.0), ReflFrontDiffDiffVis(0.0), ReflBackDiffDiffVis(0.0), TausDiffDiffVis(0.0),
               EmissThermalFront(0.0), EmissThermalBack(0.0), TausThermal(0.0), GapVentType(0), ISPleatedDrape(false), PleatedDrapeWidth(0.0),
               PleatedDrapeLength(0.0), ScreenWireSpacing(0.0), ScreenWireDiameter(0.0), SlatWidth(0.0), SlatSeparation(0.0), SlatCrown(0.0),
-              SlatAngle(0.0), SlatAngleType(0), SlatOrientation(0), GlassSpectralAndAngle(false), GlassSpecAngTransDataPtr(0),
-              GlassSpecAngFRefleDataPtr(0), GlassSpecAngBRefleDataPtr(0)
+              SlatAngle(0.0), SlatAngleType(0), SlatOrientation(DataSurfaces::Orientation::Unassigned), GlassSpectralAndAngle(false),
+              GlassSpecAngTransDataPtr(0), GlassSpecAngFRefleDataPtr(0), GlassSpecAngBRefleDataPtr(0)
         {
         }
     };

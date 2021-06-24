@@ -7714,7 +7714,7 @@ namespace WindowManager {
 
                             } else if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) {
                                 SlateOrientation = "Horizontal";
-                                if (state.dataMaterial->Material(Layer).SlatOrientation == Vertical) {
+                                if (state.dataMaterial->Material(Layer).SlatOrientation == DataSurfaces::Orientation::Vertical) {
                                     SlateOrientation = "Vertical";
                                 }
                                 // Formats

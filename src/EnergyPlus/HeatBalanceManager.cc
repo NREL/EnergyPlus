@@ -72,6 +72,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
@@ -3431,9 +3432,9 @@ namespace HeatBalanceManager {
 
             state.dataHeatBal->Blind(Loop).MaterialNumber = MaterNum;
             if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
-                state.dataHeatBal->Blind(Loop).SlatOrientation = Horizontal;
+                state.dataHeatBal->Blind(Loop).SlatOrientation = DataSurfaces::Orientation::Horizontal;
             } else if (UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
-                state.dataHeatBal->Blind(Loop).SlatOrientation = Vertical;
+                state.dataHeatBal->Blind(Loop).SlatOrientation = DataSurfaces::Orientation::Vertical;
             }
             state.dataHeatBal->Blind(Loop).SlatWidth = MaterialProps(1);
             state.dataHeatBal->Blind(Loop).SlatSeparation = MaterialProps(2);
@@ -3721,9 +3722,9 @@ namespace HeatBalanceManager {
             state.dataMaterial->Material(MaterNum).ROnly = true;
 
             if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
-                state.dataMaterial->Material(MaterNum).SlatOrientation = Horizontal;
+                state.dataMaterial->Material(MaterNum).SlatOrientation = DataSurfaces::Orientation::Horizontal;
             } else if (UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
-                state.dataMaterial->Material(MaterNum).SlatOrientation = Vertical;
+                state.dataMaterial->Material(MaterNum).SlatOrientation = DataSurfaces::Orientation::Vertical;
             }
             state.dataMaterial->Material(MaterNum).SlatWidth = MaterialProps(1);
             state.dataMaterial->Material(MaterNum).SlatSeparation = MaterialProps(2);
@@ -7292,9 +7293,9 @@ namespace HeatBalanceManager {
                 state.dataConstruction->Construct(ConstrNum).W5FileGlazingSysHeight = WinHeight(IGlSys);
                 state.dataConstruction->Construct(ConstrNum).W5FileGlazingSysWidth = WinWidth(IGlSys);
                 if (UtilityRoutines::SameString(MullionOrientation, "Vertical")) {
-                    state.dataConstruction->Construct(ConstrNum).W5FileMullionOrientation = Vertical;
+                    state.dataConstruction->Construct(ConstrNum).W5FileMullionOrientation = DataSurfaces::Orientation::Vertical;
                 } else if (UtilityRoutines::SameString(MullionOrientation, "Horizontal")) {
-                    state.dataConstruction->Construct(ConstrNum).W5FileMullionOrientation = Horizontal;
+                    state.dataConstruction->Construct(ConstrNum).W5FileMullionOrientation = DataSurfaces::Orientation::Horizontal;
                 } else {
                 }
                 state.dataConstruction->Construct(ConstrNum).W5FileMullionWidth = MullionWidth;
@@ -7472,9 +7473,9 @@ namespace HeatBalanceManager {
                     state.dataSurface->FrameDivider(FrDivNum).FrameEmis = FrameEmis;
                     state.dataSurface->FrameDivider(FrDivNum).FrameEdgeWidth = 0.06355; // 2.5 in
                     if (UtilityRoutines::SameString(MullionOrientation, "Vertical")) {
-                        state.dataSurface->FrameDivider(FrDivNum).MullionOrientation = Vertical;
+                        state.dataSurface->FrameDivider(FrDivNum).MullionOrientation = DataSurfaces::Orientation::Vertical;
                     } else if (UtilityRoutines::SameString(MullionOrientation, "Horizontal")) {
-                        state.dataSurface->FrameDivider(FrDivNum).MullionOrientation = Horizontal;
+                        state.dataSurface->FrameDivider(FrDivNum).MullionOrientation = DataSurfaces::Orientation::Horizontal;
                     }
                     if (UtilityRoutines::SameString(DividerType(IGlSys), "DividedLite")) {
                         state.dataSurface->FrameDivider(FrDivNum).DividerType = DividedLite;
