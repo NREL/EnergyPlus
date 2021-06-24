@@ -849,7 +849,7 @@ void GatherForPredefinedReport(EnergyPlusData &state)
     Array1D<Real64> computedNetArea; // holds the gross wall area minus the window and door areas
 
     // the following variables are for the CalcNominalWindowCond call but only SHGCSummer is needed
-    Real64 nomCond(-1.0);
+    Real64 nomCond;
     Real64 SHGCSummer;
     Real64 TransSolNorm;
     Real64 TransVisNorm;
@@ -1348,7 +1348,9 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
     state.dataHeatBal->SurfTempEffBulkAir.dimension(state.dataSurface->TotSurfaces, ZoneInitialTemp);
     state.dataHeatBal->HConvIn.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBal->CoeffAdjRatioIn.dimension(state.dataSurface->TotSurfaces, 1.0);
     state.dataHeatBalSurf->HcExtSurf.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->CoeffAdjRatioOut.dimension(state.dataSurface->TotSurfaces, 1.0);
     state.dataHeatBalSurf->HAirExtSurf.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->HSkyExtSurf.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->HGrdExtSurf.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -7368,11 +7370,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         if (Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 
         // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-        if ((Surface(surfNum).Class == SurfaceClass::Window) & (Surface(surfNum).ExtBoundCond == ExternalEnvironment)) {
-            HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataWindowManager->coeffAdjRatioIn;
-        } else {
-            HConvIn = state.dataHeatBal->HConvIn(surfNum);
-        }
+        HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataHeatBal->coeffAdjRatioIn(surfNum);
         auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->TempSurfIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
         state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
         state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
@@ -8113,11 +8111,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-            if (Surface(surfNum).Class == SurfaceClass::Window && (Surface(surfNum).ExtBoundCond == ExternalEnvironment)) {
-                HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataWindowManager->coeffAdjRatioIn;
-            } else {
-                HConvIn = state.dataHeatBal->HConvIn(surfNum);
-            }
+            HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataHeatBal->coeffAdjRatioIn(surfNum);
             auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->TempSurfIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
             state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
             state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;

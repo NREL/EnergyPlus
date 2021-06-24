@@ -4471,6 +4471,7 @@ namespace HeatBalanceManager {
 
         state.dataHeatBal->NominalRforNominalUCalculation.dimension(state.dataHeatBal->TotConstructs, 0.0);
         state.dataHeatBal->NominalU.dimension(state.dataHeatBal->TotConstructs, 0.0);
+        state.dataHeatBal->CoeffAdjRatio.dimension(state.dataHeatBal->TotConstructs, 1.0);
 
         // Allocate the array to the number of constructions/initialize selected variables
         state.dataConstruction->Construct.allocate(state.dataHeatBal->TotConstructs);

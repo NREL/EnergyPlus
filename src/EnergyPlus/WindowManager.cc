@@ -1658,6 +1658,15 @@ namespace WindowManager {
         } // End of surface loop
 
         ReportGlass(state);
+
+        // overwrite surface convective and radiative adjustment ratio
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if ((state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) && (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment)) {
+                ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+                state.dataHeatBal->CoeffAdjRatioIn(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+                state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+            }
+        }
     }
 
     //*****************************************************************************************
@@ -2903,9 +2912,9 @@ namespace WindowManager {
         // update exterior environment surface heat loss reporting
         Tsout = SurfOutsideTemp + state.dataWindowManager->TKelvin;
         state.dataHeatBalSurf->QdotConvOutRep(SurfNum) =
-            -surface.Area * state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * (Tsout - state.dataWindowManager->tout);
+            -surface.Area * state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
         state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum) =
-            -state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * (Tsout - state.dataWindowManager->tout);
+            -state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
         state.dataHeatBalSurf->QConvOutReport(SurfNum) = state.dataHeatBalSurf->QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
         Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
@@ -2941,7 +2950,7 @@ namespace WindowManager {
         // Radiation emission to air rate
         state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
         state.dataHeatBalSurf->QHeatEmiReport(SurfNum) =
-            surface.Area * state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * (Tsout - state.dataWindowManager->tout) +
+            surface.Area * state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout) +
             state.dataHeatBalSurf->QAirExtReport(SurfNum);
     }
 
@@ -3387,24 +3396,24 @@ namespace WindowManager {
 
                 if (SELECT_CASE_var == 1) {
                     Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                               state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * state.dataWindowManager->tout +
+                               state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * state.dataWindowManager->tout +
                                state.dataWindowManager->AbsRadGlassFace(1);
                     Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
-                               state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn * state.dataWindowManager->tin +
+                               state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatioIn(SurfNum) * state.dataWindowManager->tin +
                                state.dataWindowManager->AbsRadGlassFace(2);
 
                     Aface(1, 1) =
-                        hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut;
+                        hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
                     Aface(2, 1) = -state.dataWindowManager->scon(1);
                     Aface(1, 2) = -state.dataWindowManager->scon(1);
-                    Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn;
+                    Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatioIn(SurfNum);
 
                     if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                         Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
                                    state.dataWindowManager->AbsRadGlassFace(2);
                         Bface(3) = state.dataWindowManager->Rmir * TauShIR * RhoGlIR2 * EpsShIR1 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(1);
                         Bface(4) = state.dataWindowManager->Rmir * EpsShIR2 +
-                                   state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn * state.dataWindowManager->tin +
+                                   state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatioIn(SurfNum) * state.dataWindowManager->tin +
                                    AbsRadShadeFace(2);
 
                         Aface(2, 2) = hr(2) * (1 - RhoShIR1) / ShGlReflFacIR + state.dataWindowManager->scon(1) + hcv;
@@ -3413,21 +3422,21 @@ namespace WindowManager {
                         Aface(3, 3) = hr(3) * (1 - RhoGlIR2 * (EpsShIR1 + RhoShIR1)) / ShGlReflFacIR + sconsh + hcv;
                         Aface(4, 3) = -sconsh;
                         Aface(3, 4) = -sconsh;
-                        Aface(4, 4) = hr(4) + sconsh + state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn;
+                        Aface(4, 4) = hr(4) + sconsh + state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatioIn(SurfNum);
                     }
 
                     if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
                                    state.dataWindowManager->AbsRadGlassFace(1);
                         Bface(3) = state.dataWindowManager->Outir * EpsShIR1 +
-                                   state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * state.dataWindowManager->tout +
+                                   state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * state.dataWindowManager->tout +
                                    AbsRadShadeFace(1);
                         Bface(4) =
                             state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
 
                         Aface(1, 1) = hr(1) * (1 - RhoShIR2) / ShGlReflFacIR + state.dataWindowManager->scon(1) + hcv;
                         Aface(4, 1) = -state.dataWindowManager->emis(1) * hr(4) / ShGlReflFacIR;
-                        Aface(3, 3) = hr(3) + sconsh + state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut;
+                        Aface(3, 3) = hr(3) + sconsh + state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
                         Aface(4, 3) = -sconsh;
                         Aface(1, 4) = -hr(1) * EpsShIR2 / ShGlReflFacIR;
                         Aface(3, 4) = -sconsh;
@@ -5089,15 +5098,9 @@ namespace WindowManager {
             // Interaction with shade or blind, if one of these is present, is ignored. See below for
             // separate calculation of shade/blind temperature.
 
-            if ((state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) &&
-                state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-                rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataWindowManager->coeffAdjRatioOut;
-                rguess(state.dataWindowManager->nglface + 1) =
-                    1.0 / (state.dataWindowManager->hcin + hrad) * state.dataWindowManager->coeffAdjRatioOut;
-            } else {
-                rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad);
-                rguess(state.dataWindowManager->nglface + 1) = 1.0 / (state.dataWindowManager->hcin + hrad);
-            }
+            rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
+            rguess(state.dataWindowManager->nglface + 1) =
+                1.0 / (state.dataWindowManager->hcin + hrad) * state.dataHeatBal->CoeffAdjRatioIn(SurfNum);
 
             for (i = 2; i <= state.dataWindowManager->nglface; i += 2) {
                 rguess(i) = 1.0 / state.dataWindowManager->scon(i / 2);
@@ -6558,14 +6561,7 @@ namespace WindowManager {
         // EPTeam - believe that is done on input.
         state.dataWindowManager->nglface = 2 * state.dataWindowManager->ngllayer;
         state.dataWindowManager->tilt = 90.0; // Assume vertical window
-        if (state.dataWindowManager->coeffAdjRatioIn <= 0) {
-            state.dataWindowManager->coeffAdjRatioIn = 1.0;
-            state.dataWindowManager->coeffAdjRatioOut = 1.0;
-        }
 
-        // for debugging
-        // state.dataWindowManager->coeffAdjRatioIn = Real64(1.0);
-        // state.dataWindowManager->coeffAdjRatioOut = Real64(1.0);
         if (WinterSummerFlag == 1) { // Winter
             // LKL Oct 2007:  According to Window5, Winter environmental conditions are:
             state.dataWindowManager->tin = 294.15;  // Inside air temperature (69.8F, 21.C)
@@ -6943,14 +6939,9 @@ namespace WindowManager {
         // only compute adjustment ratio when there is valid user input U
         if ((WinterSummerFlag == 1)) {
             if (inputU > 0) {
-                Real64 adjRatio = inputU / NominalConductance;
-                state.dataWindowManager->coeffAdjRatioIn = adjRatio;
-                state.dataWindowManager->coeffAdjRatioOut = adjRatio;
+                state.dataHeatBal->CoeffAdjRatio(ConstrNum) = inputU / NominalConductance;
                 NominalConductance =
-                    1.0 / (rOut * 1 / state.dataWindowManager->coeffAdjRatioOut + Rbare + rIn * 1 / state.dataWindowManager->coeffAdjRatioIn);
-            } else {
-                state.dataWindowManager->coeffAdjRatioIn = 1.0;
-                state.dataWindowManager->coeffAdjRatioOut = 1.0;
+                    1.0 / (rOut * 1 / state.dataHeatBal->CoeffAdjRatio(ConstrNum) + Rbare + rIn * 1 / state.dataHeatBal->CoeffAdjRatio(ConstrNum));
             }
         }
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
@@ -7039,7 +7030,7 @@ namespace WindowManager {
         iter = 0;
 
         // Initialize face temperatures
-        StartingWinTempsForNominalCond(state);
+        StartingWinTempsForNominalCond(state, ConstrNum);
 
         // Calculate radiative conductance
         errtemp = errtemptol * 2.0;
@@ -7097,17 +7088,17 @@ namespace WindowManager {
 
                 if (SELECT_CASE_var == 1) {
                     Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                               state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut * state.dataWindowManager->tout +
+                               state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatio(ConstrNum) * state.dataWindowManager->tout +
                                state.dataWindowManager->AbsRadGlassFace(1);
                     Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
-                               state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn * state.dataWindowManager->tin +
+                               state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatio(ConstrNum) * state.dataWindowManager->tin +
                                state.dataWindowManager->AbsRadGlassFace(2);
 
                     Aface(1, 1) =
-                        hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataWindowManager->coeffAdjRatioOut;
+                        hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
                     Aface(2, 1) = -state.dataWindowManager->scon(1);
                     Aface(1, 2) = -state.dataWindowManager->scon(1);
-                    Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataWindowManager->coeffAdjRatioIn;
+                    Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
 
                 } else if (SELECT_CASE_var == 2) {
                     WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
@@ -7254,7 +7245,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void StartingWinTempsForNominalCond(EnergyPlusData &state)
+    void StartingWinTempsForNominalCond(EnergyPlusData &state, int const ConstrNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7284,8 +7275,8 @@ namespace WindowManager {
         Real64 ressum;  // Resistance sum (m2-K/W)
 
         // fixme: check exterior
-        rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataWindowManager->coeffAdjRatioOut;
-        rguess(state.dataWindowManager->nglface + 1) = 1.0 / (hcinStartValue + hrad) * state.dataWindowManager->coeffAdjRatioOut;
+        rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+        rguess(state.dataWindowManager->nglface + 1) = 1.0 / (hcinStartValue + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
 
         for (i = 2; i <= state.dataWindowManager->nglface; i += 2) {
             rguess(i) = 1.0 / state.dataWindowManager->scon(i / 2);

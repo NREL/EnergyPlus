@@ -2142,10 +2142,12 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
+    Array1D<Real64> CoeffAdjRatio;                  // Conductive and radiative coefficient adjustment ratio
 
     // todo - rename and reordering
     Array1D<Real64> SurfTempEffBulkAir;     // air temperature adjacent to the surface used for inside surface heat balances
     Array1D<Real64> HConvIn;                // INSIDE CONVECTION COEFFICIENT
+    Array1D<Real64> CoeffAdjRatioIn;        // INSIDE convective and radiative coefficient adjustment ratio
     Array1D<Real64> SurfAnisoSkyMult;       // Multiplier on exterior-surface sky view factor to account for
                                             // anisotropy of sky radiance; = 1.0 for for isotropic sky
     Array1D<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
@@ -2442,8 +2444,10 @@ struct HeatBalanceData : BaseGlobalStruct
         this->NominalR.deallocate();
         this->NominalRforNominalUCalculation.deallocate();
         this->NominalU.deallocate();
+        this->CoeffAdjRatio.deallocate();
         this->SurfTempEffBulkAir.deallocate();
         this->HConvIn.deallocate();
+        this->CoeffAdjRatioIn.deallocate();
         this->SurfAnisoSkyMult.deallocate();
         this->DifShdgRatioIsoSky.deallocate();
         this->DifShdgRatioIsoSkyHRTS.deallocate();
