@@ -181,6 +181,7 @@ set(test_src
     Pumps.unit.cc
     PurchasedAirManager.unit.cc
     PVWatts.unit.cc
+    QuickTestSpan.unit.cc
     ReportCoilSelection.unit.cc
     ResultsFramework.unit.cc
     RoomAirflowNetwork.unit.cc
