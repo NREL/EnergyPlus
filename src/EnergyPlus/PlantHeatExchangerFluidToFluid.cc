@@ -168,7 +168,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   November 2012
-    //       MODIFIED       na
+    //       MODIFIED       June 2021, Dareum Nam, Add Steam to water heat exchanger
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
