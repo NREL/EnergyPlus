@@ -61,7 +61,27 @@ The basic method used in EnergyPlus for CTF calculations is known as the state s
 
 where x is a vector of state variables, u is a vector of inputs, y is the output vector, t is time, and A, B, C, and D are coefficient matrices.~ Through the use of matrix algebra, the vector of state variables (x) can be eliminated from the system of equations, and the output vector (y) can be related directly to the input vector (u) and time histories of the input and output vectors.
 
-This formulation can be used to solve the transient heat conduction equation by enforcing a finite difference grid over the various layers in the building element being analyzed.~ In this case, the state variables are the nodal temperatures, the environmental temperatures (interior and exterior) are the inputs, and the resulting heat fluxes at both surfaces are the outputs.~ Thus, the state space representation with finite difference variables would take the following form:
+Seem (1987) summarizes the steps required to obtain the output vector (y) from the A, B, C, and D matrices.~ Briefly, the solution for the first order differential system of equations with constant coefficients shown above is:
+
+\begin{equation}
+x_{t + \delta} = e^{A \delta} x_t + \int\limits_t^{t + \delta } {e^{A (t + \delta - \tau)} B u(\tau) d \tau}
+\end{equation}
+
+where t is a particular point in time, \(\delta\) is the time step, and \(e^{A \delta}\) is the exponential matrix which is calculated using a power series:
+
+\begin{equation}
+e^{A \delta} = I + A \delta + \frac{A^2 \delta ^ 2}{2!} + \frac{A^3 \delta ^ 3}{3!} + \ldots{} + \frac{A^L \delta ^ L}{L!} + \ldots{}
+\end{equation}
+
+where L is the term in the sequence that defines an adequate representation of the exponential matrix.  In other words, terms beyond L are not needed because they will not supply any significant additional value to the overall exponential matrix.  So, the calculation of the exponential matrix can be terminated after the Lth term.  Seem (1987) also defines what L should be in Appendix A of his dissertation.  It is based on an equation that relates L to the matrix row norm:
+
+\begin{equation}
+L = minimum~of~[3 ||A \delta||_\infty + 6]~or~100
+\end{equation}
+
+where \(||A \delta||_\infty\) is the matrix row norm.  Seem, as part of his algorithm, indicates that the matrix row norm should be normalized so that it is less than unity by finding the power of 2 that is larger than the matrix row norm and dividing all elements of the A matrix by that term.  This is used later as part of the "scaling and squaring" approach to calculate the exponential matrix.  This scaling would also affect L meaning that if the matrix row norm has been scaled so that it is never greater than 1 then L would never go higher than 9.  In EnergyPlus, the matrix row norm is not scaled when used to calculate L.  This can result in additional terms which in general will make the calculation slightly more accurate.  To avoid excessive terms in the exponential matrix, the terms that are added in the exponential matrix calculation in EnergyPlus are limited so that if a new term is smaller than will impact the variable based on the precision of the variable it is then ignored.  To see the implementation of these details in EnergyPlus, consult both Appendix A of Seem's dissertation and the routine calculateExponentialMatrix in the code.
+
+As shown in Seem (1987), the above formulation can be used to solve the transient heat conduction equation by enforcing a finite difference grid over the various layers in the building element being analyzed.~ In this case, the state variables are the nodal temperatures, the environmental temperatures (interior and exterior) are the inputs, and the resulting heat fluxes at both surfaces are the outputs.~ Thus, the state space representation with finite difference variables would take the following form:
 
 \begin{equation}
 \frac{d\left[\begin{array}{c}T_1 \\ \vdots \\ T_n\end{array}\right]}{dt} = \left[\bf{A}\right]\left[\begin{array}{c}T_1 \\ \vdots \\ T_n\end{array}\right]+\left[\bf{B}\right]\left[\begin{array}{c}T_i \\ T_o\end{array}\right]
@@ -102,13 +122,13 @@ A is the area of the surface exposed to the environmental temperatures.
 In matrix format:
 
 \begin{equation}
-\left[\begin{array}{c}\frac{dT_1}{dt} \\ \frac{dT_2}{dt}\end{array}\right] = 
-     \left[\begin{array}{cc}-\frac{1}{RC}-\frac{hA}{C} & \frac{1}{RC} \\ \frac{1}{RC} & -\frac{1}{RC}-\frac{hA}{C}\end{array}\right]\left[\begin{array}{c}T_1 \\ T_2\end{array}\right] + 
+\left[\begin{array}{c}\frac{dT_1}{dt} \\ \frac{dT_2}{dt}\end{array}\right] =
+     \left[\begin{array}{cc}-\frac{1}{RC}-\frac{hA}{C} & \frac{1}{RC} \\ \frac{1}{RC} & -\frac{1}{RC}-\frac{hA}{C}\end{array}\right]\left[\begin{array}{c}T_1 \\ T_2\end{array}\right] +
      \left[\begin{array}{cc}\frac{hA}{C} & 0 \\ 0 & \frac{hA}{C}\end{array}\right]\left[\begin{array}{c}T_o \\ T_i\end{array}\right]
 \end{equation}
 
 \begin{equation}
-\left[\begin{array}{c}{q''}_o \\ {q''}_i\end{array}\right] = 
+\left[\begin{array}{c}{q''}_o \\ {q''}_i\end{array}\right] =
     \left[\begin{array}{cc}0 & -h \\ h & 0\end{array}\right] \left[\begin{array}{c}T_1 \\ T_2\end{array}\right] +
     \left[\begin{array}{cc}0 & h \\ -h & 0\end{array}\right] \left[\begin{array}{c}T_o \\ T_i\end{array}\right]
 \end{equation}
@@ -123,7 +143,7 @@ The important aspect of the state space technique is that through the use of mat
 
 The accuracy of the state space method of calculating CTFs has been addressed in the literature.~ Ceylan and Myers (1980) compared the response predicted by the state space method to various other solution techniques including an analytical solution.~ Their results showed that for an adequate number of nodes the state space method computed a heat flux at the surface of a simple one layer slab within 1\% of the analytical solution.~ Ouyang and Haghighat (1991) made a direct comparison between the Laplace and state space methods.~ For a wall composed of insulation between two layers of concrete, they found almost no difference in the response factors calculated by each method.
 
-Seem (1987) summarizes the steps required to obtain the CTF coefficients from the A, B, C, and D matrices.~ While more time consuming than calculating CTFs using the Laplace Transform method, the matrix algebra (including the calculation of an inverse and exponential matrix for A) is easier to follow than root find algorithms.~ Another difference between the Laplace and State Space methods is the number of coefficients required for a solution.~ In general, the State Space method requires more coefficients.~ In addition, the number of temperature and flux history terms is identical (nz = nq).~ Note that as with the Laplace method that the actual number of terms will vary from construction to construction.
+While more time consuming than calculating CTFs using the Laplace Transform method, the matrix algebra (including the calculation of an inverse and exponential matrix for A) is easier to follow than root find algorithms.~ Another difference between the Laplace and State Space methods is the number of coefficients required for a solution.~ In general, the State Space method requires more coefficients.~ In addition, the number of temperature and flux history terms is identical (nz = nq).~ Note that as with the Laplace method that the actual number of terms will vary from construction to construction.
 
 Two distinct advantages of the State Space method over the Laplace method that are of interest when applying a CTF solution for conduction through a building element are the ability to obtain CTFs for much shorter time steps and the ability to obtain 2- and 3-D conduction transfer functions.~ While not implemented in the Toolkit, both Seem (1987) and Strand (1995) have demonstrated the effectiveness of the State Space method in handling these situations that can have important applications in buildings.
 

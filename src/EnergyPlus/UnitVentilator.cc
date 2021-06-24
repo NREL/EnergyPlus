@@ -87,7 +87,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -429,7 +428,7 @@ namespace UnitVentilator {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsParent);
             state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode = GetOnlySingleNode(state,
                                                                                             Alphas(7),
@@ -438,7 +437,7 @@ namespace UnitVentilator {
                                                                                             Alphas(1),
                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType::Outlet,
-                                                                                            1,
+                                                                                            NodeInputManager::compFluidStream::Primary,
                                                                                             ObjectIsParent);
 
             // Get AirTerminal mixer data
@@ -464,7 +463,7 @@ namespace UnitVentilator {
                                                                                                Alphas(1),
                                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                                               1,
+                                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                                ObjectIsNotParent);
             }
 
@@ -612,7 +611,7 @@ namespace UnitVentilator {
                                       Alphas(1),
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::NodeConnectionType::OutsideAirReference,
-                                      1,
+                                      NodeInputManager::compFluidStream::Primary,
                                       ObjectIsNotParent);
                 if (!lAlphaBlanks(8)) {
                     CheckAndAddAirNodeNumber(state, state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode, IsValid);
@@ -628,7 +627,7 @@ namespace UnitVentilator {
                                                                                                    Alphas(1),
                                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                                    DataLoopNode::NodeConnectionType::ReliefAir,
-                                                                                                   1,
+                                                                                                   NodeInputManager::compFluidStream::Primary,
                                                                                                    ObjectIsNotParent);
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OAMixerOutNode = GetOnlySingleNode(state,
@@ -638,7 +637,7 @@ namespace UnitVentilator {
                                                                                                     Alphas(1),
                                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                    1,
+                                                                                                    NodeInputManager::compFluidStream::Primary,
                                                                                                     ObjectIsNotParent);
             } else {
                 state.dataUnitVentilators->UnitVent(UnitVentNum).OutsideAirNode = state.dataUnitVentilators->UnitVent(UnitVentNum).ATMixerPriNode;
@@ -2859,7 +2858,6 @@ namespace UnitVentilator {
         using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::CheckSteamCoilSchedule;
-        using TempSolveRoot::SolveRoot;
         using WaterCoils::CheckWaterCoilSchedule;
 
         Real64 const LowTempDiff(0.1); // Smallest allowed temperature difference for comparisons
@@ -3305,7 +3303,7 @@ namespace UnitVentilator {
                                 if (FirstHVACIteration) Par(2) = 1.0;
                                 Par(3) = double(OpMode);
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                                TempSolveRoot::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
                             }
                         }
 

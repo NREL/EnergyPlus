@@ -332,7 +332,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                               AlphArray(1),
                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                                                              1,
+                                                                                              NodeInputManager::compFluidStream::Primary,
                                                                                               ObjectIsNotParent);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideOutletNodeNum = GetOnlySingleNode(state,
@@ -342,7 +342,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                                AlphArray(1),
                                                                                                DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                                                               1,
+                                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                                ObjectIsNotParent);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideInletNodeNum = GetOnlySingleNode(state,
@@ -352,7 +352,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                             AlphArray(1),
                                                                                             DataLoopNode::NodeFluidType::Water,
                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                            2,
+                                                                                            NodeInputManager::compFluidStream::Secondary,
                                                                                             ObjectIsNotParent);
 
         state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideOutletNodeNum = GetOnlySingleNode(state,
@@ -362,7 +362,7 @@ void GetGshpInput(EnergyPlusData &state)
                                                                                              AlphArray(1),
                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                              DataLoopNode::NodeConnectionType::Outlet,
-                                                                                             2,
+                                                                                             NodeInputManager::compFluidStream::Secondary,
                                                                                              ObjectIsNotParent);
 
         // Test node sets
@@ -612,7 +612,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     Real64 CompressInletTemp;     // Compressor inlet temperature
     Real64 MassRef;               // mass flow rate of refrigerant
     Real64 SourceSideOutletEnth;  // Enthalpy at Source Side pressure
-    Real64 LoadSideOutletEnth;    // Enthalpy at Condensor Pressure
+    Real64 LoadSideOutletEnth;    // Enthalpy at Condenser Pressure
     Real64 initialQSource;        // Guess Source Side Heat rate
     Real64 initialQLoad;          // Guess Load Side Heat rate
     Real64 qual;                  // quality

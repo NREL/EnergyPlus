@@ -57,13 +57,13 @@ jobs:
         ./miktexsetup_standalone --verbose \
             --local-package-repository=C:/ProgramData/MiKTeX-Repo \
             --remote-package-repository="https://ctan.math.illinois.edu/systems/win32/miktex/tm/packages/" \
-            --package-set=basic \
+            --package-set=essential \
             download
 
         echo "Installing from the local package directory previously set up"
         ./miktexsetup_standalone --verbose \
             --local-package-repository=C:/ProgramData/MiKTeX-Repo \
-            --package-set=basic \
+            --package-set=essential \
             --shared \
             install
 
@@ -80,13 +80,19 @@ jobs:
         mpm --find-updates
         mpm --admin --find-updates
 
+    - name: Install required packages
+      shell: bash
+      working-directory: ./doc/
+      run: |
+        mpm --verbose --admin --require=@energyplus_packages_windows.lst
+
     - name: Install IFW
       shell: bash
       run: |
         set -x
         out_dir="C:/Qt"
-        aqt tool windows tools_ifw 4.0 qt.tools.ifw.40 --outputdir="$out_dir"
-        echo "$out_dir/Tools/QtInstallerFramework/4.0/bin" >> $GITHUB_PATH
+        aqt tool windows tools_ifw 4.1 qt.tools.ifw.41 --outputdir="$out_dir"
+        echo "$out_dir/Tools/QtInstallerFramework/4.1/bin" >> $GITHUB_PATH
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/

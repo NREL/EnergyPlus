@@ -1197,7 +1197,19 @@ void ConstructionProps::calculateExponentialMatrix()
     // raised in order to calculate the exponential matrix.  A new cut-off
     // criteria based on the number of significant figures in a double-
     // precision variable is used as a more practical limit on the
-    // exponentiation algorithm.
+    // exponentiation algorithm.  One thing to note is that the EnergyPlus
+    // code is slightly different here than what is presented in Seem's
+    // dissertation.  In Seem's dissertation, AMatRowNormMax (delta, the
+    // timestep, is already factored into this term above) is divided by
+    // 2^k with k defined in the code above.  Dividing AMatRowNormMax by
+    // 2^k would have the net effect of decreasing the value of
+    // AMatRowNormMax and thus potentially CheckVal as well.  l, the integer
+    // value of CheckVal, is used to define the number of terms in the
+    // exponential matrix of AMat that are required for an accurate estimation
+    // of that matrix.  In practice, additional terms probably won't have
+    // a large effect but in general should make the calculation MORE accurate.
+    // Also, if the new terms are too small, then as noted above the cut-off
+    // criteria will not use them.
 
     CheckVal = min(3.0 * AMatRowNormMax + 6.0, 100.0);
     l = int(CheckVal);
@@ -1994,14 +2006,61 @@ void ConstructionProps::setNodeSourceAndUserTemp(Array1D_int &Nodes)
 
 void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
 {
-    this->AbsDiff.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-    this->BlAbsDiff.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-    this->BlAbsDiffGnd.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-    this->BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-    this->AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-    this->BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-    this->AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
-    this->AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+    this->AbsDiff.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->AbsDiffBack.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->BlAbsDiff.allocate(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers);
+    this->BlAbsDiffGnd.allocate(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers);
+    this->BlAbsDiffSky.allocate(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers);
+    this->BlAbsDiffBack.allocate(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers);
+    this->AbsBeamCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->AbsBeamBackCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->tBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->tBareVisCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->rfBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->rfBareVisCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->rbBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->rbBareVisCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->afBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    this->abBareSolCoef.allocate(state.dataHeatBal->MaxSolidWinLayers);
+    for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+        this->AbsBeamCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->AbsBeamBackCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->tBareSolCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->tBareVisCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->rfBareSolCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->rfBareVisCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->rbBareSolCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->rbBareVisCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->afBareSolCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+        this->abBareSolCoef(Layer).allocate(DataSurfaces::MaxPolyCoeff);
+    }
+
+    for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+        this->AbsDiff(Layer) = 0.0;
+        this->AbsDiffBack(Layer) = 0.0;
+    }
+    for (int Index = 1; Index <= DataSurfaces::MaxSlatAngs; ++Index) {
+        for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+            this->BlAbsDiff(Index, Layer) = 0.0;
+            this->BlAbsDiffGnd(Index, Layer) = 0.0;
+            this->BlAbsDiffSky(Index, Layer) = 0.0;
+            this->BlAbsDiffBack(Index, Layer) = 0.0;
+        }
+    }
+    for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+        for (int Index = 1; Index <= DataSurfaces::MaxPolyCoeff; ++Index) {
+            this->AbsBeamCoef(Layer)(Index) = 0.0;
+            this->AbsBeamBackCoef(Layer)(Index) = 0.0;
+            this->tBareSolCoef(Layer)(Index) = 0.0;
+            this->tBareVisCoef(Layer)(Index) = 0.0;
+            this->rfBareSolCoef(Layer)(Index) = 0.0;
+            this->rfBareVisCoef(Layer)(Index) = 0.0;
+            this->rbBareSolCoef(Layer)(Index) = 0.0;
+            this->rbBareVisCoef(Layer)(Index) = 0.0;
+            this->afBareSolCoef(Layer)(Index) = 0.0;
+            this->abBareSolCoef(Layer)(Index) = 0.0;
+        }
+    }
 }
 
 } // namespace EnergyPlus::Construction

@@ -229,7 +229,7 @@ struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct
 
     int NumberOfPlantFluidHXs = 0;
     bool GetInput = true;
-    Array1D<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
+    EPVector<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
 
     void clear_state() override
     {

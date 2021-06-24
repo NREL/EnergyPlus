@@ -98,10 +98,10 @@ namespace EcoRoofManager {
     // Functions
 
     void CalcEcoRoof(EnergyPlusData &state,
-                     int const SurfNum, // Indicator of Surface Number for the current surface
-                     int const ZoneNum, // Indicator for zone number where the current surface
-                     int &ConstrNum,    // Indicator for construction index for the current surface
-                     Real64 &TempExt    // Exterior temperature boundary condition
+                     int const SurfNum,   // Indicator of Surface Number for the current surface
+                     int const ZoneNum,   // Indicator for zone number where the current surface
+                     int const ConstrNum, // Indicator for construction index for the current surface
+                     Real64 &TempExt      // Exterior temperature boundary condition
     )
     {
         // SUBROUTINE INFORMATION
@@ -226,7 +226,6 @@ namespace EcoRoofManager {
                         // consistent with FASST TR-04-25 p. x (W' = 2.0)
         }
 
-        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
         RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
         AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         HMovInsul = 0.0;
@@ -244,7 +243,7 @@ namespace EcoRoofManager {
                                         state.dataHeatBalSurf->HAirExtSurf(SurfNum));
         }
 
-        RS = state.dataEnvrn->BeamSolarRad + state.dataHeatBal->AnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
+        RS = state.dataEnvrn->BeamSolarRad + state.dataHeatBal->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
         Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
                1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
@@ -752,7 +751,7 @@ namespace EcoRoofManager {
                          Real64 const SoilThickness,
                          Real64 const Vfluxf, // Water mass flux from vegetation [m/s]
                          Real64 const Vfluxg, // Water mass flux from soil surface [m/s]
-                         int &ConstrNum,      // Indicator for construction index for the current surface
+                         int const ConstrNum, // Indicator for construction index for the current surface
                          Real64 &Alphag,
                          [[maybe_unused]] int const unit,    // unused1208
                          [[maybe_unused]] Real64 const Tg,   // unused1208

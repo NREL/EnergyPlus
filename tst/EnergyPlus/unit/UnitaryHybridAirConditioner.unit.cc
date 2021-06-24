@@ -121,7 +121,7 @@ using EnergyPlus::HybridEvapCoolingModel::Model;
 using namespace EnergyPlus::HybridUnitaryAirConditioners;
 
 namespace EnergyPlus {
-std::vector<std::string> getAllLinesInFile2(std::string filePath)
+std::vector<std::string> getAllLinesInFile2(fs::path const &filePath)
 {
     std::ifstream infile(filePath);
     std::vector<std::string> lines;
@@ -147,7 +147,7 @@ std::vector<std::string> parseLine(std::string line)
 TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 {
     std::vector<std::string> snippet =
-        getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
+        getAllLinesInFile2(configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
     ASSERT_TRUE(process_idf(string));
     // setup environment
@@ -460,7 +460,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     std::string NameOfComp = pZoneHybridUnitaryAirConditioner->Name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
     Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-    Array1D_int VarTypes(NumVariables);                              // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
     std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
@@ -515,7 +515,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing
 {
     std::string idf_objects = delimited_string({
         "ZoneHVAC:HybridUnitaryHVAC,",
-        "MUNTERSEPX5000,          !- Name",
+        "Hybrid Unit 1,          !- Name",
         "ALWAYS_ON,               !- Availability Schedule Name",
         ",                        !- Availability Manager List Name",
         ",                        !- Minimum Supply Air Temperature Schedule Name",
@@ -523,10 +523,10 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing
         ",                        !- Minimum Supply Air Humidity Ratio Schedule Name",
         ",                        !- Maximum Supply Air Humidity Ratio Schedule Name",
         "AUTOMATIC,               !- Method to Choose Controlled Inputs and Part Runtime Fraction",
-        "Main Return Air Node Name,  !- Return Air Node Name",
-        "Outside Air Inlet Node,  !- Outside Air Node Name",
-        "Main Zone Inlet Node,    !- Supply Air Node Name",
-        "Main Relief Node,        !- Relief Node Name",
+        "Return Air Node 1 Name,  !- Return Air Node Name",
+        "Outside Air Inlet 1 Node,  !- Outside Air Node Name",
+        "Zone Inlet 1 Node,    !- Supply Air Node Name",
+        "Relief 1 Node,        !- Relief Node Name",
         "2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}",
         ",                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}",
         "Yes,                     !- Fan Heat Included in Lookup Tables",
@@ -538,7 +538,69 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing
         "NaturalGas,              !- Second fuel type",
         "DistrictCooling,         !- Third fuel type",
         ",                        !- Objective Function Minimizes",
-        "SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name",
+        "SZ DSOA SPACE 1,        !- Design Specification Outdoor Air Object Name",
+        "Mode0 Standby,           !- Mode0 Name",
+        ",                        !- Mode0 Supply Air Temperature Lookup Table Name",
+        ",                        !- Mode0 Supply Air Humidity Ratio Lookup Table Name",
+        ",                        !- Mode0 System Electric Power Lookup Table Name",
+        ",                        !- Mode0 Supply Fan Electric Power Lookup Table Name",
+        ",                        !- Mode0 External Static Pressure Lookup Table Name",
+        ",                        !- Mode0 System Second Fuel Consumption Lookup Table Name",
+        ",                        !- Mode0 System Third Fuel Consumption Lookup Table Name",
+        ",                        !- Mode0 System Water Use Lookup Table Name",
+        "0,                       !- Mode0 Outside Air Fraction",
+        "0,                       !- Mode0 Supply Air Mass Flow Rate Ratio",
+        "Mode1_IEC,               !- Mode1 Name",
+        ",                        !- Mode1 Supply Air Temperature Lookup Table Name",
+        ",                        !- Mode1 Supply Air Humidity Ratio Lookup Table Name",
+        ",                        !- Mode1 System Electric Power Lookup Table Name",
+        ",                        !- Mode1 Supply Fan Electric Power Lookup Table Name",
+        ",                        !- Mode1 External Static Pressure Lookup Table Name",
+        ",                        !- Mode1 System Second Fuel Consumption Lookup Table Name",
+        ",                        !- Mode1 System Third Fuel Consumption Lookup Table Name",
+        ",                        !- Mode1 System Water Use Lookup Table Name",
+        "-20,                     !- Mode1 Minimum Outside Air Temperature {C}",
+        "100,                     !- Mode1 Maximum Outside Air Temperature {C}",
+        "0,                       !- Mode1 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}",
+        "0.03,                    !- Mode1 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}",
+        "0,                       !- Mode1 Minimum Outside Air Relative Humidity {percent}",
+        "100,                     !- Mode1 Maximum Outside Air Relative Humidity {percent}",
+        "-20,                     !- Mode1 Minimum Return Air Temperature {C}",
+        "100,                     !- Mode1 Maximum Return Air Temperature {C}",
+        "0,                       !- Mode1 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}",
+        "0.03,                    !- Mode1 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}",
+        "0,                       !- Mode1 Minimum Return Air Relative Humidity {percent}",
+        "100,                     !- Mode1 Maximum Return Air Relative Humidity {percent}",
+        "1,                       !- Mode1 Minimum Outside Air Fraction",
+        "1,                       !- Mode1 Maximum Outside Air Fraction",
+        "0.715,                   !- Mode1 Minimum Supply Air Mass Flow Rate Ratio",
+        "0.964;                   !- Mode1 Maximum Supply Air Mass Flow Rate Ratio",
+
+        "ZoneHVAC:HybridUnitaryHVAC,",
+        "Hybrid Unit 2,          !- Name",
+        "ALWAYS_ON,               !- Availability Schedule Name",
+        ",                        !- Availability Manager List Name",
+        ",                        !- Minimum Supply Air Temperature Schedule Name",
+        ",                        !- Maximum Supply Air Temperature Schedule Name",
+        ",                        !- Minimum Supply Air Humidity Ratio Schedule Name",
+        ",                        !- Maximum Supply Air Humidity Ratio Schedule Name",
+        "AUTOMATIC,               !- Method to Choose Controlled Inputs and Part Runtime Fraction",
+        "Return Air Node 2 Name,  !- Return Air Node Name",
+        "Outside Air Inlet 2 Node,  !- Outside Air Node Name",
+        "Zone Inlet 2 Node,    !- Supply Air Node Name",
+        "Relief 2 Node,        !- Relief Node Name",
+        "2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}",
+        ",                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}",
+        "Yes,                     !- Fan Heat Included in Lookup Tables",
+        ",                        !- Fan Heat Gain Location",
+        ",                        !- Fan Heat Gain In Airstream Fraction",
+        "1,                       !- Scaling Factor",
+        "10,                      !- Minimum Time Between Mode Change {minutes}",
+        "Electricity,             !- First fuel type",
+        "NaturalGas,              !- Second fuel type",
+        "DistrictCooling,         !- Third fuel type",
+        ",                        !- Objective Function Minimizes",
+        "SZ DSOA SPACE 2,        !- Design Specification Outdoor Air Object Name",
         "Mode0 Standby,           !- Mode0 Name",
         ",                        !- Mode0 Supply Air Temperature Lookup Table Name",
         ",                        !- Mode0 Supply Air Humidity Ratio Lookup Table Name",
@@ -581,12 +643,13 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
     GetInputZoneHybridUnitaryAirConditioners(*state, ErrorsFound);
-    InitZoneHybridUnitaryAirConditioners(*state, 1, 1);
-    Model *pZoneHybridUnitaryAirConditioner = &state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1);
-    pZoneHybridUnitaryAirConditioner->Initialize(1);
-    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
     unsigned long expectedOperatingModesSize = 2;
-    EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), expectedOperatingModesSize);
+    // check the number of operating modes
+    EXPECT_EQ(state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1).OperatingModes.size(), expectedOperatingModesSize);
+    EXPECT_EQ(state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(2).OperatingModes.size(), expectedOperatingModesSize);
+    // check if names for HybridUnitaryAC are converted to upper case
+    EXPECT_EQ("HYBRID UNIT 1", state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(1).Name);
+    EXPECT_EQ("HYBRID UNIT 2", state->dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(2).Name);
 }
 
 TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInput)
@@ -1384,7 +1447,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateOptionalError
 TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_RuntimeFraction_Initialization)
 {
     std::vector<std::string> snippet =
-        getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
+        getAllLinesInFile2(configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
     ASSERT_TRUE(process_idf(string));
     // setup environment

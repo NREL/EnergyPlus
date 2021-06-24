@@ -3,8 +3,15 @@ if(WIN32)
   configure_file(energyplusapi.rc.in "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc")
 endif()
 
+include(../../cmake/SystemDetails.cmake)
+set_system_nickname()
+
+include(../../cmake/TargetArch.cmake)
+target_architecture(TARGET_ARCH)
+
 set(PYTHON_API_VERSION_MAJOR 0)
 set(PYTHON_API_VERSION_MINOR 2)
+set(BUILD_PLATFORM_STRING "${SYSTEM_NICKNAME}_${TARGET_ARCH}")
 configure_file(DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc")
 configure_file(ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc")
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema")
@@ -331,6 +338,7 @@ set(SRC
     HVACSizingSimulationManager.hh
     HVACStandAloneERV.cc
     HVACStandAloneERV.hh
+    HVACSystemRootFindingAlgorithm.hh
     HVACUnitaryBypassVAV.cc
     HVACUnitaryBypassVAV.hh
     HVACVariableRefrigerantFlow.cc
@@ -351,8 +359,6 @@ set(SRC
     HeatBalanceKivaManager.hh
     HeatBalanceManager.cc
     HeatBalanceManager.hh
-    HeatBalanceMovableInsulation.cc
-    HeatBalanceMovableInsulation.hh
     HeatBalanceSurfaceManager.cc
     HeatBalanceSurfaceManager.hh
     HeatPumpWaterToWaterCOOLING.cc
@@ -600,8 +606,6 @@ set(SRC
     TARCOGParams.hh
     TarcogShading.cc
     TarcogShading.hh
-    TempSolveRoot.cc
-    TempSolveRoot.hh
     ThermalChimney.cc
     ThermalChimney.hh
     ThermalComfort.cc
@@ -749,6 +753,11 @@ target_link_libraries(energyplusparser PRIVATE project_options project_fp_option
 if(WIN32)
   target_link_libraries(energyplusparser PUBLIC Shlwapi)
 endif()
+# See https://en.cppreference.com/w/cpp/filesystem#Notes
+if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
+    ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
+  target_link_libraries(energyplusparser PRIVATE stdc++fs)
+endif()
 
 # first we will create a static library of EnergyPlus this will be linked
 # statically to create the DLL and also the unit tests
@@ -770,7 +779,7 @@ target_link_libraries(
          airflownetworklib
          ssc)
 
-target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings)
+target_link_libraries(energypluslib PRIVATE project_options project_fp_options project_warnings cpp_pch_files)
 
 if(OPENGL_FOUND)
   target_link_libraries(energypluslib PUBLIC penumbra)
@@ -792,6 +801,11 @@ if(UNIX AND NOT APPLE)
 endif()
 if(LINK_WITH_PYTHON)
   target_link_libraries(energypluslib PUBLIC ${PYTHON_LIBRARIES})
+endif()
+# See https://en.cppreference.com/w/cpp/filesystem#Notes
+if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
+    ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
+  target_link_libraries(energypluslib PRIVATE stdc++fs)
 endif()
 
 # second we will create the shared library that is actually packaged with

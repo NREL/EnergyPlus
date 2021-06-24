@@ -66,32 +66,40 @@ struct EnergyPlusData;
 namespace RuntimeLanguageProcessor {
 
     // Using/Aliasing
+    using DataRuntimeLanguage::ErlFunc;
     using DataRuntimeLanguage::ErlValueType;
 
     int constexpr MaxErrors(20);
-    int constexpr TokenNumber(1);       // matches the ValueNumber
-    int constexpr TokenVariable(4);     // matches the ValueVariable
-    int constexpr TokenExpression(5);   // matches the ValueExpression
-    int constexpr TokenOperator(7);     // includes basic operators and built-in functions.
-    int constexpr TokenParenthesis(9);  // parenthesis token
-    int constexpr ParenthesisLeft(10);  // indicates left side parenthesis found in parsing
-    int constexpr ParenthesisRight(11); // indicates right side parenthesis found in parsing
+
+    enum class Token
+    {
+        Invalid = -1,
+        Unassigned = 0,
+        Number = 1,           // matches the ValueNumber
+        Variable = 4,         // matches the ValueVariable
+        Expression = 5,       // matches the ValueExpression
+        Operator = 7,         // includes basic operators and built-in functions.
+        Parenthesis = 9,      // parenthesis token
+        ParenthesisLeft = 10, // indicates left side parenthesis found in parsing
+        ParenthesisRight = 11 // indicates right side parenthesis found in parsing
+
+    };
 
     struct TokenType
     {
         // Members
         // structure for token information for parsing Erl code
-        int Type;           // token type, eg. TokenNumber
+        Token Type;         // token type, eg. TokenNumber
         Real64 Number;      // May want to store all literals as a variable?
         std::string String; // Serves double duty, also saves string version of token for easy debugging
-        int Operator;       // indentifies operator or function 1..64
+        ErlFunc Operator;   // indentifies operator or function 1..64
         int Variable;       // points to a variable in ErlVariable structure
-        int Parenthesis;    // identifes if token is left or right parenthesis
+        Token Parenthesis;  // identifes if token is left or right parenthesis
         int Expression;     // points to an expression in ErlExpression structure
         std::string Error;  // holds token processing error message content
 
         // Default Constructor
-        TokenType() : Type(0), Number(0.0), Operator(0), Variable(0), Parenthesis(0), Expression(0)
+        TokenType() : Type(Token::Unassigned), Number(0.0), Operator(ErlFunc::Unassigned), Variable(0), Parenthesis(Token::Unassigned), Expression(0)
         {
         }
     };
@@ -146,14 +154,18 @@ namespace RuntimeLanguageProcessor {
     ErlValueType EvaluateExpression(EnergyPlusData &state, int ExpressionNum, bool &seriousErrorFound);
 
     void TodayTomorrowWeather(EnergyPlusData &state,
-                              int FunctionCode,
+                              ErlFunc FunctionCode,
                               Real64 Operand1,
                               Real64 Operand2,
                               Array2D<Real64> &TodayTomorrowWeatherSource,
                               ErlValueType &ReturnVal);
 
-    void TodayTomorrowWeather(
-        EnergyPlusData &state, int FunctionCode, Real64 Operand1, Real64 Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+    void TodayTomorrowWeather(EnergyPlusData &state,
+                              ErlFunc FunctionCode,
+                              Real64 Operand1,
+                              Real64 Operand2,
+                              Array2D_bool &TodayTomorrowWeatherSource,
+                              ErlValueType &ReturnVal);
 
     int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
 

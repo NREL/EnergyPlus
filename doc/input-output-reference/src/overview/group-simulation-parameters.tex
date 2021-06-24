@@ -624,8 +624,7 @@ This fields specifies during shading calculation, for all surfaces in a targeted
 This fields specifies during shading calculation, for all surfaces in a targeted Zone Group, whether or not (\textbf{Yes} or \textbf{No} ) the self-shading effect from all exterior surfaces in the target Zone Group to other zones is disabled. If Yes, self-shading will be disabled from all exterior surfaces in a given Shading Zone Group to all other zones in the model. If both Disable Self-Shading Within Shading Zone Groups and Disable Self-Shading From Shading Zone Groups to Other Zones = Yes, then all self-shading from exterior surfaces will be disabled. If only one of these fields = Yes, then at least one Shading Zone Group must be specified, or this field will be ignored. Shading from Shading:* surfaces, overhangs, fins, and reveals will not be disabled.
 
 \paragraph{Field: Shading Zone Group ZoneList Name}\label{field-shading-zone-group-zoneList-name}
-The shading zones group specifies group of zones which are controlled by the Disable Self-Shading fields.
-This field is extensible.
+The shading zones group specifies group of zones which are controlled by the Disable Self-Shading fields.  This object is extensible, so additional fields of this type can be added to the end of this object.
 
 Examples of this object in IDF: (note this object must be unique in an IDF)
 

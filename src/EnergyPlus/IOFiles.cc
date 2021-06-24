@@ -55,6 +55,7 @@
 #include "UtilityRoutines.hh"
 
 #include "nlohmann/json.hpp"
+#include <algorithm>
 #include <fmt/format.h>
 #include <stdexcept>
 
@@ -66,7 +67,7 @@ InputFile &InputFile::ensure_open(EnergyPlusData &state, const std::string &call
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for input (read).", caller, filePath.string()));
     }
     return *this;
 }
@@ -99,7 +100,7 @@ InputFile::ReadResult<std::string> InputFile::readLine() noexcept
     }
 }
 
-InputFile::InputFile(std::string FileName) : fileName(std::move(FileName))
+InputFile::InputFile(fs::path FilePath) : filePath(std::move(FilePath))
 {
 }
 
@@ -110,7 +111,7 @@ std::ostream::pos_type InputFile::position() const noexcept
 
 void InputFile::open(bool, bool)
 {
-    is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::binary));
+    is = std::unique_ptr<std::istream>(new std::fstream(filePath.c_str(), std::ios_base::in | std::ios_base::binary));
     is->imbue(std::locale("C"));
 }
 
@@ -181,7 +182,7 @@ InputOutputFile &InputOutputFile::ensure_open(EnergyPlusData &state, const std::
         open(false, output_to_file);
     }
     if (!good()) {
-        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
+        ShowFatalError(state, fmt::format("{}: Could not open file {} for output (write).", caller, filePath.string()));
     }
     return *this;
 }
@@ -206,7 +207,7 @@ void InputOutputFile::del()
 {
     if (os) {
         os.reset();
-        FileSystem::removeFile(fileName);
+        FileSystem::removeFile(filePath);
     }
 }
 
@@ -232,7 +233,7 @@ std::string InputOutputFile::get_output()
     }
 }
 
-InputOutputFile::InputOutputFile(std::string FileName, const bool DefaultToStdout) : fileName{std::move(FileName)}, defaultToStdOut{DefaultToStdout}
+InputOutputFile::InputOutputFile(fs::path FilePath, const bool DefaultToStdout) : filePath{std::move(FilePath)}, defaultToStdOut{DefaultToStdout}
 {
 }
 
@@ -255,7 +256,7 @@ void InputOutputFile::open(const bool forAppend, bool output_to_file)
         os->imbue(std::locale("C"));
         print_to_dev_null = true;
     } else {
-        os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+        os = std::unique_ptr<std::iostream>(new std::fstream(filePath.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
         os->imbue(std::locale("C"));
         print_to_dev_null = false;
     }
@@ -613,9 +614,15 @@ public:
                 // 0 pad the end
                 specs()->alt = true;
 
-                if (specs()->precision > 0) {
+                bool initialPrecisionWas1 = false;
+                if (specs()->precision > 1) {
                     // reduce the precision to get rounding behavior
                     --specs()->precision;
+                } else {
+                    // We need AT LEAST one in precision so we capture a '.' below
+                    initialPrecisionWas1 = true;
+                    specs()->precision = 1;
+                    ++specs()->width;
                 }
 
                 // multiply by 10 to get the exponent we want
@@ -627,6 +634,12 @@ public:
                 }
 
                 auto begin = std::find(std::begin(str), std::end(str), '.');
+                if (initialPrecisionWas1) {
+                    // 123.45 => 1.2E+03, except we asked for precision = 1. So we delete the thing after the dot
+                    // and this is why we manually increased the specs()->width by one above
+                    str.erase(std::next(begin));
+                }
+                // if (begin != std::end(str)) {
                 // ' -1.2345E15'
                 //     ^
                 std::swap(*begin, *std::prev(begin));

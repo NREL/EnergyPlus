@@ -58,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/StandardRatings.hh>
 
 namespace EnergyPlus {
 
@@ -69,14 +70,6 @@ namespace HVACVariableRefrigerantFlow {
     // Compressor operation
     constexpr int On(1);  // normal compressor operation
     constexpr int Off(0); // signal DXCoil that compressor shouldn't run
-
-    // Defrost strategy
-    constexpr int ReverseCycle(1); // uses reverse cycle defrost strategy
-    constexpr int Resistive(2);    // uses electric resistance heater for defrost
-
-    // Defrost control
-    constexpr int Timed(1);    // defrost cycle is timed
-    constexpr int OnDemand(2); // defrost cycle occurs only when required
 
     // Thermostat Priority Control Type
     enum class iThermostatCtrlType
@@ -213,14 +206,14 @@ namespace HVACVariableRefrigerantFlow {
         int NumCompressors;                     // number of compressors in VRF condenser
         Real64 MaxOATCCHeater;                  // maximum outdoor air dry-bulb temp for crankcase heater operation (C)
         // begin variables used for Defrost
-        int DefrostEIRPtr;         // index to defrost EIR curve
-        Real64 DefrostFraction;    // defrost time period fraction (hr)
-        int DefrostStrategy;       // Type of defrost (reversecycle or resistive)
-        int DefrostControl;        // type of defrost control (timed or ondemand)
-        Real64 DefrostCapacity;    // capacity of resistive defrost heating element (W)
-        Real64 DefrostPower;       // power used during defrost (W)
-        Real64 DefrostConsumption; // energy used during defrost (J)
-        Real64 MaxOATDefrost;      // maximum outdoor air dry-bulb temp for defrost operation (C)
+        int DefrostEIRPtr;                                // index to defrost EIR curve
+        Real64 DefrostFraction;                           // defrost time period fraction (hr)
+        StandardRatings::DefrostStrat DefrostStrategy;    // Type of defrost (reversecycle or resistive)
+        StandardRatings::HPdefrostControl DefrostControl; // type of defrost control (timed or ondemand)
+        Real64 DefrostCapacity;                           // capacity of resistive defrost heating element (W)
+        Real64 DefrostPower;                              // power used during defrost (W)
+        Real64 DefrostConsumption;                        // energy used during defrost (J)
+        Real64 MaxOATDefrost;                             // maximum outdoor air dry-bulb temp for defrost operation (C)
         // end variables used for Defrost
         int CondenserType;                             // condenser type, evap- or air-cooled
         int CondenserNodeNum;                          // condenser inlet node number
@@ -389,7 +382,8 @@ namespace HVACVariableRefrigerantFlow {
               SchedPriorityPtr(0), ZoneTUListPtr(0), HeatRecoveryUsed(false), VertPipeLngth(0.0), PCFLengthCoolPtr(0), PCFHeightCool(0.0),
               EquivPipeLngthCool(0.0), PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFHeightHeat(0.0), EquivPipeLngthHeat(0.0),
               PipingCorrectionHeating(1.0), CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0), MaxOATCCHeater(0.0), DefrostEIRPtr(0),
-              DefrostFraction(0.0), DefrostStrategy(0), DefrostControl(0), DefrostCapacity(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
+              DefrostFraction(0.0), DefrostStrategy(StandardRatings::DefrostStrat::Unassigned),
+              DefrostControl(StandardRatings::HPdefrostControl::Unassigned), DefrostCapacity(0.0), DefrostPower(0.0), DefrostConsumption(0.0),
               MaxOATDefrost(0.0), CondenserType(0), CondenserNodeNum(0), SkipCondenserNodeNumCheck(false), CondenserOutletNodeNum(0),
               WaterCondVolFlowRate(0.0), EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0), CoolCombRatioPTR(0),
               HeatCombRatioPTR(0), OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0), CoolElecConsumption(0.0),
@@ -486,7 +480,7 @@ namespace HVACVariableRefrigerantFlow {
                                   Real64 P_evap_real,    // Evaporative pressure at real conditions [Pa]
                                   Real64 T_comp_in_real, // Temperature of the refrigerant at the compressor inlet at real conditions [C]
                                   Real64 T_comp_in_rate, // Temperature of the refrigerant at the compressor inlet at rated conditions [C]
-                                  Real64 T_cond_out_rate // Temperature of the refrigerant at the condensor outlet at rated conditions [C]
+                                  Real64 T_cond_out_rate // Temperature of the refrigerant at the condenser outlet at rated conditions [C]
         );
 
         void VRFOU_TeModification(EnergyPlusData &state,
@@ -638,6 +632,7 @@ namespace HVACVariableRefrigerantFlow {
         int VRFTUOAMixerOANodeNum;           // OA node number for this TU's OA mixer
         int VRFTUOAMixerRelNodeNum;          // Relief node number for this TU's OA mixer
         int VRFTUOAMixerRetNodeNum;          // Return node number for this TU's OA mixer
+        int VRFTUOAMixerMixedNodeNum;        // Mixed node number for this TU's OA mixer
         Real64 MaxCoolAirVolFlow;            // supply air volumetric flow rate during cooling operation [m3/s]
         Real64 MaxHeatAirVolFlow;            // supply air volumetric flow rate during heating operation [m3/s]
         Real64 MaxNoCoolAirVolFlow;          // supply air volumetric flow rate when no cooling [m3/s]
@@ -755,10 +750,10 @@ namespace HVACVariableRefrigerantFlow {
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), ZoneAirNode(0), VRFTUInletNodeNum(0),
-              VRFTUOutletNodeNum(0), VRFTUOAMixerOANodeNum(0), VRFTUOAMixerRelNodeNum(0), VRFTUOAMixerRetNodeNum(0), MaxCoolAirVolFlow(0.0),
-              MaxHeatAirVolFlow(0.0), MaxNoCoolAirVolFlow(0.0), MaxNoHeatAirVolFlow(0.0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
-              MaxNoCoolAirMassFlow(0.0), MaxNoHeatAirMassFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0),
-              CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), MinOperatingPLR(1.0E-20),
+              VRFTUOutletNodeNum(0), VRFTUOAMixerOANodeNum(0), VRFTUOAMixerRelNodeNum(0), VRFTUOAMixerRetNodeNum(0), VRFTUOAMixerMixedNodeNum(0),
+              MaxCoolAirVolFlow(0.0), MaxHeatAirVolFlow(0.0), MaxNoCoolAirVolFlow(0.0), MaxNoHeatAirVolFlow(0.0), MaxCoolAirMassFlow(0.0),
+              MaxHeatAirMassFlow(0.0), MaxNoCoolAirMassFlow(0.0), MaxNoHeatAirMassFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0),
+              NoCoolHeatOutAirVolFlow(0.0), CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), MinOperatingPLR(1.0E-20),
               SuppHeatCoilFluidMaxFlow(0.0), DesignSuppHeatingCapacity(0.0), MaxSATFromSuppHeatCoil(0.0), MaxOATSuppHeatingCoil(0.0),
               SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), fanType_Num(0), FanOpModeSchedPtr(0), FanAvailSchedPtr(-1), FanIndex(0),
               FanPower(0.0), OpMode(0), FanPlace(0), ActualFanVolFlowRate(0.0), OAMixerIndex(0), OAMixerUsed(false), CoolCoilIndex(0),
@@ -896,6 +891,8 @@ namespace HVACVariableRefrigerantFlow {
 
     void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound // flag for errors in GetInput
     );
+
+    void CheckVRFTUNodeConnections(EnergyPlusData &state, int const VRFTUNum, bool &ErrorsFound);
 
     void InitVRF(EnergyPlusData &state, int VRFTUNum, int ZoneNum, bool FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq);
 
@@ -1037,11 +1034,11 @@ struct HVACVarRefFlowData : BaseGlobalStruct
     int ATMixOutNode2 = 0;        // terminal unit mixer outlet node
 
     // Object Data
-    Array1D<HVACVariableRefrigerantFlow::VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
+    EPVector<HVACVariableRefrigerantFlow::VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
     std::unordered_map<std::string, std::string> VrfUniqueNames;
-    Array1D<HVACVariableRefrigerantFlow::VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
-    Array1D<HVACVariableRefrigerantFlow::TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
-    Array1D<HVACVariableRefrigerantFlow::VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
+    EPVector<HVACVariableRefrigerantFlow::VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
+    EPVector<HVACVariableRefrigerantFlow::TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
+    EPVector<HVACVariableRefrigerantFlow::VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
     void clear_state() override
     {

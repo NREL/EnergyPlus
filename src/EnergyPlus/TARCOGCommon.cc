@@ -70,16 +70,6 @@ namespace TARCOGCommon {
     // PURPOSE OF THIS MODULE:
     // A module which contains common TARCOG functions and subroutines
 
-    bool IsShadingLayer(int const layertype)
-    {
-
-        // Using/Aliasing
-        using namespace TARCOGParams;
-
-        return layertype == VENETBLIND_HORIZ || layertype == VENETBLIND_VERT || layertype == WOVSHADE || layertype == PERFORATED ||
-               layertype == BSDF || layertype == DIFFSHADE;
-    }
-
     Real64 LDSumMax(Real64 const Width, Real64 const Height)
     {
         // LDSumMax function calculates sum part of equation for maximum deflection
@@ -97,13 +87,13 @@ namespace TARCOGCommon {
         int j;
 
         LDSumMax = 0.0;
-        for (i = 1; i <= mmax; i += 2) {
+        for (i = 1; i <= static_cast<int>(DeflectionParameters::mmax); i += 2) {
             Real64 const sin_i(std::sin(i * DataGlobalConstants::PiOvr2));
             Real64 const pow_i_W(pow_2(i / Width));
-            for (j = 1; j <= nmax; j += 2) {
+            for (j = 1; j <= static_cast<int>(DeflectionParameters::nmax); j += 2) {
                 LDSumMax += (sin_i * std::sin(j * DataGlobalConstants::PiOvr2)) / (i * j * pow_2(pow_i_W + pow_2(j / Height)));
-            } // do j = 1, nmax, 2
-        }     // do i = 1, mmax, 2
+            } // do j = 1, DeflectionParameters::nmax, 2
+        }     // do i = 1, DeflectionParameters::mmax, 2
 
         return LDSumMax;
     }
@@ -126,12 +116,12 @@ namespace TARCOGCommon {
         int j;
 
         LDSumMean = 0.0;
-        for (i = 1; i <= mmax; i += 2) {
+        for (i = 1; i <= static_cast<int>(DeflectionParameters::mmax); i += 2) {
             Real64 const pow_i_Pi_2(i * i * Pi_squared);
             Real64 const pow_i_W(pow_2(i / Width));
-            for (j = 1; j <= nmax; j += 2) {
+            for (j = 1; j <= static_cast<int>(DeflectionParameters::nmax); j += 2) {
                 LDSumMean += 4.0 / (pow_i_Pi_2 * pow_2(j) * pow_2(pow_i_W + pow_2(j / Height)));
-            } // do j = 1, nmax, 2
+            } // do j = 1, DeflectionParameters::nmax, 2
         }     // do i = 1, mmax, 2
 
         return LDSumMean;
