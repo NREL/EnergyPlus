@@ -1120,6 +1120,56 @@ namespace AirflowNetworkBalanceManager {
             }
         }
 
+        // *** Read AirflowNetwork simulation specified flow component
+        CurrentModuleObject = "AirflowNetwork:SpecifiedFlow";
+        //state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA =
+        //    state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Temporary workaround
+        instances = state.dataInputProcessing->inputProcessor->epJSON.find(CurrentModuleObject);
+        if (instances != state.dataInputProcessing->inputProcessor->epJSON.end()) {
+            //int i = 1; // Temporary workaround
+            //state.dataAirflowNetwork->MultizoneSurfaceELAData.allocate(
+            //    state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurELA); // Temporary workaround
+            //auto &instancesValue = instances.value();
+            //for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            //    auto const &fields = instance.value();
+            //    auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+            //    state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, instance.key()); // Temporary workaround
+
+            //    Real64 ela{fields.at("effective_leakage_area")};
+            //    Real64 cd{1.0};
+            //    if (fields.find("discharge_coefficient") != fields.end()) {
+            //        cd = fields.at("discharge_coefficient");
+            //    }
+            //    Real64 dp{4.0};
+            //    if (fields.find("reference_pressure_difference") != fields.end()) {
+            //        dp = fields.at("reference_pressure_difference");
+            //    }
+            //    Real64 expnt{0.65};
+            //    if (fields.find("air_mass_flow_exponent") != fields.end()) {
+            //        expnt = fields.at("air_mass_flow_exponent");
+            //    }
+
+            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).name = thisObjectName; // Name of surface effective leakage area component
+            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).ELA = ela;             // Effective leakage area
+            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).DischCoeff = cd;       // Discharge coefficient
+            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).RefDeltaP = dp;        // Reference pressure difference
+            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).FlowExpo = expnt;      // Air Mass Flow exponent
+            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).TestDeltaP = 0.0;      // Testing pressure difference
+            //    state.dataAirflowNetwork->MultizoneSurfaceELAData(i).TestDisCoef = 0.0;     // Testing Discharge coefficient
+
+            //    // Add the element to the lookup table, check for name overlaps
+            //    if (solver.elements.find(thisObjectName) == solver.elements.end()) {
+            //        solver.elements[thisObjectName] = &state.dataAirflowNetwork->MultizoneSurfaceELAData(i); // Yet another workaround
+            //    } else {
+            //        ShowSevereError(state, RoutineName + "Duplicated airflow element names are found = " + thisObjectName);
+            //        // ShowContinueError(state, "A unique component name is required in both objects " + CompName(1) + " and " + CompName(2));
+            //        success = false;
+            //    }
+
+            //    ++i;
+            //}
+        }
+
         // Read AirflowNetwork Distribution system component: duct leakage
         CurrentModuleObject = "AirflowNetwork:Distribution:Component:Leak";
         state.dataAirflowNetworkBalanceManager->DisSysNumOfLeaks =

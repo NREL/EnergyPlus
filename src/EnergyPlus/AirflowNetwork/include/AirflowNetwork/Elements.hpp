@@ -123,7 +123,8 @@ namespace AirflowNetwork {
         HOP = 17, // Horizontal opening component
         RVD = 18, // Reheat VAV terminal damper
         OAF = 19, // Distribution system OA
-        REL = 20  // Distribution system relief air
+        REL = 20, // Distribution system relief air
+        CMF = 21  // Specified flow component
     };
 
     enum class ComponentType
@@ -147,7 +148,8 @@ namespace AirflowNetwork {
         HOP,     // Horizontal opening component
         RVD,     // Reheat VAV terminal damper
         OAF,     // Distribution system OA
-        REL      // Distribution system relief air
+        REL,     // Distribution system relief air
+        CMF      // Specified flow component
     };
 
     // EPlus component Type
@@ -570,6 +572,37 @@ namespace AirflowNetwork {
         virtual ComponentType type()
         {
             return ComponentType::HOP;
+        }
+    };
+    
+    struct SpecifiedFlow : public AirflowElement // Large horizontal opening component
+    {
+        // Members
+        Real64 FlowCoef;   // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
+        Real64 FlowExpo;   // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
+        Real64 Slope;      // Sloping plane angle
+        Real64 DischCoeff; // Discharge coefficient at full opening
+
+        // Default Constructor
+        SpecifiedFlow() : FlowCoef(0.0), FlowExpo(0.0), Slope(0.0), DischCoeff(0.0)
+        {
+        }
+
+        int calculate(EnergyPlusData &state,
+                      bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
+                      Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
+                      int const i,                              // Linkage number
+                      [[maybe_unused]] const Real64 multiplier, // Element multiplier
+                      [[maybe_unused]] const Real64 control,    // Element control signal
+                      const AirProperties &propN,               // Node 1 properties
+                      const AirProperties &propM,               // Node 2 properties
+                      std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::CMF;
         }
     };
 
