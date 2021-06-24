@@ -575,29 +575,54 @@ namespace AirflowNetwork {
         }
     };
     
-    struct SpecifiedFlow : public AirflowElement // Large horizontal opening component
+    struct SpecifiedMassFlow : public AirflowElement // Specified mass flow element
     {
         // Members
-        Real64 FlowCoef;   // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
-        Real64 FlowExpo;   // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
-        Real64 Slope;      // Sloping plane angle
-        Real64 DischCoeff; // Discharge coefficient at full opening
+        Real64 mass_flow;  // Mass Flow [kg/s]
 
         // Default Constructor
-        SpecifiedFlow() : FlowCoef(0.0), FlowExpo(0.0), Slope(0.0), DischCoeff(0.0)
+        SpecifiedMassFlow() : mass_flow(0.0)
         {
         }
 
-        int calculate(EnergyPlusData &state,
-                      bool const LFLAG,                         // Initialization flag.If = 1, use laminar relationship
-                      Real64 const PDROP,                       // Total pressure drop across a component (P1 - P2) [Pa]
-                      int const i,                              // Linkage number
-                      [[maybe_unused]] const Real64 multiplier, // Element multiplier
-                      [[maybe_unused]] const Real64 control,    // Element control signal
-                      const AirProperties &propN,               // Node 1 properties
-                      const AirProperties &propM,               // Node 2 properties
+        int calculate([[maybe_unused]] EnergyPlusData &state,
+                      [[maybe_unused]] bool const LFLAG,        // Initialization flag.If = 1, use laminar relationship
+                      [[maybe_unused]] Real64 const PDROP,      // Total pressure drop across a component (P1 - P2) [Pa]
+                      [[maybe_unused]] int const i,             // Linkage number
+                      const Real64 multiplier, // Element multiplier
+                      const Real64 control,    // Element control signal
+                      [[maybe_unused]] const AirProperties &propN, // Node 1 properties
+                      [[maybe_unused]] const AirProperties &propM, // Node 2 properties
                       std::array<Real64, 2> &F,                 // Airflow through the component [kg/s]
                       std::array<Real64, 2> &DF                 // Partial derivative:  DF/DP
+        );
+
+        virtual ComponentType type()
+        {
+            return ComponentType::CMF;
+        }
+    };
+
+    struct SpecifiedVolumeFlow : public AirflowElement // Specified mass flow element
+    {
+        // Members
+        Real64 volume_flow; // Volume Flow [m3/s]
+
+        // Default Constructor
+        SpecifiedVolumeFlow() : volume_flow(0.0)
+        {
+        }
+
+        int calculate([[maybe_unused]] EnergyPlusData &state,
+                      [[maybe_unused]] bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
+                      [[maybe_unused]] Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
+                      [[maybe_unused]] int const i,                // Linkage number
+                      const Real64 multiplier,                     // Element multiplier
+                      const Real64 control,                        // Element control signal
+                      const AirProperties &propN, // Node 1 properties
+                      const AirProperties &propM, // Node 2 properties
+                      std::array<Real64, 2> &F,                    // Airflow through the component [kg/s]
+                      std::array<Real64, 2> &DF                    // Partial derivative:  DF/DP
         );
 
         virtual ComponentType type()
