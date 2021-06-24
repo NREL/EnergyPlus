@@ -44,7 +44,7 @@ jobs:
       working-directory: ./build
       shell: bash
       run: |
-        cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+        cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCPACK_BINARY_IFW=OFF \
               -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
               -DLINK_WITH_PYTHON=ON  -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
               -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
