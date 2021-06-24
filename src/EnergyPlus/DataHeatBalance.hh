@@ -109,9 +109,6 @@ namespace DataHeatBalance {
         GapEquivalentLayer
     };
 
-    constexpr int FixedSlats(1);
-    constexpr int VariableSlats(2);
-
     // Parameters for Interior and Exterior Solar Distribution
 
     constexpr int MinimalShadowing(-1);    // all incoming solar hits floor, no exterior shadowing except reveals
@@ -1184,7 +1181,7 @@ namespace DataHeatBalance {
         int MaterialNumber; // Material pointer for the blind
         // Input properties
         DataWindowEquivalentLayer::Orientation SlatOrientation; // HORIZONTAL or VERTICAL
-        int SlatAngleType;                                      // FIXED or VARIABLE
+        DataWindowEquivalentLayer::AngleType SlatAngleType;     // FIXED or VARIABLE
         Real64 SlatWidth;                                       // Slat width (m)
         Real64 SlatSeparation;                                  // Slat separation (m)
         Real64 SlatThickness;                                   // Slat thickness (m)
@@ -1294,25 +1291,26 @@ namespace DataHeatBalance {
 
         // Default Constructor
         WindowBlindProperties()
-            : MaterialNumber(0), SlatOrientation(DataWindowEquivalentLayer::Orientation::Unassigned), SlatAngleType(FixedSlats), SlatWidth(0.0),
-              SlatSeparation(0.0), SlatThickness(0.0), SlatCrown(0.0), SlatAngle(0.0), MinSlatAngle(0.0), MaxSlatAngle(0.0), SlatConductivity(0.0),
-              SlatTransSolBeamDiff(0.0), SlatFrontReflSolBeamDiff(0.0), SlatBackReflSolBeamDiff(0.0), SlatTransSolDiffDiff(0.0),
-              SlatFrontReflSolDiffDiff(0.0), SlatBackReflSolDiffDiff(0.0), SlatTransVisBeamDiff(0.0), SlatFrontReflVisBeamDiff(0.0),
-              SlatBackReflVisBeamDiff(0.0), SlatTransVisDiffDiff(0.0), SlatFrontReflVisDiffDiff(0.0), SlatBackReflVisDiffDiff(0.0), SlatTransIR(0.0),
-              SlatFrontEmissIR(0.0), SlatBackEmissIR(0.0), BlindToGlassDist(0.0), BlindTopOpeningMult(0.0), BlindBottomOpeningMult(0.0),
-              BlindLeftOpeningMult(0.0), BlindRightOpeningMult(0.0), SolFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0),
-              SolFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolBackBeamBeamTrans(MaxSlatAngs, 37, 0.0), SolBackBeamBeamRefl(MaxSlatAngs, 37, 0.0),
-              SolFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0), SolBackBeamDiffTrans(MaxSlatAngs, 37, 0.0),
-              SolBackBeamDiffRefl(MaxSlatAngs, 37, 0.0), SolFrontDiffDiffTrans(MaxSlatAngs, 0.0), SolFrontDiffDiffTransGnd(MaxSlatAngs, 0.0),
-              SolFrontDiffDiffTransSky(MaxSlatAngs, 0.0), SolFrontDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontDiffDiffReflGnd(MaxSlatAngs, 0.0),
-              SolFrontDiffDiffReflSky(MaxSlatAngs, 0.0), SolBackDiffDiffTrans(MaxSlatAngs, 0.0), SolBackDiffDiffRefl(MaxSlatAngs, 0.0),
-              SolFrontBeamAbs(MaxSlatAngs, 37, 0.0), SolBackBeamAbs(MaxSlatAngs, 37, 0.0), SolFrontDiffAbs(MaxSlatAngs, 0.0),
-              SolFrontDiffAbsGnd(MaxSlatAngs, 0.0), SolFrontDiffAbsSky(MaxSlatAngs, 0.0), SolBackDiffAbs(MaxSlatAngs, 0.0),
-              VisFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0), VisBackBeamBeamTrans(MaxSlatAngs, 37, 0.0),
-              VisBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), VisFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0), VisFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0),
-              VisBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), VisBackBeamDiffRefl(MaxSlatAngs, 37, 0.0), VisFrontDiffDiffTrans(MaxSlatAngs, 0.0),
-              VisFrontDiffDiffRefl(MaxSlatAngs, 0.0), VisBackDiffDiffTrans(MaxSlatAngs, 0.0), VisBackDiffDiffRefl(MaxSlatAngs, 0.0),
-              IRFrontTrans(MaxSlatAngs, 0.0), IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0), IRBackEmiss(MaxSlatAngs, 0.0)
+            : MaterialNumber(0), SlatOrientation(DataWindowEquivalentLayer::Orientation::Unassigned),
+              SlatAngleType(DataWindowEquivalentLayer::AngleType::Fixed), SlatWidth(0.0), SlatSeparation(0.0), SlatThickness(0.0), SlatCrown(0.0),
+              SlatAngle(0.0), MinSlatAngle(0.0), MaxSlatAngle(0.0), SlatConductivity(0.0), SlatTransSolBeamDiff(0.0), SlatFrontReflSolBeamDiff(0.0),
+              SlatBackReflSolBeamDiff(0.0), SlatTransSolDiffDiff(0.0), SlatFrontReflSolDiffDiff(0.0), SlatBackReflSolDiffDiff(0.0),
+              SlatTransVisBeamDiff(0.0), SlatFrontReflVisBeamDiff(0.0), SlatBackReflVisBeamDiff(0.0), SlatTransVisDiffDiff(0.0),
+              SlatFrontReflVisDiffDiff(0.0), SlatBackReflVisDiffDiff(0.0), SlatTransIR(0.0), SlatFrontEmissIR(0.0), SlatBackEmissIR(0.0),
+              BlindToGlassDist(0.0), BlindTopOpeningMult(0.0), BlindBottomOpeningMult(0.0), BlindLeftOpeningMult(0.0), BlindRightOpeningMult(0.0),
+              SolFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolBackBeamBeamTrans(MaxSlatAngs, 37, 0.0),
+              SolBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0),
+              SolBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), SolBackBeamDiffRefl(MaxSlatAngs, 37, 0.0), SolFrontDiffDiffTrans(MaxSlatAngs, 0.0),
+              SolFrontDiffDiffTransGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffTransSky(MaxSlatAngs, 0.0), SolFrontDiffDiffRefl(MaxSlatAngs, 0.0),
+              SolFrontDiffDiffReflGnd(MaxSlatAngs, 0.0), SolFrontDiffDiffReflSky(MaxSlatAngs, 0.0), SolBackDiffDiffTrans(MaxSlatAngs, 0.0),
+              SolBackDiffDiffRefl(MaxSlatAngs, 0.0), SolFrontBeamAbs(MaxSlatAngs, 37, 0.0), SolBackBeamAbs(MaxSlatAngs, 37, 0.0),
+              SolFrontDiffAbs(MaxSlatAngs, 0.0), SolFrontDiffAbsGnd(MaxSlatAngs, 0.0), SolFrontDiffAbsSky(MaxSlatAngs, 0.0),
+              SolBackDiffAbs(MaxSlatAngs, 0.0), VisFrontBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisFrontBeamBeamRefl(MaxSlatAngs, 37, 0.0),
+              VisBackBeamBeamTrans(MaxSlatAngs, 37, 0.0), VisBackBeamBeamRefl(MaxSlatAngs, 37, 0.0), VisFrontBeamDiffTrans(MaxSlatAngs, 37, 0.0),
+              VisFrontBeamDiffRefl(MaxSlatAngs, 37, 0.0), VisBackBeamDiffTrans(MaxSlatAngs, 37, 0.0), VisBackBeamDiffRefl(MaxSlatAngs, 37, 0.0),
+              VisFrontDiffDiffTrans(MaxSlatAngs, 0.0), VisFrontDiffDiffRefl(MaxSlatAngs, 0.0), VisBackDiffDiffTrans(MaxSlatAngs, 0.0),
+              VisBackDiffDiffRefl(MaxSlatAngs, 0.0), IRFrontTrans(MaxSlatAngs, 0.0), IRFrontEmiss(MaxSlatAngs, 0.0), IRBackTrans(MaxSlatAngs, 0.0),
+              IRBackEmiss(MaxSlatAngs, 0.0)
         {
         }
     };

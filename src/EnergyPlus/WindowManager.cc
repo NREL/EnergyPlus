@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -1485,7 +1486,7 @@ namespace WindowManager {
                     // Continue loop over slat angles only for blinds with variable slat angle
                     if (ShadeOn || ScreenOn) break;
                     if (BlindOn) {
-                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == FixedSlats) break;
+                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     }
                 } // End of slat angle loop
             }     // End of check if construction has a shade or blind
@@ -1621,7 +1622,7 @@ namespace WindowManager {
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind
                     if (IntBlind) {
-                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == FixedSlats) break;
+                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     }
                 } // End of slat angle loop
             }     // End of check if interior shade or interior blind
@@ -6707,7 +6708,7 @@ namespace WindowManager {
                            TScBmDifVis * TDifVis / (1 - RGlDiffFrontVis * RScDifBackVis);
             } else {
                 VarSlats = false;
-                if (state.dataHeatBal->Blind(BlNum).SlatAngleType == VariableSlats) VarSlats = true;
+                if (state.dataHeatBal->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Variable) VarSlats = true;
                 SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                 TBlBmBm = BlindBeamBeamTrans(0.0,
                                              SlatAng,
@@ -7864,7 +7865,7 @@ namespace WindowManager {
                 for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
 
                     st_lay = 0.0;
-                    if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == FixedSlats) {
+                    if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
                         bld_el = state.dataHeatBal->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
                     } else {                                                                     // Variable slat angle
                         bld_el = (DataGlobalConstants::Pi / (MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
@@ -7889,7 +7890,7 @@ namespace WindowManager {
                         state.dataHeatBal->Blind(BlindNum).VisBackDiffDiffRefl(ISlatAng) = st_lay(12);
                     }
 
-                    if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == FixedSlats) break;
+                    if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                 } // End of slat angle loop
 
                 // Calculate beam properties of blind. Vary profile angle from -90 to +90 deg in 5-deg steps.
@@ -7902,7 +7903,7 @@ namespace WindowManager {
 
                     for (ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng) {
                         st_lay = 0.0;
-                        if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == FixedSlats) {
+                        if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) {
                             bld_el = state.dataHeatBal->Blind(BlindNum).SlatAngle * DataGlobalConstants::DegToRadians;
                         } else {                                                                     // Variable slat angle
                             bld_el = (DataGlobalConstants::Pi / (MaxSlatAngs - 1)) * (ISlatAng - 1); // 0 <= bld_el <= 180 deg
@@ -7936,7 +7937,7 @@ namespace WindowManager {
                             state.dataHeatBal->Blind(BlindNum).VisBackBeamDiffRefl(ISlatAng, IProfAng) = st_lay(8);
                         }
 
-                        if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == FixedSlats) break;
+                        if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     } // End of loop over slat angles
                 }     // End of loop over profile angles
 
@@ -7958,7 +7959,7 @@ namespace WindowManager {
                             DiffuseAverageProfAngSky(state.dataHeatBal->Blind(BlindNum).SolFrontBeamDiffRefl(ISlatAng, {1, 37}));
 
                         // TH 2/17/2010. Added. Loop only for movable slat blinds
-                        if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == FixedSlats) break;
+                        if (state.dataHeatBal->Blind(BlindNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     }
                 }
 

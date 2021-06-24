@@ -3467,7 +3467,7 @@ namespace HeatBalanceManager {
             // TH 2/11/2010. For CR 8010
             // By default all blinds have fixed slat angle, new blinds with variable slat angle are created if
             //  they are used with window shading controls that adjust slat angles like ScheduledSlatAngle or BlockBeamSolar
-            state.dataHeatBal->Blind(Loop).SlatAngleType = FixedSlats;
+            state.dataHeatBal->Blind(Loop).SlatAngleType = DataWindowEquivalentLayer::AngleType::Fixed;
 
             if (state.dataHeatBal->Blind(Loop).SlatWidth < state.dataHeatBal->Blind(Loop).SlatSeparation) {
                 ShowWarningError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Slat Angles/Widths");

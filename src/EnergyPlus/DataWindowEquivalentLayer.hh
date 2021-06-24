@@ -105,6 +105,13 @@ namespace DataWindowEquivalentLayer {
         Vertical
     };
 
+    enum class AngleType
+    {
+        Unassigned = -1,
+        Fixed,
+        Variable
+    };
+        
     struct CFSLWP
     {
         // Members

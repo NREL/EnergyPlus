@@ -2478,7 +2478,8 @@ namespace SurfaceGeometry {
                             // TH 2/18/2010. CR 8010
                             // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
                             //  the new blind is created only once, it can be shared by multiple windows though.
-                            if (state.dataSurface->SurfWinMovableSlats(SurfNum) && state.dataHeatBal->Blind(BlNum).SlatAngleType != VariableSlats) {
+                            if (state.dataSurface->SurfWinMovableSlats(SurfNum) &&
+                                state.dataHeatBal->Blind(BlNum).SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
                                 errFlag = false;
                                 AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
                                 // point to the new blind

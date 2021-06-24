@@ -992,7 +992,7 @@ void AddVariableSlatBlind(EnergyPlusData &state,
         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds) = state.dataHeatBal->Blind(inBlindNumber);
         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).Name = "~" + state.dataHeatBal->Blind(inBlindNumber).Name;
         outBlindNumber = state.dataHeatBal->TotBlinds;
-        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngleType = VariableSlats;
+        state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngleType = DataWindowEquivalentLayer::AngleType::Variable;
 
         // Minimum and maximum slat angles allowed by slat geometry
         if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatWidth >
