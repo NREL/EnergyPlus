@@ -31,7 +31,7 @@ As shown in the previous section, minimum terminal primary air flow can (be requ
 ### Occupant diversity
 The occupant diversity, `D`, is currently calculated by EnergyPlus using user-input design levels and schedules. While this might be convenient for users, extra care should be put into developing schedules so `D`, as calculated by EnergyPlus, match a potentially expected value. Additionally, performance might be somewhat impacted by the current implementation of that routine (see [issue 6487](https://github.com/NREL/EnergyPlus/issues/6487)). We propose to make `D` a user-input in the `Sizing:System` object. If not specified by the user the current routine would be used.
 
-Letting EnergyPlus calculate `D` can potentially lead to some issues. For instance, if user-input occupancy schedules are normalized. Below is an example where two cases are compared: one using non-normalized schedules (regular case, actual occupancy fractions) and a case using normalized schedules. In both cases the actual modeled occupancies are the same. Each case leads to a different value of `D`.
+Letting EnergyPlus calculate `D` can potentially lead to some issues. For instance, if user-input occupancy schedules are normalized. Below is an example where two cases are compared: one using non-normalized schedules (regular case, actual occupancy fractions) and a case using normalized schedules. In both cases the actual modeled occupancy is the same. Each case leads to a different value of `D`.
 
 ![Occupancy Fraction](occupancy_fraction.png)
 
@@ -49,13 +49,13 @@ Letting EnergyPlus calculate `D` can potentially lead to some issues. For instan
 
 ![Occupancy Fraction](actual_nb_ppl_zone1.png)
 
-The "regular case" lead to a `D` of 0.95 while the normalized case lead to a `D` of 1.0.
+The "regular case" leads to a `D` of 0.95 while the normalized case lead to a `D` of 1.0.
 
 ### Ventilation Optimization
 The system ventilation optimization control requirement in ASHRAE Standard 90.1 requires that the system OA intake be adjusted, based on changes in System Ventilation Efficiency, below the design rate when applicable. EnergyPlus is able to make this adjustment through the `Controller:MechanicalVentilation` object but does not currently checks if the calculated system OA is less than the design value. It is possible for the System Ventilation Efficiency at non-design conditions to be lower than at design conditions. This would result in a system OA intake increase which violates the building energy code requirement. We proposed to "cap" the system OA calculated by `VentilationMechanicalProps::CalcMechVentController` to the system design OA value when the VRP is selected (Note: the SP is only used for system OA sizing calculations). The ASHRAE Guideline 36 also specifies in Section 5.16.3.1.h that the effective minimum OA intake should be not larger than the design total OA intake.
 
 ## E-mail and  Conference Call Conclusions
-During the initial presentation, the team suggested to not consider option 1 listed above as a way to determine a terminal's primary air flow rate using the SP.
+During the initial presentation, the team suggested not to consider option 1 listed above as a way to determine a terminal's primary air flow rate using the SP.
 
 Additional discussion regarding the proposal of making `D` a user input is needed. Note: an example showcasing why letting EnergyPlus calculate `D` has been added to the Approach section. 
 
@@ -136,7 +136,7 @@ Constant volume air terminal are not targeted by the SP which narrows the list o
 - `AirTerminal:SingleDuct:ParallelPIU:Reheat`
 - `AirTerminal:DualDuct:VAV`
 
-The zone minimum air flow of the `AirTerminal:DualDuct:VAV`, `AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat`, `AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat`, and `AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan` is not currently autosizable so they should not be targeted by this new feature:
+The zone minimum air flow of the `AirTerminal:DualDuct:VAV`, `AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat`, `AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat`, and `AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan` is not currently "autosizable" so they should probably not be targeted by this new feature. Removing these objects from the list above give us the following air terminal objects:
 - `AirTerminal:SingleDuct:VAV:NoReheat`
 - `AirTerminal:SingleDuct:VAV:Reheat`
 - `AirTerminal:SingleDuct:SeriesPIU:Reheat`
@@ -243,18 +243,16 @@ Residential Buildings. ASHRAE, Atlanta, GA
 # Design Document
 ## System OA Intake and Occupant Diversity
 ### Occupant Diversity
-In `SizeSysOutdoorAir` the call to the `DetermineSystemPopulationDiversity` function will be wrapped in a `if` statement which will check if the new occupant diversity field in the `Sizing:System` object is set to `autosize` or not. If set to `autosize`, the existing method will be used, if not, the value specified by the user will be retrieved through `state.dataSize->SysSizeInput`.
+In `SizeSysOutdoorAir` the call to the `DetermineSystemPopulationDiversity` function will be wrapped in a `if` statement which will check if the new occupant diversity field in the `Sizing:System` object is set to `autosize` or not. If set to `autosize`, the existing method will be used, if not, the value specified by the user will be retrieved through `state.dataSize->SysSizInput`.
 ### System OA Intake
 A new OA method will be added to `DataSizing.hh`, `SOAM_SP`.
 
-The design system OA intake, ventilation efficiency, along with the intermediate values for the design ventilation rate procedure are calculated in the `ManageSystemVentilationAdjustments` function. The existing VRP calculation will be kept and be applied to the SP. The only modification will be to the zone ventilation efficiency `Evz` which will be calculated as per the SP when request by the user. `Evz` will be the same for heating, cooling, and all zones. This code modification approach will ensure that the variables used in the 62.1 Summary reporting are determined just like for the VRP, except for `Ev` and `Evz`.
+The design system OA intake, ventilation efficiency, along with the intermediate values for the design ventilation rate procedure are calculated in `ManageSystemVentilationAdjustments`. The existing VRP calculations will be kept and also applied to the SP. The only modification will be to the zone ventilation efficiency `Evz` which will be calculated as per the SP when request by the user. `Evz` will be the same for heating, cooling, and all zones. This code modification approach will ensure that the variables used in the 62.1 Summary reporting are the same as for the VRP. The only exception being how `Ev` and `Evz` are calculated.
 ## Zone Minimum (Primary) Air Flow
 ### Single Ducts
-In the `SingleDuctAirTerminal::SizeSys` function (where terminal air flow sizing calculations for single duct terminal are done), code will be added to retrieve the system OA method associated with each terminal (through `state.dataSize->SysSizeInput`).
-
-Code will be added in that same function to determine the zone minimum airflow when the selected system OA method is the new OA method (`DataSizing::SOAM_SP`). `FixedMinAirDes` (when `ZoneMinAirFracMethod == MinFlowFraction::Fixed`) will be calculated by retrieving the values for `VozClgByZone` and `VozHtgByZone` and multiplying the larger of the two by 1.5. `MinAirFlowFracDes` (when `ZoneMinAirFracMethod == MinFlowFraction::Constant`) will be calculated similarly but also divided by `MaxAirVolFlowRate`.
+In the `SingleDuctAirTerminal::SizeSys` function (where terminal air flow sizing calculations for single duct terminals are done), code will be added to retrieve the system OA method associated with each terminal (through `state.dataSize->SysSizInput`). Code will be added in that same function to determine the zone minimum airflow if the selected system OA method is the new OA method (`DataSizing::SOAM_SP`). `FixedMinAirDes` (when `ZoneMinAirFracMethod == MinFlowFraction::Fixed`) will be calculated by retrieving the values for `VozClgByZone` and `VozHtgByZone` and multiplying the larger of the two by 1.5. `MinAirFlowFracDes` (when `ZoneMinAirFracMethod == MinFlowFraction::Constant`) will be calculated similarly (and divided by `MaxAirVolFlowRate`).
 ### PIUs
 The same approach as previously described will be used in `SizePIU`. `MinPriAirFlowFracDes` will be determined by multiplying the larger of the two `VozClgByZone` and `VozHtgByZone` air flows by 1.5.
 
 ## Ventilation Optimization
-The ventilation optimization calculations are done in the `VentilationMechanicalProps::CalcMechVentController` function in `MixedAir.cc`. The system OA flow for the VRP is calculated as follows: `SysOA = SysOAuc / SysEv;`. As mentioned in ASHRAE Standard 90.1 and Guideline 36, the calculated OA flow should be equal or smaller to the design OA flow. The design OA flow will be retrieved from `state.dataSize->FinalSysSizing` and system OA will be set to the minimum of the design air flow rate and the recalculated air flow.
+The ventilation optimization calculations are done in the `VentilationMechanicalProps::CalcMechVentController` function in `MixedAir.cc`. The system OA flow for the VRP is calculated as follows: `SysOA = SysOAuc / SysEv;`. As mentioned in ASHRAE Standard 90.1 and Guideline 36, the calculated OA flow should be equal or smaller to the design OA flow. The design OA flow will be retrieved from `state.dataSize->FinalSysSizing` and the system OA flow will be set to the minimum of the design air flow rate and the recalculated air flow.
