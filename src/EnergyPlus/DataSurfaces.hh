@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Shape.hh>
 
@@ -238,15 +239,6 @@ namespace DataSurfaces {
         MediumSmooth,
         Smooth,
         VerySmooth
-    };
-
-    // Parameters to indicate blind orientation for use with the Material
-    // derived type (see below):
-    enum class Orientation
-    {
-        Unassigned = -1,
-        Horizontal,
-        Vertical
     };
 
     inline std::string HeatTransferModelNames(iHeatTransferModel const &m)
@@ -795,10 +787,10 @@ namespace DataSurfaces {
         Real64 DividerConductance;         // Effective conductance of divider (no air films) {W/m2-K}
         Real64 DivEdgeToCenterGlCondRatio; // Ratio of divider edge of glass conductance (without air films) to
         // center of glass conductance (without air films)
-        Real64 DividerSolAbsorp;                      // Solar absorptance of divider corrected for self-shading
-        Real64 DividerVisAbsorp;                      // Visible absorptance of divider corrected for self-shading
-        Real64 DividerEmis;                           // Thermal emissivity of divider
-        DataSurfaces::Orientation MullionOrientation; // Horizontal or Vertical; used only for windows with two glazing systems
+        Real64 DividerSolAbsorp;                                   // Solar absorptance of divider corrected for self-shading
+        Real64 DividerVisAbsorp;                                   // Visible absorptance of divider corrected for self-shading
+        Real64 DividerEmis;                                        // Thermal emissivity of divider
+        DataWindowEquivalentLayer::Orientation MullionOrientation; // Horizontal or Vertical; used only for windows with two glazing systems
         //  divided by a mullion; obtained from Window5 data file.
         Real64 OutsideRevealSolAbs; // Solar absorptance of outside reveal
         Real64 InsideSillDepth;     // Inside sill depth (m)
@@ -812,8 +804,8 @@ namespace DataSurfaces {
               FrEdgeToCenterGlCondRatio(1.0), FrameSolAbsorp(0.0), FrameVisAbsorp(0.0), FrameEmis(0.9), DividerType(0), DividerWidth(0.0),
               HorDividers(0), VertDividers(0), DividerProjectionOut(0.0), DividerProjectionIn(0.0), DividerEdgeWidth(0.06355),
               DividerConductance(0.0), DivEdgeToCenterGlCondRatio(1.0), DividerSolAbsorp(0.0), DividerVisAbsorp(0.0), DividerEmis(0.9),
-              MullionOrientation(DataSurfaces::Orientation::Unassigned), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0), InsideReveal(0.0),
-              InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
+              MullionOrientation(DataWindowEquivalentLayer::Orientation::Unassigned), OutsideRevealSolAbs(0.0), InsideSillDepth(0.0),
+              InsideReveal(0.0), InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0)
         {
         }
     };

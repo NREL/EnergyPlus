@@ -901,8 +901,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->Surface(1).Tilt = 90.0;
     state->dataSurface->Surface(1).Azimuth = 180.0;
-    DataSurfaces::Orientation horiz = DataSurfaces::Orientation::Horizontal;
-    DataSurfaces::Orientation vert = DataSurfaces::Orientation::Vertical;
+    DataWindowEquivalentLayer::Orientation horiz = DataWindowEquivalentLayer::Orientation::Horizontal;
+    DataWindowEquivalentLayer::Orientation vert = DataWindowEquivalentLayer::Orientation::Vertical;
     Real64 ProfAng;
     Vector3<Real64> CosDirSun; // Solar direction cosines
 

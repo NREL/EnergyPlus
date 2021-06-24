@@ -96,6 +96,15 @@ namespace DataWindowEquivalentLayer {
         BEAM
     };
 
+    // Parameters to indicate blind orientation for use with the Material
+    // derived type (see below):
+    enum class Orientation
+    {
+        Unassigned = -1,
+        Horizontal,
+        Vertical
+    };
+
     struct CFSLWP
     {
         // Members

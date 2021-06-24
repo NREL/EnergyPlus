@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
@@ -107,7 +108,6 @@ namespace DataHeatBalance {
         ScreenEquivalentLayer,
         GapEquivalentLayer
     };
-
 
     constexpr int FixedSlats(1);
     constexpr int VariableSlats(2);
@@ -1183,16 +1183,16 @@ namespace DataHeatBalance {
         std::string Name;
         int MaterialNumber; // Material pointer for the blind
         // Input properties
-        DataSurfaces::Orientation SlatOrientation; // HORIZONTAL or VERTICAL
-        int SlatAngleType;                         // FIXED or VARIABLE
-        Real64 SlatWidth;                          // Slat width (m)
-        Real64 SlatSeparation;                     // Slat separation (m)
-        Real64 SlatThickness;                      // Slat thickness (m)
-        Real64 SlatCrown;                          // the height of the slate (length from the chord to the curve)
-        Real64 SlatAngle;                          // Slat angle (deg)
-        Real64 MinSlatAngle;                       // Minimum slat angle for variable-angle slats (deg) (user input)
-        Real64 MaxSlatAngle;                       // Maximum slat angle for variable-angle slats (deg) (user input)
-        Real64 SlatConductivity;                   // Slat conductivity (W/m-K)
+        DataWindowEquivalentLayer::Orientation SlatOrientation; // HORIZONTAL or VERTICAL
+        int SlatAngleType;                                      // FIXED or VARIABLE
+        Real64 SlatWidth;                                       // Slat width (m)
+        Real64 SlatSeparation;                                  // Slat separation (m)
+        Real64 SlatThickness;                                   // Slat thickness (m)
+        Real64 SlatCrown;                                       // the height of the slate (length from the chord to the curve)
+        Real64 SlatAngle;                                       // Slat angle (deg)
+        Real64 MinSlatAngle;                                    // Minimum slat angle for variable-angle slats (deg) (user input)
+        Real64 MaxSlatAngle;                                    // Maximum slat angle for variable-angle slats (deg) (user input)
+        Real64 SlatConductivity;                                // Slat conductivity (W/m-K)
         // Solar slat properties
         Real64 SlatTransSolBeamDiff;     // Slat solar beam-diffuse transmittance
         Real64 SlatFrontReflSolBeamDiff; // Slat front solar beam-diffuse reflectance
@@ -1294,7 +1294,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         WindowBlindProperties()
-            : MaterialNumber(0), SlatOrientation(DataSurfaces::Orientation::Unassigned), SlatAngleType(FixedSlats), SlatWidth(0.0),
+            : MaterialNumber(0), SlatOrientation(DataWindowEquivalentLayer::Orientation::Unassigned), SlatAngleType(FixedSlats), SlatWidth(0.0),
               SlatSeparation(0.0), SlatThickness(0.0), SlatCrown(0.0), SlatAngle(0.0), MinSlatAngle(0.0), MaxSlatAngle(0.0), SlatConductivity(0.0),
               SlatTransSolBeamDiff(0.0), SlatFrontReflSolBeamDiff(0.0), SlatBackReflSolBeamDiff(0.0), SlatTransSolDiffDiff(0.0),
               SlatFrontReflSolDiffDiff(0.0), SlatBackReflSolDiffDiff(0.0), SlatTransVisBeamDiff(0.0), SlatFrontReflVisBeamDiff(0.0),

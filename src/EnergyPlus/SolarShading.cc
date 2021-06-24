@@ -6954,7 +6954,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             // For blinds with horizontal slats, allow different diffuse/diffuse transmittance for
                             // ground and sky solar
                             if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
-                                DataSurfaces::Orientation::Horizontal) {
+                                DataWindowEquivalentLayer::Orientation::Horizontal) {
                                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                                     DiffTransGnd =
                                         General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).BlTransDiffGnd(SurfWinSlatsAngIndex),
@@ -7202,7 +7202,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                 state.dataSolarShading->WinTransDifSolar(SurfNum) = DiffTrans * state.dataSurface->Surface(SurfNum).Area;
                 if (ANY_BLIND(ShadeFlag)) {
                     if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
-                        DataSurfaces::Orientation::Horizontal) {
+                        DataWindowEquivalentLayer::Orientation::Horizontal) {
                         state.dataSolarShading->WinTransDifSolarGnd(SurfNum) = DiffTransGnd * state.dataSurface->Surface(SurfNum).Area;
                         state.dataSolarShading->WinTransDifSolarSky(SurfNum) = DiffTransSky * state.dataSurface->Surface(SurfNum).Area;
                     }
@@ -8429,7 +8429,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             state.dataSurface->SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         if (ANY_BLIND(ShadeFlag)) {
                             if (state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).SlatOrientation ==
-                                DataSurfaces::Orientation::Horizontal) {
+                                DataWindowEquivalentLayer::Orientation::Horizontal) {
                                 state.dataSurface->SurfWinDifSolar(SurfNum) = SkySolarInc * state.dataSolarShading->WinTransDifSolarSky(SurfNum) +
                                                                               GndSolarInc * state.dataSolarShading->WinTransDifSolarGnd(SurfNum);
                                 state.dataSurface->SurfWinDifSolarEnergy(SurfNum) =

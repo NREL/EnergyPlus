@@ -9118,10 +9118,10 @@ Real64 DayltgSkyLuminance(EnergyPlusData &state,
 }
 
 void ProfileAngle(EnergyPlusData &state,
-                  int const SurfNum,                // Surface number
-                  Vector3<Real64> const &CosDirSun, // Solar direction cosines
-                  DataSurfaces::Orientation const HorOrVert, // If HORIZONTAL, calculates ProfileAngHor
-                  Real64 &ProfileAng                // Solar profile angle (radians).
+                  int const SurfNum,                                      // Surface number
+                  Vector3<Real64> const &CosDirSun,                       // Solar direction cosines
+                  DataWindowEquivalentLayer::Orientation const HorOrVert, // If HORIZONTAL, calculates ProfileAngHor
+                  Real64 &ProfileAng                                      // Solar profile angle (radians).
 )
 {
 
@@ -9164,7 +9164,7 @@ void ProfileAngle(EnergyPlusData &state,
                                                              // WinNorm and vector along baseline of window
     auto &WinNormCrossBase = state.dataDaylightingManager->WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
 
-    if (HorOrVert == DataSurfaces::Orientation::Horizontal) { // Profile angle for horizontal structures
+    if (HorOrVert == DataWindowEquivalentLayer::Orientation::Horizontal) { // Profile angle for horizontal structures
         ElevWin = DataGlobalConstants::PiOvr2 - state.dataSurface->Surface(SurfNum).Tilt * DataGlobalConstants::DegToRadians;
         AzimWin = (90.0 - state.dataSurface->Surface(SurfNum).Azimuth) * DataGlobalConstants::DegToRadians;
         ElevSun = std::asin(CosDirSun(3));
