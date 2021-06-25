@@ -199,6 +199,15 @@ void ManageSurfaceHeatBalance(EnergyPlusData &state)
     if (state.dataHeatBalSurfMgr->ManageSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Surfaces");
     InitSurfaceHeatBalance(state); // Initialize all heat balance related parameters
 
+    // overwrite surface convective and radiative adjustment ratio
+    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+        if ((state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) && (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment)) {
+        int ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+        state.dataHeatBal->CoeffAdjRatioIn(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+        state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+        }
+    }
+
     // Solve the zone heat balance 'Detailed' solution
     // Call the outside and inside surface heat balances
     if (state.dataHeatBalSurfMgr->ManageSurfaceHeatBalancefirstTime) DisplayString(state, "Calculate Outside Surface Heat Balance");

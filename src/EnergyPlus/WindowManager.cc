@@ -1658,15 +1658,6 @@ namespace WindowManager {
         } // End of surface loop
 
         ReportGlass(state);
-
-        // overwrite surface convective and radiative adjustment ratio
-        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if ((state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) && (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment)) {
-                ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
-                state.dataHeatBal->CoeffAdjRatioIn(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-                state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-            }
-        }
     }
 
     //*****************************************************************************************
@@ -2950,7 +2941,7 @@ namespace WindowManager {
         // Radiation emission to air rate
         state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
         state.dataHeatBalSurf->QHeatEmiReport(SurfNum) =
-            surface.Area * state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout) +
+            surface.Area * state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout) +
             state.dataHeatBalSurf->QAirExtReport(SurfNum);
     }
 
@@ -7274,7 +7265,6 @@ namespace WindowManager {
         Real64 temdiff; // Inside/outside air temperature difference (K)
         Real64 ressum;  // Resistance sum (m2-K/W)
 
-        // fixme: check exterior
         rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
         rguess(state.dataWindowManager->nglface + 1) = 1.0 / (hcinStartValue + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
 
