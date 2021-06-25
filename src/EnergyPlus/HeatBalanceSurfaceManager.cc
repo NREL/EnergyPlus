@@ -7370,7 +7370,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         if (Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 
         // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-        HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataHeatBal->coeffAdjRatioIn(surfNum);
+        HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataHeatBal->CoeffAdjRatioIn(surfNum);
         auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->TempSurfIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
         state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
         state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
@@ -8111,7 +8111,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-            HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataHeatBal->coeffAdjRatioIn(surfNum);
+            HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataHeatBal->CoeffAdjRatioIn(surfNum);
             auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->TempSurfIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
             state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
             state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
