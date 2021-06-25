@@ -6866,6 +6866,13 @@ namespace UnitarySystems {
                 input_specs.availability_schedule_name = availScheduleName;
                 input_specs.cooling_coil_object_type = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));
                 input_specs.cooling_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_name"));
+                // why is this cooling coil does not have a field for Design Water Flow Rate
+                // set it "SupplyAirFlowRate" to avoid blank, which lead to fatal out during get input
+                std::string loc_cooling_coil_object_type("COIL:COOLING:WATER:DETAILEDGEOMETRY");
+                if (UtilityRoutines::SameString(loc_cooling_coil_object_type, input_specs.cooling_coil_object_type)) {
+                    input_specs.cooling_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase("SupplyAirFlowRate");
+                    input_specs.cooling_supply_air_flow_rate = DataSizing::AutoSize;
+                }
                 // optional input fields
                 Real64 minAir2FluidTempOffset(0.0);
                 if (fields.find("minimum_air_to_water_temperature_offset") != fields.end()) { // not required field, has default value of 0.0
