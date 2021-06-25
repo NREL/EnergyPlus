@@ -53,13 +53,15 @@
 // Language: C++
 
 // C++ Headers
-#include <cstdint> // C++11
 #include <cassert>
+#include <cstdint> // C++11
 
 #include <EnergyPlus/api/TypeDefs.h>
 
 // macro to guarantee array sizing in debug builds
-#define EP_SIZE_CHECK(array, min_size) assert(min_size >= 0);assert(array.size() >= (size_t)min_size)
+#define EP_SIZE_CHECK(array, min_size)                                                                                                               \
+    assert(min_size >= 0);                                                                                                                           \
+    assert(array.size() >= (size_t)min_size)
 
 typedef std::int32_t Int32;
 typedef std::int64_t Int64;
@@ -76,26 +78,20 @@ typedef std::int64_t Int64;
 #include <ObjexxFCL/Array3D.fwd.hh>
 #include <ObjexxFCL/Array4D.fwd.hh>
 #include <ObjexxFCL/Array5D.fwd.hh>
-#include <ObjexxFCL/Array6D.fwd.hh>
 #include <ObjexxFCL/MArray1.fwd.hh>
-#include <ObjexxFCL/Omit.fwd.hh>
+#include <ObjexxFCL/Omit.hh>
 #include <ObjexxFCL/Optional.fwd.hh>
 #include <ObjexxFCL/Reference.fwd.hh>
 #include <ObjexxFCL/Vector2.fwd.hh>
 #include <ObjexxFCL/Vector3.fwd.hh>
 #include <ObjexxFCL/Vector4.fwd.hh>
 
-namespace ObjexxFCL {
-extern Omit const _;
-} // namespace ObjexxFCL
 using ObjexxFCL::_;
 
 using ObjexxFCL::Array1;
-using ObjexxFCL::Array1_bool;
 using ObjexxFCL::Array1_int;
 using ObjexxFCL::Array1_string;
 using ObjexxFCL::Array1A;
-using ObjexxFCL::Array1A_bool;
 using ObjexxFCL::Array1A_int;
 using ObjexxFCL::Array1D;
 using ObjexxFCL::Array1D_bool;
@@ -125,7 +121,6 @@ using ObjexxFCL::Array3D_int;
 using ObjexxFCL::Array4D;
 using ObjexxFCL::Array4D_int;
 using ObjexxFCL::Array5D;
-using ObjexxFCL::Array6D;
 using ObjexxFCL::MArray1;
 using ObjexxFCL::Optional;
 using ObjexxFCL::Optional_bool;
@@ -144,7 +139,6 @@ using ObjexxFCL::Vector4;
 // ObjexxFCL Functions
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/bit.hh>
 #include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/numeric.hh>
@@ -206,9 +200,5 @@ using ObjexxFCL::trim;
 using ObjexxFCL::trimmed;
 using ObjexxFCL::uppercase;
 using ObjexxFCL::uppercased;
-using ObjexxFCL::bit::bit_and;
-using ObjexxFCL::bit::bit_shift;
-using ObjexxFCL::bit::bit_transfer;
-using ObjexxFCL::bit::bit_xor;
 
 #endif

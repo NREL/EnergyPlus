@@ -67,10 +67,17 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
 {
     // Test input processing for DemandManager:Ventilation
 
-    std::string const idf_objects = delimited_string({"DemandManager:Ventilation,", " Ventilation Manager,", " ,", " FIXEDRATE,", " 60,", " 0.2,",
+    std::string const idf_objects = delimited_string({"DemandManager:Ventilation,",
+                                                      " Ventilation Manager,",
+                                                      " ,",
+                                                      " FIXEDRATE,",
+                                                      " 60,",
+                                                      " 0.2,",
                                                       " ,", // N3 left blank because Numbers was only assigned up to 2
                                                       " ,", // N4 left blank because Numbers was only assigned up to 2
-                                                      " ALL,", " ,", " OA CONTROLLER 1;"});
+                                                      " ALL,",
+                                                      " ,",
+                                                      " OA CONTROLLER 1;"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -79,7 +86,7 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
     state->dataMixedAir->OAController(1).Name = "OA CONTROLLER 1";
 
     GetDemandManagerInput(*state);
-    auto & DemandMgr(state->dataDemandManager->DemandMgr);
+    auto &DemandMgr(state->dataDemandManager->DemandMgr);
     EXPECT_EQ(DataGlobalConstants::ScheduleAlwaysOn, DemandMgr(1).AvailSchedule);
     EXPECT_EQ(Limit::ManagerLimitFixed, DemandMgr(1).LimitControl);
     EXPECT_DOUBLE_EQ(60.0, DemandMgr(1).LimitDuration);

@@ -64,53 +64,18 @@ namespace HeatBalanceHAMTManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern int const ittermax; // Maximum Number of itterations
-    extern int const adjmax;   // Maximum Number of Adjacent Cells
 
-    extern Real64 const wdensity; // Density of water kg.m-3
-    extern Real64 const wspech;   // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
-    extern Real64 const whv;      // Evaporation enthalpy of water J.kg-1
-    extern Real64 const convt;    // Temperature convergence limit
-    extern Real64 const qvplim;   // Maximum latent heat W
-    extern Real64 const rhmax;    // Maximum RH value
+    constexpr int ittermax(150); // Maximum Number of itterations
+    constexpr int adjmax(6);     // Maximum Number of Adjacent Cells
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_int firstcell;
-    extern Array1D_int lastcell;
-    extern Array1D_int Extcell;
-    extern Array1D_int ExtRadcell;
-    extern Array1D_int ExtConcell;
-    extern Array1D_int ExtSkycell;
-    extern Array1D_int ExtGrncell;
-    extern Array1D_int Intcell;
-    extern Array1D_int IntConcell;
-
-    extern Array1D<Real64> watertot;
-    extern Array1D<Real64> surfrh;
-    extern Array1D<Real64> surfextrh;
-    extern Array1D<Real64> surftemp;
-    extern Array1D<Real64> surfexttemp;
-    extern Array1D<Real64> surfvp;
-
-    extern Array1D<Real64> extvtc;   // External Surface vapor transfer coefficient
-    extern Array1D<Real64> intvtc;   // Internal Surface Vapor Transfer Coefficient
-    extern Array1D_bool extvtcflag;  // External Surface vapor transfer coefficient flag
-    extern Array1D_bool intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
-    extern Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
-
-    extern Real64 deltat; // time step in seconds
-
-    extern int TotCellsMax; // Maximum number of cells per material
-
-    extern bool latswitch;  // latent heat switch,
-    extern bool rainswitch; // rain switch,
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceHAMTManager:
+    constexpr Real64 wdensity(1000.0); // Density of water kg.m-3
+    constexpr Real64 wspech(4180.0);   // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
+    constexpr Real64 whv(2489000.0);   // Evaporation enthalpy of water J.kg-1
+    constexpr Real64 convt(0.002);     // Temperature convergence limit
+    constexpr Real64 qvplim(100000.0); // Maximum latent heat W
+    constexpr Real64 rhmax(1.01);      // Maximum RH value
 
     // Types
-
     struct subcell
     {
         // Members
@@ -154,23 +119,18 @@ namespace HeatBalanceHAMTManager {
         }
     };
 
-    // Object Data
-    extern Array1D<subcell> cells;
-
-    // Functions
-
-    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
+    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp);
 
     void GetHeatBalHAMTInput(EnergyPlusData &state);
 
     void InitHeatBalHAMT(EnergyPlusData &state);
 
-    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
+    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp);
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid);
 
-    void
-    interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
+    void interp(
+        int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
 
     Real64 RHtoVP(EnergyPlusData &state, Real64 const RH, Real64 const Temperature);
 
@@ -198,11 +158,43 @@ namespace HeatBalanceHAMTManager {
 
 } // namespace HeatBalanceHAMTManager
 
-struct HeatBalHAMTMgrData : BaseGlobalStruct {
+struct HeatBalHAMTMgrData : BaseGlobalStruct
+{
+
+    Array1D_int firstcell;
+    Array1D_int lastcell;
+    Array1D_int Extcell;
+    Array1D_int ExtRadcell;
+    Array1D_int ExtConcell;
+    Array1D_int ExtSkycell;
+    Array1D_int ExtGrncell;
+    Array1D_int Intcell;
+    Array1D_int IntConcell;
+    Array1D<Real64> watertot;
+    Array1D<Real64> surfrh;
+    Array1D<Real64> surfextrh;
+    Array1D<Real64> surftemp;
+    Array1D<Real64> surfexttemp;
+    Array1D<Real64> surfvp;
+    Array1D<Real64> extvtc;   // External Surface vapor transfer coefficient
+    Array1D<Real64> intvtc;   // Internal Surface Vapor Transfer Coefficient
+    Array1D_bool extvtcflag;  // External Surface vapor transfer coefficient flag
+    Array1D_bool intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
+    Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
+    Real64 deltat = 0.0;      // time step in seconds
+    int TotCellsMax = 0;      // Maximum number of cells per material
+    bool latswitch = false;   // latent heat switch,
+    bool rainswitch = false;  // rain switch,
+    Array1D<HeatBalanceHAMTManager::subcell> cells;
+    bool OneTimeFlag = true;
+    int qvpErrCount = 0;
+    int qvpErrReport = 0;
 
     void clear_state() override
     {
-
+        this->OneTimeFlag = true;
+        this->qvpErrCount = 0;
+        this->qvpErrReport = 0;
     }
 };
 

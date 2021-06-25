@@ -89,9 +89,9 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
                           "1,                       !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
                           "0,                       !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
                           "1,                       !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
-                          "0.006701,                    !- Surface-layer penetrtion depth {m} (dEMPD)",
+                          "0.006701,                    !- Surface-layer penetration depth {m} (dEMPD)",
                           "0.013402,                    !- Deep-layer penetration depth {m} (dEPMDdeep)",
-                          "0,                       !- Coating layer permability {m} (CoatingThickness)",
+                          "0,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -101,22 +101,21 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
-    using DataSurfaces::TotSurfaces;
-    TotSurfaces = 1;
-    DataSurfaces::Surface.allocate(TotSurfaces);
-    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface(1);
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceData &surface = state->dataSurface->Surface(1);
     surface.Name = "Surface1";
     surface.Area = 1.0;
     surface.HeatTransSurf = true;
 
     // Zone
     surface.Zone = 1;
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataMoistureBalance::RhoVaporAirIn.allocate(1);
-    DataMoistureBalance::HMassConvInFD.allocate(1);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 20.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0061285406810457849;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataMstBal->RhoVaporAirIn.allocate(1);
+    state->dataMstBal->HMassConvInFD.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0061285406810457849;
 
     // Construction
     surface.Construction = 1;
@@ -131,14 +130,14 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     // Set up conditions
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataEnvrn->OutBaroPress = 101325.;
-    DataMoistureBalanceEMPD::RVSurface(1) = 0.007077173214149593;
-    DataMoistureBalanceEMPD::RVSurfaceOld(1) = DataMoistureBalanceEMPD::RVSurface(1);
-    DataMoistureBalance::HMassConvInFD(1) = 0.0016826898264131584;
-    DataMoistureBalance::RhoVaporAirIn(1) = 0.0073097913062508896;
-    DataMoistureBalanceEMPD::RVSurfLayer(1) = 0.007038850125652322;
-    DataMoistureBalanceEMPD::RVDeepLayer(1) = 0.0051334905162138695;
-    DataMoistureBalanceEMPD::RVdeepOld(1) = 0.0051334905162138695;
-    DataMoistureBalanceEMPD::RVSurfLayerOld(1) = 0.007038850125652322;
+    state->dataMstBalEMPD->RVSurface(1) = 0.007077173214149593;
+    state->dataMstBalEMPD->RVSurfaceOld(1) = state->dataMstBalEMPD->RVSurface(1);
+    state->dataMstBal->HMassConvInFD(1) = 0.0016826898264131584;
+    state->dataMstBal->RhoVaporAirIn(1) = 0.0073097913062508896;
+    state->dataMstBalEMPD->RVSurfLayer(1) = 0.007038850125652322;
+    state->dataMstBalEMPD->RVDeepLayer(1) = 0.0051334905162138695;
+    state->dataMstBalEMPD->RVdeepOld(1) = 0.0051334905162138695;
+    state->dataMstBalEMPD->RVSurfLayerOld(1) = 0.007038850125652322;
 
     // Do calcs
     Real64 Tsat(0.0);
@@ -146,16 +145,16 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     auto const &report_vars = state->dataMoistureBalEMPD->EMPDReportVars(1);
     EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
-    EXPECT_DOUBLE_EQ(0.0071762141417078054, DataMoistureBalanceEMPD::RVSurface(1));
+    EXPECT_DOUBLE_EQ(0.0071762141417078054, state->dataMstBalEMPD->RVSurface(1));
     EXPECT_DOUBLE_EQ(0.00000076900234067835945, report_vars.mass_flux_deep);
     EXPECT_DOUBLE_EQ(-0.00000019077843350248091, report_vars.mass_flux_zone);
-    EXPECT_DOUBLE_EQ(0.0070186500259181136, DataMoistureBalanceEMPD::RVSurfLayer(1));
-    EXPECT_DOUBLE_EQ(0.0051469229632164605, DataMoistureBalanceEMPD::RVDeepLayer(1));
-    EXPECT_DOUBLE_EQ(-0.47694608375620229, DataMoistureBalanceEMPD::HeatFluxLatent(1));
+    EXPECT_DOUBLE_EQ(0.0070186500259181136, state->dataMstBalEMPD->RVSurfLayer(1));
+    EXPECT_DOUBLE_EQ(0.0051469229632164605, state->dataMstBalEMPD->RVDeepLayer(1));
+    EXPECT_DOUBLE_EQ(-0.47694608375620229, state->dataMstBalEMPD->HeatFluxLatent(1));
 
     // Clean up
-    DataHeatBalFanSys::ZoneAirHumRat.deallocate();
-    DataMoistureBalance::RhoVaporAirIn.deallocate();
+    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
+    state->dataMstBal->RhoVaporAirIn.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
@@ -178,9 +177,9 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
                           "1,                       !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
                           "0,                       !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
                           "1,                       !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
-                          ",                    !- Surface-layer penetrtion depth {m} (dEMPD)",
+                          ",                    !- Surface-layer penetration depth {m} (dEMPD)",
                           "autocalculate,                    !- Deep-layer penetration depth {m} (dEPMDdeep)",
-                          "0,                       !- Coating layer permability {m} (CoatingThickness)",
+                          "0,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -215,9 +214,9 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
                           "1,                       !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
                           "0,                       !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
                           "1,                       !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
-                          "0.006701,                    !- Surface-layer penetrtion depth {m} (dEMPD)",
+                          "0.006701,                    !- Surface-layer penetration depth {m} (dEMPD)",
                           "0.013402,                    !- Deep-layer penetration depth {m} (dEPMDdeep)",
-                          "0.002,                       !- Coating layer permability {m} (CoatingThickness)",
+                          "0.002,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -227,22 +226,21 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
-    using DataSurfaces::TotSurfaces;
-    TotSurfaces = 1;
-    DataSurfaces::Surface.allocate(TotSurfaces);
-    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface(1);
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceData &surface = state->dataSurface->Surface(1);
     surface.Name = "Surface1";
     surface.Area = 1.0;
     surface.HeatTransSurf = true;
 
     // Zone
     surface.Zone = 1;
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataMoistureBalance::RhoVaporAirIn.allocate(1);
-    DataMoistureBalance::HMassConvInFD.allocate(1);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 20.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0061285406810457849;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataMstBal->RhoVaporAirIn.allocate(1);
+    state->dataMstBal->HMassConvInFD.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0061285406810457849;
 
     // Construction
     surface.Construction = 1;
@@ -257,14 +255,14 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     // Set up conditions
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataEnvrn->OutBaroPress = 101325.;
-    DataMoistureBalanceEMPD::RVSurface(1) = 0.007077173214149593;
-    DataMoistureBalanceEMPD::RVSurfaceOld(1) = DataMoistureBalanceEMPD::RVSurface(1);
-    DataMoistureBalance::HMassConvInFD(1) = 0.0016826898264131584;
-    DataMoistureBalance::RhoVaporAirIn(1) = 0.0073097913062508896;
-    DataMoistureBalanceEMPD::RVSurfLayer(1) = 0.007038850125652322;
-    DataMoistureBalanceEMPD::RVDeepLayer(1) = 0.0051334905162138695;
-    DataMoistureBalanceEMPD::RVdeepOld(1) = 0.0051334905162138695;
-    DataMoistureBalanceEMPD::RVSurfLayerOld(1) = 0.007038850125652322;
+    state->dataMstBalEMPD->RVSurface(1) = 0.007077173214149593;
+    state->dataMstBalEMPD->RVSurfaceOld(1) = state->dataMstBalEMPD->RVSurface(1);
+    state->dataMstBal->HMassConvInFD(1) = 0.0016826898264131584;
+    state->dataMstBal->RhoVaporAirIn(1) = 0.0073097913062508896;
+    state->dataMstBalEMPD->RVSurfLayer(1) = 0.007038850125652322;
+    state->dataMstBalEMPD->RVDeepLayer(1) = 0.0051334905162138695;
+    state->dataMstBalEMPD->RVdeepOld(1) = 0.0051334905162138695;
+    state->dataMstBalEMPD->RVSurfLayerOld(1) = 0.007038850125652322;
 
     // Do calcs
     Real64 Tsat(0.0);
@@ -272,16 +270,16 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     auto const &report_vars = state->dataMoistureBalEMPD->EMPDReportVars(1);
     EXPECT_DOUBLE_EQ(6.3445188238394508, Tsat);
-    EXPECT_DOUBLE_EQ(0.0071815819413115663, DataMoistureBalanceEMPD::RVSurface(1));
+    EXPECT_DOUBLE_EQ(0.0071815819413115663, state->dataMstBalEMPD->RVSurface(1));
     EXPECT_DOUBLE_EQ(0.00000076900234067835945, report_vars.mass_flux_deep);
     EXPECT_DOUBLE_EQ(-1.8118197009111738e-07, report_vars.mass_flux_zone);
-    EXPECT_DOUBLE_EQ(0.0070183147759991828, DataMoistureBalanceEMPD::RVSurfLayer(1));
-    EXPECT_DOUBLE_EQ(0.0051469229632164605, DataMoistureBalanceEMPD::RVDeepLayer(1));
-    EXPECT_DOUBLE_EQ(-0.45295492522779346, DataMoistureBalanceEMPD::HeatFluxLatent(1));
+    EXPECT_DOUBLE_EQ(0.0070183147759991828, state->dataMstBalEMPD->RVSurfLayer(1));
+    EXPECT_DOUBLE_EQ(0.0051469229632164605, state->dataMstBalEMPD->RVDeepLayer(1));
+    EXPECT_DOUBLE_EQ(-0.45295492522779346, state->dataMstBalEMPD->HeatFluxLatent(1));
 
     // Clean up
-    DataHeatBalFanSys::ZoneAirHumRat.deallocate();
-    DataMoistureBalance::RhoVaporAirIn.deallocate();
+    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
+    state->dataMstBal->RhoVaporAirIn.deallocate();
 }
 TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
 {
@@ -304,9 +302,9 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
                           "2.32,                    !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
                           "0.43,                    !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
                           "72,                      !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
-                          "0.0011,                  !- Surface-layer penetrtion depth {m} (dEMPD)",
+                          "0.0011,                  !- Surface-layer penetration depth {m} (dEMPD)",
                           "0.004,                   !- Deep-layer penetration depth {m} (dEPMDdeep)",
-                          "0,                       !- Coating layer permability {m} (CoatingThickness)",
+                          "0,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "0;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -316,11 +314,10 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
-    using DataSurfaces::TotSurfaces;
     int surfNum = 1;
-    TotSurfaces = 1;
-    DataSurfaces::Surface.allocate( TotSurfaces );
-    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface( surfNum );
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceData &surface = state->dataSurface->Surface(surfNum);
     surface.Name = "SurfaceWood";
     surface.Area = 1.0;
     surface.HeatTransSurf = true;
@@ -328,18 +325,18 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Zone
     int zoneNum = 1;
     surface.Zone = 1;
-    DataHeatBalFanSys::ZoneAirHumRat.allocate( zoneNum );
-    DataMoistureBalance::RhoVaporAirIn.allocate( surfNum );
-    DataMoistureBalance::HMassConvInFD.allocate( surfNum );
-    DataHeatBalFanSys::MAT.allocate( zoneNum );
-    DataHeatBalFanSys::MAT( zoneNum ) = 20.0;
-    DataHeatBalFanSys::ZoneAirHumRat( zoneNum ) = 0.0061285406810457849;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(zoneNum);
+    state->dataMstBal->RhoVaporAirIn.allocate(surfNum);
+    state->dataMstBal->HMassConvInFD.allocate(surfNum);
+    state->dataHeatBalFanSys->MAT.allocate(zoneNum);
+    state->dataHeatBalFanSys->MAT(zoneNum) = 20.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(zoneNum) = 0.0061285406810457849;
 
     // Construction
     int constNum = 1;
     surface.Construction = constNum;
-    state->dataConstruction->Construct.allocate( constNum );
-    Construction::ConstructionProps &construction = state->dataConstruction->Construct( constNum );
+    state->dataConstruction->Construct.allocate(constNum);
+    Construction::ConstructionProps &construction = state->dataConstruction->Construct(constNum);
     construction.TotLayers = constNum;
     construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInList("WOOD", state->dataMaterial->Material);
 
@@ -349,29 +346,28 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Set up conditions
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataEnvrn->OutBaroPress = 101325.;
-    DataMoistureBalanceEMPD::RVSurface(surfNum) = 0.0070277983586713262;
-    DataMoistureBalanceEMPD::RVSurfaceOld(surfNum) = DataMoistureBalanceEMPD::RVSurface( surfNum );
-    DataMoistureBalance::HMassConvInFD(surfNum) = 0.0016826898264131584;
-    DataMoistureBalance::RhoVaporAirIn(surfNum) = 0.0073097913062508896;
-    DataMoistureBalanceEMPD::RVSurfLayer(surfNum) = 0.0070277983586713262;
-    DataMoistureBalanceEMPD::RVDeepLayer(surfNum) = 0.0051402944814058216;
-    DataMoistureBalanceEMPD::RVdeepOld(surfNum) = 0.0051402944814058216;
-    DataMoistureBalanceEMPD::RVSurfLayerOld(surfNum) = 0.0070277983586713262;
+    state->dataMstBalEMPD->RVSurface(surfNum) = 0.0070277983586713262;
+    state->dataMstBalEMPD->RVSurfaceOld(surfNum) = state->dataMstBalEMPD->RVSurface(surfNum);
+    state->dataMstBal->HMassConvInFD(surfNum) = 0.0016826898264131584;
+    state->dataMstBal->RhoVaporAirIn(surfNum) = 0.0073097913062508896;
+    state->dataMstBalEMPD->RVSurfLayer(surfNum) = 0.0070277983586713262;
+    state->dataMstBalEMPD->RVDeepLayer(surfNum) = 0.0051402944814058216;
+    state->dataMstBalEMPD->RVdeepOld(surfNum) = 0.0051402944814058216;
+    state->dataMstBalEMPD->RVSurfLayerOld(surfNum) = 0.0070277983586713262;
 
-    using DataHeatBalSurface::TempSurfIn;
     using Psychrometrics::PsyRhFnTdbRhov;
 
     auto const &material(state->dataMaterial->Material(1));
 
     Real64 Tsat(0.0);
-    DataHeatBalSurface::TempSurfIn.allocate(surfNum);
-    DataHeatBalSurface::TempSurfIn(surfNum) = 20.0;
+    state->dataHeatBalSurf->SurfTempIn.allocate(surfNum);
+    state->dataHeatBalSurf->SurfTempIn(surfNum) = 20.0;
 
     // Calculate average vapor density [kg/m^3]
-    Real64 Taver = DataHeatBalSurface::TempSurfIn(surfNum);
+    Real64 Taver = state->dataHeatBalSurf->SurfTempIn(surfNum);
     // Calculate RH for use in material property calculations.
-    Real64 RV_Deep_Old = DataMoistureBalanceEMPD::RVdeepOld( surfNum );
-    Real64 RVaver = DataMoistureBalanceEMPD::RVSurfLayerOld(surfNum);
+    Real64 RV_Deep_Old = state->dataMstBalEMPD->RVdeepOld(surfNum);
+    Real64 RVaver = state->dataMstBalEMPD->RVSurfLayerOld(surfNum);
     Real64 RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
     Real64 dU_dRH = material.MoistACoeff * material.MoistBCoeff * pow(RHaver, material.MoistBCoeff - 1) +
                     material.MoistCCoeff * material.MoistDCoeff * pow(RHaver, material.MoistDCoeff - 1);
@@ -379,7 +375,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Convert stored vapor density to RH.
     Real64 RH_deep_layer_old = PsyRhFnTdbRhov(*state, Taver, RV_Deep_Old);
     Real64 RH_surf_layer_old = PsyRhFnTdbRhov(*state, Taver, RVaver);
-    Real64 mass_flux_surf_deep_max = material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (state->dataGlobal->TimeStepZone * 3600.0);
+    Real64 mass_flux_surf_deep_max =
+        material.EMPDDeepDepth * material.Density * dU_dRH * (RH_surf_layer_old - RH_deep_layer_old) / (state->dataGlobal->TimeStepZone * 3600.0);
 
     Real64 hm_deep_layer = 6.9551289450635225e-05;
     Real64 mass_flux_surf_deep_result = hm_deep_layer * (RVaver - RV_Deep_Old);
@@ -391,5 +388,4 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     MoistureBalanceEMPDManager::CalcMoistureBalanceEMPD(*state, 1, Taver, Taver, Tsat);
     auto const &report_vars = state->dataMoistureBalEMPD->EMPDReportVars(surfNum);
     EXPECT_DOUBLE_EQ(mass_flux_surf_deep_result, report_vars.mass_flux_deep);
-
 }

@@ -105,8 +105,8 @@ namespace DataPlant {
         int TotalConnected;                   // total number of other loops connected to this loop side
         Array1D<ConnectedLoopData> Connected; // Other loops connected to this Loop side
         Array1D<BranchData> Branch;           // Branch data
-        SplitterData Splitter;       // Data for splitter on branch (if any)
-        MixerData Mixer;             // Data for splitter on branch (if any)
+        SplitterData Splitter;                // Data for splitter on branch (if any)
+        MixerData Mixer;                      // Data for splitter on branch (if any)
         bool HasPressureComponents;
         bool HasParallelPressComps;
         Real64 PressureDrop;
@@ -168,11 +168,8 @@ namespace DataPlant {
 
         void SimulateAllLoopSideBranches(EnergyPlusData &state, Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
 
-        void SimulateLoopSideBranchGroup(EnergyPlusData &state, int FirstBranchNum,
-                                         int LastBranchNum,
-                                         Real64 FlowRequest,
-                                         bool FirstHVACIteration,
-                                         bool &LoopShutDownFlag);
+        void SimulateLoopSideBranchGroup(
+            EnergyPlusData &state, int FirstBranchNum, int LastBranchNum, Real64 FlowRequest, bool FirstHVACIteration, bool &LoopShutDownFlag);
 
         void UpdatePlantSplitter(EnergyPlusData &state);
 
@@ -188,14 +185,11 @@ namespace DataPlant {
 
         Real64 SetupLoopFlowRequest(EnergyPlusData &state, int OtherSide);
 
-        Real64 EvaluateLoopSetPointLoad(EnergyPlusData &state,
-                                        int FirstBranchNum,
-                                        int LastBranchNum,
-                                        Real64 ThisLoopSideFlow);
+        Real64 EvaluateLoopSetPointLoad(EnergyPlusData &state, int FirstBranchNum, int LastBranchNum, Real64 ThisLoopSideFlow);
 
         void ResolveParallelFlows(EnergyPlusData &state, Real64 ThisLoopSideFlow, bool FirstHVACIteration);
 
-        void SimulateSinglePump(EnergyPlusData &state, PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
+        void SimulateSinglePump(EnergyPlusData &state, PlantLocation SpecificPumpLocation, Real64 &SpecificPumpFlowRate);
 
         void UpdateAnyLoopDemandAlterations(EnergyPlusData &state, int BranchNum, int CompNum);
 
@@ -205,7 +199,8 @@ namespace DataPlant {
 
         void AdjustPumpFlowRequestByEMSControls(int BranchNum, int CompNum, Real64 &FlowToRequest);
 
-        void PushBranchFlowCharacteristics(int BranchNum,
+        void PushBranchFlowCharacteristics(EnergyPlusData &state,
+                                           int BranchNum,
                                            Real64 ValueToPush,
                                            bool FirstHVACIteration // TRUE if First HVAC iteration of Time step
         );
@@ -213,7 +208,6 @@ namespace DataPlant {
         bool CheckPlantConvergence(bool FirstHVACIteration);
 
         void solve(EnergyPlusData &state, bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
-
     };
 } // namespace DataPlant
 } // namespace EnergyPlus

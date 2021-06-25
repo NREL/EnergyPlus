@@ -62,6 +62,13 @@ struct EnergyPlusData;
 
 namespace CommandLineInterface {
 
+    enum class ReturnCodes
+    {
+        Success,
+        Failure,
+        SuccessButHelper,
+    };
+
     // Process command line arguments
     int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, int argc, const char *argv[]);
 

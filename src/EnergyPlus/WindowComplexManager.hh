@@ -57,10 +57,12 @@
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
 namespace EnergyPlus {
 
-//forward declaration
+// forward declaration
 struct EnergyPlusData;
 
 namespace WindowComplexManager {
@@ -109,7 +111,7 @@ namespace WindowComplexManager {
 
     // Functions
 
-    //void clear_state();
+    // void clear_state();
 
     void InitBSDFWindows(EnergyPlusData &state);
 
@@ -152,20 +154,19 @@ namespace WindowComplexManager {
                               int &NBasis                         // Calculated Basis length
     );
 
-    void DetermineMaxBackSurfaces(EnergyPlusData &state);
-
     void ConstructBasis(EnergyPlusData &state,
                         int const IConst, // Index for accessing Construct array
                         BasisStruct &Basis);
 
-    void FillBasisElement(EnergyPlusData &state, Real64 const Theta, // Central polar angle of element
+    void FillBasisElement(EnergyPlusData &state,
+                          Real64 const Theta, // Central polar angle of element
                           Real64 const Phi,   // Central azimuthal angle of element
                           int const Elem,     // Index number of element in basis
                           BasisElemDescr &BasisElem,
-                          Real64 const LowerTheta, // Lower edge of element (polar angle)
-                          Real64 const UpperTheta, // Upper edge of element (polar angle)
-                          Real64 const DPhi,       // Width of element (azimuthal angle)
-                          int const InputType      // Basis type
+                          Real64 const LowerTheta,              // Lower edge of element (polar angle)
+                          Real64 const UpperTheta,              // Upper edge of element (polar angle)
+                          Real64 const DPhi,                    // Width of element (azimuthal angle)
+                          DataBSDFWindow::Basis const InputType // Basis type
     );
 
     void SetupComplexWindowStateGeometry(EnergyPlusData &state,
@@ -225,7 +226,7 @@ namespace WindowComplexManager {
                                   Real64 &SurfInsideTemp,     // Inside window surface temperature
                                   Real64 &SurfOutsideTemp,    // Outside surface temperature (C)
                                   Real64 &SurfOutsideEmiss,
-                                  int const CalcCondition // Calucation condition (summer, winter or no condition)
+                                  DataBSDFWindow::Condition const CalcCondition // Calucation condition (summer, winter or no condition)
     );
 
     // This function check if gas with molecular weight has already been feed into coefficients and
@@ -242,55 +243,158 @@ namespace WindowComplexManager {
 
 } // namespace WindowComplexManager
 
-    struct WindowComplexManagerData : BaseGlobalStruct {
+struct WindowComplexManagerData : BaseGlobalStruct
+{
 
-        Real64 const sigma; // Stefan-Boltzmann constant
-        Real64 const PressureDefault;
+    Real64 const sigma; // Stefan-Boltzmann constant
+    Real64 const PressureDefault;
 
-        int const Calculate_Geometry;
-        int const Copy_Geometry;
+    int const Calculate_Geometry;
+    int const Copy_Geometry;
 
-        int const TmpLen; // Length increment of temporary arrays
+    int const TmpLen; // Length increment of temporary arrays
 
-        int const Front_Incident; // Ray identification types
-        int const Front_Transmitted;
-        int const Front_Reflected;
-        int const Back_Incident;
-        int const Back_Transmitted;
-        int const Back_Reflected;
+    int const Front_Incident; // Ray identification types
+    int const Front_Transmitted;
+    int const Front_Reflected;
+    int const Back_Incident;
+    int const Back_Transmitted;
+    int const Back_Reflected;
 
-        int NumComplexWind; // Total number of complex windows
+    int NumComplexWind; // Total number of complex windows
 
-        Array1D<DataBSDFWindow::BasisStruct> BasisList;
-        Array1D<WindowComplexManager::WindowIndex> WindowList;
-        Array2D<WindowComplexManager::WindowStateIndex> WindowStateList;
+    Array1D<DataBSDFWindow::BasisStruct> BasisList;
+    EPVector<WindowComplexManager::WindowIndex> WindowList;
+    Array2D<WindowComplexManager::WindowStateIndex> WindowStateList;
 
-        bool InitComplexWindowsOnce = true; // Flag for insuring things happen once
-        bool InitBSDFWindowsOnce = true;
-        int NumBasis = 0; // Number of unique bases (No. in BasisList)
-        int MatrixNo = 0; // Index of Basis matrix
+    bool InitComplexWindowsOnce = true; // Flag for insuring things happen once
+    bool InitBSDFWindowsOnce = true;
+    int NumBasis = 0; // Number of unique bases (No. in BasisList)
+    int MatrixNo = 0; // Index of Basis matrix
 
-        void clear_state() //override
-        {
-            this->NumComplexWind = 0;
-            this->BasisList.deallocate();
-            this->WindowList.deallocate();
-            this->WindowStateList.deallocate();
-            this->InitComplexWindowsOnce = true;
-            this->InitBSDFWindowsOnce = true;
-            this->NumBasis = 0;
-            this->MatrixNo = 0;
-        }
+    Array1D<Real64> gap = Array1D<Real64>(TARCOGParams::maxlay, 0.0);   // Vector of gap widths [m] {maxlay}
+    Array1D<Real64> thick = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Vector of glass thicknesses [m] {maxlay}
+    Array1D<Real64> scon = Array1D<Real64>(TARCOGParams::maxlay, 0.0);  // Vector of conductivities of each glazing layer  [W/m.K] {maxlay}
+    Array1D<Real64> tir =
+        Array1D<Real64>(TARCOGParams::maxlay * 2, 0.0); // Vector of IR transmittances of each layer {2*maxlay - 2 surfaces per layer}
+    Array1D<Real64> emis =
+        Array1D<Real64>(TARCOGParams::maxlay * 2, 0.0);            // Vector of IR emittances of each surface {2*maxlay - 2 surfaces per layer}
+    Array1D_int SupportPlr = Array1D_int(TARCOGParams::maxlay, 0); // Shows whether or not gap have support pillar
+    // 0 - does not have support pillar
+    // 1 - have support pillar
+    Array1D<Real64> PillarSpacing = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Pillar spacing for each gap (used in case there is support pillar)
+    Array1D<Real64> PillarRadius = Array1D<Real64>(TARCOGParams::maxlay, 0.0);  // Pillar radius for each gap (used in case there is support pillar)
+    Array1D<Real64> asol = Array1D<Real64>(TARCOGParams::maxlay, 0.0);          // Vector of Absorbed solar energy fractions for each layer {maxlay}
+    Array1D<Real64> presure = Array1D<Real64>(TARCOGParams::maxlay + 1, 0.0);   // Vector of gas pressures in gaps [N/m^2] {maxlay+1}
+    Array1D<Real64> GapDefMax = Array1D<Real64>(TARCOGParams::maxlay - 1, 0.0); // Vector of gap widths in deflected state.  It will be used as input
+    // if CalcDeflection = 2. In case CalcDeflection = 1 it will return recalculated
+    // gap widths. [m]
+    Array1D<Real64> YoungsMod = Array1D<Real64>(TARCOGParams::maxlay, 0.0);   // Vector of Young's modulus. [m]
+    Array1D<Real64> PoissonsRat = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Vector of Poisson's Ratios. [m]
+    Array1D<Real64> LayerDef = Array1D<Real64>(TARCOGParams::maxlay, 0.0);    // Vector of layers deflection. [m]
 
-        // Default Constructor
-        WindowComplexManagerData()
-            : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2),
-              TmpLen(20), Front_Incident(1), Front_Transmitted(2), Front_Reflected(3), Back_Incident(4),
-              Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0), NumBasis(0), MatrixNo(0)
-        {
-        }
+    Array2D_int iprop = Array2D_int(TARCOGGassesParams::maxgas, TARCOGParams::maxlay + 1, 1); // Matrix of gas codes - see above {maxgap x maxgas}
+    Array2D<Real64> frct =
+        Array2D<Real64>(TARCOGGassesParams::maxgas, TARCOGParams::maxlay + 1, 0.0); // Matrix of mass percentages in gap mixtures  {maxgap x maxgas}
+    Array2D<Real64> gcon = Array2D<Real64>(3, TARCOGGassesParams::maxgas, 0.0);     // Matrix of constants for gas conductivity calc
+    //     (A, B, C for max of 10 gasses) {maxgas x 3}
+    Array2D<Real64> gvis = Array2D<Real64>(3, TARCOGGassesParams::maxgas, 0.0); // Matrix of constants for gas dynamic viscosity calc
+    //     (A, B, C for max of 10 gasses) {maxgas x 3}
+    Array2D<Real64> gcp = Array2D<Real64>(3, TARCOGGassesParams::maxgas, 0.0); // Matrix of constants for gas specific heat calc at constant pressure
+    //     (A, B, C for max of 10 gasses) {maxgas x 3}
+    Array1D<Real64> wght = Array1D<Real64>(TARCOGGassesParams::maxgas, 0.0); // Vector of Molecular weights for gasses {maxgas}
+    Array1D<Real64> gama = Array1D<Real64>(TARCOGGassesParams::maxgas, 0.0); // Vector of spefic heat ration for low pressure calc {maxgas}
+    Array1D_int nmix = Array1D_int(TARCOGParams::maxlay + 1, 0);             // Vector of number of gasses in gas mixture of each gap {maxlay+1}
+    Array1D_int ibc = Array1D_int(2, 0);                                     // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor)
+    //             0 - h to be calculated;
+    //             1 - combined film coefficient (h) prescribed;
+    //             2 - convective film coefficient (hc) prescribed.
+    //           Also used in old algorithms for calculating h, accessible through
+    //           negative values for flags:
+    //             -1  - old SPC142 correlation
+    //             -2  - Klems-Yazdanian correlation (applicable to outdoor only)
+    //             -3  - Kimura correlation (applicable to outdoor only)
+    Array1D<Real64> Atop = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Vector with areas of top openings - between SD layers and top of
+    //               glazing cavity, for each layer [m^2] {maxlay} *
+    Array1D<Real64> Abot = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Vector with areas of bottom openings - between SD layers
+    //               and bottom of glazing cavity [m^2] {maxlay}
+    Array1D<Real64> Al = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Vector with areas of left-hand side openings - between SD layers
+    //               and left end of glazing cavity [m^2] {maxlay}
+    Array1D<Real64> Ar = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Vector of areas of right-hand side openings - between SD layers
+    //               and right end of glazing cavity [m^2] {maxlay}
+    Array1D<Real64> Ah = Array1D<Real64>(TARCOGParams::maxlay, 0.0);          // Vector of total areas of holes for each SD [m^2] {maxlay}
+    Array1D<Real64> SlatThick = Array1D<Real64>(TARCOGParams::maxlay, 0.0);   // Thickness of the slat material [m] {maxlay} **
+    Array1D<Real64> SlatWidth = Array1D<Real64>(TARCOGParams::maxlay, 0.0);   // Slat width [m] {maxlay}
+    Array1D<Real64> SlatAngle = Array1D<Real64>(TARCOGParams::maxlay, 0.0);   // Slat tilt angle [deg] {maxlay}
+    Array1D<Real64> SlatCond = Array1D<Real64>(TARCOGParams::maxlay, 0.0);    // Conductivity of the slat material [W/m.K] {maxlay}
+    Array1D<Real64> SlatSpacing = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Distance between slats [m] {maxlay}
+    Array1D<Real64> SlatCurve = Array1D<Real64>(TARCOGParams::maxlay, 0.0);   // Curvature radius of the slat [m] {maxlay}
+    Array1D<Real64> vvent = Array1D<Real64>(TARCOGParams::maxlay + 1, 0.0);   // Vector of velocities for forced ventilation, for each gap, and for
+    //               outdoor and indoor environment [m/s] {maxlay+1} ***
+    Array1D<Real64> tvent =
+        Array1D<Real64>(TARCOGParams::maxlay + 1, 0.0); // Vector of temperatures of ventilation gas for forced ventilation, for each
+    //  gap, and for outdoor and indoor environment [K] {maxlay+1}
+    Array1D<TARCOGParams::TARCOGLayerType> LayerType =
+        Array1D<TARCOGParams::TARCOGLayerType>(TARCOGParams::maxlay, TARCOGParams::TARCOGLayerType::SPECULAR); // Glazing layer type flag {maxlay}:
+    //                 0 - Specular layer,
+    //                 1 - Venetian blind (SD)
+    //                 2 - Woven shade (SD) (not implemented)
+    //                 3 - Diffuse shade (not implemented)
+    Array1D_int nslice = Array1D_int(TARCOGParams::maxlay, 0); // Vector of numbers of slices in a laminated glazing layers
+    //   (0 - monolithic layer) {maxlay}
+    Array1D<Real64> LaminateA = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Left-hand side array for creating slice equations {maxlay}
+    Array1D<Real64> LaminateB = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Right-hand side array for creating slice equations {maxlay}
+    Array1D<Real64> sumsol = Array1D<Real64>(TARCOGParams::maxlay, 0.0);    // Array of absorbed solar energy fractions for each laminated
+    //               glazing layer [W/m^2] {maxlay}
+    Array1D<Real64> theta = Array1D<Real64>(TARCOGParams::maxlay * 2, 0.0); // Vector of average temperatures of glazing surfaces [K] {2*maxlay}
+    Array1D<Real64> q = Array1D<Real64>(TARCOGParams::maxlay * 2 + 1, 0.0); // Vector of various heat fluxes [W/m^2] {2*maxlay+1},
+    //    depending on element index:
+    //    1  = qout (heat flux from outer-most glazing surface to outdoor space)
+    //   2*i = qpane(i) (heat flux through i-th glazing layer)
+    // 2*i-1 = qgap(i) (heat flux from i-th glazing cavity to indoor-faced
+    //          surface of the adjacent glazing layer)
+    // 2*nlayer+1 = qin (heat flux from indoor space to inner-most glazing
+    //              surface)
+    Array1D<Real64> qprim = Array1D<Real64>(TARCOGParams::maxlay1, 0.0); // Vector of heat fluxes from the outdoor-faced surfaces of glazing layers
+    //    towards the adjacent glazing cavity [W/m2]
+    Array1D<Real64> qv = Array1D<Real64>(TARCOGParams::maxlay1, 0.0);    // Vector of heat fluxes to each gap by ventillation [W/m^2]
+    Array1D<Real64> hcgap = Array1D<Real64>(TARCOGParams::maxlay1, 0.0); // Convective part of gap effective conductivity {maxlay}
+    Array1D<Real64> hrgap = Array1D<Real64>(TARCOGParams::maxlay1, 0.0); // Radiative part of gap effective conductivity (including in and out)
+    Array1D<Real64> hg = Array1D<Real64>(TARCOGParams::maxlay, 0.0);     // Gas conductance of the glazing cavity
+    //         [W/m^2.K] - EN673 and ISO 10292 procedure
+    Array1D<Real64> hr = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Radiation conductance of the glazing cavity
+    //         [W/m^2.K] - EN673 and ISO 10292 procedure
+    Array1D<Real64> hs = Array1D<Real64>(TARCOGParams::maxlay, 0.0); // Thermal conductance of the glazing cavity
+    //         [W/m^2.K] - EN673 and ISO 10292 procedure
+    Array1D<Real64> Ra = Array1D<Real64>(TARCOGParams::maxlay + 1, 0.0);               // Vector of Rayleigh numbers, for each gap {maxlay}
+    Array1D<Real64> Nu = Array1D<Real64>(TARCOGParams::maxlay + 1, 0.0);               // Vector of Nusselt numbers, for each gap {maxlay}
+    Array1D<Real64> Keff = Array1D<Real64>(TARCOGParams::maxlay, 0.0);                 // Vector of keff values for gaps [W/m.K] {maxlay}
+    Array1D<Real64> ShadeGapKeffConv = Array1D<Real64>(TARCOGParams::maxlay - 1, 0.0); // Vector of convective keff values for areas above/below
+    // SD layers [W/m.K] {maxlay-1}
+    Array1D<Real64> deltaTemp = Array1D<Real64>(100, 0.0);
+    Array1D_int iMinDT = Array1D_int(1, 0);
+    Array1D_int IDConst = Array1D_int(100, 0);
 
-    };
+    void clear_state() // override
+    {
+        this->NumComplexWind = 0;
+        this->BasisList.deallocate();
+        this->WindowList.deallocate();
+        this->WindowStateList.deallocate();
+        this->InitComplexWindowsOnce = true;
+        this->InitBSDFWindowsOnce = true;
+        this->NumBasis = 0;
+        this->MatrixNo = 0;
+        this->LayerType = Array1D<TARCOGParams::TARCOGLayerType>(TARCOGParams::maxlay, TARCOGParams::TARCOGLayerType::SPECULAR);
+    }
+
+    // Default Constructor
+    WindowComplexManagerData()
+        : sigma(5.6697e-8), PressureDefault(101325.0), Calculate_Geometry(1), Copy_Geometry(2), TmpLen(20), Front_Incident(1), Front_Transmitted(2),
+          Front_Reflected(3), Back_Incident(4), Back_Transmitted(5), Back_Reflected(6), NumComplexWind(0), NumBasis(0), MatrixNo(0)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

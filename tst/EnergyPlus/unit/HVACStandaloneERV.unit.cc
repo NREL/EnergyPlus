@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::Standalone ERV Unit Tests
+// Standalone ERV Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -65,14 +65,14 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::HVACStandAloneERV;
+using namespace HVACStandAloneERV;
 using namespace ObjexxFCL;
-using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataHVACGlobals;
-using namespace EnergyPlus::DataZoneEquipment;
-using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::Fans;
-using namespace EnergyPlus::ScheduleManager;
+using namespace DataHeatBalance;
+using namespace DataHVACGlobals;
+using namespace DataZoneEquipment;
+using namespace DataSizing;
+using namespace Fans;
+using namespace ScheduleManager;
 
 TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 {
@@ -113,20 +113,22 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
-    Zone.allocate(1);
-    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    ZoneEqSizing.allocate(1);
-    CurZoneEqNum = 1;
-    DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
-    TotPeople = 2; // Total number of people statements
-    People.allocate(TotPeople);
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-    People(2).ZonePtr = 1;
-    People(2).NumberOfPeople = 200.0;
-    People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->TotPeople = 2; // Total number of people statements
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 100.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr =
+        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(2).ZonePtr = 1;
+    state->dataHeatBal->People(2).NumberOfPeople = 200.0;
+    state->dataHeatBal->People(2).NumberOfPeoplePtr =
+        DataGlobalConstants::ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
 
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
 
@@ -141,8 +143,8 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = "ERV EXHAUST FAN";
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).FloorArea = 1000.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.0;
     SizeStandAloneERV(*state, 1);
     EXPECT_EQ(1000.0, state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow);
 
@@ -151,8 +153,8 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerFloorArea = 0.0;
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).FloorArea = 1000.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.0;
     SizeStandAloneERV(*state, 1);
     EXPECT_EQ(3000.0, state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow);
 
@@ -161,15 +163,15 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerOccupant = 10.0;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).FloorArea = 1000.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.0;
     SizeStandAloneERV(*state, 1);
     EXPECT_EQ(4000.0, state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow);
 
     // size on floor area and occupancy using zone multiplier
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
-    Zone(1).Multiplier = 5.0;
+    state->dataHeatBal->Zone(1).Multiplier = 5.0;
     SizeStandAloneERV(*state, 1);
     EXPECT_EQ(20000.0, state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow);
 }
@@ -213,37 +215,37 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput(*state);  // read schedules
+    ProcessScheduleInput(*state);               // read schedules
 
     GetFanInput(*state);
 
-    EnergyPlus::DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
 
-    Zone.allocate(1);
-    Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).FloorArea = 100.0;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).FloorArea = 100.0;
 
-    ZoneEqSizing.allocate(1);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.0;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.0;
 
-    TotPeople = 2; // Total number of people objects
-    People.allocate(TotPeople);
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 10.0;
-    People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // always returns a 1 for schedule value
-    People(2).ZonePtr = 1;
-    People(2).NumberOfPeople = 20.0;
-    People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // always returns a 1 for schedule value
+    state->dataHeatBal->TotPeople = 2; // Total number of people objects
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 10.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // always returns a 1 for schedule value
+    state->dataHeatBal->People(2).ZonePtr = 1;
+    state->dataHeatBal->People(2).NumberOfPeople = 20.0;
+    state->dataHeatBal->People(2).NumberOfPeoplePtr = DataGlobalConstants::ScheduleAlwaysOn; // always returns a 1 for schedule value
 
     state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = DataSizing::AutoSize;
@@ -251,9 +253,9 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = DataSizing::AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = DataSizing::AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = DataSizing::AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";

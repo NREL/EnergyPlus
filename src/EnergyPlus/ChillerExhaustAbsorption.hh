@@ -141,7 +141,7 @@ namespace ChillerExhaustAbsorption {
         int HWLoopSideNum;                       // hot water plant loop side index
         int HWBranchNum;                         // hot water plant loop branch index
         int HWCompNum;                           // hot water plant loop component index
-        GeneratorType CompType_Num;                        // Numeric designator for CompType (TypeOf)
+        GeneratorType CompType_Num;              // Numeric designator for CompType (TypeOf)
         int ExhTempLTAbsLeavingTempIndex;        // index for exhaust potential less than thermal energy needed during cooling
         int ExhTempLTAbsLeavingHeatingTempIndex; // index for exhaust potential less than thermal energy needed during heating
         std::string TypeOf;                      // Generator type
@@ -203,8 +203,8 @@ namespace ChillerExhaustAbsorption {
               DesEvapMassFlowRate(0.0), DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0),
               CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0),
               HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), CompType_Num(GeneratorType::Unassigned), ExhTempLTAbsLeavingTempIndex(0),
-              ExhTempLTAbsLeavingHeatingTempIndex(0), oneTimeFlag(true), envrnInit(true), oldCondSupplyTemp(0.0),
-              CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0),
+              ExhTempLTAbsLeavingHeatingTempIndex(0), oneTimeFlag(true), envrnInit(true), oldCondSupplyTemp(0.0), CoolingLoad(0.0),
+              CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0),
               ThermalEnergy(0.0), CoolThermalEnergyUseRate(0.0), CoolThermalEnergy(0.0), HeatThermalEnergyUseRate(0.0), HeatThermalEnergy(0.0),
               ElectricPower(0.0), ElectricEnergy(0.0), CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0),
               HeatElectricEnergy(0.0), ChillReturnTemp(0.0), ChillSupplyTemp(0.0), ChillWaterFlowRate(0.0), CondReturnTemp(0.0), CondSupplyTemp(0.0),
@@ -216,15 +216,17 @@ namespace ChillerExhaustAbsorption {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void
+        simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &SizFac) override;
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void oneTimeInit(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
@@ -238,25 +240,26 @@ namespace ChillerExhaustAbsorption {
 
         void calcHeater(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void updateCoolRecords(Real64 MyLoad, bool RunFlag);
+        void updateCoolRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
-        void updateHeatRecords(Real64 MyLoad, bool RunFlag);
+        void updateHeatRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
     void GetExhaustAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerExhaustAbsorption
 
-    struct ChillerExhaustAbsorptionData : BaseGlobalStruct {
-        bool Sim_GetInput = true;
-        Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
+struct ChillerExhaustAbsorptionData : BaseGlobalStruct
+{
+    bool Sim_GetInput = true;
+    Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
 
-        void clear_state() override
-        {
-            this->Sim_GetInput = true;
-            this->ExhaustAbsorber.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->Sim_GetInput = true;
+        this->ExhaustAbsorber.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

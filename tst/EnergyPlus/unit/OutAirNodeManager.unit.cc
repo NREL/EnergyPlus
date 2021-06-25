@@ -66,41 +66,41 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
 {
     state->dataOutAirNodeMgr->NumOutsideAirNodes = 3;
     state->dataOutAirNodeMgr->OutsideAirNodeList.allocate(3);
-    DataLoopNode::Node.allocate(3);
-    ScheduleManager::Schedule.allocate(2);
+    state->dataLoopNodes->Node.allocate(3);
+    state->dataScheduleMgr->Schedule.allocate(2);
 
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->OutWetBulbTemp = 15.0;
     state->dataEnvrn->WindSpeed = 2.0;
     state->dataEnvrn->WindDir = 0.0;
     state->dataEnvrn->OutBaroPress = 101325;
-    state->dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
+    state->dataEnvrn->OutHumRat =
+        Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
-    ScheduleManager::Schedule(1).CurrentValue = 24.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 24.0;
     state->dataOutAirNodeMgr->OutsideAirNodeList(1) = 1;
     state->dataOutAirNodeMgr->OutsideAirNodeList(2) = 2;
     state->dataOutAirNodeMgr->OutsideAirNodeList(3) = 3;
     // Scheduled value
-    DataLoopNode::Node(1).IsLocalNode = true;
-    DataLoopNode::Node(1).OutAirDryBulbSchedNum = 1;
-    DataLoopNode::Node(1).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(1).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
+    state->dataLoopNodes->Node(1).IsLocalNode = true;
+    state->dataLoopNodes->Node(1).OutAirDryBulbSchedNum = 1;
+    state->dataLoopNodes->Node(1).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(1).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
     // EMS override value
-    DataLoopNode::Node(2).IsLocalNode = true;
-    DataLoopNode::Node(2).EMSOverrideOutAirDryBulb = true;
-    DataLoopNode::Node(2).EMSOverrideOutAirWetBulb = true;
-    DataLoopNode::Node(2).EMSValueForOutAirDryBulb = 26.0;
-    DataLoopNode::Node(2).EMSValueForOutAirWetBulb = 16.0;
-    DataLoopNode::Node(2).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(2).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
+    state->dataLoopNodes->Node(2).IsLocalNode = true;
+    state->dataLoopNodes->Node(2).EMSOverrideOutAirDryBulb = true;
+    state->dataLoopNodes->Node(2).EMSOverrideOutAirWetBulb = true;
+    state->dataLoopNodes->Node(2).EMSValueForOutAirDryBulb = 26.0;
+    state->dataLoopNodes->Node(2).EMSValueForOutAirWetBulb = 16.0;
+    state->dataLoopNodes->Node(2).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(2).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
     // No changes
-    DataLoopNode::Node(3).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
-    DataLoopNode::Node(3).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
+    state->dataLoopNodes->Node(3).OutAirDryBulb = state->dataEnvrn->OutDryBulbTemp;
+    state->dataLoopNodes->Node(3).OutAirWetBulb = state->dataEnvrn->OutWetBulbTemp;
 
     InitOutAirNodes(*state);
 
-    EXPECT_NEAR(14.6467, DataLoopNode::Node(1).OutAirWetBulb, 0.0001);
-    EXPECT_NEAR(0.007253013, DataLoopNode::Node(2).HumRat, 0.000001);
-    EXPECT_NEAR(0.006543816, DataLoopNode::Node(3).HumRat, 0.000001);
-
+    EXPECT_NEAR(14.6467, state->dataLoopNodes->Node(1).OutAirWetBulb, 0.0001);
+    EXPECT_NEAR(0.007253013, state->dataLoopNodes->Node(2).HumRat, 0.000001);
+    EXPECT_NEAR(0.006543816, state->dataLoopNodes->Node(3).HumRat, 0.000001);
 }

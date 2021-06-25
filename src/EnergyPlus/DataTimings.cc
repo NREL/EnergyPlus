@@ -72,26 +72,6 @@ namespace DataTimings {
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for data and routines for timing within EnergyPlus.
 
-    // Following for calls to routines
-#ifdef EP_Count_Calls
-    int NumShadow_Calls(0);
-    int NumShadowAtTS_Calls(0);
-    int NumClipPoly_Calls(0);
-    int NumInitSolar_Calls(0);
-    int NumAnisoSky_Calls(0);
-    int NumDetPolyOverlap_Calls(0);
-    int NumCalcPerSolBeam_Calls(0);
-    int NumDetShadowCombs_Calls(0);
-    int NumIntSolarDist_Calls(0);
-    int NumIntRadExchange_Calls(0);
-    int NumIntRadExchangeZ_Calls(0);
-    int NumIntRadExchangeMain_Calls(0);
-    int NumIntRadExchangeOSurf_Calls(0);
-    int NumIntRadExchangeISurf_Calls(0);
-    int NumMaxInsideSurfIterations(0);
-    int NumCalcScriptF_Calls(0);
-#endif
-
     // Functions
 
     void epStartTime(
@@ -295,11 +275,25 @@ namespace DataTimings {
 
         for (loop = 1; loop <= state.dataTimingsData->NumTimingElements; ++loop) {
             if (Timing(loop).calls > 0) {
-                print(auditFile, "{}{}{}{}{:.3R}{}{:.3R}\n", Timing(loop).Element, tabchar, Timing(loop).calls, tabchar,
-                      Timing(loop).currentTimeSum, tabchar, Timing(loop).currentTimeSum / double(Timing(loop).calls));
+                print(auditFile,
+                      "{}{}{}{}{:.3R}{}{:.3R}\n",
+                      Timing(loop).Element,
+                      tabchar,
+                      Timing(loop).calls,
+                      tabchar,
+                      Timing(loop).currentTimeSum,
+                      tabchar,
+                      Timing(loop).currentTimeSum / double(Timing(loop).calls));
             } else {
-                print(auditFile, "{}{}{}{}{:.3R}{}{:.3R}\n", Timing(loop).Element, tabchar, Timing(loop).calls, tabchar ,
-                      Timing(loop).currentTimeSum, tabchar , -999.0);
+                print(auditFile,
+                      "{}{}{}{}{:.3R}{}{:.3R}\n",
+                      Timing(loop).Element,
+                      tabchar,
+                      Timing(loop).calls,
+                      tabchar,
+                      Timing(loop).currentTimeSum,
+                      tabchar,
+                      -999.0);
             }
         }
         print(auditFile, "Time from CPU_Time{}{:.3R}\n", tabchar, TimeUsed_CPUTime);

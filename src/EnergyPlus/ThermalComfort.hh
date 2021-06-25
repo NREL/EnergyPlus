@@ -87,14 +87,19 @@ namespace ThermalComfort {
         Real64 TComfCEN15251;
         Real64 ASHRAE55RunningMeanOutdoorTemp;
         Real64 CEN15251RunningMeanOutdoorTemp;
+        Real64 CoolingEffectASH55;
+        Real64 CoolingEffectAdjustedPMVASH55;
+        Real64 CoolingEffectAdjustedPPDASH55;
+        Real64 AnkleDraftPPDASH55;
 
         // Default Constructor
         ThermalComfortDataType()
             : FangerPMV(0.0), FangerPPD(0.0), CloSurfTemp(0.0), PiercePMVET(0.0), PiercePMVSET(0.0), PierceDISC(0.0), PierceTSENS(0.0),
-              PierceSET(0.0), KsuTSV(0.0), ThermalComfortMRT(0.0), ThermalComfortOpTemp(0.0), ClothingValue(0.0),
-              ThermalComfortAdaptiveASH5590(0), ThermalComfortAdaptiveASH5580(0), ThermalComfortAdaptiveCEN15251CatI(0),
-              ThermalComfortAdaptiveCEN15251CatII(0), ThermalComfortAdaptiveCEN15251CatIII(0), TComfASH55(0.0), TComfCEN15251(0.0),
-              ASHRAE55RunningMeanOutdoorTemp(0.0), CEN15251RunningMeanOutdoorTemp(0.0)
+              PierceSET(0.0), KsuTSV(0.0), ThermalComfortMRT(0.0), ThermalComfortOpTemp(0.0), ClothingValue(0.0), ThermalComfortAdaptiveASH5590(0),
+              ThermalComfortAdaptiveASH5580(0), ThermalComfortAdaptiveCEN15251CatI(0), ThermalComfortAdaptiveCEN15251CatII(0),
+              ThermalComfortAdaptiveCEN15251CatIII(0), TComfASH55(0.0), TComfCEN15251(0.0), ASHRAE55RunningMeanOutdoorTemp(0.0),
+              CEN15251RunningMeanOutdoorTemp(0.0), CoolingEffectASH55(0.0), CoolingEffectAdjustedPMVASH55(0.0), CoolingEffectAdjustedPPDASH55(0.0),
+              AnkleDraftPPDASH55(0.0)
         {
         }
     };
@@ -173,12 +178,30 @@ namespace ThermalComfort {
                                   Optional<Real64 const> Tset = _, // Temperature setpoint for thermal comfort control
                                   Optional<Real64> PMVResult = _   // PMV value for thermal comfort control
     );
+    Real64 CalcFangerPMV(
+        EnergyPlusData &state, Real64 AirTemp, Real64 RadTemp, Real64 RelHum, Real64 AirVel, Real64 ActLevel, Real64 CloUnit, Real64 WorkEff);
 
-    void CalcThermalComfortPierce(EnergyPlusData &state);
+    Real64 CalcFangerPPD(Real64 PMV);
+
+    Real64 CalcRelativeAirVelocity(Real64 AirVel, Real64 ActMet);
+
+    void GetThermalComfortInputsASHRAE(EnergyPlusData &state);
+
+    Real64 CalcStandardEffectiveTemp(
+        EnergyPlusData &state, Real64 AirTemp, Real64 RadTemp, Real64 RelHum, Real64 AirVel, Real64 ActMet, Real64 CloUnit, Real64 WorkEff);
+
+    void CalcCoolingEffectAdjustedPMV(EnergyPlusData &state, Real64 &CoolingEffect, Real64 &CoolingEffectAdjustedPMV);
+
+    void CalcThermalComfortPierceASHRAE(EnergyPlusData &state);
+
+    void CalcThermalComfortCoolingEffectASH(EnergyPlusData &state);
+
+    void CalcThermalComfortAnkleDraftASH(EnergyPlusData &state);
 
     void CalcThermalComfortKSU(EnergyPlusData &state);
 
-    void DERIV(EnergyPlusData &state, int &TempIndiceNum,         // Number of temperature indices  unused1208
+    void DERIV(EnergyPlusData &state,
+               int &TempIndiceNum,         // Number of temperature indices  unused1208
                Array1D<Real64> &Temp,      // Temperature unused1208
                Array1D<Real64> &TempChange // Change of temperature
     );
@@ -192,6 +215,8 @@ namespace ThermalComfort {
     Real64 CalcSurfaceWeightedMRT(EnergyPlusData &state, int const ZoneNum, int const SurfNum);
 
     Real64 CalcSatVapPressFromTemp(Real64 const Temp);
+
+    Real64 CalcSatVapPressFromTempTorr(Real64 const Temp);
 
     Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)
 
@@ -221,17 +246,23 @@ namespace ThermalComfort {
 
 } // namespace ThermalComfort
 
-struct ThermalComfortsData : BaseGlobalStruct {
+struct ThermalComfortsData : BaseGlobalStruct
+{
 
     bool FirstTimeFlag = true;                // Flag set to make sure you get input once
     bool FirstTimeSurfaceWeightedFlag = true; // Flag set to make sure certain calcs related to surface weighted option are only done once
+    int CoolingEffectWarningInd = 0;          // Counter for ankle draft invalid air velocity warnings.
+    int AnkleDraftAirVelWarningInd = 0;       // Counter for ankle draft invalid air velocity warnings.
+    int AnkleDraftCloUnitWarningInd = 0;      // Counter for ankle draft invalid clothing unit warnings.
+    int AnkleDraftActMetWarningInd = 0;       // Counter for ankle draft invalid activity level warnings.
 
     // MODULE PARAMETER DEFINITIONS
     Real64 const TAbsConv = DataGlobalConstants::KelvinConv; // Converter for absolute temperature
-    Real64 const ActLevelConv = 58.2;   // Converter for activity level (1Met = 58.2 W/m2)
-    Real64 const BodySurfArea = 1.8;    // Dubois body surface area of the human body (m2)
-    Real64 const RadSurfEff = 0.72;     // Fraction of surface effective for radiation
-    Real64 const StefanBoltz = 5.67e-8; // Stefan-Boltzmann constant (W/m2K4)
+    Real64 const ActLevelConv = 58.2;                        // Converter for activity level (1Met = 58.2 W/m2)
+    Real64 const BodySurfArea = 1.8;                         // Dubois body surface area of the human body (m2)
+    Real64 const BodySurfAreaPierce = 1.8258;                // Pierce two node body surface area of the human body (m2)
+    Real64 const RadSurfEff = 0.72;                          // Fraction of surface effective for radiation
+    Real64 const StefanBoltz = 5.6697e-8;                    // Stefan-Boltzmann constant (W/m2K4)
 
     // MODULE VARIABLE DECLARATIONS:
     Real64 AbsAirTemp = 0.0;                // Absolute air temperature; K
@@ -239,6 +270,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 AbsRadTemp = 0.0;                // Absolute radiant temperature; K
     Real64 AcclPattern = 0.0;               // The pattern of acclimation
     Real64 ActLevel = 0.0;                  // Metabolic rate; w/m2
+    Real64 ActMet = 0.0;                    // Metabolic rate; []
     Real64 AirVel = 0.0;                    // Air velocity; m/s
     Real64 AirTemp = 0.0;                   // Air temperature; C
     Real64 CloBodyRat = 0.0;                // Ratio of clothed body
@@ -253,6 +285,8 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 CoreTempNeut = 0.0;              // Body core temperature of neutral state
     Real64 CoreThermCap = 0.0;              // Thermal capacity of core
     Real64 DryHeatLoss = 0.0;               // Heat loss from clothing surface due to both convection and radiation
+    Real64 DryHeatLossET = 0.0;             // Effective heat loss from clothing surface due to both convection and radiation
+    Real64 DryHeatLossSET = 0.0;            // Standard effective heat loss from clothing surface due to both convection and radiation
     Real64 DryRespHeatLoss = 0.0;           // Dry respiration heat loss
     Real64 EvapHeatLoss = 0.0;              // Evaporative heat loss from skin
     Real64 EvapHeatLossDiff = 0.0;          // Evaporative heat loss due to moisture diffusion through skin
@@ -273,6 +307,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     int MaxZoneNum = 0;                     // Number of zones
     int MRTCalcType = 0;                    // The type of MRT calculation (ZoneAveraged or SurfaceWeighted)
     Real64 OpTemp = 0.0;                    // Operative temperature
+    Real64 EffTemp = 0.0;                   // Effective temperature
     int PeopleNum = 0;                      // People number
     Real64 RadHeatLoss = 0.0;               // Radiant heat loss
     Real64 RadTemp = 0.0;                   // Radiant temperature; C
@@ -291,6 +326,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     Real64 SkinWetTot = 0.0;                // Total skin wettedness
     Real64 SkinVapPress = 0.0;              // Vapor pressure at skin
     Real64 SurfaceTemp = 0.0;               // Surface temperature when MRTType is 'SurfaceWeighted'
+    Real64 AvgBodyTemp = 0.0;               // Weighted average body temperature considering core and skin temperature
     Real64 ThermCndct = 0.0;                // Thermal conductance of skin
     Real64 ThermSensTransCoef = 0.0;        // Theraml sensation coefficient for PMV
     Real64 Time = 0.0;                      // Time, hr
@@ -302,7 +338,7 @@ struct ThermalComfortsData : BaseGlobalStruct {
     int ZoneNum = 0;                        // Zone number
     Real64 TemporarySixAMTemperature = 0.0; // Temperature at 6am
 
-                                           // time that any zone is not comfortable based on simple ASHRAE 55 using summer clothes
+    // time that any zone is not comfortable based on simple ASHRAE 55 using summer clothes
     Real64 AnyZoneTimeNotSimpleASH55Summer = 0.0;
     // time that any zone is not comfortable based on simple ASHRAE 55 using winter clothes
     Real64 AnyZoneTimeNotSimpleASH55Winter = 0.0;
@@ -329,111 +365,144 @@ struct ThermalComfortsData : BaseGlobalStruct {
     bool useEpwData = false;
     Array1D<Real64> DailyAveOutTemp;
 
-    Array1D<ThermalComfort::ThermalComfortInASH55Type> ThermalComfortInASH55;
-    Array1D<ThermalComfort::ThermalComfortSetPointType> ThermalComfortSetPoint;
-    Array1D<ThermalComfort::ThermalComfortDataType> ThermalComfortData;
-    Array1D<ThermalComfort::AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
+    EPVector<ThermalComfort::ThermalComfortInASH55Type> ThermalComfortInASH55;
+    EPVector<ThermalComfort::ThermalComfortSetPointType> ThermalComfortSetPoint;
+    EPVector<ThermalComfort::ThermalComfortDataType> ThermalComfortData;
+    EPVector<ThermalComfort::AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
 
     Real64 runningAverageASH = 0.0;
 
+    Array1D<Real64> Coeff = Array1D<Real64>(2);      // Coefficients used in Range-Kutta's Method
+    Array1D<Real64> Temp = Array1D<Real64>(2);       // Temperature
+    Array1D<Real64> TempChange = Array1D<Real64>(2); // Change of temperature
+    Array1D<Real64> SurfaceAE;                       // Product of area and emissivity for each surface
+    Array1D<Real64> ZoneAESum;                       // Sum of area times emissivity for all zone surfaces
+    bool FirstTimeError;                             // Only report the error message one time
+    Real64 avgDryBulbASH = 0.0;
+    Array1D<Real64> monthlyTemp = Array1D<Real64>(12, 0.0);
+    bool useStatData = false;
+    Real64 avgDryBulbCEN = 0.0;
+    Real64 runningAverageCEN = 0.0;
+    bool useEpwDataCEN = false;
+    bool firstDaySet = false; // first day is set with initiate -- so do not update
+
     void clear_state() override
     {
-        FirstTimeFlag = true;
-        FirstTimeSurfaceWeightedFlag = true;
-        runningAverageASH = 0.0;
-        AbsAirTemp = 0.0;
-        AbsCloSurfTemp = 0.0;
-        AbsRadTemp = 0.0;
-        AcclPattern = 0.0;
-        ActLevel = 0.0;
-        AirVel = 0.0;
-        AirTemp = 0.0;
-        CloBodyRat = 0.0;
-        CloInsul = 0.0;
-        CloPermeatEff = 0.0;
-        CloSurfTemp = 0.0;
-        CloThermEff = 0.0;
-        CloUnit = 0.0;
-        ConvHeatLoss = 0.0;
-        CoreTempChange = 0.0;
-        CoreTemp = 0.0;
-        CoreTempNeut = 0.0;
-        CoreThermCap = 0.0;
-        DryHeatLoss = 0.0;
-        DryRespHeatLoss = 0.0;
-        EvapHeatLoss = 0.0;
-        EvapHeatLossDiff = 0.0;
-        EvapHeatLossMax = 0.0;
-        EvapHeatLossRegComf = 0.0;
-        EvapHeatLossRegSweat = 0.0;
-        EvapHeatLossSweat = 0.0;
-        EvapHeatLossSweatPrev = 0.0;
-        H = 0.0;
-        Hc = 0.0;
-        HcFor = 0.0;
-        HcNat = 0.0;
-        HeatFlow = 0.0;
-        Hr = 0.0;
-        IntHeatProd = 0.0;
-        IterNum = 0;
-        LatRespHeatLoss = 0.0;
-        MaxZoneNum = 0;
-        MRTCalcType = 0;
-        OpTemp = 0.0;
-        PeopleNum = 0;
-        RadHeatLoss = 0.0;
-        RadTemp = 0.0;
-        RelHum = 0.0;
-        RespHeatLoss = 0.0;
-        SatSkinVapPress = 0.0;
-        ShivResponse = 0.0;
-        SkinComfTemp = 0.0;
-        SkinComfVPress = 0.0;
-        SkinTemp = 0.0;
-        SkinTempChange = 0.0;
-        SkinTempNeut = 0.0;
-        SkinThermCap = 0.0;
-        SkinWetDiff = 0.0;
-        SkinWetSweat = 0.0;
-        SkinWetTot = 0.0;
-        SkinVapPress = 0.0;
-        SurfaceTemp = 0.0;
-        ThermCndct = 0.0;
-        ThermSensTransCoef = 0.0;
-        Time = 0.0;
-        TimeChange = 0.0;
-        VapPress = 0.0;
-        VasoconstrictFac = 0.0;
-        VasodilationFac = 0.0;
-        WorkEff = 0.0;
-        ZoneNum = 0;
-        TemporarySixAMTemperature = 0.0;
-        AnyZoneTimeNotSimpleASH55Summer = 0.0;
-        AnyZoneTimeNotSimpleASH55Winter = 0.0;
-        AnyZoneTimeNotSimpleASH55Either = 0.0;
-        AnyZoneNotMetHeating = 0.0;
-        AnyZoneNotMetCooling = 0.0;
-        AnyZoneNotMetHeatingOccupied = 0.0;
-        AnyZoneNotMetCoolingOccupied = 0.0;
-        AnyZoneNotMetOccupied = 0.0;
-        TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;
-        TotalAnyZoneTimeNotSimpleASH55Winter = 0.0;
-        TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
-        TotalAnyZoneNotMetHeating = 0.0;
-        TotalAnyZoneNotMetCooling = 0.0;
-        TotalAnyZoneNotMetHeatingOccupied = 0.0;
-        TotalAnyZoneNotMetCoolingOccupied = 0.0;
-        TotalAnyZoneNotMetOccupied = 0.0;
-        ZoneOccHrs.deallocate();
-        ThermalComfortInASH55.deallocate();
-        ThermalComfortSetPoint.deallocate();
-        ThermalComfortData.deallocate();
-        AngleFactorList.deallocate();
+        this->FirstTimeFlag = true;
+        this->FirstTimeSurfaceWeightedFlag = true;
+        this->runningAverageASH = 0.0;
+        this->AbsAirTemp = 0.0;
+        this->AbsCloSurfTemp = 0.0;
+        this->AbsRadTemp = 0.0;
+        this->AcclPattern = 0.0;
+        this->ActLevel = 0.0;
+        this->ActMet = 0.0;
+        this->AirVel = 0.0;
+        this->AirTemp = 0.0;
+        this->CloBodyRat = 0.0;
+        this->CloInsul = 0.0;
+        this->CloPermeatEff = 0.0;
+        this->CloSurfTemp = 0.0;
+        this->CloThermEff = 0.0;
+        this->CloUnit = 0.0;
+        this->ConvHeatLoss = 0.0;
+        this->CoreTempChange = 0.0;
+        this->CoreTemp = 0.0;
+        this->CoreTempNeut = 0.0;
+        this->CoreThermCap = 0.0;
+        this->DryHeatLoss = 0.0;
+        this->DryHeatLossET = 0.0;
+        this->DryHeatLossSET = 0.0;
+        this->DryRespHeatLoss = 0.0;
+        this->EvapHeatLoss = 0.0;
+        this->EvapHeatLossDiff = 0.0;
+        this->EvapHeatLossMax = 0.0;
+        this->EvapHeatLossRegComf = 0.0;
+        this->EvapHeatLossRegSweat = 0.0;
+        this->EvapHeatLossSweat = 0.0;
+        this->EvapHeatLossSweatPrev = 0.0;
+        this->H = 0.0;
+        this->Hc = 0.0;
+        this->HcFor = 0.0;
+        this->HcNat = 0.0;
+        this->HeatFlow = 0.0;
+        this->Hr = 0.0;
+        this->IntHeatProd = 0.0;
+        this->IterNum = 0;
+        this->LatRespHeatLoss = 0.0;
+        this->MaxZoneNum = 0;
+        this->MRTCalcType = 0;
+        this->OpTemp = 0.0;
+        this->EffTemp = 0.0;
+        this->PeopleNum = 0;
+        this->RadHeatLoss = 0.0;
+        this->RadTemp = 0.0;
+        this->RelHum = 0.0;
+        this->RespHeatLoss = 0.0;
+        this->SatSkinVapPress = 0.0;
+        this->ShivResponse = 0.0;
+        this->SkinComfTemp = 0.0;
+        this->SkinComfVPress = 0.0;
+        this->SkinTemp = 0.0;
+        this->SkinTempChange = 0.0;
+        this->SkinTempNeut = 0.0;
+        this->SkinThermCap = 0.0;
+        this->SkinWetDiff = 0.0;
+        this->SkinWetSweat = 0.0;
+        this->SkinWetTot = 0.0;
+        this->SkinVapPress = 0.0;
+        this->SurfaceTemp = 0.0;
+        this->AvgBodyTemp = 0.0;
+        this->ThermCndct = 0.0;
+        this->ThermSensTransCoef = 0.0;
+        this->Time = 0.0;
+        this->TimeChange = 0.0;
+        this->VapPress = 0.0;
+        this->VasoconstrictFac = 0.0;
+        this->VasodilationFac = 0.0;
+        this->WorkEff = 0.0;
+        this->ZoneNum = 0;
+        this->TemporarySixAMTemperature = 0.0;
+        this->AnyZoneTimeNotSimpleASH55Summer = 0.0;
+        this->AnyZoneTimeNotSimpleASH55Winter = 0.0;
+        this->AnyZoneTimeNotSimpleASH55Either = 0.0;
+        this->AnyZoneNotMetHeating = 0.0;
+        this->AnyZoneNotMetCooling = 0.0;
+        this->AnyZoneNotMetHeatingOccupied = 0.0;
+        this->AnyZoneNotMetCoolingOccupied = 0.0;
+        this->AnyZoneNotMetOccupied = 0.0;
+        this->TotalAnyZoneTimeNotSimpleASH55Summer = 0.0;
+        this->TotalAnyZoneTimeNotSimpleASH55Winter = 0.0;
+        this->TotalAnyZoneTimeNotSimpleASH55Either = 0.0;
+        this->TotalAnyZoneNotMetHeating = 0.0;
+        this->TotalAnyZoneNotMetCooling = 0.0;
+        this->TotalAnyZoneNotMetHeatingOccupied = 0.0;
+        this->TotalAnyZoneNotMetCoolingOccupied = 0.0;
+        this->TotalAnyZoneNotMetOccupied = 0.0;
+        this->ZoneOccHrs.deallocate();
+        this->ThermalComfortInASH55.deallocate();
+        this->ThermalComfortSetPoint.deallocate();
+        this->ThermalComfortData.deallocate();
+        this->AngleFactorList.deallocate();
+
+        this->Coeff.clear();
+        this->Temp.clear();
+        this->TempChange.clear();
+        this->SurfaceAE.clear(); // Product of area and emissivity for each surface
+        this->ZoneAESum.clear(); // Sum of area times emissivity for all zone surfaces
+        this->avgDryBulbASH = 0.0;
+        this->monthlyTemp.clear();
+        this->useStatData = false;
+        this->avgDryBulbCEN = 0.0;
+        this->runningAverageCEN = 0.0;
+        this->useEpwDataCEN = false;
+        this->firstDaySet = false; // first day is set with initiate -- so do not update
     }
 
     // Default Constructor
     ThermalComfortsData() : DailyAveOutTemp(30, 0.0)
-    {}
+    {
+    }
 };
 } // namespace EnergyPlus
 

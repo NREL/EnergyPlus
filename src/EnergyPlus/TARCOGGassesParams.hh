@@ -53,21 +53,25 @@
 
 namespace EnergyPlus::TARCOGGassesParams {
 
-    // Max number of gasses
-    int constexpr maxgas = 10;
+// Max number of gasses
+int constexpr maxgas = 10;
 
-    // Standards:
-    int constexpr ISO15099 = 1;    // standard = ISO15099
-    int constexpr EN673 = 2;       // standard = EN 673 / ISO 10292 Declared
-    int constexpr EN673Design = 3; // standard = EN 673 / ISO 10292 Design
+// Standards:
+enum class Stdrd
+{
+    Unassigned = -1,
+    ISO15099,   // standard = ISO15099
+    EN673,      // standard = EN 673 / ISO 10292 Declared
+    EN673Design // standard = EN 673 / ISO 10292 Design
+};
 
-    int constexpr MinStandard = 1; // minimum index for standard
-    int constexpr MaxStandard = 3; // maximum index for standard
+int constexpr MinStandard = static_cast<int>(Stdrd::ISO15099);    // minimum index for standard
+int constexpr MaxStandard = static_cast<int>(Stdrd::EN673Design); // maximum index for standard
 
-    Real64 constexpr alpha1 = 0.5;             // accommodation coefficient for low pressure gas calculations
-    Real64 constexpr alpha2 = 0.5;             // accommodation coefficient for low pressure gas calculations
-    Real64 constexpr InputDataTolerance = 1.0e-7; // coefficient used for input data tolerance in case for displaying error message
+Real64 constexpr alpha1 = 0.5;                // accommodation coefficient for low pressure gas calculations
+Real64 constexpr alpha2 = 0.5;                // accommodation coefficient for low pressure gas calculations
+Real64 constexpr InputDataTolerance = 1.0e-7; // coefficient used for input data tolerance in case for displaying error message
 
-} // namespace EnergyPlus
+} // namespace EnergyPlus::TARCOGGassesParams
 
 #endif

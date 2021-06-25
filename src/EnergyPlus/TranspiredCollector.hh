@@ -167,7 +167,8 @@ namespace TranspiredCollector {
 
     void UpdateTranspiredCollector(EnergyPlusData &state, int const UTSCNum);
 
-    void SetUTSCQdotSource(EnergyPlusData &state, int const UTSCNum,
+    void SetUTSCQdotSource(EnergyPlusData &state,
+                           int const UTSCNum,
                            Real64 const QSource // source term in Watts
     );
 
@@ -175,15 +176,14 @@ namespace TranspiredCollector {
 
     void GetUTSCTsColl(EnergyPlusData &state, int const UTSCNum, Real64 &TsColl);
 
-    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound
-    );
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
 
-    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound
-    );
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &UTSCName, bool &ErrorsFound);
 
 } // namespace TranspiredCollector
 
-struct TranspiredCollectorData : BaseGlobalStruct {
+struct TranspiredCollectorData : BaseGlobalStruct
+{
 
     int const Layout_Square = 1;
     int const Layout_Triangle = 2;
@@ -194,17 +194,20 @@ struct TranspiredCollectorData : BaseGlobalStruct {
     Array1D_bool CheckEquipName;
     bool GetInputFlag = true; // First time, input is gotten
 
-    Array1D<TranspiredCollector::UTSCDataStruct> UTSC;
+    EPVector<TranspiredCollector::UTSCDataStruct> UTSC;
     bool MyOneTimeFlag = true;
     bool MySetPointCheckFlag = true;
 
+    Array1D_bool MyEnvrnFlag;
+
     void clear_state() override
     {
-        NumUTSC = 0;
-        GetInputFlag = true;
-        UTSC.deallocate();
-        MyOneTimeFlag = true;
-        MySetPointCheckFlag = true;
+        this->NumUTSC = 0;
+        this->GetInputFlag = true;
+        this->UTSC.deallocate();
+        this->MyOneTimeFlag = true;
+        this->MySetPointCheckFlag = true;
+        this->MyEnvrnFlag.deallocate();
     }
 
     // Default Constructor

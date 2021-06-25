@@ -2,7 +2,8 @@
 ! Basic file description:  1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor.
 !
-! Highlights:              Illustration of using a window blind to control solar gain
+! Highlights:              Illustration of using a window blind to control solar gain with multiple exterior windows 
+!                          in the zone.
 !
 !
 ! Simulation Location/Run: Chicago IL, 2 design days, annual simulation
@@ -43,11 +44,11 @@
 !          |________________________________|____________ (12.192,6.069,0)
 !          | (0,6.096,0)        |    (9.144,6.096,0)     |
 !          |                    |                        |
-!          |                    |                        |
-!          |                    |                        |
-!          |       West         |         East           |    window = *
-!          |                    |                        |
-!          |                    |                        |
+!          *                    |                        |
+!          *                    |                        |
+!          *       West         |         East           |    window = *
+!          *                    |                        |
+!          *                    |                        |
 !          |                    |                        |
 !          |___**************___|________________________|
 !
@@ -94,7 +95,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,6;
 
@@ -400,7 +401,8 @@
     ,                        !- Setpoint 2 {W/m2 or deg C}
     ,                        !- Daylighting Control Object Name
     Sequential,              !- Multiple Surface Control Type
-    Zn001:Wall001:Win001;    !- Fenestration Surface 1 Name
+    Zn001:Wall001:Win001,    !- Fenestration Surface 1 Name
+    Zn001:Wall002:Win002;    !- Fenestration Surface 1 Name
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -746,6 +748,21 @@
     0.0000000E+00,6.096000,0.0000000E+00,  !- X,Y,Z ==> Vertex 2 {m}
     0.0000000E+00,0.0000000E+00,0.0000000E+00,  !- X,Y,Z ==> Vertex 3 {m}
     0.0000000E+00,0.0000000E+00,3.048000;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Zn001:Wall002:Win002,    !- Name
+    Window,                  !- Surface Type
+    WIN-CON-SINGLEPANE,      !- Construction Name
+    Zn001:Wall002,           !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5000000,               !- View Factor to Ground
+    ,                        !- Frame and Divider Name
+    1.0,                     !- Multiplier
+    4,                       !- Number of Vertices
+    0.0000000E+00,5.548000,2.5000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000000E+00,5.548000,0.5000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000000E+00,0.548000,0.5000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000000E+00,0.548000,2.5000;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Zn001:Wall003,           !- Name
@@ -1319,4 +1336,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-

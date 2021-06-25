@@ -68,18 +68,18 @@ namespace ChillerElectricEIR {
     struct ElectricEIRChillerSpecs : PlantComponent
     {
         // Members
-        std::string Name;                 // User identifier
-        int TypeNum;                      // plant loop type identifier
-        DataPlant::CondenserType CondenserType;  // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
-        Real64 RefCap;                    // Reference capacity of chiller [W]
-        bool RefCapWasAutoSized;          // reference capacity was autosized on input
-        Real64 RefCOP;                    // Reference coefficient of performance [W/W]
-        DataPlant::FlowMode FlowMode;     // one of 3 modes for component flow during operation
-        bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
-        bool ModulatedFlowErrDone;        // true if setpoint warning issued
-        bool HRSPErrDone;                 // TRUE if set point warning issued for heat recovery loop
-        Real64 EvapVolFlowRate;           // Reference water volumetric flow rate through the evaporator [m3/s]
-        bool EvapVolFlowRateWasAutoSized; // true if previous was autosize input
+        std::string Name;                       // User identifier
+        int TypeNum;                            // plant loop type identifier
+        DataPlant::CondenserType CondenserType; // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
+        Real64 RefCap;                          // Reference capacity of chiller [W]
+        bool RefCapWasAutoSized;                // reference capacity was autosized on input
+        Real64 RefCOP;                          // Reference coefficient of performance [W/W]
+        DataPlant::FlowMode FlowMode;           // one of 3 modes for component flow during operation
+        bool ModulatedFlowSetToLoop;            // True if the setpoint is missing at the outlet node
+        bool ModulatedFlowErrDone;              // true if setpoint warning issued
+        bool HRSPErrDone;                       // TRUE if set point warning issued for heat recovery loop
+        Real64 EvapVolFlowRate;                 // Reference water volumetric flow rate through the evaporator [m3/s]
+        bool EvapVolFlowRateWasAutoSized;       // true if previous was autosize input
         Real64 EvapMassFlowRate;
         Real64 EvapMassFlowRateMax;       // Reference water mass flow rate through evaporator [kg/s]
         Real64 CondVolFlowRate;           // Reference water volumetric flow rate through the condenser [m3/s]
@@ -200,9 +200,9 @@ namespace ChillerElectricEIR {
 
         // Default Constructor
         ElectricEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(DataPlant::FlowMode::Unassigned),
-              ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false), EvapVolFlowRate(0.0),
-              EvapVolFlowRateWasAutoSized(false), EvapMassFlowRate(0.0), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0),
+              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
+              EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false), EvapMassFlowRate(0.0), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRate(0.0), CondMassFlowRateMax(0.0), CondenserFanPowerRatio(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), EvapOutletTemp(0.0), CondInletNodeNum(0),
               CondOutletNodeNum(0), CondOutletTemp(0.0), CondOutletHumRat(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0),
@@ -216,12 +216,13 @@ namespace ChillerElectricEIR {
               CDCompNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), BasinHeaterSchedulePtr(0), CondMassFlowIndex(0),
               MsgDataLast(0.0), PrintMessage(false), MsgErrorCount(0), ErrCount1(0), PossibleSubcooling(false), FaultyChillerSWTFlag(false),
               FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0),
-              FaultyChillerFoulingFactor(1.0), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), oneTimeFlag(true), MyEnvrnFlag(true), EvapWaterConsump(0.0),
-              EvapWaterConsumpRate(0.0), Power(0.0), QEvaporator(0.0), QCondenser(0.0), QHeatRecovered(0.0), HeatRecOutletTemp(0.0),
-              CondenserFanPower(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0), ChillerPartLoadRatio(0.0), ChillerCyclingRatio(0.0),
-              BasinHeaterPower(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
-              CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecMassFlow(0.0),
-              ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0), IPLVFlag(true), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
+              FaultyChillerFoulingFactor(1.0), TimeStepSysLast(0.0), CurrentEndTimeLast(0.0), oneTimeFlag(true), MyEnvrnFlag(true),
+              EvapWaterConsump(0.0), EvapWaterConsumpRate(0.0), Power(0.0), QEvaporator(0.0), QCondenser(0.0), QHeatRecovered(0.0),
+              HeatRecOutletTemp(0.0), CondenserFanPower(0.0), ChillerCapFT(0.0), ChillerEIRFT(0.0), ChillerEIRFPLR(0.0), ChillerPartLoadRatio(0.0),
+              ChillerCyclingRatio(0.0), BasinHeaterPower(0.0), ChillerFalseLoadRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0),
+              CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
+              HeatRecMassFlow(0.0), ChillerCondAvgTemp(0.0), CondenserFanEnergyConsumption(0.0), BasinHeaterConsumption(0.0), IPLVFlag(true),
+              EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
         {
         }
 
@@ -229,9 +230,14 @@ namespace ChillerElectricEIR {
 
         void setupOutputVars(EnergyPlusData &state);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
@@ -239,7 +245,7 @@ namespace ChillerElectricEIR {
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void oneTimeInit(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void initEachEnvironment(EnergyPlusData &state);
 
@@ -263,18 +269,19 @@ namespace ChillerElectricEIR {
 
 } // namespace ChillerElectricEIR
 
-    struct ChillerElectricEIRData : BaseGlobalStruct {
-        int NumElectricEIRChillers = 0;
-        bool getInputFlag = true;
-        Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
+struct ChillerElectricEIRData : BaseGlobalStruct
+{
+    int NumElectricEIRChillers = 0;
+    bool getInputFlag = true;
+    Array1D<ChillerElectricEIR::ElectricEIRChillerSpecs> ElectricEIRChiller;
 
-        void clear_state() override
-        {
-            this->NumElectricEIRChillers = 0;
-            this->getInputFlag = true;
-            this->ElectricEIRChiller.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->NumElectricEIRChillers = 0;
+        this->getInputFlag = true;
+        this->ElectricEIRChiller.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -106,7 +106,7 @@ namespace ChillerAbsorption {
         bool NomCapWasAutoSized;          // true if Nominal capacity was autosize on input
         Real64 NomPumpPower;              // W - design nominal capacity of Absorber
         bool NomPumpPowerWasAutoSized;    // true if nominal pump power was autosize on input
-        DataPlant::FlowMode FlowMode;                     // one of 3 modes for component flow during operation
+        DataPlant::FlowMode FlowMode;     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         Real64 EvapVolFlowRate;           // m3/s - design water volumetric flow rate through the evaporator
@@ -128,48 +128,48 @@ namespace ChillerAbsorption {
         Real64 OptPartLoadRat;            // (BLAST BEST) optimal operating frac full load
         Real64 TempDesCondIn;             // C - (BLAST ADJTC(1)The design secondary loop fluid
         // temperature at the Absorber condenser side inlet
-        Array1D<Real64> SteamLoadCoef;         // (BLAST RPWRC() ) coeff of full load poly. fit
-        Array1D<Real64> PumpPowerCoef;         // coeff of pumping power poly. fit
-        Real64 TempLowLimitEvapOut;            // C - low temperature shut off
-        int ErrCount2;                         // error counter
-        int GenHeatSourceType;                 // Generator heat source type, NodeType_Steam=3 or NodeType_Water=2
-        Real64 GeneratorVolFlowRate;           // m3/s - hot water volumetric flow rate through generator
-        bool GeneratorVolFlowRateWasAutoSized; // true if hot water flow was autosize on input
-        Real64 GeneratorSubcool;               // amount of subcooling in steam generator
-        int SteamFluidIndex;                   // index to generator fluid type
-        Real64 GeneratorDeltaTemp;             // C - generator fluid temperature difference (water only)
-        bool GeneratorDeltaTempWasAutoSized;   // true if generator delta T was autosize on input
-        int CWLoopNum;                         // chilled water plant loop index number
-        int CWLoopSideNum;                     // chilled water plant loop side index
-        int CWBranchNum;                       // chilled water plant loop branch index
-        int CWCompNum;                         // chilled water plant loop component index
-        int CDLoopNum;                         // condenser water plant loop index number
-        int CDLoopSideNum;                     // condenser water plant loop side index
-        int CDBranchNum;                       // condenser water plant loop branch index
-        int CDCompNum;                         // condenser water plant loop component index
-        int GenLoopNum;                        // generator water plant loop index number
-        int GenLoopSideNum;                    // generator water plant loop side index
-        int GenBranchNum;                      // generator water plant loop branch index
-        int GenCompNum;                        // generator water plant loop component index
-        bool FaultyChillerSWTFlag;             // True if the chiller has SWT sensor fault
-        int FaultyChillerSWTIndex;             // Index of the fault object corresponding to the chiller
-        Real64 FaultyChillerSWTOffset;         // Chiller SWT sensor offset
-        bool PossibleSubcooling;               // flag to indicate chiller is doing less cooling that requested
-        Real64 CondMassFlowRate;               // Kg/s - condenser mass flow rate, water side
-        Real64 EvapMassFlowRate;               // Kg/s - evaporator mass flow rate, water side
-        Real64 SteamMassFlowRate;              // Kg/s - steam mass flow rate, water side
-        Real64 CondOutletTemp;                 // C - condenser outlet temperature, water side
-        Real64 EvapOutletTemp;                 // C - evaporator outlet temperature, water side
-        Real64 GenOutletTemp;                  // C - generator fluid outlet temperature
-        Real64 SteamOutletEnthalpy;            // J/kg - generator fluid outlet enthalpy
-        Real64 PumpingPower;                   // W - rate of Absorber energy use
-        Real64 PumpingEnergy;                  // J - Absorber energy use
-        Real64 QGenerator;                     // W - rate of Absorber steam use
-        Real64 GeneratorEnergy;                // J - Absorber steam use
-        Real64 QEvaporator;                    // W - rate of heat transfer to the evaporator coil
-        Real64 EvaporatorEnergy;               // J - heat transfer to the evaporator coil
-        Real64 QCondenser;                     // W - rate of heat transfer to the condenser coil
-        Real64 CondenserEnergy;                // J - heat transfer to the condenser coil
+        Array1D<Real64> SteamLoadCoef;                 // (BLAST RPWRC() ) coeff of full load poly. fit
+        Array1D<Real64> PumpPowerCoef;                 // coeff of pumping power poly. fit
+        Real64 TempLowLimitEvapOut;                    // C - low temperature shut off
+        int ErrCount2;                                 // error counter
+        DataLoopNode::NodeFluidType GenHeatSourceType; // Generator heat source type
+        Real64 GeneratorVolFlowRate;                   // m3/s - hot water volumetric flow rate through generator
+        bool GeneratorVolFlowRateWasAutoSized;         // true if hot water flow was autosize on input
+        Real64 GeneratorSubcool;                       // amount of subcooling in steam generator
+        int SteamFluidIndex;                           // index to generator fluid type
+        Real64 GeneratorDeltaTemp;                     // C - generator fluid temperature difference (water only)
+        bool GeneratorDeltaTempWasAutoSized;           // true if generator delta T was autosize on input
+        int CWLoopNum;                                 // chilled water plant loop index number
+        int CWLoopSideNum;                             // chilled water plant loop side index
+        int CWBranchNum;                               // chilled water plant loop branch index
+        int CWCompNum;                                 // chilled water plant loop component index
+        int CDLoopNum;                                 // condenser water plant loop index number
+        int CDLoopSideNum;                             // condenser water plant loop side index
+        int CDBranchNum;                               // condenser water plant loop branch index
+        int CDCompNum;                                 // condenser water plant loop component index
+        int GenLoopNum;                                // generator water plant loop index number
+        int GenLoopSideNum;                            // generator water plant loop side index
+        int GenBranchNum;                              // generator water plant loop branch index
+        int GenCompNum;                                // generator water plant loop component index
+        bool FaultyChillerSWTFlag;                     // True if the chiller has SWT sensor fault
+        int FaultyChillerSWTIndex;                     // Index of the fault object corresponding to the chiller
+        Real64 FaultyChillerSWTOffset;                 // Chiller SWT sensor offset
+        bool PossibleSubcooling;                       // flag to indicate chiller is doing less cooling that requested
+        Real64 CondMassFlowRate;                       // Kg/s - condenser mass flow rate, water side
+        Real64 EvapMassFlowRate;                       // Kg/s - evaporator mass flow rate, water side
+        Real64 SteamMassFlowRate;                      // Kg/s - steam mass flow rate, water side
+        Real64 CondOutletTemp;                         // C - condenser outlet temperature, water side
+        Real64 EvapOutletTemp;                         // C - evaporator outlet temperature, water side
+        Real64 GenOutletTemp;                          // C - generator fluid outlet temperature
+        Real64 SteamOutletEnthalpy;                    // J/kg - generator fluid outlet enthalpy
+        Real64 PumpingPower;                           // W - rate of Absorber energy use
+        Real64 PumpingEnergy;                          // J - Absorber energy use
+        Real64 QGenerator;                             // W - rate of Absorber steam use
+        Real64 GeneratorEnergy;                        // J - Absorber steam use
+        Real64 QEvaporator;                            // W - rate of heat transfer to the evaporator coil
+        Real64 EvaporatorEnergy;                       // J - heat transfer to the evaporator coil
+        Real64 QCondenser;                             // W - rate of heat transfer to the condenser coil
+        Real64 CondenserEnergy;                        // J - heat transfer to the condenser coil
         bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         bool GenInputOutputNodesUsed;
@@ -184,27 +184,33 @@ namespace ChillerAbsorption {
               CondMassFlowRateMax(0.0), GenMassFlowRateMax(0.0), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
               CondOutletNodeNum(0), GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
               OptPartLoadRat(0.0), TempDesCondIn(0.0), SteamLoadCoef(3, 0.0), PumpPowerCoef(3, 0.0), TempLowLimitEvapOut(0.0), ErrCount2(0),
-              GenHeatSourceType(0), GeneratorVolFlowRate(0.0), GeneratorVolFlowRateWasAutoSized(false), GeneratorSubcool(0.0), SteamFluidIndex(0),
-              GeneratorDeltaTemp(-99999.0), GeneratorDeltaTempWasAutoSized(true), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0),
-              CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0),
-              FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0),
-              EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0),
-              PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
-              CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
+              GenHeatSourceType(DataLoopNode::NodeFluidType::blank), GeneratorVolFlowRate(0.0), GeneratorVolFlowRateWasAutoSized(false),
+              GeneratorSubcool(0.0), SteamFluidIndex(0), GeneratorDeltaTemp(-99999.0), GeneratorDeltaTempWasAutoSized(true), CWLoopNum(0),
+              CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), GenLoopNum(0),
+              GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
+              PossibleSubcooling(false), CondMassFlowRate(0.0), EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0),
+              EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0),
+              GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0), CondenserEnergy(0.0), MyOneTimeFlag(true),
+              MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
         {
         }
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void oneTimeInit(EnergyPlusData &state);
+        void oneTimeInit(EnergyPlusData &state) override;
 
         void initEachEnvironment(EnergyPlusData &state);
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &tempDesCondIn, Real64 &TempDesEvapOut) override;
 
@@ -225,18 +231,19 @@ namespace ChillerAbsorption {
 
 } // namespace ChillerAbsorption
 
-    struct ChillerAbsorberData : BaseGlobalStruct {
-        int numAbsorbers = 0;
-        bool getInput = true;
-        Array1D<ChillerAbsorption::BLASTAbsorberSpecs> absorptionChillers;
+struct ChillerAbsorberData : BaseGlobalStruct
+{
+    int numAbsorbers = 0;
+    bool getInput = true;
+    Array1D<ChillerAbsorption::BLASTAbsorberSpecs> absorptionChillers;
 
-        void clear_state() override
-        {
-            this->numAbsorbers = 0;
-            this->getInput = true;
-            this->absorptionChillers.deallocate();
-        }
-    };
+    void clear_state() override
+    {
+        this->numAbsorbers = 0;
+        this->getInput = true;
+        this->absorptionChillers.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

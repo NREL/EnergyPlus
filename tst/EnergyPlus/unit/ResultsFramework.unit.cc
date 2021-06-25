@@ -232,8 +232,8 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
     state->dataResultsFramework->resultsFramework->RITimestepTSData.addVariable(var0);
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 45); // month,day,hour,minute
-    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 60); // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 45);  // month,day,hour,minute
+    state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 1, 60);  // month,day,hour,minute
     state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 24, 45); // month,day,hour,minute
     state->dataResultsFramework->resultsFramework->RITimestepTSData.newRow(*state, 2, 25, 24, 60); // month,day,hour,minute
 
@@ -274,7 +274,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
             }
         } )"_json;
 
-    EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+    EXPECT_EQ(expectedObject.dump(), OutputData.dump());
 
     // If add one more, it also should go to the top of json cols array
     reportId++;
@@ -312,7 +312,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_DataFrameInfo2)
             }
         } )"_json;
 
-    EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+    EXPECT_EQ(expectedObject.dump(), OutputData.dump());
 }
 
 TEST_F(ResultsFrameworkFixture, ResultsFramework_TableInfo)
@@ -332,7 +332,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_TableInfo)
     tableBody(1, 1) = "5.22";
     tableBody(1, 2) = "0.275000";
 
-    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
+    Table tbl(tableBody,
+              rowLabels,
+              columnLabels,
+              "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
     json result = tbl.getJSON();
@@ -371,7 +374,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ReportInfo)
     tableBody(1, 1) = "5.22";
     tableBody(1, 2) = "0.275000";
 
-    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
+    Table tbl(tableBody,
+              rowLabels,
+              columnLabels,
+              "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
     rowLabels.deallocate();
@@ -392,7 +398,10 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ReportInfo)
     tableBody(2, 1) = "100000.00";
     tableBody(3, 1) = "100000.00";
 
-    Table tbl2(tableBody, rowLabels, columnLabels, "Coil:Cooling:DX:SingleSpeed",
+    Table tbl2(tableBody,
+               rowLabels,
+               columnLabels,
+               "Coil:Cooling:DX:SingleSpeed",
                "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
     Report report;

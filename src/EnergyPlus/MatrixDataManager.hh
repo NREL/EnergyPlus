@@ -70,15 +70,13 @@ namespace MatrixDataManager {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // INTEGER, PARAMETER :: OneDimensional = 1
-    extern int const TwoDimensional;
+    int constexpr TwoDimensional = 2;
     // INTEGER, PARAMETER :: ThreeDimensional = 3
 
     // DERIVED TYPE DEFINITIONS:
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumMats; // number of matracies in input file
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -108,7 +106,6 @@ namespace MatrixDataManager {
     };
 
     // Object Data
-    extern Array1D<MatrixDataStruct> MatData;
 
     // Functions
 
@@ -116,20 +113,27 @@ namespace MatrixDataManager {
 
     int MatrixIndex(EnergyPlusData &state, std::string const &MatrixName);
 
-    void Get2DMatrix(int const Idx, // pointer index to location in MatData
+    void Get2DMatrix(EnergyPlusData &state,
+                     int const Idx, // pointer index to location in MatData
                      Array2S<Real64> Mat2D);
 
-    void Get2DMatrixDimensions(int const Idx, // pointer index to location in MatData
+    void Get2DMatrixDimensions(EnergyPlusData &state,
+                               int const Idx, // pointer index to location in MatData
                                int &NumRows,
                                int &NumCols);
 
 } // namespace MatrixDataManager
 
-struct MatrixDataManagerData : BaseGlobalStruct {
+struct MatrixDataManagerData : BaseGlobalStruct
+{
+
+    Array1D<MatrixDataManager::MatrixDataStruct> MatData;
+    int NumMats; // number of matracies in input file
 
     void clear_state() override
     {
-
+        MatData.clear();
+        NumMats = int();
     }
 };
 

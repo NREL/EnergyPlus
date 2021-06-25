@@ -54,91 +54,105 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 
 namespace EnergyPlus {
 
 namespace DataStringGlobals {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
+#ifdef _WIN32
+    char constexpr pathChar('\\');
+    char constexpr altpathChar('/');
+#elif __linux__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#elif __unix__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#elif __posix__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#elif __APPLE__
+    char constexpr pathChar('/');
+    char constexpr altpathChar('\\');
+#else
+#error "Invalid platform detection in DataStringGlobals."
+#endif
+    char constexpr CharComma(',');     // comma
+    char constexpr CharSemicolon(';'); // semicolon
+    char constexpr CharTab('\t');      // tab
+    char constexpr CharSpace(' ');     // space
 
-    extern std::string outputErrFileName;
-
-
-    extern std::string outputMddFileName;
-    extern std::string outputRddFileName;
-    extern std::string outputShdFileName;
-    extern std::string outputTblCsvFileName;
-    extern std::string outputTblHtmFileName;
-    extern std::string outputTblTabFileName;
-    extern std::string outputTblTxtFileName;
-    extern std::string outputTblXmlFileName;
-    extern std::string inputFileName;
-    extern std::string inputIddFileName;
-    extern std::string inputEpJSONSchemaFileName;
-    extern std::string outputAdsFileName;
-    extern std::string outputGLHEFileName;
-    extern std::string outputDelightOutFileName;
-    extern std::string outputIperrFileName;
-    extern std::string outputPerfLogFileName;
-    extern std::string outputSqlFileName;
-    extern std::string outputSqliteErrFileName;
-    extern std::string eplusADSFileName;
-    extern std::string outputCsvFileName;
-    extern std::string outputMtrCsvFileName;
-    extern std::string outputRvauditFileName;
-
-    extern std::string weatherFileNameOnly;
-    extern std::string idfDirPathName;
-    extern std::string outDirPathName;
-    extern std::string idfFileNameOnly;
-    extern std::string inputDirPathName;
-    extern std::string outputDirPathName;
-    extern std::string inputFileNameOnly;
-    extern std::string exeDirectory;
-
-    // MODULE PARAMETER DEFINITIONS:
-    extern std::string const UpperCase;
-    extern std::string const LowerCase;
-    extern std::string const AccentedUpperCase;
-    extern std::string const AccentedLowerCase;
-    extern std::string const AllCase;
-    extern std::string const NL; // Platform newline
-    extern char const pathChar;
-    extern char const altpathChar;
-    extern char const CharComma;     // comma
-    extern char const CharSemicolon; // semicolon
-    extern char const CharTab;       // tab
-    extern char const CharSpace;     // space
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern std::string ProgramPath;          // Path for Program from INI file
-    extern std::string CurrentWorkingFolder; // Current working directory for run
-    extern std::string FullName;             // Full name of file to open, including path
-    extern std::string IDDVerString;         // Version information from the IDD (line 1)
-    extern std::string VerString;            // String that represents version information
-    extern std::string MatchVersion;         // String to be matched by Version object
-    extern std::string CurrentDateTime;      // For printing current date and time at start of run
-
-    extern std::string PythonAPIVersion;
-
-    // Functions
-    void clear_state();
-
+    extern std::string const VerString;        // String that represents version information
+    extern std::string const MatchVersion;     // String to be matched by Version object
+    extern std::string const PythonAPIVersion; // API version string to be matched when using the Python API
+    extern std::string const BuildPlatformString;
 } // namespace DataStringGlobals
 
-struct DataStringGlobalsData : BaseGlobalStruct {
+struct DataStringGlobalsData : BaseGlobalStruct
+{
+
+    fs::path outputMddFilePath = "eplusout.mdd";
+    fs::path outputRddFilePath = "eplusout.rdd";
+    fs::path outputShdFilePath = "eplusout.shd";
+    fs::path outputTblCsvFilePath = "eplustbl.csv";
+    fs::path outputTblHtmFilePath = "eplustbl.htm";
+    fs::path outputTblTabFilePath = "eplustbl.tab";
+    fs::path outputTblTxtFilePath = "eplustbl.txt";
+    fs::path outputTblXmlFilePath = "eplustbl.xml";
+    fs::path outputAdsFilePath = "eplusADS.out";
+    fs::path outputGLHEFilePath = "eplusout.glhe";
+    fs::path outputDelightOutFilePath = "eplusout.delightout";
+    fs::path outputIperrFilePath = "eplusout.iperr";
+    fs::path outputPerfLogFilePath = "eplusout_perflog.csv";
+    fs::path outputSqlFilePath = "eplusout.sql";
+    fs::path outputSqliteErrFilePath = "eplussqlite.err";
+    fs::path outputCsvFilePath = "eplusout.csv";
+    fs::path outputMtrCsvFilePath = "eplusmtr.csv";
+    fs::path outputRvauditFilePath = "eplusout.rvaudit";
+
+    fs::path outputErrFilePath;
+    fs::path eplusADSFilePath;
+    fs::path weatherFilePathNameOnly;
+    fs::path inputFilePath;
+    fs::path inputIddFilePath;
+    fs::path inputEpJSONSchemaFilePath;
+    fs::path idfDirPath;
+    fs::path outDirPath;
+    fs::path idfFilePathNameOnly;
+    fs::path inputDirPath;
+    fs::path outputDirPath;
+    fs::path inputFilePathNameOnly;
+    fs::path exeDirectoryPath;
+    fs::path ProgramPath;          // Path for Program from INI file
+    fs::path CurrentWorkingFolder; // Current working directory for run
+    fs::path FullPath;             // Full name of file to open, including path
+
+    std::string IDDVerString;    // Version information from the IDD (line 1)
+    std::string CurrentDateTime; // For printing current date and time at start of run
+    std::string VerStringVar;
 
     void clear_state() override
     {
-
+        outputErrFilePath.clear();
+        eplusADSFilePath.clear();
+        idfFilePathNameOnly.clear();
+        idfDirPath.clear();
+        outDirPath.clear();
+        inputFilePathNameOnly.clear();
+        inputDirPath.clear();
+        outputDirPath.clear();
+        exeDirectoryPath.clear();
+        inputFilePath.clear();
+        inputIddFilePath.clear();
+        inputEpJSONSchemaFilePath.clear();
+        FullPath.clear();
+        weatherFilePathNameOnly.clear();
+        ProgramPath.clear();
+        CurrentWorkingFolder.clear();
+        CurrentDateTime.clear();
+        IDDVerString.clear();
+        VerStringVar.clear();
     }
 };
 

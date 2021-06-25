@@ -267,7 +267,7 @@ typedef void (voltage_dynamic_t::*voltage_dynamic_fptr)(const double *, double *
 void voltage_dynamic_t::initialize() {
     if ((params->dynamic.Vfull < params->dynamic.Vexp) ||
             (params->dynamic.Vexp < params->dynamic.Vnom)) {
-        throw std::runtime_error("voltage_dynamic_t error: Vfull must be greater than Vexp, which must be greater than Vnom");
+        throw std::runtime_error("voltage_dynamic_t error: For the electrochemical battery voltage model, voltage inputs must meet the requirement Vfull > Vexp > Vnom.");
     }
     // assume fully charged, not the nominal value
     state->cell_voltage = params->dynamic.Vfull;
@@ -342,7 +342,7 @@ void voltage_dynamic_t::parameter_compute() {
 }
 
 void voltage_dynamic_t::set_initial_SOC(double init_soc) {
-    updateVoltage(init_soc * 0.01 * params->dynamic.Qfull, params->dynamic.Qfull, 0, 25, params->dt_hr);
+    updateVoltage(init_soc * 0.01 * params->dynamic.Qfull * params->num_strings, params->dynamic.Qfull * params->num_strings, 0, 25, params->dt_hr);
 }
 
 // everything in here is on a per-cell basis
@@ -383,7 +383,7 @@ double voltage_dynamic_t::calculate_max_discharge_w(double q, double qmax, doubl
     q /= params->num_strings;
     qmax /= params->num_strings;
 
-    double current = 0., vol = 0;
+    double current = q * 0.5, vol = 0;
     double incr = q / 10;
     double max_p = 0, max_I = 0;
     while (current * params->dt_hr < q - tolerance && vol >= 0) {

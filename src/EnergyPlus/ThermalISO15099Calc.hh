@@ -52,13 +52,27 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGGassesParams.hh>
+#include <EnergyPlus/TARCOGParams.hh>
 
-namespace EnergyPlus::ThermalISO15099Calc {
+namespace EnergyPlus {
 
-    void film(Real64 tex, Real64 tw, Real64 ws, int iwd, Real64 &hcout, int ibc);
+// Forward declarations
+struct EnergyPlusData;
 
-    void Calc_ISO15099(EnergyPlusData &state, TARCOGOutput::Files &files,
+// Using/Aliasing
+using namespace TARCOGGassesParams;
+using namespace TARCOGParams;
+
+namespace ThermalISO15099Calc {
+
+    void film(EnergyPlusData &state, Real64 tex, Real64 tw, Real64 ws, int iwd, Real64 &hcout, int ibc);
+
+    void Calc_ISO15099(EnergyPlusData &state,
+                       TARCOGOutput::Files &files,
                        int nlayer,
                        int iwd,
                        Real64 &tout,
@@ -131,14 +145,14 @@ namespace EnergyPlus::ThermalISO15099Calc {
                        const Array1D<Real64> &SlatCurve,
                        const Array1D<Real64> &vvent,
                        const Array1D<Real64> &tvent,
-                       const Array1D_int &LayerType,
+                       const Array1D<TARCOGLayerType> &LayerType,
                        const Array1D_int &nslice,
                        const Array1D<Real64> &LaminateA,
                        const Array1D<Real64> &LaminateB,
                        const Array1D<Real64> &sumsol,
                        Array1D<Real64> &Ra,
                        Array1D<Real64> &Nu,
-                       int ThermalMod,
+                       TARCOGThermalModel ThermalMod,
                        int Debug_mode,
                        Real64 &ShadeEmisRatioOut,
                        Real64 &ShadeEmisRatioIn,
@@ -153,7 +167,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                        int &NumOfIterations,
                        Real64 egdeGlCorrFac);
 
-    void therm1d(TARCOGOutput::Files &files,
+    void therm1d(EnergyPlusData &state,
+                 TARCOGOutput::Files &files,
                  int nlayer,
                  int iwd,
                  Real64 &tout,
@@ -218,7 +233,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                  const Array1D<Real64> &EffectiveOpenness,
                  const Array1D<Real64> &vvent,
                  const Array1D<Real64> &tvent,
-                 const Array1D_int &LayerType,
+                 const Array1D<TARCOGLayerType> &LayerType,
                  Array1D<Real64> &Ra,
                  Array1D<Real64> &Nu,
                  Array1D<Real64> &vfreevent,
@@ -232,13 +247,14 @@ namespace EnergyPlus::ThermalISO15099Calc {
                  Real64 &ShadeEmisRatioIn,
                  Real64 &ShadeHcModifiedOut,
                  Real64 &ShadeHcModifiedIn,
-                 int ThermalMod,
+                 TARCOGThermalModel ThermalMod,
                  int Debug_mode,
                  Real64 &AchievedErrorTolerance,
                  int &TotalIndex,
                  Real64 edgeGlCorrFac);
 
-    void guess(Real64 tout,
+    void guess(EnergyPlusData &state,
+               Real64 tout,
                Real64 tind,
                int nlayer,
                const Array1D<Real64> &gap,
@@ -261,7 +277,7 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 Array1D<Real64> &Theta,
                 Array1D<Real64> &qlayer,
                 const Array1D<Real64> &qv,
-                const Array1D_int &LayerType,
+                const Array1D<TARCOGLayerType> &LayerType,
                 const Array1D<Real64> &thick,
                 const Array1D<Real64> &scon,
                 Real64 &ufactor,
@@ -269,7 +285,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 Array1D<Real64> &qcgas,
                 Array1D<Real64> &qrgas);
 
-    void hatter(int nlayer,
+    void hatter(EnergyPlusData &state,
+                int nlayer,
                 int iwd,
                 Real64 tout,
                 Real64 tind,
@@ -319,26 +336,28 @@ namespace EnergyPlus::ThermalISO15099Calc {
                 Array1D<Real64> &Ra,
                 Array1D<Real64> &Nu);
 
-    void effectiveLayerCond(int nlayer,
-                            const Array1D_int &LayerType,             // Layer type
-                            const Array1D<Real64> &scon,              // Layer thermal conductivity
-                            const Array1D<Real64> &thick,             // Layer thickness
-                            Array2A_int iprop,                 // Gas type in gaps
-                            Array2A<Real64> frct,              // Fraction of gas
-                            const Array1D_int &nmix,                  // Gas mixture
-                            const Array1D<Real64> &pressure,          // Gas pressure [Pa]
-                            const Array1D<Real64> &wght,              // Molecular weight
-                            Array2A<Real64> gcon,              // Gas specific conductivity
-                            Array2A<Real64> gvis,              // Gas specific viscosity
-                            Array2A<Real64> gcp,               // Gas specific heat
-                            const Array1D<Real64> &EffectiveOpenness, // Layer effective openneess [m2]
-                            Array1D<Real64> &theta,                   // Layer surface tempeartures [K]
-                            Array1D<Real64> &sconScaled,             // Layer conductivity divided by thickness
-                            int &nperr,                              // Error message flag
-                            std::string &ErrorMessage                // Error message
+    void effectiveLayerCond(EnergyPlusData &state,
+                            int nlayer,
+                            const Array1D<TARCOGLayerType> &LayerType, // Layer type
+                            const Array1D<Real64> &scon,               // Layer thermal conductivity
+                            const Array1D<Real64> &thick,              // Layer thickness
+                            Array2A_int iprop,                         // Gas type in gaps
+                            Array2A<Real64> frct,                      // Fraction of gas
+                            const Array1D_int &nmix,                   // Gas mixture
+                            const Array1D<Real64> &pressure,           // Gas pressure [Pa]
+                            const Array1D<Real64> &wght,               // Molecular weight
+                            Array2A<Real64> gcon,                      // Gas specific conductivity
+                            Array2A<Real64> gvis,                      // Gas specific viscosity
+                            Array2A<Real64> gcp,                       // Gas specific heat
+                            const Array1D<Real64> &EffectiveOpenness,  // Layer effective openneess [m2]
+                            Array1D<Real64> &theta,                    // Layer surface tempeartures [K]
+                            Array1D<Real64> &sconScaled,               // Layer conductivity divided by thickness
+                            int &nperr,                                // Error message flag
+                            std::string &ErrorMessage                  // Error message
     );
 
-    void filmi(Real64 tair,
+    void filmi(EnergyPlusData &state,
+               Real64 tair,
                Real64 t,
                int nlayer,
                Real64 tilt,
@@ -357,7 +376,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                int &nperr,
                std::string &ErrorMessage);
 
-    void filmg(Real64 tilt,
+    void filmg(EnergyPlusData &state,
+               Real64 tilt,
                const Array1D<Real64> &theta,
                const Array1D<Real64> &Tgap,
                int nlayer,
@@ -379,7 +399,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
                int &nperr,
                std::string &ErrorMessage);
 
-    void filmPillar(const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
+    void filmPillar(EnergyPlusData &state,
+                    const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
                     const Array1D<Real64> &scon,          // Conductivity of glass layers
                     const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
                     const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
@@ -392,7 +413,8 @@ namespace EnergyPlus::ThermalISO15099Calc {
 
     void nusselt(Real64 tilt, Real64 ra, Real64 asp, Real64 &gnu, int &nperr, std::string &ErrorMessage);
 
-    void storeIterationResults(TARCOGOutput::Files &files,
+    void storeIterationResults(EnergyPlusData &state,
+                               TARCOGOutput::Files &files,
                                int nlayer,
                                int index,
                                const Array1D<Real64> &theta,
@@ -415,6 +437,221 @@ namespace EnergyPlus::ThermalISO15099Calc {
                                int &);
 
     void CalculateFuncResults(int nlayer, Array2<Real64> const &a, const Array1D<Real64> &b, const Array1D<Real64> &x, Array1D<Real64> &FRes);
+} // namespace ThermalISO15099Calc
+struct ThermalISO15099CalcData : BaseGlobalStruct
+{
+    Array1D<Real64> thetas = Array1D<Real64>(maxlay2);
+    Array1D<Real64> rir = Array1D<Real64>(maxlay2);
+    Array1D<Real64> hcgass = Array1D<Real64>(maxlay1);
+    Array1D<Real64> hrgass = Array1D<Real64>(maxlay1);
+    Array1D<Real64> rs = Array1D<Real64>(maxlay3, 0.0);
+    Array1D<Real64> qs = Array1D<Real64>(maxlay3);
+    Array1D<Real64> qvs = Array1D<Real64>(maxlay1);
+    Array1D<Real64> LaminateAU = Array1D<Real64>(maxlay);
+    Array1D<Real64> sumsolU = Array1D<Real64>(maxlay);
+    Array1D<Real64> sol0 = Array1D<Real64>(maxlay);
+    Array1D<Real64> qcgas = Array1D<Real64>(maxlay1);
+    Array1D<Real64> qcgaps = Array1D<Real64>(maxlay1);
+    Array1D<Real64> qrgas = Array1D<Real64>(maxlay1);
+    Array1D<Real64> qrgaps = Array1D<Real64>(maxlay1);
+    Array1D<Real64> Atop_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Abot_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Al_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Ar_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Ah_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> EffectiveOpenness_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> SlatThick_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> SlatWidth_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> SlatAngle_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> SlatCond_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> SlatSpacing_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> SlatCurve_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> vvent_NOSD = Array1D<Real64>(maxlay1);
+    Array1D<Real64> tvent_NOSD = Array1D<Real64>(maxlay1);
+    Array1D<Real64> qv_NOSD = Array1D<Real64>(maxlay1);
+    Array1D<Real64> q_NOSD = Array1D<Real64>(maxlay3);
+    Array1D<TARCOGParams::TARCOGLayerType> LayerType_NOSD = Array1D<TARCOGParams::TARCOGLayerType>(maxlay);
+    Array1D<Real64> gap_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> thick_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> scon_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> emis_NOSD = Array1D<Real64>(maxlay2);
+    Array1D<Real64> rir_NOSD = Array1D<Real64>(maxlay2);
+    Array1D<Real64> tir_NOSD = Array1D<Real64>(maxlay2);
+    Array1D<Real64> theta_NOSD = Array1D<Real64>(maxlay2);
+    Array2D<Real64> frct_NOSD = Array2D<Real64>(maxgas, maxlay1);
+    Array2D_int iprop_NOSD = Array2D_int(maxgas, maxlay1);
+    Array1D_int nmix_NOSD = Array1D_int(maxlay1);
+    Array1D<Real64> presure_NOSD = Array1D<Real64>(maxlay1);
+    Array1D<Real64> hcgas_NOSD = Array1D<Real64>(maxlay1);
+    Array1D<Real64> hrgas_NOSD = Array1D<Real64>(maxlay1);
+    Array1D<Real64> LaminateA_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> LaminateB_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> sumsol_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Ra_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Nu_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Ebb = Array1D<Real64>(maxlay);
+    Array1D<Real64> Ebf = Array1D<Real64>(maxlay);
+    Array1D<Real64> Rb = Array1D<Real64>(maxlay);
+    Array1D<Real64> Rf = Array1D<Real64>(maxlay);
+    Array1D<Real64> Ebbs = Array1D<Real64>(maxlay);
+    Array1D<Real64> Ebfs = Array1D<Real64>(maxlay);
+    Array1D<Real64> Rbs = Array1D<Real64>(maxlay);
+    Array1D<Real64> Rfs = Array1D<Real64>(maxlay);
+    Array1D<Real64> Ebb_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Ebf_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Rb_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> Rf_NOSD = Array1D<Real64>(maxlay);
+    Array1D<Real64> ShadeGapKeffConv_NOSD = Array1D<Real64>(MaxGap);
+    Array1D<Real64> qcgas_NOSD = Array1D<Real64>(maxlay1);
+    Array1D<Real64> Keff_NOSD = Array1D<Real64>(maxlay1);
+    Array1D<Real64> qrgas_NOSD = Array1D<Real64>(maxlay1);
+    Array1D_int nslice_NOSD = Array1D_int(maxlay);
+    Array1D<Real64> vfreevent_NOSD = Array1D<Real64>(maxlay1);
+    Array1D<Real64> vfreevent = Array1D<Real64>(maxlay1);
+    Array1D<Real64> Atop_eff = Array1D<Real64>(maxlay, 0.0);
+    Array1D<Real64> Abot_eff = Array1D<Real64>(maxlay, 0.0);
+    Array1D<Real64> Al_eff = Array1D<Real64>(maxlay, 0.0);
+    Array1D<Real64> Ar_eff = Array1D<Real64>(maxlay, 0.0);
+    Array1D<Real64> Ah_eff = Array1D<Real64>(maxlay, 0.0);
+    Array1D<Real64> EffectiveOpenness = Array1D<Real64>(maxlay, 0.0);
+    Array1D<Real64> hgas = Array1D<Real64>(maxlay1);
+    Array1D<Real64> Tgap = Array1D<Real64>(maxlay1);
+    Array1D<Real64> hcgapMod = Array1D<Real64>(maxlay1);
+    Array1D<Real64> hcv = Array1D<Real64>(maxlay1);
+    Array1D_int iprop1 = Array1D_int(maxgas);
+    Array1D<Real64> frct1 = Array1D<Real64>(maxgas);
+    Array1D<Real64> frcti = Array1D<Real64>(maxgas);
+    Array1D_int ipropi = Array1D_int(maxgas);
+    Array1D<Real64> frctg = Array1D<Real64>(maxgas);
+    Array1D_int ipropg = Array1D_int(maxgas);
+
+    Real64 rtot = 0.0;
+    Real64 sft = 0.0;
+    Real64 hcins = 0.0;
+    Real64 hrins = 0.0;
+    Real64 hins = 0.0;
+    Real64 hcouts = 0.0;
+    Real64 hrouts = 0.0;
+    Real64 houts = 0.0;
+    Real64 ufactors = 0.0;
+    Real64 fluxs = 0.0;
+    Real64 qeff = 0.0;
+    Real64 flux_nonsolar = 0.0;
+    Real64 cpa = 0.0;
+    Real64 aveGlassConductivity = 0.0;
+
+    int iFP = 0;
+    int kFP = 0;
+    std::string dynFormat;
+
+    void clear_state() override
+    {
+        this->thetas = Array1D<Real64>(maxlay2);
+        this->rir = Array1D<Real64>(maxlay2);
+        this->hcgass = Array1D<Real64>(maxlay1);
+        this->hrgass = Array1D<Real64>(maxlay1);
+        this->rs = Array1D<Real64>(maxlay3, 0.0);
+        this->qs = Array1D<Real64>(maxlay3);
+        this->qvs = Array1D<Real64>(maxlay1);
+        this->LaminateAU = Array1D<Real64>(maxlay);
+        this->sumsolU = Array1D<Real64>(maxlay);
+        this->sol0 = Array1D<Real64>(maxlay);
+        this->qcgas = Array1D<Real64>(maxlay1);
+        this->qcgaps = Array1D<Real64>(maxlay1);
+        this->qrgas = Array1D<Real64>(maxlay1);
+        this->qrgaps = Array1D<Real64>(maxlay1);
+        this->Atop_NOSD = Array1D<Real64>(maxlay);
+        this->Abot_NOSD = Array1D<Real64>(maxlay);
+        this->Al_NOSD = Array1D<Real64>(maxlay);
+        this->Ar_NOSD = Array1D<Real64>(maxlay);
+        this->Ah_NOSD = Array1D<Real64>(maxlay);
+        this->EffectiveOpenness_NOSD = Array1D<Real64>(maxlay);
+        this->SlatThick_NOSD = Array1D<Real64>(maxlay);
+        this->SlatWidth_NOSD = Array1D<Real64>(maxlay);
+        this->SlatAngle_NOSD = Array1D<Real64>(maxlay);
+        this->SlatCond_NOSD = Array1D<Real64>(maxlay);
+        this->SlatSpacing_NOSD = Array1D<Real64>(maxlay);
+        this->SlatCurve_NOSD = Array1D<Real64>(maxlay);
+        this->vvent_NOSD = Array1D<Real64>(maxlay1);
+        this->tvent_NOSD = Array1D<Real64>(maxlay1);
+        this->qv_NOSD = Array1D<Real64>(maxlay1);
+        this->q_NOSD = Array1D<Real64>(maxlay3);
+        this->LayerType_NOSD = Array1D<TARCOGLayerType>(maxlay);
+        this->gap_NOSD = Array1D<Real64>(maxlay);
+        this->thick_NOSD = Array1D<Real64>(maxlay);
+        this->scon_NOSD = Array1D<Real64>(maxlay);
+        this->emis_NOSD = Array1D<Real64>(maxlay2);
+        this->rir_NOSD = Array1D<Real64>(maxlay2);
+        this->tir_NOSD = Array1D<Real64>(maxlay2);
+        this->theta_NOSD = Array1D<Real64>(maxlay2);
+        this->frct_NOSD = Array2D<Real64>(maxgas, maxlay1);
+        this->iprop_NOSD = Array2D_int(maxgas, maxlay1);
+        this->nmix_NOSD = Array1D_int(maxlay1);
+        this->presure_NOSD = Array1D<Real64>(maxlay1);
+        this->hcgas_NOSD = Array1D<Real64>(maxlay1);
+        this->hrgas_NOSD = Array1D<Real64>(maxlay1);
+        this->LaminateA_NOSD = Array1D<Real64>(maxlay);
+        this->LaminateB_NOSD = Array1D<Real64>(maxlay);
+        this->sumsol_NOSD = Array1D<Real64>(maxlay);
+        this->Ra_NOSD = Array1D<Real64>(maxlay);
+        this->Nu_NOSD = Array1D<Real64>(maxlay);
+        this->Ebb = Array1D<Real64>(maxlay);
+        this->Ebf = Array1D<Real64>(maxlay);
+        this->Rb = Array1D<Real64>(maxlay);
+        this->Rf = Array1D<Real64>(maxlay);
+        this->Ebbs = Array1D<Real64>(maxlay);
+        this->Ebfs = Array1D<Real64>(maxlay);
+        this->Rbs = Array1D<Real64>(maxlay);
+        this->Rfs = Array1D<Real64>(maxlay);
+        this->Ebb_NOSD = Array1D<Real64>(maxlay);
+        this->Ebf_NOSD = Array1D<Real64>(maxlay);
+        this->Rb_NOSD = Array1D<Real64>(maxlay);
+        this->Rf_NOSD = Array1D<Real64>(maxlay);
+        this->ShadeGapKeffConv_NOSD = Array1D<Real64>(MaxGap);
+        this->qcgas_NOSD = Array1D<Real64>(maxlay1);
+        this->Keff_NOSD = Array1D<Real64>(maxlay1);
+        this->qrgas_NOSD = Array1D<Real64>(maxlay1);
+        this->nslice_NOSD = Array1D_int(maxlay);
+        this->vfreevent_NOSD = Array1D<Real64>(maxlay1);
+        this->vfreevent = Array1D<Real64>(maxlay1);
+        this->Atop_eff = Array1D<Real64>(maxlay, 0.0);
+        this->Abot_eff = Array1D<Real64>(maxlay, 0.0);
+        this->Al_eff = Array1D<Real64>(maxlay, 0.0);
+        this->Ar_eff = Array1D<Real64>(maxlay, 0.0);
+        this->Ah_eff = Array1D<Real64>(maxlay, 0.0);
+        this->EffectiveOpenness = Array1D<Real64>(maxlay, 0.0);
+        this->hgas = Array1D<Real64>(maxlay1);
+        this->Tgap = Array1D<Real64>(maxlay1);
+        this->hcgapMod = Array1D<Real64>(maxlay1);
+        this->hcv = Array1D<Real64>(maxlay1);
+        this->iprop1 = Array1D_int(maxgas);
+        this->frct1 = Array1D<Real64>(maxgas);
+        this->frcti = Array1D<Real64>(maxgas);
+        this->ipropi = Array1D_int(maxgas);
+        this->frctg = Array1D<Real64>(maxgas);
+        this->ipropg = Array1D_int(maxgas);
+
+        this->rtot = 0.0;
+        this->sft = 0.0;
+        this->hcins = 0.0;
+        this->hrins = 0.0;
+        this->hins = 0.0;
+        this->hcouts = 0.0;
+        this->hrouts = 0.0;
+        this->houts = 0.0;
+        this->ufactors = 0.0;
+        this->fluxs = 0.0;
+        this->qeff = 0.0;
+        this->flux_nonsolar = 0.0;
+        this->cpa = 0.0;
+        this->aveGlassConductivity = 0.0;
+
+        this->iFP = 0;
+        this->kFP = 0;
+
+        this->dynFormat = "";
+    }
+};
 
 } // namespace EnergyPlus
 

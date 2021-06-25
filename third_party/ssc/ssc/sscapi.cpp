@@ -62,7 +62,7 @@
 
 SSCEXPORT int ssc_version()
 {
-	return 250;
+	return 252;
 }
 
 SSCEXPORT const char *ssc_build_info()
@@ -908,7 +908,7 @@ SSCEXPORT int ssc_entry_version( ssc_entry_t p_entry )
 }
 
 
-SSCEXPORT const ssc_info_t ssc_module_var_info( ssc_module_t p_mod, int index )
+SSCEXPORT ssc_info_t ssc_module_var_info( ssc_module_t p_mod, int index )
 {
 	compute_module *cm = static_cast<compute_module*>(p_mod);
 	if (!cm) return 0;

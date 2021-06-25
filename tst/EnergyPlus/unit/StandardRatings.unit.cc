@@ -108,8 +108,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.MinOATCompressor = -10.0;
     Coil.CrankcaseHeaterCapacity = 0.0;
     Coil.MaxOATDefrost = 0.0;
-    Coil.DefrostStrategy = Resistive;
-    Coil.DefrostControl = 0; // timed defrost control type
+    Coil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+    Coil.DefrostControl = StandardRatings::HPdefrostControl::Unassigned; // timed defrost control type
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
@@ -203,10 +203,23 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Real64 NetHeatingCapRatedLowTemp;
     Real64 HSPF;
 
-    SingleSpeedDXHeatingCoilStandardRatings(*state, Coil.RatedTotCap(1), Coil.RatedCOP(1), Coil.CCapFFlow(1), Coil.CCapFTemp(1), Coil.EIRFFlow(1),
-                                            Coil.EIRFTemp(1), Coil.RatedAirVolFlowRate(1), Coil.FanPowerPerEvapAirFlowRate(1),
-                                            NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF, Coil.RegionNum, Coil.MinOATCompressor,
-                                            Coil.OATempCompressorOn, Coil.OATempCompressorOnOffBlank, Coil.DefrostControl);
+    SingleSpeedDXHeatingCoilStandardRatings(*state,
+                                            Coil.RatedTotCap(1),
+                                            Coil.RatedCOP(1),
+                                            Coil.CCapFFlow(1),
+                                            Coil.CCapFTemp(1),
+                                            Coil.EIRFFlow(1),
+                                            Coil.EIRFTemp(1),
+                                            Coil.RatedAirVolFlowRate(1),
+                                            Coil.FanPowerPerEvapAirFlowRate(1),
+                                            NetHeatingCapRatedHighTemp,
+                                            NetHeatingCapRatedLowTemp,
+                                            HSPF,
+                                            Coil.RegionNum,
+                                            Coil.MinOATCompressor,
+                                            Coil.OATempCompressorOn,
+                                            Coil.OATempCompressorOnOffBlank,
+                                            Coil.DefrostControl);
 
     // evaluate capacity curves
     Real64 TotCapTempModFacRated = CurveValue(*state, Coil.CCapFTemp(1), StandardRatings::HeatingOutdoorCoilInletAirDBTempRated);
@@ -241,13 +254,13 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 TEST_F(EnergyPlusFixture, ChillerIPLVTest)
 {
 
-    using StandardRatings::CalcChillerIPLV;
     using DataPlant::TypeOf_Chiller_ElectricEIR;
+    using StandardRatings::CalcChillerIPLV;
 
     // Setup an air-cooled Chiller:Electric:EIR chiller
     state->dataChillerElectricEIR->ElectricEIRChiller.allocate(1);
     state->dataChillerElectricEIR->ElectricEIRChiller(1).Name = "Air Cooled Chiller";
-    state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 216000; // W
+    state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCap = 216000;           // W
     state->dataChillerElectricEIR->ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
     state->dataChillerElectricEIR->ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AirCooled;
     state->dataChillerElectricEIR->ElectricEIRChiller(1).MinUnloadRat = 0.15;
@@ -326,7 +339,6 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
                     Optional<const Real64>());
 
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
-
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
@@ -488,8 +500,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
                                             thisCoil.RatedAirVolFlowRate(1),
                                             thisCoil.FanPowerPerEvapAirFlowRate(1),
                                             NetCoolingCapRated(1),
-        SEER_User,
-        SEER_Standard,
+                                            SEER_User,
+                                            SEER_Standard,
                                             EER,
                                             IEER);
     // check SEER values calculated using user PLF and default PLF curve
@@ -499,10 +511,10 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a
-    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b
-    thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR.Coeff1 = 0.75; // = a
+    thisCoolPLFfPLR.Coeff2 = 0.25; // = b
+    thisCoolPLFfPLR.Var1Min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.Var1Max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
@@ -764,10 +776,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a
-    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b
-    thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
-    thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
+    thisCoolPLFfPLR.Coeff1 = 0.75; // = a
+    thisCoolPLFfPLR.Coeff2 = 0.25; // = b
+    thisCoolPLFfPLR.Var1Min = 0.0; // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.Var1Max = 1.0; // PLR maximum value allowed by the PLF curve
     // reset output variables
     SEER_User = 0.0;
     SEER_Standard = 0.0;
