@@ -337,6 +337,9 @@ namespace DataHeatBalance {
     {
         std::string Name = "";             // Space name
         int ZoneNum = 0;                   // Pointer to Zone wich contains this space
+        Real64 UserEnteredFloorArea = 0.0; // User input floor area for this space
+        Real64 CalcFloorArea = 0.0;        // Calculated floor area used for this space
+        bool HasFloor;                     // Has "Floor" surface
         std::string SpaceType = "General"; // Space type tag
         EPVector<std::string> Tags;        // Optional tags for reporting
         EPVector<int> Surfaces;            // Pointers to surfaces in this space
@@ -344,10 +347,10 @@ namespace DataHeatBalance {
         //   less out of bounds temperature errors allowed
         int RadiantEnclosureNum = 0; // Radiant exchange enclosure this space belongs to
         int SolarEnclosureNum = 0;   // Solar distribution enclosure this space belongs to
-        Real64 FloorArea = 0.0;            // Floor area used for this space
-        Real64 ExtWindowArea = 0.0;        // Exterior Window Area for Zone
-        Real64 TotalSurfArea = 0.0;              // Total surface area for Zone
-        Real64 OriginZ = 0.0;                    // Z origin  [m]
+        Real64 FloorArea = 0.0;      // Floor area used for this space
+        Real64 ExtWindowArea = 0.0;  // Exterior Window Area for Zone
+        Real64 TotalSurfArea = 0.0;  // Total surface area for Zone
+        Real64 OriginZ = 0.0;        // Z origin  [m]
     };
 
     struct SpaceListData
@@ -1138,6 +1141,7 @@ namespace DataHeatBalance {
         std::string CompObjectType;         // device object class name
         std::string CompObjectName;         // device user unique name
         int CompTypeOfNum;                  // type of internal gain device identifier
+        Real64 SpaceGainFrac;               // Fraction of gain value assigned to this Space (because gain rate might be for an entire zone)
         Real64 *PtrConvectGainRate;         // POINTER to value of convection heat gain rate for device, watts
         Real64 ConvectGainRate;             // current timestep value of convection heat gain rate for device, watts
         Real64 *PtrReturnAirConvGainRate;   // POINTER to value of return air convection heat gain rate for device, W
@@ -1156,18 +1160,18 @@ namespace DataHeatBalance {
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompTypeOfNum(0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr), ReturnAirConvGainRate(0.0),
-              PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr), LatentGainRate(0.0), PtrReturnAirLatentGainRate(nullptr),
-              ReturnAirLatentGainRate(0.0), PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0), PtrGenericContamGainRate(nullptr),
-              GenericContamGainRate(0.0), ReturnAirNodeNum(0)
+            : CompTypeOfNum(0), SpaceGainFrac(1.0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr),
+              ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr), LatentGainRate(0.0),
+              PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0), PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0),
+              PtrGenericContamGainRate(nullptr), GenericContamGainRate(0.0), ReturnAirNodeNum(0)
         {
         }
     };
 
-    struct ZoneSimData // Calculated data by Zone during each time step/hour
+    struct SpaceZoneSimData // Calculated data by Space or Zone during each time step/hour
     {
         // Members
-        Real64 NOFOCC;  // Number of Occupants, zone total
+        Real64 NOFOCC;  // Number of Occupants, space total
         Real64 QOCTOT;  // Total Energy from Occupants
         Real64 QOCSEN;  // Sensible Energy from Occupants
         Real64 QOCCON;  // ENERGY CONVECTED FROM OCCUPANTS (WH)
@@ -1200,18 +1204,22 @@ namespace DataHeatBalance {
         Real64 QSELAT;  // LATENT ENERGY FROM Steam Equipment
         Real64 QBBCON;  // ENERGY CONVECTED FROM BASEBOARD HEATING
         Real64 QBBRAD;  // ENERGY RADIATED FROM BASEBOARD HEATING
-        int NumberOfDevices;
-        int MaxNumberOfDevices;
-        Array1D<GenericComponentZoneIntGainStruct> Device;
 
         // Default Constructor
-        ZoneSimData()
+        SpaceZoneSimData()
             : NOFOCC(0.0), QOCTOT(0.0), QOCSEN(0.0), QOCCON(0.0), QOCRAD(0.0), QOCLAT(0.0), QLTTOT(0.0), QLTCON(0.0), QLTRAD(0.0), QLTCRA(0.0),
               QLTSW(0.0), QEECON(0.0), QEERAD(0.0), QEELost(0.0), QEELAT(0.0), QGECON(0.0), QGERAD(0.0), QGELost(0.0), QGELAT(0.0), QOECON(0.0),
               QOERAD(0.0), QOELost(0.0), QOELAT(0.0), QHWCON(0.0), QHWRAD(0.0), QHWLost(0.0), QHWLAT(0.0), QSECON(0.0), QSERAD(0.0), QSELost(0.0),
-              QSELAT(0.0), QBBCON(0.0), QBBRAD(0.0), NumberOfDevices(0), MaxNumberOfDevices(0)
+              QSELAT(0.0), QBBCON(0.0), QBBRAD(0.0)
         {
         }
+    };
+
+    struct SpaceIntGainDeviceData
+    {
+        int NumberOfDevices = 0;
+        int MaxNumberOfDevices = 0;
+        Array1D<GenericComponentZoneIntGainStruct> Device;
     };
 
     struct WindowBlindProperties
@@ -2213,7 +2221,9 @@ struct HeatBalanceData : BaseGlobalStruct
     std::vector<Real64> AirBoundaryMixingVol; // Air boundary simple mixing volume flow rate [m3/s]
     EPVector<DataHeatBalance::ZonePreDefRepType> ZonePreDefRep;
     DataHeatBalance::ZonePreDefRepType BuildingPreDefRep;
-    EPVector<DataHeatBalance::ZoneSimData> ZoneIntGain;
+    EPVector<DataHeatBalance::SpaceZoneSimData> ZoneIntGain;
+    EPVector<DataHeatBalance::SpaceZoneSimData> SpaceIntGain;
+    EPVector<DataHeatBalance::SpaceIntGainDeviceData> SpaceIntGainDevices;
     EPVector<DataHeatBalance::GapSupportPillar> SupportPillar;
     EPVector<DataHeatBalance::GapDeflectionState> DeflectionState;
     EPVector<DataHeatBalance::SpectralDataProperties> SpectralData;
@@ -2484,6 +2494,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->ZonePreDefRep.deallocate();
         this->BuildingPreDefRep = DataHeatBalance::ZonePreDefRepType();
         this->ZoneIntGain.deallocate();
+        this->SpaceIntGain.deallocate();
+        this->SpaceIntGainDevices.deallocate();
         this->SupportPillar.deallocate();
         this->DeflectionState.deallocate();
         this->SpectralData.deallocate();

@@ -654,9 +654,10 @@ namespace DataSurfaces {
         int FrameDivider;                                // Pointer to frame and divider information (windows only)
         Real64 Multiplier;                               // Multiplies glazed area, frame area and divider area (windows only)
 
-        // Air boundaries
+        // Air boundaries and spaces
+        int RadEnclIndex;       // Pointer to raidant enclosure this surface belongs to
         int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
-        int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, ZoneSolarInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
+        int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, EnclSolInfo(n).SurfacePtr(SolarEnclSurfIndex) points to this surface
         bool IsAirBoundarySurf; // True if surface is an air boundary surface (Construction:AirBoundary)
         // Default Constructor
         SurfaceData()

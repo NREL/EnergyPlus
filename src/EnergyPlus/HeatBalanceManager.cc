@@ -5455,6 +5455,7 @@ namespace HeatBalanceManager {
                 thisSpace.Name = UtilityRoutines::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
+                thisSpace.UserEnteredFloorArea = ip->getRealFieldValue(objectFields, objectSchemaProps, "floor_area");
                 int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
                 if (zoneNum > 0) {
                     thisSpace.ZoneNum = zoneNum;
