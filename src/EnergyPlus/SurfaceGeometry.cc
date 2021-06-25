@@ -3152,7 +3152,7 @@ namespace SurfaceGeometry {
         Real64 SchedMaxValue;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
-        if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
             ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
 
@@ -3329,7 +3329,8 @@ namespace SurfaceGeometry {
         int ItemsToGet;
         SurfaceClass ClassItem;
 
-        if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 &&
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
             ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
 
@@ -5791,7 +5792,8 @@ namespace SurfaceGeometry {
 
         if ((state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Window ||
              state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor) &&
-            state.dataHeatBal->SolarDistribution > MinimalShadowing && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier > 1.0) {
+            static_cast<int>(state.dataHeatBal->SolarDistribution) > static_cast<int>(DataHeatBalance::Shadowing::MinimalShadowing) &&
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier > 1.0) {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state,
                                  cRoutineName + ": A Multiplier > 1.0 for window/glass door " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
@@ -6144,7 +6146,7 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
-        if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -6357,7 +6359,8 @@ namespace SurfaceGeometry {
         Real64 TiltAngle;
         bool MakeFin;
 
-        if ((TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection) > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if ((TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection) > 0 &&
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -14888,7 +14891,8 @@ namespace SurfaceGeometry {
             }
 
             if (SignFlag != PrevSignFlag) {
-                if (state.dataHeatBal->SolarDistribution != MinimalShadowing && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar) {
+                if (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::MinimalShadowing &&
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state,
                                          "CheckConvexity: Zone=\"" +

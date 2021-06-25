@@ -670,23 +670,23 @@ namespace HeatBalanceManager {
             }
             // Solar Distribution
             if (has_prefix(AlphaName(3), "MIN") || AlphaName(3) == "-1" || state.dataSysVars->lMinimalShadowing) {
-                state.dataHeatBal->SolarDistribution = MinimalShadowing;
+                state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::MinimalShadowing;
                 AlphaName(3) = "MinimalShadowing";
                 state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIOR" || AlphaName(3) == "0") {
-                state.dataHeatBal->SolarDistribution = FullExterior;
+                state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
                 AlphaName(3) = "FullExterior";
                 state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLINTERIORANDEXTERIOR" || AlphaName(3) == "1") {
-                state.dataHeatBal->SolarDistribution = FullInteriorExterior;
+                state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullInteriorExterior;
                 AlphaName(3) = "FullInteriorAndExterior";
                 state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIORWITHREFLECTIONS") {
-                state.dataHeatBal->SolarDistribution = FullExterior;
+                state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
                 AlphaName(3) = "FullExteriorWithReflectionsFromExteriorSurfaces";
                 state.dataSurface->CalcSolRefl = true;
             } else if (AlphaName(3) == "FULLINTERIORANDEXTERIORWITHREFLECTIONS") {
-                state.dataHeatBal->SolarDistribution = FullInteriorExterior;
+                state.dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullInteriorExterior;
                 AlphaName(3) = "FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces";
                 state.dataSurface->CalcSolRefl = true;
             } else {

@@ -3410,7 +3410,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 if (dot(Ray, state.dataSurface->Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
             }
             if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-                state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
                 SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky *
                                 state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
             } else {
@@ -7909,7 +7909,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         if (dot(U, state.dataSurface->Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                     }
                     if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-                        state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                        state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
                         SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky *
                                         state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                     } else {

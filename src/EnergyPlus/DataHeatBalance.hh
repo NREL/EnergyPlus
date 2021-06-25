@@ -110,15 +110,17 @@ namespace DataHeatBalance {
     };
 
     // Parameters for Interior and Exterior Solar Distribution
+    enum class Shadowing
+    {
+        Unassigned = -1,
+        MinimalShadowing,     // all incoming solar hits floor, no exterior shadowing except reveals
+        FullExterior,         // all incoming solar hits floor, full exterior shadowing
+        FullInteriorExterior, // full interior solar distribution, full exterior solar shadowing
+        FullExteriorWithRefl  // all incoming solar hits floor, full exterior shadowing and reflections
+    };
 
-    constexpr int MinimalShadowing(-1);    // all incoming solar hits floor, no exterior shadowing except reveals
-    constexpr int FullExterior(0);         // all incoming solar hits floor, full exterior shadowing
-    constexpr int FullInteriorExterior(1); // full interior solar distribution, full exterior solar shadowing
-    constexpr int FullExteriorWithRefl(2); // all incoming solar hits floor, full exterior shadowing and reflections
-    // full exterior shadowing and reflections
     // Parameters to indicate the zone type for use with the Zone derived
     // type (see below--Zone%OfType):
-
     constexpr int StandardZone(1);
 
     // Parameters to indicate the convection correlation being used for use with
@@ -1944,8 +1946,8 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 TempConvergTol = 0.0;            // Tolerance value for Temperature Convergence
     int DefaultInsideConvectionAlgo = 1;    // 1 = simple (ASHRAE); 2 = detailed (ASHRAE); 3 = ceiling diffuser; 4 = trombe wall
     int DefaultOutsideConvectionAlgo = 1;   // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
-    int SolarDistribution = 0;              // Solar Distribution Algorithm
-    int InsideSurfIterations = 0;           // Counts inside surface iterations
+    DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                  // Solar Distribution Algorithm
+    int InsideSurfIterations = 0;                                                                             // Counts inside surface iterations
     DataSurfaces::iHeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
     // Flags for HeatTransfer Algorithms Used
     bool AllCTF = true;                  // CTF used for everything - no EMPD, no CondFD, No HAMT, No Kiva - true until flipped otherwise
@@ -2254,7 +2256,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->TempConvergTol = 0.0;
         this->DefaultInsideConvectionAlgo = 1;
         this->DefaultOutsideConvectionAlgo = 1;
-        this->SolarDistribution = 0;
+        this->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
         this->InsideSurfIterations = 0;
         this->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
         this->AllCTF = true;

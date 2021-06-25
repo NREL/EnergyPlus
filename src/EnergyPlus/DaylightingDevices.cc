@@ -165,7 +165,6 @@ namespace DaylightingDevices {
     // Mills, A. F.  Heat and Mass Transfer, 1995, p. 499.  (Shape factor for adjacent rectangles.)
 
     // Using/Aliasing
-    using DataHeatBalance::MinimalShadowing;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::SurfaceClass;
 
@@ -1272,7 +1271,7 @@ namespace DaylightingDevices {
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-            state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
             IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->DifShdgRatioIsoSky(DomeSurf);
             HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) * state.dataHeatBal->DifShdgRatioHoriz(DomeSurf);
         } else {

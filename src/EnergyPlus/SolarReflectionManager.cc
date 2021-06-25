@@ -1184,7 +1184,7 @@ namespace SolarReflectionManager {
                         }
 
                         if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries ||
-                            state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
                             state.dataSolarReflectionManager->SkyReflSolRadiance =
                                 state.dataSurface->Surface(state.dataSolarReflectionManager->HitPtSurfNumX).ViewFactorSky *
                                 state.dataHeatBal->DifShdgRatioIsoSky(state.dataSolarReflectionManager->HitPtSurfNumX) *
