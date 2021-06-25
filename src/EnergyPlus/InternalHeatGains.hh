@@ -100,27 +100,30 @@ namespace InternalHeatGains {
                                            Real64 &SumConvGainRate);
 
     int GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                   int const ZoneNum,                    // zone index pointer for which zone to sum gains for
-                                   int const IntGainTypeOfNum,           // zone internal gain type number
+                                   int const SpaceNum,                   // space index pointer for which space to sum gains for
+                                   int const IntGainTypeOfNum,           // space internal gain type number
                                    std::string_view const &IntGainName); // Internal gain name
 
     void SumInternalConvectionGainsByIndices(
         EnergyPlusData &state,
-        int const ZoneNum,                  // zone index pointer for which zone to sum gains for
+        int const NumGains,                 // number of device gains to sum
+        const Array1D_int &DeviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
         const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumConvGainRate);
 
     void SumInternalLatentGainsByIndices(
         EnergyPlusData &state,
-        int const ZoneNum,                  // zone index pointer for which zone to sum gains for
+        int const NumGains,                 // number of device gains to sum
+        const Array1D_int &DeviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
         const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumLatentGainRate);
 
     void SumReturnAirConvectionGainsByIndices(
         EnergyPlusData &state,
-        int const ZoneNum,                  // zone index pointer for which zone to sum gains for
+        int const NumGains,                 // number of device gains to sum
+        const Array1D_int &DeviceSpaceARR,  // variable length 1-d array of integer space index pointers to include in summation
         const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumReturnAirGainRate);
@@ -136,9 +139,9 @@ namespace InternalHeatGains {
                                             const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
                                             Real64 &SumReturnAirGainRate);
 
-    void SumAllInternalRadiationGains(EnergyPlusData &state,
-                                      int const ZoneNum, // zone index pointer for which zone to sum gains for
-                                      Real64 &SumRadGainRate);
+    void SumAllSpaceInternalRadiationGains(EnergyPlusData &state,
+                                           int const SpaceNum, // space index pointer for which space to sum gains for
+                                           Real64 &SumRadGainRate);
 
     void SumInternalRadiationGainsByTypes(EnergyPlusData &state,
                                           int const ZoneNum,              // zone index pointer for which zone to sum gains for

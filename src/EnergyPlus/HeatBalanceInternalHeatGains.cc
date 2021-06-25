@@ -71,12 +71,45 @@ void SetupZoneInternalGain(EnergyPlusData &state,
                            int RetNodeNum // for return air heat gains
 )
 {
+    // Distribute zone internal gain across all spaces in the zone weighted by floor area
+    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).Spaces) {
+        Real64 gainFrac = state.dataHeatBal->Space(spaceNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
+        SetupSpaceInternalGain(state,
+                               spaceNum,
+                               gainFrac,
+                               cComponentObject,
+                               cComponentName,
+                               IntGainComp_TypeOfNum,
+                               ConvectionGainRate,
+                               ReturnAirConvectionGainRate,
+                               ThermalRadiationGainRate,
+                               LatentGainRate,
+                               ReturnAirLatentGainRate,
+                               CarbonDioxideGainRate,
+                               GenericContamGainRate,
+                               RetNodeNum);
+    }
+}
+void SetupSpaceInternalGain(EnergyPlusData &state,
+                            int const SpaceNum,
+                            Real64 SpaceGainFraction,            // Fraction of gain value assigned to this space
+                            std::string const &cComponentObject, // object class name for device contributing internal gain
+                            std::string const &cComponentName,   // user unique name for device
+                            int const IntGainComp_TypeOfNum,
+                            Real64 *ConvectionGainRate, // pointer target for remote convection gain value to be accessed
+                            Real64 *ReturnAirConvectionGainRate,
+                            Real64 *ThermalRadiationGainRate, // pointer target for remote IR radiation gain value to be accessed
+                            Real64 *LatentGainRate,
+                            Real64 *ReturnAirLatentGainRate,
+                            Real64 *CarbonDioxideGainRate,
+                            Real64 *GenericContamGainRate,
+                            int RetNodeNum // for return air heat gains
+)
+{
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   November 2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // provide a general interface for setting up devices with internal gains
@@ -86,13 +119,10 @@ void SetupZoneInternalGain(EnergyPlusData &state,
     // devices are internal gains like people, lights, electric equipment
     // and HVAC components with skin loss models like thermal tanks, and power conditioning.
 
-    // Using/Aliasing
     using namespace DataHeatBalance;
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
     int const DeviceAllocInc(100);
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int IntGainsNum;
     bool FoundIntGainsType;
     bool FoundDuplicate;
@@ -115,11 +145,12 @@ void SetupZoneInternalGain(EnergyPlusData &state,
         return;
     }
 
-    for (IntGainsNum = 1; IntGainsNum <= state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices; ++IntGainsNum) {
-        if ((state.dataHeatBal->ZoneIntGain(ZoneNum).Device(IntGainsNum).CompObjectType == UpperCaseObjectType) &&
-            (state.dataHeatBal->ZoneIntGain(ZoneNum).Device(IntGainsNum).CompTypeOfNum == IntGainComp_TypeOfNum)) {
+    auto &thisIntGain = state.dataHeatBal->SpaceIntGainDevices(SpaceNum);
+    for (IntGainsNum = 1; IntGainsNum <= thisIntGain.NumberOfDevices; ++IntGainsNum) {
+        if ((thisIntGain.Device(IntGainsNum).CompObjectType == UpperCaseObjectType) &&
+            (thisIntGain.Device(IntGainsNum).CompTypeOfNum == IntGainComp_TypeOfNum)) {
             FoundIntGainsType = true;
-            if (state.dataHeatBal->ZoneIntGain(ZoneNum).Device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
+            if (thisIntGain.Device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
                 FoundDuplicate = true;
                 break;
             }
@@ -134,70 +165,58 @@ void SetupZoneInternalGain(EnergyPlusData &state,
         return;
     }
 
-    if (state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device.allocate(DeviceAllocInc);
-        state.dataHeatBal->ZoneIntGain(ZoneNum).MaxNumberOfDevices = DeviceAllocInc;
+    if (thisIntGain.NumberOfDevices == 0) {
+        thisIntGain.Device.allocate(DeviceAllocInc);
+        thisIntGain.MaxNumberOfDevices = DeviceAllocInc;
     } else {
-        if (state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices + 1 > state.dataHeatBal->ZoneIntGain(ZoneNum).MaxNumberOfDevices) {
-            state.dataHeatBal->ZoneIntGain(ZoneNum).Device.redimension(state.dataHeatBal->ZoneIntGain(ZoneNum).MaxNumberOfDevices += DeviceAllocInc);
+        if (thisIntGain.NumberOfDevices + 1 > thisIntGain.MaxNumberOfDevices) {
+            thisIntGain.Device.redimension(thisIntGain.MaxNumberOfDevices += DeviceAllocInc);
         }
     }
-    ++state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices;
+    ++thisIntGain.NumberOfDevices;
 
-    state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).CompObjectType = UpperCaseObjectType;
-    state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).CompObjectName = UpperCaseObjectName;
-    state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).CompTypeOfNum = IntGainComp_TypeOfNum;
+    thisIntGain.Device(thisIntGain.NumberOfDevices).CompObjectType = UpperCaseObjectType;
+    thisIntGain.Device(thisIntGain.NumberOfDevices).CompObjectName = UpperCaseObjectName;
+    thisIntGain.Device(thisIntGain.NumberOfDevices).CompTypeOfNum = IntGainComp_TypeOfNum;
+    thisIntGain.Device(thisIntGain.NumberOfDevices).SpaceGainFrac = SpaceGainFraction;
 
     // note pointer assignments in code below!
     if (ConvectionGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate =
-            ConvectionGainRate;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrConvectGainRate = ConvectionGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrConvectGainRate =
-            &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrConvectGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (ReturnAirConvectionGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate =
-            ReturnAirConvectionGainRate;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrReturnAirConvGainRate = ReturnAirConvectionGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirConvGainRate =
-            &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrReturnAirConvGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (ThermalRadiationGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate =
-            ThermalRadiationGainRate;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrRadiantGainRate = ThermalRadiationGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrRadiantGainRate =
-            &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrRadiantGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (LatentGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrLatentGainRate = LatentGainRate;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrLatentGainRate = LatentGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrLatentGainRate =
-            &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrLatentGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (ReturnAirLatentGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate =
-            ReturnAirLatentGainRate;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrReturnAirLatentGainRate = ReturnAirLatentGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrReturnAirLatentGainRate =
-            &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrReturnAirLatentGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (CarbonDioxideGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate =
-            CarbonDioxideGainRate;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrCarbonDioxideGainRate = CarbonDioxideGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrCarbonDioxideGainRate =
-            &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrCarbonDioxideGainRate = &state.dataHeatBal->zeroPointerVal;
     }
     if (GenericContamGainRate) {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate =
-            GenericContamGainRate;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrGenericContamGainRate = GenericContamGainRate;
     } else {
-        state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).PtrGenericContamGainRate =
-            &state.dataHeatBal->zeroPointerVal;
+        thisIntGain.Device(thisIntGain.NumberOfDevices).PtrGenericContamGainRate = &state.dataHeatBal->zeroPointerVal;
     }
-    state.dataHeatBal->ZoneIntGain(ZoneNum).Device(state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices).ReturnAirNodeNum = RetNodeNum;
+    thisIntGain.Device(thisIntGain.NumberOfDevices).ReturnAirNodeNum = RetNodeNum;
 }
 
 } // namespace EnergyPlus
