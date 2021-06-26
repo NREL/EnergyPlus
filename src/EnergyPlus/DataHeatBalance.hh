@@ -356,6 +356,7 @@ namespace DataHeatBalance {
     struct SpaceListData
     {
         std::string Name = "";                          // Space List name
+        int NumOfSpaces = 0;                            // Number of spaces in the list
         std::string::size_type MaxSpaceNameLength = 0u; // Max Name length of Spaces in the list
         EPVector<int> Spaces;                           // Pointers to Spaces in the list
     };
@@ -573,27 +574,28 @@ namespace DataHeatBalance {
     struct GlobalInternalGainMiscObject
     {
         // Members
-        std::string Name;
-        int ZoneOrZoneListPtr;
-        int NumOfZones;
-        int StartPtr;
-        bool ZoneListActive;
-
-        // Default Constructor
-        GlobalInternalGainMiscObject() : ZoneOrZoneListPtr(0), NumOfZones(0), StartPtr(0), ZoneListActive(false)
-        {
-        }
+        std::string Name = "";
+        int ZoneOrZoneListPtr = 0;
+        int NumOfZones = 0;
+        int StartPtr = 0;
+        bool ZoneListActive = false;
+        int SpaceOrSpaceListPtr = 0;
+        int NumOfSpaces = 0;
+        int SpaceStartPtr = 0;
+        bool SpaceListActive = false;
     };
 
     struct PeopleData
     {
         // Members
-        std::string Name;         // PEOPLE object name
-        int ZonePtr;              // Pointer to the zone number for this people statement
-        Real64 NumberOfPeople;    // Maximum number of people for this statement
-        int NumberOfPeoplePtr;    // Pointer to schedule for number of people
-        bool EMSPeopleOn;         // EMS actuating number of people if .TRUE.
-        Real64 EMSNumberOfPeople; // Value EMS is directing to use for override
+        std::string Name;            // PEOPLE object name
+        int ZonePtr;                 // Pointer to the zone number for this people statement
+        EPVector<int> SpacePtrs;     // Pointers to space numbers for this people statement
+        EPVector<Real64> SpaceFracs; // Fraction of total gains applied to each space
+        Real64 NumberOfPeople;       // Maximum number of people for this statement
+        int NumberOfPeoplePtr;       // Pointer to schedule for number of people
+        bool EMSPeopleOn;            // EMS actuating number of people if .TRUE.
+        Real64 EMSNumberOfPeople;    // Value EMS is directing to use for override
         // Note that the schedule and maximum number was kept for people since it seemed likely that
         // users would want to assign the same schedule to multiple people statements.
         int ActivityLevelPtr;   // Pointer to schedule for activity level
@@ -2272,6 +2274,7 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> InfiltrationObjects;
     EPVector<DataHeatBalance::GlobalInternalGainMiscObject> VentilationObjects;
     EPVector<DataHeatBalance::ZoneReportVars> ZnRpt;
+    EPVector<DataHeatBalance::ZoneReportVars> SpaceRpt;
     EPVector<DataHeatBalance::ZoneMassConservationData> MassConservation;
     DataHeatBalance::ZoneAirMassFlowConservation ZoneAirMassFlow;
     EPVector<DataHeatBalance::ZoneLocalEnvironmentData> ZoneLocalEnvironment;
@@ -2544,6 +2547,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->InfiltrationObjects.deallocate();
         this->VentilationObjects.deallocate();
         this->ZnRpt.deallocate();
+        this->SpaceRpt.deallocate();
         this->MassConservation.deallocate();
         this->ZoneAirMassFlow = DataHeatBalance::ZoneAirMassFlowConservation();
         this->ZoneLocalEnvironment.deallocate();
