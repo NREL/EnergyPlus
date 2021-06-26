@@ -1220,6 +1220,14 @@ void GetPlantInput(EnergyPlusData &state)
                             this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
                         }
                         this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(state, CompNames(CompNum));
+                    } else if (UtilityRoutines::SameString(this_comp_type, "HeatExchanger:SteamToWater")) {
+                        this_comp.TypeOf_Num = TypeOf_SteamToWaterPlantHtExchg;
+                        if (LoopSideNum == DemandSide) {
+                            this_comp.CurOpSchemeType = DemandOpSchemeType;
+                        } else if (LoopSideNum == SupplySide) {
+                            this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
+                        }
+                        this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(state, CompNames(CompNum));
                     } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroTurbine")) {
                         this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
                         if (LoopSideNum == DemandSide) {
@@ -4097,6 +4105,15 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                             this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                             this_component.HowLoadServed = HowMet_PassiveCap;
                         } else if (SELECT_CASE_var == TypeOf_FluidToFluidPlantHtExchg) { //          = 84
+                            this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
+                            if (LoopSideCtr == DemandSide) {
+                                this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+                                this_component.HowLoadServed = HowMet_NoneDemand;
+                            } else {
+                                this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+                                this_component.HowLoadServed = HowMet_PassiveCap;
+                            }
+                        } else if (SELECT_CASE_var == TypeOf_SteamToWaterPlantHtExchg) { //          = 99
                             this_component.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                             if (LoopSideCtr == DemandSide) {
                                 this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
