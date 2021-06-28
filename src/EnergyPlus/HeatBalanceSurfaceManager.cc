@@ -8057,25 +8057,33 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
         // Convergence check - Loop through all relevant non-window surfaces to check for convergence...
         Real64 MaxDelTemp = 0.0; // Maximum change in surface temperature for any opaque surface from one iteration to the next
-        Converged = true;
+        bool isZoneByZoneConverged = true;
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-            if (state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) continue;
+            if (!state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones && state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) continue;
             Real64 zoneMaxDelTemp = 0.0;
             int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
             int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
                 Real64 delta = state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurf->SurfTempInsOld(surfNum);
                 Real64 absDif = std::abs(delta);
-                // MaxDelTemp = std::max(absDif, MaxDelTemp);
                 zoneMaxDelTemp = std::max(absDif, zoneMaxDelTemp);
             }
             MaxDelTemp = std::max(zoneMaxDelTemp, MaxDelTemp);
-            if (zoneMaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) state.dataHeatBal->ZoneInsideSurfConverged(zoneNum) = true;
-            if (!state.dataHeatBal->ZoneInsideSurfConverged(zoneNum)) Converged = false;
+            if (zoneMaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) {
+                state.dataHeatBal->ZoneInsideSurfConverged(zoneNum) = true;
+            } else {
+                isZoneByZoneConverged = false;
+            }
 
         } // ...end of loop to check for convergence
 
-        if (state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones && (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp)) Converged = true;
+        if (state.dataHeatBalSurf->insideSurfHeatBalConvergeAllZones) {
+            if (MaxDelTemp <= state.dataHeatBal->MaxAllowedDelTemp) {
+                Converged = true;
+            }
+        } else {
+            Converged = isZoneByZoneConverged;
+        }
 
 #ifdef EP_Count_Calls
         state.dataTimingsData->NumMaxInsideSurfIterations =
