@@ -522,7 +522,7 @@ namespace HWBaseboardRadiator {
                                                                          state.dataIPShortCut->cAlphaArgs(1),
                                                                          DataLoopNode::NodeFluidType::Water,
                                                                          DataLoopNode::NodeConnectionType::Inlet,
-                                                                         1,
+                                                                         NodeInputManager::compFluidStream::Primary,
                                                                          ObjectIsNotParent);
 
             // Get outlet node number
@@ -533,7 +533,7 @@ namespace HWBaseboardRadiator {
                                                                           state.dataIPShortCut->cAlphaArgs(1),
                                                                           DataLoopNode::NodeFluidType::Water,
                                                                           DataLoopNode::NodeConnectionType::Outlet,
-                                                                          1,
+                                                                          NodeInputManager::compFluidStream::Primary,
                                                                           ObjectIsNotParent);
             TestCompSet(state,
                         cCMO_BBRadiator_Water,
@@ -697,7 +697,7 @@ namespace HWBaseboardRadiator {
                     HWBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
                 }
                 if (HWBaseboard(BaseboardNum).SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->Surface(HWBaseboard(BaseboardNum).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(HWBaseboard(BaseboardNum).SurfacePtr(SurfNum)) = true;
                 }
 
                 AllFracsSummed += HWBaseboard(BaseboardNum).FracDistribToSurf(SurfNum);
@@ -1840,20 +1840,19 @@ namespace HWBaseboardRadiator {
 
                 if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
                 }
 
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
                     !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                  state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
         }
 
         return SumHATsurf;

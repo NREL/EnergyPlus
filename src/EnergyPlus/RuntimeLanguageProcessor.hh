@@ -75,15 +75,15 @@ namespace RuntimeLanguageProcessor {
     {
         Invalid = -1,
         Unassigned = 0,
-        Number = 1,     // matches the ValueNumber
-        Variable = 4,   // matches the ValueVariable
-        Expression = 5, // matches the ValueExpression
-        Operator = 7,   // includes basic operators and built-in functions.
-        Parenthesis = 9 // parenthesis token
-    };
+        Number = 1,           // matches the ValueNumber
+        Variable = 4,         // matches the ValueVariable
+        Expression = 5,       // matches the ValueExpression
+        Operator = 7,         // includes basic operators and built-in functions.
+        Parenthesis = 9,      // parenthesis token
+        ParenthesisLeft = 10, // indicates left side parenthesis found in parsing
+        ParenthesisRight = 11 // indicates right side parenthesis found in parsing
 
-    int constexpr ParenthesisLeft(10);  // indicates left side parenthesis found in parsing
-    int constexpr ParenthesisRight(11); // indicates right side parenthesis found in parsing
+    };
 
     struct TokenType
     {
@@ -94,12 +94,12 @@ namespace RuntimeLanguageProcessor {
         std::string String; // Serves double duty, also saves string version of token for easy debugging
         ErlFunc Operator;   // indentifies operator or function 1..64
         int Variable;       // points to a variable in ErlVariable structure
-        int Parenthesis;    // identifes if token is left or right parenthesis
+        Token Parenthesis;  // identifes if token is left or right parenthesis
         int Expression;     // points to an expression in ErlExpression structure
         std::string Error;  // holds token processing error message content
 
         // Default Constructor
-        TokenType() : Type(Token::Unassigned), Number(0.0), Operator(ErlFunc::Unassigned), Variable(0), Parenthesis(0), Expression(0)
+        TokenType() : Type(Token::Unassigned), Number(0.0), Operator(ErlFunc::Unassigned), Variable(0), Parenthesis(Token::Unassigned), Expression(0)
         {
         }
     };

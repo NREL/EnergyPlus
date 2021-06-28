@@ -127,16 +127,6 @@ using namespace FaultsManager;
 using namespace HybridModel;
 using ScheduleManager::GetCurrentScheduleValue;
 
-// Data
-// MODULE PARAMETER DEFINITIONS:
-// Controls for PredictorCorrector
-// INTEGER, PUBLIC, PARAMETER :: iGetZoneSetPoints             = 1
-// INTEGER, PUBLIC, PARAMETER :: iPredictStep                  = 2
-// INTEGER, PUBLIC, PARAMETER :: iCorrectStep                  = 3
-// INTEGER, PUBLIC, PARAMETER :: iRevertZoneTimestepHistories  = 4
-// INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
-// INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
-
 Array1D_string const ValidControlTypes(4,
                                        {"ThermostatSetpoint:SingleHeating",
                                         "ThermostatSetpoint:SingleCooling",
@@ -177,8 +167,8 @@ Array1D_string const AdaptiveComfortModelTypes(8,
 
 // Functions
 void ManageZoneAirUpdates(EnergyPlusData &state,
-                          int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
-                          Real64 &ZoneTempChange, // Temp change in zone air btw previous and current timestep
+                          DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+                          Real64 &ZoneTempChange,                                     // Temp change in zone air btw previous and current timestep
                           bool const ShortenTimeStepSys,
                           bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                           Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
@@ -206,22 +196,22 @@ void ManageZoneAirUpdates(EnergyPlusData &state,
     {
         auto const SELECT_CASE_var(UpdateType);
 
-        if (SELECT_CASE_var == iGetZoneSetPoints) {
+        if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::GetZoneSetPoints) {
             CalcZoneAirTempSetPoints(state);
 
-        } else if (SELECT_CASE_var == iPredictStep) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PredictStep) {
             PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        } else if (SELECT_CASE_var == iCorrectStep) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::CorrectStep) {
             CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        } else if (SELECT_CASE_var == iRevertZoneTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::RevertZoneTimestepHistories) {
             RevertZoneTimestepHistories(state);
 
-        } else if (SELECT_CASE_var == iPushZoneTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushZoneTimestepHistories) {
             PushZoneTimestepHistories(state);
 
-        } else if (SELECT_CASE_var == iPushSystemTimestepHistories) {
+        } else if (SELECT_CASE_var == DataHeatBalFanSys::PredictorCorrectorCtrl::PushSystemTimestepHistories) {
             PushSystemTimestepHistories(state);
         }
     }
@@ -2667,9 +2657,9 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
     Array1D<Real64> dailyDryTemp(state.dataWeatherManager->NumDaysInYear, 0.0);
 
     readStat = 0;
-    if (FileSystem::fileExists(state.files.inputWeatherFileName.fileName)) {
+    if (FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
         // Read hourly dry bulb temperature first
-        auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptive");
+        auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptive");
         for (i = 1; i <= 9; ++i) { // Headers
             epwFile.readLine();
         }
@@ -2737,7 +2727,7 @@ void CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state, Array1D<Real64
         }
     } else {
         ShowFatalError(state,
-                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFileName.fileName +
+                       "CalcThermalComfortAdaptive: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
                            " for input (read). (File does not exist)");
     }
 }
@@ -2937,12 +2927,12 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             FirstSurfFlag = true;
             for (SurfNum = Zone(Loop).HTSurfaceFirst; SurfNum <= Zone(Loop).HTSurfaceLast; ++SurfNum) {
                 if (FirstSurfFlag) {
-                    TRefFlag = state.dataSurface->Surface(SurfNum).TAirRef;
+                    TRefFlag = state.dataSurface->SurfTAirRef(SurfNum);
                     FirstSurfFlag = false;
                 }
                 // for each particular zone, the reference air temperature(s) should be the same
                 // (either mean air, bulk air, or supply air temp).
-                if (state.dataSurface->Surface(SurfNum).TAirRef != TRefFlag) {
+                if (state.dataSurface->SurfTAirRef(SurfNum) != TRefFlag) {
                     ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + Zone(Loop).Name);
                 }
             }
@@ -6761,34 +6751,34 @@ void CalcZoneSums(EnergyPlusData &state,
             // Add to the surface convection sums
             if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                 // Window frame contribution
-                Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
                                      (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)));
-                SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
+                SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempIn(SurfNum);
                 HA += HA_surf;
             }
 
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
                 // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
                                      (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)));
-                SumHATsurf += HA_surf * state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
+                SumHATsurf += HA_surf * state.dataSurface->SurfWinDividerTempIn(SurfNum);
                 HA += HA_surf;
             }
 
         } // End of check if window
 
-        HA += state.dataHeatBal->HConvIn(SurfNum) * Area;
-        SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
+        HA += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area;
+        SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
 
         // determine reference air temperature for this surface
         {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
                 RefAirTemp = MAT(ZoneNum);
                 SumHA += HA;
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
                 SumHATref += HA * RefAirTemp;
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
@@ -7033,12 +7023,12 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
         // determine reference air temperature for this surface's convective heat transfer model
         {
-            auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
+            auto const SELECT_CASE_var(state.dataSurface->SurfTAirRef(SurfNum));
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature
                 RefAirTemp = MAT(ZoneNum);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
+                RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
                 if (!ControlledZoneAirFlag) {
@@ -7103,21 +7093,21 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
             if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                 // Window frame contribution
 
-                SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
                                 (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
-                                (state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) - RefAirTemp);
+                                (state.dataSurface->SurfWinFrameTempIn(SurfNum) - RefAirTemp);
             }
 
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                 // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
                                 (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                (state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) - RefAirTemp);
+                                (state.dataSurface->SurfWinDividerTempIn(SurfNum) - RefAirTemp);
             }
 
         } // End of check if window
 
-        SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * Area * (state.dataHeatBalSurf->TempSurfInTmp(SurfNum) - RefAirTemp);
+        SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - RefAirTemp);
 
         // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
         if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {
@@ -7437,7 +7427,7 @@ void AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state, int const TempContr
     }
 
     // get mean radiant temperature for zone
-    thisMRT = state.dataHeatBal->MRT(ActualZoneNum);
+    thisMRT = state.dataHeatBal->ZoneMRT(ActualZoneNum);
 
     // modify setpoint for operative temperature control
     //  traping for MRT fractions between 0.0 and 0.9 during get input, so shouldn't be able to divide by zero here.

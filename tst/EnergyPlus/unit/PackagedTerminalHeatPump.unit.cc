@@ -439,15 +439,34 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    // Test for #7053:
-    // Fake that there is at least one UnitarySystemPerformance:Multispeed object
-    UnitarySystems::DesignSpecMSHP fakeDesignSpecMSHP;
-    state->dataUnitarySystems->designSpecMSHP.push_back(fakeDesignSpecMSHP);
-
     bool ErrorsFound(false);
     GetZoneData(*state, ErrorsFound);
     GetZoneEquipmentData(*state);
     GetPTUnit(*state);
+
+    // Test for #8812:
+    // Verify zone sizing check if airflow is Autosized to prevent hard crash
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->ZoneSizingRunDone = false;
+    state->dataPTHP->PTUnit(1).HVACSizingIndex = 0;
+    state->dataPTHP->PTUnit(1).CoolOutAirVolFlow = AutoSize;
+    EXPECT_THROW(SizePTUnit(*state, 1), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** For autosizing of ZoneHVAC:WaterToAirHeatPump ZONE WSHP, a zone sizing run must be done.",
+        "   **   ~~~   ** No \"Sizing:Zone\" objects were entered.",
+        "   **   ~~~   ** The \"SimulationControl\" object did not have the field \"Do Zone Sizing Calculation\" set to Yes.",
+        "   **  Fatal  ** Program terminates due to previously shown condition(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=For autosizing of ZoneHVAC:WaterToAirHeatPump ZONE WSHP, a zone sizing run must be done.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Test for #7053:
+    // Fake that there is at least one UnitarySystemPerformance:Multispeed object
+    UnitarySystems::DesignSpecMSHP fakeDesignSpecMSHP;
+    state->dataUnitarySystems->designSpecMSHP.push_back(fakeDesignSpecMSHP);
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);

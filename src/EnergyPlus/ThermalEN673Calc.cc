@@ -93,7 +93,7 @@ namespace ThermalEN673Calc {
 
     void Calc_EN673(EnergyPlusData &state,
                     TARCOGOutput::Files &files,
-                    int const standard,
+                    TARCOGGassesParams::Stdrd const standard,
                     int const nlayer,
                     Real64 const tout,
                     Real64 const tind,
@@ -248,7 +248,7 @@ namespace ThermalEN673Calc {
                        const Array1D<Real64> &presure,
                        const Array1D_int &nmix,
                        Array1D<Real64> &theta,
-                       int const standard,
+                       TARCOGGassesParams::Stdrd const standard,
                        Array1D<Real64> &hg,
                        Array1D<Real64> &hr,
                        Array1D<Real64> &hs,
@@ -448,13 +448,13 @@ namespace ThermalEN673Calc {
                 sumRsold = sumRs;
                 sumRs = 0.0;
 
-                if ((standard == EN673) && (nlayer == 2)) {
+                if ((standard == TARCOGGassesParams::Stdrd::EN673) && (nlayer == 2)) {
                     return; // If EN673 declared values path and glazing has 2 layers, end claculations and return
                 } else {
                     if (tind > tout) {
                         for (i = 1; i <= nlayer - 1; ++i) {
                             dT(i) = 15.0 * (1.0 / hs(i)) / sumRsold; // updated temperature distribution
-                            if (standard == EN673) {
+                            if (standard == TARCOGGassesParams::Stdrd::EN673) {
                                 Tm = 283.0;
                             } else {
                                 Tm = (theta(2 * i) + theta(2 * i + 1)) / 2.0;
@@ -533,7 +533,7 @@ namespace ThermalEN673Calc {
                      int const nlayer,
                      const Array1D<Real64> &absol,
                      Real64 &sf,
-                     int const standard,
+                     TARCOGGassesParams::Stdrd const standard,
                      int &nperr,
                      std::string &ErrorMessage)
     {
@@ -564,7 +564,7 @@ namespace ThermalEN673Calc {
         sf = 0.0;
 
         // evaluate inward flowing fraction of absorbed radiation:
-        if ((standard == EN673) || (standard == EN673Design)) {
+        if ((standard == TARCOGGassesParams::Stdrd::EN673) || (standard == TARCOGGassesParams::Stdrd::EN673Design)) {
             if (nlayer == 1) {
                 fract = dir * absol(1) * (rs(1) * rs(3)) / (rs(1) * (rs(1) + rs(3)));
             } else {

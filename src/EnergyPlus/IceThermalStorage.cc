@@ -777,7 +777,7 @@ namespace IceThermalStorage {
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             // Get Plant Outlet Node Num
@@ -789,7 +789,7 @@ namespace IceThermalStorage {
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             // Test InletNode and OutletNode
@@ -887,7 +887,7 @@ namespace IceThermalStorage {
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             // Get Plant Outlet Node Num
@@ -899,7 +899,7 @@ namespace IceThermalStorage {
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             // Test InletNode and OutletNode

@@ -318,7 +318,7 @@ This is an optional field used to specify pressure drop information for this par
 
 \paragraph{Field Set (Branch Specifications)}\label{field-set-branch-specifications}
 
-Following the two introductory items, there are groups of 4 repeated items: a type, a name, inlet and outlet node names. All of these items refer to one particular component on the branch. The first component defined by these items will be the first component on this branch, etc. through the end of the list.~ This object is extensible and can use as many field sets as needed.
+Following the two introductory items, there are groups of 4 repeated items: a type, a name, inlet and outlet node names. All of these items refer to one particular component on the branch. The first component defined by these items will be the first component on this branch, etc. through the end of the list.~ This object is extensible and can use as many field sets as needed by repeating the last four fields.
 
 \paragraph{Field: Component \textless{}\#\textgreater{} Object Type}\label{field-component-object-type-000}
 
@@ -356,7 +356,7 @@ And a more complex one:
   BRANCH,
       Air Loop Main Branch,    !- Branch Name
       ,                        !- Pressure Drop Curve Name
-      FAN:SIMPLE:ConstVolume,  !- Comp1 Type
+      FAN:ConstantVolume,      !- Comp1 Type
       Supply Fan 1,            !- Comp1 Name
       Air Loop Inlet Node,     !- Comp1 Inlet Node Name
       Cooling Coil Air Inlet Node,  !- Comp1 Outlet Node Name
@@ -963,9 +963,9 @@ Numeric field specifies the ground cover effects used in the evapotranspiration 
 
 The number of pipe circuit objects which will be defined in the following fields.
 
-\paragraph{Field: Pipe Circuit 1 \{\ldots{} to N; extensible\}}\label{field-pipe-circuit-1-to-n-extensible}
+\paragraph{Field: Pipe Circuit \textless{}\#\textgreater{}}\label{field-pipe-circuit-1-to-n-extensible}
 
-A \hyperref[pipingsystemundergroundpipecircuit]{PipingSystem:Underground:PipeCircuit} to be included in this domain.~ This indicates that the pipe circuit and all of the underlying pipe segments will be included during mesh development and heat transfer calculations within this domain.~ Any number of pipe circuits can be added, assuming all underlying pipe segments do not cause any conflicts for the mesh development engine (overlapping pipes, etc.).
+A \hyperref[pipingsystemundergroundpipecircuit]{PipingSystem:Underground:PipeCircuit} to be included in this domain.~ This indicates that the pipe circuit and all of the underlying pipe segments will be included during mesh development and heat transfer calculations within this domain.~ This object is extensible, so any number of pipe circuits can be added, assuming all underlying pipe segments do not cause any conflicts for the mesh development engine (overlapping pipes, etc.).
 
 \subsection{PipingSystem:Underground:PipeCircuit}\label{pipingsystemundergroundpipecircuit}
 
@@ -1029,9 +1029,9 @@ This alpha field is used as an identifying field for the pipe circuit.
 
 ~The number of pipe segment objects which will be defined in the following fields.
 
-\paragraph{Field: Pipe Segment 1 \{\ldots{} to N; extensible\}}\label{field-pipe-segment-1-to-n-extensible}
+\paragraph{Field: Pipe Segment \textless{}\#\textgreater{}}\label{field-pipe-segment-1-to-n-extensible}
 
-~A \hyperref[pipingsystemundergroundpipesegment]{PipingSystem:Underground:PipeSegment} to be included in this pipe circuit.~ The circuit is set up so that flow passes through the \emph{N} segments in the order they are entered here.
+~A \hyperref[pipingsystemundergroundpipesegment]{PipingSystem:Underground:PipeSegment} to be included in this pipe circuit.~ The circuit is set up so that flow passes through the \emph{N} segments in the order they are entered here. This object is extensible, so additional fields of this type can be added to the end of this object.
 
 \subsection{PipingSystem:Underground:PipeSegment}\label{pipingsystemundergroundpipesegment}
 

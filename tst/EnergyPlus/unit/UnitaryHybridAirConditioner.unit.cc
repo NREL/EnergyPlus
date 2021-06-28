@@ -121,7 +121,7 @@ using EnergyPlus::HybridEvapCoolingModel::Model;
 using namespace EnergyPlus::HybridUnitaryAirConditioners;
 
 namespace EnergyPlus {
-std::vector<std::string> getAllLinesInFile2(std::string filePath)
+std::vector<std::string> getAllLinesInFile2(fs::path const &filePath)
 {
     std::ifstream infile(filePath);
     std::vector<std::string> lines;
@@ -147,7 +147,7 @@ std::vector<std::string> parseLine(std::string line)
 TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 {
     std::vector<std::string> snippet =
-        getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
+        getAllLinesInFile2(configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
     ASSERT_TRUE(process_idf(string));
     // setup environment
@@ -460,7 +460,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     std::string NameOfComp = pZoneHybridUnitaryAirConditioner->Name;
     int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
     Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-    Array1D_int VarTypes(NumVariables);                              // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
     std::map<int, DataGlobalConstants::ResourceType> ResourceTypes;  // ResourceTypes for each variable
@@ -1447,7 +1447,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateOptionalError
 TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_RuntimeFraction_Initialization)
 {
     std::vector<std::string> snippet =
-        getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
+        getAllLinesInFile2(configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
     ASSERT_TRUE(process_idf(string));
     // setup environment

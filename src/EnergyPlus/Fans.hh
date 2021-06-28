@@ -68,6 +68,9 @@ namespace Fans {
     // Using/Aliasing
     using DataHVACGlobals::MinFrac;
 
+    constexpr int ExhaustFanCoupledToAvailManagers = 150;
+    constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
+
     struct FanEquipConditions
     {
         // Members
@@ -350,11 +353,6 @@ namespace Fans {
 
 struct FansData : BaseGlobalStruct
 {
-    // constants
-    static constexpr int ExhaustFanCoupledToAvailManagers = 150;
-    static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
-
-    // members
     int NumFans = 0;
     int NumNightVentPerf = 0;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
     bool GetFanInputFlag = true;   // Flag set to make sure you get input once
