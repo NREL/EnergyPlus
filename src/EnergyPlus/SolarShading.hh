@@ -247,8 +247,6 @@ namespace SolarShading {
 
     void CalcAbsorbedOnExteriorOpaqueSurfaces(EnergyPlusData &state);
 
-    void CalcInteriorSolarDistributionWCE(EnergyPlusData &state);
-
     void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state);
 
     int WindowScheduledSolarAbs(EnergyPlusData &state,
@@ -291,6 +289,8 @@ namespace SolarShading {
     );
 
     void WindowShadingManager(EnergyPlusData &state);
+
+    void CheckGlazingShadingStatusChange(EnergyPlusData &state);
 
     DataSurfaces::WinShadingType findValueInEnumeration(Real64 controlValue);
 
@@ -369,7 +369,22 @@ struct SolarShadingData : BaseGlobalStruct
                        // 1=No overlap; 2=NS1 completely within NS2
                        // 3=NS2 completely within NS1; 4=Partial overlap
 
-    Array1D<Real64> CTHETA;         // Cosine of angle of incidence of sun's rays on surface NS
+    Array1D<Real64> SurfSunCosTheta;            // Cosine of angle of incidence of sun's rays on surface NS
+    Array1D<Real64> SurfAnisoSkyMult;           // Multiplier on exterior-surface sky view factor to account for
+                                                // anisotropy of sky radiance; = 1.0 for for isotropic sky
+    Array1D<Real64> SurfDifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+    Array3D<Real64> SurfDifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+    Array1D<Real64> SurfCurDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
+    Array1D<Real64> SurfDifShdgRatioHoriz;      // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
+    Array3D<Real64> SurfDifShdgRatioHorizHRTS;  // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
+    Array1D<Real64> SurfWithShdgIsoSky;         // Diffuse solar irradiance from sky on surface, with shading
+    Array1D<Real64> SurfWoShdgIsoSky;           // Diffuse solar from sky on surface, without shading
+    Array1D<Real64> SurfWithShdgHoriz;          // Diffuse solar irradiance from horizon portion of sky on surface, with shading
+    Array1D<Real64> SurfWoShdgHoriz;            // Diffuse solar irradiance from horizon portion of sky on surface, without shading
+    Array1D<Real64> SurfMultIsoSky;             // Contribution to eff sky view factor from isotropic sky
+    Array1D<Real64> SurfMultCircumSolar;        // Contribution to eff sky view factor from circumsolar brightening
+    Array1D<Real64> SurfMultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
+
     int FBKSHC;                     // HC location of first back surface
     int FGSSHC;                     // HC location of first general shadowing surface
     int FINSHC;                     // HC location of first back surface overlap
@@ -392,21 +407,21 @@ struct SolarShadingData : BaseGlobalStruct
     Array2D<Int64> HCC; // 'C' homogeneous coordinates of sides
     Array2D<Int64> HCX; // 'X' homogeneous coordinates of vertices of figure.
     Array2D<Int64> HCY; // 'Y' homogeneous coordinates of vertices of figure.
-    Array3D_int WindowRevealStatus;
-    Array1D<Real64> HCAREA; // Area of each HC figure.  Sign Convention:  Base Surface
-                            // - Positive, Shadow - Negative, Overlap between two shadows
-                            // - positive, etc., so that sum of HC areas=base sunlit area
-    Array1D<Real64> HCT;    // Transmittance of each HC figure
-    Array1D<Real64> ISABSF; // For simple interior solar distribution (in which all beam
-                            // radiation entering zone is assumed to strike the floor),
-                            // fraction of beam radiation absorbed by each floor surface
-    Array1D<Real64> SAREA;  // Sunlit area of heat transfer surface HTS
-                            // Excludes multiplier for windows
-                            // Shadowing combinations data structure...See ShadowingCombinations type
+    Array3D_int SurfWinRevealStatus;
+    Array1D<Real64> HCAREA;         // Area of each HC figure.  Sign Convention:  Base Surface
+                                    // - Positive, Shadow - Negative, Overlap between two shadows
+                                    // - positive, etc., so that sum of HC areas=base sunlit area
+    Array1D<Real64> HCT;            // Transmittance of each HC figure
+    Array1D<Real64> SurfIntAbsFac;  // For simple interior solar distribution (in which all beam
+                                    // radiation entering zone is assumed to strike the floor),
+                                    // fraction of beam radiation absorbed by each floor surface
+    Array1D<Real64> SurfSunlitArea; // Sunlit area of heat transfer surface HTS
+                                    // Excludes multiplier for windows
+                                    // Shadowing combinations data structure...See ShadowingCombinations type
     int NumTooManyFigures = 0;
     int NumTooManyVertices = 0;
     int NumBaseSubSurround = 0;
-    Array1D<Real64> SUNCOS;   // Direction cosines of solar position
+    Vector3<Real64> SUNCOS;   // Direction cosines of solar position
     Real64 XShadowProjection; // X projection of a shadow (formerly called C)
     Real64 YShadowProjection; // Y projection of a shadow (formerly called S)
     Array1D<Real64> XTEMP;    // Temporary 'X' values for HC vertices of the overlap
@@ -430,7 +445,6 @@ struct SolarShadingData : BaseGlobalStruct
     std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
 #endif
 
-    bool MustAllocSolarShading = true;
     bool GetInputFlag = true;
     bool firstTime = true;
     bool debugging = false;
@@ -469,34 +483,34 @@ struct SolarShadingData : BaseGlobalStruct
     Array1D<Real64> ZVert;
     Array1D<Real64> AbsBeamWin;                                                               // Glass layer beam solar absorptance of a window
     Array1D<Real64> AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1); // layers beam solar absorptance of a window
+    Array1D<Real64> SurfWinExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade (1/m2) (absorbed radation = beam incident *
+                                                // ExtBeamAbsByShad
+    Array1D<Real64> SurfWinIntBeamAbsByShadFac; // Like SurfWinExtBeamAbsByShadFac, but for interior beam radiation.
     Array1D<Real64>
-        ExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade (1/m2) (absorbed radation = beam incident * ExtBeamAbsByShad
-    Array1D<Real64> IntBeamAbsByShadFac; // Like ExtBeamAbsByShadFac, but for interior beam radiation.
+        SurfWinTransBmSolar; // Factor for exterior beam solar transmitted through window, or window plus shade, into zone at current time (m2)
     Array1D<Real64>
-        WinTransBmSolar; // Factor for exterior beam solar transmitted through window, or window plus shade, into zone at current time (m2)
-    Array1D<Real64>
-        WinTransDifSolar; // Factor for exterior diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
-    Array1D<Real64> WinTransDifSolarGnd; // Factor for exterior ground diffuse solar transmitted through window with horizontally-slatted blind into
-                                         // zone at current time (m2)
-    Array1D<Real64> WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through window with horizontally-slatted blind into zone
-                                         // at current time (m2)
-    Array2D<Real64> AbsSolBeamEQL =
+        SurfWinTransDifSolar; // Factor for exterior diffuse solar transmitted through window, or window plus shade, into zone at current time (m2)
+    Array1D<Real64> SurfWinTransDifSolarGnd; // Factor for exterior ground diffuse solar transmitted through window with horizontally-slatted blind
+                                             // into zone at current time (m2)
+    Array1D<Real64> SurfWinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through window with horizontally-slatted blind into
+                                             // zone at current time (m2)
+    Array2D<Real64> SurfWinAbsSolBeamEQL =
         Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior beam radiation by layers fraction
-    Array2D<Real64> AbsSolDiffEQL =
+    Array2D<Real64> SurfWinAbsSolDiffEQL =
         Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed exterior diffuse radiation by layers fraction
-    Array2D<Real64> AbsSolBeamBackEQL =
+    Array2D<Real64> SurfWinAbsSolBeamBackEQL =
         Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1); // absorbed interior beam radiation by layers fraction from back
-    Array1D<Real64>
-        WinTransBmBmSolar; // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at current time (m2)
-    Array1D<Real64> WinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone at
-                                        // current time (m2)
-    Real64 ThetaBig = 0.0;              // Larger of ThetaBlock1 and ThetaBlock2     //Autodesk Used uninitialized in some runs
-    Real64 ThetaSmall = 0.0;            // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
-    Real64 ThetaMin = 0.0;              // Minimum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
-    Real64 ThetaMax = 0.0;              // Maximum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
-    Array1D<Real64> XVertex;            // X,Y,Z coordinates of vertices of
-    Array1D<Real64> YVertex;            // back surfaces projected into system
-    Array1D<Real64> ZVertex;            // relative to receiving surface
+    Array1D<Real64> SurfWinTransBmBmSolar;  // Factor for exterior beam to beam solar transmitted through window, or window plus shade, into zone at
+                                            // current time (m2)
+    Array1D<Real64> SurfWinTransBmDifSolar; // Factor for exterior beam to diffuse solar transmitted through window, or window plus shade, into zone
+                                            // at current time (m2)
+    Real64 ThetaBig = 0.0;                  // Larger of ThetaBlock1 and ThetaBlock2     //Autodesk Used uninitialized in some runs
+    Real64 ThetaSmall = 0.0;                // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
+    Real64 ThetaMin = 0.0;                  // Minimum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
+    Real64 ThetaMax = 0.0;                  // Maximum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
+    Array1D<Real64> XVertex;                // X,Y,Z coordinates of vertices of
+    Array1D<Real64> YVertex;                // back surfaces projected into system
+    Array1D<Real64> ZVertex;                // relative to receiving surface
     std::vector<Real64> sin_Phi;
     std::vector<Real64> cos_Phi;
     std::vector<Real64> sin_Theta;
@@ -514,7 +528,20 @@ struct SolarShadingData : BaseGlobalStruct
         this->CurrentSurfaceBeingShadowed = 0;
         this->CurrentShadowingSurface = 0;
         this->OverlapStatus = 0;
-        this->CTHETA.deallocate();
+        this->SurfSunCosTheta.deallocate();
+        this->SurfAnisoSkyMult.deallocate();
+        this->SurfDifShdgRatioIsoSky.deallocate();
+        this->SurfDifShdgRatioIsoSkyHRTS.deallocate();
+        this->SurfCurDifShdgRatioIsoSky.deallocate();
+        this->SurfDifShdgRatioHoriz.deallocate();
+        this->SurfDifShdgRatioHorizHRTS.deallocate();
+        this->SurfWithShdgIsoSky.deallocate();
+        this->SurfWoShdgIsoSky.deallocate();
+        this->SurfWithShdgHoriz.deallocate();
+        this->SurfWoShdgHoriz.deallocate();
+        this->SurfMultIsoSky.deallocate();
+        this->SurfMultCircumSolar.deallocate();
+        this->SurfMultHorizonZenith.deallocate();
         this->FBKSHC = 0;
         this->FGSSHC = 0;
         this->FINSHC = 0;
@@ -530,7 +557,6 @@ struct SolarShadingData : BaseGlobalStruct
         this->ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
         this->ShadowingDaysLeft = 0;      // Days left in current shadowing period
         this->debugging = false;
-        this->MustAllocSolarShading = true;
         this->GetInputFlag = true;
         this->firstTime = true;
         this->HCNS.deallocate();
@@ -540,11 +566,11 @@ struct SolarShadingData : BaseGlobalStruct
         this->HCC.deallocate();
         this->HCX.deallocate();
         this->HCY.deallocate();
-        this->WindowRevealStatus.deallocate();
+        this->SurfWinRevealStatus.deallocate();
         this->HCAREA.deallocate();
         this->HCT.deallocate();
-        this->ISABSF.deallocate();
-        this->SAREA.deallocate();
+        this->SurfIntAbsFac.deallocate();
+        this->SurfSunlitArea.deallocate();
         this->NumTooManyFigures = 0;
         this->NumTooManyVertices = 0;
         this->NumBaseSubSurround = 0;
@@ -566,7 +592,6 @@ struct SolarShadingData : BaseGlobalStruct
         this->TrackTooManyFigures.deallocate();
         this->TrackTooManyVertices.deallocate();
         this->TrackBaseSubSurround.deallocate();
-        this->ISABSF.deallocate();
         this->InitComplexOnce = true;
         this->ShadowOneTimeFlag = true;
         this->CHKSBSOneTimeFlag = true;
@@ -595,17 +620,17 @@ struct SolarShadingData : BaseGlobalStruct
         this->ZVert.deallocate();
         this->AbsBeamWin.deallocate();
         this->AbsBeamWinEQL = Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL + 1);
-        this->ExtBeamAbsByShadFac.deallocate();
-        this->IntBeamAbsByShadFac.deallocate();
-        this->WinTransBmSolar.deallocate();
-        this->WinTransDifSolar.deallocate();
-        this->WinTransDifSolarGnd.deallocate();
-        this->WinTransDifSolarSky.deallocate();
-        this->AbsSolBeamEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
-        this->AbsSolDiffEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
-        this->AbsSolBeamBackEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
-        this->WinTransBmBmSolar.deallocate();
-        this->WinTransBmDifSolar.deallocate();
+        this->SurfWinExtBeamAbsByShadFac.deallocate();
+        this->SurfWinIntBeamAbsByShadFac.deallocate();
+        this->SurfWinTransBmSolar.deallocate();
+        this->SurfWinTransDifSolar.deallocate();
+        this->SurfWinTransDifSolarGnd.deallocate();
+        this->SurfWinTransDifSolarSky.deallocate();
+        this->SurfWinAbsSolBeamEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->SurfWinAbsSolDiffEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->SurfWinAbsSolBeamBackEQL = Array2D<Real64>(2, DataWindowEquivalentLayer::CFSMAXNL + 1);
+        this->SurfWinTransBmBmSolar.deallocate();
+        this->SurfWinTransBmDifSolar.deallocate();
         this->ThetaBig = 0.0;
         this->ThetaSmall = 0.0;
         this->ThetaMin = 0.0;
