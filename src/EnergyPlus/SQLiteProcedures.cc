@@ -2305,7 +2305,7 @@ bool SQLite::NominalPeople::insertIntoSQLite(sqlite3_stmt *insertStmt)
     sqliteBindLogical(insertStmt, 12, fanger);
     sqliteBindLogical(insertStmt, 13, pierce);
     sqliteBindLogical(insertStmt, 14, ksu);
-    sqliteBindInteger(insertStmt, 15, mrtCalcType);
+    sqliteBindInteger(insertStmt, 15, static_cast<int>(mrtCalcType));
     sqliteBindForeignKey(insertStmt, 16, surfacePtr);
     sqliteBindText(insertStmt, 17, angleFactorListName);
     sqliteBindInteger(insertStmt, 18, angleFactorListPtr);

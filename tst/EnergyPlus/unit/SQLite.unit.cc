@@ -705,7 +705,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     peopleData1->Fanger = true;
     peopleData1->Pierce = true;
     peopleData1->KSU = true;
-    peopleData1->MRTCalcType = 2;
+    peopleData1->MRTCalcType = DataHeatBalance::CalcMRT::SurfaceWeighted;
     peopleData1->SurfacePtr = 1;
     peopleData1->AngleFactorListName = "test";
     peopleData1->AngleFactorListPtr = 1;

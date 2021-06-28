@@ -159,9 +159,13 @@ namespace DataHeatBalance {
     };
 
     // Parameter for MRT calculation type
-    constexpr int ZoneAveraged(1);
-    constexpr int SurfaceWeighted(2);
-    constexpr int AngleFactor(3);
+    enum class CalcMRT
+    {
+        Unassigned = -1,
+        ZoneAveraged,
+        SurfaceWeighted,
+        AngleFactor
+    };
 
     // Parameters for Ventilation
     constexpr int NaturalVentilation(0);
@@ -585,7 +589,7 @@ namespace DataHeatBalance {
         //   to be performed
         bool CoolingEffectASH55;         // True when ASHRAE Standard 55 cooling effect calculation to be performed
         bool AnkleDraftASH55;            // True when ASHRAE Standard 55 ankle draft calculation to be performed
-        int MRTCalcType;                 // MRT calculation type (See MRT Calculation type parameters)
+        CalcMRT MRTCalcType;             // MRT calculation type (See MRT Calculation type parameters)
         int SurfacePtr;                  // Pointer to the name of surface
         std::string AngleFactorListName; // Name of angle factor list
         int AngleFactorListPtr;          // Pointer to the name of angle factor list
@@ -621,11 +625,12 @@ namespace DataHeatBalance {
             : ZonePtr(0), NumberOfPeople(0.0), NumberOfPeoplePtr(-1), EMSPeopleOn(false), EMSNumberOfPeople(0.0), ActivityLevelPtr(-1),
               FractionRadiant(0.0), FractionConvected(0.0), NomMinNumberPeople(0.0), NomMaxNumberPeople(0.0), WorkEffPtr(-1), ClothingPtr(-1),
               ClothingMethodPtr(-1), ClothingType(-1), AirVelocityPtr(-1), AnkleAirVelocityPtr(-1), Fanger(false), Pierce(false), KSU(false),
-              AdaptiveASH55(false), AdaptiveCEN15251(false), CoolingEffectASH55(false), AnkleDraftASH55(false), MRTCalcType(0), SurfacePtr(-1),
-              AngleFactorListPtr(-1), UserSpecSensFrac(0.0), Show55Warning(false), CO2RateFactor(0.0), NumOcc(0.0), TemperatureInZone(0.0),
-              RelativeHumidityInZone(0.0), RadGainRate(0.0), ConGainRate(0.0), SenGainRate(0.0), LatGainRate(0.0), TotGainRate(0.0), CO2GainRate(0.0),
-              RadGainEnergy(0.0), ConGainEnergy(0.0), SenGainEnergy(0.0), LatGainEnergy(0.0), TotGainEnergy(0.0), AirVelErrIndex(0),
-              TimeNotMetASH5580(0.0), TimeNotMetASH5590(0.0), TimeNotMetCEN15251CatI(0.0), TimeNotMetCEN15251CatII(0.0), TimeNotMetCEN15251CatIII(0.0)
+              AdaptiveASH55(false), AdaptiveCEN15251(false), CoolingEffectASH55(false), AnkleDraftASH55(false),
+              MRTCalcType(DataHeatBalance::CalcMRT::Unassigned), SurfacePtr(-1), AngleFactorListPtr(-1), UserSpecSensFrac(0.0), Show55Warning(false),
+              CO2RateFactor(0.0), NumOcc(0.0), TemperatureInZone(0.0), RelativeHumidityInZone(0.0), RadGainRate(0.0), ConGainRate(0.0),
+              SenGainRate(0.0), LatGainRate(0.0), TotGainRate(0.0), CO2GainRate(0.0), RadGainEnergy(0.0), ConGainEnergy(0.0), SenGainEnergy(0.0),
+              LatGainEnergy(0.0), TotGainEnergy(0.0), AirVelErrIndex(0), TimeNotMetASH5580(0.0), TimeNotMetASH5590(0.0), TimeNotMetCEN15251CatI(0.0),
+              TimeNotMetCEN15251CatII(0.0), TimeNotMetCEN15251CatIII(0.0)
         {
         }
     };

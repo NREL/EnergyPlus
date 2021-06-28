@@ -723,7 +723,7 @@ private:
         bool const &fanger;
         bool const &pierce;
         bool const &ksu;
-        int const &mrtCalcType;
+        DataHeatBalance::CalcMRT const &mrtCalcType;
         int const &surfacePtr;
         std::string const &angleFactorListName;
         int const &angleFactorListPtr;
