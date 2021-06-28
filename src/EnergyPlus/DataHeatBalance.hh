@@ -142,13 +142,21 @@ namespace DataHeatBalance {
     constexpr int DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
     // Parameters for Sky Radiance Distribution
-    constexpr int Isotropic(0);
-    constexpr int Anisotropic(1);
+    enum class SkyRadDistribution
+    {
+        Unassigned = -1,
+        Isotropic,
+        Anisotropic
+    };
 
     // Parameters for ZoneAirSolutionAlgo
-    constexpr int Use3rdOrder(0);
-    constexpr int UseAnalyticalSolution(1);
-    constexpr int UseEulerMethod(2);
+    enum class SolutionAlgo
+    {
+        Unassigned = -1,
+        ThirdOrder,
+        AnalyticalSolution,
+        EulerMethod
+    };
 
     // Parameter for MRT calculation type
     constexpr int ZoneAveraged(1);
@@ -1962,13 +1970,14 @@ struct HeatBalanceData : BaseGlobalStruct
     int MinNumberOfWarmupDays = 1;       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor = 1.0;      // Relaxation factor, for looping across all the surfaces.
     Real64 CondFDRelaxFactorInput = 1.0; // Relaxation factor, for looping across all the surfaces, user input value
-    int ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder; // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    bool OverrideZoneAirSolutionAlgo = false;               // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
-    Real64 BuildingRotationAppendixG = 0.0;                 // Building Rotation for Appendix G
-    Real64 ZoneTotalExfiltrationHeatLoss = 0.0;             // Building total heat emission through zone exfiltration;
-    Real64 ZoneTotalExhaustHeatLoss = 0.0;                  // Building total heat emission through zone air exhaust;
-    Real64 SysTotalHVACReliefHeatLoss = 0.0;                // Building total heat emission through HVAC system relief air;
-    Real64 SysTotalHVACRejectHeatLoss = 0.0;                // Building total heat emission through HVAC system heat rejection;
+    DataHeatBalance::SolutionAlgo ZoneAirSolutionAlgo =
+        DataHeatBalance::SolutionAlgo::ThirdOrder; // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    bool OverrideZoneAirSolutionAlgo = false;      // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
+    Real64 BuildingRotationAppendixG = 0.0;        // Building Rotation for Appendix G
+    Real64 ZoneTotalExfiltrationHeatLoss = 0.0;    // Building total heat emission through zone exfiltration;
+    Real64 ZoneTotalExhaustHeatLoss = 0.0;         // Building total heat emission through zone air exhaust;
+    Real64 SysTotalHVACReliefHeatLoss = 0.0;       // Building total heat emission through HVAC system relief air;
+    Real64 SysTotalHVACRejectHeatLoss = 0.0;       // Building total heat emission through HVAC system heat rejection;
     // END SiteData
     int NumOfZoneLists = 0;             // Total number of zone lists
     int NumOfZoneGroups = 0;            // Total number of zone groups
@@ -2271,7 +2280,7 @@ struct HeatBalanceData : BaseGlobalStruct
         this->MinNumberOfWarmupDays = 1;
         this->CondFDRelaxFactor = 1.0;
         this->CondFDRelaxFactorInput = 1.0;
-        this->ZoneAirSolutionAlgo = DataHeatBalance::Use3rdOrder;
+        this->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
         this->OverrideZoneAirSolutionAlgo = false;
         this->BuildingRotationAppendixG = 0.0;
         this->ZoneTotalExfiltrationHeatLoss = 0.0;

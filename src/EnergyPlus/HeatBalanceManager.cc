@@ -1026,16 +1026,16 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if (SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE") {
-                        state.dataHeatBal->ZoneAirSolutionAlgo = Use3rdOrder;
+                        state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
                         AlphaName(1) = "ThirdOrderBackwardDifference";
                     } else if (SELECT_CASE_var == "ANALYTICALSOLUTION") {
-                        state.dataHeatBal->ZoneAirSolutionAlgo = UseAnalyticalSolution;
+                        state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::AnalyticalSolution;
                         AlphaName(1) = "AnalyticalSolution";
                     } else if (SELECT_CASE_var == "EULERMETHOD") {
-                        state.dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+                        state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
                         AlphaName(1) = "EulerMethod";
                     } else {
-                        state.dataHeatBal->ZoneAirSolutionAlgo = Use3rdOrder;
+                        state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
                         AlphaName(1) = "ThirdOrderBackwardDifference";
                         ShowWarningError(state,
                                          state.dataHeatBalMgr->CurrentModuleObject + ": Invalid input of " +
@@ -1045,11 +1045,11 @@ namespace HeatBalanceManager {
                 }
             }
         } else {
-            state.dataHeatBal->ZoneAirSolutionAlgo = Use3rdOrder;
+            state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
         }
         if (state.dataHeatBal->OverrideZoneAirSolutionAlgo) {
-            state.dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+            state.dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
             AlphaName(1) = "EulerMethod";
         }
 
