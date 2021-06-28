@@ -3295,7 +3295,102 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
+        static constexpr std::string_view RoutineName("InitFuelCellGenerators");
+
         this->oneTimeInit(state);
+
+        // Do the Begin Environment initializations
+        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag_Init && !this->MyPlantScanFlag_Init) {
+
+            state.dataGenerator->FuelSupply(this->FuelSupNum).PfuelCompEl = 0.0;
+            state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoFCPM = 0.0;
+            state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoCompress = 0.0;
+            state.dataGenerator->FuelSupply(this->FuelSupNum).QskinLoss = 0.0;
+
+            this->AirSup.TairIntoFCPM = 0.0;
+            this->AirSup.PairCompEl = 0.0;
+            this->AirSup.TairIntoBlower = 0.0;
+            this->AirSup.QskinLoss = 0.0;
+            this->AirSup.QintakeRecovery = 0.0;
+            this->FCPM.NumCycles = this->FCPM.NumCyclesAtStart;
+            this->FCPM.Pel = 0.0;
+            this->FCPM.PelLastTimeStep = 0.0;
+            this->FCPM.Eel = 0.0;
+            this->FCPM.PelancillariesAC = 0.0;
+            this->FCPM.NdotFuel = 0.0;
+            this->FCPM.TotFuelInEnthalphy = 0.0;
+            this->FCPM.NdotProdGas = 0.0;
+            this->FCPM.TprodGasLeavingFCPM = 0.0;
+            this->FCPM.TotProdGasEnthalphy = 0.0;
+            this->FCPM.NdotAir = 0.0;
+            this->FCPM.TotAirInEnthalphy = 0.0;
+            this->FCPM.NdotLiqwater = 0.0;
+            this->FCPM.TwaterInlet = 0.0;
+            this->FCPM.WaterInEnthalpy = 0.0;
+            this->FCPM.TprodGasLeavingFCPM = 200.0;
+            this->FCPM.FractionalDayofLastStartUp = 0.0;
+            this->FCPM.FractionalDayofLastShutDown = 0.0;
+            this->FCPM.HasBeenOn = true;
+            this->FCPM.DuringShutDown = false;
+            this->FCPM.DuringStartUp = false;
+            this->WaterSup.TwaterIntoCompress = 0.0;
+            this->WaterSup.TwaterIntoFCPM = 0.0;
+            this->WaterSup.PwaterCompEl = 0.0;
+            this->WaterSup.QskinLoss = 0.0;
+            this->AuxilHeat.TauxMix = 0.0;
+            this->AuxilHeat.NdotAuxMix = 0.0;
+            this->AuxilHeat.QskinLoss = 0.0;
+            this->AuxilHeat.QairIntake = 0.0;
+            this->ExhaustHX.NdotHXleaving = 0.0;
+            this->ExhaustHX.WaterOutletTemp = 0.0;
+            this->ExhaustHX.WaterOutletEnthalpy = 0.0;
+            this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
+            this->ElecStorage.ThisTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
+            this->ElecStorage.PelNeedFromStorage = 0.0;
+            this->ElecStorage.IdesiredDischargeCurrent = 0.0;
+            this->ElecStorage.PelFromStorage = 0.0;
+            this->ElecStorage.IfromStorage = 0.0;
+            this->ElecStorage.PelIntoStorage = 0.0;
+            this->ElecStorage.QairIntake = 0.0;
+
+            this->Inverter.PCUlosses = 0.0;
+            this->Inverter.QairIntake = 0.0;
+
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
+                                                           DataGenerators::InitHRTemp,
+                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
+                                                           RoutineName);
+
+            this->ExhaustHX.WaterMassFlowRateDesign = this->ExhaustHX.WaterVolumeFlowMax * rho;
+            this->ExhaustHX.WaterMassFlowRate = this->ExhaustHX.WaterMassFlowRateDesign;
+            state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp = DataGenerators::InitHRTemp;
+            state.dataLoopNodes->Node(this->ExhaustHX.WaterOutNode).Temp = DataGenerators::InitHRTemp;
+
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
+                                               this->ExhaustHX.WaterMassFlowRateDesign,
+                                               this->ExhaustHX.WaterInNode,
+                                               this->ExhaustHX.WaterOutNode,
+                                               this->CWLoopNum,
+                                               this->CWLoopSideNum,
+                                               this->CWBranchNum,
+                                               this->CWCompNum);
+
+            this->MyEnvrnFlag_Init = false;
+            this->MyWarmupFlag_Init = true;
+        } // end environmental inits
+
+        if (!state.dataGlobal->BeginEnvrnFlag) {
+            this->MyEnvrnFlag_Init = true;
+        }
+
+        if (this->MyWarmupFlag_Init && (!state.dataGlobal->WarmupFlag)) {
+            // need to reset initial state of charge at beginning of environment but after warm up is complete
+            this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
+            this->ElecStorage.ThisTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
+            this->MyWarmupFlag_Init = false;
+        }
 
         // using and elapsed time method rather than FirstHVACIteration here
         Real64 timeElapsed =
@@ -3539,8 +3634,6 @@ namespace FuelCellElectricGenerator {
     void FCDataStruct::oneTimeInit(EnergyPlusData &state)
     {
 
-        static constexpr std::string_view RoutineName("InitFuelCellGenerators");
-
         if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
 
@@ -3564,99 +3657,6 @@ namespace FuelCellElectricGenerator {
                 ShowFatalError(state, "InitFuelCellGenerators: Program terminated due to previous condition(s).");
             }
             this->MyPlantScanFlag_Init = false;
-        }
-
-        // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag_Init && !this->MyPlantScanFlag_Init) {
-
-            state.dataGenerator->FuelSupply(this->FuelSupNum).PfuelCompEl = 0.0;
-            state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoFCPM = 0.0;
-            state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoCompress = 0.0;
-            state.dataGenerator->FuelSupply(this->FuelSupNum).QskinLoss = 0.0;
-
-            this->AirSup.TairIntoFCPM = 0.0;
-            this->AirSup.PairCompEl = 0.0;
-            this->AirSup.TairIntoBlower = 0.0;
-            this->AirSup.QskinLoss = 0.0;
-            this->AirSup.QintakeRecovery = 0.0;
-            this->FCPM.NumCycles = this->FCPM.NumCyclesAtStart;
-            this->FCPM.Pel = 0.0;
-            this->FCPM.PelLastTimeStep = 0.0;
-            this->FCPM.Eel = 0.0;
-            this->FCPM.PelancillariesAC = 0.0;
-            this->FCPM.NdotFuel = 0.0;
-            this->FCPM.TotFuelInEnthalphy = 0.0;
-            this->FCPM.NdotProdGas = 0.0;
-            this->FCPM.TprodGasLeavingFCPM = 0.0;
-            this->FCPM.TotProdGasEnthalphy = 0.0;
-            this->FCPM.NdotAir = 0.0;
-            this->FCPM.TotAirInEnthalphy = 0.0;
-            this->FCPM.NdotLiqwater = 0.0;
-            this->FCPM.TwaterInlet = 0.0;
-            this->FCPM.WaterInEnthalpy = 0.0;
-            this->FCPM.TprodGasLeavingFCPM = 200.0;
-            this->FCPM.FractionalDayofLastStartUp = 0.0;
-            this->FCPM.FractionalDayofLastShutDown = 0.0;
-            this->FCPM.HasBeenOn = true;
-            this->FCPM.DuringShutDown = false;
-            this->FCPM.DuringStartUp = false;
-            this->WaterSup.TwaterIntoCompress = 0.0;
-            this->WaterSup.TwaterIntoFCPM = 0.0;
-            this->WaterSup.PwaterCompEl = 0.0;
-            this->WaterSup.QskinLoss = 0.0;
-            this->AuxilHeat.TauxMix = 0.0;
-            this->AuxilHeat.NdotAuxMix = 0.0;
-            this->AuxilHeat.QskinLoss = 0.0;
-            this->AuxilHeat.QairIntake = 0.0;
-            this->ExhaustHX.NdotHXleaving = 0.0;
-            this->ExhaustHX.WaterOutletTemp = 0.0;
-            this->ExhaustHX.WaterOutletEnthalpy = 0.0;
-            this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
-            this->ElecStorage.ThisTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
-            this->ElecStorage.PelNeedFromStorage = 0.0;
-            this->ElecStorage.IdesiredDischargeCurrent = 0.0;
-            this->ElecStorage.PelFromStorage = 0.0;
-            this->ElecStorage.IfromStorage = 0.0;
-            this->ElecStorage.PelIntoStorage = 0.0;
-            this->ElecStorage.QairIntake = 0.0;
-
-            this->Inverter.PCUlosses = 0.0;
-            this->Inverter.QairIntake = 0.0;
-
-            Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
-                                                           DataGenerators::InitHRTemp,
-                                                           state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
-                                                           RoutineName);
-
-            this->ExhaustHX.WaterMassFlowRateDesign = this->ExhaustHX.WaterVolumeFlowMax * rho;
-            this->ExhaustHX.WaterMassFlowRate = this->ExhaustHX.WaterMassFlowRateDesign;
-            state.dataLoopNodes->Node(this->ExhaustHX.WaterInNode).Temp = DataGenerators::InitHRTemp;
-            state.dataLoopNodes->Node(this->ExhaustHX.WaterOutNode).Temp = DataGenerators::InitHRTemp;
-
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->ExhaustHX.WaterMassFlowRateDesign,
-                                               this->ExhaustHX.WaterInNode,
-                                               this->ExhaustHX.WaterOutNode,
-                                               this->CWLoopNum,
-                                               this->CWLoopSideNum,
-                                               this->CWBranchNum,
-                                               this->CWCompNum);
-
-            this->MyEnvrnFlag_Init = false;
-            this->MyWarmupFlag_Init = true;
-        } // end environmental inits
-
-        if (!state.dataGlobal->BeginEnvrnFlag) {
-            this->MyEnvrnFlag_Init = true;
-        }
-
-        if (this->MyWarmupFlag_Init && (!state.dataGlobal->WarmupFlag)) {
-            // need to reset initial state of charge at beginning of environment but after warm up is complete
-            this->ElecStorage.LastTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
-            this->ElecStorage.ThisTimeStepStateOfCharge = this->ElecStorage.StartingEnergyStored;
-            this->MyWarmupFlag_Init = false;
         }
     }
 
