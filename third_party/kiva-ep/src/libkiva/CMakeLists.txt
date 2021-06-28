@@ -148,7 +148,7 @@ set(kiva_src Aggregator.cpp
              Instance.hpp
              Mesher.cpp
              Mesher.hpp
-             Version.hpp )
+             "${PROJECT_BINARY_DIR}/Version.hpp" )
 
 include_directories("${kiva_BINARY_DIR}/src/libkiva")
 
