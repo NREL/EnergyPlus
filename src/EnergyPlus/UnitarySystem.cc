@@ -10250,7 +10250,7 @@ namespace UnitarySystems {
                 }
             } else { // IF(MultiOrVarSpeedCoolCoil(UnitarySysNum)) THEN
                 state.dataUnitarySystems->CompOnMassFlow = this->MaxCoolAirMassFlow;
-                state.dataUnitarySystems->CompOnFlowRatio = this->m_CoolingSpeedRatio;
+                state.dataUnitarySystems->CompOnFlowRatio = this->m_CoolingFanSpeedRatio;
                 if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
                     if (this->m_AirFlowControl == UseCompFlow::UseCompressorOnFlow) {
                         state.dataUnitarySystems->CompOffMassFlow = this->MaxCoolAirMassFlow;
