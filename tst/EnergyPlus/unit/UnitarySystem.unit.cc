@@ -3795,17 +3795,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     EXPECT_EQ(1.2, state->dataUnitarySystems->CompOnMassFlow);
     EXPECT_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateHigh);
-    problem here... needs some check but CompOnFlowRatio never set(still equal to 0.25)-- is that correct ?
 
-                                                                                                          PartLoadRatio = 0.5;
+    PartLoadRatio = 0.5;
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.6, state->dataUnitarySystems->CompOffMassFlow);
     EXPECT_EQ(1.2, state->dataUnitarySystems->CompOnMassFlow);
     EXPECT_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateHigh);
-    problem here... needs some check but CompOnFlowRatio never set(still equal to 0.25)-- is that correct ?
 
-                                                                                                          PartLoadRatio = 1.0;
+    PartLoadRatio = 1.0;
     state->dataUnitarySystems->MoistureLoad = 0.0;
     thisSys.m_Humidistat = false;
     thisSys.m_DehumidControlType_Num = UnitarySys::DehumCtrlType::None;
