@@ -1057,7 +1057,8 @@ namespace UnitarySystems {
                     val = 0;
                 }
 
-                if (this->m_ControlType == ControlType::Setpoint) {
+                // for DX systems, just read the inlet node flow rate and let air loop decide flow
+                if (this->m_ControlType == ControlType::Setpoint && this->UnitType != "CoilSystem:Cooling:DX") {
                     if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0) {
                         if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
                             if (this->m_MultiOrVarSpeedCoolCoil) {
@@ -1079,7 +1080,7 @@ namespace UnitarySystems {
                             }
                         }
                     } else {
-                        if (this->UnitType != "CoilSystem:Cooling:DX") state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = 0.0;
+                        state.dataLoopNodes->Node(this->AirInNode).MassFlowRate = 0.0;
                     }
                 }
             }
@@ -7800,10 +7801,11 @@ namespace UnitarySystems {
                             if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnLatentLoad) {
                                 this->frostControlSetPointLimit(state,
                                                                 state.dataLoopNodes->Node(ControlNode).TempSetPoint,
-                                                                humRatMaxSP,
+                                                                state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                                                 state.dataEnvrn->OutBaroPress,
                                                                 this->DesignMinOutletTemp,
                                                                 2);
+                                humRatMaxSP = state.dataLoopNodes->Node(ControlNode).HumRatMax;
                             }
                             this->m_DesiredOutletHumRat = humRatMaxSP; // should this be outside so as to capture humrat for 100%DOASDXCoil ?
                         }
@@ -7824,10 +7826,11 @@ namespace UnitarySystems {
                             if (this->m_ISHundredPercentDOASDXCoil && this->m_RunOnLatentLoad) {
                                 this->frostControlSetPointLimit(state,
                                                                 state.dataLoopNodes->Node(ControlNode).TempSetPoint,
-                                                                humRatMaxSP,
+                                                                state.dataLoopNodes->Node(ControlNode).HumRatMax,
                                                                 state.dataEnvrn->OutBaroPress,
                                                                 this->DesignMinOutletTemp,
                                                                 2);
+                                humRatMaxSP = state.dataLoopNodes->Node(ControlNode).HumRatMax;
                             }
                             this->m_DesiredOutletHumRat = humRatMaxSP; // should this be outside so as to capture humrat for 100%DOASDXCoil ?
                         }
