@@ -1540,13 +1540,13 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(5)); // Fan type character input-->convert to integer
                     if (SELECT_CASE_var == "EXHAUST") {
-                        state.dataHeatBal->Ventilation(Loop).FanType = ExhaustVentilation;
+                        state.dataHeatBal->Ventilation(Loop).FanType = DataHeatBalance::Vent::ExhaustVentilation;
                     } else if (SELECT_CASE_var == "INTAKE") {
-                        state.dataHeatBal->Ventilation(Loop).FanType = IntakeVentilation;
+                        state.dataHeatBal->Ventilation(Loop).FanType = DataHeatBalance::Vent::IntakeVentilation;
                     } else if ((SELECT_CASE_var == "NATURAL") || (SELECT_CASE_var == "NONE") || (SELECT_CASE_var == std::string())) {
-                        state.dataHeatBal->Ventilation(Loop).FanType = NaturalVentilation;
+                        state.dataHeatBal->Ventilation(Loop).FanType = DataHeatBalance::Vent::NaturalVentilation;
                     } else if (SELECT_CASE_var == "BALANCED") {
-                        state.dataHeatBal->Ventilation(Loop).FanType = BalancedVentilation;
+                        state.dataHeatBal->Ventilation(Loop).FanType = DataHeatBalance::Vent::BalancedVentilation;
                     } else {
                         if (Item1 == 1) {
                             ShowSevereError(state,
@@ -1578,7 +1578,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Override any user input for cases where natural ventilation is being used
-                if (state.dataHeatBal->Ventilation(Loop).FanType == NaturalVentilation) {
+                if (state.dataHeatBal->Ventilation(Loop).FanType == DataHeatBalance::Vent::NaturalVentilation) {
                     state.dataHeatBal->Ventilation(Loop).FanPressure = 0.0;
                     state.dataHeatBal->Ventilation(Loop).FanEfficiency = 1.0;
                 }
@@ -4037,13 +4037,13 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         divide_and_print_if_greater_than_zero(state.dataHeatBal->Zone(ZoneNum).Volume,
                                               state.dataHeatBal->Ventilation(Loop).DesignLevel * DataGlobalConstants::SecInHour);
 
-        if (state.dataHeatBal->Ventilation(Loop).FanType == ExhaustVentilation) {
+        if (state.dataHeatBal->Ventilation(Loop).FanType == DataHeatBalance::Vent::ExhaustVentilation) {
             print(state.files.eio, "Exhaust,");
-        } else if (state.dataHeatBal->Ventilation(Loop).FanType == IntakeVentilation) {
+        } else if (state.dataHeatBal->Ventilation(Loop).FanType == DataHeatBalance::Vent::IntakeVentilation) {
             print(state.files.eio, "Intake,");
-        } else if (state.dataHeatBal->Ventilation(Loop).FanType == NaturalVentilation) {
+        } else if (state.dataHeatBal->Ventilation(Loop).FanType == DataHeatBalance::Vent::NaturalVentilation) {
             print(state.files.eio, "Natural,");
-        } else if (state.dataHeatBal->Ventilation(Loop).FanType == BalancedVentilation) {
+        } else if (state.dataHeatBal->Ventilation(Loop).FanType == DataHeatBalance::Vent::BalancedVentilation) {
             print(state.files.eio, "Balanced,");
         } else {
             print(state.files.eio, "UNKNOWN,");

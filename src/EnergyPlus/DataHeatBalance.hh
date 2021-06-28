@@ -168,10 +168,14 @@ namespace DataHeatBalance {
     };
 
     // Parameters for Ventilation
-    constexpr int NaturalVentilation(0);
-    constexpr int IntakeVentilation(1);
-    constexpr int ExhaustVentilation(2);
-    constexpr int BalancedVentilation(3);
+    enum class Vent
+    {
+        Unassigned = -1,
+        NaturalVentilation,
+        IntakeVentilation,
+        ExhaustVentilation,
+        BalancedVentilation
+    };
 
     // Parameters for hybrid ventilation using Ventilation and Mixing objects
     constexpr int HybridControlTypeIndiv(0);
@@ -924,7 +928,7 @@ namespace DataHeatBalance {
         Real64 EMSimpleVentFlowRate; // Value EMS is directing to use for override
         Real64 MinIndoorTemperature;
         Real64 DelTemperature;
-        int FanType;
+        Vent FanType;
         Real64 FanPressure;
         Real64 FanEfficiency;
         Real64 FanPower;
@@ -962,7 +966,7 @@ namespace DataHeatBalance {
         // Default Constructor
         VentilationData()
             : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), EMSSimpleVentOn(false), EMSimpleVentFlowRate(0.0),
-              MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(0), FanPressure(0.0), FanEfficiency(0.0), FanPower(0.0), AirTemp(0.0),
+              MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(Vent::NaturalVentilation), FanPressure(0.0), FanEfficiency(0.0), FanPower(0.0), AirTemp(0.0),
               ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0), MaxIndoorTemperature(100.0),
               MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0), MinIndoorTempSchedPtr(0), MaxIndoorTempSchedPtr(0),
               DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0), OutdoorTempErrCount(0),
