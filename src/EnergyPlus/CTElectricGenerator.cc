@@ -767,23 +767,25 @@ namespace CTElectricGenerator {
         auto constexpr RoutineName("InitICEngineGenerators");
         bool errFlag;
 
-        if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
-            errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::TypeOf_Generator_CTurbine,
-                                                    this->HRLoopNum,
-                                                    this->HRLoopSideNum,
-                                                    this->HRBranchNum,
-                                                    this->HRCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitCTGenerators: Program terminated due to previous condition(s).");
+        if (this->MyPlantScanFlag) { // this flag to be removed
+            if (allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
+                errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        DataPlant::TypeOf_Generator_CTurbine,
+                                                        this->HRLoopNum,
+                                                        this->HRLoopSideNum,
+                                                        this->HRBranchNum,
+                                                        this->HRCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(state, "InitCTGenerators: Program terminated due to previous condition(s).");
+                }
             }
 
             this->MyPlantScanFlag = false;
