@@ -1484,9 +1484,6 @@ void GetChillerHeaterInput(EnergyPlusData &state)
         ShowFatalError(state, "Errors found in processing input for " + state.dataIPShortCut->cCurrentModuleObject);
     }
 }
-void oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
-}
 
 void WrapperSpecs::initialize(EnergyPlusData &state,
                               Real64 MyLoad, // Demand Load
@@ -2522,7 +2519,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 } else {
                     ShowWarningError(state, "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name + "\":");
                     ShowContinueError(state,
-                                      format("Chiller condensor temperature for curve fit are not decided, defalt value= cond_leaving ({:.3R}).",
+                                      format("Chiller condenser temperature for curve fit are not decided, default value= cond_leaving ({:.3R}).",
                                              state.dataPlantCentralGSHP->ChillerCapFT));
                     CondTempforCurve = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 }
