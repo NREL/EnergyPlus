@@ -282,7 +282,7 @@ void WaterThermalTankData::simulate(
     // set the caller loop num to mimic what was happening in plant loop equip
     this->callerLoopNum = calledFromLocation.loopNum;
 
-    oneTimeInit(state);
+    this->oneTimeInit(state);
 
     if (this->MyOneTimeFlagWH) {
         this->MyOneTimeFlagWH = false;
