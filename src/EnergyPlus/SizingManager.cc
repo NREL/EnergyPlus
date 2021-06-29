@@ -2912,7 +2912,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lNumericFieldBlanks(1)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp = 0.0;
                 } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
-                    ReportTemperatureInputError(state,cCurrentModuleObject,1,lowTempLimit,false,ErrorsFound);
+                    ReportTemperatureInputError(state, cCurrentModuleObject, 1, lowTempLimit, false, ErrorsFound);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp = state.dataIPShortCut->rNumericArgs(1);
                 } else {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp = 0.0;
@@ -2959,8 +2959,9 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 if (state.dataIPShortCut->lNumericFieldBlanks(3)) {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = 0.0;
                 } else if (state.dataSize->ZoneSizingInput(ZoneSizIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {
-                    ReportTemperatureInputError(state,cCurrentModuleObject,1,lowTempLimit,false,ErrorsFound);
-                    ReportTemperatureInputError(state,cCurrentModuleObject,1,state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp,true,ErrorsFound);
+                    ReportTemperatureInputError(state, cCurrentModuleObject, 1, lowTempLimit, false, ErrorsFound);
+                    ReportTemperatureInputError(
+                        state, cCurrentModuleObject, 1, state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolDesTemp, true, ErrorsFound);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = state.dataIPShortCut->rNumericArgs(3);
                 } else {
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatDesTemp = 0.0;
@@ -3359,12 +3360,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
     }
 }
 
-void ReportTemperatureInputError(EnergyPlusData &state,
-                                 std::string cObjectName,
-                                 int const paramNum,
-                                 Real64 comparisonTemperature,
-                                 bool const shouldFlagSevere,
-                                 bool &ErrorsFound)
+void ReportTemperatureInputError(
+    EnergyPlusData &state, std::string cObjectName, int const paramNum, Real64 comparisonTemperature, bool const shouldFlagSevere, bool &ErrorsFound)
 {
     if (state.dataIPShortCut->rNumericArgs(1) < comparisonTemperature) {
         if (shouldFlagSevere) { // heating supply air temperature is lower than cooling supply air temperature--not allowed
@@ -3373,20 +3370,18 @@ void ReportTemperatureInputError(EnergyPlusData &state,
                               format("... incorrect {}=[{:.2R}] is less than {}=[{:.2R}]",
                                      state.dataIPShortCut->cNumericFieldNames(paramNum),
                                      state.dataIPShortCut->rNumericArgs(paramNum),
-                                     state.dataIPShortCut->cNumericFieldNames(paramNum-2),
-                                     state.dataIPShortCut->rNumericArgs(paramNum-2)));
-            ShowContinueError(state,
-                              format("This is not allowed.  Please check and revise your input."));
+                                     state.dataIPShortCut->cNumericFieldNames(paramNum - 2),
+                                     state.dataIPShortCut->rNumericArgs(paramNum - 2)));
+            ShowContinueError(state, format("This is not allowed.  Please check and revise your input."));
             ErrorsFound = true;
-        } else {    // then input is lower than comparison tempeature--just produce a warning for user to check input
+        } else { // then input is lower than comparison tempeature--just produce a warning for user to check input
             ShowWarningError(state, cObjectName + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\" has invalid data.");
             ShowContinueError(state,
                               format("... incorrect {}=[{:.2R}] is less than [{:.2R}]",
                                      state.dataIPShortCut->cNumericFieldNames(paramNum),
                                      state.dataIPShortCut->rNumericArgs(paramNum),
                                      comparisonTemperature));
-            ShowContinueError(state,
-                              format("Please check your input to make sure this is correct."));
+            ShowContinueError(state, format("Please check your input to make sure this is correct."));
         }
     }
 }

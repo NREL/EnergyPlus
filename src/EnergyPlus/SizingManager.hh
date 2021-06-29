@@ -118,8 +118,7 @@ namespace SizingManager {
                                      int const paramNum,
                                      Real64 comparisonTemperature,
                                      bool const shouldFlagSevere,
-                                     bool &ErrorsFound
-    );
+                                     bool &ErrorsFound);
 
     void GetZoneAndZoneListNames(
         EnergyPlusData &state, bool &ErrorsFound, int &NumZones, Array1D_string &ZoneNames, int &NumZoneLists, Array1D<ZoneListData> &ZoneListNames);
