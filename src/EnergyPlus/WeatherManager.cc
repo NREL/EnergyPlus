@@ -5576,6 +5576,16 @@ namespace WeatherManager {
                 ErrorsFound = true;
             }
 
+            // A9,  \field First Hour Interpolation Starting Values
+            if (state.dataIPShortCut->lAlphaFieldBlanks(9) || UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Hour24")) {
+                state.dataWeatherManager->RunPeriodInput(i).firstHrInterp_UseHr1 = false;
+            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Hour1")) {
+                state.dataWeatherManager->RunPeriodInput(i).firstHrInterp_UseHr1 = true;
+            } else {
+                // fail-safe default
+                state.dataWeatherManager->RunPeriodInput(i).firstHrInterp_UseHr1 = false;
+            }
+
             state.dataWeatherManager->RunPeriodInput(i).dayOfWeek = static_cast<int>(state.dataWeatherManager->RunPeriodInput(i).startWeekDay);
             state.dataWeatherManager->RunPeriodInput(i).isLeapYear = isLeapYear(state.dataWeatherManager->RunPeriodInput(i).startYear);
 
