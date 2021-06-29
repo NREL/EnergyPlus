@@ -178,9 +178,13 @@ namespace DataHeatBalance {
     };
 
     // Parameters for hybrid ventilation using Ventilation and Mixing objects
-    constexpr int HybridControlTypeIndiv(0);
-    constexpr int HybridControlTypeClose(1);
-    constexpr int HybridControlTypeGlobal(2);
+    enum class HybridCtrlType
+    {
+        Unassigned = -1,
+        Indiv,
+        Close,
+        Global
+    };
 
     // System type, detailed refrigeration or refrigerated case rack
     constexpr int RefrigSystemTypeDetailed(1);
@@ -941,20 +945,20 @@ namespace DataHeatBalance {
         Real64 MinOutdoorTemperature;
         Real64 MaxOutdoorTemperature;
         Real64 MaxWindSpeed;
-        int MinIndoorTempSchedPtr;      // Minimum indoor temperature schedule index
-        int MaxIndoorTempSchedPtr;      // Maximum indoor temperature schedule index
-        int DeltaTempSchedPtr;          // Delta temperature schedule index
-        int MinOutdoorTempSchedPtr;     // Minimum outdoor temperature schedule index
-        int MaxOutdoorTempSchedPtr;     // Maximum outdoor temperature schedule index
-        int IndoorTempErrCount;         // Indoor temperature error count
-        int OutdoorTempErrCount;        // Outdoor temperature error count
-        int IndoorTempErrIndex;         // Indoor temperature error Index
-        int OutdoorTempErrIndex;        // Outdoor temperature error Index
-        int HybridControlType;          // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
-        int HybridControlMasterNum;     // Hybrid ventilation control master object number
-        bool HybridControlMasterStatus; // Hybrid ventilation control master object opening status
-        bool QuadratureSum;             // If quadrature sum of zone air balance method is used
-        int OABalancePtr;               // A pointer to ZoneAirBalance
+        int MinIndoorTempSchedPtr;        // Minimum indoor temperature schedule index
+        int MaxIndoorTempSchedPtr;        // Maximum indoor temperature schedule index
+        int DeltaTempSchedPtr;            // Delta temperature schedule index
+        int MinOutdoorTempSchedPtr;       // Minimum outdoor temperature schedule index
+        int MaxOutdoorTempSchedPtr;       // Maximum outdoor temperature schedule index
+        int IndoorTempErrCount;           // Indoor temperature error count
+        int OutdoorTempErrCount;          // Outdoor temperature error count
+        int IndoorTempErrIndex;           // Indoor temperature error Index
+        int OutdoorTempErrIndex;          // Outdoor temperature error Index
+        HybridCtrlType HybridControlType; // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
+        int HybridControlMasterNum;       // Hybrid ventilation control master object number
+        bool HybridControlMasterStatus;   // Hybrid ventilation control master object opening status
+        bool QuadratureSum;               // If quadrature sum of zone air balance method is used
+        int OABalancePtr;                 // A pointer to ZoneAirBalance
         // WindandStackOpenArea
         Real64 OpenArea;      // Opening area [m2]
         int OpenAreaSchedPtr; // Opening area fraction schedule pointer
@@ -966,12 +970,13 @@ namespace DataHeatBalance {
         // Default Constructor
         VentilationData()
             : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), EMSSimpleVentOn(false), EMSimpleVentFlowRate(0.0),
-              MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(Vent::NaturalVentilation), FanPressure(0.0), FanEfficiency(0.0), FanPower(0.0), AirTemp(0.0),
-              ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0), MaxIndoorTemperature(100.0),
-              MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0), MinIndoorTempSchedPtr(0), MaxIndoorTempSchedPtr(0),
-              DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0), OutdoorTempErrCount(0),
-              IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(0), HybridControlMasterNum(0), HybridControlMasterStatus(false),
-              QuadratureSum(false), OABalancePtr(0), OpenArea(0.0), OpenAreaSchedPtr(0), OpenEff(0.0), EffAngle(0.0), DH(0.0), DiscCoef(0.0)
+              MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(Vent::NaturalVentilation), FanPressure(0.0), FanEfficiency(0.0),
+              FanPower(0.0), AirTemp(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0),
+              MaxIndoorTemperature(100.0), MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0), MinIndoorTempSchedPtr(0),
+              MaxIndoorTempSchedPtr(0), DeltaTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0),
+              OutdoorTempErrCount(0), IndoorTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
+              HybridControlMasterNum(0), HybridControlMasterStatus(false), QuadratureSum(false), OABalancePtr(0), OpenArea(0.0), OpenAreaSchedPtr(0),
+              OpenEff(0.0), EffAngle(0.0), DH(0.0), DiscCoef(0.0)
         {
         }
     };
@@ -1016,21 +1021,21 @@ namespace DataHeatBalance {
         Real64 DesiredAirFlowRate;
         Real64 DesiredAirFlowRateSaved;
         Real64 MixingMassFlowRate;
-        int DeltaTempSchedPtr;      // Delta temperature schedule index
-        int MinIndoorTempSchedPtr;  // Minimum indoor temperature schedule index
-        int MaxIndoorTempSchedPtr;  // Maximum indoor temperature schedule index
-        int MinSourceTempSchedPtr;  // Minimum source zone temperature schedule index
-        int MaxSourceTempSchedPtr;  // Maximum source zone temperature schedule index
-        int MinOutdoorTempSchedPtr; // Minimum outdoor temperature schedule index
-        int MaxOutdoorTempSchedPtr; // Maximum outdoor temperature schedule index
-        int IndoorTempErrCount;     // Indoor temperature error count
-        int SourceTempErrCount;     // Source zone temperature error count
-        int OutdoorTempErrCount;    // Outdoor temperature error count
-        int IndoorTempErrIndex;     // Indoor temperature error Index
-        int SourceTempErrIndex;     // Source zone temperature error Index
-        int OutdoorTempErrIndex;    // Outdoor temperature error Index
-        int HybridControlType;      // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
-        int HybridControlMasterNum; // Hybrid ventilation control master ventilation object number
+        int DeltaTempSchedPtr;            // Delta temperature schedule index
+        int MinIndoorTempSchedPtr;        // Minimum indoor temperature schedule index
+        int MaxIndoorTempSchedPtr;        // Maximum indoor temperature schedule index
+        int MinSourceTempSchedPtr;        // Minimum source zone temperature schedule index
+        int MaxSourceTempSchedPtr;        // Maximum source zone temperature schedule index
+        int MinOutdoorTempSchedPtr;       // Minimum outdoor temperature schedule index
+        int MaxOutdoorTempSchedPtr;       // Maximum outdoor temperature schedule index
+        int IndoorTempErrCount;           // Indoor temperature error count
+        int SourceTempErrCount;           // Source zone temperature error count
+        int OutdoorTempErrCount;          // Outdoor temperature error count
+        int IndoorTempErrIndex;           // Indoor temperature error Index
+        int SourceTempErrIndex;           // Source zone temperature error Index
+        int OutdoorTempErrIndex;          // Outdoor temperature error Index
+        HybridCtrlType HybridControlType; // Hybrid ventilation control type: 0 Individual, 1 Close, 2 Global
+        int HybridControlMasterNum;       // Hybrid ventilation control master ventilation object number
         int NumRefDoorConnections;
         bool EMSSimpleMixingOn;        // EMS actuating ventilation flow rate if .TRUE.
         bool RefDoorMixFlag;           // Refrigeration door mixing within zone
@@ -1053,7 +1058,7 @@ namespace DataHeatBalance {
             : ZonePtr(0), SchedPtr(0), DesignLevel(0.0), FromZone(0), DeltaTemperature(0.0), DesiredAirFlowRate(0.0), DesiredAirFlowRateSaved(0.0),
               MixingMassFlowRate(0.0), DeltaTempSchedPtr(0), MinIndoorTempSchedPtr(0), MaxIndoorTempSchedPtr(0), MinSourceTempSchedPtr(0),
               MaxSourceTempSchedPtr(0), MinOutdoorTempSchedPtr(0), MaxOutdoorTempSchedPtr(0), IndoorTempErrCount(0), SourceTempErrCount(0),
-              OutdoorTempErrCount(0), IndoorTempErrIndex(0), SourceTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(0),
+              OutdoorTempErrCount(0), IndoorTempErrIndex(0), SourceTempErrIndex(0), OutdoorTempErrIndex(0), HybridControlType(HybridCtrlType::Indiv),
               HybridControlMasterNum(0), NumRefDoorConnections(0), EMSSimpleMixingOn(false), RefDoorMixFlag(false), EMSimpleMixingFlowRate(0.0)
         {
         }

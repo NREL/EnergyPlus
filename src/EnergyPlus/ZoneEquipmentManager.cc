@@ -5267,7 +5267,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt);
         CpAir = PsyCpAirFnW(HumRatExt);
         // Hybrid ventilation global control
-        if (state.dataHeatBal->Ventilation(j).HybridControlType == HybridControlTypeGlobal &&
+        if (state.dataHeatBal->Ventilation(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global &&
             state.dataHeatBal->Ventilation(j).HybridControlMasterNum > 0) {
             I = state.dataHeatBal->Ventilation(j).HybridControlMasterNum;
             NH = state.dataHeatBal->Ventilation(I).ZonePtr;
@@ -5360,9 +5360,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         if ((WindSpeedExt > state.dataHeatBal->Ventilation(I).MaxWindSpeed) && (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn)) continue;
 
         // Hybrid ventilation controls
-        if ((state.dataHeatBal->Ventilation(j).HybridControlType == HybridControlTypeClose) && (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn))
+        if ((state.dataHeatBal->Ventilation(j).HybridControlType == DataHeatBalance::HybridCtrlType::Close) &&
+            (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn))
             continue;
-        if (state.dataHeatBal->Ventilation(j).HybridControlType == HybridControlTypeGlobal &&
+        if (state.dataHeatBal->Ventilation(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global &&
             state.dataHeatBal->Ventilation(j).HybridControlMasterNum > 0) {
             if (j == I) state.dataHeatBal->Ventilation(j).HybridControlMasterStatus = true;
         }
@@ -5501,12 +5502,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         TZM = state.dataZoneEquip->ZMAT(m);
 
         // Hybrid ventilation controls
-        if (state.dataHeatBal->Mixing(j).HybridControlType == HybridControlTypeClose) continue;
+        if (state.dataHeatBal->Mixing(j).HybridControlType == DataHeatBalance::HybridCtrlType::Close) continue;
         // Check temperature limit
         MixingLimitFlag = false;
 
         // Hybrid ventilation global control
-        if (state.dataHeatBal->Mixing(j).HybridControlType == HybridControlTypeGlobal && state.dataHeatBal->Mixing(j).HybridControlMasterNum > 0) {
+        if (state.dataHeatBal->Mixing(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global &&
+            state.dataHeatBal->Mixing(j).HybridControlMasterNum > 0) {
             I = state.dataHeatBal->Mixing(j).HybridControlMasterNum;
             if (!state.dataHeatBal->Ventilation(I).HybridControlMasterStatus) continue;
         } else {
@@ -5605,8 +5607,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             }
         }
 
-        if (state.dataHeatBal->Mixing(j).HybridControlType != HybridControlTypeGlobal && MixingLimitFlag) continue;
-        if (state.dataHeatBal->Mixing(j).HybridControlType == HybridControlTypeGlobal) TD = 0.0;
+        if (state.dataHeatBal->Mixing(j).HybridControlType != DataHeatBalance::HybridCtrlType::Global && MixingLimitFlag) continue;
+        if (state.dataHeatBal->Mixing(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global) TD = 0.0;
 
         //  If TD equals zero (default) set coefficients for full mixing otherwise test
         //    for mixing conditions if user input delta temp > 0, then from zone temp (TZM)

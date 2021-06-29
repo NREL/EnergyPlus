@@ -647,7 +647,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     constructData1->OutsideAbsorpSolar = 2;
     constructData1->InsideAbsorpThermal = 2;
     constructData1->OutsideAbsorpThermal = 2;
-    constructData1->OutsideRoughness = DataSurfaces::SurfaceRoughness::Rough; // 1 
+    constructData1->OutsideRoughness = DataSurfaces::SurfaceRoughness::Rough; // 1
     constructData1->TypeIsWindow = true;
     constructData1->LayerPoint.allocate(2);
     constructData1->LayerPoint(1) = 2;
