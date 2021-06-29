@@ -187,8 +187,12 @@ namespace DataHeatBalance {
     };
 
     // System type, detailed refrigeration or refrigerated case rack
-    constexpr int RefrigSystemTypeDetailed(1);
-    constexpr int RefrigSystemTypeRack(2);
+    enum class RefrigSystemType
+    {
+        Unassigned = -1,
+        Detailed,
+        Rack
+    };
 
     // Refrigeration condenser type
     constexpr int RefrigCondenserTypeAir(1);

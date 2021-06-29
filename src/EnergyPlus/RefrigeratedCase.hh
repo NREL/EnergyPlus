@@ -1722,7 +1722,7 @@ namespace RefrigeratedCase {
     void GetRefrigeratedRackIndex(EnergyPlusData &state,
                                   std::string const &Name,
                                   int &IndexPtr,
-                                  int SysType,
+                                  DataHeatBalance::RefrigSystemType SysType,
                                   bool &ErrorsFound,
                                   Optional_string_const ThisObjectType = _,
                                   const Optional_bool_const &SuppressWarning = _);

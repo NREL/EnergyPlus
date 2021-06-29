@@ -13325,7 +13325,7 @@ void RefrigSystemData::CalculateSubcoolers(EnergyPlusData &state)
 void GetRefrigeratedRackIndex(EnergyPlusData &state,
                               std::string const &Name,
                               int &IndexPtr,
-                              int const SysType,
+                              DataHeatBalance::RefrigSystemType const SysType,
                               bool &ErrorsFound,
                               Optional_string_const ThisObjectType,
                               const Optional_bool_const &SuppressWarning)
@@ -13347,7 +13347,7 @@ void GetRefrigeratedRackIndex(EnergyPlusData &state,
 
     {
         auto const SELECT_CASE_var(SysType);
-        if (SELECT_CASE_var == DataHeatBalance::RefrigSystemTypeRack) {
+        if (SELECT_CASE_var == DataHeatBalance::RefrigSystemType::Rack) {
             IndexPtr = UtilityRoutines::FindItemInList(Name, RefrigRack);
             if (IndexPtr == 0) {
                 if (present(SuppressWarning)) {
@@ -13361,7 +13361,7 @@ void GetRefrigeratedRackIndex(EnergyPlusData &state,
                 }
                 ErrorsFound = true;
             }
-        } else if (SELECT_CASE_var == DataHeatBalance::RefrigSystemTypeDetailed) {
+        } else if (SELECT_CASE_var == DataHeatBalance::RefrigSystemType::Detailed) {
             IndexPtr = UtilityRoutines::FindItemInList(Name, Condenser);
             if (IndexPtr == 0) {
                 if (present(SuppressWarning)) {
