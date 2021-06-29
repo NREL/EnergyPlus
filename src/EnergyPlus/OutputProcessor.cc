@@ -239,7 +239,7 @@ namespace OutputProcessor {
     }
 
     void SetupTimePointers(EnergyPlusData &state,
-                           std::string const &TimeStepTypeKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+                           eTimeStepType const &TimeStepTypeKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
                            Real64 &TimeStep                    // The timestep variable.  Used to get the address
     )
     {
@@ -266,7 +266,7 @@ namespace OutputProcessor {
         tPtr.TimeStep = &TimeStep;
         if (!state.dataOutputProcessor->TimeValue.insert(std::make_pair(timeStepType, tPtr)).second) {
             // The element was already present... shouldn't happen
-            ShowFatalError(state, "SetupTimePointers was already called for " + TimeStepTypeKey);
+            ShowFatalError(state, format("SetupTimePointers was already called for {}", sTimeStepType.at((int)TimeStepTypeKey)));
         }
     }
 
@@ -4151,7 +4151,7 @@ namespace OutputProcessor {
                                            StoreType const storeType,
                                            int const reportID,                       // The reporting ID for the data
                                            [[maybe_unused]] int const indexGroupKey, // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &indexGroup,            // The reporting group (e.g., Zone, Plant Loop, etc.)
+                                           eTimeStepType const &indexGroup,            // The reporting group (e.g., Zone, Plant Loop, etc.)
                                            std::string const &reportIDChr,           // The reporting ID for the data
                                            std::string const &keyedValue,            // The key name for the data
                                            std::string const &variableName,          // The variable's actual name
@@ -4243,7 +4243,7 @@ namespace OutputProcessor {
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(reportID,
                                                                                    static_cast<int>(storeType),
-                                                                                   indexGroup,
+                                                                                   std::string(sTimeStepType.at((int)indexGroup)),
                                                                                    keyedValue,
                                                                                    variableName,
                                                                                    static_cast<int>(timeStepType),
@@ -5410,8 +5410,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable (with units)
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         OutputProcessor::eTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::eVariableType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
                          Optional_string_const ReportFreq,          // Internal use -- causes reporting at this frequency
                          Optional_string_const ResourceTypeKey,     // Meter Resource Type (Electricity, Gas, etc)
@@ -5660,8 +5660,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          int &ActualVariable,                       // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         OutputProcessor::eTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::eVariableType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
                          Optional_string_const ReportFreq,          // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey           // Group identifier for SQL output
@@ -5821,8 +5821,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         OutputProcessor::eTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::eVariableType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          int const KeyedValue,                      // Associated Key for this variable
                          Optional_string_const ReportFreq,          // Internal use -- causes reporting at this freqency
                          Optional_string_const ResourceTypeKey,     // Meter Resource Type (Electricity, Gas, etc)
@@ -5848,25 +5848,6 @@ void SetupOutputVariable(EnergyPlusData &state,
 
     // METHODOLOGY EMPLOYED:
     // Pointers (as pointers), pointers (as indices), and lots of other KEWL data stuff.
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    // Not checking for valid number
 
     SetupOutputVariable(state,
                         VariableName,

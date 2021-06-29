@@ -74,6 +74,15 @@ struct EnergyPlusData;
 
 namespace OutputProcessor {
 
+    enum class eTimeStepType : int {
+        Zone = 0, HeatBalance = 1, HVAC = 2, System = 3, Plant = 4
+    };
+    std::array<std::string_view, 5> constexpr sTimeStepType = {"Zone", "HeatBalance", "HVAC", "System", "Plant"};
+
+    enum class eVariableType : int {
+        Average, Sum
+    };
+
     enum class iReportVDD
     {
         No,  // Don't report the variable dictionaries in any form
@@ -561,7 +570,7 @@ namespace OutputProcessor {
     void InitializeOutput(EnergyPlusData &state);
 
     void SetupTimePointers(EnergyPlusData &state,
-                           std::string const &IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
+                           eTimeStepType const &IndexKey, // Which timestep is being set up, 'Zone'=1, 'HVAC'=2
                            Real64 &TimeStep             // The timestep variable.  Used to get the address
     );
 
@@ -614,13 +623,13 @@ namespace OutputProcessor {
     inline void ReallocateIVar(EnergyPlusData &state);
 
     TimeStepType ValidateTimeStepType(EnergyPlusData &state,
-                                      std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
+                                      eTimeStepType const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
                                       std::string const &CalledFrom       // Routine called from (for error messages)
     );
 
     std::string StandardTimeStepTypeKey(TimeStepType const timeStepType);
 
-    StoreType validateVariableType(EnergyPlusData &state, std::string const &VariableTypeKey);
+    StoreType validateVariableType(EnergyPlusData &state, eVariableType const &VariableTypeKey);
 
     std::string standardVariableTypeKey(StoreType const VariableType);
 
@@ -771,7 +780,7 @@ namespace OutputProcessor {
                                            StoreType const storeType,
                                            int const reportID,              // The reporting ID for the data
                                            int const indexGroupKey,         // The reporting group (e.g., Zone, Plant Loop, etc.)
-                                           std::string const &indexGroup,   // The reporting group (e.g., Zone, Plant Loop, etc.)
+                                           eTimeStepType const &indexGroup,   // The reporting group (e.g., Zone, Plant Loop, etc.)
                                            std::string const &reportIDChr,  // The reporting ID for the data
                                            std::string const &keyedValue,   // The key name for the data
                                            std::string const &variableName, // The variable's actual name
@@ -907,8 +916,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable (with units)
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         eTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         eVariableType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
                          Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
                          Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
@@ -926,8 +935,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          std::string const &VariableName,           // String Name of variable
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          int &ActualVariable,                       // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         eTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         eVariableType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          std::string const &KeyedValue,             // Associated Key for this variable
                          Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
                          Optional_int_const indexGroupKey = _       // Group identifier for SQL output
@@ -936,8 +945,8 @@ void SetupOutputVariable(EnergyPlusData &state,
 void SetupOutputVariable(std::string const &VariableName,           // String Name of variable
                          OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
                          Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+                         eTimeStepType const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         eVariableType const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
                          int const KeyedValue,                      // Associated Key for this variable
                          Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
                          Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
