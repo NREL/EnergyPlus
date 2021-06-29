@@ -903,7 +903,7 @@ namespace EnergyPlus {
         }
 
         TimeStepType ValidateTimeStepType(EnergyPlusData &state,
-                                          std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
+                                          eTimeStepType const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
                                           std::string const &CalledFrom       // Routine called from (for error messages)
         ) {
 
@@ -925,7 +925,7 @@ namespace EnergyPlus {
             // TODO: , "HEATBALANCE", "HEAT BALANCE" are used nowhere aside from tests. Should we remove them?
             std::vector<std::string> zoneIndexes({"ZONE", "HEATBALANCE", "HEAT BALANCE"});
             std::vector<std::string> systemIndexes({"HVAC", "SYSTEM", "PLANT"});
-            std::string uppercase(UtilityRoutines::MakeUPPERCase(TimeStepTypeKey));
+            std::string uppercase(UtilityRoutines::MakeUPPERCase(std::string(OutputProcessor::sTimeStepType[(int)TimeStepTypeKey])));
 
             if (std::find(zoneIndexes.begin(), zoneIndexes.end(), uppercase) != zoneIndexes.end()) {
                 return TimeStepType::TimeStepZone;
@@ -937,8 +937,8 @@ namespace EnergyPlus {
 
             //  The following should never happen to a user!!!!
             ShowSevereError(state,
-                            "OutputProcessor/ValidateTimeStepType: Invalid Index Key passed to ValidateTimeStepType=" +
-                            TimeStepTypeKey);
+                            format("OutputProcessor/ValidateTimeStepType: Invalid Index Key passed to ValidateTimeStepType={}",
+                            OutputProcessor::sTimeStepType[(int)TimeStepTypeKey]));
             ShowContinueError(state,
                               R"(..Should be "ZONE", "SYSTEM", "HVAC", or "PLANT"... was called from:)" + CalledFrom);
             ShowFatalError(state, "Preceding condition causes termination.");
@@ -996,7 +996,7 @@ namespace EnergyPlus {
             return StandardTimeStepTypeKey;
         }
 
-        StoreType validateVariableType(EnergyPlusData &state, std::string const &VariableTypeKey) {
+        StoreType validateVariableType(EnergyPlusData &state, OutputProcessor::eVariableType const &VariableTypeKey) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Linda K. Lawrie
@@ -1017,7 +1017,7 @@ namespace EnergyPlus {
             // FUNCTION LOCAL VARIABLE DECLARATIONS:
             std::vector<std::string> stateVariables({"STATE", "AVERAGE", "AVERAGED"});
             std::vector<std::string> nonStateVariables({"NON STATE", "NONSTATE", "SUM", "SUMMED"});
-            std::string uppercase(UtilityRoutines::MakeUPPERCase(VariableTypeKey));
+            std::string uppercase(UtilityRoutines::MakeUPPERCase(std::string(OutputProcessor::sVariableType[(int)VariableTypeKey])));
 
             auto iter = std::find(stateVariables.begin(), stateVariables.end(), uppercase);
             if (iter != stateVariables.end()) {
@@ -1029,7 +1029,7 @@ namespace EnergyPlus {
                 return StoreType::Summed;
             }
 
-            ShowSevereError(state, "Invalid variable type requested=" + VariableTypeKey);
+            ShowSevereError(state, "Invalid variable type requested=" + uppercase);
 
             return StoreType::Averaged;
         }
@@ -6059,28 +6059,28 @@ namespace EnergyPlus {
 
     }
 
-    void SetupOutputVariable(std::string const &VariableName,           // String Name of variable
-                             OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
-                             Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                             std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                             std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
-                             int const KeyedValue,                      // Associated Key for this variable
-                             Optional_string_const ReportFreq,      // Internal use -- causes reporting at this freqency
-                             Optional_string_const ResourceTypeKey, // Meter Resource Type (Electricity, Gas, etc)
-                             Optional_string_const EndUseKey,       // Meter End Use Key (Lights, Heating, Cooling, etc)
-                             Optional_string_const EndUseSubKey,    // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                             Optional_string_const GroupKey,        // Meter Super Group Key (Building, System, Plant)
-                             Optional_string_const ZoneKey,         // Meter Zone Key (zone name)
-                             Optional_int_const ZoneMult,           // Zone Multiplier, defaults to 1
-                             Optional_int_const ZoneListMult,       // Zone List Multiplier, defaults to 1
-                             Optional_int_const indexGroupKey       // Group identifier for SQL output
-    ) {
-        auto const tsKey = OutputProcessor::getTimeStepTypeEnum(TimeStepTypeKey);
-        auto const vtKey = OutputProcessor::getVariableTypeEnum(VariableTypeKey);
-        SetupOutputVariable(VariableName, VariableUnit, ActualVariable, tsKey, vtKey, KeyedValue, ReportFreq,
-                            ResourceTypeKey, EndUseKey, EndUseSubKey, GroupKey, ZoneKey, ZoneMult, ZoneListMult,
-                            indexGroupKey);
-    };
+    //void SetupOutputVariable(std::string const &VariableName,           // String Name of variable
+    //                         OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
+    //                         Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
+    //                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
+    //                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
+    //                         int const KeyedValue,                      // Associated Key for this variable
+    //                         Optional_string_const ReportFreq,      // Internal use -- causes reporting at this freqency
+    //                         Optional_string_const ResourceTypeKey, // Meter Resource Type (Electricity, Gas, etc)
+    //                         Optional_string_const EndUseKey,       // Meter End Use Key (Lights, Heating, Cooling, etc)
+    //                         Optional_string_const EndUseSubKey,    // Meter End Use Sub Key (General Lights, Task Lights, etc)
+    //                         Optional_string_const GroupKey,        // Meter Super Group Key (Building, System, Plant)
+    //                         Optional_string_const ZoneKey,         // Meter Zone Key (zone name)
+    //                         Optional_int_const ZoneMult,           // Zone Multiplier, defaults to 1
+    //                         Optional_int_const ZoneListMult,       // Zone List Multiplier, defaults to 1
+    //                         Optional_int_const indexGroupKey       // Group identifier for SQL output
+    //) {
+    //    auto const tsKey = OutputProcessor::getTimeStepTypeEnum(TimeStepTypeKey);
+    //    auto const vtKey = OutputProcessor::getVariableTypeEnum(VariableTypeKey);
+    //    SetupOutputVariable(VariableName, VariableUnit, ActualVariable, tsKey, vtKey, KeyedValue, ReportFreq,
+    //                        ResourceTypeKey, EndUseKey, EndUseSubKey, GroupKey, ZoneKey, ZoneMult, ZoneListMult,
+    //                        indexGroupKey);
+    //};
 
     void UpdateDataandReport(EnergyPlusData &state,
                              OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
