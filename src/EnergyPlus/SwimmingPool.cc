@@ -1126,9 +1126,6 @@ Real64 MakeUpWaterVolFlowFunct(Real64 MakeUpWaterMassFlowRate, Real64 Density)
 {
     return MakeUpWaterMassFlowRate / Density;
 }
-void oneTimeInit([[maybe_unused]] EnergyPlusData &state)
-{
-}
 
 Real64 MakeUpWaterVolFunct(Real64 MakeUpWaterMass, Real64 Density)
 {
