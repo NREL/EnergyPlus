@@ -11365,6 +11365,7 @@ namespace UnitarySystems {
                 if (!this->runWaterSideEconomizer) {
                     SensibleLoad = false;
                     LatentLoad = false;
+                    HXUnitOn = false;
                 }
             }
 
