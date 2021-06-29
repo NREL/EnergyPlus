@@ -3105,20 +3105,23 @@ namespace WeatherManager {
             if (!state.dataWeatherManager->LastHourSet) {
                 // For first day of weather, all time steps of the first hour will be
                 // equal to the first hour's value.
-                state.dataWeatherManager->LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp(1);
-                state.dataWeatherManager->LastHrOutDewPointTemp = Wthr.OutDewPointTemp(1);
-                state.dataWeatherManager->LastHrOutBaroPress = Wthr.OutBaroPress(1);
-                state.dataWeatherManager->LastHrOutRelHum = Wthr.OutRelHum(1);
-                state.dataWeatherManager->LastHrWindSpeed = Wthr.WindSpeed(1);
-                state.dataWeatherManager->LastHrWindDir = Wthr.WindDir(1);
-                state.dataWeatherManager->LastHrSkyTemp = Wthr.SkyTemp(1);
-                state.dataWeatherManager->LastHrHorizIRSky = Wthr.HorizIRSky(1);
-                state.dataWeatherManager->LastHrBeamSolarRad = Wthr.BeamSolarRad(1);
-                state.dataWeatherManager->LastHrDifSolarRad = Wthr.DifSolarRad(1);
-                state.dataWeatherManager->LastHrAlbedo = Wthr.Albedo(1);
-                state.dataWeatherManager->LastHrLiquidPrecip = Wthr.LiquidPrecip(1);
-                state.dataWeatherManager->LastHrTotalSkyCover = Wthr.TotalSkyCover(1);
-                state.dataWeatherManager->LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(1);
+                // 2021-06: An additional input is added to here to allow the user to have chosen which hour to use
+                int HrUsedtoInterp = state.dataWeatherManager->Environment(Environ).firstHrInterpUseHr1 ? 1 : 24;
+
+                state.dataWeatherManager->LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrOutDewPointTemp = Wthr.OutDewPointTemp(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrOutBaroPress = Wthr.OutBaroPress(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrOutRelHum = Wthr.OutRelHum(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrWindSpeed = Wthr.WindSpeed(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrWindDir = Wthr.WindDir(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrSkyTemp = Wthr.SkyTemp(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrHorizIRSky = Wthr.HorizIRSky(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrBeamSolarRad = Wthr.BeamSolarRad(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrDifSolarRad = Wthr.DifSolarRad(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrAlbedo = Wthr.Albedo(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrLiquidPrecip = Wthr.LiquidPrecip(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrTotalSkyCover = Wthr.TotalSkyCover(HrUsedtoInterp);
+                state.dataWeatherManager->LastHrOpaqueSkyCover = Wthr.OpaqueSkyCover(HrUsedtoInterp);
 
                 state.dataWeatherManager->LastHourSet = true;
             }
@@ -9080,6 +9083,7 @@ namespace WeatherManager {
             env.ApplyWeekendRule = runPer.applyWeekendRule;
             env.UseRain = runPer.useRain;
             env.UseSnow = runPer.useSnow;
+            env.firstHrInterpUseHr1 = runPer.firstHrInterpUsingHr1; // this will just the default
             ++state.dataWeatherManager->Envrn;
         }
 
@@ -9168,6 +9172,7 @@ namespace WeatherManager {
             env.ApplyWeekendRule = runPer.applyWeekendRule;
             env.UseRain = runPer.useRain;
             env.UseSnow = runPer.useSnow;
+            env.firstHrInterpUseHr1 = runPer.firstHrInterpUsingHr1; // first hour interpolation choice
             ++state.dataWeatherManager->Envrn;
         }
     }
