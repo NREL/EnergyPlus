@@ -1365,7 +1365,7 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
     ReadWeatherForDay(*state, 1, 1, true);
 
     // Test additional set of weather data on sky temp calc
-    Real64 expected_SkyTemp = -10.27130753;
+    Real64 expected_SkyTemp = -1.7901122977770569;
     EXPECT_NEAR(state->dataWeatherManager->TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
 
     // Test Total Sky Cover and Opaque Sky Cover
