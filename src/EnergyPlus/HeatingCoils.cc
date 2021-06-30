@@ -109,9 +109,6 @@ namespace HeatingCoils {
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
     using namespace DataGlobalConstants;
-    using DataHeatBalance::RefrigCondenserTypeAir;
-    using DataHeatBalance::RefrigCondenserTypeEvap;
-    using DataHeatBalance::RefrigCondenserTypeWater;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;

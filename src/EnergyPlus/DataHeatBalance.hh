@@ -195,10 +195,15 @@ namespace DataHeatBalance {
     };
 
     // Refrigeration condenser type
-    constexpr int RefrigCondenserTypeAir(1);
-    constexpr int RefrigCondenserTypeEvap(2);
-    constexpr int RefrigCondenserTypeWater(3);
-    constexpr int RefrigCondenserTypeCascade(4);
+    enum class RefrigCondenserType
+    {
+        Unassigned = -1,
+        Air,
+        Evap,
+        Water,
+        Cascade,
+        WaterHeater
+    };
 
     // Parameters for type of infiltration model
     constexpr int InfiltrationDesignFlowRate(1);
