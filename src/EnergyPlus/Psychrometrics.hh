@@ -106,8 +106,6 @@ namespace Psychrometrics {
     // MODULE PARAMETER DEFINITIONS:
     // call for recurring errors
 
-    constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
-
     enum class psychrometricsError : int
     {
         Unassigned = -1,
@@ -1367,13 +1365,13 @@ struct PsychrometricsData : BaseGlobalStruct
     Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
     Real64 Press_Save = -99999.0;
     Real64 tSat_Save = -99999.0;
-    Array1D_int iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0); // Number of times error occurred
+    Array1D_int iPsyErrIndex = Array1D_int(EnergyPlus::NumPsychMonitors, 0); // Number of times error occurred
     std::string String;
     bool ReportErrors = true;
 
     void clear_state() override
     {
-        iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0);
+        iPsyErrIndex = Array1D_int(EnergyPlus::NumPsychMonitors, 0);
         iconvTol = 0.0001;
         last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
         last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
