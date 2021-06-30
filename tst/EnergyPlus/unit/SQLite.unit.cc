@@ -952,8 +952,8 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     EXPECT_EQ(lighting1, lightings[1]);
 
     ASSERT_EQ(2ul, peoples.size());
-    std::vector<std::string> people0{"1", "test people 1", "", "0", "", "", "0.0", "0.0", "", "", "", "0", "0", "0", "0", "", "", "-1", "0.0", "0"};
-    std::vector<std::string> people1{"2", "test people 2", "1", "2",   "1", "1", "2.0", "2.0", "1", "1", "1", "1", "1", "1", "2",
+    std::vector<std::string> people0{"1", "test people 1", "", "0", "", "", "0.0", "0.0", "", "", "", "0", "0", "0", "-1", "", "", "-1", "0.0", "0"};
+    std::vector<std::string> people1{"2", "test people 2", "1", "2",   "1", "1", "2.0", "2.0", "1", "1", "1", "1", "1", "1", "1",
                                      "1", "test",          "1", "2.0", "1"};
     EXPECT_EQ(people0, peoples[0]);
     EXPECT_EQ(people1, peoples[1]);
