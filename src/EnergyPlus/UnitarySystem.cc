@@ -11872,7 +11872,6 @@ namespace UnitarySystems {
                                                                             state.dataLoopNodes->Node(OutletNode).HumRat,
                                                                             state.dataLoopNodes->Node(InletNode).Temp,
                                                                             state.dataLoopNodes->Node(InletNode).HumRat);
-
                 }
 
                 //        IF ((FullOutput - ReqOutput) .GT. Acc) THEN ! old method
