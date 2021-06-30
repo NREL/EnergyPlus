@@ -941,11 +941,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
         {
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
             if (SELECT_CASE_var == "MEANAIRTEMPERATURE") {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = RefTempMeanAirTemp;
+                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = RefTemp::MeanAirTemp;
             } else if (SELECT_CASE_var == "ADJACENTAIRTEMPERATURE") {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = RefTempAdjacentAirTemp;
+                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = RefTemp::AdjacentAirTemp;
             } else if (SELECT_CASE_var == "SUPPLYAIRTEMPERATURE") {
-                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = RefTempSupplyAirTemp;
+                state.dataConvectionCoefficient->HcInsideUserCurve(Loop).ReferenceTempType = RefTemp::SupplyAirTemp;
             } else {
                 ShowSevereError(state,
                                 "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " +
@@ -6398,19 +6398,21 @@ void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int const SurfNum, int 
 
     auto &UserCurve = state.dataConvectionCoefficient->HcInsideUserCurve(UserCurveNum);
 
-    {
-        auto const SELECT_CASE_var(UserCurve.ReferenceTempType);
-
-        if (SELECT_CASE_var == RefTempMeanAirTemp) {
-            tmpAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-            state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
-        } else if (SELECT_CASE_var == RefTempAdjacentAirTemp) {
-            tmpAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
-            state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
-        } else if (SELECT_CASE_var == RefTempSupplyAirTemp) {
-            tmpAirTemp = SupplyAirTemp;
-            state.dataSurface->SurfTAirRef(SurfNum) = ZoneSupplyAirTemp;
-        }
+    switch (UserCurve.ReferenceTempType) {
+    case RefTemp::MeanAirTemp:
+        tmpAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
+        state.dataSurface->SurfTAirRef(SurfNum) = ZoneMeanAirTemp;
+        break;
+    case RefTemp::AdjacentAirTemp:
+        tmpAirTemp = state.dataHeatBal->SurfTempEffBulkAir(SurfNum);
+        state.dataSurface->SurfTAirRef(SurfNum) = AdjacentAirTemp;
+        break;
+    case RefTemp::SupplyAirTemp:
+        tmpAirTemp = SupplyAirTemp;
+        state.dataSurface->SurfTAirRef(SurfNum) = ZoneSupplyAirTemp;
+        break;
+    default:
+        assert(false);
     }
 
     Real64 HcFnTempDiff(0.0), HcFnTempDiffDivHeight(0.0), HcFnACH(0.0), HcFnACHDivPerimLength(0.0);

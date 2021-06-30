@@ -155,9 +155,13 @@ namespace ConvectionCoefficients {
     int constexpr InConvFlowRegime_E{7};  // mixed. mechanical air and buoyancy
 
     // params for reference temperature type
-    int constexpr RefTempMeanAirTemp{1};
-    int constexpr RefTempAdjacentAirTemp{2};
-    int constexpr RefTempSupplyAirTemp{3};
+    enum class RefTemp
+    {
+        Invalid,
+        MeanAirTemp,
+        AdjacentAirTemp,
+        SupplyAirTemp,
+    };
 
     // params for wind speed type
     enum class RefWind
@@ -173,7 +177,7 @@ namespace ConvectionCoefficients {
     {
         // Members
         std::string Name; // user's name for object
-        int ReferenceTempType;
+        RefTemp ReferenceTempType;
         int HcFnTempDiffCurveNum;
         int HcFnTempDiffDivHeightCurveNum;
         int HcFnACHCurveNum;
@@ -181,7 +185,8 @@ namespace ConvectionCoefficients {
 
         // Default Constructor
         HcInsideFaceUserCurveStruct()
-            : ReferenceTempType(0), HcFnTempDiffCurveNum(0), HcFnTempDiffDivHeightCurveNum(0), HcFnACHCurveNum(0), HcFnACHDivPerimLengthCurveNum(0)
+            : ReferenceTempType(RefTemp::Invalid), HcFnTempDiffCurveNum(0), HcFnTempDiffDivHeightCurveNum(0), HcFnACHCurveNum(0),
+              HcFnACHDivPerimLengthCurveNum(0)
         {
         }
     };
