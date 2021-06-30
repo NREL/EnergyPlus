@@ -355,6 +355,10 @@ bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_ass
 
     inputProcessor->initializeMaps();
     SimulationManager::PostIPProcessing(*state);
+
+    FluidProperties::GetFluidPropertiesData(*state);
+    state->dataFluidProps->GetInput = false;
+
     // inputProcessor->state->printErrors();
 
     bool successful_processing = success && is_valid && !hasErrors;

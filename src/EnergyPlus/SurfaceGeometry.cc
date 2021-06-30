@@ -188,8 +188,8 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinFrameEmis.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio.dimension(NumSurfaces, 1.0);
         state.dataSurface->SurfWinFrameEdgeArea.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinFrameTempSurfIn.dimension(NumSurfaces, 23.0);
-        state.dataSurface->SurfWinFrameTempSurfInOld.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinFrameTempIn.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinFrameTempInOld.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinFrameTempSurfOut.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinProjCorrFrOut.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinProjCorrFrIn.dimension(NumSurfaces, 0);
@@ -201,8 +201,8 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinDividerEmis.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio.dimension(NumSurfaces, 1);
         state.dataSurface->SurfWinDividerEdgeArea.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinDividerTempSurfIn.dimension(NumSurfaces, 23.0);
-        state.dataSurface->SurfWinDividerTempSurfInOld.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinDividerTempIn.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinDividerTempInOld.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinDividerTempSurfOut.dimension(NumSurfaces, 23.0);
         state.dataSurface->SurfWinProjCorrDivOut.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinProjCorrDivIn.dimension(NumSurfaces, 0);
@@ -414,7 +414,8 @@ namespace SurfaceGeometry {
                 state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
                 state.dataHeatBal->Zone(ZoneNum).HasWindow = true;
             }
-            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) ZoneCeilingArea(ZoneNum) += state.dataSurface->Surface(SurfNum).Area;
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof)
+                ZoneCeilingArea(ZoneNum) += state.dataSurface->Surface(SurfNum).GrossArea;
             if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) {
                 if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment ||
                     state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
@@ -505,14 +506,14 @@ namespace SurfaceGeometry {
                       state.dataHeatBal->Zone(ZoneNum).ExtWindowArea);
             }
             // Use AllSurfaceFirst which includes air boundaries
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Roof) {
                     // Use Average Z for surface, more important for roofs than floors...
                     ++CeilCount;
                     Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
                     Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
                     //        ZCeilAvg=ZCeilAvg+(Z1+Z2)/2.d0
-                    ZCeilAvg += ((Z1 + Z2) / 2.0) * (state.dataSurface->Surface(SurfNum).Area / ZoneCeilingArea(ZoneNum));
+                    ZCeilAvg += ((Z1 + Z2) / 2.0) * (state.dataSurface->Surface(SurfNum).GrossArea / ZoneCeilingArea(ZoneNum));
                 }
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Floor) {
                     // Use Average Z for surface, more important for roofs than floors...
@@ -638,11 +639,11 @@ namespace SurfaceGeometry {
         ZoneCeilingHeightEntered.deallocate();
         ZoneCeilingArea.deallocate();
 
-        state.dataSurface->AdjacentZoneToSurface.dimension(state.dataSurface->TotSurfaces, 0);
+        state.dataSurface->SurfAdjacentZone.dimension(state.dataSurface->TotSurfaces, 0);
         // note -- adiabatic surfaces will show same zone as surface
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->Surface(SurfNum).ExtBoundCond <= 0) continue;
-            state.dataSurface->AdjacentZoneToSurface(SurfNum) = state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).ExtBoundCond).Zone;
+            state.dataSurface->SurfAdjacentZone(SurfNum) = state.dataSurface->Surface(state.dataSurface->Surface(SurfNum).ExtBoundCond).Zone;
         }
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {

@@ -76,6 +76,8 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
     printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
     Real64 dp_temp = getVariableValue(state, outdoorDewPointSensor);
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
+    Real64 simTime = currentSimTime(state);
+    printf("Current Sim Time: %0.2f \n", simTime);
 }
 
 int main(int argc, const char *argv[])

@@ -2519,7 +2519,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 } else {
                     ShowWarningError(state, "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name + "\":");
                     ShowContinueError(state,
-                                      format("Chiller condensor temperature for curve fit are not decided, defalt value= cond_leaving ({:.3R}).",
+                                      format("Chiller condenser temperature for curve fit are not decided, defalt value= cond_leaving ({:.3R}).",
                                              state.dataPlantCentralGSHP->ChillerCapFT));
                     CondTempforCurve = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 }
