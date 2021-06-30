@@ -146,13 +146,17 @@ namespace ConvectionCoefficients {
     int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
 
     // parameters, by zone, for flow regimes for adaptive convection on inside face
-    int constexpr InConvFlowRegime_A1{1}; // In-floor heating or in-ceiling cooling
-    int constexpr InConvFlowRegime_A2{2}; // In-wall heating
-    int constexpr InConvFlowRegime_A3{3}; // no HVAC system, all buoyancy
-    int constexpr InConvFlowRegime_B{4};  // Convective heater in zone
-    int constexpr InConvFlowRegime_C{5};  // central mechanical air
-    int constexpr InConvFlowRegime_D{6};  // zone mechanical air
-    int constexpr InConvFlowRegime_E{7};  // mixed. mechanical air and buoyancy
+    enum class InConvFlowRegime
+    {
+        Invalid,
+        A1, // In-floor heating or in-ceiling cooling
+        A2, // In-wall heating
+        A3, // no HVAC system, all buoyancy
+        B,  // Convective heater in zone
+        C,  // central mechanical air
+        D,  // zone mechanical air
+        E,  // mixed. mechanical air and buoyancy
+    };
 
     // params for reference temperature type
     enum class RefTemp

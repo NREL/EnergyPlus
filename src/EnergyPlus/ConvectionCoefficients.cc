@@ -5221,22 +5221,22 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     using Psychrometrics::PsyWFnTdpPb;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const g(9.81);                     // gravity constant (m/s**2)
-    Real64 const v(15.89e-6);                 // kinematic viscosity (m**2/s) for air at 300 K
-    Real64 const ActiveDelTempThreshold(1.5); // deg C, temperature difference for surfaces to be considered "active"
+    Real64 constexpr g(9.81);                     // gravity constant (m/s**2)
+    Real64 constexpr v(15.89e-6);                 // kinematic viscosity (m**2/s) for air at 300 K
+    Real64 constexpr ActiveDelTempThreshold(1.5); // deg C, temperature difference for surfaces to be considered "active"
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneNum(0);
     int PriorityEquipOn(0);
     Array1D_int HeatingPriorityStack({0, 10}, 0);
     Array1D_int CoolingPriorityStack({0, 10}, 0);
-    Array1D_int FlowRegimeStack({0, 10}, 0);
+    std::vector<InConvFlowRegime> FlowRegimeStack(10, InConvFlowRegime::Invalid);
     int EquipNum(0);
     int ZoneNode(0);
     int EquipOnCount(0);
     int EquipOnLoop(0);
     int thisZoneInletNode(0);
-    int FinalFlowRegime(0);
+    InConvFlowRegime FinalFlowRegime(InConvFlowRegime::Invalid);
     Real64 Tmin(0.0);       // temporary min surf temp
     Real64 Tmax(0.0);       // temporary max surf temp
     Real64 GrH(0.0);        // Grashof number for zone height H
@@ -5253,16 +5253,15 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     EquipOnCount = 0;
     ZoneNum = Surface(SurfNum).Zone;
     ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-    FlowRegimeStack = 0;
 
     // HVAC connections
     if (!Zone(ZoneNum).IsControlled) { // no HVAC control
-        FlowRegimeStack(0) = InConvFlowRegime_A3;
+        FlowRegimeStack[0] = InConvFlowRegime::A3;
     } else { // is controlled, lets see by how and if that means is currently active
 
         if (!(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex > 0) || state.dataGlobal->SysSizingCalc ||
             state.dataGlobal->ZoneSizingCalc || !state.dataZoneEquip->ZoneEquipSimulatedOnce) {
-            FlowRegimeStack(0) = InConvFlowRegime_A3;
+            FlowRegimeStack[0] = InConvFlowRegime::A3;
         } else {
 
             for (EquipNum = 1;
@@ -5285,7 +5284,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         if (thisZoneInletNode > 0) {
                             if (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
-                                FlowRegimeStack(EquipOnCount) = InConvFlowRegime_C;
+                                FlowRegimeStack[EquipOnCount] = InConvFlowRegime::C;
                                 HeatingPriorityStack(EquipOnCount) =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .HeatingPriority(EquipNum);
@@ -5296,7 +5295,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         } else {
                             if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
-                                FlowRegimeStack(EquipOnCount) = InConvFlowRegime_C;
+                                FlowRegimeStack[EquipOnCount] = InConvFlowRegime::C;
                                 HeatingPriorityStack(EquipOnCount) =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .HeatingPriority(EquipNum);
@@ -5320,7 +5319,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         if (thisZoneInletNode > 0) {
                             if (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
-                                FlowRegimeStack(EquipOnCount) = InConvFlowRegime_D;
+                                FlowRegimeStack[EquipOnCount] = InConvFlowRegime::D;
                                 HeatingPriorityStack(EquipOnCount) =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .HeatingPriority(EquipNum);
@@ -5331,7 +5330,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         } else {
                             if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
-                                FlowRegimeStack(EquipOnCount) = InConvFlowRegime_D;
+                                FlowRegimeStack[EquipOnCount] = InConvFlowRegime::D;
                                 HeatingPriorityStack(EquipOnCount) =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .HeatingPriority(EquipNum);
@@ -5346,7 +5345,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
                         if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                             EquipOnCount = min(EquipOnCount + 1, 10);
-                            FlowRegimeStack(EquipOnCount) = InConvFlowRegime_B;
+                            FlowRegimeStack[EquipOnCount] = InConvFlowRegime::B;
                             HeatingPriorityStack(EquipOnCount) =
                                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                     .HeatingPriority(EquipNum);
@@ -5357,7 +5356,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                     } else if ((SELECT_CASE_var == BBElectric_Num) || (SELECT_CASE_var == HiTempRadiant_Num)) {
                         if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                             EquipOnCount = min(EquipOnCount + 1, 10);
-                            FlowRegimeStack(EquipOnCount) = InConvFlowRegime_B;
+                            FlowRegimeStack[EquipOnCount] = InConvFlowRegime::B;
                             HeatingPriorityStack(EquipOnCount) =
                                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                     .HeatingPriority(EquipNum);
@@ -5375,7 +5374,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                     if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with floor
                                         // system ON is not enough because floor surfaces can continue to heat because of thermal capacity
                                         EquipOnCount = min(EquipOnCount + 1, 10);
-                                        FlowRegimeStack(EquipOnCount) = InConvFlowRegime_A1;
+                                        FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A1;
                                         HeatingPriorityStack(EquipOnCount) =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
@@ -5396,7 +5395,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                     if (DeltaTemp < ActiveDelTempThreshold) { // assume cooling with ceiling
                                         // system ON is not enough because  surfaces can continue to cool because of thermal capacity
                                         EquipOnCount = min(EquipOnCount + 1, 10);
-                                        FlowRegimeStack(EquipOnCount) = InConvFlowRegime_A1;
+                                        FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A1;
                                         HeatingPriorityStack(EquipOnCount) =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
@@ -5417,7 +5416,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                     if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with wall panel
                                         // system ON is not enough because  surfaces can continue to heat because of thermal capacity
                                         EquipOnCount = min(EquipOnCount + 1, 10);
-                                        FlowRegimeStack(EquipOnCount) = InConvFlowRegime_A2;
+                                        FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A2;
                                         HeatingPriorityStack(EquipOnCount) =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
@@ -5426,7 +5425,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                                 .CoolingPriority(EquipNum);
                                     } else { // not heating, no special models wall cooling so use simple buoyancy
                                         EquipOnCount = min(EquipOnCount + 1, 10);
-                                        FlowRegimeStack(EquipOnCount) = InConvFlowRegime_A3;
+                                        FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A3;
                                         HeatingPriorityStack(EquipOnCount) =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
@@ -5462,14 +5461,14 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 }
             }
         }
-        FinalFlowRegime = FlowRegimeStack(PriorityEquipOn);
+        FinalFlowRegime = FlowRegimeStack[PriorityEquipOn];
     } else {
         // no equipment on, so simple buoyancy flow regime
-        FinalFlowRegime = InConvFlowRegime_A3;
+        FinalFlowRegime = InConvFlowRegime::A3;
     }
 
     // now if flow regimes C or D, then check for Mixed regime or very low flow rates
-    if ((FinalFlowRegime == InConvFlowRegime_C) || (FinalFlowRegime == InConvFlowRegime_D)) {
+    if ((FinalFlowRegime == InConvFlowRegime::C) || (FinalFlowRegime == InConvFlowRegime::D)) {
 
         // Calculate Grashof, Reynolds, and Richardson numbers for the zone
         // Grashof for zone air based on largest delta T between surfaces and zone height
@@ -5492,14 +5491,14 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         if (Re > 0.0) {
             Ri = GrH / pow_2(Re); // Richardson Number
             if (Ri > 10.0) {      // natural convection expected
-                FinalFlowRegime = InConvFlowRegime_A3;
+                FinalFlowRegime = InConvFlowRegime::A3;
             } else if (Ri < 0.1) { // forced
                 // no change, already a forced regime
             } else { // mixed
-                FinalFlowRegime = InConvFlowRegime_E;
+                FinalFlowRegime = InConvFlowRegime::E;
             }
         } else { // natural convection expected
-            FinalFlowRegime = InConvFlowRegime_A3;
+            FinalFlowRegime = InConvFlowRegime::A3;
         }
     }
 
@@ -5508,7 +5507,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     {
         auto const SELECT_CASE_var(FinalFlowRegime);
 
-        if (SELECT_CASE_var == InConvFlowRegime_A1) {
+        if (SELECT_CASE_var == InConvFlowRegime::A1) {
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
@@ -5586,7 +5585,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A1 surface named" + Surface(SurfNum).Name);
             }
 
-        } else if (SELECT_CASE_var == InConvFlowRegime_A2) {
+        } else if (SELECT_CASE_var == InConvFlowRegime::A2) {
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
@@ -5661,7 +5660,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 ShowSevereError(state,
                                 "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A2 surface named" + Surface(SurfNum).Name);
             }
-        } else if (SELECT_CASE_var == InConvFlowRegime_A3) {
+        } else if (SELECT_CASE_var == InConvFlowRegime::A3) {
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
@@ -5734,7 +5733,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 ShowSevereError(state,
                                 "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A3 surface named" + Surface(SurfNum).Name);
             }
-        } else if (SELECT_CASE_var == InConvFlowRegime_B) {
+        } else if (SELECT_CASE_var == InConvFlowRegime::B) {
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
@@ -5815,7 +5814,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             if (state.dataSurface->SurfIntConvClassification(SurfNum) == 0) {
                 ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for B surface named" + Surface(SurfNum).Name);
             }
-        } else if (SELECT_CASE_var == InConvFlowRegime_C) {
+        } else if (SELECT_CASE_var == InConvFlowRegime::C) {
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_C_Walls;
             } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
@@ -5832,7 +5831,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for C surface named" + Surface(SurfNum).Name);
             }
 
-        } else if (SELECT_CASE_var == InConvFlowRegime_D) {
+        } else if (SELECT_CASE_var == InConvFlowRegime::D) {
 
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
@@ -5910,23 +5909,23 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for D surface named" + Surface(SurfNum).Name);
             }
 
-        } else if (SELECT_CASE_var == InConvFlowRegime_E) {
+        } else if (SELECT_CASE_var == InConvFlowRegime::E) {
 
             DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
             if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                 // mixed regime, but need to know what regime it was before it was mixed
                 {
-                    auto const SELECT_CASE_var1(FlowRegimeStack(PriorityEquipOn));
+                    auto const SELECT_CASE_var1(FlowRegimeStack[PriorityEquipOn]);
 
-                    if (SELECT_CASE_var1 == InConvFlowRegime_C) {
+                    if (SELECT_CASE_var1 == InConvFlowRegime::C) {
                         // assume forced flow is down along wall (ceiling diffuser)
                         if (DeltaTemp > 0.0) { // surface is hotter so plume upwards and forces oppose
                             state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_E_OpposFlowWalls;
                         } else { // surface is cooler so plume down and forces assist
                             state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_E_AssistFlowWalls;
                         }
-                    } else if (SELECT_CASE_var1 == InConvFlowRegime_D) {
+                    } else if (SELECT_CASE_var1 == InConvFlowRegime::D) {
                         // assume forced flow is upward along wall (perimeter zone HVAC with fan)
                         if (DeltaTemp > 0.0) { // surface is hotter so plume up and forces assist
                             state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_E_AssistFlowWalls;
