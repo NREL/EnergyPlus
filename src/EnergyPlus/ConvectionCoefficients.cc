@@ -1063,13 +1063,13 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(2));
 
             if (SELECT_CASE_var == "WEATHERFILE") {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWindWeatherFile;
+                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWind::WeatherFile;
             } else if (SELECT_CASE_var == "HEIGHTADJUST") {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWindAtZ;
+                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWind::AtZ;
             } else if (SELECT_CASE_var == "PARALLELCOMPONENT") {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWindParallComp;
+                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWind::ParallelComp;
             } else if (SELECT_CASE_var == "PARALLELCOMPONENTHEIGHTADJUST") {
-                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWindParallCompAtZ;
+                state.dataConvectionCoefficient->HcOutsideUserCurve(Loop).WindSpeedType = RefWind::ParallelCompAtZ;
             } else {
                 ShowSevereError(state,
                                 "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ": Invalid Key choice Entered, for " +
@@ -6481,24 +6481,26 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
     auto &UserCurve = state.dataConvectionCoefficient->HcOutsideUserCurve(UserCurveNum);
     auto &Surface(state.dataSurface->Surface);
 
-    {
-        auto const SELECT_CASE_var(UserCurve.WindSpeedType);
-
-        if (SELECT_CASE_var == RefWindWeatherFile) {
-            windVel = state.dataEnvrn->WindSpeed;
-        } else if (SELECT_CASE_var == RefWindAtZ) {
-            windVel = state.dataSurface->SurfOutWindSpeed(SurfNum);
-        } else if (SELECT_CASE_var == RefWindParallComp) {
-            // WindSpeed , WindDir, surface Azimuth
-            Theta = state.dataEnvrn->WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
-            ThetaRad = Theta * DataGlobalConstants::DegToRadians;
-            windVel = std::cos(ThetaRad) * state.dataEnvrn->WindSpeed;
-        } else if (SELECT_CASE_var == RefWindParallCompAtZ) {
-            // Surface WindSpeed , Surface WindDir, surface Azimuth
-            Theta = state.dataSurface->SurfOutWindDir(SurfNum) - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
-            ThetaRad = Theta * DataGlobalConstants::DegToRadians;
-            windVel = std::cos(ThetaRad) * state.dataSurface->SurfOutWindSpeed(SurfNum);
-        }
+    switch (UserCurve.WindSpeedType) {
+    case RefWind::WeatherFile:
+        windVel = state.dataEnvrn->WindSpeed;
+        break;
+    case RefWind::AtZ:
+        windVel = state.dataSurface->SurfOutWindSpeed(SurfNum);
+        break;
+    case RefWind::ParallelComp:
+        // WindSpeed , WindDir, surface Azimuth
+        Theta = state.dataEnvrn->WindDir - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
+        ThetaRad = Theta * DataGlobalConstants::DegToRadians;
+        break;
+    case RefWind::ParallelCompAtZ:
+        // Surface WindSpeed , Surface WindDir, surface Azimuth
+        Theta = state.dataSurface->SurfOutWindDir(SurfNum) - Surface(SurfNum).Azimuth - 90.0; // TODO double check theta
+        ThetaRad = Theta * DataGlobalConstants::DegToRadians;
+        windVel = std::cos(ThetaRad) * state.dataSurface->SurfOutWindSpeed(SurfNum);
+        break;
+    default:
+        assert(false);
     }
 
     Kiva::ForcedConvectionTerm HfFnWindSpeedFn(KIVA_HF_DEF);

@@ -160,10 +160,14 @@ namespace ConvectionCoefficients {
     int constexpr RefTempSupplyAirTemp{3};
 
     // params for wind speed type
-    int constexpr RefWindWeatherFile{1};
-    int constexpr RefWindAtZ{2};
-    int constexpr RefWindParallComp{3};
-    int constexpr RefWindParallCompAtZ{4};
+    enum class RefWind
+    {
+        Invalid,
+        WeatherFile,
+        AtZ,
+        ParallelComp,
+        ParallelCompAtZ,
+    };
 
     struct HcInsideFaceUserCurveStruct
     {
@@ -188,14 +192,14 @@ namespace ConvectionCoefficients {
         std::string Name;
         int ReferenceTempType;
         bool SuppressRainChange;
-        int WindSpeedType;
+        RefWind WindSpeedType;
         int HfFnWindSpeedCurveNum;
         int HnFnTempDiffCurveNum;
         int HnFnTempDiffDivHeightCurveNum;
 
         // Default Constructor
         HcOutsideFaceUserCurveStruct()
-            : ReferenceTempType(0), SuppressRainChange(false), WindSpeedType(0), HfFnWindSpeedCurveNum(0), HnFnTempDiffCurveNum(0),
+            : ReferenceTempType(0), SuppressRainChange(false), WindSpeedType(RefWind::Invalid), HfFnWindSpeedCurveNum(0), HnFnTempDiffCurveNum(0),
               HnFnTempDiffDivHeightCurveNum(0)
         {
         }
@@ -431,16 +435,16 @@ namespace ConvectionCoefficients {
 
         // Member Constructor
         FacadeGeoCharacteristicsStruct(Real64 const AzimuthRangeLow,
-                                     Real64 const AzimuthRangeHi,
-                                     Real64 const Zmax,
-                                     Real64 const Zmin,
-                                     Real64 const Ymax,
-                                     Real64 const Ymin,
-                                     Real64 const Xmax,
-                                     Real64 const Xmin,
-                                     Real64 const Area,
-                                     Real64 const Perimeter,
-                                     Real64 const Height)
+                                       Real64 const AzimuthRangeHi,
+                                       Real64 const Zmax,
+                                       Real64 const Zmin,
+                                       Real64 const Ymax,
+                                       Real64 const Ymin,
+                                       Real64 const Xmax,
+                                       Real64 const Xmin,
+                                       Real64 const Area,
+                                       Real64 const Perimeter,
+                                       Real64 const Height)
             : AzimuthRangeLow(AzimuthRangeLow), AzimuthRangeHi(AzimuthRangeHi), Zmax(Zmax), Zmin(Zmin), Ymax(Ymax), Ymin(Ymin), Xmax(Xmax),
               Xmin(Xmin), Area(Area), Perimeter(Perimeter), Height(Height)
         {
