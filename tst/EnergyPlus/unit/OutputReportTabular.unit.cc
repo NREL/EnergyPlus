@@ -3582,8 +3582,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, "Zone", timeStep);
-    SetupTimePointers(*state, "HVAC", timeStep);
+    SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
@@ -7918,8 +7918,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, "Zone", timeStep);
-    SetupTimePointers(*state, "HVAC", timeStep);
+    SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
@@ -9471,8 +9471,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, "Zone", timeStep);
-    SetupTimePointers(*state, "HVAC", timeStep);
+    SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;

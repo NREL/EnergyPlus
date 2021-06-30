@@ -1262,30 +1262,6 @@ namespace OutputProcessor {
         }
     }
 
-    TEST_F(SQLiteFixture, OutputProcessor_validateTimeStepType)
-    {
-        std::map<std::string, OutputProcessor::TimeStepType> const resource_map = {// Zone
-                                                                                   {"ZONE", OutputProcessor::TimeStepType::TimeStepZone},
-                                                                                   {"HEATBALANCE", OutputProcessor::TimeStepType::TimeStepZone},
-                                                                                   {"HEAT BALANCE", OutputProcessor::TimeStepType::TimeStepZone},
-                                                                                   // System
-                                                                                   {"HVAC", OutputProcessor::TimeStepType::TimeStepSystem},
-                                                                                   {"SYSTEM", OutputProcessor::TimeStepType::TimeStepSystem},
-                                                                                   {"PLANT", OutputProcessor::TimeStepType::TimeStepSystem}};
-
-        auto const calledFrom = "UnitTest";
-
-        for (auto const &indexGroup : resource_map) {
-            EXPECT_EQ(indexGroup.second, ValidateTimeStepType(*state, indexGroup.first, calledFrom)) << "where indexTypeKey is " << indexGroup.first;
-        }
-    }
-
-    TEST_F(SQLiteFixture, OutputProcessor_DeathTest_validateTimeStepType)
-    {
-        auto const calledFrom = "UnitTest";
-        EXPECT_ANY_THROW(ValidateTimeStepType(*state, "BAD INPUT", calledFrom));
-    }
-
     TEST_F(SQLiteFixture, OutputProcessor_standardIndexTypeKey)
     {
         EXPECT_EQ("Zone", StandardTimeStepTypeKey(OutputProcessor::TimeStepType::TimeStepZone));
@@ -1295,35 +1271,6 @@ namespace OutputProcessor {
         // EXPECT_EQ("UNKW", StandardTimeStepTypeKey(0));
         // EXPECT_EQ("UNKW", StandardTimeStepTypeKey(-1));
         // EXPECT_EQ("UNKW", StandardTimeStepTypeKey(3));
-    }
-
-    TEST_F(SQLiteFixture, OutputProcessor_validateVariableType)
-    {
-        std::map<std::string, StoreType> const resource_map = {{"STATE", StoreType::Averaged},
-                                                               {"AVERAGE", StoreType::Averaged},
-                                                               {"AVERAGED", StoreType::Averaged},
-                                                               {"NON STATE", StoreType::Summed},
-                                                               {"NONSTATE", StoreType::Summed},
-                                                               {"SUM", StoreType::Summed},
-                                                               {"SUMMED", StoreType::Summed}};
-
-        for (auto const &variableType : resource_map) {
-            EXPECT_EQ(variableType.second, validateVariableType(*state, variableType.first)) << "where variableTypeKey is " << variableType.first;
-        }
-
-        state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-
-        std::string const variableTypeKey = "BAD INPUT";
-
-        auto index = validateVariableType(*state, variableTypeKey);
-
-        EXPECT_EQ(StoreType::Averaged, index);
-
-        auto errorData = queryResult("SELECT * FROM Errors;", "Errors");
-
-        ASSERT_EQ(1ul, errorData.size());
-        std::vector<std::string> errorData0{"1", "1", "1", "Invalid variable type requested=BAD INPUT", "1"};
-        EXPECT_EQ(errorData0, errorData[0]);
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_standardVariableTypeKey)
@@ -1875,7 +1822,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           1,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "1",
                                           "keyedValue",
                                           "variableName",
@@ -1890,7 +1837,7 @@ namespace OutputProcessor {
                                           StoreType::Summed,
                                           2,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "2",
                                           "keyedValue",
                                           "variableName",
@@ -1905,7 +1852,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           3,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "3",
                                           "keyedValue",
                                           "variableName",
@@ -1920,7 +1867,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           4,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "4",
                                           "keyedValue",
                                           "variableName",
@@ -1936,7 +1883,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           5,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "5",
                                           "keyedValue",
                                           "variableName",
@@ -1951,7 +1898,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           6,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "6",
                                           "keyedValue",
                                           "variableName",
@@ -1966,7 +1913,7 @@ namespace OutputProcessor {
                                           StoreType::Summed,
                                           7,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "7",
                                           "keyedValue",
                                           "variableName",
@@ -1981,7 +1928,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           8,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "8",
                                           "keyedValue",
                                           "variableName",
@@ -1996,7 +1943,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           9,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::HVAC,
                                           "9",
                                           "keyedValue",
                                           "variableName",
@@ -2011,7 +1958,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           10,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "10",
                                           "keyedValue",
                                           "variableName",
@@ -2026,7 +1973,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           11,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "11",
                                           "keyedValue",
                                           "variableName",
@@ -2043,7 +1990,7 @@ namespace OutputProcessor {
                                           StoreType::Summed,
                                           12,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "12",
                                           "keyedValue",
                                           "variableName",
@@ -2060,7 +2007,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           13,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "13",
                                           "keyedValue",
                                           "variableName",
@@ -2077,7 +2024,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           14,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "14",
                                           "keyedValue",
                                           "variableName",
@@ -2094,7 +2041,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           15,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "15",
                                           "keyedValue",
                                           "variableName",
@@ -2111,7 +2058,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           16,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "16",
                                           "keyedValue",
                                           "variableName",
@@ -2129,7 +2076,7 @@ namespace OutputProcessor {
                                           StoreType::Summed,
                                           17,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "17",
                                           "keyedValue",
                                           "variableName",
@@ -2147,7 +2094,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           18,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "18",
                                           "keyedValue",
                                           "variableName",
@@ -2165,7 +2112,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           19,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "19",
                                           "keyedValue",
                                           "variableName",
@@ -2183,7 +2130,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           20,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "20",
                                           "keyedValue",
                                           "variableName",
@@ -2201,7 +2148,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           21,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "21",
                                           "keyedValue",
                                           "variableName",
@@ -2219,7 +2166,7 @@ namespace OutputProcessor {
                                           StoreType::Summed,
                                           22,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "22",
                                           "keyedValue",
                                           "variableName",
@@ -2237,7 +2184,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           23,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "23",
                                           "keyedValue",
                                           "variableName",
@@ -2255,7 +2202,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           24,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "24",
                                           "keyedValue",
                                           "variableName",
@@ -2273,7 +2220,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           25,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "25",
                                           "keyedValue",
                                           "variableName",
@@ -2291,7 +2238,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           26,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "26",
                                           "keyedValue",
                                           "variableName",
@@ -2309,7 +2256,7 @@ namespace OutputProcessor {
                                           StoreType::Summed,
                                           27,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "27",
                                           "keyedValue",
                                           "variableName",
@@ -2327,7 +2274,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           28,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "28",
                                           "keyedValue",
                                           "variableName",
@@ -2345,7 +2292,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           29,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "29",
                                           "keyedValue",
                                           "variableName",
@@ -2363,7 +2310,7 @@ namespace OutputProcessor {
                                           StoreType::Averaged,
                                           30,
                                           -999,
-                                          "indexGroup",
+                                          OutputProcessor::eTimeStepType::Zone,
                                           "30",
                                           "keyedValue",
                                           "variableName",
@@ -3047,14 +2994,14 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0;
 
-        SetupTimePointers(*state, "Zone", timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
 
         EXPECT_DOUBLE_EQ(timeStep, *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep);
         EXPECT_DOUBLE_EQ(0.0, state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute);
 
         timeStep = 2.0;
 
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
         EXPECT_DOUBLE_EQ(timeStep, *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep);
         EXPECT_DOUBLE_EQ(0.0, state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute);
@@ -4110,8 +4057,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -4373,8 +4320,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -4649,8 +4596,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -4870,8 +4817,8 @@ namespace OutputProcessor {
         }
         // OutputProcessor::TimeValue.allocate(2);
         auto timeStep = 1.0 / 6;
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 10;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 10;
@@ -5019,8 +4966,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
@@ -5103,8 +5050,8 @@ namespace OutputProcessor {
 
         auto timeStep = 1.0 / 6;
 
-        SetupTimePointers(*state, "Zone", timeStep);
-        SetupTimePointers(*state, "HVAC", timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
+        SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
