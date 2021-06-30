@@ -111,7 +111,7 @@ namespace DataWindowEquivalentLayer {
         Fixed,
         Variable
     };
-        
+
     struct CFSLWP
     {
         // Members

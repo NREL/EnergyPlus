@@ -2773,7 +2773,8 @@ void GetRefrigerationInput(EnergyPlusData &state)
             }
 
             RefrigRack(RackNum).BasinHeaterSetPointTemp = Numbers(10);
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap && RefrigRack(RackNum).BasinHeaterSetPointTemp < 2.0) {
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap &&
+                RefrigRack(RackNum).BasinHeaterSetPointTemp < 2.0) {
                 ShowWarningError(state,
                                  CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cNumericFieldNames(10) +
                                      " is less than 2 deg C. Freezing could occur.");

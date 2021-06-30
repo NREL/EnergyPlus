@@ -2284,7 +2284,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         } else {
             {
                 auto const SELECT_CASE_var(state.dataHVACVarRefFlow->VRF(VRFNum).CondenserType);
-                if ((SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Air) || (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Evap)) {
+                if ((SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Air) ||
+                    (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Evap)) {
                     state.dataHVACVarRefFlow->VRF(VRFNum).CondenserNodeNum = GetOnlySingleNode(state,
                                                                                                cAlphaArgs(35),
                                                                                                ErrorsFound,
