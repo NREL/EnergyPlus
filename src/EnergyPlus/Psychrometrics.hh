@@ -105,25 +105,32 @@ namespace Psychrometrics {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // call for recurring errors
-    constexpr int iPsyTdpFnTdbTwbPb = 1;
-    constexpr int iPsyRhFnTdbWPb = 2;
-    constexpr int iPsyTwbFnTdbWPb = 3;
-    constexpr int iPsyTwbFnTdbWPb2 = 14;
-    constexpr int iPsyTwbFnTdbWPb3 = 15; // convergence
-    constexpr int iPsyVFnTdbWPb = 4;
-    constexpr int iPsyWFnTdpPb = 5;
-    constexpr int iPsyWFnTdbH = 6;
-    constexpr int iPsyWFnTdbTwbPb = 7;
-    constexpr int iPsyWFnTdbTwbPb2 = 16;
-    constexpr int iPsyWFnTdbRhPb = 8;
-    constexpr int iPsyPsatFnTemp = 9;
-    constexpr int iPsyTsatFnHPb = 10;
-    constexpr int iPsyTsatFnPb = 11;
-    constexpr int iPsyTsatFnPb2 = 17; // iterations
-    constexpr int iPsyRhFnTdbRhov = 12;
-    constexpr int iPsyRhFnTdbRhovLBnd0C = 13;
-    constexpr int iPsyTwbFnTdbWPb_cache = 18;
-    constexpr int iPsyPsatFnTemp_cache = 19;
+
+constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
+
+    enum class psychrometricsError : int {
+    Unassigned = -1,
+    None = 0,
+    TdpFnTdbTwbPb = 1,
+    RhFnTdbWPb = 2,
+    TwbFnTdbWPb = 3,
+    VFnTdbWPb = 4,
+    WFnTdpPb = 5,
+    WFnTdbH = 6,
+    WFnTdbTwbPb = 7,
+    WFnTdbRhPb = 8,
+    PsatFnTemp = 9,
+    TsatFnHPb = 10,
+    TsatFnPb = 11,
+    RhFnTdbRhov = 12,
+    RhFnTdbRhovLBnd0C = 13,
+    TwbFnTdbWPb2 = 14,
+    TwbFnTdbWPb3 = 15, // convergence,
+    WFnTdbTwbPb2 = 16,
+    TsatFnPb2 = 17, // iteration,
+    TwbFnTdbWPb_cache = 18,
+    PsatFnTemp_cache = 19
+};
 
 #ifdef EP_psych_stats
     extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 -
@@ -1359,13 +1366,13 @@ struct PsychrometricsData : BaseGlobalStruct
     Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
     Real64 Press_Save = -99999.0;
     Real64 tSat_Save = -99999.0;
-    Array1D_int iPsyErrIndex = Array1D_int(EnergyPlus::NumPsychMonitors, 0); // Number of times error occurred
+    Array1D_int iPsyErrIndex = Array1D_int( Psychrometrics::NumPsychMonitors, 0); // Number of times error occurred
     std::string String;
     bool ReportErrors = true;
 
     void clear_state() override
     {
-        iPsyErrIndex = Array1D_int(EnergyPlus::NumPsychMonitors, 0);
+        iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0);
         iconvTol = 0.0001;
         last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
         last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)

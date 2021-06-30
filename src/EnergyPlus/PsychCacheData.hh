@@ -52,8 +52,6 @@
 
 namespace EnergyPlus {
 
-constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
-
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
 #undef EP_cache_PsyPsatFnTemp
