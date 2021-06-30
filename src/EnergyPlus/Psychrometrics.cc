@@ -599,8 +599,9 @@ namespace Psychrometrics {
                     ShowContinueError(state, format(" Input Pressure = {:.2T}", Patm));
                     FlagError = true;
                 }
-                ShowRecurringWarningErrorAtEnd(
-                    state, "WetBulb not converged after max iterations(PsyTwbFnTdbWPb)", state.dataPsychrometrics->iPsyErrIndex(static_cast<int>(psychrometricsError::TwbFnTdbWPb3)));
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "WetBulb not converged after max iterations(PsyTwbFnTdbWPb)",
+                                               state.dataPsychrometrics->iPsyErrIndex(static_cast<int>(psychrometricsError::TwbFnTdbWPb3)));
             }
         }
 #endif
@@ -1014,8 +1015,14 @@ namespace Psychrometrics {
                     ShowContinueError(state, state.dataPsychrometrics->String);
                     FlagError = true;
                 }
-                ShowRecurringWarningErrorAtEnd(
-                    state, "Enthalpy out of range (PsyTsatFnHPb)", state.dataPsychrometrics->iPsyErrIndex(static_cast<int>(psychrometricsError::TsatFnHPb)), HH, HH, _, "J/kg", "J/kg");
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "Enthalpy out of range (PsyTsatFnHPb)",
+                                               state.dataPsychrometrics->iPsyErrIndex(static_cast<int>(psychrometricsError::TsatFnHPb)),
+                                               HH,
+                                               HH,
+                                               _,
+                                               "J/kg",
+                                               "J/kg");
             }
         }
 #endif
@@ -1249,8 +1256,14 @@ namespace Psychrometrics {
                     format("Instead, calculated Humidity Ratio at {:.1T} ({} degree less) = {:.4T}", TDP - DeltaT, static_cast<int>(DeltaT), W);
                 ShowContinueError(state, state.dataPsychrometrics->String + " will be used. Simulation continues.");
             }
-            ShowRecurringWarningErrorAtEnd(
-                state, "Entered Humidity Ratio invalid (PsyWFnTdpPb)", state.dataPsychrometrics->iPsyErrIndex(static_cast<int>(psychrometricsError::WFnTdpPb)), W, W, _, "[]", "[]");
+            ShowRecurringWarningErrorAtEnd(state,
+                                           "Entered Humidity Ratio invalid (PsyWFnTdpPb)",
+                                           state.dataPsychrometrics->iPsyErrIndex(static_cast<int>(psychrometricsError::WFnTdpPb)),
+                                           W,
+                                           W,
+                                           _,
+                                           "[]",
+                                           "[]");
         }
     }
 #endif
@@ -1366,8 +1379,14 @@ namespace Psychrometrics {
                     ShowContinueError(state, format(" Input Pressure= {:.2T}", Press));
                     FlagError = true;
                 }
-                ShowRecurringWarningErrorAtEnd(
-                    state, "Pressure out of range (PsyTsatFnPb)", state.dataPsychrometrics->iPsyErrIndex(static_cast<int>(psychrometricsError::TsatFnPb)), Press, Press, _, "Pa", "Pa");
+                ShowRecurringWarningErrorAtEnd(state,
+                                               "Pressure out of range (PsyTsatFnPb)",
+                                               state.dataPsychrometrics->iPsyErrIndex(static_cast<int>(psychrometricsError::TsatFnPb)),
+                                               Press,
+                                               Press,
+                                               _,
+                                               "Pa",
+                                               "Pa");
             }
         }
 #endif

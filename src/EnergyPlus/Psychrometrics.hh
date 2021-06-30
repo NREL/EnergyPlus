@@ -106,31 +106,32 @@ namespace Psychrometrics {
     // MODULE PARAMETER DEFINITIONS:
     // call for recurring errors
 
-constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
+    constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
 
-    enum class psychrometricsError : int {
-    Unassigned = -1,
-    None = 0,
-    TdpFnTdbTwbPb = 1,
-    RhFnTdbWPb = 2,
-    TwbFnTdbWPb = 3,
-    VFnTdbWPb = 4,
-    WFnTdpPb = 5,
-    WFnTdbH = 6,
-    WFnTdbTwbPb = 7,
-    WFnTdbRhPb = 8,
-    PsatFnTemp = 9,
-    TsatFnHPb = 10,
-    TsatFnPb = 11,
-    RhFnTdbRhov = 12,
-    RhFnTdbRhovLBnd0C = 13,
-    TwbFnTdbWPb2 = 14,
-    TwbFnTdbWPb3 = 15, // convergence,
-    WFnTdbTwbPb2 = 16,
-    TsatFnPb2 = 17, // iteration,
-    TwbFnTdbWPb_cache = 18,
-    PsatFnTemp_cache = 19
-};
+    enum class psychrometricsError : int
+    {
+        Unassigned = -1,
+        None = 0,
+        TdpFnTdbTwbPb = 1,
+        RhFnTdbWPb = 2,
+        TwbFnTdbWPb = 3,
+        VFnTdbWPb = 4,
+        WFnTdpPb = 5,
+        WFnTdbH = 6,
+        WFnTdbTwbPb = 7,
+        WFnTdbRhPb = 8,
+        PsatFnTemp = 9,
+        TsatFnHPb = 10,
+        TsatFnPb = 11,
+        RhFnTdbRhov = 12,
+        RhFnTdbRhovLBnd0C = 13,
+        TwbFnTdbWPb2 = 14,
+        TwbFnTdbWPb3 = 15, // convergence,
+        WFnTdbTwbPb2 = 16,
+        TsatFnPb2 = 17, // iteration,
+        TwbFnTdbWPb_cache = 18,
+        PsatFnTemp_cache = 19
+    };
 
 #ifdef EP_psych_stats
     extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 -
@@ -520,7 +521,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         // ASHRAE handbook 1993 Fundamentals,
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyRhFnTdbRhovLBnd0C);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::RhFnTdbRhovLBnd0C);
 #endif
 
         Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) *
@@ -597,7 +598,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 28
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyVFnTdbWPb);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::VFnTdbWPb);
 #endif
 
         Real64 const w(max(dW, 1.0e-5));                                           // humidity ratio
@@ -644,7 +645,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P100, EQN 32
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdbH);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::WFnTdbH);
 #endif
 
         Real64 const W((H - 1.00484e3 * TDB) / (2.50094e6 + 1.85895e3 * TDB)); // humidity ratio
@@ -699,7 +700,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         std::uint64_t constexpr Grid_Shift = 64 - 12 - psatprecision_bits;
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyPsatFnTemp_cache);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::PsatFnTemp_cache);
 #endif
 
         DISABLE_WARNING_PUSH
@@ -757,7 +758,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::TwbFnTdbWPb_cache);
 #endif
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
@@ -855,7 +856,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         static std::string const RoutineName("PsyRhFnTdbRhov");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyRhFnTdbRhov);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::RhFnTdbRhov);
 #endif
 
         Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) / PsyPsatFnTemp(state, Tdb, RoutineName)
@@ -906,7 +907,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         static std::string const RoutineName("PsyRhFnTdbWPb");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyRhFnTdbWPb);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::RhFnTdbWPb);
 #endif
 
         Real64 const PWS(PsyPsatFnTemp(state, TDB, (CalledFrom.empty() ? RoutineName : CalledFrom))); // Pressure -- saturated for pure water
@@ -964,7 +965,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         static std::string const RoutineName("PsyWFnTdpPb");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdpPb);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::WFnTdpPb);
 #endif
 
         Real64 const PDEW(
@@ -1027,7 +1028,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         static std::string const RoutineName("PsyWFnTdbRhPb");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdbRhPb);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::WFnTdbRhPb);
 #endif
 
         Real64 const PDEW(RH *
@@ -1093,7 +1094,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         static std::string const RoutineName("PsyWFnTdbTwbPb");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyWFnTdbTwbPb);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::WFnTdbTwbPb);
 #endif
 
         Real64 TWB(TWBin); // test wet-bulb temperature
@@ -1242,7 +1243,7 @@ constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychromet
         // This function calculates the dew-point temperature {C} from dry-bulb, wet-bulb and pressure.
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(iPsyTdpFnTdbTwbPb);
+        ++state.dataPsychCache->NumTimesCalled(psychrometricsError::TdpFnTdbTwbPb);
 #endif
 
         Real64 const W(max(PsyWFnTdbTwbPb(state, TDB, TWB, PB, CalledFrom), 1.0e-5));
@@ -1366,7 +1367,7 @@ struct PsychrometricsData : BaseGlobalStruct
     Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
     Real64 Press_Save = -99999.0;
     Real64 tSat_Save = -99999.0;
-    Array1D_int iPsyErrIndex = Array1D_int( Psychrometrics::NumPsychMonitors, 0); // Number of times error occurred
+    Array1D_int iPsyErrIndex = Array1D_int(Psychrometrics::NumPsychMonitors, 0); // Number of times error occurred
     std::string String;
     bool ReportErrors = true;
 
