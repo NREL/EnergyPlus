@@ -17186,7 +17186,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     EXPECT_GT(state->dataLoopNodes->Node(5).Temp, state->dataLoopNodes->Node(4).Temp);
 }
 
-TEST_F(EnergyPlusFixture, getCoilWaterSystemInputDataTest)
+TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
 {
     std::string const idf_objects = delimited_string({
 
@@ -17261,4 +17261,192 @@ TEST_F(EnergyPlusFixture, getCoilWaterSystemInputDataTest)
     EXPECT_TRUE(thisSys.m_waterSideEconomizerFlag);
     EXPECT_TRUE(thisSys.m_RunOnSensibleLoad);
     EXPECT_FALSE(thisSys.m_RunOnLatentLoad);
+}
+
+TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
+{
+    std::string const idf_objects = delimited_string({
+
+        " Coil:Cooling:Water:DetailedGeometry,",
+        "   Water Cooling Coil,      !- Name",
+        "   ,                        !- Availability Schedule Name",
+        "   autosize,                !- Maximum Water Flow Rate {m3/s}",
+        "   autosize,                !- Tube Outside Surface Area {m2}",
+        "   autosize,                !- Total Tube Inside Area {m2}",
+        "   autosize,                !- Fin Surface Area {m2}",
+        "   autosize,                !- Minimum Airflow Area {m2}",
+        "   autosize,                !- Coil Depth {m}",
+        "   autosize,                !- Fin Diameter {m}",
+        "   ,                        !- Fin Thickness {m}",
+        "   ,                        !- Tube Inside Diameter {m}",
+        "   ,                        !- Tube Outside Diameter {m}",
+        "   ,                        !- Tube Thermal Conductivity {W/m-K}",
+        "   ,                        !- Fin Thermal Conductivity {W/m-K}",
+        "   ,                        !- Fin Spacing {m}",
+        "   ,                        !- Tube Depth Spacing {m}",
+        "   ,                        !- Number of Tube Rows",
+        "   autosize,                !- Number of Tubes per Row",
+        "   Node 13,                 !- Water Inlet Node Name",
+        "   Node 15,                 !- Water Outlet Node Name",
+        "   Mixed Air Node,          !- Air Inlet Node Name",
+        "   FreeClgCoil OutletNode,  !- Air Outlet Node Name",
+        "   ,                        !- Condensate Collection Water Storage Tank Name",
+        "   5.0;                     !- Design Water Temperature Difference,",
+
+        " CoilSystem:Cooling:Water,",
+        "   Coil System Water,    !- Name",
+        "   CoilAirInletNode,     !- Air Inlet Node Name",
+        "   CoilAirOutletNode,    !- Air Outlet Node Name",
+        "   ,                     !- Availability Schedule Name",
+        "   Coil:Cooling:Water:DetailedGeometry,   !- Cooling Coil Object Type",
+        "   Water Cooling Coil,   !- Cooling Coil Name",
+        "   CoolReheat,           !- Dehumidification Control Type",
+        "   Yes,                  !- Run on Sensible Load",
+        "   No,                   !- Run on Latent Load",
+        "   2.0;                  !- Minimum Air To Water Temperature Offset",
+        });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    bool zoneEquipment = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataLoopNodes->Node.allocate(2);
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumOut = 1;
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
+
+    int unitarySysIndex(0);
+    bool ErrorsFound(false);
+    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    // re-run to fill in additional inputs
+    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
+    auto &thisSys = unitSys[unitarySysIndex];
+    // check object inputs
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
+    EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
+    EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
+    EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
+    EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
+    EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
+    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat);
+    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWaterDetailed);
+    EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
+    EXPECT_TRUE(thisSys.m_CoolCoilExists);
+    EXPECT_TRUE(thisSys.m_waterSideEconomizerFlag);
+    EXPECT_TRUE(thisSys.m_RunOnSensibleLoad);
+    EXPECT_FALSE(thisSys.m_RunOnLatentLoad);
+}
+
+TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
+{
+    std::string const idf_objects = delimited_string({
+
+        " Coil:Cooling:Water,",
+        "   Water Cooling Coil,   !- Name",
+        "   ,                     !- Availability Schedule Name",
+        "   0.0002,               !- Design Water Flow Rate { m3 / s }",
+        "   0.5000,               !- Design Air Flow Rate { m3 / s }",
+        "   8.33,                 !- Design Inlet Water Temperature { Cv }",
+        "   26.0,                 !- Design Inlet Air Temperature { C }",
+        "   16.0,                 !- Design Outlet Air Temperature { C }",
+        "   0.0095,               !- Design Inlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "   0.0090,               !- Design Outlet Air Humidity Ratio { kgWater / kgDryAir }",
+        "   CoilFluidInletNode,   !- Water Inlet Node Name",
+        "   CoilFluidOutletNode,  !- Water Outlet Node Name",
+        "   CoilAirInletNode,     !- Air Inlet Node Name",
+        "   CoilAirOutletNode,    !- Air Outlet Node Name",
+        "   SimpleAnalysis,       !- Type of Analysis",
+        "   CrossFlow;            !- Heat Exchanger Configuration",
+
+        " CoilSystem:Cooling:Water,",
+        "   Coil System Water,    !- Name",
+        "   CoilAirInletNode,     !- Air Inlet Node Name",
+        "   CoilAirOutletNode,    !- Air Outlet Node Name",
+        "   ,                     !- Availability Schedule Name",
+        "   Coil:Cooling:Water,   !- Cooling Coil Object Type",
+        "   Water Cooling Coil,   !- Cooling Coil Name",
+        "   CoolReheat,           !- Dehumidification Control Type",
+        "   Yes,                  !- Run on Sensible Load",
+        "   Yes,                   !- Run on Latent Load",
+        "   2.0;                  !- Minimum Air To Water Temperature Offset",
+
+        " CoilSystem:Cooling:Water:HeatExchangerAssisted,",
+        "   Free Cooling Coil HXA,   !- Name",
+        "   HeatExchanger:AirToAir:FlatPlate, !- Heat Exchanger Object Type",
+        "   HX Assisting Clg Coil,   !- Heat Exchanger Name",
+        "   Coil:Cooling:Water,      !- Cooling Coil Object Type",
+        "   Water Cooling Coil;      !- Cooling Coil Name,",
+
+        " HeatExchanger:AirToAir:FlatPlate,",
+        "   HX Assisting Clg Coil,   !- Name",
+        "   ,                        !- Availability Schedule Name",
+        "   CounterFlow,             !- Flow Arrangement Type",
+        "   Yes,                     !- Economizer Lockout",
+        "   1,                       !- Ratio of Supply to Secondary hA Values",
+        "   autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
+        "   24,                      !- Nominal Supply Air Inlet Temperature {C}",
+        "   21,                      !- Nominal Supply Air Outlet Temperature {C}",
+        "   autosize,                !- Nominal Secondary Air Flow Rate {m3/s}",
+        "   12,                      !- Nominal Secondary Air Inlet Temperature {C}",
+        "   50,                      !- Nominal Electric Power {W}",
+        "   HXSupplyAirInletNode,    !- Supply Air Inlet Node Name",
+        "   CoilAirInletNode,        !- Supply Air Outlet Node Name",
+        "   CoilAirOutletNode,       !- Secondary Air Inlet Node Name",
+        "   HXExhaustAirOutletNode;  !- Secondary Air Outlet Node Name,",
+
+        });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    bool zoneEquipment = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+
+    state->dataHVACGlobal->NumPrimaryAirSys = 1;
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataLoopNodes->Node.allocate(2);
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).NodeNumOut = 1;
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).Name = "COIL SYSTEM WATER";
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "COILSYSTEM:COOLING:WATER";
+
+    int unitarySysIndex(0);
+    bool ErrorsFound(false);
+    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    // re-run to fill in additional inputs
+    UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
+    UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
+    auto &thisSys = unitSys[unitarySysIndex];
+    // check object inputs
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
+    EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
+    EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
+    EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
+    EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
+    EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
+    EXPECT_EQ(thisSys.m_DehumidControlType_Num, UnitarySys::DehumCtrlType::CoolReheat);
+    EXPECT_EQ(thisSys.m_ControlType, UnitarySys::ControlType::Setpoint);
+    EXPECT_EQ(thisSys.m_CoolingCoilType_Num, DataHVACGlobals::Coil_CoolingWater);
+    EXPECT_EQ(thisSys.m_CoolingCoilName, "WATER COOLING COIL");
+    EXPECT_TRUE(thisSys.m_CoolCoilExists);
+    EXPECT_TRUE(thisSys.m_waterSideEconomizerFlag);
+    EXPECT_TRUE(thisSys.m_RunOnSensibleLoad);
+    EXPECT_TRUE(thisSys.m_RunOnLatentLoad);
 }
