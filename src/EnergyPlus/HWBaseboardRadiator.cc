@@ -1398,7 +1398,7 @@ namespace HWBaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates both the convective and radiant heat transfer rate
         // in a hot water baseboard heater.  The heater is assumed to be crossflowwith
-        // both fluids unmixed.  The air flow is bouyancy driven and a constant airflow
+        // both fluids unmixed.  The air flow is buoyancy driven and a constant airflow
         // and a constant airflow velocity of 0.5m/s is assumed.
 
         // METHODOLOGY EMPLOYED:

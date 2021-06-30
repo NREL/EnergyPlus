@@ -180,7 +180,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
                                   Real64 const Cv,               // Oriface coefficient for volume-based discharge, wind-driven [--]
-                                  Real64 const Cd,               // oriface coefficient for discharge,  bouyancy-driven [--]
+                                  Real64 const Cd,               // oriface coefficient for discharge,  buoyancy-driven [--]
                                   Real64 const HdeltaNPL,        // Height difference from neutral pressure level [m]
                                   Real64 const SolAbs,           // solar absorptivity of baffle [--]
                                   Real64 const AbsExt,           // thermal absorptance/emittance of baffle material [--]

@@ -262,7 +262,7 @@ namespace TranspiredCollector {
         Real64 AvgTilt;       // temp for error checking
         int SurfID;           // local surface "pointer"
         Real64 TiltRads;      // average tilt of collector in radians
-        Real64 tempHdeltaNPL; // temporary variable for bouyancy length scale
+        Real64 tempHdeltaNPL; // temporary variable for buoyancy length scale
         int NumUTSCSplitter(0);
         Array1D_string AlphasSplit; // Alpha items for extensible
         // Solar Collectors:Unglazed Transpired object

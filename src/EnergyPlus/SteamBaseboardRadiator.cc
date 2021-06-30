@@ -1282,7 +1282,7 @@ namespace SteamBaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine calculates both the convective and radiant heat transfer rate
         // of steam baseboard heaters. The heater is assumed to be crossflow with
-        // both fluids unmixed. The air flow is bouyancy driven and a constant airflow.
+        // both fluids unmixed. The air flow is buoyancy driven and a constant airflow.
 
         // METHODOLOGY EMPLOYED:
         // Equations that calculates heating capacity of steam coils and outlet air and water temperatures

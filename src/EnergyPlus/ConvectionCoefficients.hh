@@ -148,11 +148,11 @@ namespace ConvectionCoefficients {
     // parameters, by zone, for flow regimes for adaptive convection on inside face
     int constexpr InConvFlowRegime_A1{1}; // In-floor heating or in-ceiling cooling
     int constexpr InConvFlowRegime_A2{2}; // In-wall heating
-    int constexpr InConvFlowRegime_A3{3}; // no HVAC system, all bouyancy
+    int constexpr InConvFlowRegime_A3{3}; // no HVAC system, all buoyancy
     int constexpr InConvFlowRegime_B{4};  // Convective heater in zone
     int constexpr InConvFlowRegime_C{5};  // central mechanical air
     int constexpr InConvFlowRegime_D{6};  // zone mechanical air
-    int constexpr InConvFlowRegime_E{7};  // mixed. mechancial air and bouyancy
+    int constexpr InConvFlowRegime_E{7};  // mixed. mechanical air and buoyancy
 
     // params for reference temperature type
     int constexpr RefTempMeanAirTemp{1};
@@ -204,7 +204,6 @@ namespace ConvectionCoefficients {
     struct InsideFaceAdaptiveConvAlgoStruct
     {
         // Members
-        bool EnteredByUser;
         std::string Name;
         int SimpleBouyVertWallEqNum; // InConvClass_A3_VertWalls
         int SimpleBouyVertWallUserCurveNum;
@@ -222,7 +221,7 @@ namespace ConvectionCoefficients {
         int FloorHeatCeilingCoolVertWallUserCurveNum;
         int FloorHeatCeilingCoolStableHorizEqNum; // InConvClass_A1_StableHoriz
         int FloorHeatCeilingCoolStableHorizUserCurveNum;
-        int FloorHeatCeilingCoolUnstableHorizEqNum; // InConvClass_A1_UntableHoriz
+        int FloorHeatCeilingCoolUnstableHorizEqNum; // InConvClass_A1_UnstableHoriz
         int FloorHeatCeilingCoolUnstableHorizUserCurveNum;
         int FloorHeatCeilingCoolHeatedFloorEqNum; // InConvClass_A1_HeatedFloor
         int FloorHeatCeilingCoolHeatedFloorUserCurveNum;
@@ -282,10 +281,10 @@ namespace ConvectionCoefficients {
         int ZoneFanCircUnstableTiltedUserCurveNum;
         int ZoneFanCircWindowsEqNum;
         int ZoneFanCircWindowsUserCurveNum;
-        int MixedBouyAssistingFlowWallEqNum;
-        int MixedBouyAssistingFlowWallUserCurveNum;
-        int MixedBouyOppossingFlowWallEqNum;
-        int MixedBouyOppossingFlowWallUserCurveNum;
+        int MixedBuoyAssistingFlowWallEqNum;
+        int MixedBuoyAssistingFlowWallUserCurveNum;
+        int MixedBuoyOpposingFlowWallEqNum;
+        int MixedBuoyOpposingFlowWallUserCurveNum;
         int MixedStableFloorEqNum;
         int MixedStableFloorUserCurveNum;
         int MixedUnstableFloorEqNum;
@@ -299,7 +298,7 @@ namespace ConvectionCoefficients {
 
         // Default Constructor
         InsideFaceAdaptiveConvAlgoStruct()
-            : EnteredByUser(false), SimpleBouyVertWallEqNum(HcInt_FohannoPolidoriVerticalWall), SimpleBouyVertWallUserCurveNum(0),
+            : SimpleBouyVertWallEqNum(HcInt_FohannoPolidoriVerticalWall), SimpleBouyVertWallUserCurveNum(0),
               SimpleBouyStableHorizEqNum(HcInt_AlamdariHammondStableHorizontal), SimpleBouyStableHorizUserCurveNum(0),
               SimpleBouyUnstableHorizEqNum(HcInt_AlamdariHammondUnstableHorizontal), SimpleBouyUnstableHorizUserCurveNum(0),
               SimpleBouyStableTiltedEqNum(HcInt_WaltonStableHorizontalOrTilt), SimpleBouyStableTiltedUserCurveNum(0),
@@ -337,8 +336,8 @@ namespace ConvectionCoefficients {
               ZoneFanCircStableTiltedEqNum(HcInt_WaltonStableHorizontalOrTilt), ZoneFanCircStableTiltedUserCurveNum(0),
               ZoneFanCircUnstableTiltedEqNum(HcInt_WaltonUnstableHorizontalOrTilt), ZoneFanCircUnstableTiltedUserCurveNum(0),
               ZoneFanCircWindowsEqNum(HcInt_ISO15099Windows), ZoneFanCircWindowsUserCurveNum(0),
-              MixedBouyAssistingFlowWallEqNum(HcInt_BeausoleilMorrisonMixedAssistingWall), MixedBouyAssistingFlowWallUserCurveNum(0),
-              MixedBouyOppossingFlowWallEqNum(HcInt_BeausoleilMorrisonMixedOppossingWall), MixedBouyOppossingFlowWallUserCurveNum(0),
+              MixedBuoyAssistingFlowWallEqNum(HcInt_BeausoleilMorrisonMixedAssistingWall), MixedBuoyAssistingFlowWallUserCurveNum(0),
+              MixedBuoyOpposingFlowWallEqNum(HcInt_BeausoleilMorrisonMixedOppossingWall), MixedBuoyOpposingFlowWallUserCurveNum(0),
               MixedStableFloorEqNum(HcInt_BeausoleilMorrisonMixedStableFloor), MixedStableFloorUserCurveNum(0),
               MixedUnstableFloorEqNum(HcInt_BeausoleilMorrisonMixedUnstableFloor), MixedUnstableFloorUserCurveNum(0),
               MixedStableCeilingEqNum(HcInt_BeausoleilMorrisonMixedStableCeiling), MixedStableCeilingUserCurveNum(0),
@@ -348,10 +347,9 @@ namespace ConvectionCoefficients {
         }
     };
 
-    struct OutsideFaceAdpativeConvAlgoStruct
+    struct OutsideFaceAdaptiveConvAlgoStruct
     {
         // Members
-        bool EnteredByUser;
         std::string Name;
         bool SuppressRainChange;
         int HWindWallWindwardEqNum;
@@ -365,15 +363,15 @@ namespace ConvectionCoefficients {
         int HNatStableHorizEqNum;
         int HNatStableHorizUserCurveNum;
         int HNatUnstableHorizEqNum;
-        int HNatUstableHorizUserCurveNum;
+        int HNatUnstableHorizUserCurveNum;
 
         // Default Constructor
-        OutsideFaceAdpativeConvAlgoStruct()
-            : EnteredByUser(false), SuppressRainChange(false), HWindWallWindwardEqNum(HcExt_SparrowWindward), HWindWallWindwardUserCurveNum(0),
+        OutsideFaceAdaptiveConvAlgoStruct()
+            : SuppressRainChange(false), HWindWallWindwardEqNum(HcExt_SparrowWindward), HWindWallWindwardUserCurveNum(0),
               HWindWallLeewardEqNum(HcExt_SparrowLeeward), HWindWallLeewardUserCurveNum(0), HWindHorizRoofEqNum(HcExt_ClearRoof),
               HWindHorizRoofUserCurveNum(0), HNatVertWallEqNum(HcExt_NaturalASHRAEVerticalWall), HNatVertWallUserCurveNum(0),
               HNatStableHorizEqNum(HcExt_NaturalWaltonStableHorizontalOrTilt), HNatStableHorizUserCurveNum(0),
-              HNatUnstableHorizEqNum(HcExt_NaturalWaltonUnstableHorizontalOrTilt), HNatUstableHorizUserCurveNum(0)
+              HNatUnstableHorizEqNum(HcExt_NaturalWaltonUnstableHorizontalOrTilt), HNatUnstableHorizUserCurveNum(0)
         {
         }
     };
@@ -391,7 +389,7 @@ namespace ConvectionCoefficients {
         }
     };
 
-    struct RoofGeoCharactisticsStruct
+    struct RoofGeoCharacteristicsStruct
     {
         // Members
         BoundingBoxVertStruct XdYdZd; // 1 low x, low y, low z
@@ -408,12 +406,12 @@ namespace ConvectionCoefficients {
         Real64 Height;
 
         // Default Constructor
-        RoofGeoCharactisticsStruct() : BoundSurf(4), Area(0.0), Perimeter(0.0), Height(0.0)
+        RoofGeoCharacteristicsStruct() : BoundSurf(4), Area(0.0), Perimeter(0.0), Height(0.0)
         {
         }
     };
 
-    struct FacadeGeoCharactisticsStruct
+    struct FacadeGeoCharacteristicsStruct
     {
         // Members
         Real64 AzimuthRangeLow;
@@ -429,10 +427,10 @@ namespace ConvectionCoefficients {
         Real64 Height;
 
         // Default Constructor
-        FacadeGeoCharactisticsStruct() = default;
+        FacadeGeoCharacteristicsStruct() = default;
 
         // Member Constructor
-        FacadeGeoCharactisticsStruct(Real64 const AzimuthRangeLow,
+        FacadeGeoCharacteristicsStruct(Real64 const AzimuthRangeLow,
                                      Real64 const AzimuthRangeHi,
                                      Real64 const Zmax,
                                      Real64 const Zmin,
@@ -956,19 +954,19 @@ struct ConvectionCoefficientsData : BaseGlobalStruct
 
     // Object Data
     ConvectionCoefficients::InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
-    ConvectionCoefficients::OutsideFaceAdpativeConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
+    ConvectionCoefficients::OutsideFaceAdaptiveConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
     Array1D<ConvectionCoefficients::HcInsideFaceUserCurveStruct> HcInsideUserCurve;
     Array1D<ConvectionCoefficients::HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
-    ConvectionCoefficients::RoofGeoCharactisticsStruct RoofGeo;
+    ConvectionCoefficients::RoofGeoCharacteristicsStruct RoofGeo;
 
-    ConvectionCoefficients::FacadeGeoCharactisticsStruct NorthFacade = {332.5, 22.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ConvectionCoefficients::FacadeGeoCharactisticsStruct NorthEastFacade = {22.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ConvectionCoefficients::FacadeGeoCharactisticsStruct EastFacade = {67.5, 112.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ConvectionCoefficients::FacadeGeoCharactisticsStruct SouthEastFacade = {112.5, 157.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ConvectionCoefficients::FacadeGeoCharactisticsStruct SouthFacade = {157.5, 202.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ConvectionCoefficients::FacadeGeoCharactisticsStruct SouthWestFacade = {202.5, 247.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ConvectionCoefficients::FacadeGeoCharactisticsStruct WestFacade = {247.5, 287.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ConvectionCoefficients::FacadeGeoCharactisticsStruct NorthWestFacade = {287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ConvectionCoefficients::FacadeGeoCharacteristicsStruct NorthFacade = {332.5, 22.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ConvectionCoefficients::FacadeGeoCharacteristicsStruct NorthEastFacade = {22.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ConvectionCoefficients::FacadeGeoCharacteristicsStruct EastFacade = {67.5, 112.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ConvectionCoefficients::FacadeGeoCharacteristicsStruct SouthEastFacade = {112.5, 157.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ConvectionCoefficients::FacadeGeoCharacteristicsStruct SouthFacade = {157.5, 202.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ConvectionCoefficients::FacadeGeoCharacteristicsStruct SouthWestFacade = {202.5, 247.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ConvectionCoefficients::FacadeGeoCharacteristicsStruct WestFacade = {247.5, 287.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ConvectionCoefficients::FacadeGeoCharacteristicsStruct NorthWestFacade = {287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
     void clear_state() override
     {

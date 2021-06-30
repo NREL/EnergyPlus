@@ -1814,7 +1814,6 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.Name = state.dataIPShortCut->cAlphaArgs(1); // not used by E+, unique object
-        state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
 
         // The following array maps the inputs for the SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections algorithm input fields
         // to the corresponding defaults by making a pair with a pointer to the InsideFaceAdaptiveConvectionAlgo algorithm int parameter
@@ -1858,8 +1857,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
             &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum,
             &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum,
             &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum,
+            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyAssistingFlowWallEqNum,
+            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyOpposingFlowWallEqNum,
             &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum,
             &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum,
             &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum,
@@ -1898,7 +1897,6 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
         state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.Name =
             state.dataIPShortCut->cAlphaArgs(1); // not used by E+, unique object
-        state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.EnteredByUser = true;
         std::array<int *const, 6> AdaptiveConvectionAlgoOutsideDefaults = {
             &state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum,
             &state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum,
@@ -4787,7 +4785,7 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 Hf(0.0); // the forced, or wind driven portion of film coefficient
-    Real64 Hn(0.0); // the natural, or bouyancy driven portion of film coefficient
+    Real64 Hn(0.0); // the natural, or buoyancy driven portion of film coefficient
     Real64 SurfWindSpeed;
     Real64 SurfWindDir;
     Real64 HydraulicDiameter;
@@ -5096,7 +5094,7 @@ void DynamicExtConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     //       RE-ENGINEERED  na
 
     // METHODOLOGY EMPLOYED:
-    // Decide surface classification based on wind and bouyancy, class, orientation
+    // Decide surface classification based on wind and buoyancy, class, orientation
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 DeltaTemp(0.0);
@@ -5189,7 +5187,7 @@ void MapExtConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
                 state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum;
             if (state.dataSurface->SurfOutConvHnModelEq(SurfNum) == HcExt_UserCurve) {
                 state.dataSurface->SurfOutConvHfUserCurveIndex(SurfNum) =
-                    state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUstableHorizUserCurveNum;
+                    state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizUserCurveNum;
             }
         } else {
             ShowSevereError(state,
@@ -5426,7 +5424,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                         CoolingPriorityStack(EquipOnCount) =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
-                                    } else { // not heating, no special models wall cooling so use simple bouyancy
+                                    } else { // not heating, no special models wall cooling so use simple buoyancy
                                         EquipOnCount = min(EquipOnCount + 1, 10);
                                         FlowRegimeStack(EquipOnCount) = InConvFlowRegime_A3;
                                         HeatingPriorityStack(EquipOnCount) =
@@ -5466,7 +5464,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
         }
         FinalFlowRegime = FlowRegimeStack(PriorityEquipOn);
     } else {
-        // no equipment on, so simple bouyancy flow regime
+        // no equipment on, so simple buoyancy flow regime
         FinalFlowRegime = InConvFlowRegime_A3;
     }
 
@@ -6279,17 +6277,17 @@ void MapIntConvClassificationToHcModels(EnergyPlusData &state, int const SurfNum
             }
         } else if (SELECT_CASE_var == InConvClass_E_AssistFlowWalls) {
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
-                state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallEqNum;
+                state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyAssistingFlowWallEqNum;
             if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == HcInt_UserCurve) {
                 state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
-                    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyAssistingFlowWallUserCurveNum;
+                    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyAssistingFlowWallUserCurveNum;
             }
         } else if (SELECT_CASE_var == InConvClass_E_OpposFlowWalls) {
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
-                state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallEqNum;
+                state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyOpposingFlowWallEqNum;
             if (state.dataSurface->SurfIntConvHcModelEq(SurfNum) == HcInt_UserCurve) {
                 state.dataSurface->SurfIntConvHcUserCurveIndex(SurfNum) =
-                    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBouyOppossingFlowWallUserCurveNum;
+                    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyOpposingFlowWallUserCurveNum;
             }
         } else if (SELECT_CASE_var == InConvClass_E_StableFloor) {
             state.dataSurface->SurfIntConvHcModelEq(SurfNum) =
@@ -7141,7 +7139,7 @@ Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const &DeltaTemp,     // [
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate model equation Beausoleil-Morrison's mixed flow regime
-    // with mechanical and bouyancy forces assisting each other along a Wall
+    // with mechanical and buoyancy forces assisting each other along a Wall
 
     // METHODOLOGY EMPLOYED:
     // isolate function for equation.
@@ -7222,7 +7220,7 @@ Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const &DeltaTemp,     // [
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate model equation Beausoleil-Morrison's mixed flow regime
-    // with mechanical and bouyancy forces opposing each other along a Wall
+    // with mechanical and buoyancy forces opposing each other along a Wall
 
     // METHODOLOGY EMPLOYED:
     // isolate function for equation.
@@ -7319,7 +7317,7 @@ Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const &DeltaTemp,         /
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate model equation Beausoleil-Morrison's mixed flow regime
-    // with mechanical and bouyancy forces acting on an thermally stable floor
+    // with mechanical and buoyancy forces acting on an thermally stable floor
 
     // METHODOLOGY EMPLOYED:
     // isolate function for equation.
@@ -7399,7 +7397,7 @@ Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const &DeltaTemp,        
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate model equation Beausoleil-Morrison's mixed flow regime
-    // with mechanical and bouyancy forces acting on an thermally unstable floor
+    // with mechanical and buoyancy forces acting on an thermally unstable floor
 
     // METHODOLOGY EMPLOYED:
     // isolate function for equation.
@@ -7482,7 +7480,7 @@ Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const &DeltaTemp,        
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate model equation Beausoleil-Morrison's mixed flow regime
-    // with mechanical and bouyancy forces acting on a thermally stable ceiling
+    // with mechanical and buoyancy forces acting on a thermally stable ceiling
 
     // METHODOLOGY EMPLOYED:
     // isolate function for equation.
@@ -7562,7 +7560,7 @@ Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const &DeltaTemp,      
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate model equation Beausoleil-Morrison's mixed flow regime
-    // with mechanical and bouyancy forces acting on a thermally unstable ceiling
+    // with mechanical and buoyancy forces acting on a thermally unstable ceiling
 
     // METHODOLOGY EMPLOYED:
     // isolate function for equation.
