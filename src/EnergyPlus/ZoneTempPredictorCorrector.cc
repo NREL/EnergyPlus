@@ -6752,24 +6752,24 @@ void CalcZoneSums(EnergyPlusData &state,
             // Add to the surface convection sums
             if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                 // Window frame contribution
-                Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
                                      (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)));
-                SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
+                SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempIn(SurfNum);
                 HA += HA_surf;
             }
 
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
                 // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                Real64 const HA_surf(state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
                                      (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)));
-                SumHATsurf += HA_surf * state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
+                SumHATsurf += HA_surf * state.dataSurface->SurfWinDividerTempIn(SurfNum);
                 HA += HA_surf;
             }
 
         } // End of check if window
 
-        HA += state.dataHeatBal->HConvIn(SurfNum) * Area;
-        SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
+        HA += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area;
+        SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
 
         // determine reference air temperature for this surface
         {
@@ -7094,21 +7094,21 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
             if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                 // Window frame contribution
 
-                SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
                                 (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
-                                (state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) - RefAirTemp);
+                                (state.dataSurface->SurfWinFrameTempIn(SurfNum) - RefAirTemp);
             }
 
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                 // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
                                 (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                (state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) - RefAirTemp);
+                                (state.dataSurface->SurfWinDividerTempIn(SurfNum) - RefAirTemp);
             }
 
         } // End of check if window
 
-        SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * Area * (state.dataHeatBalSurf->TempSurfInTmp(SurfNum) - RefAirTemp);
+        SumHADTsurfs += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * (state.dataHeatBalSurf->SurfTempInTmp(SurfNum) - RefAirTemp);
 
         // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
         if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::iHeatTransferModel::CondFD) {

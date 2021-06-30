@@ -5733,9 +5733,9 @@ namespace LowTempRadiantSystem {
         case LowTempRadiantControlTypes::OWBControl:
             return state.dataHeatBal->Zone(this->ZonePtr).OutWetBulbTemp;
         case LowTempRadiantControlTypes::SurfFaceTempControl:
-            return state.dataHeatBalSurf->TempSurfIn(this->SurfacePtr(1)); // Grabs the inside face temperature of the first surface in the list
+            return state.dataHeatBalSurf->SurfTempIn(this->SurfacePtr(1)); // Grabs the inside face temperature of the first surface in the list
         case LowTempRadiantControlTypes::SurfIntTempControl:
-            return state.dataHeatBalSurf->TempUserLoc(
+            return state.dataHeatBalSurf->SurfTempUserLoc(
                 this->SurfacePtr(1)); // Grabs the temperature inside the slab at the location specified by the user
         case LowTempRadiantControlTypes::RunningMeanODBControl:
             return this->todayRunningMeanOutdoorDryBulbTemperature;
@@ -6109,20 +6109,19 @@ namespace LowTempRadiantSystem {
 
                 if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
                     // Window frame contribution
-                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(surfNum);
+                    sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) *
+                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) * state.dataSurface->SurfWinFrameTempIn(surfNum);
                 }
 
                 if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0 &&
                     !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) *
-                                  state.dataSurface->SurfWinDividerTempSurfIn(surfNum);
+                    sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) * state.dataSurface->SurfWinDividerTempIn(surfNum);
                 }
             }
 
-            sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(surfNum);
+            sumHATsurf += state.dataHeatBalSurf->SurfHConvInt(surfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(surfNum);
         }
 
         return sumHATsurf;

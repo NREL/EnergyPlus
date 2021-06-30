@@ -1062,26 +1062,25 @@ namespace RoomAirModelAirflowNetwork {
                 // Add to the surface convection sums
                 if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
-                    HA += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
+                    HA += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
                           (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum));
                 }
 
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
                     !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution(only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                  state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
-                    HA += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
+                    HA += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
                           (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum));
                 }
 
             } // End of check if window
 
-            HA = HA + state.dataHeatBal->HConvIn(SurfNum) * Area;
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
+            HA = HA + state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area;
+            SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
 
             if (state.dataSurface->SurfTAirRef(SurfNum) == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
@@ -1196,8 +1195,8 @@ namespace RoomAirModelAirflowNetwork {
                         state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
 
                 Wsurf = PsyWFnTdbRhPb(state,
-                                      state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
-                                      PsyRhFnTdbRhov(state, state.dataHeatBalSurf->TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"),
+                                      state.dataHeatBalSurf->SurfTempInTmp(SurfNum),
+                                      PsyRhFnTdbRhov(state, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"),
                                       state.dataEnvrn->OutBaroPress);
 
                 SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoAirZone;
@@ -1217,10 +1216,10 @@ namespace RoomAirModelAirflowNetwork {
                                PsyRhoAirFnPbTdbW(
                                    state,
                                    state.dataEnvrn->OutBaroPress,
-                                   state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
+                                   state.dataHeatBalSurf->SurfTempInTmp(SurfNum),
                                    PsyWFnTdbRhPb(state,
-                                                 state.dataHeatBalSurf->TempSurfInTmp(SurfNum),
-                                                 PsyRhFnTdbRhovLBnd0C(state, state.dataHeatBalSurf->TempSurfInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
+                                                 state.dataHeatBalSurf->SurfTempInTmp(SurfNum),
+                                                 PsyRhFnTdbRhovLBnd0C(state, state.dataHeatBalSurf->SurfTempInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
                                                  state.dataEnvrn->OutBaroPress));
                 SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoVaporSurfIn(SurfNum);
             }
