@@ -223,16 +223,18 @@ namespace Psychrometrics {
         Real64 AverageIterations;
 
         if (!auditFile.good()) return;
-        if (any_gt(state.dataPsychCache->NumTimesCalled, 0)) {
-            print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
-            for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
-                if (!PsyReportIt(Loop)) continue;
-                const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
-                if (state.dataPsychCache->NumIterations[Loop] > 0) {
-                    AverageIterations = double(state.dataPsychCache->NumIterations[Loop]) / double(state.dataPsychCache->NumTimesCalled[Loop]);
-                    print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames(Loop), istring, AverageIterations);
-                } else {
-                    print(auditFile, "{},{}\n", PsyRoutineNames(Loop), istring);
+        for (int item : dataPsychCache->NumTimesCalled) {
+            if (item) { // if item is greater than 0
+                print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
+                for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
+                    if (!PsyReportIt(Loop)) continue;
+                    const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
+                    if (state.dataPsychCache->NumIterations[Loop] > 0) {
+                        AverageIterations = double(state.dataPsychCache->NumIterations[Loop]) / double(state.dataPsychCache->NumTimesCalled[Loop]);
+                        print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames(Loop), istring, AverageIterations);
+                    } else {
+                        print(auditFile, "{},{}\n", PsyRoutineNames(Loop), istring);
+                    }
                 }
             }
         }
