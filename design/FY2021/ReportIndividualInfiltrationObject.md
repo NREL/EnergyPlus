@@ -82,3 +82,15 @@ The idea is to follow how`People` object is implemented to report both individua
 The requested feature will be implemented by allocating new variable `state.dataHeatBal->Infiltration(NumInfil).HeatLoss`, etc. Since `state.dataHeatBal->Infiltration` already arranges and contains infiltration objects that only point to single zone (instead of zone or zone list), the total number of `state.dataHeatBal->Infiltration` should be equal to `state.dataHeatBal->TotInfiltration`. This structure will store calculated infiltration data at object level. It will be calculated at HVACManager.cc or ZoneEquipmentManager.cc or HeatBalanceAirManager.cc depending on detailed implementation.
 
 New variables will be set up for Infiltration objects. 
+
+## Testing
+
+No new example file needed. Assume it isn't supposed to be any diffs expected on ci testing. Local tests should verify that the new variables are able to be requested and reported correctly.
+
+## Input Output Reference Documentation ##
+
+Need to update the output descriptions for infiltration objects as reporting both at zone and individual object level.
+
+## IDD Changes and Transition
+
+None
