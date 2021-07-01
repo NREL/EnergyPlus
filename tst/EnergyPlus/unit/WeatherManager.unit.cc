@@ -1175,7 +1175,9 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
         "  Yes,                     !- Use Weather File Daylight Saving Period",
         "  No,                      !- Apply Weekend Holiday Rule",
         "  Yes,                     !- Use Weather File Rain Indicators",
-        "  Yes;                     !- Use Weather File Snow Indicators",
+        "  Yes,                     !- Use Weather File Snow Indicators", 
+        "  No,                      !-Treat Weather as Actual",
+        "  Hour1;                   !-First Hour Interpolation Starting Values",
 
         "Site:Location,",
         "  CHICAGO_IL_USA TMY3-725300,  !- Name",
