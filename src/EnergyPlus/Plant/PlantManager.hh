@@ -119,6 +119,8 @@ namespace PlantManager {
         {
             // this is empty on purpose
         }
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
 } // namespace PlantManager

@@ -867,34 +867,7 @@ namespace SolarCollectors {
         static std::string const RoutineName("InitSolarCollector");
         Real64 const BigNumber(9999.9); // Component desired mass flow rate
 
-        // Do the one time initializations
-        if (this->MyOneTimeFlag) {
-            this->setupOutputVars(state);
-            this->MyOneTimeFlag = false;
-        }
-
-        if (this->SetLoopIndexFlag) {
-            if (allocated(state.dataPlnt->PlantLoop)) {
-                bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->TypeNum,
-                                                        this->WLoopNum,
-                                                        this->WLoopSideNum,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
-                if (errFlag) {
-                    ShowFatalError(state, "InitSolarCollector: Program terminated due to previous condition(s).");
-                }
-                this->SetLoopIndexFlag = false;
-            }
-        }
+        this->oneTimeInit(state); // Do the one time initializations
 
         if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
             PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNode, this->VolFlowRateMax);
@@ -2162,6 +2135,37 @@ namespace SolarCollectors {
         } else {
 
             VentCavIndex = CavNum;
+        }
+    }
+    void CollectorData::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->MyOneTimeFlag) {
+            this->setupOutputVars(state);
+            this->MyOneTimeFlag = false;
+        }
+
+        if (this->SetLoopIndexFlag) {
+            if (allocated(state.dataPlnt->PlantLoop)) {
+                bool errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->TypeNum,
+                                                        this->WLoopNum,
+                                                        this->WLoopSideNum,
+                                                        this->WLoopBranchNum,
+                                                        this->WLoopCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(state, "InitSolarCollector: Program terminated due to previous condition(s).");
+                }
+                this->SetLoopIndexFlag = false;
+            }
         }
     }
 
