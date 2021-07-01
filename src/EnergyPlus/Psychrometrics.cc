@@ -710,7 +710,7 @@ namespace Psychrometrics {
 #else
 
     Real64 PsyPsatFnTemp(EnergyPlusData &state,
-                         Real64 const T,                   // dry-bulb temperature {C}
+                         Real64 const T,                                    // dry-bulb temperature {C}
                          [[maybe_unused]] std::string_view const CalledFrom // routine this function was called from (error messages)
     )
 #endif
