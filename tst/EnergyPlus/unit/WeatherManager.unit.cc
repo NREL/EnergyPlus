@@ -1209,16 +1209,22 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     state->dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(*state);
 
+    //int nRP = 1;
+    //WeatherManager::GetRunPeriodData(*state,
+    //                                 nRP, // Total number of Run Periods requested
+    //                                 ErrorsFound);
+
     bool Available(true);
     Available = true;
 
     state->dataGlobal->BeginSimFlag = true;
     WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+    // WeatherManager::SetupEnvironmentTypes(*state);
 
-    state->dataWeatherManager->Envrn = 1;
+    //state->dataWeatherManager->Envrn = 1;
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
-    state->dataWeatherManager->Environment.allocate(1);
+    //state->dataWeatherManager->Environment.allocate(1);
     state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
     state->dataWeatherManager->Environment(1).StartMonth = 1;
     state->dataWeatherManager->Environment(1).StartDay = 1;
