@@ -5607,7 +5607,7 @@ namespace HeatBalanceManager {
                     }
                     for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                         constexpr const char *ShdFracFmt2("{:10.8F},");
-                        print(state.files.shade, ShdFracFmt2, state.dataHeatBal->SunlitFrac(TS, iHour, SurfNum));
+                        print(state.files.shade, ShdFracFmt2, state.dataHeatBal->SurfSunlitFrac(iHour, TS, SurfNum));
                     }
                     print(state.files.shade, "\n");
                 }
@@ -5696,37 +5696,38 @@ namespace HeatBalanceManager {
     void AllocateZoneHeatBalArrays(EnergyPlusData &state)
     {
         // Allocate zone / encl hb arrays
-        state.dataHeatBal->EnclSolDB.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->EnclSolDBSSG.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->EnclSolDBIntWin.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->EnclSolQD.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->EnclRadQThermalRad.allocate(state.dataGlobal->NumOfZones);
+
         state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
-        state.dataHeatBal->EnclRadThermAbsMult.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->ZoneSolAbsFirstCalc.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->EnclRadReCalc.allocate(state.dataGlobal->NumOfZones);
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            state.dataHeatBal->EnclSolDB(zoneNum) = 0.0;
-            state.dataHeatBal->EnclSolDBSSG(zoneNum) = 0.0;
-            state.dataHeatBal->EnclSolDBIntWin(zoneNum) = 0.0;
-            state.dataHeatBal->EnclSolQSDifSol(zoneNum) = 0.0;
-            state.dataHeatBal->EnclSolQD(zoneNum) = 0.0;
-            state.dataHeatBal->EnclSolQDforDaylight(zoneNum) = 0.0;
-            state.dataHeatBal->EnclRadQThermalRad(zoneNum) = 0.0;
             state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
-            state.dataHeatBal->EnclRadThermAbsMult(zoneNum) = 0.0;
             state.dataHeatBal->ZoneSolAbsFirstCalc(zoneNum) = true;
             state.dataHeatBal->EnclRadReCalc(zoneNum) = false;
         }
+        state.dataHeatBal->EnclSolQSDifSol.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolQD.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolQDforDaylight.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclRadQThermalRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclRadThermAbsMult.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolDB.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolDBSSG.allocate(state.dataViewFactor->NumOfSolarEnclosures);
+        state.dataHeatBal->EnclSolDBIntWin.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQSWRad.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolQSWRadLights.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         state.dataHeatBal->EnclSolVMULT.allocate(state.dataViewFactor->NumOfSolarEnclosures);
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
+            state.dataHeatBal->EnclSolQSDifSol(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolQD(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolQDforDaylight(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclRadQThermalRad(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclRadThermAbsMult(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQSWRad(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolQSWRadLights(enclosureNum) = 0.0;
             state.dataHeatBal->EnclSolVMULT(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolDB(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolDBSSG(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclSolDBIntWin(enclosureNum) = 0.0;
         }
     }
     void AllocateHeatBalArrays(EnergyPlusData &state)
@@ -6747,8 +6748,9 @@ namespace HeatBalanceManager {
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
             ++FileLineCount;
-            readItem(NextLine.data.substr(19), NGlSys);
-            if (NGlSys <= 0 || NGlSys > 2) {
+            bool error = false;
+            NGlSys = static_cast<int>(UtilityRoutines::ProcessNumber(NextLine.data.substr(19), error));
+            if (NGlSys <= 0 || NGlSys > 2 || error) {
                 ShowFatalError(
                     state,
                     format("Construction={} from the Window5 data file cannot be used: it has {} glazing systems; only 1 or 2 are allowed.",
@@ -6831,14 +6833,17 @@ namespace HeatBalanceManager {
             MullionWidth = 0.0;
             MullionOrientation = "Vertical";
             if (NGlSys == 2) {
-                if (!readItem(DataLine(10).substr(19), MullionWidth)) {
+                error = false;
+                MullionWidth = UtilityRoutines::ProcessNumber(DataLine(10).substr(19), error);
+                if (error) {
                     ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Width.");
                     ShowContinueError(state,
                                       format("Line (~{}) in error (first 100 characters)={}", FileLineCount + 10, DataLine(10).substr(0, 100)));
                     ErrorsFound = true;
                 }
                 MullionWidth *= 0.001;
-                if (!readItem(DataLine(10).substr(88), MullionOrientation)) {
+                MullionOrientation = UtilityRoutines::ProcessNumber(DataLine(10).substr(88), error);
+                if (error) {
                     ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Orientation.");
                     ShowContinueError(state,
                                       format("Line (~{}) in error (first 100 characters)={}", FileLineCount + 10, DataLine(10).substr(0, 100)));
