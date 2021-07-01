@@ -60,6 +60,8 @@ jobs:
         # Avoid annoying warning: "xelatex: major issue: So far, you have not checked for updates as a MiKTeX user."
         mpm --find-updates
         mpm --admin --find-updates
+        initexmf --enable-installer --quiet --update-fndb
+        initexmf --admin --enable-installer --quiet --update-fndb
 
     - name: Upload log folder before install required packages
       uses: actions/upload-artifact@v2
