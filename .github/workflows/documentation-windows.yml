@@ -102,17 +102,17 @@ jobs:
     - name: Add problem matcher
       run: echo "::add-matcher::.github/workflows/doc-problem-match.json"
 
-    - name: Build a single doc which works because it's not in parallel
-      working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
-      run: |
-        cmake --build . --target zPDF_InputOutputReference
-
-    - name: Upload log folder
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v2
-      with:
-        name: Xelatex_Logs_after_single_zPDF
-        path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\
+#    - name: Build a single doc which works because it's not in parallel
+#      working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
+#      run: |
+#        cmake --build . --target zPDF_InputOutputReference
+#
+#    - name: Upload log folder
+#      if: ${{ always() }}
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: Xelatex_Logs_after_single_zPDF
+#        path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\
 
     - name: Build Docs in parallel after one first pass?
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
