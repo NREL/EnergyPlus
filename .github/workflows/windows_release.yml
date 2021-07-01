@@ -88,8 +88,11 @@ jobs:
     # This will install all required packages and does that in a single thread. So later in cmake we can safely run in parallel
     - name: Install required packages by building the Test document
       shell: bash
-      working-directory: ./doc/test/
+      working-directory: ./doc/
       run: |
+        # It shaves about 1min40s to preinstall from the .lst so do it first
+        mpm --verbose --admin --require=@energyplus_packages_windows.lst
+        cd test/
         xelatex dependencies.tex
 
     - name: Create Build Directory

@@ -69,6 +69,7 @@ jobs:
       shell: bash
       working-directory: ./doc/
       run: |
+        # It shaves about 1min40s to preinstall from the .lst so do it first
         mpm --verbose --admin --require=@energyplus_packages_windows.lst
         cd test/
         xelatex dependencies.tex
