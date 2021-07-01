@@ -1203,28 +1203,20 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     ErrorsFound = false;
 
     state->dataWeatherManager->WeatherFileExists = true;
-    // state->files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
     state->files.inputWeatherFilePath.filePath = configured_source_directory() / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     state->dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(*state);
 
-    // int nRP = 1;
-    // WeatherManager::GetRunPeriodData(*state,
-    //                                 nRP, // Total number of Run Periods requested
-    //                                 ErrorsFound);
-
     bool Available(true);
     Available = true;
 
     state->dataGlobal->BeginSimFlag = true;
-    WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
-    // WeatherManager::SetupEnvironmentTypes(*state);
 
-    // state->dataWeatherManager->Envrn = 1;
+    // The added first hour processing will be called here:
+    WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
-    // state->dataWeatherManager->Environment.allocate(1);
     state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
     state->dataWeatherManager->Environment(1).StartMonth = 1;
     state->dataWeatherManager->Environment(1).StartDay = 1;
@@ -1235,7 +1227,7 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     OpenWeatherFile(*state, ErrorsFound);
     ReadWeatherForDay(*state, 1, 1, true);
 
-    // Test the feature of interpolating some weather inputs to calc sky temp
+    // Test interpolating values of some weather data during the first hour
     Real64 expected_DryBulbTemp = -12.2;
     EXPECT_NEAR(state->dataWeatherManager->TomorrowOutDryBulbTemp(4, 1), expected_DryBulbTemp, 1e-6);
 
