@@ -61,11 +61,24 @@ jobs:
         mpm --find-updates
         mpm --admin --find-updates
 
+    - name: Upload log folder before install required packages
+      uses: actions/upload-artifact@v2
+      with:
+        name: Xelatex_Logs_before_packages
+        path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\
+
     - name: Install required packages
       shell: bash
       working-directory: ./doc/
       run: |
         mpm --verbose --admin --require=@energyplus_packages_windows.lst
+
+    - name: Upload log folder after install required packages
+      uses: actions/upload-artifact@v2
+      with:
+        name: Xelatex_Logs_after_packages
+        path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\
+
 
 # For quick debugging this could be useful, but note that it does not exhibit the main memory size exceeded error
 #   - name: Build Test package - Pass Number 1
@@ -92,7 +105,7 @@ jobs:
     - name: Build Docs
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
       run: |
-        cmake --build . -j 2
+        cmake --build . -j 2 --target zPDF_InputOutputReference
 
     # I made the BuildDOcumentation.cmake throw a FATAL_ERROR already on pass 2 and 3 of xelatex, so this is redundant now
     # but if you want to just build `--target zPDF_InputOutputReference` and test it here, I'm leaving it as an example
@@ -120,11 +133,12 @@ jobs:
       if: ${{ failure() }}
       shell: bash
       run: |
+        ls ~/AppData/Local/MiKTeX/miktex/log/ || true
         cat ~/AppData/Local/MiKTeX/miktex/log/xelatex.log || true
 
-    - name: Upload log
+    - name: Upload log folder
       if: ${{ failure() }}
       uses: actions/upload-artifact@v2
       with:
-        name: InputOutputReference
-        path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\xelatex.log
+        name: Xelatex_Logs_after_zPDF
+        path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\
