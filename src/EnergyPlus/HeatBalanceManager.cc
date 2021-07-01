@@ -6748,8 +6748,9 @@ namespace HeatBalanceManager {
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
             ++FileLineCount;
-            readItem(NextLine.data.substr(19), NGlSys);
-            if (NGlSys <= 0 || NGlSys > 2) {
+            bool error = false;
+            NGlSys = static_cast<int>(UtilityRoutines::ProcessNumber(NextLine.data.substr(19), error));
+            if (NGlSys <= 0 || NGlSys > 2 || error) {
                 ShowFatalError(
                     state,
                     format("Construction={} from the Window5 data file cannot be used: it has {} glazing systems; only 1 or 2 are allowed.",
@@ -6832,14 +6833,17 @@ namespace HeatBalanceManager {
             MullionWidth = 0.0;
             MullionOrientation = "Vertical";
             if (NGlSys == 2) {
-                if (!readItem(DataLine(10).substr(19), MullionWidth)) {
+                error = false;
+                MullionWidth = UtilityRoutines::ProcessNumber(DataLine(10).substr(19), error);
+                if (error) {
                     ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Width.");
                     ShowContinueError(state,
                                       format("Line (~{}) in error (first 100 characters)={}", FileLineCount + 10, DataLine(10).substr(0, 100)));
                     ErrorsFound = true;
                 }
                 MullionWidth *= 0.001;
-                if (!readItem(DataLine(10).substr(88), MullionOrientation)) {
+                MullionOrientation = UtilityRoutines::ProcessNumber(DataLine(10).substr(88), error);
+                if (error) {
                     ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Orientation.");
                     ShowContinueError(state,
                                       format("Line (~{}) in error (first 100 characters)={}", FileLineCount + 10, DataLine(10).substr(0, 100)));
