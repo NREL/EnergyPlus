@@ -2762,7 +2762,8 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    ,                        !- Return Air Fraction Calculated from Plenum Temperature",
         "    ,                        !- Return Air Fraction Function of Plenum Temperature Coefficient 1",
         "    ,                        !- Return Air Fraction Function of Plenum Temperature Coefficient 2",
-        "    SPACE1-1 Return Air NodeList; !- Return Air Heat Gain Node or NodeList Name",
+        "    SPACE1-1 Return Outlet,  !- Return Air Heat Gain Node Name",
+        "    SPACE1-1 Air Terminal Mixer Secondary Inlet;   !- Exhaust Air Heat Gain Node Name",
 
         "  Lights,",
         "    SPACE2-1 Lights 1,       !- Name",
@@ -3744,11 +3745,6 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE5-1 Inlets,         !- Name",
         "    SPACE5-1 Supply Inlet;   !- Node 1 Name",
 
-        "  NodeList,",
-        "    SPACE1-1 Return Air NodeList, !- Name",
-        "    SPACE1-1 Return Outlet,   !- Node 1 Name",
-        "    SPACE1-1 Air Terminal Mixer Secondary Inlet;   !- Node 2 Name",
-
         "  OutdoorAir:NodeList,",
         "    DOAS Outdoor Air Inlet;  !- Node or NodeList Name 1",
 
@@ -3930,10 +3926,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     EXPECT_NEAR(Inletmdot, outletmdot, 0.0001);
     // System 1 draw air from return node with InletSide of ATMixer
     EXPECT_NEAR(23.153277047505515, state->dataLoopNodes->Node(11).Temp, 0.001);
-    EXPECT_TRUE(state->dataLoopNodes->Node(11).Temp > state->dataLoopNodes->Node(12).Temp);
+    EXPECT_TRUE(state->dataLoopNodes->Node(11).Temp > state->dataLoopNodes->Node(10).Temp);
     // mass balance 1 supply, 2 outlets
     EXPECT_NEAR(
-        state->dataLoopNodes->Node(4).MassFlowRate, state->dataLoopNodes->Node(10).MassFlowRate + state->dataLoopNodes->Node(11).MassFlowRate, 0.001);
+        state->dataLoopNodes->Node(4).MassFlowRate, state->dataLoopNodes->Node(12).MassFlowRate + state->dataLoopNodes->Node(11).MassFlowRate, 0.001);
 
     // System 2 use AirTerminal:SingleDuct:ConstantVolume:NoReheat
     // mass balance 2 inlets, 1 outlet

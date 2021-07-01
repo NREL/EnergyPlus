@@ -1606,7 +1606,8 @@
     ,                        !- Return Air Fraction Calculated from Plenum Temperature
     ,                        !- Return Air Fraction Function of Plenum Temperature Coefficient 1
     ,                        !- Return Air Fraction Function of Plenum Temperature Coefficient 2
-    SPACE1-1 Return Air NodeList; !- Return Air Heat Gain Node or NodeList Name
+    SPACE1-1 Return Outlet, !- Return Air Heat Gain Node Name
+    SPACE1-1 Air Terminal Mixer Secondary Inlet; !- Exhaust Air Heat Gain Node Name  
 
   Lights,
     SPACE2-1 Lights 1,       !- Name
@@ -2856,11 +2857,6 @@
   NodeList,
     SPACE5-1 Inlets,         !- Name
     SPACE5-1 Supply Inlet;   !- Node 1 Name
-
-  NodeList,
-    SPACE1-1 Return Air NodeList, !- Name
-    SPACE1-1 Return Outlet,   !- Node 1 Name
-    SPACE1-1 Air Terminal Mixer Secondary Inlet;   !- Node 2 Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:NODELIST ===========
 
