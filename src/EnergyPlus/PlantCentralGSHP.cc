@@ -604,7 +604,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWOutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -614,7 +614,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                1,
+                                                NodeInputManager::compFluidStream::Primary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -631,7 +631,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                2,
+                                                NodeInputManager::compFluidStream::Secondary,
                                                 DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEOutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -641,7 +641,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                2,
+                                                NodeInputManager::compFluidStream::Secondary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -658,7 +658,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Inlet,
-                                                3,
+                                                NodeInputManager::compFluidStream::Tertiary,
                                                 DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
         state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWOutletNodeNum =
             NodeInputManager::GetOnlySingleNode(state,
@@ -668,7 +668,7 @@ void GetWrapperInput(EnergyPlusData &state)
                                                 state.dataIPShortCut->cAlphaArgs(1),
                                                 DataLoopNode::NodeFluidType::Water,
                                                 DataLoopNode::NodeConnectionType::Outlet,
-                                                3,
+                                                NodeInputManager::compFluidStream::Tertiary,
                                                 DataLoopNode::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -2519,7 +2519,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                 } else {
                     ShowWarningError(state, "ChillerHeaterPerformance:Electric:EIR \"" + this->ChillerHeater(ChillerHeaterNum).Name + "\":");
                     ShowContinueError(state,
-                                      format("Chiller condensor temperature for curve fit are not decided, defalt value= cond_leaving ({:.3R}).",
+                                      format("Chiller condenser temperature for curve fit are not decided, default value= cond_leaving ({:.3R}).",
                                              state.dataPlantCentralGSHP->ChillerCapFT));
                     CondTempforCurve = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWLoopNum).TempSetPointNodeNum).TempSetPoint;
                 }
@@ -3526,6 +3526,9 @@ void WrapperSpecs::UpdateChillerHeaterRecords(EnergyPlusData &state) // Wrapper 
         this->ChillerHeater(ChillerHeaterNum).Report.EvapEnergy = this->ChillerHeater(ChillerHeaterNum).Report.QEvap * SecInTimeStep;
         this->ChillerHeater(ChillerHeaterNum).Report.CondEnergy = this->ChillerHeater(ChillerHeaterNum).Report.QCond * SecInTimeStep;
     }
+}
+void WrapperSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::PlantCentralGSHP

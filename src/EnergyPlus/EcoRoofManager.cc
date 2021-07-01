@@ -64,6 +64,7 @@
 #include <EnergyPlus/EcoRoofManager.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -237,13 +238,13 @@ namespace EcoRoofManager {
                                         RoughSurf,
                                         AbsThermSurf,
                                         state.dataHeatBalSurf->TH(1, 1, SurfNum),
-                                        state.dataHeatBalSurf->HcExtSurf(SurfNum),
-                                        state.dataHeatBalSurf->HSkyExtSurf(SurfNum),
-                                        state.dataHeatBalSurf->HGrdExtSurf(SurfNum),
-                                        state.dataHeatBalSurf->HAirExtSurf(SurfNum));
+                                        state.dataHeatBalSurf->SurfHcExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHAirExt(SurfNum));
         }
 
-        RS = state.dataEnvrn->BeamSolarRad + state.dataHeatBal->AnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
+        RS = state.dataEnvrn->BeamSolarRad + state.dataSolarShading->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
         Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
                1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
@@ -475,16 +476,16 @@ namespace EcoRoofManager {
             if (state.dataConstruction->Construct(ConstrNum).CTFCross(0) > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
                 F1temp = state.dataConstruction->Construct(ConstrNum).CTFCross(0) /
-                         (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBal->HConvIn(SurfNum));
-                Qsoilpart1 = -state.dataHeatBalSurf->CTFConstOutPart(SurfNum) +
-                             F1temp * (state.dataHeatBalSurf->CTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
+                         (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
+                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
+                             F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                                        state.dataHeatBal->SurfQRadThermInAbs(SurfNum) +
                                        state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
-                                       state.dataHeatBal->HConvIn(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
+                                       state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
                                        state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum));
             } else {
-                Qsoilpart1 = -state.dataHeatBalSurf->CTFConstOutPart(SurfNum) +
-                             state.dataConstruction->Construct(ConstrNum).CTFCross(0) * state.dataHeatBalSurf->TempSurfIn(SurfNum);
+                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
+                             state.dataConstruction->Construct(ConstrNum).CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
                 F1temp = 0.0;
             }
 

@@ -2922,7 +2922,7 @@ namespace UnitarySystems {
                                                                   thisObjectName,
                                                                   DataLoopNode::NodeFluidType::Air,
                                                                   DataLoopNode::NodeConnectionType::Inlet,
-                                                                  1,
+                                                                  NodeInputManager::compFluidStream::Primary,
                                                                   DataLoopNode::ObjectIsParent);
 
         std::string loc_AirOutNodeName = input_data.air_outlet_node_name;
@@ -2934,7 +2934,7 @@ namespace UnitarySystems {
                                                                    thisObjectName,
                                                                    DataLoopNode::NodeFluidType::Air,
                                                                    DataLoopNode::NodeConnectionType::Outlet,
-                                                                   1,
+                                                                   NodeInputManager::compFluidStream::Primary,
                                                                    DataLoopNode::ObjectIsParent);
 
         // these are needed for call from GetOASysNumHeat(Cool)ingCoils
@@ -6543,7 +6543,7 @@ namespace UnitarySystems {
                                                                                thisObjectName,
                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                                               1,
+                                                                               NodeInputManager::compFluidStream::Primary,
                                                                                DataLoopNode::ObjectIsParent);
             } else {
                 // do nothing?
@@ -6583,7 +6583,7 @@ namespace UnitarySystems {
                                                                                        thisObjectName,
                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType::Inlet,
-                                                                                       3,
+                                                                                       NodeInputManager::compFluidStream::Tertiary,
                                                                                        DataLoopNode::ObjectIsNotParent);
                 this->m_HeatRecoveryOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                                         loc_heatRecoveryOutletNodeName,
@@ -6592,7 +6592,7 @@ namespace UnitarySystems {
                                                                                         thisObjectName,
                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                                                        3,
+                                                                                        NodeInputManager::compFluidStream::Tertiary,
                                                                                         DataLoopNode::ObjectIsNotParent);
 
                 BranchNodeConnections::TestCompSet(state,

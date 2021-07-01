@@ -146,7 +146,7 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
                                                              this->name,
                                                              DataLoopNode::NodeFluidType::Water,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             1,
+                                                             NodeInputManager::compFluidStream::Primary,
                                                              ObjectIsNotParent);
 
     // get outlet node num
@@ -157,7 +157,7 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
                                                               this->name,
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              1,
+                                                              NodeInputManager::compFluidStream::Primary,
                                                               ObjectIsNotParent);
 
     this->available = true;
@@ -284,7 +284,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                              objName,
                                                              DataLoopNode::NodeFluidType::Water,
                                                              DataLoopNode::NodeConnectionType::Inlet,
-                                                             1,
+                                                             NodeInputManager::compFluidStream::Primary,
                                                              ObjectIsNotParent);
 
     // get outlet node num
@@ -296,7 +296,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
                                                               objName,
                                                               DataLoopNode::NodeFluidType::Water,
                                                               DataLoopNode::NodeConnectionType::Outlet,
-                                                              1,
+                                                              NodeInputManager::compFluidStream::Primary,
                                                               ObjectIsNotParent);
     this->available = true;
     this->on = true;
@@ -1408,14 +1408,14 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
     // For convenience
     using json = nlohmann::json;
 
-    if (!FileSystem::fileExists(state.dataStrGlobals->outputGLHEFileName)) {
+    if (!FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
         // if the file doesn't exist, there are no data to read
         return;
     } else {
         // file exists -- read data and load if possible
 
         // open file
-        std::ifstream ifs(state.dataStrGlobals->outputGLHEFileName);
+        std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
 
         // create empty json object
         json json_in;
@@ -1427,7 +1427,7 @@ void GLHEVert::readCacheFileAndCompareWithThisGLHECache(EnergyPlusData &state)
         } catch (...) {
             if (!json_in.empty()) {
                 // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, state.dataStrGlobals->outputGLHEFileName + " contains invalid file format");
+                ShowWarningError(state, state.dataStrGlobals->outputGLHEFilePath.string() + " contains invalid file format");
             }
             ifs.close();
             return;
@@ -1485,11 +1485,11 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
     // For convenience
     using json = nlohmann::json;
 
-    if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFileName)) {
+    if (FileSystem::fileExists(state.dataStrGlobals->outputGLHEFilePath)) {
         // file exists -- add data
 
         // open file
-        std::ifstream ifs(state.dataStrGlobals->outputGLHEFileName);
+        std::ifstream ifs(state.dataStrGlobals->outputGLHEFilePath);
 
         // create empty json object
         json json_in;
@@ -1501,8 +1501,8 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
         } catch (...) {
             if (!json_in.empty()) {
                 // file exists, is not empty, but failed for some other reason
-                ShowWarningError(state, "Error reading from " + state.dataStrGlobals->outputGLHEFileName);
-                ShowWarningError(state, "Data from previous " + state.dataStrGlobals->outputGLHEFileName + " not saved");
+                ShowWarningError(state, "Error reading from " + state.dataStrGlobals->outputGLHEFilePath.string());
+                ShowWarningError(state, "Data from previous " + state.dataStrGlobals->outputGLHEFilePath.string() + " not saved");
             }
             ifs.close();
         }
@@ -1525,7 +1525,7 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
         if (state.files.outputControl.glhe) {
             // open output file
             std::ofstream ofs;
-            ofs.open(state.dataStrGlobals->outputGLHEFileName);
+            ofs.open(state.dataStrGlobals->outputGLHEFilePath);
             // write data to file, set spacing at 2
             ofs << std::setw(2) << json_out;
             // don't forget to close
@@ -1545,7 +1545,7 @@ void GLHEVert::writeGLHECacheToFile(EnergyPlusData &state) const
         if (state.files.outputControl.glhe) {
             // open output file
             std::ofstream ofs;
-            ofs.open(state.dataStrGlobals->outputGLHEFileName);
+            ofs.open(state.dataStrGlobals->outputGLHEFilePath);
             // write data to file, set spacing at 2
             ofs << std::setw(2) << json_out;
             // don't forget to close
@@ -3065,9 +3065,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     //       RE-ENGINEERED    na
 
     // Using/Aliasing
-    using DataPlant::TypeOf_GrndHtExchgSystem;
     using PlantUtilities::RegulateCondenserCompFlowReqOp;
-    using PlantUtilities::ScanPlantLoopsForObject;
     using PlantUtilities::SetComponentFlowRate;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3076,16 +3074,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
                       DataGlobalConstants::SecInHour;
 
     // Init more variables
-    if (this->myFlag) {
-        // Locate the hx on the plant loops for later usage
-        bool errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
-        if (errFlag) {
-            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
-        }
-        this->myFlag = false;
-    }
+    this->oneTimeInit(state);
 
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->initEnvironment(state, currTime);
@@ -3150,6 +3139,26 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 
 //******************************************************************************
 
+void GLHEVert::oneTimeInit(EnergyPlusData &state)
+{
+
+    using DataPlant::TypeOf_GrndHtExchgSystem;
+    using PlantUtilities::ScanPlantLoopsForObject;
+
+    if (this->myOneTImeInitFlag) {
+        // Locate the hx on the plant loops for later usage
+        bool errFlag = false;
+        ScanPlantLoopsForObject(
+            state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+        if (errFlag) {
+            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
+        }
+        this->myOneTImeInitFlag = false;
+    }
+}
+
+//******************************************************************************
+
 void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -3159,9 +3168,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     //       RE-ENGINEERED    na
 
     // Using/Aliasing
-    using DataPlant::TypeOf_GrndHtExchgSlinky;
     using PlantUtilities::RegulateCondenserCompFlowReqOp;
-    using PlantUtilities::ScanPlantLoopsForObject;
     using PlantUtilities::SetComponentFlowRate;
     using namespace GroundTemperatureManager;
 
@@ -3170,16 +3177,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
                      DataGlobalConstants::SecInHour;
 
     // Init more variables
-    if (this->myFlag) {
-        // Locate the hx on the plant loops for later usage
-        bool errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
-        if (errFlag) {
-            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
-        }
-        this->myFlag = false;
-    }
+    this->oneTimeInit(state);
 
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->initEnvironment(state, CurTime);
@@ -3225,6 +3223,25 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
     state.dataGroundHeatExchanger->currentSimTime = 0.0;
     this->QGLHE = 0.0;
     this->prevHour = 1;
+}
+
+//******************************************************************************
+
+void GLHESlinky::oneTimeInit(EnergyPlusData &state)
+{
+    using DataPlant::TypeOf_GrndHtExchgSlinky;
+    using PlantUtilities::ScanPlantLoopsForObject;
+
+    if (this->myOneTImeInitFlag) {
+        // Locate the hx on the plant loops for later usage
+        bool errFlag = false;
+        ScanPlantLoopsForObject(
+            state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+        if (errFlag) {
+            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
+        }
+        this->myOneTImeInitFlag = false;
+    }
 }
 
 //******************************************************************************

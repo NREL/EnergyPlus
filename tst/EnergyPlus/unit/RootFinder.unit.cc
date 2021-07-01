@@ -61,7 +61,7 @@ using namespace EnergyPlus;
 TEST_F(EnergyPlusFixture, RootFinder_CheckConvergence)
 {
     DataRootFinder::RootFinderDataType rootFinderData;
-    int slopeType = DataRootFinder::iSlopeDecreasing;
+    DataRootFinder::Slope slopeType = DataRootFinder::Slope::Decreasing;
     DataRootFinder::iMethod methodType = DataRootFinder::iMethod::Brent;
     Real64 relativeXTolerance = 0.0;
     Real64 absoluteXTolerance = 1.0e-6;
@@ -109,7 +109,7 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckConvergence)
 TEST_F(EnergyPlusFixture, RootFinder_CheckBracketRoundOff)
 {
     DataRootFinder::RootFinderDataType rootFinderData;
-    int slopeType = DataRootFinder::iSlopeDecreasing;
+    DataRootFinder::Slope slopeType = DataRootFinder::Slope::Decreasing;
     DataRootFinder::iMethod methodType = DataRootFinder::iMethod::Brent;
     Real64 relativeXTolerance = 0.0;
     Real64 absoluteXTolerance = 1.0e-6;

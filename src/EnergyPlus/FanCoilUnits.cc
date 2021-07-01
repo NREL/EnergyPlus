@@ -399,7 +399,7 @@ namespace FanCoilUnits {
                                                               Alphas(1),
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::NodeConnectionType::Inlet,
-                                                              1,
+                                                              NodeInputManager::compFluidStream::Primary,
                                                               ObjectIsParent); // air input node
 
             FanCoil(FanCoilNum).AirOutNode = GetOnlySingleNode(state,
@@ -409,7 +409,7 @@ namespace FanCoilUnits {
                                                                Alphas(1),
                                                                DataLoopNode::NodeFluidType::Air,
                                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                               1,
+                                                               NodeInputManager::compFluidStream::Primary,
                                                                ObjectIsParent); // air outlet node
 
             FanCoil(FanCoilNum).OAMixType = Alphas(7);
