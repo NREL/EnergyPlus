@@ -7264,18 +7264,19 @@ namespace SurfaceGeometry {
 
             Roughness = state.dataIPShortCut->cAlphaArgs(3);
             // Select the correct Number for the associated ascii name for the roughness type
-            if (UtilityRoutines::SameString(Roughness, "VeryRough"))
+            if (UtilityRoutines::SameString(Roughness, "VeryRough")) {
                 state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VeryRough;
-            if (UtilityRoutines::SameString(Roughness, "Rough"))
+            } else if (UtilityRoutines::SameString(Roughness, "Rough")) {
                 state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::Rough;
-            if (UtilityRoutines::SameString(Roughness, "MediumRough"))
+            } else if (UtilityRoutines::SameString(Roughness, "MediumRough")) {
                 state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumRough;
-            if (UtilityRoutines::SameString(Roughness, "MediumSmooth"))
+            } else if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) {
                 state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
-            if (UtilityRoutines::SameString(Roughness, "Smooth"))
+            } else if (UtilityRoutines::SameString(Roughness, "Smooth")) {
                 state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::Smooth;
-            if (UtilityRoutines::SameString(Roughness, "VerySmooth"))
+            } else if (UtilityRoutines::SameString(Roughness, "VerySmooth")) {
                 state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+            } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             // Was it set?
             if (state.dataSurface->ExtVentedCavity(Item).BaffleRoughness == DataSurfaces::SurfaceRoughness::Unassigned) {
@@ -11444,12 +11445,13 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
                     DataHeatBalance::MaterialGroup const MaterialLayerGroup = state.dataMaterial->Material(MaterNum).Group;
-                    if ((MaterialLayerGroup == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) ||
-                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) ||
-                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) ||
-                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::BlindEquivalentLayer) ||
-                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) ||
-                        (MaterialLayerGroup == DataHeatBalance::MaterialGroup::GapEquivalentLayer)) {
+                    if BITF_TEST_ANY (BITF(MaterialLayerGroup),
+                                      BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing) |
+                                          BITF(DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) |
+                                          BITF(DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) |
+                                          BITF(DataHeatBalance::MaterialGroup::BlindEquivalentLayer) |
+                                          BITF(DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) |
+                                          BITF(DataHeatBalance::MaterialGroup::GapEquivalentLayer)) {
                         ShowSevereError(state, "Invalid movable insulation material for " + cCurrentModuleObject + ":");
                         ShowSevereError(
                             state, "...Movable insulation material type specified = " + cMaterialGroupType(static_cast<int>(MaterialLayerGroup)));

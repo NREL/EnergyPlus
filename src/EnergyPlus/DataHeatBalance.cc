@@ -483,20 +483,11 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
 
         } else if (TotLayers == 1) {
 
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group ==
-                    DataHeatBalance::MaterialGroup::Shade ||
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group ==
-                    DataHeatBalance::MaterialGroup::WindowGas ||
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group ==
-                    DataHeatBalance::MaterialGroup::WindowGasMixture ||
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group ==
-                    DataHeatBalance::MaterialGroup::WindowBlind ||
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group ==
-                    DataHeatBalance::MaterialGroup::Screen ||
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group ==
-                    DataHeatBalance::MaterialGroup::ComplexWindowShade ||
-                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group ==
-                    DataHeatBalance::MaterialGroup::ComplexWindowGap) {
+            if BITF_TEST_ANY (BITF(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group),
+                              BITF(DataHeatBalance::MaterialGroup::Shade) | BITF(DataHeatBalance::MaterialGroup::WindowGas) |
+                                  BITF(DataHeatBalance::MaterialGroup::WindowGasMixture) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |
+                                  BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade) |
+                                  BITF(DataHeatBalance::MaterialGroup::ComplexWindowGap)) {
                 ShowSevereError(
                     state,
                     "CheckAndSetConstructionProperties: The single-layer window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
@@ -515,14 +506,13 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
             if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowGlass) ++TotGlassLayers;
             if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) ++TotGlassLayers;
-            if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Shade ||
-                state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowBlind ||
-                state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::Screen ||
-                state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ComplexWindowShade)
+            if BITF_TEST_ANY (BITF(state.dataMaterial->Material(MaterNum).Group),
+                              BITF(DataHeatBalance::MaterialGroup::Shade) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |
+                                  BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade))
                 ++TotShadeLayers;
-            if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowGas ||
-                state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::WindowGasMixture ||
-                state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::ComplexWindowGap)
+            if BITF_TEST_ANY (BITF(state.dataMaterial->Material(MaterNum).Group),
+                              BITF(DataHeatBalance::MaterialGroup::WindowGas) | BITF(DataHeatBalance::MaterialGroup::WindowGasMixture) |
+                                  BITF(DataHeatBalance::MaterialGroup::ComplexWindowGap))
                 ++TotGasLayers;
             if (Layer < TotLayers) {
                 MaterNumNext = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer + 1);

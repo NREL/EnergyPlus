@@ -5386,16 +5386,16 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (state.dataHeatBal->Ventilation(j).QuadratureSum) {
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->Ventilation(j).FanType); // ventilation type based calculation
-                    if (SELECT_CASE_var == DataHeatBalance::Vent::ExhaustVentilation) {
+                    if (SELECT_CASE_var == DataHeatBalance::VentilationType::Exhaust) {
                         state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).ExhMassFlowRate +=
                             state.dataZoneEquip->VentMCP(j) / CpAir;
-                    } else if (SELECT_CASE_var == DataHeatBalance::Vent::IntakeVentilation) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::VentilationType::Intake) {
                         state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).IntMassFlowRate +=
                             state.dataZoneEquip->VentMCP(j) / CpAir;
-                    } else if (SELECT_CASE_var == DataHeatBalance::Vent::NaturalVentilation) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::VentilationType::Natural) {
                         state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).NatMassFlowRate +=
                             state.dataZoneEquip->VentMCP(j) / CpAir;
-                    } else if (SELECT_CASE_var == DataHeatBalance::Vent::BalancedVentilation) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::VentilationType::Balanced) {
                         state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).BalMassFlowRate +=
                             state.dataZoneEquip->VentMCP(j) / CpAir;
                     }
@@ -5407,7 +5407,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (state.dataHeatBal->Ventilation(j).FanEfficiency > 0.0) {
                 state.dataHeatBal->Ventilation(j).FanPower =
                     VAMFL_temp * state.dataHeatBal->Ventilation(j).FanPressure / (state.dataHeatBal->Ventilation(j).FanEfficiency * AirDensity);
-                if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::Vent::BalancedVentilation)
+                if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced)
                     state.dataHeatBal->Ventilation(j).FanPower *= 2.0;
                 // calc electric
                 if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
@@ -5427,13 +5427,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 }
             }
             // Intake fans will add some heat to the air, raising the temperature for an intake fan...
-            if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::Vent::IntakeVentilation ||
-                state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::Vent::BalancedVentilation) {
+            if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Intake ||
+                state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced) {
                 if (VAMFL_temp == 0.0) {
                     OutletAirEnthalpy = EnthalpyExt;
                 } else {
                     if (state.dataHeatBal->Ventilation(j).FanPower > 0.0) {
-                        if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::Vent::BalancedVentilation) {
+                        if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced) {
                             OutletAirEnthalpy =
                                 EnthalpyExt + state.dataHeatBal->Ventilation(j).FanPower / VAMFL_temp / 2.0; // Half fan power to calculate inlet T
                         } else {

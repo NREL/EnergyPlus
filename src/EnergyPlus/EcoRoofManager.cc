@@ -629,7 +629,7 @@ namespace EcoRoofManager {
                 state.dataEcoRoofMgr->Zog = 0.0030;
             } else { // VeryRough
                 state.dataEcoRoofMgr->Zog = 0.005;
-            }
+            } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             Chng = pow_2(Kv / std::log(state.dataEcoRoofMgr->Za / state.dataEcoRoofMgr->Zog)) / rch; // bulk transfer coefficient near ground
             Chg = Gammah * ((1.0 - sigmaf) * Chng + sigmaf * Cfhn);
