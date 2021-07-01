@@ -118,11 +118,11 @@ namespace Psychrometrics {
         WFnTdbTwbPb,
         WFnTdbRhPb,
         PsatFnTemp,
-        TsatFnHPb ,
-        TsatFnPb ,
-        RhFnTdbRhov ,
-        RhFnTdbRhovLBnd0C ,
-        TwbFnTdbWPb2 ,
+        TsatFnHPb,
+        TsatFnPb,
+        RhFnTdbRhov,
+        RhFnTdbRhovLBnd0C,
+        TwbFnTdbWPb2,
         TwbFnTdbWPb3, // convergence,
         WFnTdbTwbPb2,
         TsatFnPb2, // iteration,
@@ -1364,13 +1364,13 @@ struct PsychrometricsData : BaseGlobalStruct
     Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
     Real64 Press_Save = -99999.0;
     Real64 tSat_Save = -99999.0;
-    Array1D_int iPsyErrIndex = Array1D_int(EnergyPlus::NumPsychMonitors, 0); // Number of times error occurred
+    std::array<int, EnergyPlus::NumPsychMonitors> iPsyErrIndex;
     std::string String;
     bool ReportErrors = true;
 
     void clear_state() override
     {
-        iPsyErrIndex = Array1D_int(EnergyPlus::NumPsychMonitors, 0);
+        iPsyErrIndex.fill(0);
         iconvTol = 0.0001;
         last_Patm = -99999.0;  // barometric pressure {Pascals}  (last)
         last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
