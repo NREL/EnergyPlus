@@ -102,10 +102,22 @@ jobs:
     - name: Add problem matcher
       run: echo "::add-matcher::.github/workflows/doc-problem-match.json"
 
-    - name: Build Docs
+    - name: Build a single doc which works because it's not in parallel
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
       run: |
-        cmake --build . -j 2 --target zPDF_InputOutputReference
+        cmake --build . --target zPDF_InputOutputReference
+
+    - name: Upload log folder
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: Xelatex_Logs_after_single_zPDF
+        path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\
+
+    - name: Build Docs in parallel after one first pass?
+      working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
+      run: |
+        cmake --build . -j 2
 
     # I made the BuildDOcumentation.cmake throw a FATAL_ERROR already on pass 2 and 3 of xelatex, so this is redundant now
     # but if you want to just build `--target zPDF_InputOutputReference` and test it here, I'm leaving it as an example
@@ -137,8 +149,8 @@ jobs:
         cat ~/AppData/Local/MiKTeX/miktex/log/xelatex.log || true
 
     - name: Upload log folder
-      if: ${{ failure() }}
+      if: ${{ always() }}
       uses: actions/upload-artifact@v2
       with:
-        name: Xelatex_Logs_after_zPDF
+        name: Xelatex_Logs_after_all
         path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\
