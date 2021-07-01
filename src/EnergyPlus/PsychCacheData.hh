@@ -134,8 +134,8 @@ struct PsychrometricCacheData : BaseGlobalStruct
 #endif
 
 #ifdef EP_psych_stats
-    Array1D<Int64> NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
-    Array1D_int NumIterations = Array1D_int(NumPsychMonitors, 0);
+    std::array<std::int64_t, EnergyPlus::NumPsychMonitors> NumTimesCalled;
+    std::array<int, EnergyPlus::NumPsychMonitors> NumIterations;
 #endif
 
     void clear_state() override
