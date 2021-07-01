@@ -153,6 +153,32 @@ namespace WindowManager {
 
     //****************************************************************************
 
+    void GetHeatBalanceEqCoefMatrix(EnergyPlusData &state,
+                                    int const SurfNum,
+                                    int const nglasslayer,
+                                    DataSurfaces::WinShadingType const ShadeFlag,
+                                    Real64 const sconsh,
+                                    Real64 const TauShIR,
+                                    Real64 const EpsShIR1,
+                                    Real64 const EpsShIR2,
+                                    Real64 const RhoShIR1,
+                                    Real64 const RhoShIR2,
+                                    Real64 const ShGlReflFacIR,
+                                    Real64 const RhoGlIR1,
+                                    Real64 const RhoGlIR2,
+                                    Real64 const hcv,           // Convection coefficient from gap glass or shade/blind to gap air (W/m2-K)
+                                    Real64 const TGapNew,       // Current-iteration average air temp in airflow gap (K)
+                                    Real64 TAirflowGapNew,      // Average air temp in airflow gap between glass panes (K)
+                                    Real64 const hcvAirflowGap, // Convection coefficient from airflow gap glass to airflow gap air (W/m2-K)
+                                    Array1A<Real64> hcvBG,      // Convection coefficient from gap glass or shade to gap gas (W/m2-K)
+                                    Array1A<Real64> TGapNewBG,
+                                    Array1A<Real64> AbsRadShadeFace,
+                                    Array2D<Real64> &Aface,
+                                    Array1D<Real64> &Bface,
+                                    Array1D<Real64> hr);
+
+    //****************************************************************************
+
     void SolveForWindowTemperatures(EnergyPlusData &state, int const SurfNum); // Surface number
 
     //****************************************************************************
