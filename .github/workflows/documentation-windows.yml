@@ -75,8 +75,11 @@ jobs:
         [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 1 (as expected)" || echo "TOC IS available for pass NO. 1"
         xelatex dependencies.tex
         nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
-        [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 2" || echo "TOC IS available for pass NO. 2"
-        [ "$nwords" -lt "10" ] && exit 1
+        if [ "$nwords" -lt "10" ]; then
+          echo "TOC isn't available for pass NO. 2"
+          exit 1
+        fi;
+        echo "TOC is available for pass NO.2"
 
     - name: Create Build Directory
       run: cmake -E make_directory ./doc/build/
