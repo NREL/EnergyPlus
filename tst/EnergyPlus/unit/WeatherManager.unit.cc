@@ -1175,7 +1175,7 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
         "  Yes,                     !- Use Weather File Daylight Saving Period",
         "  No,                      !- Apply Weekend Holiday Rule",
         "  Yes,                     !- Use Weather File Rain Indicators",
-        "  Yes,                     !- Use Weather File Snow Indicators", 
+        "  Yes,                     !- Use Weather File Snow Indicators",
         "  No,                      !-Treat Weather as Actual",
         "  Hour1;                   !-First Hour Interpolation Starting Values",
 
@@ -1209,8 +1209,8 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     state->dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(*state);
 
-    //int nRP = 1;
-    //WeatherManager::GetRunPeriodData(*state,
+    // int nRP = 1;
+    // WeatherManager::GetRunPeriodData(*state,
     //                                 nRP, // Total number of Run Periods requested
     //                                 ErrorsFound);
 
@@ -1221,10 +1221,10 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
     // WeatherManager::SetupEnvironmentTypes(*state);
 
-    //state->dataWeatherManager->Envrn = 1;
+    // state->dataWeatherManager->Envrn = 1;
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
-    //state->dataWeatherManager->Environment.allocate(1);
+    // state->dataWeatherManager->Environment.allocate(1);
     state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
     state->dataWeatherManager->Environment(1).StartMonth = 1;
     state->dataWeatherManager->Environment(1).StartDay = 1;
