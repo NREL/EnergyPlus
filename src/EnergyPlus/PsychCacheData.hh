@@ -153,8 +153,8 @@ struct PsychrometricCacheData : BaseGlobalStruct
         cached_Tsat_HPb.clear();
 #endif
 #ifdef EP_psych_stats
-        NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
-        NumIterations = Array1D_int(NumPsychMonitors, 0);
+        std::array<std::int64_t, EnergyPlus::NumPsychMonitors> NumTimesCalled;
+        std::array<int, EnergyPlus::NumPsychMonitors> NumIterations;
 #endif
     }
 };
