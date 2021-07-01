@@ -223,7 +223,7 @@ namespace Psychrometrics {
         Real64 AverageIterations;
 
         if (!auditFile.good()) return;
-        for (int item : dataPsychCache->NumTimesCalled) {
+        for (int item : state.dataPsychCache->NumTimesCalled) {
             if (item) { // if item is greater than 0
                 print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
                 for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
