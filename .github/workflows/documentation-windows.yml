@@ -2,7 +2,7 @@ name: Documentation Windows
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop, debug_windows_doc ]
 
 env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
@@ -115,3 +115,16 @@ jobs:
       with:
         name: InputOutputReference
         path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/
+
+    - name: Print log
+      if: ${{ failure() }}
+      shell: bash
+      run: |
+        cat ~/AppData/Local/MiKTeX/miktex/log/xelatex.log || true
+
+    - name: Upload log
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: InputOutputReference
+        path: C:\Users\runneradmin\AppData\Local\MiKTeX\miktex\log\xelatex.log
