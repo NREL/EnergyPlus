@@ -67,9 +67,10 @@ jobs:
     # This will install all required packages and does that in a single thread. So later in cmake we can safely run in parallel
     - name: Install required packages by building the Test document
       shell: bash
-      working-directory: ./doc/test/
+      working-directory: ./doc/
       run: |
-        # mpm --verbose --admin --require=@energyplus_packages_windows.lst
+        mpm --verbose --admin --require=@energyplus_packages_windows.lst
+        cd test/
         xelatex dependencies.tex
         nwords=$(pdftotext -f 2 -l 2 dependencies.pdf - | wc -w)
         [ "$nwords" -lt "10" ] && echo "TOC isn't available for pass NO. 1 (as expected)" || echo "TOC IS available for pass NO. 1"
