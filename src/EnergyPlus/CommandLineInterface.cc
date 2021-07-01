@@ -883,8 +883,8 @@ namespace CommandLineInterface {
             if (!ofs.good()) {
                 ShowFatalError(state, "EnergyPlus: Could not open file \"" + RVIfile.string() + "\" for output (write).");
             } else {
-                ofs << state.files.eso.filePath << '\n';
-                ofs << state.files.csv.filePath << '\n';
+                ofs << state.files.eso.filePath.string() << '\n';
+                ofs << state.files.csv.filePath.string() << '\n';
             }
         }
 
@@ -894,8 +894,8 @@ namespace CommandLineInterface {
             if (!ofs.good()) {
                 ShowFatalError(state, "EnergyPlus: Could not open file \"" + RVIfile.string() + "\" for output (write).");
             } else {
-                ofs << state.files.mtr.filePath << '\n';
-                ofs << state.files.mtr_csv.filePath << '\n';
+                ofs << state.files.mtr.filePath.string() << '\n';
+                ofs << state.files.mtr_csv.filePath.string() << '\n';
             }
         }
 

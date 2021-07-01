@@ -1201,13 +1201,11 @@ struct SurfacesData : BaseGlobalStruct
     bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
     bool AnyMovableInsulation = false;            // True if any movable insulation presents
     bool AnyMovableSlat = false;                  // True if there are any movable slats for window blinds presented
-    Array1D_int InsideGlassCondensationFlag;      // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
-    Array1D_int InsideFrameCondensationFlag;      // 1 if frame inside surface temp < zone air dew point; 0 otherwise
-    Array1D_int InsideDividerCondensationFlag;    // 1 if divider inside surface temp < zone air dew point;  0 otherwise
-    Array1D_int AdjacentZoneToSurface;            // Array of adjacent zones to each surface
-    Array1D<Real64> X0;                           // X-component of translation vector
-    Array1D<Real64> Y0;                           // Y-component of translation vector
-    Array1D<Real64> Z0;                           // Z-component of translation vector
+
+    Array1D_int SurfAdjacentZone; // Array of adjacent zones to each surface
+    Array1D<Real64> X0;           // X-component of translation vector
+    Array1D<Real64> Y0;           // Y-component of translation vector
+    Array1D<Real64> Z0;           // Z-component of translation vector
 
     std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
@@ -1225,22 +1223,22 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfHighTempErrCount;
 
     // Surface solar arrays
-    Array1D<Real64> SurfAirSkyRadSplit;     // Fractional split between the air and the sky for radiation from the surface
-                                            // Fraction of sky IR coming from sky itself; 1-SurfAirSkyRadSplit comes from the atmosphere.
-    Array2D<Real64> SurfSunCosHourly;       // Hourly values of SUNCOS (solar direction cosines)
-                                            // Autodesk: Init Zero-initialization added to avoid use uninitialized
-    Array1D<Real64> SurfSunlitArea;         // Sunlit area by surface number
-    Array1D<Real64> SurfSunlitFrac;         // Sunlit fraction by surface number
-    Array1D<Real64> SurfSkySolarInc;        // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse
-                                            // and beam solar from exterior obstructions [W/m2]
-    Array1D<Real64> SurfGndSolarInc;        // Incident diffuse solar from ground; if CalcSolRefl is true,
-                                            // accounts for shadowing of ground by building and obstructions [W/m2]
-    Array1D<Real64> SurfBmToBmReflFacObs;   // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> SurfBmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
-    Array1D<Real64> SurfBmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
-    Array1D<Real64> SurfSkyDiffReflFacGnd;  // sky diffuse reflection view factors from ground
-    Array1D<Real64> SurfOpaqAI;             // Time step value of factor for beam absorbed on inside of opaque surface
-    Array1D<Real64> SurfOpaqAO;             // Time step value of factor for beam absorbed on outside of opaque surface
+    Array1D<Real64> SurfAirSkyRadSplit;        // Fractional split between the air and the sky for radiation from the surface
+                                               // Fraction of sky IR coming from sky itself; 1-SurfAirSkyRadSplit comes from the atmosphere.
+    Array1D<Vector3<Real64>> SurfSunCosHourly; // Hourly values of SUNCOS (solar direction cosines)
+                                               // Autodesk: Init Zero-initialization added to avoid use uninitialized
+    Array1D<Real64> SurfSunlitArea;            // Sunlit area by surface number
+    Array1D<Real64> SurfSunlitFrac;            // Sunlit fraction by surface number
+    Array1D<Real64> SurfSkySolarInc;           // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse
+                                               // and beam solar from exterior obstructions [W/m2]
+    Array1D<Real64> SurfGndSolarInc;           // Incident diffuse solar from ground; if CalcSolRefl is true,
+                                               // accounts for shadowing of ground by building and obstructions [W/m2]
+    Array1D<Real64> SurfBmToBmReflFacObs;      // Factor for incident solar from specular beam refl from obstructions (W/m2)/(W/m2)
+    Array1D<Real64> SurfBmToDiffReflFacObs;    // Factor for incident solar from diffuse beam refl from obstructions (W/m2)/(W/m2)
+    Array1D<Real64> SurfBmToDiffReflFacGnd;    // Factor for incident solar from diffuse beam refl from ground
+    Array1D<Real64> SurfSkyDiffReflFacGnd;     // sky diffuse reflection view factors from ground
+    Array1D<Real64> SurfOpaqAI;                // Time step value of factor for beam absorbed on inside of opaque surface
+    Array1D<Real64> SurfOpaqAO;                // Time step value of factor for beam absorbed on outside of opaque surface
     Array1D<int> SurfPenumbraID;
 
     // Surface reflectance
@@ -1325,6 +1323,10 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIntConvSurfHasActiveInIt;
 
     // Surface Window Heat Balance
+    Array1D_int SurfWinInsideGlassCondensationFlag;   // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
+    Array1D_int SurfWinInsideFrameCondensationFlag;   // 1 if frame inside surface temp < zone air dew point; 0 otherwise
+    Array1D_int SurfWinInsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;  0 otherwise
+
     Array2D<Real64> SurfWinA;            // Time step value of factor for beam absorbed in window glass layers
     Array2D<Real64> SurfWinADiffFront;   // Time step value of factor for diffuse absorbed in window layers
     Array2D<Real64> SurfWinACFOverlap;   // Time step value of factor for beam absorbed in window glass layers which comes from other windows
@@ -1456,8 +1458,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio;  // Ratio of frame edge of glass conductance (without air films) to center of glass conductance
                                                        // (without air films)
     Array1D<Real64> SurfWinFrameEdgeArea;              // Area of glass near frame (m2)
-    Array1D<Real64> SurfWinFrameTempSurfIn;            // Frame inside surface temperature (C)
-    Array1D<Real64> SurfWinFrameTempSurfInOld;         // Previous value of frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempIn;                // Frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempInOld;             // Previous value of frame inside surface temperature (C)
     Array1D<Real64> SurfWinFrameTempSurfOut;           // Frame outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrFrOut;              // Correction factor to absorbed radiation due to frame outside projection
     Array1D<Real64> SurfWinProjCorrFrIn;               // Correction factor to absorbed radiation due to frame inside projection
@@ -1470,8 +1472,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinDivEdgeToCenterGlCondRatio; // Ratio of divider edge of glass conductance (without air films) to center of glass
                                                        // conductance (without air films)
     Array1D<Real64> SurfWinDividerEdgeArea;            // Area of glass near dividers (m2)
-    Array1D<Real64> SurfWinDividerTempSurfIn;          // Divider inside surface temperature (C)
-    Array1D<Real64> SurfWinDividerTempSurfInOld;       // Previous value of divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempIn;              // Divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempInOld;           // Previous value of divider inside surface temperature (C)
     Array1D<Real64> SurfWinDividerTempSurfOut;         // Divider outside surface temperature (C)
     Array1D<Real64> SurfWinProjCorrDivOut;             // Correction factor to absorbed radiation due to divider outside projection
     Array1D<Real64> SurfWinProjCorrDivIn;              // Correction factor to absorbed radiation due to divider inside projection
@@ -1592,10 +1594,10 @@ struct SurfacesData : BaseGlobalStruct
         this->ShadingTransmittanceVaries = false;
         this->AnyMovableInsulation = false;
         this->AnyMovableSlat = false;
-        this->InsideGlassCondensationFlag.deallocate();
-        this->InsideFrameCondensationFlag.deallocate();
-        this->InsideDividerCondensationFlag.deallocate();
-        this->AdjacentZoneToSurface.deallocate();
+        this->SurfWinInsideGlassCondensationFlag.deallocate();
+        this->SurfWinInsideFrameCondensationFlag.deallocate();
+        this->SurfWinInsideDividerCondensationFlag.deallocate();
+        this->SurfAdjacentZone.deallocate();
         this->X0.deallocate();
         this->Y0.deallocate();
         this->Z0.deallocate();
@@ -1802,8 +1804,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinFrameEmis.deallocate();
         this->SurfWinFrEdgeToCenterGlCondRatio.deallocate();
         this->SurfWinFrameEdgeArea.deallocate();
-        this->SurfWinFrameTempSurfIn.deallocate();
-        this->SurfWinFrameTempSurfInOld.deallocate();
+        this->SurfWinFrameTempIn.deallocate();
+        this->SurfWinFrameTempInOld.deallocate();
         this->SurfWinFrameTempSurfOut.deallocate();
         this->SurfWinProjCorrFrOut.deallocate();
         this->SurfWinProjCorrFrIn.deallocate();
@@ -1815,8 +1817,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinDividerEmis.deallocate();
         this->SurfWinDivEdgeToCenterGlCondRatio.deallocate();
         this->SurfWinDividerEdgeArea.deallocate();
-        this->SurfWinDividerTempSurfIn.deallocate();
-        this->SurfWinDividerTempSurfInOld.deallocate();
+        this->SurfWinDividerTempIn.deallocate();
+        this->SurfWinDividerTempInOld.deallocate();
         this->SurfWinDividerTempSurfOut.deallocate();
         this->SurfWinProjCorrDivOut.deallocate();
         this->SurfWinProjCorrDivIn.deallocate();

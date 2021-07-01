@@ -622,6 +622,8 @@ namespace FuelCellElectricGenerator {
                                   bool FirstHVACIteration);
 
         void UpdateFuelCellGeneratorRecords(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void getFuelCellInput(EnergyPlusData &state);

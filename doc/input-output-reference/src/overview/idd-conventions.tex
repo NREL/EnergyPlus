@@ -3,7 +3,8 @@
 The following is a basic description of the structure of the IDD (it's actually taken directly from the IDD file). As noted within, \textbf{!} signifies a comment character as does the \textbf{\textbackslash{}}. \textbf{\textbackslash{}} has also been adopted as a convention for including more specific comments about each field in an object. These have been used with success in the IDFEditor and it is hoped the flexibility will provide other interface developers with useful information.
 
 \begin{lstlisting}
-!IDD_Version **VERSION NUMBER**
+!IDD_Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}
+!IDD_BUILD ${CMAKE_VERSION_BUILD}
 ! **************************************************************************
 ! This file is the Input Data Dictionary (IDD) for EnergyPlus.
 ! The IDD defines the syntax and data model for each type of input "Object."
@@ -13,14 +14,14 @@ The following is a basic description of the structure of the IDD (it's actually 
 ! ------------------
 ! To define an object (a record with data), develop a key word that is unique
 ! Each data item to the object can be A (Alphanumeric string) or N (numeric)
-! Number each A and N.  This will show how the data items will be put into the
+! Number each A and N. This will show how the data items will be put into the
 ! arrays that are passed to the Input Processor "Get" (GetObjectItem) routines.
-! All alpha fields are limited to 100 characters.  Numeric fields should be
+! All alpha fields are limited to 100 characters. Numeric fields should be
 ! valid numerics (can include such as 1.0E+05) and are placed into double
 ! precision variables.
 !
 ! NOTE: Even though a field may be optional, a comma representing that field
-!   must be included (unless it is the last field in the object).  Since the
+!   must be included (unless it is the last field in the object). Since the
 !   entire input is "field-oriented" and not "keyword-oriented", the EnergyPlus
 !   Input Processor must have some representation (even if blank) for each
 !   field.
@@ -28,7 +29,7 @@ The following is a basic description of the structure of the IDD (it's actually 
 ! Object Documentation
 ! --------------------
 ! In addition, the following special comments appear one per line and
-! most are followed by a value.  Comments may apply to a field or the object
+! most are followed by a value. Comments may apply to a field or the object
 ! or a group of objects.
 !
 ! Field-level comments:
@@ -39,11 +40,14 @@ The following is a basic description of the structure of the IDD (it's actually 
 !  \note            Note describing the field and its valid values. If multiple lines,
 !                   start each line with \note. Limit line length to 100 characters.
 !
-!  \required-field  To flag fields which may not be left blank
+!  \required-field  To flag fields which must have a value. If the idf input is blank and
+!                   there is a \default, then the default will be used. However, as of v8.6.0
+!                   the use of \required-field and \default on the same field is discouraged
+!                   and instances with both have been changed.
 !                     (this comment has no "value")
 !
 !  \begin-extensible  Marks the first field at which the object accepts an extensible
-!                   field set.  A fixed number of fields from this marker define the
+!                   field set. A fixed number of fields from this marker define the
 !                   extensible field set, see the object code \extensible for
 !                   more information.
 !
@@ -66,7 +70,10 @@ The following is a basic description of the structure of the IDD (it's actually 
 !
 !  \maximum<        Maximum that must be < than the following value
 !
-!  \default         Default for the field (if N/A then omit entire line)
+!  \default         Default for the field (if N/A then omit entire line). If a default is
+!                   added to an existing field, then \required-field should be removed if present.
+!                   Defaults are filled in only if the field is within \min-fields, or the actual
+!                   object is longer than this field.
 !
 !  \deprecated      This field is not really used and will be deleted from the object.
 !                   The required information is gotten internally or
@@ -74,14 +81,14 @@ The following is a basic description of the structure of the IDD (it's actually 
 !
 !  \autosizable     Flag to indicate that this field can be used with the Auto
 !                   Sizing routines to produce calculated results for the
-!                   field.  If a value follows this, then that will be used
-!                   when the "Autosize" feature is flagged.  To trigger
+!                   field. If a value follows this, then that will be used
+!                   when the "Autosize" feature is flagged. To trigger
 !                   autosizing for a field, enter Autosize as the field's
-!                   value.  Only applicable to numeric fields.
+!                   value. Only applicable to numeric fields.
 !
-! \autocalculatable Flag to indicate that this field can be automatically
+!  \autocalculatable Flag to indicate that this field can be automatically
 !                   calculated. To trigger auto calculation for a field, enter
-!                   Autocalculate as the field's value.  Only applicable to
+!                   Autocalculate as the field's value. Only applicable to
 !                   numeric fields.
 !
 !  \type            Type of data for the field -
@@ -155,26 +162,26 @@ The following is a basic description of the structure of the IDD (it's actually 
 !                     (this comment has no "value")
 !
 !  \min-fields      Minimum number of fields that should be included in the
-!                   object.  If appropriate, the Input Processor will fill
+!                   object. If appropriate, the Input Processor will fill
 !                   any missing fields with defaults (for numeric fields).
 !                   It will also supply that number of fields to the "get"
 !                   routines using blanks for alpha fields (note -- blanks
 !                   may not be allowable for some alpha fields).
 !
 !  \obsolete        This object has been replaced though is kept (and is read)
-!                   in the current version.  Please refer to documentation as
-!                   to the dispersal of the object.  If this object is
+!                   in the current version. Please refer to documentation as
+!                   to the dispersal of the object. If this object is
 !                   encountered in an IDF, the InputProcessor will post an
 !                   appropriate message to the error file.
-!                   usage:  \obsolete New = >[New object name]
+!                   usage:  \obsolete New=>[New object name]
 !
-!  \extensible:<\#>  This object is dynamically extensible -- meaning, if you
+!  \extensible:<#>  This object is dynamically extensible -- meaning, if you
 !           change the IDD appropriately (if the object has a simple list
 !           structure -- just add items to the list arguments (i.e. BRANCH
 !           LIST). These will be automatically redimensioned and used during
-!           the simulation. <\#> should be entered by the developer to signify
+!           the simulation. <#> should be entered by the developer to signify
 !           how many of the last fields are needed to be extended (and EnergyPlus
-!           will attempt to auto-extend the object).  The first field of the first
+!           will attempt to auto-extend the object). The first field of the first
 !           instance of the extensible field set is marked with \begin-extensible.
 !
 !  \begin-extensible See previous item, marks beginning of extensible fields in
@@ -207,10 +214,10 @@ The following is a basic description of the structure of the IDD (it's actually 
 ! Notes on comments
 ! -----------------
 !
-! 1.  If a particular comment is not applicable (such as units, or default)
+! 1. If a particular comment is not applicable (such as units, or default)
 ! then simply omit the comment rather than indicating N/A.
 !
-! 2.  Memos and notes should be brief (recommend 5 lines or less per block).
+! 2. Memos and notes should be brief (recommend 5 lines or less per block).
 ! More extensive explanations are expected to be in the user documentation
 \end{lstlisting}
 
