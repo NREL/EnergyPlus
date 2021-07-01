@@ -150,6 +150,10 @@ namespace OutputReportPredefined {
         s->pdchFenUfact = newPreDefColumn(state, s->pdstFen, "Glass U-Factor [W/m2-K]");
         s->pdchFenSHGC = newPreDefColumn(state, s->pdstFen, "Glass SHGC");
         s->pdchFenVisTr = newPreDefColumn(state, s->pdstFen, "Glass Visible Transmittance");
+        s->pdchFenAssemNfrcType = newPreDefColumn(state, s->pdstFen, "NFRC Product Type");
+        s->pdchFenAssemUfact = newPreDefColumn(state, s->pdstFen, "Assembly U-Factor [W/m2-K]");
+        s->pdchFenAssemSHGC = newPreDefColumn(state, s->pdstFen, "Assembly SHGC");
+        s->pdchFenAssemVisTr = newPreDefColumn(state, s->pdstFen, "Assembly Visible Transmittance");
         s->pdchFenFrameConductance = newPreDefColumn(state, s->pdstFen, "Frame Conductance [W/m2-K]");
         s->pdchFenDividerConductance = newPreDefColumn(state, s->pdstFen, "Divider Conductance [W/m2-K]");
         s->pdchFenSwitchable = newPreDefColumn(state, s->pdstFen, "Shade Control");
@@ -171,6 +175,10 @@ namespace OutputReportPredefined {
         // s->pdchIntFenDividerAreaOf1 =   newPreDefColumn(state, s->pdstIntFen,'Divider Area [m2]')
         // s->pdchIntFenFrameConductance =  newPreDefColumn(state, s->pdstIntFen,'Frame Conductance [W/m2-K]')
         // s->pdchIntFenDividerConductance =  newPreDefColumn(state, s->pdstIntFen,'Divider Conductance [W/m2-K]')
+        s->pdchIntFenAssemNfrcType = newPreDefColumn(state, s->pdstIntFen, "NFRC Product Type");
+        s->pdchIntFenAssemUfact = newPreDefColumn(state, s->pdstIntFen, "Assembly U-Factor [W/m2-K]");
+        s->pdchIntFenAssemSHGC = newPreDefColumn(state, s->pdstIntFen, "Assembly SHGC");
+        s->pdchIntFenAssemVisTr = newPreDefColumn(state, s->pdstIntFen, "Assembly Visible Transmittance");
         s->pdchIntFenParent = newPreDefColumn(state, s->pdstIntFen, "Parent Surface");
 
         s->pdstDoor = newPreDefSubTable(state, s->pdrEnvelope, "Exterior Door");

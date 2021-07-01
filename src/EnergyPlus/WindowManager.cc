@@ -7372,7 +7372,10 @@ namespace WindowManager {
                       "Glass Distance {m}");
 
             if (state.dataWindowManager->HasComplexWindows)
-                print(state.files.eio, "{}\n", "! <WindowConstruction:Complex>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC");
+                print(state.files.eio,
+                      "{}\n",
+                      "! <WindowConstruction:Complex>,Construction Name,Index,#Layers,U-factor {W/m2-K},SHGC"
+                      "NFRC Product Type,Assembly U-Factor {W/m2-K},Assembly SHGC,Assembly Visible Transmittance");
 
             if (state.dataWindowManager->HasEQLWindows)
                 print(state.files.eio,

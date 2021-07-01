@@ -357,6 +357,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFenUfact = 0;
     int pdchFenSHGC = 0;
     int pdchFenVisTr = 0;
+    int pdchFenAssemNfrcType = 0;
+    int pdchFenAssemUfact = 0;
+    int pdchFenAssemSHGC = 0;
+    int pdchFenAssemVisTr = 0;
     int pdchFenFrameConductance = 0;
     int pdchFenDividerConductance = 0;
     int pdchFenSwitchable = 0;
@@ -383,6 +387,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchIntFenUfact = 0;
     int pdchIntFenSHGC = 0;
     int pdchIntFenVisTr = 0;
+    int pdchIntFenAssemNfrcType = 0;
+    int pdchIntFenAssemUfact = 0;
+    int pdchIntFenAssemSHGC = 0;
+    int pdchIntFenAssemVisTr = 0;
     int pdchIntFenParent = 0;
 
     // Shading Report
