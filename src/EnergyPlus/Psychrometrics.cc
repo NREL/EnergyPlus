@@ -227,9 +227,9 @@ namespace Psychrometrics {
             print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
             for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
                 if (!PsyReportIt(Loop)) continue;
-                const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled(Loop));
-                if (state.dataPsychCache->NumIterations(Loop) > 0) {
-                    AverageIterations = double(state.dataPsychCache->NumIterations(Loop)) / double(state.dataPsychCache->NumTimesCalled(Loop));
+                const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
+                if (state.dataPsychCache->NumIterations[Loop] > 0) {
+                    AverageIterations = double(state.dataPsychCache->NumIterations[Loop]) / double(state.dataPsychCache->NumTimesCalled[Loop]);
                     print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames(Loop), istring, AverageIterations);
                 } else {
                     print(auditFile, "{},{}\n", PsyRoutineNames(Loop), istring);
@@ -368,7 +368,7 @@ namespace Psychrometrics {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
+        ++state.dataPsychrometrics->NumTimesCalled[psychrometricsError::TwbFnTdbWPb_cache];
 #endif
 
         DISABLE_WARNING_PUSH
@@ -997,7 +997,7 @@ namespace Psychrometrics {
         }
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::TsatFnHPb));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::TsatFnHPb)];
 #endif
 
         FlagError = false;

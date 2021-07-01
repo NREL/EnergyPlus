@@ -518,7 +518,7 @@ namespace Psychrometrics {
         // ASHRAE handbook 1993 Fundamentals,
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::RhFnTdbRhovLBnd0C));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::RhFnTdbRhovLBnd0C)];
 #endif
 
         Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) *
@@ -595,7 +595,7 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 28
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::VFnTdbWPb));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::VFnTdbWPb)];
 #endif
 
         Real64 const w(max(dW, 1.0e-5));                                           // humidity ratio
@@ -642,7 +642,7 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P100, EQN 32
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::WFnTdbH));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::WFnTdbH)];
 #endif
 
         Real64 const W((H - 1.00484e3 * TDB) / (2.50094e6 + 1.85895e3 * TDB)); // humidity ratio
@@ -697,7 +697,7 @@ namespace Psychrometrics {
         std::uint64_t constexpr Grid_Shift = 64 - 12 - psatprecision_bits;
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::PsatFnTemp_cache));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::PsatFnTemp_cache)];
 #endif
 
         DISABLE_WARNING_PUSH
@@ -755,7 +755,7 @@ namespace Psychrometrics {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::TwbFnTdbWPb_cache));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::TwbFnTdbWPb_cache));
 #endif
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
@@ -853,7 +853,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyRhFnTdbRhov");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::RhFnTdbRhov));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::RhFnTdbRhov)];
 #endif
 
         Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) / PsyPsatFnTemp(state, Tdb, RoutineName)
@@ -904,7 +904,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyRhFnTdbWPb");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::RhFnTdbWPb));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::RhFnTdbWPb)];
 #endif
 
         Real64 const PWS(PsyPsatFnTemp(state, TDB, (CalledFrom.empty() ? RoutineName : CalledFrom))); // Pressure -- saturated for pure water
@@ -962,7 +962,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyWFnTdpPb");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::WFnTdpPb));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::WFnTdpPb)];
 #endif
 
         Real64 const PDEW(
@@ -1025,7 +1025,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyWFnTdbRhPb");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::WFnTdbRhPb));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::WFnTdbRhPb)];
 #endif
 
         Real64 const PDEW(RH *
@@ -1091,7 +1091,7 @@ namespace Psychrometrics {
         static std::string const RoutineName("PsyWFnTdbTwbPb");
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::WFnTdbTwbPb));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::WFnTdbTwbPb)];
 #endif
 
         Real64 TWB(TWBin); // test wet-bulb temperature
@@ -1240,7 +1240,7 @@ namespace Psychrometrics {
         // This function calculates the dew-point temperature {C} from dry-bulb, wet-bulb and pressure.
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled(static_cast<int>(psychrometricsError::TdpFnTdbTwbPb));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::TdpFnTdbTwbPb)];
 #endif
 
         Real64 const W(max(PsyWFnTdbTwbPb(state, TDB, TWB, PB, CalledFrom), 1.0e-5));
