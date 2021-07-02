@@ -106,30 +106,6 @@ namespace Psychrometrics {
     // MODULE PARAMETER DEFINITIONS:
     // call for recurring errors
 
-    enum class psychrometricsError : int
-    {
-        Unassigned = -1,
-        TdpFnTdbTwbPb,
-        RhFnTdbWPb,
-        TwbFnTdbWPb,
-        VFnTdbWPb,
-        WFnTdpPb,
-        WFnTdbH,
-        WFnTdbTwbPb,
-        WFnTdbRhPb,
-        PsatFnTemp,
-        TsatFnHPb,
-        TsatFnPb,
-        RhFnTdbRhov,
-        RhFnTdbRhovLBnd0C,
-        TwbFnTdbWPb2,
-        TwbFnTdbWPb3, // convergence,
-        WFnTdbTwbPb2,
-        TsatFnPb2, // iteration,
-        TwbFnTdbWPb_cache,
-        PsatFnTemp_cache
-    };
-
 #ifdef EP_psych_stats
     extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 -
                                                  // max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
@@ -1364,7 +1340,7 @@ struct PsychrometricsData : BaseGlobalStruct
     Real64 last_tBoil = -99999.0; // Boiling temperature of water at given pressure (last)
     Real64 Press_Save = -99999.0;
     Real64 tSat_Save = -99999.0;
-    std::array<int, EnergyPlus::NumPsychMonitors> iPsyErrIndex;
+    std::array<int, static_cast<int>(EnergyPlus::psychrometricsError::Num)> iPsyErrIndex;
     std::string String;
     bool ReportErrors = true;
 

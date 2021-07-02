@@ -107,7 +107,7 @@ namespace Psychrometrics {
 #endif
 
 #ifdef EP_psych_stats
-    Array1D_string const PsyRoutineNames(NumPsychMonitors,
+    Array1D_string const PsyRoutineNames(static_cast<int>(psychrometricsError::Num),
                                          {"PsyTdpFnTdbTwbPb",
                                           "PsyRhFnTdbWPb",
                                           "PsyTwbFnTdbWPb",
@@ -131,7 +131,7 @@ namespace Psychrometrics {
                                                                    // PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw
                                                                    // (raw calc)
 
-    Array1D_bool const PsyReportIt(NumPsychMonitors,
+    Array1D_bool const PsyReportIt(static_cast<int>(psychrometricsError::Num),
                                    {true,
                                     true,
                                     true,
@@ -226,7 +226,7 @@ namespace Psychrometrics {
         for (int item : state.dataPsychCache->NumTimesCalled) {
             if (item) { // if item is greater than 0
                 print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
-                for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
+                for (Loop = 1; Loop <= static_cast<int>(psychrometricsError::Num); ++Loop) {
                     if (!PsyReportIt(Loop)) continue;
                     const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
                     if (state.dataPsychCache->NumIterations[Loop] > 0) {

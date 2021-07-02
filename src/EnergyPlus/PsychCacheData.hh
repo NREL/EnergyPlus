@@ -52,7 +52,30 @@
 
 namespace EnergyPlus {
 
-constexpr int NumPsychMonitors = 19; // Parameterization of Number of psychrometric routines that
+enum class psychrometricsError : int
+{
+    Unassigned = -1,
+    TdpFnTdbTwbPb,
+    RhFnTdbWPb,
+    TwbFnTdbWPb,
+    VFnTdbWPb,
+    WFnTdpPb,
+    WFnTdbH,
+    WFnTdbTwbPb,
+    WFnTdbRhPb,
+    PsatFnTemp,
+    TsatFnHPb,
+    TsatFnPb,
+    RhFnTdbRhov,
+    RhFnTdbRhovLBnd0C,
+    TwbFnTdbWPb2,
+    TwbFnTdbWPb3, // convergence,
+    WFnTdbTwbPb2,
+    TsatFnPb2, // iteration,
+    TwbFnTdbWPb_cache,
+    PsatFnTemp_cache,
+    Num // The number of enums in this enum class
+};
 
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
@@ -134,8 +157,8 @@ struct PsychrometricCacheData : BaseGlobalStruct
 #endif
 
 #ifdef EP_psych_stats
-    std::array<std::int64_t, EnergyPlus::NumPsychMonitors> NumTimesCalled;
-    std::array<int, EnergyPlus::NumPsychMonitors> NumIterations;
+    std::array<std::int64_t, static_cast<int>(psychrometricsError::Num)> NumTimesCalled;
+    std::array<int, static_cast<int>(psychrometricsError::Num)> NumIterations;
 #endif
 
     void clear_state() override
