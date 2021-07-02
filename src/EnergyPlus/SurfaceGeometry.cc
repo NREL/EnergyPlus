@@ -2472,13 +2472,14 @@ namespace SurfaceGeometry {
                     // Use the new generic code (assuming only one blind) as follows
                     for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
                         iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
-                        if (state.dataMaterial->Material(iTmp2).Group == WindowBlind) {
+                        if (state.dataMaterial->Material(iTmp2).Group == DataHeatBalance::MaterialGroup::WindowBlind) {
                             BlNum = state.dataMaterial->Material(iTmp2).BlindDataPtr;
                             state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
                             // TH 2/18/2010. CR 8010
                             // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
                             //  the new blind is created only once, it can be shared by multiple windows though.
-                            if (state.dataSurface->SurfWinMovableSlats(SurfNum) && state.dataHeatBal->Blind(BlNum).SlatAngleType != VariableSlats) {
+                            if (state.dataSurface->SurfWinMovableSlats(SurfNum) &&
+                                state.dataHeatBal->Blind(BlNum).SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
                                 errFlag = false;
                                 AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
                                 // point to the new blind
@@ -3151,7 +3152,7 @@ namespace SurfaceGeometry {
         Real64 SchedMaxValue;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
-        if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if ((TotDetachedFixed + TotDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
             ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
 
@@ -3328,7 +3329,8 @@ namespace SurfaceGeometry {
         int ItemsToGet;
         SurfaceClass ClassItem;
 
-        if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if ((TotRectDetachedFixed + TotRectDetachedBldg) > 0 &&
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
             ShowWarningError(state, "Detached shading effects are ignored when Solar Distribution = MinimalShadowing");
         }
 
@@ -5790,7 +5792,8 @@ namespace SurfaceGeometry {
 
         if ((state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Window ||
              state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor) &&
-            state.dataHeatBal->SolarDistribution > MinimalShadowing && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier > 1.0) {
+            static_cast<int>(state.dataHeatBal->SolarDistribution) > static_cast<int>(DataHeatBalance::Shadowing::MinimalShadowing) &&
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier > 1.0) {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state,
                                  cRoutineName + ": A Multiplier > 1.0 for window/glass door " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
@@ -5809,8 +5812,9 @@ namespace SurfaceGeometry {
             for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                 LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                 if (LayerPtr == 0) continue; // Error is caught already, will terminate later
-                if (state.dataMaterial->Material(LayerPtr).Group == Shade || state.dataMaterial->Material(LayerPtr).Group == WindowBlind ||
-                    state.dataMaterial->Material(LayerPtr).Group == Screen)
+                if (state.dataMaterial->Material(LayerPtr).Group == DataHeatBalance::MaterialGroup::Shade ||
+                    state.dataMaterial->Material(LayerPtr).Group == DataHeatBalance::MaterialGroup::WindowBlind ||
+                    state.dataMaterial->Material(LayerPtr).Group == DataHeatBalance::MaterialGroup::Screen)
                     ++NumShades;
             }
             if (NumShades != 0) {
@@ -5830,7 +5834,7 @@ namespace SurfaceGeometry {
             if (ConstrNum > 0) {
                 for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
                     LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-                    if (state.dataMaterial->Material(LayerPtr).Group == WindowGlass &&
+                    if (state.dataMaterial->Material(LayerPtr).Group == DataHeatBalance::MaterialGroup::WindowGlass &&
                         state.dataMaterial->Material(LayerPtr).GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state, cRoutineName + ": Interior Window or GlassDoor " + SubSurfaceName + " has a glass layer with");
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
@@ -6142,7 +6146,7 @@ namespace SurfaceGeometry {
         Real64 SchedMinValue;
         Real64 SchedMaxValue;
 
-        if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if (TotShdSubs > 0 && state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -6355,7 +6359,8 @@ namespace SurfaceGeometry {
         Real64 TiltAngle;
         bool MakeFin;
 
-        if ((TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection) > 0 && state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+        if ((TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection) > 0 &&
+            state.dataHeatBal->SolarDistribution == DataHeatBalance::Shadowing::MinimalShadowing) {
             ShowWarningError(state, "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing");
         }
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -7259,15 +7264,22 @@ namespace SurfaceGeometry {
 
             Roughness = state.dataIPShortCut->cAlphaArgs(3);
             // Select the correct Number for the associated ascii name for the roughness type
-            if (UtilityRoutines::SameString(Roughness, "VeryRough")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = VeryRough;
-            if (UtilityRoutines::SameString(Roughness, "Rough")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Rough;
-            if (UtilityRoutines::SameString(Roughness, "MediumRough")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = MediumRough;
-            if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = MediumSmooth;
-            if (UtilityRoutines::SameString(Roughness, "Smooth")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = Smooth;
-            if (UtilityRoutines::SameString(Roughness, "VerySmooth")) state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = VerySmooth;
+            if (UtilityRoutines::SameString(Roughness, "VeryRough")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VeryRough;
+            } else if (UtilityRoutines::SameString(Roughness, "Rough")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::Rough;
+            } else if (UtilityRoutines::SameString(Roughness, "MediumRough")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumRough;
+            } else if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
+            } else if (UtilityRoutines::SameString(Roughness, "Smooth")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::Smooth;
+            } else if (UtilityRoutines::SameString(Roughness, "VerySmooth")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+            } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             // Was it set?
-            if (state.dataSurface->ExtVentedCavity(Item).BaffleRoughness == 0) {
+            if (state.dataSurface->ExtVentedCavity(Item).BaffleRoughness == DataSurfaces::SurfaceRoughness::Unassigned) {
                 ShowSevereError(state,
                                 cCurrentModuleObject + "=\"" + state.dataSurface->ExtVentedCavity(Item).Name + "\", invalid " +
                                     state.dataIPShortCut->cAlphaFieldNames(3) + "=\"" + state.dataIPShortCut->cAlphaArgs(3));
@@ -9410,7 +9422,8 @@ namespace SurfaceGeometry {
             }
 
             if (state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice > 0) {
-                if (state.dataMaterial->Material(state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice).Group == Screen &&
+                if (state.dataMaterial->Material(state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice).Group ==
+                        DataHeatBalance::MaterialGroup::Screen &&
                     !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
                     ErrorsFound = true;
                     ShowSevereError(state,
@@ -9427,7 +9440,7 @@ namespace SurfaceGeometry {
                                 ->Material(
                                     state.dataConstruction->Construct(state.dataSurface->WindowShadingControl(ControlNum).getInputShadedConstruction)
                                         .LayerPoint(1))
-                                .Group == Screen &&
+                                .Group == DataHeatBalance::MaterialGroup::Screen &&
                         !(ControlType == "ALWAYSON" || ControlType == "ALWAYSOFF" || ControlType == "ONIFSCHEDULEALLOWS")) {
                         ErrorsFound = true;
                         ShowSevereError(state,
@@ -9583,7 +9596,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntShade || ShTyp == WinShadingType::ExtShade) &&
-                    state.dataMaterial->Material(IShadingDevice).Group != Shade) {
+                    state.dataMaterial->Material(IShadingDevice).Group != DataHeatBalance::MaterialGroup::Shade) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " +
                                         state.dataIPShortCut->cAlphaArgs(3) +
@@ -9593,7 +9606,8 @@ namespace SurfaceGeometry {
                                           "\".");
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice).Group != Screen) {
+                if ((ShTyp == WinShadingType::ExtScreen) &&
+                    state.dataMaterial->Material(IShadingDevice).Group != DataHeatBalance::MaterialGroup::Screen) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " +
                                         state.dataIPShortCut->cAlphaArgs(3) + "= ExteriorScreen but matching shading device is not a window screen");
@@ -9603,7 +9617,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
                 if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
-                    state.dataMaterial->Material(IShadingDevice).Group != WindowBlind) {
+                    state.dataMaterial->Material(IShadingDevice).Group != DataHeatBalance::MaterialGroup::WindowBlind) {
                     ShowSevereError(state,
                                     cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " +
                                         state.dataIPShortCut->cAlphaArgs(3) +
@@ -9642,7 +9656,8 @@ namespace SurfaceGeometry {
                 if (state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers) != 0) {
                     if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::IntShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers)).Group != Shade) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers)).Group !=
+                            DataHeatBalance::MaterialGroup::Shade) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" the " +
@@ -9653,7 +9668,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::ExtShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1)).Group != Shade) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1)).Group !=
+                            DataHeatBalance::MaterialGroup::Shade) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" the " +
@@ -9664,7 +9680,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::ExtScreen) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1)).Group != Screen) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1)).Group !=
+                            DataHeatBalance::MaterialGroup::Screen) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" the " +
@@ -9675,7 +9692,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::IntBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers)).Group != WindowBlind) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers)).Group !=
+                            DataHeatBalance::MaterialGroup::WindowBlind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" the " +
@@ -9686,7 +9704,8 @@ namespace SurfaceGeometry {
                         }
                     } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::ExtBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
-                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1)).Group != WindowBlind) {
+                        if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1)).Group !=
+                            DataHeatBalance::MaterialGroup::WindowBlind) {
                             ErrorsFound = true;
                             ShowSevereError(state,
                                             cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" the " +
@@ -9698,11 +9717,13 @@ namespace SurfaceGeometry {
                     } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::BGShade) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3)).Group != Shade)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3)).Group !=
+                                DataHeatBalance::MaterialGroup::Shade)
                                 BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5)).Group != Shade)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5)).Group !=
+                                DataHeatBalance::MaterialGroup::Shade)
                                 BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
@@ -9718,11 +9739,13 @@ namespace SurfaceGeometry {
                     } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::BGBlind) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3)).Group != WindowBlind)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3)).Group !=
+                                DataHeatBalance::MaterialGroup::WindowBlind)
                                 BGShadeBlindError = true;
                         }
                         if (NLayers == 7) {
-                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5)).Group != WindowBlind)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(5)).Group !=
+                                DataHeatBalance::MaterialGroup::WindowBlind)
                                 BGShadeBlindError = true;
                         }
                         if (BGShadeBlindError) {
@@ -9739,7 +9762,7 @@ namespace SurfaceGeometry {
                 }
                 if (IShadingDevice > 0) {
                     if ((ShTyp == WinShadingType::IntShade || ShTyp == WinShadingType::ExtShade) &&
-                        state.dataMaterial->Material(IShadingDevice).Group != Shade) {
+                        state.dataMaterial->Material(IShadingDevice).Group != DataHeatBalance::MaterialGroup::Shade) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " +
                                             state.dataIPShortCut->cAlphaFieldNames(3) +
@@ -9747,7 +9770,8 @@ namespace SurfaceGeometry {
                         ShowContinueError(state, "Shading Device in error=\"" + state.dataMaterial->Material(IShadingDevice).Name + "\".");
                         ErrorsFound = true;
                     }
-                    if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice).Group != Screen) {
+                    if ((ShTyp == WinShadingType::ExtScreen) &&
+                        state.dataMaterial->Material(IShadingDevice).Group != DataHeatBalance::MaterialGroup::Screen) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " +
                                             state.dataIPShortCut->cAlphaFieldNames(3) +
@@ -9756,7 +9780,7 @@ namespace SurfaceGeometry {
                         ErrorsFound = true;
                     }
                     if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) &&
-                        state.dataMaterial->Material(IShadingDevice).Group != WindowBlind) {
+                        state.dataMaterial->Material(IShadingDevice).Group != DataHeatBalance::MaterialGroup::WindowBlind) {
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " +
                                             state.dataIPShortCut->cAlphaFieldNames(3) +
@@ -10060,7 +10084,7 @@ namespace SurfaceGeometry {
                                           "\" not found as storm window layer.");
                     ErrorsFound = true;
                 } else {
-                    if (state.dataMaterial->Material(MatNum).Group != WindowGlass) {
+                    if (state.dataMaterial->Material(MatNum).Group != DataHeatBalance::MaterialGroup::WindowGlass) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) + "\"");
                         ShowContinueError(state,
                                           state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + state.dataIPShortCut->cAlphaArgs(2) +
@@ -10540,7 +10564,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto &m = state.dataMaterial->Material(index);
-                    if (m.Group != RegularMaterial || m.ROnly) {
+                    if (m.Group != DataHeatBalance::MaterialGroup::RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -10600,7 +10624,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto &m = state.dataMaterial->Material(index);
-                    if (m.Group != RegularMaterial || m.ROnly) {
+                    if (m.Group != DataHeatBalance::MaterialGroup::RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -10648,7 +10672,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto &m = state.dataMaterial->Material(index);
-                    if (m.Group != RegularMaterial || m.ROnly) {
+                    if (m.Group != DataHeatBalance::MaterialGroup::RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -10708,7 +10732,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto &m = state.dataMaterial->Material(index);
-                    if (m.Group != RegularMaterial || m.ROnly) {
+                    if (m.Group != DataHeatBalance::MaterialGroup::RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -10793,7 +10817,7 @@ namespace SurfaceGeometry {
                         continue;
                     }
                     auto &m = state.dataMaterial->Material(index);
-                    if (m.Group != RegularMaterial || m.ROnly) {
+                    if (m.Group != DataHeatBalance::MaterialGroup::RegularMaterial || m.ROnly) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " + state.dataIPShortCut->cAlphaFieldNames(alpF) +
@@ -10853,7 +10877,7 @@ namespace SurfaceGeometry {
                                 continue;
                             }
                             auto &m = state.dataMaterial->Material(index);
-                            if (m.Group != RegularMaterial || m.ROnly) {
+                            if (m.Group != DataHeatBalance::MaterialGroup::RegularMaterial || m.ROnly) {
                                 ErrorsFound = true;
                                 ShowSevereError(state,
                                                 cCurrentModuleObject + "=\"" + fndInput.name + "\", invalid " +
@@ -11420,12 +11444,17 @@ namespace SurfaceGeometry {
                                                              "WindowMaterial:Screen:EquivalentLayer",
                                                              "WindowMaterial:Gap:EquivalentLayer"});
 
-                    int const MaterialLayerGroup = state.dataMaterial->Material(MaterNum).Group;
-                    if ((MaterialLayerGroup == WindowSimpleGlazing) || (MaterialLayerGroup == ShadeEquivalentLayer) ||
-                        (MaterialLayerGroup == DrapeEquivalentLayer) || (MaterialLayerGroup == BlindEquivalentLayer) ||
-                        (MaterialLayerGroup == ScreenEquivalentLayer) || (MaterialLayerGroup == GapEquivalentLayer)) {
+                    DataHeatBalance::MaterialGroup const MaterialLayerGroup = state.dataMaterial->Material(MaterNum).Group;
+                    if BITF_TEST_ANY (BITF(MaterialLayerGroup),
+                                      BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing) |
+                                          BITF(DataHeatBalance::MaterialGroup::ShadeEquivalentLayer) |
+                                          BITF(DataHeatBalance::MaterialGroup::DrapeEquivalentLayer) |
+                                          BITF(DataHeatBalance::MaterialGroup::BlindEquivalentLayer) |
+                                          BITF(DataHeatBalance::MaterialGroup::ScreenEquivalentLayer) |
+                                          BITF(DataHeatBalance::MaterialGroup::GapEquivalentLayer)) {
                         ShowSevereError(state, "Invalid movable insulation material for " + cCurrentModuleObject + ":");
-                        ShowSevereError(state, "...Movable insulation material type specified = " + cMaterialGroupType(MaterialLayerGroup));
+                        ShowSevereError(
+                            state, "...Movable insulation material type specified = " + cMaterialGroupType(static_cast<int>(MaterialLayerGroup)));
                         ShowSevereError(state, "...Movable insulation material name specified = " + state.dataIPShortCut->cAlphaArgs(3));
                         ErrorsFound = true;
                     }
@@ -13086,7 +13115,7 @@ namespace SurfaceGeometry {
             //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
             state.dataConstruction->Construct(ConstrNewSh).InsideAbsorpThermal =
                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld)).AbsorpThermalBack;
-            state.dataConstruction->Construct(ConstrNewSh).OutsideRoughness = VerySmooth;
+            state.dataConstruction->Construct(ConstrNewSh).OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
             state.dataConstruction->Construct(ConstrNewSh).DayltPropPtr = 0;
             state.dataConstruction->Construct(ConstrNewSh).CTFCross = 0.0;
             state.dataConstruction->Construct(ConstrNewSh).CTFFlux = 0.0;
@@ -13193,11 +13222,12 @@ namespace SurfaceGeometry {
                 int MatBetweenGlassSh = 0; // Material number of between-glass shade or blind
                 if (TotLayers == 5) MatBetweenGlassSh = state.dataConstruction->Construct(curConstruction).LayerPoint(3);
                 if (state.dataConstruction->Construct(curConstruction).TotGlassLayers <= 3 &&
-                    (state.dataMaterial->Material(MatIntSh).Group == Shade || state.dataMaterial->Material(MatIntSh).Group == WindowBlind))
+                    (state.dataMaterial->Material(MatIntSh).Group == DataHeatBalance::MaterialGroup::Shade ||
+                     state.dataMaterial->Material(MatIntSh).Group == DataHeatBalance::MaterialGroup::WindowBlind))
                     ShAndSt = true;
                 if (MatBetweenGlassSh > 0) {
-                    if (state.dataMaterial->Material(MatBetweenGlassSh).Group == Shade ||
-                        state.dataMaterial->Material(MatBetweenGlassSh).Group == WindowBlind) {
+                    if (state.dataMaterial->Material(MatBetweenGlassSh).Group == DataHeatBalance::MaterialGroup::Shade ||
+                        state.dataMaterial->Material(MatBetweenGlassSh).Group == DataHeatBalance::MaterialGroup::WindowBlind) {
                         ShAndSt = true;
                     } else {
                         ShowContinueError(state,
@@ -13233,8 +13263,8 @@ namespace SurfaceGeometry {
             state.dataMaterial->Material.redimension(state.dataHeatBal->TotMaterials);
             state.dataHeatBal->NominalR.redimension(state.dataHeatBal->TotMaterials);
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Name = MatNameStAir;
-            state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Group = WindowGas;
-            state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Roughness = 3;
+            state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Group = DataHeatBalance::MaterialGroup::WindowGas;
+            state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Roughness = DataSurfaces::SurfaceRoughness::MediumRough;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Conductivity = 0.0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).Density = 0.0;
             state.dataMaterial->Material(state.dataHeatBal->TotMaterials).IsoMoistCap = 0.0;
@@ -13329,7 +13359,7 @@ namespace SurfaceGeometry {
                 state.dataConstruction->Construct(oldConstruction).InsideAbsorpThermal;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideAbsorpThermal =
                 state.dataMaterial->Material(stormMaterial).AbsorpThermalFront;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideRoughness = VerySmooth;
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).OutsideRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).DayltPropPtr = 0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFCross = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).CTFFlux = 0.0;
@@ -13373,7 +13403,8 @@ namespace SurfaceGeometry {
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FrameDivider = 0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).FromWindow5DataFile = false;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionWidth = 0.0;
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionOrientation = 0;
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileMullionOrientation =
+                DataWindowEquivalentLayer::Orientation::Unassigned;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysWidth = 0.0;
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).W5FileGlazingSysHeight = 0.0;
             for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
@@ -13765,7 +13796,7 @@ namespace SurfaceGeometry {
         // Assign vertices to the new window; modify vertices of original window.
         // In the following, vertices are numbered counter-clockwise with vertex #1 at the upper left.
 
-        if (state.dataConstruction->Construct(IConst).W5FileMullionOrientation == Vertical) {
+        if (state.dataConstruction->Construct(IConst).W5FileMullionOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
 
             // VERTICAL MULLION: original window is modified to become left-hand glazing (system #1);
             // new window is created to become right-hand glazing (system #2)
@@ -14862,7 +14893,8 @@ namespace SurfaceGeometry {
             }
 
             if (SignFlag != PrevSignFlag) {
-                if (state.dataHeatBal->SolarDistribution != MinimalShadowing && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar) {
+                if (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::MinimalShadowing &&
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar) {
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state,
                                          "CheckConvexity: Zone=\"" +
@@ -15076,14 +15108,16 @@ namespace SurfaceGeometry {
             auto &revConstLayer(state.dataConstruction->Construct(ConstrNumRev).LayerPoint(TotalLayers - LayerNo + 1));
             auto &thisMatLay(state.dataMaterial->Material(thisConstLayer));
             auto &revMatLay(state.dataMaterial->Material(revConstLayer));
-            if ((thisConstLayer != revConstLayer) || // Not pointing to the same layer
-                (thisMatLay.Group == WindowGlass) || // Not window glass or glass equivalent layer which have
-                (revMatLay.Group == WindowGlass) ||  // to have certain properties flipped from front to back
-                (thisMatLay.Group == GlassEquivalentLayer) || (revMatLay.Group == GlassEquivalentLayer)) {
+            if ((thisConstLayer != revConstLayer) ||                                 // Not pointing to the same layer
+                (thisMatLay.Group == DataHeatBalance::MaterialGroup::WindowGlass) || // Not window glass or glass equivalent layer which have
+                (revMatLay.Group == DataHeatBalance::MaterialGroup::WindowGlass) ||  // to have certain properties flipped from front to back
+                (thisMatLay.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) ||
+                (revMatLay.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer)) {
                 // If not point to the same layer, check to see if this is window glass which might need to have
                 // front and back material properties reversed.
                 Real64 const SmallDiff = 0.0001;
-                if ((thisMatLay.Group == WindowGlass) && (revMatLay.Group == WindowGlass)) {
+                if ((thisMatLay.Group == DataHeatBalance::MaterialGroup::WindowGlass) &&
+                    (revMatLay.Group == DataHeatBalance::MaterialGroup::WindowGlass)) {
                     // Both layers are window glass, so need to check to see if the properties are reversed
                     if ((abs(thisMatLay.Thickness - revMatLay.Thickness) > SmallDiff) ||
                         (abs(thisMatLay.ReflectSolBeamBack - revMatLay.ReflectSolBeamFront) > SmallDiff) ||
@@ -15102,7 +15136,8 @@ namespace SurfaceGeometry {
                         RevLayerDiffs = true;
                         break; // exit when diff
                     }          // If none of the above conditions is met, then these should be the same layers in reverse (RevLayersDiffs = false)
-                } else if ((thisMatLay.Group == GlassEquivalentLayer) && (revMatLay.Group == GlassEquivalentLayer)) {
+                } else if ((thisMatLay.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer) &&
+                           (revMatLay.Group == DataHeatBalance::MaterialGroup::GlassEquivalentLayer)) {
                     if ((abs(thisMatLay.TausBackBeamBeam - revMatLay.TausFrontBeamBeam) > SmallDiff) ||
                         (abs(thisMatLay.TausFrontBeamBeam - revMatLay.TausBackBeamBeam) > SmallDiff) ||
                         (abs(thisMatLay.ReflBackBeamBeam - revMatLay.ReflFrontBeamBeam) > SmallDiff) ||
