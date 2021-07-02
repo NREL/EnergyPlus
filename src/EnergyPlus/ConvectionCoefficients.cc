@@ -47,7 +47,6 @@
 
 // C++ Headers
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <cmath>
 #include <string>
@@ -149,10 +148,6 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
     //       Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.137
     // 5.  ISO Standard 15099:2003e
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNum; // DO loop counter for zones
-    int SurfNum; // DO loop counter for surfaces in zone
-
     auto &Zone(state.dataHeatBal->Zone);
     auto &Surface(state.dataSurface->Surface);
 
@@ -165,7 +160,7 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
         if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && state.dataZoneEquip->ZoneEquipInputsFilled &&
             allocated(state.dataLoopNodes->Node)) {
             state.dataConvectionCoefficient->NodeCheck = false;
-            for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).InsideConvectionAlgo != CeilingDiffuser) continue;
                 if (Zone(ZoneNum).SystemZoneNodeNumber != 0) continue;
                 ShowSevereError(state,
@@ -237,7 +232,7 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
         state.dataConvectionCoefficient->MyEnvirnFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) state.dataConvectionCoefficient->MyEnvirnFlag = true;
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
         {
             auto const SELECT_CASE_var(Zone(ZoneNum).InsideConvectionAlgo);
@@ -253,9 +248,9 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
             }
         }
     }
-    for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-        for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+        for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
             if (present(ZoneToResimulate)) {
                 if ((ZoneNum != ZoneToResimulate) && (state.dataSurface->SurfAdjacentZone(SurfNum) != ZoneToResimulate)) {
@@ -647,7 +642,7 @@ Real64 CalcHfExteriorSparrow(Real64 const SurfWindSpeed, // Local wind speed at 
 
 bool Windward(Real64 const CosTilt,      // Cosine of the surface tilt angle
               Real64 const Azimuth,      // or Facing, Direction the surface outward normal faces (degrees)
-              Real64 const WindDirection // Wind direction measured clockwise from geographhic North
+              Real64 const WindDirection // Wind direction measured clockwise from geographic North
 )
 {
 
@@ -687,24 +682,25 @@ bool Windward(Real64 const CosTilt,      // Cosine of the surface tilt angle
     return AgainstWind;
 }
 
-bool SetAdaptiveConvectionAlgoCoefficient(EnergyPlusData &state,
-                                          const std::unordered_map<std::string, int> &HcInt_ConvectionTypesMap,
-                                          int *const InsideFaceAdaptiveConvectionAlgoParam,
-                                          const std::string equationName,
-                                          const std::string curveName,
-                                          const std::string sourceFieldName,
-                                          const std::string curveFieldName,
-                                          const std::string RoutineName,
-                                          const std::string CurrentModuleObject)
+int SetInsideAdaptiveConvectionAlgo(EnergyPlusData &state,
+                                    const std::unordered_map<std::string, int> &HcInt_ConvectionTypesMap,
+                                    bool &ErrorsFound,
+                                    const std::string equationName,
+                                    const std::string curveName,
+                                    const std::string sourceFieldName,
+                                    const std::string curveFieldName,
+                                    const std::string RoutineName,
+                                    const std::string CurrentModuleObject)
 {
 
-    bool ErrorsFound = false;
+    int InsideAdaptiveConvectionAlgoParam = 0;
 
     if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
-        *InsideFaceAdaptiveConvectionAlgoParam = HcInt_ConvectionTypesMap.at(equationName);
-        if (HcInt_ConvectionTypesMap.at(equationName) == HcInt_UserCurve) {
-            *InsideFaceAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, state.dataConvectionCoefficient->HcInsideUserCurve);
-            if (*InsideFaceAdaptiveConvectionAlgoParam == 0) {
+        int HcInt = HcInt_ConvectionTypesMap.at(equationName);
+        InsideAdaptiveConvectionAlgoParam = HcInt;
+        if (HcInt == HcInt_UserCurve) {
+            InsideAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, state.dataConvectionCoefficient->HcInsideUserCurve);
+            if (InsideAdaptiveConvectionAlgoParam == 0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
                 ShowContinueError(state, "Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
                 ErrorsFound = true;
@@ -715,7 +711,39 @@ bool SetAdaptiveConvectionAlgoCoefficient(EnergyPlusData &state,
         ShowContinueError(state, "Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
         ErrorsFound = true;
     }
-    return ErrorsFound;
+    return InsideAdaptiveConvectionAlgoParam;
+}
+
+int SetOutsideAdaptiveConvectionAlgo(EnergyPlusData &state,
+                                     const std::unordered_map<std::string, int> &HcExt_ConvectionTypesMap,
+                                     bool &ErrorsFound,
+                                     const std::string equationName,
+                                     const std::string curveName,
+                                     const std::string sourceFieldName,
+                                     const std::string curveFieldName,
+                                     const std::string RoutineName,
+                                     const std::string CurrentModuleObject)
+{
+
+    int OutsideAdaptiveConvectionAlgoParam = 0;
+
+    if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
+        int HcInt = HcExt_ConvectionTypesMap.at(equationName);
+        OutsideAdaptiveConvectionAlgoParam = HcInt;
+        if (HcInt == HcExt_UserCurve) {
+            OutsideAdaptiveConvectionAlgoParam = UtilityRoutines::FindItemInList(curveName, state.dataConvectionCoefficient->HcOutsideUserCurve);
+            if (OutsideAdaptiveConvectionAlgoParam == 0) {
+                ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
+                ShowContinueError(state, "Invalid Name choice Entered, for " + curveFieldName + '=' + curveName);
+                ErrorsFound = true;
+            }
+        }
+    } else {
+        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + equationName + ", invalid value");
+        ShowContinueError(state, "Invalid Key choice Entered, for " + sourceFieldName + '=' + equationName);
+        ErrorsFound = true;
+    }
+    return OutsideAdaptiveConvectionAlgoParam;
 }
 
 void GetUserConvectionCoefficients(EnergyPlusData &state)
@@ -1798,128 +1826,646 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     // get SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections
 
     CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
-    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    // IF (Count > 1) ! throw  error ... TODO or IP handles it
-    if (Count == 1) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 1,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 Status,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-        state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.Name = state.dataIPShortCut->cAlphaArgs(1); // not used by E+, unique object
+    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                             CurrentModuleObject,
+                                                             1,
+                                                             state.dataIPShortCut->cAlphaArgs,
+                                                             NumAlphas,
+                                                             state.dataIPShortCut->rNumericArgs,
+                                                             NumNumbers,
+                                                             Status,
+                                                             state.dataIPShortCut->lNumericFieldBlanks,
+                                                             state.dataIPShortCut->lAlphaFieldBlanks,
+                                                             state.dataIPShortCut->cAlphaFieldNames,
+                                                             state.dataIPShortCut->cNumericFieldNames);
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.Name = state.dataIPShortCut->cAlphaArgs(1); // not used by E+, unique object
 
-        // The following array maps the inputs for the SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections algorithm input fields
-        // to the corresponding defaults by making a pair with a pointer to the InsideFaceAdaptiveConvectionAlgo algorithm int parameter
-        // to the default int value
-        std::array<int *const, 45> AdaptiveConvectionAlgoInsideDefaults = {
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyAssistingFlowWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyOpposingFlowWallEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum,
-            &state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum};
-        for (int i = 2; i <= NumAlphas - 1; i += 2) { // up to 45
-            static std::string const RoutineName = "GetUserConvectionCoefficients";
-            static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
-            ErrorsFound = SetAdaptiveConvectionAlgoCoefficient(state,
-                                                               HcInt_ConvectionTypesMap,
-                                                               AdaptiveConvectionAlgoInsideDefaults[(i / 2) - 1],
-                                                               state.dataIPShortCut->cAlphaArgs(i),
-                                                               state.dataIPShortCut->cAlphaArgs(i + 1),
-                                                               state.dataIPShortCut->cAlphaFieldNames(i),
-                                                               state.dataIPShortCut->cAlphaFieldNames(i + 1),
-                                                               RoutineName,
-                                                               CurrentModuleObject);
-        }
-    } // end of 'SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections'
+    int i = 2;
+    CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections";
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolHeatedFloorEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolChilledCeilingEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolStableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolUnstableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolWindowsEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatVertWallEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatHeatedWallEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatStableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatUnstableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.WallPanelHeatWindowsEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatVertWallNearHeaterEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatStableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatUnstableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ConvectiveHeatWindowsEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWallEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirCeilingEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirFloorEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.CentralAirWindowsEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircVertWallEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableHorizEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircStableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircUnstableTiltedEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.ZoneFanCircWindowsEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyAssistingFlowWallEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedBuoyOpposingFlowWallEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableFloorEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableFloorEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedStableCeilingEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedUnstableCeilingEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.MixedWindowsEqNum =
+        SetInsideAdaptiveConvectionAlgo(state,
+                                        HcInt_ConvectionTypesMap,
+                                        ErrorsFound,
+                                        state.dataIPShortCut->cAlphaArgs(i),
+                                        state.dataIPShortCut->cAlphaArgs(i + 1),
+                                        state.dataIPShortCut->cAlphaFieldNames(i),
+                                        state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                        RoutineName,
+                                        CurrentModuleObject);
 
     CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
-    Count = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-    // IF (Count > 1) ! throw  error ... TODO or IP handles it
-    if (Count == 1) {
-        state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                 CurrentModuleObject,
-                                                                 1,
-                                                                 state.dataIPShortCut->cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 state.dataIPShortCut->rNumericArgs,
-                                                                 NumNumbers,
-                                                                 Status,
-                                                                 state.dataIPShortCut->lNumericFieldBlanks,
-                                                                 state.dataIPShortCut->lAlphaFieldBlanks,
-                                                                 state.dataIPShortCut->cAlphaFieldNames,
-                                                                 state.dataIPShortCut->cNumericFieldNames);
-        state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.Name =
-            state.dataIPShortCut->cAlphaArgs(1); // not used by E+, unique object
-        std::array<int *const, 6> AdaptiveConvectionAlgoOutsideDefaults = {
-            &state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum,
-            &state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum,
-            &state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum,
-            &state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum,
-            &state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum,
-            &state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum,
-        };
+    state.dataInputProcessing->inputProcessor->getObjectItem(state,
+                                                             CurrentModuleObject,
+                                                             1,
+                                                             state.dataIPShortCut->cAlphaArgs,
+                                                             NumAlphas,
+                                                             state.dataIPShortCut->rNumericArgs,
+                                                             NumNumbers,
+                                                             Status,
+                                                             state.dataIPShortCut->lNumericFieldBlanks,
+                                                             state.dataIPShortCut->lAlphaFieldBlanks,
+                                                             state.dataIPShortCut->cAlphaFieldNames,
+                                                             state.dataIPShortCut->cNumericFieldNames);
+    state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.Name = state.dataIPShortCut->cAlphaArgs(1); // not used by E+, unique object
 
-        for (int i = 2; i <= NumAlphas - 1; i += 2) {
-            static std::string const RoutineName = "GetUserConvectionCoefficients";
-            static std::string const CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections";
-            ErrorsFound = SetAdaptiveConvectionAlgoCoefficient(state,
-                                                               HcExt_ConvectionTypesMap,
-                                                               AdaptiveConvectionAlgoOutsideDefaults[(i / 2) - 1],
-                                                               state.dataIPShortCut->cAlphaArgs(i),
-                                                               state.dataIPShortCut->cAlphaArgs(i + 1),
-                                                               state.dataIPShortCut->cAlphaFieldNames(i),
-                                                               state.dataIPShortCut->cAlphaFieldNames(i + 1),
-                                                               RoutineName,
-                                                               CurrentModuleObject);
-        }
-    } // end of 'SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections'
+    i = 2;
+    state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum =
+        SetOutsideAdaptiveConvectionAlgo(state,
+                                         HcExt_ConvectionTypesMap,
+                                         ErrorsFound,
+                                         state.dataIPShortCut->cAlphaArgs(i),
+                                         state.dataIPShortCut->cAlphaArgs(i + 1),
+                                         state.dataIPShortCut->cAlphaFieldNames(i),
+                                         state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                         RoutineName,
+                                         CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallLeewardEqNum =
+        SetOutsideAdaptiveConvectionAlgo(state,
+                                         HcExt_ConvectionTypesMap,
+                                         ErrorsFound,
+                                         state.dataIPShortCut->cAlphaArgs(i),
+                                         state.dataIPShortCut->cAlphaArgs(i + 1),
+                                         state.dataIPShortCut->cAlphaFieldNames(i),
+                                         state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                         RoutineName,
+                                         CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindHorizRoofEqNum =
+        SetOutsideAdaptiveConvectionAlgo(state,
+                                         HcExt_ConvectionTypesMap,
+                                         ErrorsFound,
+                                         state.dataIPShortCut->cAlphaArgs(i),
+                                         state.dataIPShortCut->cAlphaArgs(i + 1),
+                                         state.dataIPShortCut->cAlphaFieldNames(i),
+                                         state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                         RoutineName,
+                                         CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatVertWallEqNum =
+        SetOutsideAdaptiveConvectionAlgo(state,
+                                         HcExt_ConvectionTypesMap,
+                                         ErrorsFound,
+                                         state.dataIPShortCut->cAlphaArgs(i),
+                                         state.dataIPShortCut->cAlphaArgs(i + 1),
+                                         state.dataIPShortCut->cAlphaFieldNames(i),
+                                         state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                         RoutineName,
+                                         CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatStableHorizEqNum =
+        SetOutsideAdaptiveConvectionAlgo(state,
+                                         HcExt_ConvectionTypesMap,
+                                         ErrorsFound,
+                                         state.dataIPShortCut->cAlphaArgs(i),
+                                         state.dataIPShortCut->cAlphaArgs(i + 1),
+                                         state.dataIPShortCut->cAlphaFieldNames(i),
+                                         state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                         RoutineName,
+                                         CurrentModuleObject);
+
+    i += 2;
+    state.dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HNatUnstableHorizEqNum =
+        SetOutsideAdaptiveConvectionAlgo(state,
+                                         HcExt_ConvectionTypesMap,
+                                         ErrorsFound,
+                                         state.dataIPShortCut->cAlphaArgs(i),
+                                         state.dataIPShortCut->cAlphaArgs(i + 1),
+                                         state.dataIPShortCut->cAlphaFieldNames(i),
+                                         state.dataIPShortCut->cAlphaFieldNames(i + 1),
+                                         RoutineName,
+                                         CurrentModuleObject);
 
     if (ErrorsFound) {
         ShowFatalError(state, RoutineName + "Errors found getting input.  Program termination.");
@@ -8604,7 +9150,6 @@ Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 c
     Real64 Ra;                                                 // Rayleigh number
     Real64 Re;                                                 // Reynolds number
     constexpr Real64 g = DataGlobalConstants::GravityConstant; // Acceleration of gravity, m/s2
-    constexpr Real64 OneThird((1.0 / 3.0));                    // 1/3 in highest precision
 
     auto &Surface(state.dataSurface->Surface);
 

@@ -2132,12 +2132,29 @@ TEST_F(ConvectionCoefficientsFixture, TestSetAdaptiveConvectionAlgoCoefficient)
         ",                        !- Hc Function of Air Change Rate Curve Name",
         ";                        !- Hc Function of Air System Volume Flow Rate Divided by Zone Perimeter Length Curve Name",
 
+        "Curve:Exponent,",
+        "ASHRAEVerticalModel,     !- Name",
+        "0.0,                     !- Coefficient1 Constant",
+        "1.31,                    !- Coefficient2 Constant",
+        "0.33333333333333333,     !- Coefficient3 Constant",
+        "0.1,                     !- Minimum Value of x",
+        "50.0,                    !- Maximum Value of x",
+        "0.1,                     !- Minimum Curve Output",
+        "20.0;                    !- Maximum Curve Output",
+
         "SurfaceConvectionAlgorithm:Outside:UserCurve,",
         "NusseltJurgesDupCurve,   !- Name",
         "HeightAdjust,            !- Wind Speed Type for Curve",
         "MyNusseltJurgesCurve,    !- Hf Function of Wind Speed Curve Name",
         ",                        !- Hn Function of Temperature Difference Curve Name",
         ";                        !- Hn Function of Temperature Difference Divided by Height Curve Name",
+
+        "Curve:Linear,",
+        "MyNusseltJurgesCurve,    !- Name",
+        "5.8,                     !- Coefficient1 Constant",
+        "3.94,                    !- Coefficient2 x",
+        "0.0,                     !- Minimum Value of x",
+        "100.0;                   !- Maximum Value of x",
 
     });
 
