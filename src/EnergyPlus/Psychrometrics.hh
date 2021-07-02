@@ -107,8 +107,29 @@ namespace Psychrometrics {
     // call for recurring errors
 
 #ifdef EP_psych_stats
-    extern Array1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 -
-                                                 // max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
+    extern constexpr std::array<std::string_view, static_cast<int>(psychrometricsError::Num)> PsyRoutineNames = {
+        "PsyTdpFnTdbTwbPb",
+        "PsyRhFnTdbWPb",
+        "PsyTwbFnTdbWPb",
+        "PsyVFnTdbWPb",
+        "PsyWFnTdpPb",
+        "PsyWFnTdbH",
+        "PsyWFnTdbTwbPb",
+        "PsyWFnTdbRhPb",
+        "PsyPsatFnTemp",
+        "PsyTsatFnHPb",
+        "PsyTsatFnPb",
+        "PsyRhFnTdbRhov",
+        "PsyRhFnTdbRhovLBnd0C",
+        "PsyTwbFnTdbWPb",
+        "PsyTwbFnTdbWPb",
+        "PsyWFnTdbTwbPb",
+        "PsyTsatFnPb",
+        "PsyTwbFnTdbWPb_cache",
+        "PsyPsatFnTemp_cache"}; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
+                                // 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 -
+                                // PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw
+                                // (raw calc)
 
     extern constexpr std::array<bool, static_cast<int>(psychrometricsError::Num)> PsyReportIt = {
         true,
