@@ -338,117 +338,90 @@ This can be an optional feature built based on new or existing CMake flags.
 
 ### Dependencies
 
-The current outlook for the future of this library and its interaction with 
-EnergyPlus is to only be dependent on Eigen. The project is dependent on 
-nlohmann json for running unit tests, but the local tests will not be built 
-by EnergyPlus. 
-
-Currently, the tool is relying on nlohmann json, Eigen and Boost. The 
-following sections aim to communicate the reasoning behind the use of each 
-dependency and give the current outlook on future dependency. 
-
 Cpgfunction was originally written making use of Boost and BLAS/LAPACK. The 
 BLAS/LAPACK library is based on Fortran code. While it is quite easy to make an 
 executable in Linux and Mac environments that combines C++ code with the 
 BLAS/LAPACK library, there are some difficulties in doing this on Windows. 
-Additionally, EnergyPlus has a goal of ridding the repository of Fortran 
-dependencies. 
-Discussions with the EnergyPlus development team have led us to minimize the 
-use of Boost and replace the BLAS/LAPACK with native C++ code. A small portion 
-of Eigen has been introduced to perform an LU decomposition of a system of 
-equations for the g-function. 
+Additionally, the EnergyPlus development team has goals of ridding the 
+repository of Fortran dependencies and eliminating the use of Boost.  
 
-The only libraries currently made use of from boost are `asio` for the thread 
-pool and `math` for the gaussian quadrature integration. The `asio` portion of
-boost is being replaced by `OpenMP`. The Gauss-Kronrod quadrature integration 
-of the finite line source is being replaced with the QUADPACK methodology 
-written in C/C++.
-
-Three BLAS functions were used (copy, axpy, spmv). These functions have been 
-replaced with native C++ code. The gesv function from LAPACK has been of loaded 
-to the Eigen library.
+Therefore, we have replaced the calls to BLAS/LAPACK with native C++ code and a 
+call to the Eigen library, and (to date) minimized the use of Boost.  Based on 
+the further discussions with the EnergyPlus development team, we plan to 
+eliminate the use of Boost also.  The following sections describe the 
+dependencies, past, present, and future, along with some discussion of the 
+performance implications of the changes already made or to be made in the code 
+for this feature.
 
 #### Nlohmann json
 
-This dependency is not necessary for EnergyPlus. This dependency exists for 
-running unit tests in the `cpgfunctionEP` repository. The unit tests will not 
-be built and ran, and neither will this dependency. 
-
-The [single include](https://github.com/nlohmann/json#integration), 
-[json.hpp](https://github.com/nlohmann/json/blob/develop/single_include/nlohmann/json.hpp), 
-is made use of. The file sits inside of a `third_party/` folder. The location 
-of the file and the linking of it in cpgfunction is still up for discussion. 
-Beyond that, the input structure in the input JSON files, containing borefield 
-coordinates, is no more complicated than this: 
-`{"x": [1, 2, 3, 4], "y": [1, 2, 3, 4]}`. This is basically just csv data. 
-In the foreseeable future, there will be nothing more input that these 
-coordinates.
-
-#### Boost functions
-
-The boost functions made use of are [Gauss-Kronrod Quadrature](https://www.boost.org/doc/libs/1_71_0/libs/math/doc/html/math_toolkit/gauss_kronrod.html) and [thread pool](https://www.boost.org/doc/libs/1_76_0/doc/html/boost_asio/reference/thread_pool.html). 
-The quadrature integration is performed to compute the integration of the 
-finite line source. The thread pool was being removed and replaced by `BLAS` 
-linear algebra routines. Although, it was found that 1) `EnergyPlus` has a goal 
-of removing all Fortran from the library, and 2) building `BLAS` on Windows is
-not a straightforward task. It is possible that `OpenMP` could be made use of 
-as opposed to `Boost`s thread pool for multi-threading, though initial speed 
-comparisons significantly favored `Boost`. A standalone [Gauss-Kronrod](https://people.sc.fsu.edu/~jburkardt/cpp_src/kronrod/kronrod.html)
-integration could be made use of, but the speed and accuracy are unknown. We 
-would like input as to whether or not this development, the removal of the 
-boost dependency, should be made a priority to be accomplished by August.
+This dependency exists for running unit tests in the cpgfunctionEP repository. 
+This dependence will not be used in the EnergyPlus build.
 
 #### BLAS and LAPACK routines (deprecated)
 
-BLAS and LAPACK are Fortran libraries. In the current version, these are 
-expected to be installed as system libraries. Last summer, during the initial 
-development of cpgfunction, it was found that [OpenBLAS](https://github.com/xianyi/OpenBLAS) 
-performed LU factorization for solving systems of linear equations ([gesv](https://icl.bitbucket.io/lapackpp/group__gesv.html#ga8f2d5c8af99b6aee06f0650d723f8e2f)) 
-5x faster than [netlib](http://www.netlib.org/blas/). The speed of OpenBLAS was 
-nearly identical to the solution solved in Python's [numpy.linalg.solve](https://numpy.org/doc/stable/reference/generated/numpy.linalg.solve.html), 
-which makes use of the same LAPACK routine. More recently, it has been found 
-that linear algebra with BLAS is both significantly faster than 
-multi-threading, and that BLAS has low level functionality that helps with the 
-goals of cpgfunction. (cpgfunction was developed due to the need to compute 
-g-functions faster and with lower memory on high performance computers for the 
-development of g-function databases (Cook and Spitler 2021).) BLAS provides for 
-"fast slicing" of vectors or matrices represented in 1D format. The functions 
-take in pointers to a starting location, and a number of elements to be 
-operated on. Additionally, the BLAS routine function [symv](https://icl.bitbucket.io/blaspp/group__symv.html#ga496ee8fe24db5f3dd003b09cc2bec5a4) 
-gives tremendous speed improvement for performing linear algebra on the packed 
-symmetric matrix discussed in Cook and Spitler (2021). The packed symmetric 
-response matrix can remain packed at each point in time, where inputs to the 
-function instruct whether or not it is the upper or lower triangle. The 
-consumption of memory is also minimized by storing the results in the input 
-vector `y`. This allocation of memory can occur once, and that vector can be 
-re-used across functions. This results in significant speed improvements when 
-compared to multi-threading, with minimal to no additional memory consumption. 
-However, while many of these things are good, and a 2x speed improvement has 
-already been made by initial transfer of computation from boost's thread pool 
-to BLAS, the dependency is programmed in Fortran. 
+Three BLAS functions were used (copy, axpy, spmv). These functions have been 
+replaced with native C++ code. The gesv function from LAPACK has been off 
+loaded to the Eigen library.
 
-However, there are more than one sticking points with the use of BLAS/LAPACK
-being a dependency. A fork has been made in the project so that `EnergyPlus` 
-can be delivered what is requested. The name of the fork is `cpgfunctionEP`. 
-Therefore, BLAS/LAPACK will not be included in the dependency for 
-`cpgfunctionEP`. The speed of `cpgfunctionEP` is slower than `cpgfunction`, but
-for reasons previously stated, it is necessary to remove all Fortran code 
-from the library for delivery to EnergyPlus. 
+In the previous version, these were expected to be installed as system 
+libraries. Last summer, during the initial development of cpgfunction, it was 
+found that OpenBLAS performed LU factorization for solving systems of linear 
+equations (gesv) 5x faster than netlib. The speed of OpenBLAS was nearly 
+identical to the solution solved in Python's numpy.linalg.solve, which makes 
+use of the same LAPACK routine. More recently, it has been found that linear 
+algebra with BLAS is both significantly faster than multi-threading, and that 
+BLAS has low level functionality that helps with the goals of cpgfunction. 
+(cpgfunction was developed due to the need to compute g-functions faster and 
+with lower memory on high performance computers for the development of 
+g-function databases (Cook and Spitler 2021).) BLAS provides for "fast slicing" 
+of vectors or matrices represented in 1D format. The functions take in pointers 
+to a starting location, and a number of elements to be operated on. 
+Additionally, the BLAS routine function symv gives tremendous speed improvement 
+for performing linear algebra on the packed symmetric matrix discussed in Cook 
+and Spitler (2021). The packed symmetric response matrix can remain packed at 
+each point in time, where inputs to the function instruct whether or not it is 
+the upper or lower triangle. The consumption of memory is also minimized by 
+storing the results in the input vector y. This allocation of memory can occur 
+once, and that vector can be re-used across functions. This results in 
+significant speed improvements when compared to multi-threading, with minimal 
+to no additional memory consumption. However, while many of these things are 
+good, and a 2x speed improvement has already been made by initial transfer of 
+computation from boost's thread pool to BLAS, the dependency was programmed in 
+Fortran.
+
+There is more than one sticking point with the use of BLAS/LAPACK being a 
+dependency. A fork has been made in the project so that EnergyPlus can be 
+delivered what is requested. The name of the fork is cpgfunctionEP. Therefore, 
+BLAS/LAPACK will not be included in the dependency for cpgfunctionEP. The speed 
+of cpgfunctionEP is slower than cpgfunction, but for reasons previously stated, 
+it is necessary to remove all Fortran code from the library for delivery to 
+EnergyPlus.
 
 #### Eigen
 
-The `Eigen` library has been made a dependency to be used in solving a system
-of equations using LU decomposition. As previously mentioned, 
-`cpgfunction` is faster than `cpgfunctionEP` due to more linear algebra being
-made use of. It may be possible for `cpgfunctionEP` to someday match the speed 
-performance of `cpgfunction` by depending more heavily on `Eigen`, though the 
-library from its conception has been geared towards BLAS/LAPACK. The re-write 
-would be substantial, and the amount of memory consumed will grow. 
+The Eigen library has been made a dependency to be used in solving a system of 
+equations using LU decomposition. As previously mentioned, cpgfunction is faster 
+than cpgfunctionEP due to more linear algebra being made use of. It may be 
+possible for cpgfunctionEP to someday match the speed performance of cpgfunction 
+by depending more heavily on Eigen, though the library from its conception has 
+been geared towards BLAS/LAPACK. The re-write would be substantial, and the 
+amount of memory consumed will grow.
 
-It is unclear if a greater dependency on `Eigen` could provide performance 
-similar to the BLAS/LAPACK of OpenBLAS. A re-write with a focus on `Eigen` for 
-linear algebra could be done, but would take time, and is not feasible to be 
-accomplished by August. 
+It is unclear if a greater dependency on Eigen could provide performance similar 
+to the BLAS/LAPACK of OpenBLAS. A re-write with a focus on Eigen for linear 
+algebra could be done, but would take time, and is not feasible to be 
+accomplished by August.
+
+#### Boost
+
+The boost functions currently made use of are Gauss-Kronrod Quadrature and 
+thread pool. The quadrature integration is performed to compute the integration 
+of the finite line source. Replacements for both functions are under 
+investigation. It appears likely that OpenMP could be made use of as opposed to 
+Boosts thread pool for multi-threading, though initial speed comparisons 
+significantly favored Boost. A standalone Gauss-Kronrod integration could be 
+made use of, but the speed and accuracy are unknown.
 
 ### Git
 
