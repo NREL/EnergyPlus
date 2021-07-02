@@ -107,7 +107,7 @@ namespace Psychrometrics {
     // call for recurring errors
 
 #ifdef EP_psych_stats
-    extern constexpr std::array<std::string_view, static_cast<int>(psychrometricsError::Num)> PsyRoutineNames = {
+    constexpr std::array<std::string_view, static_cast<int>(psychrometricsError::Num)> PsyRoutineNames = {
         "PsyTdpFnTdbTwbPb",
         "PsyRhFnTdbWPb",
         "PsyTwbFnTdbWPb",
@@ -131,7 +131,7 @@ namespace Psychrometrics {
                                 // PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw
                                 // (raw calc)
 
-    extern constexpr std::array<bool, static_cast<int>(psychrometricsError::Num)> PsyReportIt = {
+    constexpr std::array<bool, static_cast<int>(psychrometricsError::Num)> PsyReportIt = {
         true,
         true,
         true,
@@ -771,7 +771,7 @@ namespace Psychrometrics {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::TwbFnTdbWPb_cache));
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::TwbFnTdbWPb_cache)];
 #endif
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING

@@ -174,7 +174,7 @@ namespace Psychrometrics {
         for (int item : state.dataPsychCache->NumTimesCalled) {
             if (item) { // if item is greater than 0
                 print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
-                for (Loop = 1; Loop <= static_cast<int>(psychrometricsError::Num); ++Loop) {
+                for (Loop = 0; Loop < static_cast<int>(psychrometricsError::Num); ++Loop) {
                     if (!PsyReportIt[Loop]) continue;
                     const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
                     if (state.dataPsychCache->NumIterations[Loop] > 0) {
