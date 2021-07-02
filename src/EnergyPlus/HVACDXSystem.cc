@@ -75,7 +75,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -406,15 +405,16 @@ namespace HVACDXSystem {
                 }
             }
 
-            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum = GetOnlySingleNode(state,
-                                                                                                             Alphas(3),
-                                                                                                             ErrorsFound,
-                                                                                                             CurrentModuleObject,
-                                                                                                             Alphas(1),
-                                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                                             DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                             1,
-                                                                                                             ObjectIsParent);
+            state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum =
+                GetOnlySingleNode(state,
+                                  Alphas(3),
+                                  ErrorsFound,
+                                  CurrentModuleObject,
+                                  Alphas(1),
+                                  DataLoopNode::NodeFluidType::Air,
+                                  DataLoopNode::NodeConnectionType::Inlet,
+                                  NodeInputManager::compFluidStream::Primary,
+                                  ObjectIsParent);
             state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum =
                 GetOnlySingleNode(state,
                                   Alphas(4),
@@ -423,7 +423,7 @@ namespace HVACDXSystem {
                                   Alphas(1),
                                   DataLoopNode::NodeFluidType::Air,
                                   DataLoopNode::NodeConnectionType::Outlet,
-                                  1,
+                                  NodeInputManager::compFluidStream::Primary,
                                   ObjectIsParent);
 
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
@@ -435,7 +435,7 @@ namespace HVACDXSystem {
                                                                                                           Alphas(1),
                                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                                           DataLoopNode::NodeConnectionType::Sensor,
-                                                                                                          1,
+                                                                                                          NodeInputManager::compFluidStream::Primary,
                                                                                                           ObjectIsParent);
             if (state.dataHVACDXSys->DXCoolingSystem(DXCoolSysNum).DXSystemControlNodeNum == 0) {
                 ShowSevereError(state, CurrentModuleObject + ": control node must be input");
@@ -1056,7 +1056,6 @@ namespace HVACDXSystem {
         using PackagedThermalStorageCoil::SimTESCoil;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdpFnWPb;
-        using TempSolveRoot::SolveRoot;
         using VariableSpeedCoils::SimVariableSpeedCoils;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1237,7 +1236,7 @@ namespace HVACDXSystem {
                                     Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     Par(2) = DesOutTemp;
                                     Par(5) = double(FanOpMode);
-                                    TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par);
+                                    General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilResidual, 0.0, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
                                             if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
@@ -1331,7 +1330,7 @@ namespace HVACDXSystem {
                                     Par(1) = double(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     Par(2) = DesOutHumRat;
                                     Par(5) = double(FanOpMode);
-                                    TempSolveRoot::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilHumRatResidual, 0.0, 1.0, Par);
+                                    General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, DOE2DXCoilHumRatResidual, 0.0, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
                                             if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).DXCoilLatPLRIter < 1) {
@@ -1473,7 +1472,7 @@ namespace HVACDXSystem {
                                     Par(4) = 0.0;
                                 }
                                 Par(5) = double(FanOpMode);
-                                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
 
                                     //               RegulaFalsi may not find sensible PLR when the latent degradation model is used.
@@ -1521,7 +1520,7 @@ namespace HVACDXSystem {
                                     TempMinPLR = max(0.0, (TempMinPLR - 0.01));
                                     TempMaxPLR = min(1.0, (TempMaxPLR + 0.01));
                                     //               tighter boundary of solution has been found, call RegulaFalsi a second time
-                                    TempSolveRoot::SolveRoot(
+                                    General::SolveRoot(
                                         state, Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, TempMinPLR, TempMaxPLR, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {
@@ -1663,7 +1662,7 @@ namespace HVACDXSystem {
                                     Par(4) = 0.0;
                                 }
                                 Par(5) = double(FanOpMode);
-                                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilTempResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).HXAssistedLatPLRIter < 1) {
@@ -1747,7 +1746,7 @@ namespace HVACDXSystem {
                                     Par(4) = 0.0;
                                 }
                                 Par(5) = double(FanOpMode);
-                                TempSolveRoot::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
 
                                     //               RegulaFalsi may not find latent PLR when the latent degradation model is used.
@@ -1791,7 +1790,7 @@ namespace HVACDXSystem {
                                             state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     }
                                     //               tighter boundary of solution has been found, call RegulaFalsi a second time
-                                    TempSolveRoot::SolveRoot(
+                                    General::SolveRoot(
                                         state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, HXAssistedCoolCoilHRResidual, TempMinPLR, TempMaxPLR, Par);
                                     if (SolFla == -1) {
                                         if (!state.dataGlobal->WarmupFlag) {

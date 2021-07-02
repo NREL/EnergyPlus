@@ -60,6 +60,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -82,6 +83,7 @@ namespace WeatherManager {
     // Water mains temperatures calculation methods
     enum class WaterMainsTempCalcMethod
     {
+        FixedDefault = 0,
         Schedule = 1,
         Correlation = 2,
         CorrelationFromWeatherFile = 3
@@ -942,7 +944,7 @@ struct WeatherManagerData : BaseGlobalStruct
                            // holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of the solar declination
                            // angle | Value of the equation of time formula
     // NOLINTNEXTLINE(cert-err58-cpp)
-    Array1D<WeatherManager::DayWeatherVariables> DesignDay; // Design day environments
+    EPVector<WeatherManager::DayWeatherVariables> DesignDay; // Design day environments
     // NOLINTNEXTLINE(cert-err58-cpp)
     WeatherManager::MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) |
                                          // Wind Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) |
@@ -950,19 +952,19 @@ struct WeatherManagerData : BaseGlobalStruct
                                          // Number of Days since last snow | Albedo | Rain/Liquid Precipitation (mm)
     WeatherManager::MissingDataCounts Missed;              // NOLINT(cert-err58-cpp)
     WeatherManager::RangeDataCounts OutOfRange;            // NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::DesignDayData> DesDayInput;    // Design day Input Data NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::DesignDayData> DesDayInput;   // Design day Input Data NOLINT(cert-err58-cpp)
     Array1D<WeatherManager::EnvironmentData> Environment;  // Environment data NOLINT(cert-err58-cpp)
     Array1D<WeatherManager::RunPeriodData> RunPeriodInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodInputUniqueNames;
-    Array1D<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
     std::unordered_map<std::string, std::string> RunPeriodDesignInputUniqueNames;
-    Array1D<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData EPWDST;                   // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData IDFDST;                   // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
-    WeatherManager::DaylightSavingPeriodData DST;                      // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::WeatherProperties> WPSkyTemperature;       // NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::SpecialDayData> SpecialDays;               // NOLINT(cert-err58-cpp)
-    Array1D<WeatherManager::DataPeriodData> DataPeriods;               // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData IDFDST;                    // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
+    WeatherManager::DaylightSavingPeriodData DST;                       // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::WeatherProperties> WPSkyTemperature;       // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::SpecialDayData> SpecialDays;               // NOLINT(cert-err58-cpp)
+    EPVector<WeatherManager::DataPeriodData> DataPeriods;               // NOLINT(cert-err58-cpp)
 
     std::shared_ptr<BaseGroundTempsModel> siteShallowGroundTempsPtr;
     std::shared_ptr<BaseGroundTempsModel> siteBuildingSurfaceGroundTempsPtr;
@@ -1023,8 +1025,9 @@ struct WeatherManagerData : BaseGlobalStruct
         this->GroundTempsFCFromEPWHeader = Array1D<Real64>(12, 0.0);
         this->GroundReflectances = Array1D<Real64>(12, 0.2);
 
-        this->SnowGndRefModifier = 1.0;              // Modifier to ground reflectance during snow
-        this->SnowGndRefModifierForDayltg = 1.0;     // Modifier to ground reflectance during snow for daylighting
+        this->SnowGndRefModifier = 1.0;          // Modifier to ground reflectance during snow
+        this->SnowGndRefModifierForDayltg = 1.0; // Modifier to ground reflectance during snow for daylighting
+        this->WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::FixedDefault;
         this->WaterMainsTempsSchedule = 0;           // Water mains temperature schedule
         this->WaterMainsTempsAnnualAvgAirTemp = 0.0; // Annual average outdoor air temperature (C)
         this->WaterMainsTempsMaxDiffAirTemp = 0.0;   // Maximum difference in monthly average outdoor air temperatures (deltaC)
@@ -1206,14 +1209,15 @@ struct WeatherManagerData : BaseGlobalStruct
           PrintEnvrnStamp(false), Sigma(5.6697e-8), YearOfSim(1), NumDaysInYear(365), EnvironmentReportNbr(0), EnvironmentReportChr(""),
           WeatherFileExists(false), LocationGathered(false), WeatherFileLatitude(0.0), WeatherFileLongitude(0.0), WeatherFileTimeZone(0.0),
           WeatherFileElevation(0.0), GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0),
-          SnowGndRefModifierForDayltg(1.0), WaterMainsTempsSchedule(0), WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0),
-          WaterMainsTempsScheduleName(""), wthFCGroundTemps(false), TotRunPers(0), TotRunDesPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0),
-          WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0), NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true),
-          UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false), IDFDaylightSaving(false), DaylightSavingIsActive(false),
-          WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0), NumWPSkyTemperatures(0),
-          RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0), HorizIRSky(0.0),
-          TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), LeapYearAdd(0),
-          DatesShouldBeReset(false), StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
+          SnowGndRefModifierForDayltg(1.0), WaterMainsTempsMethod{WeatherManager::WaterMainsTempCalcMethod::FixedDefault}, WaterMainsTempsSchedule(0),
+          WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0), WaterMainsTempsScheduleName(""), wthFCGroundTemps(false),
+          TotRunPers(0), TotRunDesPers(0), NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0), NumDataPeriods(0),
+          NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true), UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false),
+          IDFDaylightSaving(false), DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0),
+          NumEPWTypExtSets(0), NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0),
+          SolarAzimuthAngle(0.0), HorizIRSky(0.0), TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0),
+          EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), LeapYearAdd(0), DatesShouldBeReset(false),
+          StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
     {
     }
 };

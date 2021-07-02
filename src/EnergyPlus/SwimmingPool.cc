@@ -322,7 +322,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                  Alphas(1),
                                                                                                  DataLoopNode::NodeFluidType::Water,
                                                                                                  DataLoopNode::NodeConnectionType::Inlet,
-                                                                                                 1,
+                                                                                                 NodeInputManager::compFluidStream::Primary,
                                                                                                  DataLoopNode::ObjectIsNotParent);
         state.dataSwimmingPools->Pool(Item).WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                                   Alphas(7),
@@ -331,7 +331,7 @@ void GetSwimmingPool(EnergyPlusData &state)
                                                                                                   Alphas(1),
                                                                                                   DataLoopNode::NodeFluidType::Water,
                                                                                                   DataLoopNode::NodeConnectionType::Outlet,
-                                                                                                  1,
+                                                                                                  NodeInputManager::compFluidStream::Primary,
                                                                                                   DataLoopNode::ObjectIsNotParent);
         if ((!lAlphaBlanks(6)) || (!lAlphaBlanks(7))) {
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(6), Alphas(7), "Hot Water Nodes");
@@ -404,7 +404,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
         ShowSevereError(state, RoutineName + "Invalid " + cAlphaField2 + " = " + Alpha2);
         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alpha1);
         ErrorsFound = true;
-    } else if (state.dataSurface->Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool) {
+    } else if (state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr)) {
         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha1 + "\", Invalid Surface");
         ShowContinueError(state, cAlphaField2 + "=\"" + Alpha2 + "\" has been used in another radiant system, ventilated slab, or pool.");
         ShowContinueError(state,
@@ -423,7 +423,7 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
                         state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is defined as a window.  This is not allowed.  A pool must be a floor that is NOT a window.");
         ErrorsFound = true;
-    } else if (state.dataSurface->Surface(this->SurfacePtr).MaterialMovInsulInt > 0) {
+    } else if (state.dataSurface->SurfMaterialMovInsulInt(this->SurfacePtr) > 0) {
         ShowSevereError(state,
                         state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
@@ -435,8 +435,8 @@ void SwimmingPoolData::ErrorCheckSetupPoolSurface(
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
         ErrorsFound = true;
     } else { // ( Pool( Item ).SurfacePtr > 0 )
-        state.dataSurface->Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
-        state.dataSurface->Surface(this->SurfacePtr).IsPool = true;
+        state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(this->SurfacePtr) = true;
+        state.dataSurface->SurfIsPool(this->SurfacePtr) = true;
         this->ZonePtr = state.dataSurface->Surface(this->SurfacePtr).Zone;
         // Check to make sure pool surface is a floor
         if (state.dataSurface->Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::Floor) {
@@ -775,10 +775,10 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // for the inside surface temperature which is assumed to be the same as the pool
     // water temperature.
     // Standard Heat Balance Equation:
-    //        TempSurfInTmp( SurfNum ) = ( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn( SurfNum
+    //        SurfTempInTmp( SurfNum ) = ( SurfCTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn( SurfNum
     //)
     //* RefAirTemp( SurfNum ) + NetLWRadToSurf( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( 1, SurfNum ) + QHTRadSysSurf(
-    // SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + IterDampConst * TempInsOld(
+    // SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + IterDampConst * SurfTempInsOld(
     // SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TH11 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) + IterDampConst );
     //// Constant part of conduction eq (history terms) | LW radiation from internal sources | SW radiation from internal sources | Convection
     // from surface to zone air | Net radiant exchange with other zone surfaces | Heat source/sink term for radiant systems | (if there is one
@@ -936,6 +936,9 @@ void SwimmingPoolData::update(EnergyPlusData &state)
     Real64 WaterMassFlow = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate; // water mass flow rate
     if (WaterMassFlow > 0.0) state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->PoolWaterTemp;
 }
+void SwimmingPoolData::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRUE. if the swimming pool "runs" this zone time step
 {
@@ -1037,20 +1040,20 @@ Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
 
             if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                 // Window frame contribution
-                SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                              (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
+                SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                              (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
             }
 
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
                 state.dataSurface->SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntShade &&
                 state.dataSurface->SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntBlind) {
                 // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                              (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
+                SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                              (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
             }
         }
 
-        SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
+        SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
     }
 
     return SumHATsurf;

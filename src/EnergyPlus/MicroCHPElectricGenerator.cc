@@ -325,7 +325,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantOutletNodeID =
                 NodeInputManager::GetOnlySingleNode(state,
@@ -335,7 +335,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
                 state, state.dataIPShortCut->cCurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Heat Recovery Nodes");
@@ -350,7 +350,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    2,
+                                                    NodeInputManager::compFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             state.dataCHPElectGen->MicroCHP(GeneratorNum).AirOutletNodeName = AlphArray(7); //  A7 Air Outlet Node Name
@@ -362,7 +362,7 @@ void GetMicroCHPGeneratorInput(EnergyPlusData &state)
                                                     AlphArray(1),
                                                     DataLoopNode::NodeFluidType::Air,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    2,
+                                                    NodeInputManager::compFluidStream::Secondary,
                                                     DataLoopNode::ObjectIsNotParent);
 
             state.dataCHPElectGen->MicroCHP(GeneratorNum).FuelSupplyID =
@@ -584,7 +584,7 @@ void MicroCHPDataStruct::simulate(EnergyPlusData &state,
 
 void MicroCHPDataStruct::onInitLoopEquip(EnergyPlusData &state, const EnergyPlus::PlantLocation &)
 {
-    constexpr auto RoutineName("MicroCHPDataStruct::onInitLoopEquip");
+    static constexpr std::string_view RoutineName("MicroCHPDataStruct::onInitLoopEquip");
 
     Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
@@ -633,46 +633,7 @@ void MicroCHPDataStruct::InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    bool errFlag;
-
-    if (this->myFlag) {
-        this->setupOutputVars(state);
-        this->myFlag = false;
-    }
-
-    if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
-        errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(state,
-                                                this->Name,
-                                                DataPlant::TypeOf_Generator_MicroCHP,
-                                                this->CWLoopNum,
-                                                this->CWLoopSideNum,
-                                                this->CWBranchNum,
-                                                this->CWCompNum,
-                                                errFlag,
-                                                _,
-                                                _,
-                                                _,
-                                                _,
-                                                _);
-
-        if (errFlag) {
-            ShowFatalError(state, "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");
-        }
-
-        if (!this->A42Model.InternalFlowControl) {
-            // IF this is on the supply side and not internal flow control then reset flow priority to lower
-            if (this->CWLoopSideNum == DataPlant::SupplySide) {
-                state.dataPlnt->PlantLoop(this->CWLoopNum)
-                    .LoopSide(this->CWLoopSideNum)
-                    .Branch(this->CWBranchNum)
-                    .Comp(this->CWCompNum)
-                    .FlowPriority = DataPlant::LoopFlowStatus_TakesWhatGets;
-            }
-        }
-
-        this->MyPlantScanFlag = false;
-    }
+    this->oneTimeInit(state);
 
     if (!state.dataGlobal->SysSizingCalc && this->MySizeFlag && !this->MyPlantScanFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
         this->MySizeFlag = false;
@@ -781,7 +742,7 @@ void MicroCHPDataStruct::CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &s
     // IEA Annex 42 FC-COGEN-SIM "A Generic Model Specification for Combustion-based Residential CHP Devices"
     // Alex Ferguson, Nick Kelly, Version 3, June 26, 2006
 
-    constexpr auto RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
+    static constexpr std::string_view RoutineName("CalcMicroCHPNoNormalizeGeneratorModel");
 
     DataGenerators::OperatingMode CurrentOpMode = DataGenerators::OperatingMode::Unassigned;
     Real64 AllowedLoad = 0.0;
@@ -1346,7 +1307,7 @@ void MicroCHPDataStruct::CalcUpdateHeatRecovery(EnergyPlusData &state) const
     // PURPOSE OF THIS SUBROUTINE:
     // update plant loop interactions, do any calcs needed
 
-    constexpr auto RoutineName("CalcUpdateHeatRecovery");
+    static constexpr std::string_view RoutineName("CalcUpdateHeatRecovery");
 
     PlantUtilities::SafeCopyPlantNode(state, this->PlantInletNodeID, this->PlantOutletNodeID);
 
@@ -1381,7 +1342,7 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
     // PURPOSE OF THIS SUBROUTINE:
     // update variables in structures linked to output reports
 
-    constexpr auto RoutineName("UpdateMicroCHPGeneratorRecords");
+    static constexpr std::string_view RoutineName("UpdateMicroCHPGeneratorRecords");
 
     this->A42Model.ACPowerGen = this->A42Model.Pnet; // electrical power produced [W]
     this->A42Model.ACEnergyGen = this->A42Model.Pnet * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour; // energy produced (J)
@@ -1431,6 +1392,52 @@ void MicroCHPDataStruct::UpdateMicroCHPGeneratorRecords(EnergyPlusData &state) /
     if (this->AirOutletNodeID > 0) {
         state.dataLoopNodes->Node(this->AirOutletNodeID).MassFlowRate = this->A42Model.MdotAir;
         state.dataLoopNodes->Node(this->AirOutletNodeID).Temp = this->A42Model.Teng;
+    }
+}
+void MicroCHPDataStruct::oneTimeInit(EnergyPlusData &state)
+{
+
+    bool errFlag;
+
+    if (this->myFlag) {
+        this->setupOutputVars(state);
+        this->myFlag = false;
+    }
+
+    if (this->MyPlantScanFlag) {
+        if (allocated(state.dataPlnt->PlantLoop)) {
+            errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_Generator_MicroCHP,
+                                                    this->CWLoopNum,
+                                                    this->CWLoopSideNum,
+                                                    this->CWBranchNum,
+                                                    this->CWCompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
+
+            if (errFlag) {
+                ShowFatalError(state, "InitMicroCHPNoNormalizeGenerators: Program terminated for previous conditions.");
+            }
+
+            if (!this->A42Model.InternalFlowControl) {
+                // IF this is on the supply side and not internal flow control then reset flow priority to lower
+                if (this->CWLoopSideNum == DataPlant::SupplySide) {
+                    state.dataPlnt->PlantLoop(this->CWLoopNum)
+                        .LoopSide(this->CWLoopSideNum)
+                        .Branch(this->CWBranchNum)
+                        .Comp(this->CWCompNum)
+                        .FlowPriority = DataPlant::LoopFlowStatus_TakesWhatGets;
+                }
+            }
+
+            this->MyPlantScanFlag = false;
+        }
     }
 }
 } // namespace EnergyPlus::MicroCHPElectricGenerator

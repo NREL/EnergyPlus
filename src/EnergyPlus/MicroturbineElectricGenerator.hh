@@ -221,6 +221,8 @@ namespace MicroturbineElectricGenerator {
         void setupOutputVars(EnergyPlusData &state);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetMTGeneratorInput(EnergyPlusData &state);
@@ -232,7 +234,7 @@ struct MicroturbineElectricGeneratorData : BaseGlobalStruct
 
     int NumMTGenerators = 0;
     bool GetMTInput = true;
-    Array1D<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
+    EPVector<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
 
     void clear_state() override
     {

@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -68,12 +69,17 @@ namespace DataHeatBalFanSys {
     constexpr Real64 MaxRadHeatFlux = 4000.0; // [W/m2] max limit for radiant heat flux at a surface due to HVAC equipment
 
     // Controls for PredictorCorrector
-    constexpr int iGetZoneSetPoints = 1;
-    constexpr int iPredictStep = 2;
-    constexpr int iCorrectStep = 3;
-    constexpr int iRevertZoneTimestepHistories = 4;
-    constexpr int iPushZoneTimestepHistories = 5;
-    constexpr int iPushSystemTimestepHistories = 6;
+
+    enum class PredictorCorrectorCtrl
+    {
+        Unassigned = -1,
+        GetZoneSetPoints,
+        PredictStep,
+        CorrectStep,
+        RevertZoneTimestepHistories,
+        PushZoneTimestepHistories,
+        PushSystemTimestepHistories
+    };
 
     struct ZoneComfortControlsFangerData
     {
@@ -266,7 +272,7 @@ struct HeatBalFanSysData : BaseGlobalStruct
     Array1D<std::vector<Real64>> ZoneLowSETHours;
     Array1D<std::vector<Real64>> ZoneHighSETHours;
 
-    Array1D<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
+    EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
     void clear_state() override
     {

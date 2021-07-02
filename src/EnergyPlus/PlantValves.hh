@@ -106,6 +106,8 @@ namespace PlantValves {
         void initialize(EnergyPlusData &state);
 
         void calculate(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetPlantValvesInput(EnergyPlusData &state);
@@ -118,7 +120,7 @@ struct PlantValvesData : BaseGlobalStruct
     bool GetTemperingValves = true;
     bool OneTimeInitFlag = true;
     int NumTemperingValves = 0;
-    Array1D<PlantValves::TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
+    EPVector<PlantValves::TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
 
     void clear_state() override
     {

@@ -1071,10 +1071,15 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
     state->dataSurface->Surface.allocate(3);
-    state->dataHeatBal->HConvIn.allocate(3);
+    state->dataHeatBalSurf->SurfHConvInt.allocate(3);
     state->dataLoopNodes->Node.allocate(4);
-    state->dataHeatBal->TempEffBulkAir.allocate(3);
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(3);
+    state->dataHeatBal->SurfTempEffBulkAir.allocate(3);
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(3);
+
+    state->dataSurface->SurfTAirRef.allocate(3);
+    state->dataSurface->SurfTAirRef(1) = ZoneMeanAirTemp;
+    state->dataSurface->SurfTAirRef(2) = AdjacentAirTemp;
+    state->dataSurface->SurfTAirRef(3) = ZoneSupplyAirTemp;
 
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(2).HeatTransSurf = true;
@@ -1082,15 +1087,12 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataSurface->Surface(1).Area = 10.0;
     state->dataSurface->Surface(2).Area = 10.0;
     state->dataSurface->Surface(3).Area = 10.0;
-    state->dataSurface->Surface(1).TAirRef = ZoneMeanAirTemp;
-    state->dataSurface->Surface(2).TAirRef = AdjacentAirTemp;
-    state->dataSurface->Surface(3).TAirRef = ZoneSupplyAirTemp;
-    state->dataHeatBalSurf->TempSurfInTmp(1) = 15.0;
-    state->dataHeatBalSurf->TempSurfInTmp(2) = 20.0;
-    state->dataHeatBalSurf->TempSurfInTmp(3) = 25.0;
-    state->dataHeatBal->TempEffBulkAir(1) = 10.0;
-    state->dataHeatBal->TempEffBulkAir(2) = 10.0;
-    state->dataHeatBal->TempEffBulkAir(3) = 10.0;
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBal->SurfTempEffBulkAir(1) = 10.0;
+    state->dataHeatBal->SurfTempEffBulkAir(2) = 10.0;
+    state->dataHeatBal->SurfTempEffBulkAir(3) = 10.0;
 
     state->dataLoopNodes->Node(1).Temp = 20.0;
     state->dataLoopNodes->Node(2).Temp = 20.0;
@@ -1101,9 +1103,9 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBal->HConvIn(1) = 0.5;
-    state->dataHeatBal->HConvIn(2) = 0.5;
-    state->dataHeatBal->HConvIn(3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(3) = 0.5;
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;

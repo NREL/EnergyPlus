@@ -75,7 +75,6 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
@@ -177,7 +176,7 @@ namespace HVACSingleDuctInduc {
         {
             auto const SELECT_CASE_var(state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num);
 
-            if (SELECT_CASE_var == SingleDuct_CV_FourPipeInduc) {
+            if (SELECT_CASE_var == SingleDuct_CV::FourPipeInduc) {
 
                 SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
@@ -290,7 +289,7 @@ namespace HVACSingleDuctInduc {
 
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name = Alphas(1);
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType = CurrentModuleObject;
-            state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num = SingleDuct_CV_FourPipeInduc;
+            state.dataHVACSingleDuctInduc->IndUnit(IUNum).UnitType_Num = SingleDuct_CV::FourPipeInduc;
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -314,7 +313,7 @@ namespace HVACSingleDuctInduc {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsParent,
                                                                                            cAlphaFields(3));
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).SecAirInNode = GetOnlySingleNode(state,
@@ -324,7 +323,7 @@ namespace HVACSingleDuctInduc {
                                                                                            Alphas(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Inlet,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsParent,
                                                                                            cAlphaFields(4));
             state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutAirNode = GetOnlySingleNode(state,
@@ -334,7 +333,7 @@ namespace HVACSingleDuctInduc {
                                                                                          Alphas(1),
                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                          DataLoopNode::NodeConnectionType::Outlet,
-                                                                                         1,
+                                                                                         NodeInputManager::compFluidStream::Primary,
                                                                                          ObjectIsParent,
                                                                                          cAlphaFields(5));
 
@@ -1204,27 +1203,14 @@ namespace HVACSingleDuctInduc {
         // (3) If there is a heating coil load, control the heating coil to meet the load and keep
         //     the cooling coil off.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
 
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
-        using TempSolveRoot::SolveRoot;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const SolveMaxIter(50);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QZnReq;           // heating or cooling needed by zone [Watts]

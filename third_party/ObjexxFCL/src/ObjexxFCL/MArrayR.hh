@@ -87,14 +87,11 @@ public: // Creation
 
 	// Destructor
 	virtual
-	~MArrayR()
-	{}
-
-protected: // Assignment
+	~MArrayR() = default;
 
 	// Copy Assignment
 	MArrayR &
-	operator =( MArrayR const & a ); // Disallow
+	operator =( MArrayR const & a ) = delete;
 
 public: // Inspector
 

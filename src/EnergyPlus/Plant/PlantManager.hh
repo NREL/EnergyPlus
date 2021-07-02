@@ -107,12 +107,27 @@ namespace PlantManager {
 
     void CheckOngoingPlantWarnings(EnergyPlusData &state);
 
+    struct EmptyPlantComponent : PlantComponent
+    {
+        // this is for purely air side equipment or similar that dont need anything at all done on plant for now
+        // this could be a placeholder until those components are more integrated with plant side calcs.
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      [[maybe_unused]] const PlantLocation &calledFromLocation,
+                      [[maybe_unused]] bool FirstHVACIteration,
+                      [[maybe_unused]] Real64 &CurLoad,
+                      [[maybe_unused]] bool RunFlag) override
+        {
+            // this is empty on purpose
+        }
+
+        void oneTimeInit(EnergyPlusData &state) override;
+    };
+
 } // namespace PlantManager
 
 struct PlantMgrData : BaseGlobalStruct
 {
 
-    bool InitLoopEquip = true;
     bool GetCompSizFac = true;
     bool SupplyEnvrnFlag = true;
     bool MySetPointCheckFlag = true;
@@ -122,10 +137,10 @@ struct PlantMgrData : BaseGlobalStruct
     int OtherLoopDemandSideCallingIndex = 0;
     int NewOtherDemandSideCallingIndex = 0;
     int newCallingIndex = 0;
+    PlantManager::EmptyPlantComponent dummyPlantComponent;
 
     void clear_state() override
     {
-        this->InitLoopEquip = true;
         this->GetCompSizFac = true;
         this->SupplyEnvrnFlag = true;
         this->MySetPointCheckFlag = true;
@@ -135,6 +150,7 @@ struct PlantMgrData : BaseGlobalStruct
         this->OtherLoopDemandSideCallingIndex = 0;
         this->NewOtherDemandSideCallingIndex = 0;
         this->newCallingIndex = 0;
+        this->dummyPlantComponent = {};
     }
 };
 

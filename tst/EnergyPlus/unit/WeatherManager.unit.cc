@@ -685,7 +685,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation)
         "   ** Warning ** Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?  Your building site is in the middle of the "
         "Atlantic Ocean.",
         "   ** Severe  ** GetNextEnvironment: No location specified, program will terminate.",
-        "   **  Fatal  ** GetNextEnvironment: Errors found in Weater Data Input. Program terminates.",
+        "   **  Fatal  ** GetNextEnvironment: Errors found in Weather Data Input. Program terminates.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=2",
         "   ..... Last severe error=GetNextEnvironment: No location specified, program will terminate.",
@@ -966,7 +966,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz)
 TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz)
 {
 
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
     std::string const idf_objects = delimited_string({
         "  Version,9.3;",
 
@@ -1104,7 +1104,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     ErrorsFound = false;
 
     state->dataWeatherManager->WeatherFileExists = true;
-    state->files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     state->dataGlobal->BeginSimFlag = true;
     SimulationManager::GetProjectData(*state);
@@ -1147,4 +1147,113 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     // Test the feature of interpolating some weather inputs to calc sky temp
     Real64 expected_SkyTemp = -20.8188538296;
     EXPECT_NEAR(state->dataWeatherManager->TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
+}
+
+// Test for Issue 8760: fix opaque sky cover weather values;
+TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
+{
+    std::string const idf_objects = delimited_string({
+        "Timestep,4;"
+
+        "SimulationControl,",
+        "  Yes,                     !- Do Zone Sizing Calculation",
+        "  Yes,                     !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  Yes,                     !- Run Simulation for Sizing Periods",
+        "  No;                      !- Run Simulation for Weather File Run Periods",
+
+        "RunPeriod,",
+        "  January,                 !- Name",
+        "  1,                       !- Begin Month",
+        "  1,                       !- Begin Day of Month",
+        "  ,                        !- Begin Year",
+        "  1,                       !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Tuesday,                 !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Holidays and Special Days",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  No,                      !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes;                     !- Use Weather File Snow Indicators",
+
+        "Site:Location,",
+        "  Univ_Of_Illinois_725315,  !- Name",
+        "  40.06,                   !- Latitude {deg}",
+        "  -88.37,                  !- Longitude {deg}",
+        "  -6.0,                   !- Time Zone {hr}",
+        "  213.0;                  !- Elevation {m}",
+
+        "Output:Variable,*,Site Total Sky Cover,Timestep;",
+        "Output:Variable,*,Site Opaque Sky Cover,Timestep;",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::PostIPProcessing(*state);
+    bool ErrorsFound(false);
+    ErrorsFound = false;
+
+    state->dataWeatherManager->WeatherFileExists = true;
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "weather/USA_IL_University.of.Illinois-Willard.AP.725315_TMY3.epw";
+    state->dataGlobal->BeginSimFlag = true;
+    SimulationManager::GetProjectData(*state);
+
+    bool Available(true);
+    Available = true;
+
+    state->dataGlobal->BeginSimFlag = true;
+    WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
+
+    // Test get output variables for Total Sky Cover and Opaque Sky Cover
+    EXPECT_EQ("Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(1).VarNameOnly);
+    EXPECT_EQ("Environment:Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(1).VarName);
+    EXPECT_EQ("Site Opaque Sky Cover", state->dataOutputProcessor->RVariableTypes(2).VarNameOnly);
+    EXPECT_EQ("Environment:Site Opaque Sky Cover", state->dataOutputProcessor->RVariableTypes(2).VarName);
+
+    EXPECT_EQ(7, state->dataOutputProcessor->RVariableTypes(1).ReportID);
+    EXPECT_EQ(8, state->dataOutputProcessor->RVariableTypes(2).ReportID);
+
+    state->dataWeatherManager->Envrn = 1;
+
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeatherManager->Environment.allocate(1);
+    state->dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state->dataWeatherManager->Environment(1).StartMonth = 1;
+    state->dataWeatherManager->Environment(1).StartDay = 1;
+
+    state->dataWeatherManager->Environment(1).UseWeatherFileHorizontalIR = false;
+
+    AllocateWeatherData(*state);
+    OpenWeatherFile(*state, ErrorsFound);
+    ReadWeatherForDay(*state, 1, 1, true);
+
+    // Test additional set of weather data on sky temp calc
+    Real64 expected_SkyTemp = -1.7901122977770569;
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowSkyTemp(2, 1), expected_SkyTemp, 1e-6);
+
+    // Test Total Sky Cover and Opaque Sky Cover
+    Real64 expected_TSC = 9;
+    Real64 expected_OSC = 8;
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(4, 3), expected_TSC, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(4, 3), expected_OSC, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(3, 3), 9.25, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(3, 3), 8.25, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(2, 3), 9.5, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(2, 3), 8.5, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(1, 3), 9.75, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(1, 3), 8.75, 1e-6);
+
+    expected_TSC = 8;
+    expected_OSC = 8;
+
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(4, 4), expected_TSC, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(4, 4), expected_OSC, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(3, 4), 8.25, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(3, 4), 8.00, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(2, 4), 8.50, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(2, 4), 8.00, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowTotalSkyCover(1, 4), 8.75, 1e-6);
+    EXPECT_NEAR(state->dataWeatherManager->TomorrowOpaqueSkyCover(1, 4), 8.00, 1e-6);
 }

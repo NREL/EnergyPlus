@@ -80,10 +80,10 @@ bool MatchAndSetColorTextString(EnergyPlusData &state,
     //       RE-ENGINEERED  na
 
     bool WasSet = false;
-    int found = UtilityRoutines::FindItem(String, state.dataSurfColor->colorkeys, NumColors);
+    int found = UtilityRoutines::FindItem(String, state.dataSurfColor->colorkeys, static_cast<int>(ColorNo::NUM));
     if (found != 0) {
         if (ColorType == "DXF") {
-            state.dataSurfColor->DXFcolorno(state.dataSurfColor->colorkeyptr(found)) = SetValue;
+            state.dataSurfColor->DXFcolorno(found) = SetValue;
             WasSet = true;
         }
     }
