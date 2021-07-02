@@ -17304,7 +17304,7 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
         "   Yes,                  !- Run on Sensible Load",
         "   No,                   !- Run on Latent Load",
         "   2.0;                  !- Minimum Air To Water Temperature Offset",
-        });
+    });
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
@@ -17911,7 +17911,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
     ;
-    // Test 1: economizer inlet water temperature is favorbale, coil is ON
+    // Test 1: economizer inlet water temperature is favorable, coil ON
     // run init and check the coil system operating condition and control status
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
     EXPECT_TRUE(thisSys.runWaterSideEconomizer);
@@ -17921,7 +17921,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     thisSys.calcUnitaryCoolingSystem(*state, AirLoopNum, false, thisSys.m_CoolingPartLoadFrac, CompOn, OnOffAirFlowRatio, CoilCoolHeatRat, false);
     EXPECT_NEAR(19267.0, state->dataWaterCoils->WaterCoil(1).TotWaterCoolingCoilRate, 1.0);
     ;
-    // Test 2: economizer inlet water temperature is favorbale, expect coil is OFF
+    // Test 2: economizer inlet water temperature is NOT favorable, expect coil OFF
     state->dataWaterCoils->WaterCoil(1).InletWaterTemp = 29.5;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).Temp = state->dataWaterCoils->WaterCoil(1).InletWaterTemp;
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
