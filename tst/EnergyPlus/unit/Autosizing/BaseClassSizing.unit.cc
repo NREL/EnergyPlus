@@ -67,6 +67,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -1425,6 +1426,10 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     SimulationManager::ManageSimulation(*state);
+    EXPECT_EQ(state->dataSurface->Surface(7).Class, EnergyPlus::DataSurfaces::SurfaceClass::Window);
+    EXPECT_EQ(state->dataSurface->Surface(7).ExtBoundCond, EnergyPlus::DataSurfaces::ExternalEnvironment);
+    EXPECT_NEAR(state->dataHeatBal->CoeffAdjRatioIn(7), 1.0006045, 1E-7);
+    EXPECT_NEAR(state->dataHeatBalSurf->CoeffAdjRatioOut(7), 1.0006045, 1E-7);
 
     int CtrlZoneNum(1);
     // design peak load conditons and design supply air temperature
@@ -1440,6 +1445,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
     EXPECT_EQ(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);      // expects zero
     EXPECT_EQ(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0);     // expects zero
     // expects non-zero peak heating load
-    EXPECT_NEAR(state->dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
-    EXPECT_NEAR(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
+    // reference value changed from 6911.42 to 6911.12
+    // due to state->dataHeatBal->CoeffAdjRatioIn(7) and state->dataHeatBalSurf->CoeffAdjRatioOut(7)
+    EXPECT_NEAR(state->dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.12, 0.01);
+    EXPECT_NEAR(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.12, 0.01);
 }
