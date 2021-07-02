@@ -258,6 +258,10 @@ namespace SurfaceGroundHeatExchanger {
         //==============================================================================
 
         void ReportSurfaceGroundHeatExchngr(EnergyPlusData &state); // Index for the surface under consideration
+
+        //==============================================================================
+
+        void oneTimeInit(EnergyPlusData &state) override; // Empty function for pure virtual oneTimeInitFlag function
     };
 
     void GetSurfaceGroundHeatExchanger(EnergyPlusData &state);

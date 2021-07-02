@@ -571,6 +571,8 @@ namespace RefrigeratedCase {
                       bool FirstHVACIteration,
                       Real64 &CurLoad,
                       bool RunFlag) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct RefrigSystemData
@@ -1070,6 +1072,8 @@ namespace RefrigeratedCase {
                       bool FirstHVACIteration,
                       Real64 &CurLoad,
                       bool RunFlag) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct RefrigGasCoolerData

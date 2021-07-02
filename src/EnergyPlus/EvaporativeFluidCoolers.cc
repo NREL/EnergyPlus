@@ -1141,64 +1141,7 @@ namespace EvaporativeFluidCoolers {
 
         std::string const RoutineName("InitEvapFluidCooler");
 
-        bool ErrorsFound(false); // Flag if input data errors are found
-        if (this->MyOneTimeFlag) {
-
-            this->setupOutputVars(state);
-
-            this->FluidIndex = state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).FluidIndex;
-            std::string FluidName = FluidProperties::GetGlycolNameByIndex(state, this->FluidIndex);
-
-            if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
-                this->PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
-                if (FluidName != "WATER") {
-                    ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = \"" + this->Name +
-                                        R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
-                    ShowContinueError(state,
-                                      "Currently, Fluid Type = " + FluidName +
-                                          " in CondenserLoop = " + state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).Name);
-                    ErrorsFound = true;
-                }
-            }
-
-            this->MyOneTimeFlag = false;
-        }
-
-        if (this->OneTimeFlagForEachEvapFluidCooler) {
-            // Locate the tower on the plant loops for later usage
-            PlantUtilities::ScanPlantLoopsForObject(
-                state, this->Name, this->TypeOf_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
-
-            if (ErrorsFound) {
-                ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
-            }
-
-            if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
-                if (this->DesignWaterFlowRate > 0.0) {
-                    if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate) {
-                        ShowSevereError(state,
-                                        "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
-                                            "\". Low speed air flow rate must be less than the high speed air flow rate.");
-                        ErrorsFound = true;
-                    }
-                    if ((this->HighSpeedEvapFluidCoolerUA > 0.0) && (this->LowSpeedEvapFluidCoolerUA > 0.0) &&
-                        (this->HighSpeedEvapFluidCoolerUA <= this->LowSpeedEvapFluidCoolerUA)) {
-                        ShowSevereError(state,
-                                        "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
-                                            "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at "
-                                            "high fan speed.");
-                        ErrorsFound = true;
-                    }
-                }
-            }
-
-            if (ErrorsFound) {
-                ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
-            }
-
-            this->OneTimeFlagForEachEvapFluidCooler = false;
-        }
+        this->oneTimeInit(state);
 
         // Begin environment initializations
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -2715,6 +2658,68 @@ namespace EvaporativeFluidCoolers {
             this->fluidCoolerOutletWaterTemp = this->OutletWaterTemp;
             this->FanEnergy = this->FanPower * ReportingConstant;
             this->WaterAmountUsed = this->WaterUsage * ReportingConstant;
+        }
+    }
+    void EvapFluidCoolerSpecs::oneTimeInit(EnergyPlusData &state)
+    {
+        bool ErrorsFound(false); // Flag if input data errors are found
+
+        if (this->MyOneTimeFlag) {
+
+            this->setupOutputVars(state);
+
+            this->FluidIndex = state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).FluidIndex;
+            std::string FluidName = FluidProperties::GetGlycolNameByIndex(state, this->FluidIndex);
+
+            if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
+                this->PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
+                if (FluidName != "WATER") {
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + " = \"" + this->Name +
+                                        R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
+                    ShowContinueError(state,
+                                      "Currently, Fluid Type = " + FluidName +
+                                          " in CondenserLoop = " + state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).Name);
+                    ErrorsFound = true;
+                }
+            }
+
+            this->MyOneTimeFlag = false;
+        }
+
+        if (this->OneTimeFlagForEachEvapFluidCooler) {
+            // Locate the tower on the plant loops for later usage
+            PlantUtilities::ScanPlantLoopsForObject(
+                state, this->Name, this->TypeOf_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+
+            if (ErrorsFound) {
+                ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
+            }
+
+            if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_TwoSpd) {
+                if (this->DesignWaterFlowRate > 0.0) {
+                    if (this->HighSpeedAirFlowRate <= this->LowSpeedAirFlowRate) {
+                        ShowSevereError(state,
+                                        "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
+                                            "\". Low speed air flow rate must be less than the high speed air flow rate.");
+                        ErrorsFound = true;
+                    }
+                    if ((this->HighSpeedEvapFluidCoolerUA > 0.0) && (this->LowSpeedEvapFluidCoolerUA > 0.0) &&
+                        (this->HighSpeedEvapFluidCoolerUA <= this->LowSpeedEvapFluidCoolerUA)) {
+                        ShowSevereError(state,
+                                        "EvaporativeFluidCooler:TwoSpeed \"" + this->Name +
+                                            "\". Evaporative fluid cooler UA at low fan speed must be less than the evaporative fluid cooler UA at "
+                                            "high fan speed.");
+                        ErrorsFound = true;
+                    }
+                }
+            }
+
+            if (ErrorsFound) {
+                ShowFatalError(state, "InitEvapFluidCooler: Program terminated due to previous condition(s).");
+            }
+
+            this->OneTimeFlagForEachEvapFluidCooler = false;
         }
     }
 

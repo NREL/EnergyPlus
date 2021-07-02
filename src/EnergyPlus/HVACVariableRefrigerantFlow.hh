@@ -587,6 +587,8 @@ namespace HVACVariableRefrigerantFlow {
                              Real64 &Pipe_DeltP,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
                              Real64 &Pipe_h_comp_out // Piping Loss Algorithm Parameter: Enthalpy before piping loss (compressor outlet) [kJ/kg]
         ) const;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct TerminalUnitListData
