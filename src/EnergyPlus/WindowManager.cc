@@ -3113,6 +3113,155 @@ namespace WindowManager {
 
     //****************************************************************************
 
+    void GetHeatBalanceEqCoefMatrixSimple(EnergyPlusData &state,
+                                          int const ConstrNum,
+                                          int const nglasslayer,
+                                          Array2D<Real64> &Aface,
+                                          Array1D<Real64> &Bface,
+                                          Array1D<Real64> hr)
+    {
+        auto &hgap = state.dataWindowManager->hgap;
+
+        Real64 gr;  // Grashof number of gas in a gap
+        Real64 con; // Gap gas conductivity
+        Real64 pr;  // Gap gas Prandtl number
+        Real64 nu;  // Gap gas Nusselt number
+
+        if (nglasslayer == 1) {
+            Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
+                       state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatio(ConstrNum) * state.dataWindowManager->tout +
+                       state.dataWindowManager->AbsRadGlassFace(1);
+            Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
+                       state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatio(ConstrNum) * state.dataWindowManager->tin +
+                       state.dataWindowManager->AbsRadGlassFace(2);
+
+            Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+            Aface(2, 1) = -state.dataWindowManager->scon(1);
+            Aface(1, 2) = -state.dataWindowManager->scon(1);
+            Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+
+        } else if (nglasslayer == 2) {
+            WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
+            NusseltNumber(state, 0, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, gr, pr, nu);
+            hgap(1) = con / state.dataWindowManager->gap(1) * nu;
+
+            Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
+                       state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
+            Bface(2) = state.dataWindowManager->AbsRadGlassFace(2);
+            Bface(3) = state.dataWindowManager->AbsRadGlassFace(3);
+            Bface(4) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(4) +
+                       state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(4);
+
+            Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
+            Aface(2, 1) = -state.dataWindowManager->scon(1);
+
+            Aface(1, 2) = -state.dataWindowManager->scon(1);
+            Aface(2, 2) = state.dataWindowManager->scon(1) + hgap(1) - state.dataWindowManager->A23P * hr(2);
+            Aface(3, 2) = -hgap(1) - state.dataWindowManager->A32P * hr(3);
+
+            Aface(2, 3) = -hgap(1) + state.dataWindowManager->A23P * hr(2);
+            Aface(3, 3) = hgap(1) + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
+            Aface(4, 3) = -state.dataWindowManager->scon(2);
+
+            Aface(3, 4) = -state.dataWindowManager->scon(2);
+            Aface(4, 4) = hr(4) + state.dataWindowManager->scon(2) + state.dataWindowManager->hcin;
+
+        } else if (nglasslayer == 3) {
+            WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
+            NusseltNumber(state, 0, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, gr, pr, nu);
+            hgap(1) = con / state.dataWindowManager->gap(1) * nu;
+
+            WindowGasConductance(state, state.dataWindowManager->thetas(4), state.dataWindowManager->thetas(5), 2, con, pr, gr);
+            NusseltNumber(state, 0, state.dataWindowManager->thetas(4), state.dataWindowManager->thetas(5), 2, gr, pr, nu);
+            hgap(2) = con / state.dataWindowManager->gap(2) * nu;
+
+            Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
+                       state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
+            Bface(2) = state.dataWindowManager->AbsRadGlassFace(2);
+            Bface(3) = state.dataWindowManager->AbsRadGlassFace(3);
+            Bface(4) = state.dataWindowManager->AbsRadGlassFace(4);
+            Bface(5) = state.dataWindowManager->AbsRadGlassFace(5);
+            Bface(6) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(6) +
+                       state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(6);
+
+            Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
+            Aface(2, 1) = -state.dataWindowManager->scon(1);
+
+            Aface(1, 2) = -state.dataWindowManager->scon(1);
+            Aface(2, 2) = state.dataWindowManager->scon(1) + hgap(1) - state.dataWindowManager->A23P * hr(2);
+            Aface(3, 2) = -hgap(1) - state.dataWindowManager->A32P * hr(3);
+
+            Aface(2, 3) = -hgap(1) + state.dataWindowManager->A23P * hr(2);
+            Aface(3, 3) = hgap(1) + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
+            Aface(4, 3) = -state.dataWindowManager->scon(2);
+
+            Aface(3, 4) = -state.dataWindowManager->scon(2);
+            Aface(4, 4) = state.dataWindowManager->scon(2) + hgap(2) - state.dataWindowManager->A45P * hr(4);
+            Aface(5, 4) = -hgap(2) - state.dataWindowManager->A54P * hr(5);
+
+            Aface(4, 5) = -hgap(2) + state.dataWindowManager->A45P * hr(4);
+            Aface(5, 5) = hgap(2) + state.dataWindowManager->scon(3) + state.dataWindowManager->A54P * hr(5);
+            Aface(6, 5) = -state.dataWindowManager->scon(3);
+
+            Aface(5, 6) = -state.dataWindowManager->scon(3);
+            Aface(6, 6) = hr(6) + state.dataWindowManager->scon(3) + state.dataWindowManager->hcin;
+
+        } else if (nglasslayer == 4) {
+            WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
+            NusseltNumber(state, 0, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, gr, pr, nu);
+            hgap(1) = con / state.dataWindowManager->gap(1) * nu;
+
+            WindowGasConductance(state, state.dataWindowManager->thetas(4), state.dataWindowManager->thetas(5), 2, con, pr, gr);
+            NusseltNumber(state, 0, state.dataWindowManager->thetas(4), state.dataWindowManager->thetas(5), 2, gr, pr, nu);
+            hgap(2) = con / state.dataWindowManager->gap(2) * nu;
+
+            WindowGasConductance(state, state.dataWindowManager->thetas(6), state.dataWindowManager->thetas(7), 3, con, pr, gr);
+            NusseltNumber(state, 0, state.dataWindowManager->thetas(6), state.dataWindowManager->thetas(7), 3, gr, pr, nu);
+            hgap(3) = con / state.dataWindowManager->gap(3) * nu;
+
+            Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
+                       state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
+            Bface(2) = state.dataWindowManager->AbsRadGlassFace(2);
+            Bface(3) = state.dataWindowManager->AbsRadGlassFace(3);
+            Bface(4) = state.dataWindowManager->AbsRadGlassFace(4);
+            Bface(5) = state.dataWindowManager->AbsRadGlassFace(5);
+            Bface(6) = state.dataWindowManager->AbsRadGlassFace(6);
+            Bface(7) = state.dataWindowManager->AbsRadGlassFace(7);
+            Bface(8) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(8) +
+                       state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(8);
+
+            Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
+            Aface(2, 1) = -state.dataWindowManager->scon(1);
+
+            Aface(1, 2) = -state.dataWindowManager->scon(1);
+            Aface(2, 2) = state.dataWindowManager->scon(1) + hgap(1) - state.dataWindowManager->A23P * hr(2);
+            Aface(3, 2) = -hgap(1) - state.dataWindowManager->A32P * hr(3);
+
+            Aface(2, 3) = -hgap(1) + state.dataWindowManager->A23P * hr(2);
+            Aface(3, 3) = hgap(1) + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
+            Aface(4, 3) = -state.dataWindowManager->scon(2);
+
+            Aface(3, 4) = -state.dataWindowManager->scon(2);
+            Aface(4, 4) = state.dataWindowManager->scon(2) + hgap(2) - state.dataWindowManager->A45P * hr(4);
+            Aface(5, 4) = -hgap(2) - state.dataWindowManager->A54P * hr(5);
+
+            Aface(4, 5) = -hgap(2) + state.dataWindowManager->A45P * hr(4);
+            Aface(5, 5) = hgap(2) + state.dataWindowManager->scon(3) + state.dataWindowManager->A54P * hr(5);
+            Aface(6, 5) = -state.dataWindowManager->scon(3);
+
+            Aface(5, 6) = -state.dataWindowManager->scon(3);
+            Aface(6, 6) = state.dataWindowManager->scon(3) + hgap(3) - state.dataWindowManager->A67P * hr(6);
+            Aface(7, 6) = -hgap(3) - state.dataWindowManager->A76P * hr(7);
+
+            Aface(6, 7) = -hgap(3) + state.dataWindowManager->A67P * hr(6);
+            Aface(7, 7) = hgap(3) + state.dataWindowManager->scon(4) + state.dataWindowManager->A76P * hr(7);
+            Aface(8, 7) = -state.dataWindowManager->scon(4);
+
+            Aface(7, 8) = -state.dataWindowManager->scon(4);
+            Aface(8, 8) = hr(8) + state.dataWindowManager->scon(4) + state.dataWindowManager->hcin;
+        }
+    }
+
     void GetHeatBalanceEqCoefMatrix(EnergyPlusData &state,
                                     int const SurfNum,
                                     int const nglasslayer,
@@ -7120,154 +7269,18 @@ namespace WindowManager {
 
             ++iter;
 
-            {
-                auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-
-                if (SELECT_CASE_var == 1) {
-                    Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                               state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatio(ConstrNum) * state.dataWindowManager->tout +
-                               state.dataWindowManager->AbsRadGlassFace(1);
-                    Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
-                               state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatio(ConstrNum) * state.dataWindowManager->tin +
-                               state.dataWindowManager->AbsRadGlassFace(2);
-
-                    Aface(1, 1) =
-                        hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-                    Aface(2, 1) = -state.dataWindowManager->scon(1);
-                    Aface(1, 2) = -state.dataWindowManager->scon(1);
-                    Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-
-                } else if (SELECT_CASE_var == 2) {
-                    WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
-                    NusseltNumber(state, 0, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, gr, pr, nu);
-                    hgap(1) = con / state.dataWindowManager->gap(1) * nu;
-
-                    Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                               state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
-                    Bface(2) = state.dataWindowManager->AbsRadGlassFace(2);
-                    Bface(3) = state.dataWindowManager->AbsRadGlassFace(3);
-                    Bface(4) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(4) +
-                               state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(4);
-
-                    Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
-                    Aface(2, 1) = -state.dataWindowManager->scon(1);
-
-                    Aface(1, 2) = -state.dataWindowManager->scon(1);
-                    Aface(2, 2) = state.dataWindowManager->scon(1) + hgap(1) - state.dataWindowManager->A23P * hr(2);
-                    Aface(3, 2) = -hgap(1) - state.dataWindowManager->A32P * hr(3);
-
-                    Aface(2, 3) = -hgap(1) + state.dataWindowManager->A23P * hr(2);
-                    Aface(3, 3) = hgap(1) + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
-                    Aface(4, 3) = -state.dataWindowManager->scon(2);
-
-                    Aface(3, 4) = -state.dataWindowManager->scon(2);
-                    Aface(4, 4) = hr(4) + state.dataWindowManager->scon(2) + state.dataWindowManager->hcin;
-
-                } else if (SELECT_CASE_var == 3) {
-                    WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
-                    NusseltNumber(state, 0, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, gr, pr, nu);
-                    hgap(1) = con / state.dataWindowManager->gap(1) * nu;
-
-                    WindowGasConductance(state, state.dataWindowManager->thetas(4), state.dataWindowManager->thetas(5), 2, con, pr, gr);
-                    NusseltNumber(state, 0, state.dataWindowManager->thetas(4), state.dataWindowManager->thetas(5), 2, gr, pr, nu);
-                    hgap(2) = con / state.dataWindowManager->gap(2) * nu;
-
-                    Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                               state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
-                    Bface(2) = state.dataWindowManager->AbsRadGlassFace(2);
-                    Bface(3) = state.dataWindowManager->AbsRadGlassFace(3);
-                    Bface(4) = state.dataWindowManager->AbsRadGlassFace(4);
-                    Bface(5) = state.dataWindowManager->AbsRadGlassFace(5);
-                    Bface(6) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(6) +
-                               state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(6);
-
-                    Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
-                    Aface(2, 1) = -state.dataWindowManager->scon(1);
-
-                    Aface(1, 2) = -state.dataWindowManager->scon(1);
-                    Aface(2, 2) = state.dataWindowManager->scon(1) + hgap(1) - state.dataWindowManager->A23P * hr(2);
-                    Aface(3, 2) = -hgap(1) - state.dataWindowManager->A32P * hr(3);
-
-                    Aface(2, 3) = -hgap(1) + state.dataWindowManager->A23P * hr(2);
-                    Aface(3, 3) = hgap(1) + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
-                    Aface(4, 3) = -state.dataWindowManager->scon(2);
-
-                    Aface(3, 4) = -state.dataWindowManager->scon(2);
-                    Aface(4, 4) = state.dataWindowManager->scon(2) + hgap(2) - state.dataWindowManager->A45P * hr(4);
-                    Aface(5, 4) = -hgap(2) - state.dataWindowManager->A54P * hr(5);
-
-                    Aface(4, 5) = -hgap(2) + state.dataWindowManager->A45P * hr(4);
-                    Aface(5, 5) = hgap(2) + state.dataWindowManager->scon(3) + state.dataWindowManager->A54P * hr(5);
-                    Aface(6, 5) = -state.dataWindowManager->scon(3);
-
-                    Aface(5, 6) = -state.dataWindowManager->scon(3);
-                    Aface(6, 6) = hr(6) + state.dataWindowManager->scon(3) + state.dataWindowManager->hcin;
-
-                } else if (SELECT_CASE_var == 4) {
-                    WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
-                    NusseltNumber(state, 0, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, gr, pr, nu);
-                    hgap(1) = con / state.dataWindowManager->gap(1) * nu;
-
-                    WindowGasConductance(state, state.dataWindowManager->thetas(4), state.dataWindowManager->thetas(5), 2, con, pr, gr);
-                    NusseltNumber(state, 0, state.dataWindowManager->thetas(4), state.dataWindowManager->thetas(5), 2, gr, pr, nu);
-                    hgap(2) = con / state.dataWindowManager->gap(2) * nu;
-
-                    WindowGasConductance(state, state.dataWindowManager->thetas(6), state.dataWindowManager->thetas(7), 3, con, pr, gr);
-                    NusseltNumber(state, 0, state.dataWindowManager->thetas(6), state.dataWindowManager->thetas(7), 3, gr, pr, nu);
-                    hgap(3) = con / state.dataWindowManager->gap(3) * nu;
-
-                    Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                               state.dataWindowManager->hcout * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
-                    Bface(2) = state.dataWindowManager->AbsRadGlassFace(2);
-                    Bface(3) = state.dataWindowManager->AbsRadGlassFace(3);
-                    Bface(4) = state.dataWindowManager->AbsRadGlassFace(4);
-                    Bface(5) = state.dataWindowManager->AbsRadGlassFace(5);
-                    Bface(6) = state.dataWindowManager->AbsRadGlassFace(6);
-                    Bface(7) = state.dataWindowManager->AbsRadGlassFace(7);
-                    Bface(8) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(8) +
-                               state.dataWindowManager->hcin * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(8);
-
-                    Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout;
-                    Aface(2, 1) = -state.dataWindowManager->scon(1);
-
-                    Aface(1, 2) = -state.dataWindowManager->scon(1);
-                    Aface(2, 2) = state.dataWindowManager->scon(1) + hgap(1) - state.dataWindowManager->A23P * hr(2);
-                    Aface(3, 2) = -hgap(1) - state.dataWindowManager->A32P * hr(3);
-
-                    Aface(2, 3) = -hgap(1) + state.dataWindowManager->A23P * hr(2);
-                    Aface(3, 3) = hgap(1) + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
-                    Aface(4, 3) = -state.dataWindowManager->scon(2);
-
-                    Aface(3, 4) = -state.dataWindowManager->scon(2);
-                    Aface(4, 4) = state.dataWindowManager->scon(2) + hgap(2) - state.dataWindowManager->A45P * hr(4);
-                    Aface(5, 4) = -hgap(2) - state.dataWindowManager->A54P * hr(5);
-
-                    Aface(4, 5) = -hgap(2) + state.dataWindowManager->A45P * hr(4);
-                    Aface(5, 5) = hgap(2) + state.dataWindowManager->scon(3) + state.dataWindowManager->A54P * hr(5);
-                    Aface(6, 5) = -state.dataWindowManager->scon(3);
-
-                    Aface(5, 6) = -state.dataWindowManager->scon(3);
-                    Aface(6, 6) = state.dataWindowManager->scon(3) + hgap(3) - state.dataWindowManager->A67P * hr(6);
-                    Aface(7, 6) = -hgap(3) - state.dataWindowManager->A76P * hr(7);
-
-                    Aface(6, 7) = -hgap(3) + state.dataWindowManager->A67P * hr(6);
-                    Aface(7, 7) = hgap(3) + state.dataWindowManager->scon(4) + state.dataWindowManager->A76P * hr(7);
-                    Aface(8, 7) = -state.dataWindowManager->scon(4);
-
-                    Aface(7, 8) = -state.dataWindowManager->scon(4);
-                    Aface(8, 8) = hr(8) + state.dataWindowManager->scon(4) + state.dataWindowManager->hcin;
-                }
-            }
+            auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
+            GetHeatBalanceEqCoefMatrixSimple(state, ConstrNum, SELECT_CASE_var, Aface, Bface, hr);
 
             LUdecomposition(state, Aface, state.dataWindowManager->nglface, indx, d); // Note that these routines change Aface;
             LUsolution(Aface, state.dataWindowManager->nglface, indx, Bface);         // face temperatures are returned in Bface
 
             errtemp = 0.0;
-            for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
+                for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
                 errtemp += std::abs(state.dataWindowManager->thetas(i) - Bface(i)) / state.dataWindowManager->nglface;
-            }
+                }
 
-            for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
+                for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
                 state.dataWindowManager->thetas(i) = 0.5 * (state.dataWindowManager->thetas(i) + Bface(i));
             }
         }

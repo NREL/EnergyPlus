@@ -153,6 +153,16 @@ namespace WindowManager {
 
     //****************************************************************************
 
+    void GetHeatBalanceEqCoefMatrixSimple(EnergyPlusData &state,
+                                          int const ConstrNum,     // Construction number
+                                          int const nglasslayer,   // Number of glass layers
+                                          Array2D<Real64> &Aface,  // Coefficient in equation Aface*thetas = Bface
+                                          Array1D<Real64> &Bface,  // Coefficient in equation Aface*thetas = Bface
+                                          Array1D<Real64> hr       // Radiative conductance (W/m2-K)
+    );
+
+    //****************************************************************************
+
     void GetHeatBalanceEqCoefMatrix(EnergyPlusData &state,
                                     int const SurfNum,
                                     int const nglasslayer,
@@ -173,9 +183,9 @@ namespace WindowManager {
                                     Array1A<Real64> hcvBG,      // Convection coefficient from gap glass or shade to gap gas (W/m2-K)
                                     Array1A<Real64> TGapNewBG,
                                     Array1A<Real64> AbsRadShadeFace,
-                                    Array2D<Real64> &Aface,
-                                    Array1D<Real64> &Bface,
-                                    Array1D<Real64> hr);
+                                    Array2D<Real64> &Aface,     // Coefficient in equation Aface*thetas = Bface
+                                    Array1D<Real64> &Bface,     // Coefficient in equation Aface*thetas = Bface
+                                    Array1D<Real64> hr);        // Radiative conductance (W/m2-K)
 
     //****************************************************************************
 
