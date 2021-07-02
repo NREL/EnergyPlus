@@ -2007,3 +2007,160 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
 
     EXPECT_NEAR(Hin, 1.756, 0.001);
 }
+
+TEST_F(ConvectionCoefficientsFixture, TestSetAdaptiveConvectionAlgoCoefficient)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "SurfaceConvectionAlgorithm:Inside,AdaptiveConvectionAlgorithm;",
+        "SurfaceConvectionAlgorithm:Outside,AdaptiveConvectionAlgorithm;",
+
+        "SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,",
+        "Default Algorithm,       !- Name",
+        "UserCurve,               !- Simple Buoyancy Vertical Wall Equation Source",
+        "ASHRAE Vert Duplicate,   !- Simple Buoyancy Vertical Wall User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Simple Buoyancy Stable Horizontal Equation Source",
+        ",                        !- Simple Buoyancy Stable Horizontal Equation User Curve Name",
+        "AlamdariHammondUnstableHorizontal,  !- Simple Buoyancy Unstable Horizontal Equation Source",
+        ",                        !- Simple Buoyancy Unstable Horizontal Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Simple Buoyancy Stable Tilted Equation Source",
+        ",                        !- Simple Buoyancy Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Simple Buoyancy Unstable Tilted Equation Source",
+        ",                        !- Simple Buoyancy Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Simple Buoyancy Windows Equation Source",
+        ",                        !- Simple Buoyancy Windows Equation User Curve Name",
+        "KhalifaEq3WallAwayFromHeat,  !- Floor Heat Ceiling Cool Vertical Wall Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Vertical Wall Equation User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Floor Heat Ceiling Cool Stable Horizontal Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Stable Horizontal Equation User Curve Name",
+        "KhalifaEq4CeilingAwayFromHeat,  !- Floor Heat Ceiling Cool Unstable Horizontal Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Unstable Horizontal Equation User Curve Name",
+        "AwbiHattonHeatedFloor,   !- Floor Heat Ceiling Cool Heated Floor Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Heated Floor Equation User Curve Name",
+        "KaradagChilledCeiling,   !- Floor Heat Ceiling Cool Chilled Ceiling Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Chilled Ceiling Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Floor Heat Ceiling Cool Stable Tilted Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Floor Heat Ceiling Cool Unstable Tilted Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Floor Heat Ceiling Cool Window Equation Source",
+        ",                        !- Floor Heat Ceiling Cool Window Equation User Curve Name",
+        "KhalifaEq6NonHeatedWalls,!- Wall Panel Heating Vertical Wall Equation Source",
+        ",                        !- Wall Panel Heating Vertical Wall Equation User Curve Name",
+        "AwbiHattonHeatedWall,    !- Wall Panel Heating Heated Wall Equation Source",
+        ",                        !- Wall Panel Heating Heated Wall Equation User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Wall Panel Heating Stable Horizontal Equation Source",
+        ",                        !- Wall Panel Heating Stable Horizontal Equation User Curve Name",
+        "KhalifaEq7Ceiling,       !- Wall Panel Heating Unstable Horizontal Equation Source",
+        ",                        !- Wall Panel Heating Unstable Horizontal Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Wall Panel Heating Stable Tilted Equation Source",
+        ",                        !- Wall Panel Heating Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Wall Panel Heating Unstable Tilted Equation Source",
+        ",                        !- Wall Panel Heating Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Wall Panel Heating Window Equation Source",
+        ",                        !- Wall Panel Heating Window Equation User Curve Name",
+        "FohannoPolidoriVerticalWall,  !- Convective Zone Heater Vertical Wall Equation Source",
+        ",                        !- Convective Zone Heater Vertical Wall Equation User Curve Name",
+        "KhalifaEq5WallNearHeat,  !- Convective Zone Heater Vertical Walls Near Heater Equation Source",
+        ",                        !- Convective Zone Heater Vertical Walls Near Heater Equation User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Convective Zone Heater Stable Horizontal Equation Source",
+        ",                        !- Convective Zone Heater Stable Horizontal Equation User Curve Name",
+        "KhalifaEq7Ceiling,       !- Convective Zone Heater Unstable Horizontal Equation Source",
+        ",                        !- Convective Zone Heater Unstable Horizontal Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Convective Zone Heater Stable Tilted Equation Source",
+        ",                        !- Convective Zone Heater Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Convective Zone Heater Unstable Tilted Equation Source",
+        ",                        !- Convective Zone Heater Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Convective Zone Heater Windows Equation Source",
+        ",                        !- Convective Zone Heater Windows Equation User Curve Name",
+        "GoldsteinNovoselacCeilingDiffuserWalls,  !- Central Air Diffuser Wall Equation Source",
+        ",                        !- Central Air Diffuser Wall Equation User Curve Name",
+        "FisherPedersenCeilingDiffuserCeiling,  !- Central Air Diffuser Ceiling Equation Source",
+        ",                        !- Central Air Diffuser Ceiling Equation User Curve Name",
+        "GoldsteinNovoselacCeilingDiffuserFloor,  !- Central Air Diffuser Floor Equation Source",
+        ",                        !- Central Air Diffuser Floor Equation User Curve Name",
+        "GoldsteinNovoselacCeilingDiffuserWindow,  !- Central Air Diffuser Window Equation Source",
+        ",                        !- Central Air Diffuser Window Equation User Curve Name",
+        "KhalifaEq3WallAwayFromHeat,  !- Mechanical Zone Fan Circulation Vertical Wall Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Vertical Wall Equation User Curve Name",
+        "AlamdariHammondStableHorizontal,  !- Mechanical Zone Fan Circulation Stable Horizontal Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Stable Horizontal Equation User Curve Name",
+        "KhalifaEq4CeilingAwayFromHeat,  !- Mechanical Zone Fan Circulation Unstable Horizontal Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Unstable Horizontal Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Mechanical Zone Fan Circulation Stable Tilted Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Stable Tilted Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Mechanical Zone Fan Circulation Unstable Tilted Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Unstable Tilted Equation User Curve Name",
+        "ISO15099Windows,         !- Mechanical Zone Fan Circulation Window Equation Source",
+        ",                        !- Mechanical Zone Fan Circulation Window Equation User Curve Name",
+        ",                        !- Mixed Regime Buoyancy Assisting Flow on Walls Equation Source",
+        ",                        !- Mixed Regime Buoyancy Assisting Flow on Walls Equation User Curve Name",
+        ",                        !- Mixed Regime Buoyancy Opposing Flow on Walls Equation Source",
+        ",                        !- Mixed Regime Buoyancy Opposing Flow on Walls Equation User Curve Name",
+        ",                        !- Mixed Regime Stable Floor Equation Source",
+        ",                        !- Mixed Regime Stable Floor Equation User Curve Name",
+        ",                        !- Mixed Regime Unstable Floor Equation Source",
+        ",                        !- Mixed Regime Unstable Floor Equation User Curve Name",
+        ",                        !- Mixed Regime Stable Ceiling Equation Source",
+        ",                        !- Mixed Regime Stable Ceiling Equation User Curve Name",
+        ",                        !- Mixed Regime Unstable Ceiling Equation Source",
+        ",                        !- Mixed Regime Unstable Ceiling Equation User Curve Name",
+        ",                        !- Mixed Regime Window Equation Source",
+        ";                        !- Mixed Regime Window Equation User Curve Name",
+
+        "SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,",
+        "Default algorithms,      !- Name",
+        "UserCurve,               !- Wind Convection Windward Vertical Wall Equation Source",
+        "NusseltJurgesDupCurve,   !- Wind Convection Windward Equation Vertical Wall User Curve Name",
+        "TARPLeeward,             !- Wind Convection Leeward Vertical Wall Equation Source",
+        ",                        !- Wind Convection Leeward Vertical Wall Equation User Curve Name",
+        "ClearRoof,               !- Wind Convection Horizontal Roof Equation Source",
+        ",                        !- Wind Convection Horizontal Roof User Curve Name",
+        "ASHRAEVerticalWall,      !- Natural Convection Vertical Wall Equation Source",
+        ",                        !- Natural Convection Vertical Wall Equation User Curve Name",
+        "WaltonStableHorizontalOrTilt,  !- Natural Convection Stable Horizontal Equation Source",
+        ",                        !- Natural Convection Stable Horizontal Equation User Curve Name",
+        "WaltonUnstableHorizontalOrTilt,  !- Natural Convection Unstable Horizontal Equation Source",
+        ";                        !- Natural Convection Unstable Horizontal Equation User Curve Name",
+
+        "SurfaceConvectionAlgorithm:Inside:UserCurve,",
+        "ASHRAE Vert Duplicate,   !- Name",
+        "MeanAirTemperature,      !- Reference Temperature for Convection Heat Transfer",
+        "ASHRAEVerticalModel,     !- Hc Function of Temperature Difference Curve Name",
+        ",                        !- Hc Function of Temperature Difference Divided by Height Curve Name",
+        ",                        !- Hc Function of Air Change Rate Curve Name",
+        ";                        !- Hc Function of Air System Volume Flow Rate Divided by Zone Perimeter Length Curve Name",
+
+        "SurfaceConvectionAlgorithm:Outside:UserCurve,",
+        "NusseltJurgesDupCurve,   !- Name",
+        "HeightAdjust,            !- Wind Speed Type for Curve",
+        "MyNusseltJurgesCurve,    !- Hf Function of Wind Speed Curve Name",
+        ",                        !- Hn Function of Temperature Difference Curve Name",
+        ";                        !- Hn Function of Temperature Difference Divided by Height Curve Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(6);
+    state->dataHeatBalSurf->SurfTempInTmp(1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(4) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(5) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(6) = 25.0;
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(*state, state->dataHeatBalSurf->SurfTempInTmp);
+    ConvectionCoefficients::GetUserConvectionCoefficients(*state);
+
+    int algorithm_identifier;
+    int expected_curve;
+
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
+    expected_curve = UtilityRoutines::FindItemInList("ASHRAE VERT DUPLICATE", state->dataConvectionCoefficient->HcInsideUserCurve);
+    ASSERT_EQ(algorithm_identifier, expected_curve);
+
+    algorithm_identifier = state->dataConvectionCoefficient->OutsideFaceAdaptiveConvectionAlgo.HWindWallWindwardEqNum;
+    expected_curve = UtilityRoutines::FindItemInList("NUSSELTJURGESDUPCURVE", state->dataConvectionCoefficient->HcOutsideUserCurve);
+    ASSERT_EQ(algorithm_identifier, expected_curve);
+}
