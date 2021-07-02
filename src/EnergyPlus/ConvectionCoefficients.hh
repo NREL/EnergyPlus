@@ -218,18 +218,18 @@ namespace ConvectionCoefficients {
     {
         // Members
         std::string Name;
-        int SimpleBouyVertWallEqNum; // InConvClass_A3_VertWalls
-        int SimpleBouyVertWallUserCurveNum;
-        int SimpleBouyStableHorizEqNum; // InConvClass_A3_StableHoriz
-        int SimpleBouyStableHorizUserCurveNum;
-        int SimpleBouyUnstableHorizEqNum; // InConvClass_A3_UnstableHoriz
-        int SimpleBouyUnstableHorizUserCurveNum;
-        int SimpleBouyStableTiltedEqNum; // InConvClass_A3_StableTilted
-        int SimpleBouyStableTiltedUserCurveNum;
-        int SimpleBouyUnstableTiltedEqNum; // InConvClass_A3_UnstableTilted
-        int SimpleBouyUnstableTiltedUserCurveNum;
-        int SimpleBouyWindowsEqNum; // InConvClass_A3_Windows
-        int SimpleBouyWindowsUserCurveNum;
+        int SimpleBuoyVertWallEqNum; // InConvClass_A3_VertWalls
+        int SimpleBuoyVertWallUserCurveNum;
+        int SimpleBuoyStableHorizEqNum; // InConvClass_A3_StableHoriz
+        int SimpleBuoyStableHorizUserCurveNum;
+        int SimpleBuoyUnstableHorizEqNum; // InConvClass_A3_UnstableHoriz
+        int SimpleBuoyUnstableHorizUserCurveNum;
+        int SimpleBuoyStableTiltedEqNum; // InConvClass_A3_StableTilted
+        int SimpleBuoyStableTiltedUserCurveNum;
+        int SimpleBuoyUnstableTiltedEqNum; // InConvClass_A3_UnstableTilted
+        int SimpleBuoyUnstableTiltedUserCurveNum;
+        int SimpleBuoyWindowsEqNum; // InConvClass_A3_Windows
+        int SimpleBuoyWindowsUserCurveNum;
         int FloorHeatCeilingCoolVertWallEqNum; // InConvClass_A1_VertWalls
         int FloorHeatCeilingCoolVertWallUserCurveNum;
         int FloorHeatCeilingCoolStableHorizEqNum; // InConvClass_A1_StableHoriz
@@ -311,12 +311,12 @@ namespace ConvectionCoefficients {
 
         // Default Constructor
         InsideFaceAdaptiveConvAlgoStruct()
-            : SimpleBouyVertWallEqNum(HcInt_FohannoPolidoriVerticalWall), SimpleBouyVertWallUserCurveNum(0),
-              SimpleBouyStableHorizEqNum(HcInt_AlamdariHammondStableHorizontal), SimpleBouyStableHorizUserCurveNum(0),
-              SimpleBouyUnstableHorizEqNum(HcInt_AlamdariHammondUnstableHorizontal), SimpleBouyUnstableHorizUserCurveNum(0),
-              SimpleBouyStableTiltedEqNum(HcInt_WaltonStableHorizontalOrTilt), SimpleBouyStableTiltedUserCurveNum(0),
-              SimpleBouyUnstableTiltedEqNum(HcInt_WaltonUnstableHorizontalOrTilt), SimpleBouyUnstableTiltedUserCurveNum(0),
-              SimpleBouyWindowsEqNum(HcInt_ISO15099Windows), SimpleBouyWindowsUserCurveNum(0),
+            : SimpleBuoyVertWallEqNum(HcInt_FohannoPolidoriVerticalWall), SimpleBuoyVertWallUserCurveNum(0),
+              SimpleBuoyStableHorizEqNum(HcInt_AlamdariHammondStableHorizontal), SimpleBuoyStableHorizUserCurveNum(0),
+              SimpleBuoyUnstableHorizEqNum(HcInt_AlamdariHammondUnstableHorizontal), SimpleBuoyUnstableHorizUserCurveNum(0),
+              SimpleBuoyStableTiltedEqNum(HcInt_WaltonStableHorizontalOrTilt), SimpleBuoyStableTiltedUserCurveNum(0),
+              SimpleBuoyUnstableTiltedEqNum(HcInt_WaltonUnstableHorizontalOrTilt), SimpleBuoyUnstableTiltedUserCurveNum(0),
+              SimpleBuoyWindowsEqNum(HcInt_ISO15099Windows), SimpleBuoyWindowsUserCurveNum(0),
               FloorHeatCeilingCoolVertWallEqNum(HcInt_KhalifaEq3WallAwayFromHeat), FloorHeatCeilingCoolVertWallUserCurveNum(0),
               FloorHeatCeilingCoolStableHorizEqNum(HcInt_AlamdariHammondStableHorizontal), FloorHeatCeilingCoolStableHorizUserCurveNum(0),
               FloorHeatCeilingCoolUnstableHorizEqNum(HcInt_KhalifaEq4CeilingAwayFromHeat), FloorHeatCeilingCoolUnstableHorizUserCurveNum(0),

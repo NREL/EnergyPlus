@@ -1458,17 +1458,17 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ProperConstruction)
 
     int algorithm_identifier;
 
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondUnstableHorizontal);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
     algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
@@ -1594,17 +1594,17 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
 
     int algorithm_identifier;
 
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_FohannoPolidoriVerticalWall);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondUnstableHorizontal);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
     algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
@@ -1834,17 +1834,17 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
 
     int algorithm_identifier;
 
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondStableHorizontal);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableHorizEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableHorizEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_AlamdariHammondUnstableHorizontal);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyStableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyStableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonStableHorizontalOrTilt);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyUnstableTiltedEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyUnstableTiltedEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_WaltonUnstableHorizontalOrTilt);
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyWindowsEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyWindowsEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_ISO15099Windows);
     algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.FloorHeatCeilingCoolVertWallEqNum;
     ASSERT_EQ(algorithm_identifier, HcInt_KhalifaEq3WallAwayFromHeat);
@@ -2173,7 +2173,7 @@ TEST_F(ConvectionCoefficientsFixture, TestSetAdaptiveConvectionAlgoCoefficient)
     int algorithm_identifier;
     int expected_curve;
 
-    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBouyVertWallEqNum;
+    algorithm_identifier = state->dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo.SimpleBuoyVertWallEqNum;
     expected_curve = UtilityRoutines::FindItemInList("ASHRAE VERT DUPLICATE", state->dataConvectionCoefficient->HcInsideUserCurve);
     ASSERT_EQ(algorithm_identifier, expected_curve);
 

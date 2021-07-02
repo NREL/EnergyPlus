@@ -859,7 +859,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Optional<Real64> IscRpt,
                                   Optional<Real64> MdotVentRpt,
                                   Optional<Real64> VdotWindRpt,
-                                  Optional<Real64> VdotBouyRpt)
+                                  Optional<Real64> VdotBuoyRpt)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1097,7 +1097,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     if (present(IscRpt)) IscRpt = Isc;
     if (present(MdotVentRpt)) MdotVentRpt = MdotVent;
     if (present(VdotWindRpt)) VdotWindRpt = VdotWind;
-    if (present(VdotBouyRpt)) VdotBouyRpt = VdotThermal;
+    if (present(VdotBuoyRpt)) VdotBuoyRpt = VdotThermal;
 }
 
 //****************************************************************************

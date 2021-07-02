@@ -196,7 +196,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
                                   Optional<Real64> IscRpt = _,
                                   Optional<Real64> MdotVentRpt = _,
                                   Optional<Real64> VdotWindRpt = _,
-                                  Optional<Real64> VdotBouyRpt = _);
+                                  Optional<Real64> VdotBuoyRpt = _);
 
 //****************************************************************************
 

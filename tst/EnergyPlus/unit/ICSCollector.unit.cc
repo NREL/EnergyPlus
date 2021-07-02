@@ -159,7 +159,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 IscRpt;               //
     Real64 MdotVentRpt;          // gap air mass flow rate [kg/s]
     Real64 VdotWindRpt;          // gap wind driven air volume flow rate [m3/s]
-    Real64 VdotBouyRpt;          // gap buoyancy driven volume flow rate [m3/s]
+    Real64 VdotBuoyRpt;          // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
     CalcPassiveExteriorBaffleGap(*state,
@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
                                  IscRpt,
                                  MdotVentRpt,
                                  VdotWindRpt,
-                                 VdotBouyRpt);
+                                 VdotBuoyRpt);
 
     EXPECT_NEAR(21.862, TsBaffle, 0.001);
     EXPECT_NEAR(1.692, HcGapRpt, 0.001);
