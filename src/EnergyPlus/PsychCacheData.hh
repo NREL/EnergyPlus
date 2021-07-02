@@ -52,7 +52,7 @@
 
 namespace EnergyPlus {
 
-enum class PsychrometricsError : int
+enum class PsychrometricFunction : int
 {
     Unassigned = -1,
     TdpFnTdbTwbPb,
@@ -157,8 +157,8 @@ struct PsychrometricCacheData : BaseGlobalStruct
 #endif
 
 #ifdef EP_psych_stats
-    std::array<std::int64_t, static_cast<int>(PsychrometricsError::Num)> NumTimesCalled;
-    std::array<int, static_cast<int>(PsychrometricsError::Num)> NumIterations;
+    std::array<std::int64_t, static_cast<int>(PsychrometricFunction::Num)> NumTimesCalled;
+    std::array<int, static_cast<int>(PsychrometricFunction::Num)> NumIterations;
 #endif
 
     void clear_state() override
