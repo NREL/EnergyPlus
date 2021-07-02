@@ -7264,18 +7264,18 @@ namespace SurfaceGeometry {
 
             Roughness = state.dataIPShortCut->cAlphaArgs(3);
             // Select the correct Number for the associated ascii name for the roughness type
-            if (UtilityRoutines::SameString(Roughness, "VeryRough")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VeryRough;
-            } else if (UtilityRoutines::SameString(Roughness, "Rough")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::Rough;
-            } else if (UtilityRoutines::SameString(Roughness, "MediumRough")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumRough;
-            } else if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
+            if (UtilityRoutines::SameString(Roughness, "VerySmooth")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
             } else if (UtilityRoutines::SameString(Roughness, "Smooth")) {
                 state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::Smooth;
-            } else if (UtilityRoutines::SameString(Roughness, "VerySmooth")) {
-                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VerySmooth;
+            } else if (UtilityRoutines::SameString(Roughness, "MediumSmooth")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumSmooth;
+            } else if (UtilityRoutines::SameString(Roughness, "MediumRough")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::MediumRough;
+            } else if (UtilityRoutines::SameString(Roughness, "Rough")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::Rough;
+            } else if (UtilityRoutines::SameString(Roughness, "VeryRough")) {
+                state.dataSurface->ExtVentedCavity(Item).BaffleRoughness = DataSurfaces::SurfaceRoughness::VeryRough;
             } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             // Was it set?
