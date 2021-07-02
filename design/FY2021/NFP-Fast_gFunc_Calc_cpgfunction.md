@@ -330,7 +330,6 @@ if (UHF) {
     gt::gfunction::uniform_borehole_wall_temperature(...);
 
 }
-
 ```
 
 ### Optional Build
@@ -339,33 +338,34 @@ This can be an optional feature built based on new or existing CMake flags.
 
 ### Dependencies
 
-Currently the tool is relying on nlohmann json, boost, BLAS and LAPACK. The 
+Currently, the tool is relying on nlohmann json and boost. The 
 following sections aim to communicate the reasoning behind the use of each 
-dependency and give the current outlook on future dependency. There are also 
-requests for input based on the information provided. These outlooks are not 
-yet set in stone, though a decisive "code freeze" and a path forward for the 
-August deadline needs to occur in the near future.
+dependency and give the current outlook on future dependency. 
 
 Cpgfunction was originally written making use of Boost and BLAS/LAPACK. The 
 BLAS/LAPACK library is based on Fortran code. While it is quite easy to make an 
 executable in Linux and Mac environments that combines C++ code with the 
-BLAS/LAPACK library, there are some difficulties with doing this for Windows. 
+BLAS/LAPACK library, there are some difficulties in doing this on Windows. 
 Discussions with the EnergyPlus development team have led us to minimize the 
-use of Boost and replace the BLAS/LAPACK with native C++ code. Eigen may be 
-used; this has not been decided yet.
+use of Boost and replace the BLAS/LAPACK with native C++ code. A small portion 
+of Eigen has been introduced to perform an LU decomposition of a system of 
+equations for the g-function. 
 
-The only libraries made use of from boost are asio for the thread pool and 
-math for the gaussian quadrature integration. We have therefore reduced the use 
-of Boost substantially. The full Boost library contains 14,787 source code 
-files; this has been reduced to 704. The full Boost library is 139.9 MiB; the 
-reduced set of files uses 8.6 MiB.
+The only libraries currently made use of from boost are `asio` for the thread 
+pool and `math` for the gaussian quadrature integration. The `asio` portion of
+boost is being replaced by `OpenMP`. The Gauss-Kronrod quadrature integration 
+of the finite line source is being replaced with the QUADPACK methodology 
+written in C/C++.
 
-Three BLAS functions were used (copy, axpy, spmv). As of June 28th, copy and 
-axpy have been replaced with native C++ code; conversion of spmv is in 
-progress. We plan to replace gesv from LAPACK with either native C++ code or 
-the Eigen library.
+Three BLAS functions were used (copy, axpy, spmv). These functions have been 
+replaced with native C++ code. The gesv function from LAPACK has been of loaded 
+to the Eigen library.
 
 #### Nlohmann json
+
+This dependency is not necessary for EnergyPlus. This dependency exists for 
+running unit tests in the `cpgfunctionEP` repository. The unit tests will not 
+be built and ran, and neither will this dependency. 
 
 The [single include](https://github.com/nlohmann/json#integration), 
 [json.hpp](https://github.com/nlohmann/json/blob/develop/single_include/nlohmann/json.hpp), 
@@ -375,13 +375,11 @@ Beyond that, the input structure in the input JSON files, containing borefield
 coordinates, is no more complicated than this: 
 `{"x": [1, 2, 3, 4], "y": [1, 2, 3, 4]}`. This is basically just csv data. 
 In the foreseeable future, there will be nothing more input that these 
-coordinates. This dependency could be eliminated. Although, this is a 
-relatively small dependency, should effort be put into eliminating this 
-dependency by August?
+coordinates.
 
 #### Boost functions
 
-The boost functions made use of are[Gauss-Kronrod Quadrature](https://www.boost.org/doc/libs/1_71_0/libs/math/doc/html/math_toolkit/gauss_kronrod.html) and [thread pool](https://www.boost.org/doc/libs/1_76_0/doc/html/boost_asio/reference/thread_pool.html). 
+The boost functions made use of are [Gauss-Kronrod Quadrature](https://www.boost.org/doc/libs/1_71_0/libs/math/doc/html/math_toolkit/gauss_kronrod.html) and [thread pool](https://www.boost.org/doc/libs/1_76_0/doc/html/boost_asio/reference/thread_pool.html). 
 The quadrature integration is performed to compute the integration of the 
 finite line source. The thread pool was being removed and replaced by `BLAS` 
 linear algebra routines. Although, it was found that 1) `EnergyPlus` has a goal 
@@ -393,7 +391,7 @@ integration could be made use of, but the speed and accuracy are unknown. We
 would like input as to whether or not this development, the removal of the 
 boost dependency, should be made a priority to be accomplished by August.
 
-#### BLAS and LAPACK routines
+#### BLAS and LAPACK routines (deprecated)
 
 BLAS and LAPACK are Fortran libraries. In the current version, these are 
 expected to be installed as system libraries. Last summer, during the initial 
