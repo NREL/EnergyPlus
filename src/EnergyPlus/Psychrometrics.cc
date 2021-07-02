@@ -174,7 +174,7 @@ namespace Psychrometrics {
         for (int item : state.dataPsychCache->NumTimesCalled) {
             if (item) { // if item is greater than 0
                 print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
-                for (Loop = 0; Loop < static_cast<int>(psychrometricsError::Num); ++Loop) {
+                for (Loop = 0; Loop < static_cast<int>(PsychrometricsError::Num); ++Loop) {
                     if (!PsyReportIt[Loop]) continue;
                     const auto istring = fmt::to_string(state.dataPsychCache->NumTimesCalled[Loop]);
                     if (state.dataPsychCache->NumIterations[Loop] > 0) {
@@ -417,7 +417,7 @@ namespace Psychrometrics {
         bool FlagError;  // set when errors should be flagged
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::TwbFnTdbWPb)];
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricsError::TwbFnTdbWPb)];
 #endif
 
         // CHECK TDB IN RANGE.
@@ -529,7 +529,7 @@ namespace Psychrometrics {
         } // End of Iteration Loop
 
 #ifdef EP_psych_stats
-        state.dataPsychCache->NumIterations[static_cast<int>(psychrometricsError::TwbFnTdbWPb)] += iter;
+        state.dataPsychCache->NumIterations[static_cast<int>(PsychrometricsError::TwbFnTdbWPb)] += iter;
 #endif
 
         // Wet bulb temperature has not converged after maximum specified
@@ -699,7 +699,7 @@ namespace Psychrometrics {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::PsatFnTemp)];
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricsError::PsatFnTemp)];
 #endif
 
         // CHECK T IN RANGE.
@@ -947,7 +947,7 @@ namespace Psychrometrics {
         }
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::TsatFnHPb)];
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricsError::TsatFnHPb)];
 #endif
 
         FlagError = false;
@@ -1311,7 +1311,7 @@ namespace Psychrometrics {
         int iter;       // Iteration counter
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::TsatFnPb)];
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricsError::TsatFnPb)];
 #endif
 
         // Check press in range.
@@ -1398,7 +1398,7 @@ namespace Psychrometrics {
         } // End If for the Pressure Range Checking
 
 #ifdef EP_psych_stats
-        state.dataPsychCache->NumIterations[static_cast<int>(psychrometricsError::TsatFnPb)] += iter;
+        state.dataPsychCache->NumIterations[static_cast<int>(PsychrometricsError::TsatFnPb)] += iter;
 #endif
 
 #ifdef EP_psych_errors
