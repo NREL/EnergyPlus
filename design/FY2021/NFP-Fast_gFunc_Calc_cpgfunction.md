@@ -338,7 +338,12 @@ This can be an optional feature built based on new or existing CMake flags.
 
 ### Dependencies
 
-Currently, the tool is relying on nlohmann json and boost. The 
+The current outlook for the future of this library and its interaction with 
+EnergyPlus is to only be dependent on Eigen. The project is dependent on 
+nlohmann json for running unit tests, but the local tests will not be built 
+by EnergyPlus. 
+
+Currently, the tool is relying on nlohmann json, Eigen and Boost. The 
 following sections aim to communicate the reasoning behind the use of each 
 dependency and give the current outlook on future dependency. 
 
@@ -346,6 +351,8 @@ Cpgfunction was originally written making use of Boost and BLAS/LAPACK. The
 BLAS/LAPACK library is based on Fortran code. While it is quite easy to make an 
 executable in Linux and Mac environments that combines C++ code with the 
 BLAS/LAPACK library, there are some difficulties in doing this on Windows. 
+Additionally, EnergyPlus has a goal of ridding the repository of Fortran 
+dependencies. 
 Discussions with the EnergyPlus development team have led us to minimize the 
 use of Boost and replace the BLAS/LAPACK with native C++ code. A small portion 
 of Eigen has been introduced to perform an LU decomposition of a system of 
@@ -430,17 +437,18 @@ from the library for delivery to EnergyPlus.
 
 #### Eigen
 
-The `Eigen` library will likely become a dependency to be used in solving a 
-system of equations using LU decomposition. As previously mentioned, 
+The `Eigen` library has been made a dependency to be used in solving a system
+of equations using LU decomposition. As previously mentioned, 
 `cpgfunction` is faster than `cpgfunctionEP` due to more linear algebra being
 made use of. It may be possible for `cpgfunctionEP` to someday match the speed 
 performance of `cpgfunction` by depending more heavily on `Eigen`, though the 
 library from its conception has been geared towards BLAS/LAPACK. The re-write 
 would be substantial, and the amount of memory consumed will grow. 
 
-A re-write with a dependency on `Eigen` would more than likely provide a great
-increase in speed performance of `cpgfunctionEP`. This re-write would 
-take time, and is not feasible to be accomplished by August. 
+It is unclear if a greater dependency on `Eigen` could provide performance 
+similar to the BLAS/LAPACK of OpenBLAS. A re-write with a focus on `Eigen` for 
+linear algebra could be done, but would take time, and is not feasible to be 
+accomplished by August. 
 
 ### Git
 
