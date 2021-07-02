@@ -148,33 +148,33 @@ namespace ConvectionCoefficients {
     // parameters, by zone, for flow regimes for adaptive convection on inside face
     enum class InConvFlowRegime
     {
-        Invalid,
-        A1, // In-floor heating or in-ceiling cooling
-        A2, // In-wall heating
-        A3, // no HVAC system, all buoyancy
-        B,  // Convective heater in zone
-        C,  // central mechanical air
-        D,  // zone mechanical air
-        E,  // mixed. mechanical air and buoyancy
+        Invalid = -1,
+        A1 = 0, // In-floor heating or in-ceiling cooling
+        A2 = 1, // In-wall heating
+        A3 = 2, // no HVAC system, all buoyancy
+        B = 3,  // Convective heater in zone
+        C = 4,  // central mechanical air
+        D = 5,  // zone mechanical air
+        E = 6,  // mixed. mechanical air and buoyancy
     };
 
     // params for reference temperature type
     enum class RefTemp
     {
-        Invalid,
-        MeanAirTemp,
-        AdjacentAirTemp,
-        SupplyAirTemp,
+        Invalid = -1,
+        MeanAirTemp = 0,
+        AdjacentAirTemp = 1,
+        SupplyAirTemp = 2,
     };
 
     // params for wind speed type
     enum class RefWind
     {
-        Invalid,
-        WeatherFile,
-        AtZ,
-        ParallelComp,
-        ParallelCompAtZ,
+        Invalid = -1,
+        WeatherFile = 0,
+        AtZ = 1,
+        ParallelComp = 2,
+        ParallelCompAtZ = 3,
     };
 
     struct HcInsideFaceUserCurveStruct
