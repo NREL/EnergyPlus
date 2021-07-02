@@ -67,6 +67,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 
 using namespace EnergyPlus;
@@ -1426,8 +1427,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     SimulationManager::ManageSimulation(*state);
+
     EXPECT_EQ(state->dataSurface->Surface(7).Class, EnergyPlus::DataSurfaces::SurfaceClass::Window);
     EXPECT_EQ(state->dataSurface->Surface(7).ExtBoundCond, EnergyPlus::DataSurfaces::ExternalEnvironment);
+    Real64 inputU = state->dataMaterial->Material(state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).LayerPoint(1))
+                        .SimpleWindowUfactor;
+    EXPECT_NEAR(inputU, 0.6, 0.001);
+    int ConstrNum = state->dataSurface->Surface(7).Construction;
+    EXPECT_NEAR(state->dataHeatBal->NominalU(ConstrNum), 0.6, 0.001);
     EXPECT_NEAR(state->dataHeatBal->CoeffAdjRatioIn(7), 1.0006045, 1E-7);
     EXPECT_NEAR(state->dataHeatBalSurf->CoeffAdjRatioOut(7), 1.0006045, 1E-7);
 
