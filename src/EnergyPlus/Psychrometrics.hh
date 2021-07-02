@@ -713,7 +713,7 @@ namespace Psychrometrics {
         std::uint64_t constexpr Grid_Shift = 64 - 12 - psatprecision_bits;
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricsError::PsatFnTemp_cache)];
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::PsatFnTemp_cache)];
 #endif
 
         DISABLE_WARNING_PUSH
@@ -771,7 +771,7 @@ namespace Psychrometrics {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_psych_stats
-        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricsError::TwbFnTdbWPb_cache)];
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::TwbFnTdbWPb_cache)];
 #endif
         DISABLE_WARNING_PUSH
         DISABLE_WARNING_STRICT_ALIASING
