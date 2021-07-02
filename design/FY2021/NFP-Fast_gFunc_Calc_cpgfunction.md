@@ -355,7 +355,7 @@ for this feature.
 
 #### Nlohmann json
 
-This dependency exists for running unit tests in the cpgfunctionEP repository. 
+This dependency exists for running unit tests in the `cpgfunctionEP` repository. 
 This dependence will not be used in the EnergyPlus build.
 
 #### BLAS and LAPACK routines (deprecated)
@@ -367,8 +367,12 @@ loaded to the Eigen library.
 In the previous version, these were expected to be installed as system 
 libraries. Last summer, during the initial development of cpgfunction, it was 
 found that OpenBLAS performed LU factorization for solving systems of linear 
-equations (gesv) 5x faster than netlib. The speed of OpenBLAS was nearly 
-identical to the solution solved in Python's numpy.linalg.solve, which makes 
+equations ([gesv](https://icl.bitbucket.io/lapackpp/group__gesv.html#ga8f2d5c8af99b6aee06f0650d723f8e2f)) 
+5x faster than [netlib](https://www.netlib.org/blas/). 
+The speed of [OpenBLAS](https://github.com/xianyi/OpenBLAS) 
+was nearly 
+identical to the solution solved in Python's [numpy.linalg.solve](https://numpy.org/doc/stable/reference/generated/numpy.linalg.solve.html), 
+which makes 
 use of the same LAPACK routine. More recently, it has been found that linear 
 algebra with BLAS is both significantly faster than multi-threading, and that 
 BLAS has low level functionality that helps with the goals of cpgfunction. 
@@ -377,7 +381,8 @@ with lower memory on high performance computers for the development of
 g-function databases (Cook and Spitler 2021).) BLAS provides for "fast slicing" 
 of vectors or matrices represented in 1D format. The functions take in pointers 
 to a starting location, and a number of elements to be operated on. 
-Additionally, the BLAS routine function symv gives tremendous speed improvement 
+Additionally, the BLAS routine function [symv](https://icl.bitbucket.io/blaspp/group__symv.html#ga496ee8fe24db5f3dd003b09cc2bec5a4) 
+gives tremendous speed improvement 
 for performing linear algebra on the packed symmetric matrix discussed in Cook 
 and Spitler (2021). The packed symmetric response matrix can remain packed at 
 each point in time, where inputs to the function instruct whether or not it is 
@@ -415,13 +420,14 @@ accomplished by August.
 
 #### Boost
 
-The boost functions currently made use of are Gauss-Kronrod Quadrature and 
-thread pool. The quadrature integration is performed to compute the integration 
+The boost functions currently made use of are [Gauss-Kronrod Quadrature](https://www.boost.org/doc/libs/1_71_0/libs/math/doc/html/math_toolkit/gauss_kronrod.html) 
+and [thread pool](https://www.boost.org/doc/libs/1_76_0/doc/html/boost_asio/reference/thread_pool.html). 
+The quadrature integration is performed to compute the integration 
 of the finite line source. Replacements for both functions are under 
 investigation. It appears likely that OpenMP could be made use of as opposed to 
 Boosts thread pool for multi-threading, though initial speed comparisons 
-significantly favored Boost. A standalone Gauss-Kronrod integration could be 
-made use of, but the speed and accuracy are unknown.
+significantly favored Boost. A standalone [Gauss-Kronrod](https://people.sc.fsu.edu/~jburkardt/cpp_src/kronrod/kronrod.html) 
+integration could be made use of, but the speed and accuracy are unknown.
 
 ### Git
 
