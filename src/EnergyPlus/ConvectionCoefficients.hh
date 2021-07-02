@@ -115,10 +115,13 @@ namespace ConvectionCoefficients {
     int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserFloor{230};
 
     // parameters for identifying more specific hc model equations, outside face
-    // parameters for identifying more specific hc model equations, outside face
     int constexpr HcExt_None{300}; // none is allowed because Hn and Hf are split
     int constexpr HcExt_UserValue{301};
     int constexpr HcExt_UserSchedule{302};
+    int constexpr HcExt_TarpHcOutside{5};
+    int constexpr HcExt_MoWiTTHcOutside{6};
+    int constexpr HcExt_DOE2HcOutside{7};
+    int constexpr HcExt_AdaptiveConvectionAlgorithm{9};
     int constexpr HcExt_UserCurve{303};
     int constexpr HcExt_ASHRAESimpleCombined{304};
     int constexpr HcExt_NaturalASHRAEVerticalWall{305};
