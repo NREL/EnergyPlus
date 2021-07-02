@@ -109,7 +109,7 @@ using namespace DataSurfaces;
 using namespace DataVectorTypes;
 
 // Coefficients that modify the convection coeff based on surface roughness
-Array1D<Real64> const RoughnessMultiplier({0, 5}, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
+std::array<Real64, 6> const RoughnessMultiplier{2.17, 1.67, 1.52, 1.13, 1.11, 1.0};
 
 void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                                   const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
@@ -5777,9 +5777,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ZoneNum(0);
     int PriorityEquipOn(0);
-    Array1D_int HeatingPriorityStack({0, 10}, 0);
-    Array1D_int CoolingPriorityStack({0, 10}, 0);
-    std::vector<InConvFlowRegime> FlowRegimeStack(10, InConvFlowRegime::Invalid);
+    std::array<int, 11> HeatingPriorityStack{};
+    std::array<int, 11> CoolingPriorityStack{};
+    std::array<InConvFlowRegime, 11> FlowRegimeStack{};
+    FlowRegimeStack.fill(InConvFlowRegime::Invalid);
     int EquipNum(0);
     int ZoneNode(0);
     int EquipOnCount(0);
@@ -5834,10 +5835,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                             if (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
                                 FlowRegimeStack[EquipOnCount] = InConvFlowRegime::C;
-                                HeatingPriorityStack(EquipOnCount) =
+                                HeatingPriorityStack[EquipOnCount] =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .HeatingPriority(EquipNum);
-                                CoolingPriorityStack(EquipOnCount) =
+                                CoolingPriorityStack[EquipOnCount] =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .CoolingPriority(EquipNum);
                             }
@@ -5845,10 +5846,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                             if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
                                 FlowRegimeStack[EquipOnCount] = InConvFlowRegime::C;
-                                HeatingPriorityStack(EquipOnCount) =
+                                HeatingPriorityStack[EquipOnCount] =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .HeatingPriority(EquipNum);
-                                CoolingPriorityStack(EquipOnCount) =
+                                CoolingPriorityStack[EquipOnCount] =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .CoolingPriority(EquipNum);
                             }
@@ -5869,10 +5870,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                             if (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
                                 FlowRegimeStack[EquipOnCount] = InConvFlowRegime::D;
-                                HeatingPriorityStack(EquipOnCount) =
+                                HeatingPriorityStack[EquipOnCount] =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .HeatingPriority(EquipNum);
-                                CoolingPriorityStack(EquipOnCount) =
+                                CoolingPriorityStack[EquipOnCount] =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .CoolingPriority(EquipNum);
                             }
@@ -5880,10 +5881,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                             if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
                                 EquipOnCount = min(EquipOnCount + 1, 10);
                                 FlowRegimeStack[EquipOnCount] = InConvFlowRegime::D;
-                                HeatingPriorityStack(EquipOnCount) =
+                                HeatingPriorityStack[EquipOnCount] =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .HeatingPriority(EquipNum);
-                                CoolingPriorityStack(EquipOnCount) =
+                                CoolingPriorityStack[EquipOnCount] =
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                         .CoolingPriority(EquipNum);
                             }
@@ -5895,10 +5896,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                             EquipOnCount = min(EquipOnCount + 1, 10);
                             FlowRegimeStack[EquipOnCount] = InConvFlowRegime::B;
-                            HeatingPriorityStack(EquipOnCount) =
+                            HeatingPriorityStack[EquipOnCount] =
                                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                     .HeatingPriority(EquipNum);
-                            CoolingPriorityStack(EquipOnCount) =
+                            CoolingPriorityStack[EquipOnCount] =
                                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                     .CoolingPriority(EquipNum);
                         }
@@ -5906,10 +5907,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                             EquipOnCount = min(EquipOnCount + 1, 10);
                             FlowRegimeStack[EquipOnCount] = InConvFlowRegime::B;
-                            HeatingPriorityStack(EquipOnCount) =
+                            HeatingPriorityStack[EquipOnCount] =
                                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                     .HeatingPriority(EquipNum);
-                            CoolingPriorityStack(EquipOnCount) =
+                            CoolingPriorityStack[EquipOnCount] =
                                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                     .CoolingPriority(EquipNum);
                         }
@@ -5924,10 +5925,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                         // system ON is not enough because floor surfaces can continue to heat because of thermal capacity
                                         EquipOnCount = min(EquipOnCount + 1, 10);
                                         FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A1;
-                                        HeatingPriorityStack(EquipOnCount) =
+                                        HeatingPriorityStack[EquipOnCount] =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
-                                        CoolingPriorityStack(EquipOnCount) =
+                                        CoolingPriorityStack[EquipOnCount] =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
                                         break;
@@ -5945,10 +5946,10 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                         // system ON is not enough because  surfaces can continue to cool because of thermal capacity
                                         EquipOnCount = min(EquipOnCount + 1, 10);
                                         FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A1;
-                                        HeatingPriorityStack(EquipOnCount) =
+                                        HeatingPriorityStack[EquipOnCount] =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
-                                        CoolingPriorityStack(EquipOnCount) =
+                                        CoolingPriorityStack[EquipOnCount] =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
                                         break;
@@ -5966,19 +5967,19 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                         // system ON is not enough because  surfaces can continue to heat because of thermal capacity
                                         EquipOnCount = min(EquipOnCount + 1, 10);
                                         FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A2;
-                                        HeatingPriorityStack(EquipOnCount) =
+                                        HeatingPriorityStack[EquipOnCount] =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
-                                        CoolingPriorityStack(EquipOnCount) =
+                                        CoolingPriorityStack[EquipOnCount] =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
                                     } else { // not heating, no special models wall cooling so use simple buoyancy
                                         EquipOnCount = min(EquipOnCount + 1, 10);
                                         FlowRegimeStack[EquipOnCount] = InConvFlowRegime::A3;
-                                        HeatingPriorityStack(EquipOnCount) =
+                                        HeatingPriorityStack[EquipOnCount] =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .HeatingPriority(EquipNum);
-                                        CoolingPriorityStack(EquipOnCount) =
+                                        CoolingPriorityStack[EquipOnCount] =
                                             state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                                 .CoolingPriority(EquipNum);
                                     }
@@ -5997,7 +5998,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             PriorityEquipOn = 1;
             for (EquipOnLoop = 1; EquipOnLoop <= EquipOnCount; ++EquipOnLoop) {
                 // assume highest priority/first sim order is dominant for flow regime
-                if (HeatingPriorityStack(EquipOnLoop) < HeatingPriorityStack(PriorityEquipOn)) {
+                if (HeatingPriorityStack[EquipOnLoop] < HeatingPriorityStack[PriorityEquipOn]) {
                     PriorityEquipOn = EquipOnLoop;
                 }
             }
@@ -6005,7 +6006,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             PriorityEquipOn = 1;
             for (EquipOnLoop = 1; EquipOnLoop <= EquipOnCount; ++EquipOnLoop) {
                 // assume highest priority/first sim order is dominant for flow regime
-                if (CoolingPriorityStack(EquipOnLoop) < CoolingPriorityStack(PriorityEquipOn)) {
+                if (CoolingPriorityStack[EquipOnLoop] < CoolingPriorityStack[PriorityEquipOn]) {
                     PriorityEquipOn = EquipOnLoop;
                 }
             }
@@ -8526,7 +8527,7 @@ CalcSparrowWindward(DataSurfaces::SurfaceRoughness const RoughnessIndex, Real64 
     //   M.S. Thesis, Department of Mechanical and Industrial Engineering,
     //   University of Illinois at Urbana-Champaign.
 
-    return 2.537 * RoughnessMultiplier(static_cast<int>(RoughnessIndex)) * std::sqrt(FacePerimeter * WindAtZ / FaceArea);
+    return 2.537 * RoughnessMultiplier[static_cast<int>(RoughnessIndex)] * std::sqrt(FacePerimeter * WindAtZ / FaceArea);
 }
 
 Real64
@@ -8690,7 +8691,7 @@ Real64 CalcDOE2Forced(Real64 const SurfaceTemp,
     // This allows costly HfSmooth to be calculated independently (avoids excessive use of std::pow() in Kiva)
     Real64 Hn = CalcASHRAETARPNatural(SurfaceTemp, AirTemp, CosineTilt);
     Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(HfSmooth));
-    return RoughnessMultiplier(static_cast<int>(RoughnessIndex)) * (HcSmooth - Hn);
+    return RoughnessMultiplier[static_cast<int>(RoughnessIndex)] * (HcSmooth - Hn);
 }
 
 Real64 CalcDOE2Windward(Real64 const SurfaceTemp,
@@ -9066,7 +9067,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
 
     Rex = WindAtZ * AirDensity * x / v;
 
-    Real64 Rf = RoughnessMultiplier(static_cast<int>(RoughnessIndex));
+    Real64 Rf = RoughnessMultiplier[static_cast<int>(RoughnessIndex)];
     if (Rex > 0.1) { // avoid zero and crazy small denominators
         Real64 tmp = std::log(1.0 + GrLn / pow_2(Rex));
         eta = tmp / (1.0 + tmp);

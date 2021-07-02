@@ -81,9 +81,6 @@ namespace ConvectionCoefficients {
     Real64 constexpr OneSixth{1.0 / 6.0};   // 1/6 in highest precision
     Real64 constexpr FourFifths{4.0 / 5.0}; // 4/5 in highest precision
 
-    // Coefficients that modify the convection coeff based on surface roughness
-    extern Array1D<Real64> const RoughnessMultiplier;
-
     // parameters for identifying more specific hc model equations, inside face
     int constexpr HcInt_UserValue{200};
     int constexpr HcInt_UserSchedule{201};
