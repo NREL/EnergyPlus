@@ -318,7 +318,7 @@ namespace Psychrometrics {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 #ifdef EP_psych_stats
-        ++state.dataPsychrometrics->NumTimesCalled[psychrometricsError::TwbFnTdbWPb_cache];
+        ++state.dataPsychCache->NumTimesCalled[static_cast<int>(psychrometricsError::TwbFnTdbWPb_cache)];
 #endif
 
         DISABLE_WARNING_PUSH
