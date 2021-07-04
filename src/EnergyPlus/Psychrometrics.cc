@@ -1376,12 +1376,12 @@ namespace Psychrometrics {
             return state.dataPsychrometrics->tSat_Save;
         }
         state.dataPsychrometrics->Press_Save = Press;
-        int n_sample = 105;
+        int n_sample = 217; //sample bin size =512 Pa; sample size =53
         //linear interpolation
-       tSat=linearint(state, n_sample, Press); // linear interpolation for y
+       //tSat=linearint(state, n_sample, Press); // linear interpolation for y
        
        //CSpline interpolation
-       //tSat = CSplineint(state, n_sample, Press); // Cubic spline interpolation for y
+       tSat = CSplineint(state, n_sample, Press); // Cubic spline interpolation for y
 
         // Uses an iterative process to determine the saturation temperature at a given
         // pressure by correlating saturated water vapor as a function of temperature.
@@ -1484,11 +1484,14 @@ namespace Psychrometrics {
         Real64 A, B, y;
         // find location of x in arrays without searching since array bins are equally sized
         int x_int = static_cast<int>(x);
-        int j = x_int / 100 - 1;
+        int j = x_int / 512 - 1;
         // check bounds
         if (j < 0) j = 0;
+        //if (x > 10752 && x <= 95744) j = 21;// address the gap between two sample sets. bin size: 512 pa  
+        //if (x > 95744) j = j - 165;// address the gap between two sample sets. bin size: 512 pa  
         if (j > (n - 2)) j = n - 2;
-        static constexpr Real64 h(100); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        static constexpr Real64 h(512); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        //if (x > 10752 && x <= 95744) static constexpr Real64 h(84992); // address the gap between two sample sets. bin size 512 pa for the rest
         A = (tsat_fn_pb_x[j + 1] - x) / h;
         B = 1 - A;
         y = A * tsat_fn_pb_y[j] + B * tsat_fn_pb_y[j + 1]; // y=A*y[j]+B*y[j+1]
@@ -1503,11 +1506,15 @@ namespace Psychrometrics {
         Real64 A, B, y;
         // find location of x in arrays without searching since array bins are equally sized
         int x_int = static_cast<int>(x);
-        int j = x_int / 100 - 1;
+        int j = x_int / 512 - 1;
         // check bounds
         if (j < 0) j = 0;
         if (j > (n - 2)) j = n - 2;
-        static constexpr Real64 h(100); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        //if (x > 10752 && x <= 95744) j = 21; // address the gap between two sample sets. bin size: 512 pa
+        //if (x > 95744) j = j - 165;          // address the gap between two sample sets. bin size: 512 pa
+        if (j > (n - 2)) j = n - 2;
+        static constexpr Real64 h(512);      // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        //if (x > 10752 && x <= 95744) static constexpr Real64 h(84992); // address the gap between two sample sets A = (tsat_fn_pb_x[j + 1] - x) / h;
         A = (tsat_fn_pb_x[j + 1] - x) / h;
         B = 1 - A;
         y = A * tsat_fn_pb_y[j] + B * tsat_fn_pb_y[j + 1] +

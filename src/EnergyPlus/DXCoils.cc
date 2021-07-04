@@ -9412,11 +9412,11 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
             A0 = 0.0;
         }
         ADiff = -A0 / AirMassFlow;
-        if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) {
+        //if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) { //temporary patch 
             CBF = std::exp(ADiff);
-        } else {
-            CBF = 0.0;
-        }
+        //} else {   //temporary patch
+        //    CBF = 0.0; //temporary patch
+        //}
 
         //   check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
         if (state.dataDXCoils->DXCoil(DXCoilNum).CondenserType(Mode) == AirCooled) {
