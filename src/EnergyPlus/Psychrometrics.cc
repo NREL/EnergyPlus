@@ -123,6 +123,7 @@ namespace Psychrometrics {
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
         state.dataPsychCache->cached_Psat.fill(cached_psat_t());
+        state.dataPsychCache->cached_Psat.fill(cached_psat_t());
 #endif
 #ifdef EP_cache_PsyTsatFnPb
         state.dataPsychCache->cached_Tsat.fill(cached_tsat_h_pb());
@@ -399,7 +400,7 @@ namespace Psychrometrics {
 
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(100); // Maximum No of Iterations
-        static constexpr std::string_view RoutineName("PsyTwbFnTdbWPb");
+        static constexpr std::string_view RoutineName(PsyRoutineNames[static_cast<int>(PsychrometricFunction::RhFnTdbRhov)]); // PsyTwbFnTdbWPb
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 tBoil;    // Boiling temperature of water at given pressure
@@ -1297,7 +1298,7 @@ namespace Psychrometrics {
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(50); // Maximum number of iterations
         Real64 constexpr convTol(0.0001);
-        static constexpr std::string_view RoutineName("PsyTsatFnPb");
+        static constexpr std::string_view RoutineName(PsyRoutineNames[static_cast<int>(PsychrometricFunction::TsatFnPb)]); // PsyTsatFnPb
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
