@@ -9405,15 +9405,15 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
         //    NTU = A0/(m*cp). Relationship models the cooling coil as a heat exchanger with Cmin/Cmax = 0.
 
         RatedCBF = state.dataDXCoils->DXCoil(DXCoilNum).RatedCBF(Mode);
-        //if (RatedCBF > 0.0) {
-        if (RatedCBF >= 0.0) {   //temporary patch
-            A0 = -std::log(RatedCBF+1e-60) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode); //temporary patch
+        // if (RatedCBF > 0.0) {
+        if (RatedCBF >= 0.0) {                                                                                  // temporary patch
+            A0 = -std::log(RatedCBF + 1e-60) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode); // temporary patch
         } else {
             A0 = 0.0;
         }
         ADiff = -A0 / AirMassFlow;
-        //if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) { //temporary patch 
-            CBF = std::exp(ADiff);
+        // if (ADiff >= DataPrecisionGlobals::EXP_LowerLimit) { //temporary patch
+        CBF = std::exp(ADiff);
         //} else {   //temporary patch
         //    CBF = 0.0; //temporary patch
         //}
@@ -16967,10 +16967,10 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
         // New VRF_FluidTCtrl model implements VAV fan which can vary air flow rate during simulation
 
         RatedCBF = state.dataDXCoils->DXCoil(DXCoilNum).RatedCBF(Mode);
-        //if (RatedCBF > 0.0) {
+        // if (RatedCBF > 0.0) {
         //    A0 = -std::log(RatedCBF) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
         if (RatedCBF >= 0.0) {
-            A0 = -std::log(RatedCBF+1e-60) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
+            A0 = -std::log(RatedCBF + 1e-60) * state.dataDXCoils->DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
         } else {
             A0 = 0.0;
         }

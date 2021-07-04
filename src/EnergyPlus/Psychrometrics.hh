@@ -124,17 +124,17 @@ namespace Psychrometrics {
     constexpr int iPsyTwbFnTdbWPb_cache = 18;
     constexpr int iPsyPsatFnTemp_cache = 19;
     // sample bin =64 Pa; sample size =318
-    //constexpr std::array<Real64, 318> tsat_fn_pb_x = {}; // pressure
-    //constexpr std::array<Real64, 318> tsat_fn_pb_y = {}; //tsat
-    //constexpr std::array<Real64, 318> tsat_fn_pb_d2y = {};
+    // constexpr std::array<Real64, 318> tsat_fn_pb_x = {}; // pressure
+    // constexpr std::array<Real64, 318> tsat_fn_pb_y = {}; //tsat
+    // constexpr std::array<Real64, 318> tsat_fn_pb_d2y = {};
     // sample bin size =128 Pa; sample size =161
-    //constexpr std::array<Real64, 161> tsat_fn_pb_x = {}; // pressure
-    //constexpr std::array<Real64, 161> tsat_fn_pb_y = {}; // tsat
-    //constexpr std::array<Real64, 161> tsat_fn_pb_d2y = {};
+    // constexpr std::array<Real64, 161> tsat_fn_pb_x = {}; // pressure
+    // constexpr std::array<Real64, 161> tsat_fn_pb_y = {}; // tsat
+    // constexpr std::array<Real64, 161> tsat_fn_pb_d2y = {};
     // sample bin size =256 Pa; sample size =82
-    //constexpr std::array<Real64, 82> tsat_fn_pb_x = {}; // pressure
-    //constexpr std::array<Real64, 82> tsat_fn_pb_y = {}; // tsat
-    //constexpr std::array<Real64, 82> tsat_fn_pb_d2y = {};
+    // constexpr std::array<Real64, 82> tsat_fn_pb_x = {}; // pressure
+    // constexpr std::array<Real64, 82> tsat_fn_pb_y = {}; // tsat
+    // constexpr std::array<Real64, 82> tsat_fn_pb_d2y = {};
     // sample bin size =512 Pa; sample size =52 (two sample sets)
     constexpr std::array<Real64, 52> tsat_fn_pb_x = {0,      512,    1024,   1536,   2048,   2560,   3072,   3584,   4096,   4608,   5120,
                                                      5632,   6144,   6656,   7168,   7680,   8192,   8704,   9216,   9728,   10240,  10752,
@@ -156,7 +156,7 @@ namespace Psychrometrics {
         -2.2E-09,     -2.2E-09,     -2.1E-09,     -2.1E-09,     -2.1E-09,    -2.1E-09,    -2.1E-09,   -2.1E-09,     -0.000000002,
         -2.1E-09,     -0.000000002, -0.000000002, -0.000000002, -1.8E-09,    -2.8E-09,    1.4E-09};
     // sample bin size =512 Pa; sample size =217 (continous)
-    //constexpr std::array<Real64, 217> tsat_fn_pb_x = {
+    // constexpr std::array<Real64, 217> tsat_fn_pb_x = {
     //    0,      512,    1024,   1536,   2048,   2560,   3072,   3584,   4096,   4608,   5120,   5632,   6144,   6656,   7168,   7680,   8192,
     //    8704,   9216,   9728,   10240,  10752,  11264,  11776,  12288,  12800,  13312,  13824,  14336,  14848,  15360,  15872,  16384,  16896,
     //    17408,  17920,  18432,  18944,  19456,  19968,  20480,  20992,  21504,  22016,  22528,  23040,  23552,  24064,  24576,  25088,  25600,
@@ -171,7 +171,7 @@ namespace Psychrometrics {
     //    95744,  96256,  96768,  97280,  97792,  98304,  98816,  99328,  99840,  100352, 100864, 101376, 101888, 102400, 102912, 103424, 103936,
     //    104448, 104960, 105472, 105984, 106496, 107008, 107520, 108032, 108544, 109056, 109568, 110080, 110592}; // pressure
 
-   // constexpr std::array<Real64, 217> tsat_fn_pb_y = {
+    // constexpr std::array<Real64, 217> tsat_fn_pb_y = {
     //    -100,        -2.132789207, 7.317464071, 13.38541367, 17.87411665, 21.46712703, 24.4784194,  27.07951029, 29.37480614, 31.43278471,
     //    33.30089772, 35.01342775,  36.59599334, 38.06825698, 39.44565725, 40.74054192, 41.96295168, 43.12116511, 44.22209605, 45.27156964,
     //    46.27455279, 47.23530984,  48.15753313, 49.04443945, 49.89885468, 50.72326533, 51.51988223, 52.29067211, 53.03739768, 53.76164079,
@@ -195,7 +195,7 @@ namespace Psychrometrics {
     //    100.2700192, 100.4100569,  100.5495203, 100.6884104, 100.8267359, 100.9645009, 101.101711,  101.2383738, 101.3744899, 101.5100639,
     //    101.6451069, 101.7796152,  101.9136007, 102.0470595, 102.180006,  102.3124366, 102.4443601
     //    }; // tsat
-    //constexpr std::array<Real64, 217> tsat_fn_pb_d2y = {
+    // constexpr std::array<Real64, 217> tsat_fn_pb_d2y = {
     //    0.000310208,  -0.000620417, 0.000147756,  -4.80E-05,    0.000008179,  -5.20E-06,    -7.07E-07,    -1.36E-06,    -8.34E-07,    -0.000000732,
     //    -0.000000584, -4.93E-07,    -4.18E-07,    -0.00000036,  -3.13E-07,    -2.75E-07,    -0.000000244, -2.18E-07,    -1.96E-07,    -1.77E-07,
     //    -1.61E-07,    -1.47E-07,    -1.35E-07,    -1.24E-07,    -1.14E-07,    -1.06E-07,    -9.84E-08,    -9.17E-08,    -8.57E-08,    -8.02E-08,
