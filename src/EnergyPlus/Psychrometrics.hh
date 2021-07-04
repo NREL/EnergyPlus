@@ -158,28 +158,6 @@ namespace Psychrometrics {
                // PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
-#ifndef EP_psych_errors
-#endif
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-    constexpr int twbcache_size = 1024 * 1024;
-    constexpr int twbprecision_bits = 20;
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-    constexpr int psatcache_size = 1024 * 1024;
-    constexpr int psatprecision_bits = 24; // 28  //24  //32
-    constexpr Int64 psatcache_mask = psatcache_size - 1;
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-    constexpr int tsatcache_size = 1024 * 1024;
-    constexpr int tsatprecision_bits = 24;
-    constexpr Int64 tsatcache_mask = tsatcache_size - 1;
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-    constexpr int tsat_hbp_cache_size = 1024 * 1024;
-    constexpr int tsat_hbp_precision_bits = 28;
-#endif
-
     void InitializePsychRoutines(EnergyPlusData &state);
 
     void ShowPsychrometricSummary(EnergyPlusData &state, InputOutputFile &auditFile);
@@ -721,7 +699,7 @@ namespace Psychrometrics {
         Int64 Tdb_tag(*reinterpret_cast<Int64 const *>(&T) >> Grid_Shift);
         DISABLE_WARNING_POP
         Int64 const hash(Tdb_tag & psatcache_mask);
-        auto &cPsat(state.dataPsychCache->cached_Psat(hash));
+        auto &cPsat(state.dataPsychCache->cached_Psat[hash]);
 
         if (cPsat.iTdb != Tdb_tag) {
             cPsat.iTdb = Tdb_tag;
@@ -780,13 +758,13 @@ namespace Psychrometrics {
         DISABLE_WARNING_POP
         Int64 hash = (H_tag ^ Pb_tag) & Int64(tsat_hbp_cache_size - 1);
         auto &cached_Tsat_HPb = state.dataPsychCache->cached_Tsat_HPb;
-        if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
-            cached_Tsat_HPb(hash).iH = H_tag;
-            cached_Tsat_HPb(hash).iPb = Pb_tag;
-            cached_Tsat_HPb(hash).Tsat = PsyTsatFnHPb_raw(state, H, Pb, CalledFrom);
+        if (cached_Tsat_HPb[hash].iH != H_tag || cached_Tsat_HPb[hash].iPb != Pb_tag) {
+            cached_Tsat_HPb[hash].iH = H_tag;
+            cached_Tsat_HPb[hash].iPb = Pb_tag;
+            cached_Tsat_HPb[hash].Tsat = PsyTsatFnHPb_raw(state, H, Pb, CalledFrom);
         }
 
-        Tsat_result = cached_Tsat_HPb(hash).Tsat;
+        Tsat_result = cached_Tsat_HPb[hash].Tsat;
 
         return Tsat_result;
     }
@@ -1182,7 +1160,7 @@ namespace Psychrometrics {
         DISABLE_WARNING_POP
 
         Int64 const hash(Pb_tag & tsatcache_mask);
-        auto &cTsat(state.dataPsychCache->cached_Tsat(hash));
+        auto &cTsat(state.dataPsychCache->cached_Tsat[hash]);
         if (cTsat.iPb != Pb_tag) {
             cTsat.iPb = Pb_tag;
             cTsat.Tsat = PsyTsatFnPb_raw(state, Press, CalledFrom);

@@ -90,6 +90,25 @@ enum class PsychrometricFunction : int
 #endif
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
+constexpr int twbcache_size = 1024 * 1024;
+constexpr int twbprecision_bits = 20;
+#endif
+#ifdef EP_cache_PsyPsatFnTemp
+constexpr int psatcache_size = 1024 * 1024;
+constexpr int psatprecision_bits = 24; // 28  //24  //32
+constexpr Int64 psatcache_mask = psatcache_size - 1;
+#endif
+#ifdef EP_cache_PsyTsatFnPb
+constexpr int tsatcache_size = 1024 * 1024;
+constexpr int tsatprecision_bits = 24;
+constexpr Int64 tsatcache_mask = tsatcache_size - 1;
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+constexpr int tsat_hbp_cache_size = 1024 * 1024;
+constexpr int tsat_hbp_precision_bits = 28;
+#endif
+
+#ifdef EP_cache_PsyTwbFnTdbWPb
 struct cached_twb_t
 {
     // Members
@@ -144,16 +163,16 @@ struct PsychrometricCacheData : BaseGlobalStruct
 {
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
-    Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
+    std::array<cached_twb_t, twbcache_size> cached_Twb;
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-    Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
+    std::array<cached_psat_t, psatcache_size> cached_Psat;
 #endif
 #ifdef EP_cache_PsyTsatFnPb
-    Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+    std::array<cached_tsat_h_pb, tsatcache_size> cached_Tsat;
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
-    Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
+    std::array<cached_tsat_h_pb, tsat_hbp_cache_size> cached_Tsat_HPb;
 #endif
 
 #ifdef EP_psych_stats
@@ -164,16 +183,16 @@ struct PsychrometricCacheData : BaseGlobalStruct
     void clear_state() override
     {
 #ifdef EP_cache_PsyTwbFnTdbWPb
-        cached_Twb.clear();
+        cached_Twb.fill(cached_twb_t());
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-        cached_Psat.clear();
+        cached_Psat.fill(cached_psat_t());
 #endif
 #ifdef EP_cache_PsyTsatFnPb
-        cached_Tsat.clear();
+        cached_Tsat.fill(cached_tsat_h_pb());
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
-        cached_Tsat_HPb.clear();
+        cached_Tsat_HPb.fill(cached_tsat_h_pb());
 #endif
 #ifdef EP_psych_stats
         NumTimesCalled.fill(0);

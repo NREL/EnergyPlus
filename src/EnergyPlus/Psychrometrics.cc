@@ -119,16 +119,16 @@ namespace Psychrometrics {
         // Initializes some variables for PsychRoutines
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
-        state.dataPsychCache->cached_Twb.allocate({0, twbcache_size});
+        state.dataPsychCache->cached_Twb.fill(cached_twb_t());
 #endif
 #ifdef EP_cache_PsyPsatFnTemp
-        state.dataPsychCache->cached_Psat.allocate({0, psatcache_size});
+        state.dataPsychCache->cached_Psat.fill(cached_psat_t());
 #endif
 #ifdef EP_cache_PsyTsatFnPb
-        state.dataPsychCache->cached_Tsat.allocate({0, tsatcache_size});
+        state.dataPsychCache->cached_Tsat.fill(cached_tsat_h_pb());
 #endif
 #ifdef EP_cache_PsyTsatFnHPb
-        state.dataPsychCache->cached_Tsat_HPb.allocate({0, tsat_hbp_cache_size});
+        state.dataPsychCache->cached_Tsat_HPb.fill(cached_tsat_h_pb());
 #endif
     }
 
@@ -332,10 +332,10 @@ namespace Psychrometrics {
 
         auto &cached_Twb = state.dataPsychCache->cached_Twb;
 
-        if (cached_Twb(hash).iTdb != Tdb_tag || cached_Twb(hash).iW != W_tag || cached_Twb(hash).iPb != Pb_tag) {
-            cached_Twb(hash).iTdb = Tdb_tag;
-            cached_Twb(hash).iW = W_tag;
-            cached_Twb(hash).iPb = Pb_tag;
+        if (cached_Twb[hash].iTdb != Tdb_tag || cached_Twb[hash].iW != W_tag || cached_Twb[hash].iPb != Pb_tag) {
+            cached_Twb[hash].iTdb = Tdb_tag;
+            cached_Twb[hash].iW = W_tag;
+            cached_Twb[hash].iPb = Pb_tag;
 
             DISABLE_WARNING_PUSH
             DISABLE_WARNING_STRICT_ALIASING
@@ -349,12 +349,12 @@ namespace Psychrometrics {
             Real64 Pb_tag_r = *reinterpret_cast<Real64 const *>(&Pb_tag);
             DISABLE_WARNING_POP
 
-            cached_Twb(hash).Twb = PsyTwbFnTdbWPb_raw(state, Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom);
+            cached_Twb[hash].Twb = PsyTwbFnTdbWPb_raw(state, Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom);
         }
 
         //  Twbresult_last = cached_Twb(hash)%Twb
         //  Twb_result = Twbresult_last
-        Twb_result = cached_Twb(hash).Twb;
+        Twb_result = cached_Twb[hash].Twb;
 
         return Twb_result;
     }
