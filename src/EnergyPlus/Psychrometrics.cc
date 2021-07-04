@@ -1376,7 +1376,8 @@ namespace Psychrometrics {
             return state.dataPsychrometrics->tSat_Save;
         }
         state.dataPsychrometrics->Press_Save = Press;
-        int n_sample = 217; //sample bin size =512 Pa; sample size =53
+       // int n_sample = 217; //sample bin size =512 Pa; continous sample size =217
+        int n_sample = 52; // sample bin size = 512 Pa; sample size = 52
         //linear interpolation
        //tSat=linearint(state, n_sample, Press); // linear interpolation for y
        
@@ -1487,8 +1488,8 @@ namespace Psychrometrics {
         int j = x_int / 512 - 1;
         // check bounds
         if (j < 0) j = 0;
-        //if (x > 10752 && x <= 95744) j = 21;// address the gap between two sample sets. bin size: 512 pa  
-        //if (x > 95744) j = j - 165;// address the gap between two sample sets. bin size: 512 pa  
+        if (x > 10752 && x <= 95744) j = 21;// address the gap between two sample sets. bin size: 512 pa  
+        if (x > 95744) j = j - 165;// address the gap between two sample sets. bin size: 512 pa  
         if (j > (n - 2)) j = n - 2;
         static constexpr Real64 h(512); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
         //if (x > 10752 && x <= 95744) static constexpr Real64 h(84992); // address the gap between two sample sets. bin size 512 pa for the rest
@@ -1508,13 +1509,12 @@ namespace Psychrometrics {
         int x_int = static_cast<int>(x);
         int j = x_int / 512 - 1;
         // check bounds
-        if (j < 0) j = 0;
-        if (j > (n - 2)) j = n - 2;
-        //if (x > 10752 && x <= 95744) j = 21; // address the gap between two sample sets. bin size: 512 pa
-        //if (x > 95744) j = j - 165;          // address the gap between two sample sets. bin size: 512 pa
+        if (j < 0) j = 0;     
+        if (x > 10752 && x <= 95744) j = 21; // address the gap between two sample sets. bin size: 512 pa
+        if (x > 95744) j = j - 165;          // address the gap between two sample sets. bin size: 512 pa
         if (j > (n - 2)) j = n - 2;
         static constexpr Real64 h(512);      // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
-        //if (x > 10752 && x <= 95744) static constexpr Real64 h(84992); // address the gap between two sample sets A = (tsat_fn_pb_x[j + 1] - x) / h;
+        if (x > 10752 && x <= 95744) static constexpr Real64 h(84992); // address the gap between two sample sets A = (tsat_fn_pb_x[j + 1] - x) / h;
         A = (tsat_fn_pb_x[j + 1] - x) / h;
         B = 1 - A;
         y = A * tsat_fn_pb_y[j] + B * tsat_fn_pb_y[j + 1] +
