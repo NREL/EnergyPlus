@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -70,119 +71,11 @@ namespace ConvectionCoefficients {
     // Using/Aliasing
     using DataVectorTypes::Vector;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    Real64 constexpr AdaptiveHcInsideLowLimit{0.5};  // W/m2-K
-    Real64 constexpr AdaptiveHcOutsideLowLimit{1.0}; // W/m2-K
-
-    Real64 constexpr OneThird{1.0 / 3.0};   // 1/3 in highest precision
-    Real64 constexpr OneFourth{1.0 / 4.0};  // 1/4 in highest precision
-    Real64 constexpr OneFifth{1.0 / 5.0};   // 1/5 in highest precision
-    Real64 constexpr OneSixth{1.0 / 6.0};   // 1/6 in highest precision
-    Real64 constexpr FourFifths{4.0 / 5.0}; // 4/5 in highest precision
-
-    // parameters for identifying more specific hc model equations, inside face
-    int constexpr HcInt_UserValue{200};
-    int constexpr HcInt_UserSchedule{201};
-    int constexpr HcInt_UserCurve{202};
-    int constexpr HcInt_ASHRAEVerticalWall{203};
-    int constexpr HcInt_WaltonUnstableHorizontalOrTilt{204};
-    int constexpr HcInt_WaltonStableHorizontalOrTilt{205};
-    int constexpr HcInt_FisherPedersenCeilDiffuserFloor{206};
-    int constexpr HcInt_FisherPedersenCeilDiffuserCeiling{207};
-    int constexpr HcInt_FisherPedersenCeilDiffuserWalls{208};
-    int constexpr HcInt_AlamdariHammondStableHorizontal{209};
-    int constexpr HcInt_AlamdariHammondVerticalWall{210};
-    int constexpr HcInt_AlamdariHammondUnstableHorizontal{211};
-    int constexpr HcInt_KhalifaEq3WallAwayFromHeat{212};
-    int constexpr HcInt_KhalifaEq4CeilingAwayFromHeat{213};
-    int constexpr HcInt_KhalifaEq5WallNearHeat{214};
-    int constexpr HcInt_KhalifaEq6NonHeatedWalls{215};
-    int constexpr HcInt_KhalifaEq7Ceiling{216};
-    int constexpr HcInt_AwbiHattonHeatedFloor{217};
-    int constexpr HcInt_AwbiHattonHeatedWall{218};
-    int constexpr HcInt_BeausoleilMorrisonMixedAssistingWall{219};
-    int constexpr HcInt_BeausoleilMorrisonMixedOppossingWall{220};
-    int constexpr HcInt_BeausoleilMorrisonMixedStableCeiling{221};
-    int constexpr HcInt_BeausoleilMorrisonMixedUnstableCeiling{222};
-    int constexpr HcInt_BeausoleilMorrisonMixedStableFloor{223};
-    int constexpr HcInt_BeausoleilMorrisonMixedUnstableFloor{224};
-    int constexpr HcInt_FohannoPolidoriVerticalWall{225};
-    int constexpr HcInt_KaradagChilledCeiling{226};
-    int constexpr HcInt_ISO15099Windows{227};
-    int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserWindow{228};
-    int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserWalls{229};
-    int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserFloor{230};
-
-    // parameters for identifying more specific hc model equations, outside face
-    int constexpr HcExt_None{300}; // none is allowed because Hn and Hf are split
-    int constexpr HcExt_UserValue{301};
-    int constexpr HcExt_UserSchedule{302};
-    int constexpr HcExt_TarpHcOutside{5};
-    int constexpr HcExt_MoWiTTHcOutside{6};
-    int constexpr HcExt_DOE2HcOutside{7};
-    int constexpr HcExt_AdaptiveConvectionAlgorithm{9};
-    int constexpr HcExt_UserCurve{303};
-    int constexpr HcExt_ASHRAESimpleCombined{304};
-    int constexpr HcExt_NaturalASHRAEVerticalWall{305};
-    int constexpr HcExt_NaturalWaltonUnstableHorizontalOrTilt{306};
-    int constexpr HcExt_NaturalWaltonStableHorizontalOrTilt{307};
-    int constexpr HcExt_SparrowWindward{308};
-    int constexpr HcExt_SparrowLeeward{309};
-    int constexpr HcExt_MoWiTTWindward{310};
-    int constexpr HcExt_MoWiTTLeeward{311};
-    int constexpr HcExt_DOE2Windward{312};
-    int constexpr HcExt_DOE2Leeward{313};
-    int constexpr HcExt_NusseltJurges{314};
-    int constexpr HcExt_McAdams{315};
-    int constexpr HcExt_Mitchell{316};
-    int constexpr HcExt_ClearRoof{317};
-    int constexpr HcExt_BlockenWindward{318};
-    int constexpr HcExt_EmmelVertical{319};
-    int constexpr HcExt_EmmelRoof{320};
-    int constexpr HcExt_AlamdariHammondVerticalWall{321};
-    int constexpr HcExt_FohannoPolidoriVerticalWall{322};
-    int constexpr HcExt_ISO15099Windows{323};
-    int constexpr HcExt_AlamdariHammondStableHorizontal{324};
-    int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
-
-    // parameters, by zone, for flow regimes for adaptive convection on inside face
-    enum class InConvFlowRegime
-    {
-        Invalid = -1,
-        A1 = 0, // In-floor heating or in-ceiling cooling
-        A2 = 1, // In-wall heating
-        A3 = 2, // no HVAC system, all buoyancy
-        B = 3,  // Convective heater in zone
-        C = 4,  // central mechanical air
-        D = 5,  // zone mechanical air
-        E = 6,  // mixed. mechanical air and buoyancy
-    };
-
-    // params for reference temperature type
-    enum class RefTemp
-    {
-        Invalid = -1,
-        MeanAirTemp = 0,
-        AdjacentAirTemp = 1,
-        SupplyAirTemp = 2,
-    };
-
-    // params for wind speed type
-    enum class RefWind
-    {
-        Invalid = -1,
-        WeatherFile = 0,
-        AtZ = 1,
-        ParallelComp = 2,
-        ParallelCompAtZ = 3,
-    };
-
     struct HcInsideFaceUserCurveStruct
     {
         // Members
         std::string Name; // user's name for object
-        RefTemp ReferenceTempType;
+        ConvectionConstants::RefTemp ReferenceTempType;
         int HcFnTempDiffCurveNum;
         int HcFnTempDiffDivHeightCurveNum;
         int HcFnACHCurveNum;
@@ -190,7 +83,7 @@ namespace ConvectionCoefficients {
 
         // Default Constructor
         HcInsideFaceUserCurveStruct()
-            : ReferenceTempType(RefTemp::Invalid), HcFnTempDiffCurveNum(0), HcFnTempDiffDivHeightCurveNum(0), HcFnACHCurveNum(0),
+            : ReferenceTempType(ConvectionConstants::RefTemp::Invalid), HcFnTempDiffCurveNum(0), HcFnTempDiffDivHeightCurveNum(0), HcFnACHCurveNum(0),
               HcFnACHDivPerimLengthCurveNum(0)
         {
         }
@@ -202,15 +95,15 @@ namespace ConvectionCoefficients {
         std::string Name;
         int ReferenceTempType;
         bool SuppressRainChange;
-        RefWind WindSpeedType;
+        ConvectionConstants::RefWind WindSpeedType;
         int HfFnWindSpeedCurveNum;
         int HnFnTempDiffCurveNum;
         int HnFnTempDiffDivHeightCurveNum;
 
         // Default Constructor
         HcOutsideFaceUserCurveStruct()
-            : ReferenceTempType(0), SuppressRainChange(false), WindSpeedType(RefWind::Invalid), HfFnWindSpeedCurveNum(0), HnFnTempDiffCurveNum(0),
-              HnFnTempDiffDivHeightCurveNum(0)
+            : ReferenceTempType(0), SuppressRainChange(false), WindSpeedType(ConvectionConstants::RefWind::Invalid), HfFnWindSpeedCurveNum(0),
+              HnFnTempDiffCurveNum(0), HnFnTempDiffDivHeightCurveNum(0)
         {
         }
     };
@@ -312,51 +205,58 @@ namespace ConvectionCoefficients {
 
         // Default Constructor
         InsideFaceAdaptiveConvAlgoStruct()
-            : SimpleBuoyVertWallEqNum(HcInt_FohannoPolidoriVerticalWall), SimpleBuoyVertWallUserCurveNum(0),
-              SimpleBuoyStableHorizEqNum(HcInt_AlamdariHammondStableHorizontal), SimpleBuoyStableHorizUserCurveNum(0),
-              SimpleBuoyUnstableHorizEqNum(HcInt_AlamdariHammondUnstableHorizontal), SimpleBuoyUnstableHorizUserCurveNum(0),
-              SimpleBuoyStableTiltedEqNum(HcInt_WaltonStableHorizontalOrTilt), SimpleBuoyStableTiltedUserCurveNum(0),
-              SimpleBuoyUnstableTiltedEqNum(HcInt_WaltonUnstableHorizontalOrTilt), SimpleBuoyUnstableTiltedUserCurveNum(0),
-              SimpleBuoyWindowsEqNum(HcInt_ISO15099Windows), SimpleBuoyWindowsUserCurveNum(0),
-              FloorHeatCeilingCoolVertWallEqNum(HcInt_KhalifaEq3WallAwayFromHeat), FloorHeatCeilingCoolVertWallUserCurveNum(0),
-              FloorHeatCeilingCoolStableHorizEqNum(HcInt_AlamdariHammondStableHorizontal), FloorHeatCeilingCoolStableHorizUserCurveNum(0),
-              FloorHeatCeilingCoolUnstableHorizEqNum(HcInt_KhalifaEq4CeilingAwayFromHeat), FloorHeatCeilingCoolUnstableHorizUserCurveNum(0),
-              FloorHeatCeilingCoolHeatedFloorEqNum(HcInt_AwbiHattonHeatedFloor), FloorHeatCeilingCoolHeatedFloorUserCurveNum(0),
-              FloorHeatCeilingCoolChilledCeilingEqNum(HcInt_KaradagChilledCeiling), FloorHeatCeilingCoolChilledCeilingUserCurveNum(0),
-              FloorHeatCeilingCoolStableTiltedEqNum(HcInt_WaltonStableHorizontalOrTilt), FloorHeatCeilingCoolStableTiltedUserCurveNum(0),
-              FloorHeatCeilingCoolUnstableTiltedEqNum(HcInt_WaltonUnstableHorizontalOrTilt), FloorHeatCeilingCoolUnstableTiltedUserCurveNum(0),
-              FloorHeatCeilingCoolWindowsEqNum(HcInt_ISO15099Windows), FloorHeatCeilingCoolWindowsUserCurveNum(0),
-              WallPanelHeatVertWallEqNum(HcInt_KhalifaEq6NonHeatedWalls), WallPanelHeatVertWallUserCurveNum(0),
-              WallPanelHeatHeatedWallEqNum(HcInt_AwbiHattonHeatedWall), WallPanelHeatHeatedWallUserCurveNum(0),
-              WallPanelHeatStableHorizEqNum(HcInt_AlamdariHammondStableHorizontal), WallPanelHeatStableHorizUserCurveNum(0),
-              WallPanelHeatUnstableHorizEqNum(HcInt_KhalifaEq7Ceiling), WallPanelHeatUnstableHorizUserCurveNum(0),
-              WallPanelHeatStableTiltedEqNum(HcInt_WaltonStableHorizontalOrTilt), WallPanelHeatStableTiltedUserCurveNum(0),
-              WallPanelHeatUnstableTiltedEqNum(HcInt_WaltonUnstableHorizontalOrTilt), WallPanelHeatUnstableTiltedUserCurveNum(0),
-              WallPanelHeatWindowsEqNum(HcInt_ISO15099Windows), WallPanelHeatWindowsUserCurveNum(0),
-              ConvectiveHeatVertWallEqNum(HcInt_FohannoPolidoriVerticalWall), ConvectiveHeatVertWallUserCurveNum(0),
-              ConvectiveHeatVertWallNearHeaterEqNum(HcInt_KhalifaEq5WallNearHeat), ConvectiveHeatVertWallNearHeaterUserCurveNum(0),
-              ConvectiveHeatStableHorizEqNum(HcInt_AlamdariHammondStableHorizontal), ConvectiveHeatStableHorizUserCurveNum(0),
-              ConvectiveHeatUnstableHorizEqNum(HcInt_KhalifaEq7Ceiling), ConvectiveHeatUnstableHorizUserCurveNum(0),
-              ConvectiveHeatStableTiltedEqNum(HcInt_WaltonStableHorizontalOrTilt), ConvectiveHeatStableTiltedUserCurveNum(0),
-              ConvectiveHeatUnstableTiltedEqNum(HcInt_WaltonUnstableHorizontalOrTilt), ConvectiveHeatUnstableTiltedUserCurveNum(0),
-              ConvectiveHeatWindowsEqNum(HcInt_ISO15099Windows), ConvectiveHeatWindowsUserCurveNum(0),
-              CentralAirWallEqNum(HcInt_GoldsteinNovoselacCeilingDiffuserWalls), CentralAirWallUserCurveNum(0),
-              CentralAirCeilingEqNum(HcInt_FisherPedersenCeilDiffuserCeiling), CentralAirCeilingUserCurveNum(0),
-              CentralAirFloorEqNum(HcInt_GoldsteinNovoselacCeilingDiffuserFloor), CentralAirFloorUserCurveNum(0),
-              CentralAirWindowsEqNum(HcInt_GoldsteinNovoselacCeilingDiffuserWindow), CentralAirWindowsUserCurveNum(0),
-              ZoneFanCircVertWallEqNum(HcInt_KhalifaEq3WallAwayFromHeat), ZoneFanCircVertWallUserCurveNum(0),
-              ZoneFanCircStableHorizEqNum(HcInt_AlamdariHammondStableHorizontal), ZoneFanCircStableHorizUserCurveNum(0),
-              ZoneFanCircUnstableHorizEqNum(HcInt_KhalifaEq4CeilingAwayFromHeat), ZoneFanCircUnstableHorizUserCurveNum(0),
-              ZoneFanCircStableTiltedEqNum(HcInt_WaltonStableHorizontalOrTilt), ZoneFanCircStableTiltedUserCurveNum(0),
-              ZoneFanCircUnstableTiltedEqNum(HcInt_WaltonUnstableHorizontalOrTilt), ZoneFanCircUnstableTiltedUserCurveNum(0),
-              ZoneFanCircWindowsEqNum(HcInt_ISO15099Windows), ZoneFanCircWindowsUserCurveNum(0),
-              MixedBuoyAssistingFlowWallEqNum(HcInt_BeausoleilMorrisonMixedAssistingWall), MixedBuoyAssistingFlowWallUserCurveNum(0),
-              MixedBuoyOpposingFlowWallEqNum(HcInt_BeausoleilMorrisonMixedOppossingWall), MixedBuoyOpposingFlowWallUserCurveNum(0),
-              MixedStableFloorEqNum(HcInt_BeausoleilMorrisonMixedStableFloor), MixedStableFloorUserCurveNum(0),
-              MixedUnstableFloorEqNum(HcInt_BeausoleilMorrisonMixedUnstableFloor), MixedUnstableFloorUserCurveNum(0),
-              MixedStableCeilingEqNum(HcInt_BeausoleilMorrisonMixedStableCeiling), MixedStableCeilingUserCurveNum(0),
-              MixedUnstableCeilingEqNum(HcInt_BeausoleilMorrisonMixedUnstableCeiling), MixedUnstableCeilingUserCurveNum(0),
-              MixedWindowsEqNum(HcInt_GoldsteinNovoselacCeilingDiffuserWindow), MixedWindowsUserCurveNum(0)
+            : SimpleBuoyVertWallEqNum(ConvectionConstants::HcInt_FohannoPolidoriVerticalWall), SimpleBuoyVertWallUserCurveNum(0),
+              SimpleBuoyStableHorizEqNum(ConvectionConstants::HcInt_AlamdariHammondStableHorizontal), SimpleBuoyStableHorizUserCurveNum(0),
+              SimpleBuoyUnstableHorizEqNum(ConvectionConstants::HcInt_AlamdariHammondUnstableHorizontal), SimpleBuoyUnstableHorizUserCurveNum(0),
+              SimpleBuoyStableTiltedEqNum(ConvectionConstants::HcInt_WaltonStableHorizontalOrTilt), SimpleBuoyStableTiltedUserCurveNum(0),
+              SimpleBuoyUnstableTiltedEqNum(ConvectionConstants::HcInt_WaltonUnstableHorizontalOrTilt), SimpleBuoyUnstableTiltedUserCurveNum(0),
+              SimpleBuoyWindowsEqNum(ConvectionConstants::HcInt_ISO15099Windows), SimpleBuoyWindowsUserCurveNum(0),
+              FloorHeatCeilingCoolVertWallEqNum(ConvectionConstants::HcInt_KhalifaEq3WallAwayFromHeat), FloorHeatCeilingCoolVertWallUserCurveNum(0),
+              FloorHeatCeilingCoolStableHorizEqNum(ConvectionConstants::HcInt_AlamdariHammondStableHorizontal),
+              FloorHeatCeilingCoolStableHorizUserCurveNum(0),
+              FloorHeatCeilingCoolUnstableHorizEqNum(ConvectionConstants::HcInt_KhalifaEq4CeilingAwayFromHeat),
+              FloorHeatCeilingCoolUnstableHorizUserCurveNum(0),
+              FloorHeatCeilingCoolHeatedFloorEqNum(ConvectionConstants::HcInt_AwbiHattonHeatedFloor), FloorHeatCeilingCoolHeatedFloorUserCurveNum(0),
+              FloorHeatCeilingCoolChilledCeilingEqNum(ConvectionConstants::HcInt_KaradagChilledCeiling),
+              FloorHeatCeilingCoolChilledCeilingUserCurveNum(0),
+              FloorHeatCeilingCoolStableTiltedEqNum(ConvectionConstants::HcInt_WaltonStableHorizontalOrTilt),
+              FloorHeatCeilingCoolStableTiltedUserCurveNum(0),
+              FloorHeatCeilingCoolUnstableTiltedEqNum(ConvectionConstants::HcInt_WaltonUnstableHorizontalOrTilt),
+              FloorHeatCeilingCoolUnstableTiltedUserCurveNum(0), FloorHeatCeilingCoolWindowsEqNum(ConvectionConstants::HcInt_ISO15099Windows),
+              FloorHeatCeilingCoolWindowsUserCurveNum(0), WallPanelHeatVertWallEqNum(ConvectionConstants::HcInt_KhalifaEq6NonHeatedWalls),
+              WallPanelHeatVertWallUserCurveNum(0), WallPanelHeatHeatedWallEqNum(ConvectionConstants::HcInt_AwbiHattonHeatedWall),
+              WallPanelHeatHeatedWallUserCurveNum(0), WallPanelHeatStableHorizEqNum(ConvectionConstants::HcInt_AlamdariHammondStableHorizontal),
+              WallPanelHeatStableHorizUserCurveNum(0), WallPanelHeatUnstableHorizEqNum(ConvectionConstants::HcInt_KhalifaEq7Ceiling),
+              WallPanelHeatUnstableHorizUserCurveNum(0), WallPanelHeatStableTiltedEqNum(ConvectionConstants::HcInt_WaltonStableHorizontalOrTilt),
+              WallPanelHeatStableTiltedUserCurveNum(0), WallPanelHeatUnstableTiltedEqNum(ConvectionConstants::HcInt_WaltonUnstableHorizontalOrTilt),
+              WallPanelHeatUnstableTiltedUserCurveNum(0), WallPanelHeatWindowsEqNum(ConvectionConstants::HcInt_ISO15099Windows),
+              WallPanelHeatWindowsUserCurveNum(0), ConvectiveHeatVertWallEqNum(ConvectionConstants::HcInt_FohannoPolidoriVerticalWall),
+              ConvectiveHeatVertWallUserCurveNum(0), ConvectiveHeatVertWallNearHeaterEqNum(ConvectionConstants::HcInt_KhalifaEq5WallNearHeat),
+              ConvectiveHeatVertWallNearHeaterUserCurveNum(0),
+              ConvectiveHeatStableHorizEqNum(ConvectionConstants::HcInt_AlamdariHammondStableHorizontal), ConvectiveHeatStableHorizUserCurveNum(0),
+              ConvectiveHeatUnstableHorizEqNum(ConvectionConstants::HcInt_KhalifaEq7Ceiling), ConvectiveHeatUnstableHorizUserCurveNum(0),
+              ConvectiveHeatStableTiltedEqNum(ConvectionConstants::HcInt_WaltonStableHorizontalOrTilt), ConvectiveHeatStableTiltedUserCurveNum(0),
+              ConvectiveHeatUnstableTiltedEqNum(ConvectionConstants::HcInt_WaltonUnstableHorizontalOrTilt),
+              ConvectiveHeatUnstableTiltedUserCurveNum(0), ConvectiveHeatWindowsEqNum(ConvectionConstants::HcInt_ISO15099Windows),
+              ConvectiveHeatWindowsUserCurveNum(0), CentralAirWallEqNum(ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWalls),
+              CentralAirWallUserCurveNum(0), CentralAirCeilingEqNum(ConvectionConstants::HcInt_FisherPedersenCeilDiffuserCeiling),
+              CentralAirCeilingUserCurveNum(0), CentralAirFloorEqNum(ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserFloor),
+              CentralAirFloorUserCurveNum(0), CentralAirWindowsEqNum(ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWindow),
+              CentralAirWindowsUserCurveNum(0), ZoneFanCircVertWallEqNum(ConvectionConstants::HcInt_KhalifaEq3WallAwayFromHeat),
+              ZoneFanCircVertWallUserCurveNum(0), ZoneFanCircStableHorizEqNum(ConvectionConstants::HcInt_AlamdariHammondStableHorizontal),
+              ZoneFanCircStableHorizUserCurveNum(0), ZoneFanCircUnstableHorizEqNum(ConvectionConstants::HcInt_KhalifaEq4CeilingAwayFromHeat),
+              ZoneFanCircUnstableHorizUserCurveNum(0), ZoneFanCircStableTiltedEqNum(ConvectionConstants::HcInt_WaltonStableHorizontalOrTilt),
+              ZoneFanCircStableTiltedUserCurveNum(0), ZoneFanCircUnstableTiltedEqNum(ConvectionConstants::HcInt_WaltonUnstableHorizontalOrTilt),
+              ZoneFanCircUnstableTiltedUserCurveNum(0), ZoneFanCircWindowsEqNum(ConvectionConstants::HcInt_ISO15099Windows),
+              ZoneFanCircWindowsUserCurveNum(0), MixedBuoyAssistingFlowWallEqNum(ConvectionConstants::HcInt_BeausoleilMorrisonMixedAssistingWall),
+              MixedBuoyAssistingFlowWallUserCurveNum(0),
+              MixedBuoyOpposingFlowWallEqNum(ConvectionConstants::HcInt_BeausoleilMorrisonMixedOppossingWall),
+              MixedBuoyOpposingFlowWallUserCurveNum(0), MixedStableFloorEqNum(ConvectionConstants::HcInt_BeausoleilMorrisonMixedStableFloor),
+              MixedStableFloorUserCurveNum(0), MixedUnstableFloorEqNum(ConvectionConstants::HcInt_BeausoleilMorrisonMixedUnstableFloor),
+              MixedUnstableFloorUserCurveNum(0), MixedStableCeilingEqNum(ConvectionConstants::HcInt_BeausoleilMorrisonMixedStableCeiling),
+              MixedStableCeilingUserCurveNum(0), MixedUnstableCeilingEqNum(ConvectionConstants::HcInt_BeausoleilMorrisonMixedUnstableCeiling),
+              MixedUnstableCeilingUserCurveNum(0), MixedWindowsEqNum(ConvectionConstants::HcInt_GoldsteinNovoselacCeilingDiffuserWindow),
+              MixedWindowsUserCurveNum(0)
         {
         }
     };
@@ -381,11 +281,12 @@ namespace ConvectionCoefficients {
 
         // Default Constructor
         OutsideFaceAdaptiveConvAlgoStruct()
-            : SuppressRainChange(false), HWindWallWindwardEqNum(HcExt_SparrowWindward), HWindWallWindwardUserCurveNum(0),
-              HWindWallLeewardEqNum(HcExt_SparrowLeeward), HWindWallLeewardUserCurveNum(0), HWindHorizRoofEqNum(HcExt_ClearRoof),
-              HWindHorizRoofUserCurveNum(0), HNatVertWallEqNum(HcExt_NaturalASHRAEVerticalWall), HNatVertWallUserCurveNum(0),
-              HNatStableHorizEqNum(HcExt_NaturalWaltonStableHorizontalOrTilt), HNatStableHorizUserCurveNum(0),
-              HNatUnstableHorizEqNum(HcExt_NaturalWaltonUnstableHorizontalOrTilt), HNatUnstableHorizUserCurveNum(0)
+            : SuppressRainChange(false), HWindWallWindwardEqNum(ConvectionConstants::HcExt_SparrowWindward), HWindWallWindwardUserCurveNum(0),
+              HWindWallLeewardEqNum(ConvectionConstants::HcExt_SparrowLeeward), HWindWallLeewardUserCurveNum(0),
+              HWindHorizRoofEqNum(ConvectionConstants::HcExt_ClearRoof), HWindHorizRoofUserCurveNum(0),
+              HNatVertWallEqNum(ConvectionConstants::HcExt_NaturalASHRAEVerticalWall), HNatVertWallUserCurveNum(0),
+              HNatStableHorizEqNum(ConvectionConstants::HcExt_NaturalWaltonStableHorizontalOrTilt), HNatStableHorizUserCurveNum(0),
+              HNatUnstableHorizEqNum(ConvectionConstants::HcExt_NaturalWaltonUnstableHorizontalOrTilt), HNatUnstableHorizUserCurveNum(0)
         {
         }
     };
