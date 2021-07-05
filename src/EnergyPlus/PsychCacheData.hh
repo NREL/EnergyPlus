@@ -182,18 +182,6 @@ struct PsychrometricCacheData : BaseGlobalStruct
 
     void clear_state() override
     {
-#ifdef EP_cache_PsyTwbFnTdbWPb
-        cached_Twb.fill(cached_twb_t());
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-        cached_Psat.fill(cached_psat_t());
-#endif
-#ifdef EP_cache_PsyTsatFnPb
-        cached_Tsat.fill(cached_tsat_h_pb());
-#endif
-#ifdef EP_cache_PsyTsatFnHPb
-        cached_Tsat_HPb.fill(cached_tsat_h_pb());
-#endif
 #ifdef EP_psych_stats
         NumTimesCalled.fill(0);
         NumIterations.fill(0);
