@@ -844,13 +844,13 @@ namespace Psychrometrics {
         // values from PsyRhFnTdbWPb
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName(PsyRoutineNames[static_cast<int>(PsychrometricFunction::RhFnTdbRhov)]); // PsyRhFnTdbRhov
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::RhFnTdbRhov)];
 #endif
 
-        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) / PsyPsatFnTemp(state, Tdb, RoutineName)
+        Real64 const RHValue(Rhovapor > 0.0 ? Rhovapor * 461.52 * (Tdb + DataGlobalConstants::KelvinConv) /
+                                                  PsyPsatFnTemp(state, Tdb, PsyRoutineNames[static_cast<int>(PsychrometricFunction::RhFnTdbRhov)])
                                             : 0.0);
 
         if ((RHValue < 0.0) || (RHValue > 1.0)) {
@@ -895,13 +895,15 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK FUNDAMENTALS 1985, P6.12, EQN 10,21,23
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName(PsyRoutineNames[static_cast<int>(PsychrometricFunction::RhFnTdbWPb)]); // PsyRhFnTdbWPb
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::RhFnTdbWPb)];
 #endif
 
-        Real64 const PWS(PsyPsatFnTemp(state, TDB, (CalledFrom.empty() ? RoutineName : CalledFrom))); // Pressure -- saturated for pure water
+        Real64 const PWS(PsyPsatFnTemp(state,
+                                       TDB,
+                                       (CalledFrom.empty() ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::RhFnTdbWPb)]
+                                                           : CalledFrom))); // Pressure -- saturated for pure water
 
         // Find Degree Of Saturation
         Real64 const W(max(dW, 1.0e-5));                  // humidity ratio
@@ -953,15 +955,16 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 22
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName(PsyRoutineNames[static_cast<int>(PsychrometricFunction::WFnTdpPb)]); // PsyWFnTdpPb
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::WFnTdpPb)];
 #endif
 
-        Real64 const PDEW(
-            PsyPsatFnTemp(state, TDP, (CalledFrom.empty() ? RoutineName : CalledFrom))); // saturation pressure at dew-point temperature {Pascals}
-        Real64 const W(PDEW * 0.62198 / (PB - PDEW));                                    // humidity ratio
+        Real64 const PDEW(PsyPsatFnTemp(state,
+                                        TDP,
+                                        (CalledFrom.empty() ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::WFnTdpPb)]
+                                                            : CalledFrom))); // saturation pressure at dew-point temperature {Pascals}
+        Real64 const W(PDEW * 0.62198 / (PB - PDEW));                        // humidity ratio
 
         // Validity test
         if (W < 0.0) {
@@ -971,7 +974,8 @@ namespace Psychrometrics {
                 DeltaT++;
                 PDEW1 = PsyPsatFnTemp(state,
                                       TDP - DeltaT,
-                                      (CalledFrom.empty() ? RoutineName : CalledFrom)); // saturation pressure at dew-point temperature {Pascals}
+                                      (CalledFrom.empty() ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::WFnTdpPb)]
+                                                          : CalledFrom)); // saturation pressure at dew-point temperature {Pascals}
             }
             Real64 W1 = PDEW1 * 0.62198 / (PB - PDEW1);
 #ifdef EP_psych_errors
@@ -1016,14 +1020,15 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 22
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName(PsyRoutineNames[static_cast<int>(PsychrometricFunction::WFnTdbRhPb)]); // PsyWFnTdbRhPb
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::WFnTdbRhPb)];
 #endif
 
-        Real64 const PDEW(RH *
-                          PsyPsatFnTemp(state, TDB, (CalledFrom.empty() ? RoutineName : CalledFrom))); // Pressure at dew-point temperature {Pascals}
+        Real64 const PDEW(RH * PsyPsatFnTemp(state,
+                                             TDB,
+                                             (CalledFrom.empty() ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::WFnTdbRhPb)]
+                                                                 : CalledFrom))); // Pressure at dew-point temperature {Pascals}
 
         // Numeric error check when the temperature and RH values cause Pdew to equal or exceed
         // barometric pressure which is physically impossible. An approach limit of 1000 pascals
@@ -1082,7 +1087,6 @@ namespace Psychrometrics {
         // ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQ 22,35
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName(PsyRoutineNames[static_cast<int>(PsychrometricFunction::WFnTdbTwbPb)]); // PsyWFnTdbTwbPb
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled[static_cast<int>(PsychrometricFunction::WFnTdbTwbPb)];
@@ -1099,8 +1103,11 @@ namespace Psychrometrics {
         }
 
         // Calculation
-        Real64 const PWET(PsyPsatFnTemp(state, TWB, (CalledFrom.empty() ? RoutineName : CalledFrom))); // Pressure at wet-bulb temperature {Pascals}
-        Real64 const WET(0.62198 * PWET / (PB - PWET));                                                // Humidity ratio at wet-bulb temperature
+        Real64 const PWET(PsyPsatFnTemp(state,
+                                        TWB,
+                                        (CalledFrom.empty() ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::WFnTdbTwbPb)]
+                                                            : CalledFrom))); // Pressure at wet-bulb temperature {Pascals}
+        Real64 const WET(0.62198 * PWET / (PB - PWET));                      // Humidity ratio at wet-bulb temperature
         Real64 const W(((2501.0 - 2.381 * TWB) * WET - (TDB - TWB)) / (2501.0 + 1.805 * TDB - 4.186 * TWB)); // humidity ratio
 
         // Validity check

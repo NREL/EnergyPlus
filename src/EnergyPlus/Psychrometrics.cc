@@ -400,7 +400,6 @@ namespace Psychrometrics {
 
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(100); // Maximum No of Iterations
-        static constexpr std::string_view RoutineName(PsyRoutineNames[static_cast<int>(PsychrometricFunction::TwbFnTdbWPb)]); // PsyTwbFnTdbWPb
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 tBoil;    // Boiling temperature of water at given pressure
@@ -481,7 +480,8 @@ namespace Psychrometrics {
 
         // Initial temperature guess at atmospheric pressure
         if (Patm != state.dataPsychrometrics->last_Patm) {
-            tBoil = PsyTsatFnPb(state, Patm, (CalledFrom.empty() ? RoutineName : CalledFrom));
+            tBoil =
+                PsyTsatFnPb(state, Patm, (CalledFrom.empty() ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::TwbFnTdbWPb)] : CalledFrom));
             state.dataPsychrometrics->last_Patm = Patm;
             state.dataPsychrometrics->last_tBoil = tBoil;
         } else {
@@ -501,7 +501,8 @@ namespace Psychrometrics {
             if (WBT >= (tBoil - 0.09)) WBT = tBoil - 0.1;
 
             // Determine the saturation pressure for wet bulb temperature
-            PSatstar = PsyPsatFnTemp(state, WBT, (CalledFrom.empty() ? RoutineName : CalledFrom));
+            PSatstar =
+                PsyPsatFnTemp(state, WBT, (CalledFrom.empty() ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::TwbFnTdbWPb)] : CalledFrom));
 
             // Determine humidity ratio for given saturation pressure
             Wstar = 0.62198 * PSatstar / (Patm - PSatstar);
@@ -1298,7 +1299,6 @@ namespace Psychrometrics {
         // FUNCTION PARAMETER DEFINITIONS:
         int constexpr itmax(50); // Maximum number of iterations
         Real64 constexpr convTol(0.0001);
-        static constexpr std::string_view RoutineName(PsyRoutineNames[static_cast<int>(PsychrometricFunction::TsatFnPb)]); // PsyTsatFnPb
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -1380,7 +1380,8 @@ namespace Psychrometrics {
             for (iter = 1; iter <= itmax; ++iter) {
 
                 // Calculate saturation pressure for estimated boiling temperature
-                pSat = PsyPsatFnTemp(state, tSat, (CalledFrom_empty ? RoutineName : CalledFrom));
+                pSat =
+                    PsyPsatFnTemp(state, tSat, (CalledFrom_empty ? PsyRoutineNames[static_cast<int>(PsychrometricFunction::TsatFnPb)] : CalledFrom));
 
                 // Compare with specified pressure and update estimate of temperature
                 error = Press - pSat;
