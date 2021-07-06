@@ -17515,9 +17515,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
 
     int AirLoopNum(1);
     bool FirstHVACIteration(false);
-    Real64 CoilCoolHeatRat(1.0);
     Real64 AirMassFlowRate(1.0);
-    Real64 HotWaterMassFlowRate(0.0);
     Real64 ColdWaterMassFlowRate(1.0);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.0;
@@ -17762,7 +17760,6 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     Real64 OnOffAirFlowRatio(1.0);
     Real64 CoilCoolHeatRat(1.0);
     Real64 AirMassFlowRate(1.0);
-    Real64 HotWaterMassFlowRate(0.0);
     Real64 ColdWaterMassFlowRate(1.0);
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.0;
@@ -17911,7 +17908,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataWaterCoils->WaterCoil(1).DesAirVolFlowRate = 1.0;
     state->dataLoopNodes->Node(state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum).MassFlowRate = ColdWaterMassFlowRate;
     ;
-    // Test 1: economizer inlet water temperature is favorable, coil ON
+    // Test 1: economizer inlet water temperature is favorable, expect coil ON
     // run init and check the coil system operating condition and control status
     thisSys.initUnitarySystems(*state, AirLoopNum, FirstHVACIteration, ZoneOAUnitNum, OAUCoilOutTemp);
     EXPECT_TRUE(thisSys.runWaterSideEconomizer);
