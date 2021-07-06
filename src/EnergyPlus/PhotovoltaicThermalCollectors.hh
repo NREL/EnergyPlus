@@ -183,6 +183,8 @@ namespace PhotovoltaicThermalCollectors {
         void calculate(EnergyPlusData &state);
 
         void update(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetPVTcollectorsInput(EnergyPlusData &state);
