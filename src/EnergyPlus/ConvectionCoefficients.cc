@@ -170,7 +170,7 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                 ShowContinueError(state, "Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone=" + Zone(ZoneNum).Name);
                 Zone(ZoneNum).InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAETARP;
             }
-            // insert one-time setup for adpative inside face
+            // insert one-time setup for adaptive inside face
         }
     }
 
@@ -7021,7 +7021,7 @@ void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int const SurfNum, int
 {
 
     // SUBROUTINE INFORMATION:
-    //       AUTHOR         <Brent Griffith
+    //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   Aug 2010
     //       MODIFIED       na
     //       RE-ENGINEERED  na

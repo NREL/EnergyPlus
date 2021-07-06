@@ -1962,8 +1962,8 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 BuildingAzimuth = 0.0;           // North Axis of Building
     Real64 LoadsConvergTol = 0.0;           // Tolerance value for Loads Convergence
     Real64 TempConvergTol = 0.0;            // Tolerance value for Temperature Convergence
-    int DefaultInsideConvectionAlgo = 1;    // 1 = simple (ASHRAE); 2 = detailed (ASHRAE); 3 = ceiling diffuser; 4 = trombe wall
-    int DefaultOutsideConvectionAlgo = 1;   // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
+    int DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
+    int DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
     DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                  // Solar Distribution Algorithm
     int InsideSurfIterations = 0;                                                                             // Counts inside surface iterations
     DataSurfaces::iHeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
@@ -2258,8 +2258,8 @@ struct HeatBalanceData : BaseGlobalStruct
         this->BuildingAzimuth = 0.0;
         this->LoadsConvergTol = 0.0;
         this->TempConvergTol = 0.0;
-        this->DefaultInsideConvectionAlgo = 1;
-        this->DefaultOutsideConvectionAlgo = 1;
+        this->DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
+        this->DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
         this->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
         this->InsideSurfIterations = 0;
         this->OverallHeatTransferSolutionAlgo = DataSurfaces::iHeatTransferModel::CTF;
