@@ -802,8 +802,9 @@ void BLASTAbsorberSpecs::initEachEnvironment(EnergyPlusData &state)
             Real64 SteamDeltaT = this->GeneratorSubcool;
             Real64 SteamOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
             Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
+            auto curWaterIndex = waterIndex;
             Real64 CpWater = FluidProperties::GetDensityGlycol(
-                state, fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
+                state, fluidNameWater, SteamOutletTemp, curWaterIndex, calcChillerAbsorption + this->Name);
             this->GenMassFlowRateMax = this->QGenerator / (HfgSteam + CpWater * SteamDeltaT);
         }
 
@@ -1289,8 +1290,9 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
                                                                                0.0,
                                                                                this->SteamFluidIndex,
                                                                                moduleObjectType + this->Name);
+                auto curWaterIndex = waterIndex;
                 Real64 CpWater =
-                    FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, GeneratorOutletTemp, const_cast<int &>(waterIndex), RoutineName);
+                    FluidProperties::GetSpecificHeatGlycol(state, fluidNameWater, GeneratorOutletTemp, curWaterIndex, RoutineName);
                 Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
                 this->SteamMassFlowRate = (this->NomCap * SteamInputRatNom) / ((HfgSteam) + (SteamDeltaT * CpWater));
                 tmpGeneratorVolFlowRate = this->SteamMassFlowRate / SteamDensity;
@@ -1762,8 +1764,9 @@ void BLASTAbsorberSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool R
             Real64 SteamDeltaT = this->GeneratorSubcool;
             Real64 SteamOutletTemp = state.dataLoopNodes->Node(this->GeneratorInletNodeNum).Temp - SteamDeltaT;
             Real64 HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
+            auto curWaterIndex = waterIndex;
             CpFluid = FluidProperties::GetSpecificHeatGlycol(
-                state, fluidNameWater, SteamOutletTemp, const_cast<int &>(waterIndex), calcChillerAbsorption + this->Name);
+                state, fluidNameWater, SteamOutletTemp, curWaterIndex, calcChillerAbsorption + this->Name);
             this->SteamMassFlowRate = this->QGenerator / (HfgSteam + CpFluid * SteamDeltaT);
             PlantUtilities::SetComponentFlowRate(state,
                                                  this->SteamMassFlowRate,

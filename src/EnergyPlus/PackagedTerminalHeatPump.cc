@@ -8863,7 +8863,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                 ShowWarningMessage(state,
                                                    "RoutineName//Hot water coil control failed for " + state.dataPTHP->PTUnit(PTUnitNum).UnitType +
                                                        "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
-                                                       "\""); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
+                                                       "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
                                 ShowContinueErrorTimeStamp(state, "");
                                 ShowContinueError(state,
                                                   format("  Iteration limit [{}] exceeded in calculating hot water mass flow rate", SolveMaxIter));
@@ -8874,14 +8874,13 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                        SolveMaxIter,
                                        state.dataPTHP->PTUnit(PTUnitNum).UnitType,
                                        state.dataPTHP->PTUnit(PTUnitNum).Name),
-                                state.dataPTHP->PTUnit(PTUnitNum)
-                                    .HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
+                                state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex); // Autodesk:Bug? Meant RoutineName + "Hot water...
                         } else if (SolFlag == -2) {
                             if (state.dataPTHP->PTUnit(PTUnitNum).HotWaterCoilMaxIterIndex2 == 0) {
                                 ShowWarningMessage(state,
                                                    "RoutineName//Hot water coil control failed (maximum flow limits) for " +
                                                        state.dataPTHP->PTUnit(PTUnitNum).UnitType + "=\"" + state.dataPTHP->PTUnit(PTUnitNum).Name +
-                                                       "\""); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
+                                                       "\""); // Autodesk:Bug? Meant RoutineName + "Hot water...
                                 ShowContinueErrorTimeStamp(state, "");
                                 ShowContinueError(state, "...Bad hot water maximum flow rate limits");
                                 ShowContinueError(state, format("...Given minimum water flow rate={:.3R} kg/s", state.dataPTHP->MinWaterFlow));
@@ -8896,7 +8895,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
                                                            state.dataPTHP->MinWaterFlow,
                                                            _,
                                                            "[kg/s]",
-                                                           "[kg/s]"); // Autodesk:Bug? Meant std::string{RoutineName} + "Hot water...
+                                                           "[kg/s]"); // Autodesk:Bug? Meant RoutineName + "Hot water...
                         }
                         QActual = SupHeaterLoad;
                         // simulate the hot water supplemental heating coil
