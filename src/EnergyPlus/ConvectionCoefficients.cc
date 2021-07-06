@@ -906,6 +906,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
         {"VALUE", ConvectionConstants::HcExt_Value},
         {"SCHEDULE", ConvectionConstants::HcExt_Schedule},
         {"TARP", ConvectionConstants::HcExt_TarpHcOutside},
+        {"SIMPLE", ConvectionConstants::HcExt_ASHRAESimple},
         {"MOWITT", ConvectionConstants::HcExt_MoWiTTHcOutside},
         {"DOE-2", ConvectionConstants::HcExt_DOE2HcOutside},
         {"ADAPTIVECONVECTIONALGORITHM", ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm},
@@ -1558,10 +1559,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
                         ExtValue = HcExt_ConvectionTypesMap.at(equationName);
-                        if (equationName == "SIMPLE" || equationName == "TARP" || equationName == "MOWITT" || equationName == "DOE-2" ||
-                            equationName == "ADAPTIVECONVECTIONALGORITHM") {
+                        if ((ExtValue == ConvectionConstants::HcExt_ASHRAESimple) || (ExtValue == ConvectionConstants::HcExt_ASHRAETARP) ||
+                            (ExtValue == ConvectionConstants::HcExt_MoWiTTHcOutside) || (ExtValue == ConvectionConstants::HcExt_DOE2HcOutside) ||
+                            (ExtValue == ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm)) {
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", -ExtValue);
-                        } else if (equationName == "VALUE") {
+                        } else if (ExtValue == ConvectionConstants::HcExt_Value) {
                             // SimpleValueAssignment via UserExtConvectionCoeffs array
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
@@ -1590,7 +1592,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                       state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                             }
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
-                        } else if (equationName == "SCHEDULE") {
+                        } else if (ExtValue == ConvectionConstants::HcExt_Schedule) {
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
@@ -1649,10 +1651,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
                         IntValue = HcInt_ConvectionTypesMap.at(equationName);
-                        if ((equationName == "SIMPLE") || (equationName == "TARP") ||
-                            (equationName == "ADAPTIVECONVECTIONALGORITHM" || (equationName == "ASTMC1340"))) {
+                        if ((IntValue == ConvectionConstants::HcInt_ASHRAESimple) || (IntValue == ConvectionConstants::HcInt_ASHRAETARP) ||
+                            (IntValue == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm ||
+                             (IntValue == ConvectionConstants::HcInt_ASTMC1340))) {
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
-                        } else if (equationName == "VALUE") {
+                        } else if (IntValue == ConvectionConstants::HcInt_Value) {
                             // SimpleValueAssignment via UserExtConvectionCoeffs array
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
@@ -1681,7 +1684,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                       state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                             }
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
-                        } else if (equationName == "SCHEDULE") {
+                        } else if (IntValue == ConvectionConstants::HcInt_Schedule) {
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
