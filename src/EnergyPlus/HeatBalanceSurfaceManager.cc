@@ -5561,23 +5561,59 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
     // This subroutine puts the reporting part of the HBSurface Module in one area.
 
     using SolarShading::ReportSurfaceShading;
-
-    state.dataHeatBalSurf->SumSurfaceHeatEmission = 0.0;
-
-    ReportSurfaceShading(state);
     auto &Surface(state.dataSurface->Surface);
-
-    // update inside face radiation reports
+    state.dataHeatBalSurf->SumSurfaceHeatEmission = 0.0;
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        Real64 const surfaceArea(Surface(SurfNum).Area);
+        if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+            state.dataHeatBalSurf->SumSurfaceHeatEmission += state.dataHeatBalSurf->QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        }
+    }
+    ReportSurfaceShading(state);
+
+    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         // Tuned Replaced by one line form below for speed
         //            QdotRadNetSurfInRep( SurfNum ) = NetLWRadToSurf( SurfNum ) * surfaceArea;
         //            QdotRadNetSurfInRepPerArea( SurfNum ) = NetLWRadToSurf( SurfNum );
-        state.dataHeatBalSurf->QdotRadNetSurfInRep(SurfNum) =
-            (state.dataHeatBalSurf->QdotRadNetSurfInRepPerArea(SurfNum) = state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum)) * surfaceArea;
-        state.dataHeatBalSurf->QRadNetSurfInReport(SurfNum) = state.dataHeatBalSurf->QdotRadNetSurfInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        int const firstSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst;
+        int const lastSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast;
+        for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+            Real64 const surfaceArea(Surface(SurfNum).Area);
+            state.dataHeatBalSurf->QdotRadNetSurfInRep(SurfNum) =
+                (state.dataHeatBalSurf->QdotRadNetSurfInRepPerArea(SurfNum) = state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum)) * surfaceArea;
+            state.dataHeatBalSurf->QRadNetSurfInReport(SurfNum) =
+                state.dataHeatBalSurf->QdotRadNetSurfInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+            // Tuned Replaced by one line form below for speed
+            //            QdotRadIntGainsInRepPerArea( SurfNum ) = QRadThermInAbs( SurfNum );
+            //            QdotRadIntGainsInRep( SurfNum ) = QdotRadIntGainsInRepPerArea( SurfNum ) * surfaceArea;
+            state.dataHeatBalSurf->QdotRadIntGainsInRep(SurfNum) =
+                (state.dataHeatBalSurf->QdotRadIntGainsInRepPerArea(SurfNum) = state.dataHeatBal->SurfQRadThermInAbs(SurfNum)) * surfaceArea;
+            state.dataHeatBalSurf->QRadIntGainsInReport(SurfNum) =
+                state.dataHeatBalSurf->QdotRadIntGainsInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
 
-        if (Surface(SurfNum).Class != SurfaceClass::Window) { // not a window...
+            state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) =
+                state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) +
+                state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
+                state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum);
+            state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) * Surface(SurfNum).Area;
+            // Tuned Replaced by one line form below for speed
+            //            QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf(
+            // SurfNum
+            //)
+            //+  QElecBaseboardSurf( SurfNum );             QdotRadHVACInRep( SurfNum ) = QdotRadHVACInRepPerArea( SurfNum ) *
+            // surfaceArea;
+            state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) =
+                (state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) =
+                     state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) +
+                     state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
+                     state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)) *
+                surfaceArea;
+            state.dataHeatBalSurf->QRadHVACInReport(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        }
+        int const firstSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst;
+        int const lastSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast;
+        for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+            // update inside face radiation reports
+            Real64 const surfaceArea(Surface(SurfNum).Area);
             state.dataHeatBalSurf->QdotRadSolarInRepPerArea(SurfNum) =
                 state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) - state.dataHeatBalSurf->SurfOpaqQRadSWLightsInAbs(SurfNum);
             state.dataHeatBalSurf->QdotRadSolarInRep(SurfNum) = state.dataHeatBalSurf->QdotRadSolarInRepPerArea(SurfNum) * surfaceArea;
@@ -5595,43 +5631,6 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                 state.dataOutRptTab->feneSolarRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, SurfNum) =
                     state.dataHeatBalSurf->QdotRadSolarInRep(SurfNum);
             }
-        } else { // can we fill these for windows?
-        }
-
-        // Tuned Replaced by one line form below for speed
-        //            QdotRadIntGainsInRepPerArea( SurfNum ) = QRadThermInAbs( SurfNum );
-        //            QdotRadIntGainsInRep( SurfNum ) = QdotRadIntGainsInRepPerArea( SurfNum ) * surfaceArea;
-        state.dataHeatBalSurf->QdotRadIntGainsInRep(SurfNum) =
-            (state.dataHeatBalSurf->QdotRadIntGainsInRepPerArea(SurfNum) = state.dataHeatBal->SurfQRadThermInAbs(SurfNum)) * surfaceArea;
-        state.dataHeatBalSurf->QRadIntGainsInReport(SurfNum) =
-            state.dataHeatBalSurf->QdotRadIntGainsInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-
-        state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) =
-            state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) +
-            state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
-            state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum);
-        state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) * Surface(SurfNum).Area;
-        // Tuned Replaced by one line form below for speed
-        //            QdotRadHVACInRepPerArea( SurfNum ) = QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf(
-        // SurfNum
-        //)
-        //+  QElecBaseboardSurf( SurfNum );             QdotRadHVACInRep( SurfNum ) = QdotRadHVACInRepPerArea( SurfNum ) *
-        // surfaceArea;
-        state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) =
-            (state.dataHeatBalSurf->QdotRadHVACInRepPerArea(SurfNum) =
-                 state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) +
-                 state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
-                 state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)) *
-            surfaceArea;
-        state.dataHeatBalSurf->QRadHVACInReport(SurfNum) = state.dataHeatBalSurf->QdotRadHVACInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-        if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-            state.dataHeatBalSurf->SumSurfaceHeatEmission += state.dataHeatBalSurf->QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-        }
-    }
-    for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        int const firstSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst;
-        int const lastSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast;
-        for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
             // inside face conduction updates
             state.dataHeatBalSurf->SurfOpaqInsFaceConductionEnergy(SurfNum) =
                 state.dataHeatBalSurf->SurfOpaqInsFaceConduction(SurfNum) * state.dataGlobal->TimeStepZoneSec;
