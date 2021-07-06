@@ -2078,5 +2078,8 @@ void GshpSpecs::UpdateGSHPRecords(EnergyPlusData &state)
     state.dataLoopNodes->Node(SourceSideOutletNode).Temp = this->reportSourceSideOutletTemp;
     state.dataLoopNodes->Node(LoadSideOutletNode).Temp = this->reportLoadSideOutletTemp;
 }
+void GshpSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 } // namespace EnergyPlus::HeatPumpWaterToWaterSimple

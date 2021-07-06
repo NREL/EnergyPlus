@@ -2347,6 +2347,9 @@ namespace PlantPipingSystemsManager {
         this->CircuitInletCell = Point3DInteger(in.X_index, in.Y_index, in.Z_index);
         this->CircuitOutletCell = Point3DInteger(out.X_index, out.Y_index, out.Z_index);
     }
+    void Circuit::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     bool Domain::IsConverged_CurrentToPrevIteration()
     {

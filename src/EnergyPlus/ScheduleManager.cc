@@ -3563,9 +3563,10 @@ namespace ScheduleManager {
         } else if (Pos == 0) {
             RetHH = 0;
         } else {
-            const bool readFailed = !readItem(String.substr(0, Pos), rRetHH);
+            bool error = false;
+            rRetHH = UtilityRoutines::ProcessNumber(String.substr(0, Pos), error);
             RetHH = int(rRetHH);
-            if (double(RetHH) != rRetHH || readFailed || rRetHH < 0.0) {
+            if (double(RetHH) != rRetHH || error || rRetHH < 0.0) {
                 if (double(RetHH) != rRetHH && rRetHH >= 0.0) {
                     ShowWarningError(state,
                                      "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in HH)=" +
@@ -3584,9 +3585,10 @@ namespace ScheduleManager {
         }
 
         String.erase(0, Pos + 1);
-        const bool readFailed = !readItem(String, rRetMM);
+        bool error = false;
+        rRetMM = UtilityRoutines::ProcessNumber(String, error);
         RetMM = int(rRetMM);
-        if (double(RetMM) != rRetMM || readFailed || rRetMM < 0.0) {
+        if (double(RetMM) != rRetMM || error || rRetMM < 0.0) {
             if (double(RetMM) != rRetMM && rRetMM >= 0.0) {
                 ShowWarningError(state,
                                  "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in MM)=" +

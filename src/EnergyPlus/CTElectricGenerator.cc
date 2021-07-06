@@ -705,62 +705,7 @@ namespace CTElectricGenerator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the CT generators.
 
-        auto constexpr RoutineName("InitICEngineGenerators");
-
-        bool errFlag;
-
-        if (this->MyPlantScanFlag && allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
-            errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::TypeOf_Generator_CTurbine,
-                                                    this->HRLoopNum,
-                                                    this->HRLoopSideNum,
-                                                    this->HRBranchNum,
-                                                    this->HRCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitCTGenerators: Program terminated due to previous condition(s).");
-            }
-
-            this->MyPlantScanFlag = false;
-        }
-
-        if (this->MyFlag) {
-            this->setupOutputVars(state);
-            this->MyFlag = false;
-        }
-
-        if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
-            int HeatRecInletNode = this->HeatRecInletNodeNum;
-            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
-
-            // size mass flow rate
-            Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
-                                                           DataGlobalConstants::InitConvTemp,
-                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
-                                                           RoutineName);
-
-            this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
-
-            PlantUtilities::InitComponentNodes(state,
-                                               0.0,
-                                               this->DesignHeatRecMassFlowRate,
-                                               HeatRecInletNode,
-                                               HeatRecOutletNode,
-                                               this->HRLoopNum,
-                                               this->HRLoopSideNum,
-                                               this->HRBranchNum,
-                                               this->HRCompNum);
-
-            this->MySizeAndNodeInitFlag = false;
-        } // end one time inits
+        this->oneTimeInit(state); // Do one-time inits
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && this->HeatRecActive) {
@@ -814,6 +759,67 @@ namespace CTElectricGenerator {
                                                      this->HRBranchNum,
                                                      this->HRCompNum);
             }
+        }
+    }
+
+    void CTGeneratorData::oneTimeInit(EnergyPlusData &state)
+    {
+        auto constexpr RoutineName("InitICEngineGenerators");
+        bool errFlag;
+
+        if (this->MyPlantScanFlag) { // this flag to be removed
+            if (allocated(state.dataPlnt->PlantLoop) && this->HeatRecActive) {
+                errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        DataPlant::TypeOf_Generator_CTurbine,
+                                                        this->HRLoopNum,
+                                                        this->HRLoopSideNum,
+                                                        this->HRBranchNum,
+                                                        this->HRCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(state, "InitCTGenerators: Program terminated due to previous condition(s).");
+                }
+            }
+
+            this->MyPlantScanFlag = false;
+        }
+
+        if (this->MyFlag) {
+            this->setupOutputVars(state);
+            this->MyFlag = false;
+        }
+
+        if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
+            int HeatRecInletNode = this->HeatRecInletNodeNum;
+            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
+
+            // size mass flow rate
+            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName,
+                                                           DataGlobalConstants::InitConvTemp,
+                                                           state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex,
+                                                           RoutineName);
+
+            this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
+
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
+                                               this->DesignHeatRecMassFlowRate,
+                                               HeatRecInletNode,
+                                               HeatRecOutletNode,
+                                               this->HRLoopNum,
+                                               this->HRLoopSideNum,
+                                               this->HRBranchNum,
+                                               this->HRCompNum);
+
+            this->MySizeAndNodeInitFlag = false;
         }
     }
 

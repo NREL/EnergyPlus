@@ -201,6 +201,8 @@ namespace UserDefinedComponents {
         void initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad);
 
         void report(EnergyPlusData &state, int LoopNum);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct UserCoilComponentStruct

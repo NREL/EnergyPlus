@@ -415,7 +415,7 @@ void InitMoistureBalanceEMPD(EnergyPlusData &state)
 
 void CalcMoistureBalanceEMPD(EnergyPlusData &state,
                              int const SurfNum,
-                             Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
+                             Real64 const SurfTempIn, // INSIDE SURFACE TEMPERATURE at current time step
                              Real64 const TempZone,   // Zone temperature at current time step.
                              Real64 &TempSat          // Saturated surface temperature.
 )
@@ -515,7 +515,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
         return;
     }
 
-    Taver = TempSurfIn;
+    Taver = SurfTempIn;
     // Calculate average vapor density [kg/m^3], and RH for use in material property calculations.
     RVaver = rv_surface_old;
     RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));

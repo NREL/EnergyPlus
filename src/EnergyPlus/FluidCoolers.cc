@@ -730,13 +730,29 @@ bool FluidCoolerspecs::validateTwoSpeedInputs(EnergyPlusData &state,
 
 void FluidCoolerspecs::oneTimeInit(EnergyPlusData &state)
 {
-    bool ErrorsFound = false;
-    // Locate the tower on the plant loops for later usage
-    PlantUtilities::ScanPlantLoopsForObject(
-        state, this->Name, this->FluidCoolerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
+    if (this->oneTimeInitFlag) {
 
-    if (ErrorsFound) {
-        ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
+        this->setupOutputVars(state);
+        bool ErrorsFound = false;
+        // Locate the tower on the plant loops for later usage
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                this->FluidCoolerType_Num,
+                                                this->LoopNum,
+                                                this->LoopSideNum,
+                                                this->BranchNum,
+                                                this->CompNum,
+                                                ErrorsFound,
+                                                _,
+                                                _,
+                                                _,
+                                                _,
+                                                _);
+
+        if (ErrorsFound) {
+            ShowFatalError(state, "InitFluidCooler: Program terminated due to previous condition(s).");
+        }
+        this->oneTimeInitFlag = false;
     }
 }
 
@@ -781,11 +797,7 @@ void FluidCoolerspecs::initialize(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    if (this->oneTimeInitFlag) {
-        this->setupOutputVars(state);
-        this->oneTimeInit(state);
-        this->oneTimeInitFlag = false;
-    }
+    this->oneTimeInit(state);
 
     // Begin environment initializations
     if (this->beginEnvrnInit && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {

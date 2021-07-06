@@ -188,7 +188,7 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag = true;
         }
 
-        this->InitSimpleIceStorage(state);
+        this->oneTimeInit(state);
 
         //------------------------------------------------------------------------
         // FIRST PROCESS (MyLoad = 0.0 as IN)
@@ -282,7 +282,7 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag = true;
         }
 
-        this->InitDetailedIceStorage(state); // Initialize detailed ice storage
+        this->oneTimeInit(state); // Initialize detailed ice storage
 
         this->SimDetailedIceStorage(state); // Simulate detailed ice storage
 
@@ -1198,7 +1198,7 @@ namespace IceThermalStorage {
                             "System");
     }
 
-    void DetailedIceStorageData::InitDetailedIceStorage(EnergyPlusData &state)
+    void DetailedIceStorageData::oneTimeInit(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1227,7 +1227,7 @@ namespace IceThermalStorage {
                                                     errFlag);
 
             if (errFlag) {
-                ShowFatalError(state, "InitDetailedIceStorage: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "DetailedIceStorageData: oneTimeInit: Program terminated due to previous condition(s).");
             }
 
             this->setupOutputVars(state);
@@ -1292,7 +1292,7 @@ namespace IceThermalStorage {
         this->ParasiticElecEnergy = 0.0;
     }
 
-    void SimpleIceStorageData::InitSimpleIceStorage(EnergyPlusData &state)
+    void SimpleIceStorageData::oneTimeInit(EnergyPlusData &state)
     {
 
         bool errFlag;
@@ -1314,7 +1314,7 @@ namespace IceThermalStorage {
                                                     _,
                                                     _);
             if (errFlag) {
-                ShowFatalError(state, "InitSimpleIceStorage: Program terminated due to previous condition(s).");
+                ShowFatalError(state, "SimpleIceStorageData:oneTimeInit: Program terminated due to previous condition(s).");
             }
 
             this->setupOutputVars(state);

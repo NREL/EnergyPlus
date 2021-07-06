@@ -3065,9 +3065,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     //       RE-ENGINEERED    na
 
     // Using/Aliasing
-    using DataPlant::TypeOf_GrndHtExchgSystem;
     using PlantUtilities::RegulateCondenserCompFlowReqOp;
-    using PlantUtilities::ScanPlantLoopsForObject;
     using PlantUtilities::SetComponentFlowRate;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3076,16 +3074,7 @@ void GLHEVert::initGLHESimVars(EnergyPlusData &state)
                       DataGlobalConstants::SecInHour;
 
     // Init more variables
-    if (this->myFlag) {
-        // Locate the hx on the plant loops for later usage
-        bool errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
-        if (errFlag) {
-            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
-        }
-        this->myFlag = false;
-    }
+    this->oneTimeInit(state);
 
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->initEnvironment(state, currTime);
@@ -3150,6 +3139,26 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
 
 //******************************************************************************
 
+void GLHEVert::oneTimeInit(EnergyPlusData &state)
+{
+
+    using DataPlant::TypeOf_GrndHtExchgSystem;
+    using PlantUtilities::ScanPlantLoopsForObject;
+
+    if (this->myOneTImeInitFlag) {
+        // Locate the hx on the plant loops for later usage
+        bool errFlag = false;
+        ScanPlantLoopsForObject(
+            state, this->name, TypeOf_GrndHtExchgSystem, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+        if (errFlag) {
+            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
+        }
+        this->myOneTImeInitFlag = false;
+    }
+}
+
+//******************************************************************************
+
 void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -3159,9 +3168,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     //       RE-ENGINEERED    na
 
     // Using/Aliasing
-    using DataPlant::TypeOf_GrndHtExchgSlinky;
     using PlantUtilities::RegulateCondenserCompFlowReqOp;
-    using PlantUtilities::ScanPlantLoopsForObject;
     using PlantUtilities::SetComponentFlowRate;
     using namespace GroundTemperatureManager;
 
@@ -3170,16 +3177,7 @@ void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
                      DataGlobalConstants::SecInHour;
 
     // Init more variables
-    if (this->myFlag) {
-        // Locate the hx on the plant loops for later usage
-        bool errFlag = false;
-        ScanPlantLoopsForObject(
-            state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
-        if (errFlag) {
-            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
-        }
-        this->myFlag = false;
-    }
+    this->oneTimeInit(state);
 
     if (this->myEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         this->initEnvironment(state, CurTime);
@@ -3225,6 +3223,25 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const &CurTime)
     state.dataGroundHeatExchanger->currentSimTime = 0.0;
     this->QGLHE = 0.0;
     this->prevHour = 1;
+}
+
+//******************************************************************************
+
+void GLHESlinky::oneTimeInit(EnergyPlusData &state)
+{
+    using DataPlant::TypeOf_GrndHtExchgSlinky;
+    using PlantUtilities::ScanPlantLoopsForObject;
+
+    if (this->myOneTImeInitFlag) {
+        // Locate the hx on the plant loops for later usage
+        bool errFlag = false;
+        ScanPlantLoopsForObject(
+            state, this->name, TypeOf_GrndHtExchgSlinky, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, errFlag, _, _, _, _, _);
+        if (errFlag) {
+            ShowFatalError(state, "initGLHESimVars: Program terminated due to previous condition(s).");
+        }
+        this->myOneTImeInitFlag = false;
+    }
 }
 
 //******************************************************************************

@@ -3297,30 +3297,7 @@ namespace FuelCellElectricGenerator {
 
         static constexpr std::string_view RoutineName("InitFuelCellGenerators");
 
-        if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
-            bool errFlag = false;
-
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->NameExhaustHX,
-                                                    DataPlant::TypeOf_Generator_FCExhaust,
-                                                    this->CWLoopNum,
-                                                    this->CWLoopSideNum,
-                                                    this->CWBranchNum,
-                                                    this->CWCompNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    _);
-
-            // if there is a stack cooler option it might be connected to plant as well
-
-            if (errFlag) {
-                ShowFatalError(state, "InitFuelCellGenerators: Program terminated due to previous condition(s).");
-            }
-            this->MyPlantScanFlag_Init = false;
-        }
+        this->oneTimeInit(state);
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag_Init && !this->MyPlantScanFlag_Init) {
@@ -3653,6 +3630,34 @@ namespace FuelCellElectricGenerator {
         this->Report.SkinLossEnergy = (this->QconvZone + this->QradZone) * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
         this->Report.SkinLossConvect = this->QconvZone;
         this->Report.SkinLossRadiat = this->QradZone;
+    }
+    void FCDataStruct::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->MyPlantScanFlag_Init && allocated(state.dataPlnt->PlantLoop)) {
+            bool errFlag = false;
+
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->NameExhaustHX,
+                                                    DataPlant::TypeOf_Generator_FCExhaust,
+                                                    this->CWLoopNum,
+                                                    this->CWLoopSideNum,
+                                                    this->CWBranchNum,
+                                                    this->CWCompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
+
+            // if there is a stack cooler option it might be connected to plant as well
+
+            if (errFlag) {
+                ShowFatalError(state, "InitFuelCellGenerators: Program terminated due to previous condition(s).");
+            }
+            this->MyPlantScanFlag_Init = false;
+        }
     }
 
 } // namespace FuelCellElectricGenerator

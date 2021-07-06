@@ -3527,7 +3527,9 @@ namespace WeatherManager {
         Pos = index(Line, ',');
         if (Pos != std::string::npos) {
             if (Pos != 0) {
-                if (!readItem(Line.substr(0, Pos), PrecipWater)) {
+                bool error = false;
+                PrecipWater = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                if (error) {
                     ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
             } else {
@@ -3537,7 +3539,9 @@ namespace WeatherManager {
             Pos = index(Line, ',');
             if (Pos != std::string::npos) {
                 if (Pos != 0) {
-                    if (!readItem(Line.substr(0, Pos), AerosolOptDepth)) {
+                    bool error = false;
+                    AerosolOptDepth = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                    if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                 } else {
@@ -3547,7 +3551,9 @@ namespace WeatherManager {
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
                     if (Pos != 0) {
-                        if (!readItem(Line.substr(0, Pos), SnowDepth)) {
+                        bool error = false;
+                        SnowDepth = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                        if (error) {
                             ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                     } else {
@@ -3557,7 +3563,9 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         if (Pos != 0) {
-                            if (!readItem(Line.substr(0, Pos), DaysSinceLastSnow)) {
+                            bool error = false;
+                            DaysSinceLastSnow = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                            if (error) {
                                 ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                             }
                         } else {
@@ -3567,7 +3575,9 @@ namespace WeatherManager {
                         Pos = index(Line, ',');
                         if (Pos != std::string::npos) {
                             if (Pos != 0) {
-                                if (!readItem(Line.substr(0, Pos), Albedo)) {
+                                bool error = false;
+                                Albedo = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                                if (error) {
                                     ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                 }
                             } else {
@@ -3577,7 +3587,9 @@ namespace WeatherManager {
                             Pos = index(Line, ',');
                             if (Pos != std::string::npos) {
                                 if (Pos != 0) {
-                                    if (!readItem(Line.substr(0, Pos), LiquidPrecip)) {
+                                    bool error = false;
+                                    LiquidPrecip = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                                    if (error) {
                                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                     }
                                 } else {
@@ -3593,14 +3605,18 @@ namespace WeatherManager {
                             LiquidPrecip = 999.0;
                         }
                     } else {
-                        if (!readItem(Line, DaysSinceLastSnow)) {
+                        bool error = false;
+                        DaysSinceLastSnow = UtilityRoutines::ProcessNumber(Line, error);
+                        if (error) {
                             ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                         Albedo = 999.0;
                         LiquidPrecip = 999.0;
                     }
                 } else {
-                    if (!readItem(Line, SnowDepth)) {
+                    bool error = false;
+                    SnowDepth = UtilityRoutines::ProcessNumber(Line, error);
+                    if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                     DaysSinceLastSnow = 999.0;
@@ -3608,7 +3624,9 @@ namespace WeatherManager {
                     LiquidPrecip = 999.0;
                 }
             } else {
-                if (!readItem(Line, AerosolOptDepth)) {
+                bool error = false;
+                AerosolOptDepth = UtilityRoutines::ProcessNumber(Line, error);
+                if (error) {
                     ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
                 SnowDepth = 999.0;
@@ -3617,7 +3635,9 @@ namespace WeatherManager {
                 LiquidPrecip = 999.0;
             }
         } else {
-            if (!readItem(Line, PrecipWater)) {
+            bool error = false;
+            PrecipWater = UtilityRoutines::ProcessNumber(Line, error);
+            if (error) {
                 ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
             }
             AerosolOptDepth = 999.0;

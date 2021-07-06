@@ -118,7 +118,7 @@ namespace HeatBalanceHAMTManager {
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
 
-    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
+    void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp)
     {
 
         // SUBROUTINE INFORMATION:
@@ -140,7 +140,7 @@ namespace HeatBalanceHAMTManager {
             InitHeatBalHAMT(state);
         }
 
-        CalcHeatBalHAMT(state, SurfNum, TempSurfInTmp, TempSurfOutTmp);
+        CalcHeatBalHAMT(state, SurfNum, SurfTempInTmp, TempSurfOutTmp);
     }
 
     void GetHeatBalHAMTInput(EnergyPlusData &state)
@@ -1053,7 +1053,7 @@ namespace HeatBalanceHAMTManager {
         }
     }
 
-    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
+    void CalcHeatBalHAMT(EnergyPlusData &state, int const sid, Real64 &SurfTempInTmp, Real64 &TempSurfOutTmp)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -1075,7 +1075,7 @@ namespace HeatBalanceHAMTManager {
         static std::string const HAMTInt("HAMT-Int");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 TempSurfInP;
+        Real64 SurfTempInP;
         Real64 RhoIn;
         Real64 RhoOut;
         Real64 torsum;
@@ -1523,12 +1523,12 @@ namespace HeatBalanceHAMTManager {
 
         // report back to CalcHeatBalanceInsideSurf
         TempSurfOutTmp = cells(Extcell(sid)).tempp1;
-        TempSurfInTmp = cells(Intcell(sid)).tempp1;
+        SurfTempInTmp = cells(Intcell(sid)).tempp1;
 
-        TempSurfInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(state, cells(Intcell(sid)).tempp1);
+        SurfTempInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(state, cells(Intcell(sid)).tempp1);
 
         state.dataMstBal->RhoVaporSurfIn(sid) =
-            TempSurfInP / (461.52 * (state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
+            SurfTempInP / (461.52 * (state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
     }
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid)

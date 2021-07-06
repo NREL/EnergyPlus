@@ -480,7 +480,7 @@ namespace HVACVariableRefrigerantFlow {
                                   Real64 P_evap_real,    // Evaporative pressure at real conditions [Pa]
                                   Real64 T_comp_in_real, // Temperature of the refrigerant at the compressor inlet at real conditions [C]
                                   Real64 T_comp_in_rate, // Temperature of the refrigerant at the compressor inlet at rated conditions [C]
-                                  Real64 T_cond_out_rate // Temperature of the refrigerant at the condensor outlet at rated conditions [C]
+                                  Real64 T_cond_out_rate // Temperature of the refrigerant at the condenser outlet at rated conditions [C]
         );
 
         void VRFOU_TeModification(EnergyPlusData &state,
@@ -586,6 +586,8 @@ namespace HVACVariableRefrigerantFlow {
                              Real64 &Pipe_DeltP,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
                              Real64 &Pipe_h_comp_out // Piping Loss Algorithm Parameter: Enthalpy before piping loss (compressor outlet) [kJ/kg]
         ) const;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct TerminalUnitListData
