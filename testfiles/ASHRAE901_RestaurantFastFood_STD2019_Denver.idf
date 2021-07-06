@@ -1,18 +1,14 @@
 !-Generator IDFEditor 1.51
 !-Option SortedOrder UseSpecialFormat
-
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-
-
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-Version,9.5;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
-
-SimulationControl,
+  SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
     Yes,                     !- Do Plant Sizing Calculation
@@ -21,10 +17,9 @@ SimulationControl,
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
-
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
-Building,
+  Building,
     RestaurantFastFood,      !- Name
     0.0000,                  !- North Axis {deg}
     City,                    !- Terrain
@@ -34,53 +29,48 @@ Building,
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SHADOWCALCULATION ===========
 
-ShadowCalculation,
+  ShadowCalculation,
     PolygonClipping,         !- Shading Calculation Method
     Periodic,                !- Shading Calculation Update Frequency Method
     30,                      !- Shading Calculation Update Frequency
-    15000;                   !- Maximum Figures in Shadow Overlap Calculations
-
+    1500;                    !- Maximum Figures in Shadow Overlap Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
-SurfaceConvectionAlgorithm:Inside,TARP;
+  SurfaceConvectionAlgorithm:Inside,TARP;
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:OUTSIDE ===========
 
-SurfaceConvectionAlgorithm:Outside,TARP;
+  SurfaceConvectionAlgorithm:Outside,TARP;
 
 !-   ===========  ALL OBJECTS IN CLASS: HEATBALANCEALGORITHM ===========
 
-HeatBalanceAlgorithm,ConductionTransferFunction,200.0000;
+  HeatBalanceAlgorithm,ConductionTransferFunction,200.0000;
 
 !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
 
-Timestep,6;
+  Timestep,6;
 
 !-   ===========  ALL OBJECTS IN CLASS: CONVERGENCELIMITS ===========
 
-
-ConvergenceLimits,
+  ConvergenceLimits,
     1,                       !- Minimum System Timestep {minutes}
-    20;                      !- Maximum HVAC Iterations
-
+    5;                       !- Maximum HVAC Iterations
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
-Site:Location,
+  Site:Location,
     Denver-Aurora-Buckley.AFB_CO_USA WMO=724695,  !- Name
     39.72,                   !- Latitude {deg}
     -104.75,                 !- Longitude {deg}
     -7.00,                   !- Time Zone {hr}
     1726.00;                 !- Elevation {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
 
-SizingPeriod:DesignDay,
+  SizingPeriod:DesignDay,
     Denver-Aurora-Buckley.AFB_CO_USA Ann Htg 99.6% Condns DB,  !- Name
     12,                      !- Month
     21,                      !- Day of Month
@@ -108,7 +98,7 @@ SizingPeriod:DesignDay,
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.00;                    !- Sky Clearness
 
-SizingPeriod:DesignDay,
+  SizingPeriod:DesignDay,
     Denver-Aurora-Buckley.AFB_CO_USA Ann Clg .4% Condns DB=>MWB,  !- Name
     7,                       !- Month
     21,                      !- Day of Month
@@ -135,10 +125,9 @@ SizingPeriod:DesignDay,
     0.423,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
     2.020;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
-RunPeriod,
+  RunPeriod,
     RUNPERIOD 1,             !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
@@ -153,1396 +142,1392 @@ RunPeriod,
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:SPECIALDAYS ===========
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     New Years Day,           !- Name
     January 1,               !- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     Veterans Day,            !- Name
     November 11,             !- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     Christmas,               !- Name
     December 25,             !- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     Independence Day,        !- Name
     July 4,                  !- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     MLK Day,                 !- Name
     3rd Monday in January,   !- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     Presidents Day,          !- Name
     3rd Monday in February,  !- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     Memorial Day,            !- Name
     Last Monday in May,      !- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     Labor Day,               !- Name
     1st Monday in September, !- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     Columbus Day,            !- Name
     2nd Monday in October,   !- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-RunPeriodControl:SpecialDays,
+  RunPeriodControl:SpecialDays,
     Thanksgiving,            !- Name
     4th Thursday in November,!- Start Date
     1,                       !- Duration {days}
     Holiday;                 !- Special Day Type
 
-
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:DAYLIGHTSAVINGTIME ===========
 
-RunPeriodControl:DaylightSavingTime,
+  RunPeriodControl:DaylightSavingTime,
     2nd Sunday in March,     !- Start Date
     1st Sunday in November;  !- End Date
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:FCFACTORMETHOD ===========
 
-Site:GroundTemperature:FCfactorMethod,7.1,3.0,-1.0,0.8,-0.2,4.8,6.1,13.7,22.2,22.7,21.7,18.5;
+  Site:GroundTemperature:FCfactorMethod,7.1,3.0,-1.0,0.8,-0.2,4.8,6.1,13.7,22.2,22.7,21.7,18.5;
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:WATERMAINSTEMPERATURE ===========
 
-
-Site:WaterMainsTemperature,
+  Site:WaterMainsTemperature,
     Correlation,             !- Calculation Method
     ,                        !- Temperature Schedule Name
     9.95,                    !- Annual Average Outdoor Air Temperature {C}
     23.7;                    !- Maximum Difference In Monthly Average Outdoor Air Temperatures {deltaC}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPELIMITS ===========
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     Any Number;              !- Name
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     Fraction,                !- Name
     0.0,                     !- Lower Limit Value
     1.0,                     !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     Temperature,             !- Name
     -60,                     !- Lower Limit Value
     200,                     !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     On/Off,                  !- Name
     0,                       !- Lower Limit Value
     1,                       !- Upper Limit Value
     DISCRETE;                !- Numeric Type
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     Control Type,            !- Name
     0,                       !- Lower Limit Value
     4,                       !- Upper Limit Value
     DISCRETE;                !- Numeric Type
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     Humidity,                !- Name
     10,                      !- Lower Limit Value
     90,                      !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     Number;                  !- Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:COMPACT ===========
+                             !- Field 4
+                             !- Field 12
+                             !- Field 14
+                             !- Field 16
+                             !- Field 18
+                             !- Field 27
+                             !- Field 29
+                             !- Field 31
+                             !- Field 33
+                             !- Field 35
+                             !- Field 50
+                             !- Field 52
+                             !- Field 54
+                             !- Field 56
 
-Schedule:Compact,
+  Schedule:Compact,
     BLDG_LIGHT_DINING_SCH,   !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekday,            !- Field 2
-    Until: 1:00, 0.1398570735,
-                             !- Field 4
-    Until: 5:00, 0.15,       !- Field 6
-    Until: 6:00, 0.186476098,!- Field 8
-    Until: 8:00, 0.372952196,!- Field 10
-    Until: 10:00, 0.559428294,
-                             !- Field 12
-    Until: 22:00, 0.839142441,
-                             !- Field 14
-    Until: 23:00, 0.466190245,
-                             !- Field 16
-    Until: 24:00, 0.279714147,
-                             !- Field 18
+    Until: 1:00,0.1398570735,!- Field 3
+    Until: 5:00,0.15,        !- Field 5
+    Until: 6:00,0.186476098, !- Field 7
+    Until: 8:00,0.372952196, !- Field 9
+    Until: 10:00,0.559428294,!- Field 11
+    Until: 22:00,0.839142441,!- Field 13
+    Until: 23:00,0.466190245,!- Field 15
+    Until: 24:00,0.279714147,!- Field 17
     For: Saturday,           !- Field 19
-    Until: 1:00, 0.186476098,!- Field 21
-    Until: 6:00, 0.15,       !- Field 23
-    Until: 8:00, 0.279714147,!- Field 25
-    Until: 10:00, 0.559428294,
-                             !- Field 27
-    Until: 17:00, 0.745904392,
-                             !- Field 29
-    Until: 22:00, 0.839142441,
-                             !- Field 31
-    Until: 23:00, 0.466190245,
-                             !- Field 33
-    Until: 24:00, 0.279714147,
-                             !- Field 35
+    Until: 1:00,0.186476098, !- Field 20
+    Until: 6:00,0.15,        !- Field 22
+    Until: 8:00,0.279714147, !- Field 24
+    Until: 10:00,0.559428294,!- Field 26
+    Until: 17:00,0.745904392,!- Field 28
+    Until: 22:00,0.839142441,!- Field 30
+    Until: 23:00,0.466190245,!- Field 32
+    Until: 24:00,0.279714147,!- Field 34
     For: SummerDesignDay,    !- Field 36
-    Until: 24:00, 1,         !- Field 38
+    Until: 24:00,1,          !- Field 37
     For: WinterDesignDay,    !- Field 39
-    Until: 24:00, 0,         !- Field 41
-    For: Sunday Holidays AllOtherDays,  !- Field 42
-    Until: 1:00, 0.186476098,!- Field 44
-    Until: 6:00, 0.15,       !- Field 46
-    Until: 8:00, 0.279714147,!- Field 48
-    Until: 10:00, 0.466190245,
-                             !- Field 50
-    Until: 16:00, 0.652666343,
-                             !- Field 52
-    Until: 22:00, 0.559428294,
-                             !- Field 54
-    Until: 23:00, 0.466190245,
-                             !- Field 56
-    Until: 24:00, 0.279714147;
+    Until: 24:00,0,          !- Field 40
+    For: Sunday Holidays AllOtherDays, !- Field 42
+    Until: 1:00,0.186476098, !- Field 43
+    Until: 6:00,0.15,        !- Field 45
+    Until: 8:00,0.279714147, !- Field 47
+    Until: 10:00,0.466190245,!- Field 49
+    Until: 16:00,0.652666343,!- Field 51
+    Until: 22:00,0.559428294,!- Field 53
+    Until: 23:00,0.466190245,!- Field 55
+    Until: 24:00,0.279714147;!- Field 57
+
                              !- Field 58
 
-Schedule:Compact,
+  Schedule:Compact,
     BLDG_LIGHT_KITCHEN_SCH,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekday,            !- Field 2
-    Until: 1:00, 0.13332,    !- Field 4
-    Until: 5:00, 0.15,       !- Field 6
-    Until: 6:00, 0.17776,    !- Field 8
-    Until: 8:00, 0.35552,    !- Field 10
-    Until: 10:00, 0.53328,   !- Field 12
-    Until: 22:00, 0.79992,   !- Field 14
-    Until: 23:00, 0.4444,    !- Field 16
-    Until: 24:00, 0.26664,   !- Field 18
+    Until: 1:00,0.13332,     !- Field 3
+    Until: 5:00,0.15,        !- Field 5
+    Until: 6:00,0.17776,     !- Field 7
+    Until: 8:00,0.35552,     !- Field 9
+    Until: 10:00,0.53328,    !- Field 11
+    Until: 22:00,0.79992,    !- Field 13
+    Until: 23:00,0.4444,     !- Field 15
+    Until: 24:00,0.26664,    !- Field 17
     For: Saturday,           !- Field 19
-    Until: 1:00, 0.17776,    !- Field 21
-    Until: 6:00, 0.15,       !- Field 23
-    Until: 8:00, 0.26664,    !- Field 25
-    Until: 10:00, 0.53328,   !- Field 27
-    Until: 17:00, 0.71104,   !- Field 29
-    Until: 22:00, 0.79992,   !- Field 31
-    Until: 23:00, 0.4444,    !- Field 33
-    Until: 24:00, 0.26664,   !- Field 35
+    Until: 1:00,0.17776,     !- Field 20
+    Until: 6:00,0.15,        !- Field 22
+    Until: 8:00,0.26664,     !- Field 24
+    Until: 10:00,0.53328,    !- Field 26
+    Until: 17:00,0.71104,    !- Field 28
+    Until: 22:00,0.79992,    !- Field 30
+    Until: 23:00,0.4444,     !- Field 32
+    Until: 24:00,0.26664,    !- Field 34
     For: SummerDesignDay,    !- Field 36
-    Until: 24:00, 1,         !- Field 38
+    Until: 24:00,1,          !- Field 37
     For: WinterDesignDay,    !- Field 39
-    Until: 24:00, 0,         !- Field 41
-    For: Sunday Holidays AllOtherDays,  !- Field 42
-    Until: 1:00, 0.17776,    !- Field 44
-    Until: 6:00, 0.15,       !- Field 46
-    Until: 8:00, 0.26664,    !- Field 48
-    Until: 10:00, 0.4444,    !- Field 50
-    Until: 16:00, 0.62216,   !- Field 52
-    Until: 22:00, 0.53328,   !- Field 54
-    Until: 23:00, 0.4444,    !- Field 56
-    Until: 24:00, 0.26664;   !- Field 58
+    Until: 24:00,0,          !- Field 40
+    For: Sunday Holidays AllOtherDays, !- Field 42
+    Until: 1:00,0.17776,     !- Field 43
+    Until: 6:00,0.15,        !- Field 45
+    Until: 8:00,0.26664,     !- Field 47
+    Until: 10:00,0.4444,     !- Field 49
+    Until: 16:00,0.62216,    !- Field 51
+    Until: 22:00,0.53328,    !- Field 53
+    Until: 23:00,0.4444,     !- Field 55
+    Until: 24:00,0.26664;    !- Field 57
 
-Schedule:Compact,
+  Schedule:Compact,
     BLDG_LIGHT_SCH,          !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekday,            !- Field 2
-    Until: 5:00, 0.15,       !- Field 4
-    Until: 6:00, 0.2,        !- Field 6
-    Until: 8:00, 0.4,        !- Field 8
-    Until: 10:00, 0.6,       !- Field 10
-    Until: 22:00, 0.9,       !- Field 12
-    Until: 23:00, 0.5,       !- Field 14
-    Until: 24:00, 0.3,       !- Field 16
+    Until: 5:00,0.15,        !- Field 3
+    Until: 6:00,0.2,         !- Field 5
+    Until: 8:00,0.4,         !- Field 7
+    Until: 10:00,0.6,        !- Field 9
+    Until: 22:00,0.9,        !- Field 11
+    Until: 23:00,0.5,        !- Field 13
+    Until: 24:00,0.3,        !- Field 15
     For: Saturday,           !- Field 17
-    Until: 1:00, 0.2,        !- Field 19
-    Until: 6:00, 0.15,       !- Field 21
-    Until: 8:00, 0.3,        !- Field 23
-    Until: 10:00, 0.6,       !- Field 25
-    Until: 17:00, 0.8,       !- Field 27
-    Until: 22:00, 0.9,       !- Field 29
-    Until: 23:00, 0.5,       !- Field 31
-    Until: 24:00, 0.3,       !- Field 33
+    Until: 1:00,0.2,         !- Field 18
+    Until: 6:00,0.15,        !- Field 20
+    Until: 8:00,0.3,         !- Field 22
+    Until: 10:00,0.6,        !- Field 24
+    Until: 17:00,0.8,        !- Field 26
+    Until: 22:00,0.9,        !- Field 28
+    Until: 23:00,0.5,        !- Field 30
+    Until: 24:00,0.3,        !- Field 32
     For: SummerDesignDay,    !- Field 34
-    Until: 24:00, 1,         !- Field 36
+    Until: 24:00,1,          !- Field 35
     For: WinterDesignDay,    !- Field 37
-    Until: 24:00, 0,         !- Field 39
-    For: Sunday Holidays AllOtherDays,  !- Field 40
-    Until: 1:00, 0.2,        !- Field 42
-    Until: 6:00, 0.15,       !- Field 44
-    Until: 8:00, 0.3,        !- Field 46
-    Until: 10:00, 0.5,       !- Field 48
-    Until: 16:00, 0.7,       !- Field 50
-    Until: 22:00, 0.6,       !- Field 52
-    Until: 23:00, 0.5,       !- Field 54
-    Until: 24:00, 0.3;       !- Field 56
+    Until: 24:00,0,          !- Field 38
+    For: Sunday Holidays AllOtherDays, !- Field 40
+    Until: 1:00,0.2,         !- Field 41
+    Until: 6:00,0.15,        !- Field 43
+    Until: 8:00,0.3,         !- Field 45
+    Until: 10:00,0.5,        !- Field 47
+    Until: 16:00,0.7,        !- Field 49
+    Until: 22:00,0.6,        !- Field 51
+    Until: 23:00,0.5,        !- Field 53
+    Until: 24:00,0.3;        !- Field 55
 
-Schedule:Compact,
+                             !- Field 4
+                             !- Field 8
+                             !- Field 12
+                             !- Field 14
+                             !- Field 16
+                             !- Field 18
+                             !- Field 20
+                             !- Field 22
+                             !- Field 24
+                             !- Field 26
+                             !- Field 28
+                             !- Field 30
+                             !- Field 32
+                             !- Field 34
+                             !- Field 36
+                             !- Field 38
+                             !- Field 40
+                             !- Field 42
+                             !- Field 46
+                             !- Field 48
+                             !- Field 50
+                             !- Field 53
+                             !- Field 57
+                             !- Field 61
+                             !- Field 65
+                             !- Field 67
+                             !- Field 69
+                             !- Field 71
+                             !- Field 73
+                             !- Field 75
+                             !- Field 77
+                             !- Field 79
+                             !- Field 81
+                             !- Field 83
+                             !- Field 85
+                             !- Field 87
+                             !- Field 89
+                             !- Field 91
+                             !- Field 95
+                             !- Field 97
+                             !- Field 99
+                             !- Field 108
+                             !- Field 112
+                             !- Field 116
+                             !- Field 120
+                             !- Field 122
+                             !- Field 124
+                             !- Field 126
+                             !- Field 128
+                             !- Field 130
+                             !- Field 132
+                             !- Field 134
+                             !- Field 136
+                             !- Field 138
+                             !- Field 140
+                             !- Field 142
+                             !- Field 144
+                             !- Field 146
+                             !- Field 150
+                             !- A154
+
+  Schedule:Compact,
     BLDG_EQUIP_SCH,          !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 01:00, 0.0299674785,
-                             !- Field 4
-    Until: 02:00, 0.01990145,!- Field 6
-    Until: 03:00, 0.029852175,
-                             !- Field 8
-    Until: 04:00, 0.01990145,!- Field 10
-    Until: 05:00, 0.049753625,
-                             !- Field 12
-    Until: 06:00, 0.119869914,
-                             !- Field 14
-    Until: 07:00, 0.1298590735,
-                             !- Field 16
-    Until: 08:00, 0.1498373925,
-                             !- Field 18
-    Until: 09:00, 0.179804871,
-                             !- Field 20
-    Until: 10:00, 0.2097723495,
-                             !- Field 22
-    Until: 11:00, 0.259718147,
-                             !- Field 24
-    Until: 12:00, 0.2896856255,
-                             !- Field 26
-    Until: 13:00, 0.2697073065,
-                             !- Field 28
-    Until: 14:00, 0.2497289875,
-                             !- Field 30
-    Until: 15:00, 0.2297506685,
-                             !- Field 32
-    Until: 16:00, 0.2297506685,
-                             !- Field 34
-    Until: 17:00, 0.259718147,
-                             !- Field 36
-    Until: 18:00, 0.259718147,
-                             !- Field 38
-    Until: 19:00, 0.239739828,
-                             !- Field 40
-    Until: 20:00, 0.219761509,
-                             !- Field 42
-    Until: 21:00, 0.19978319,!- Field 44
-    Until: 22:00, 0.179804871,
-                             !- Field 46
-    Until: 23:00, 0.0899024355,
-                             !- Field 48
-    Until: 24:00, 0.0299674785,
-                             !- Field 50
+    Until: 01:00,0.0299674785, !- Field 3
+    Until: 02:00,0.01990145, !- Field 5
+    Until: 03:00,0.029852175,!- Field 7
+    Until: 04:00,0.01990145, !- Field 9
+    Until: 05:00,0.049753625,!- Field 11
+    Until: 06:00,0.119869914,!- Field 13
+    Until: 07:00,0.1298590735, !- Field 15
+    Until: 08:00,0.1498373925, !- Field 17
+    Until: 09:00,0.179804871,!- Field 19
+    Until: 10:00,0.2097723495, !- Field 21
+    Until: 11:00,0.259718147,!- Field 23
+    Until: 12:00,0.2896856255, !- Field 25
+    Until: 13:00,0.2697073065, !- Field 27
+    Until: 14:00,0.2497289875, !- Field 29
+    Until: 15:00,0.2297506685, !- Field 31
+    Until: 16:00,0.2297506685, !- Field 33
+    Until: 17:00,0.259718147,!- Field 35
+    Until: 18:00,0.259718147,!- Field 37
+    Until: 19:00,0.239739828,!- Field 39
+    Until: 20:00,0.219761509,!- Field 41
+    Until: 21:00,0.19978319, !- Field 43
+    Until: 22:00,0.179804871,!- Field 45
+    Until: 23:00,0.0899024355, !- Field 47
+    Until: 24:00,0.0299674785, !- Field 49
     For: Saturday,           !- Field 51
-    Until: 01:00, 0.0299674785,
-                             !- Field 53
-    Until: 02:00, 0.01990145,!- Field 55
-    Until: 03:00, 0.029852175,
-                             !- Field 57
-    Until: 04:00, 0.01990145,!- Field 59
-    Until: 05:00, 0.049753625,
-                             !- Field 61
-    Until: 06:00, 0.1194087, !- Field 63
-    Until: 07:00, 0.1298590735,
-                             !- Field 65
-    Until: 08:00, 0.1498373925,
-                             !- Field 67
-    Until: 09:00, 0.179804871,
-                             !- Field 69
-    Until: 10:00, 0.2097723495,
-                             !- Field 71
-    Until: 11:00, 0.259718147,
-                             !- Field 73
-    Until: 12:00, 0.2896856255,
-                             !- Field 75
-    Until: 13:00, 0.2697073065,
-                             !- Field 77
-    Until: 14:00, 0.2497289875,
-                             !- Field 79
-    Until: 15:00, 0.2297506685,
-                             !- Field 81
-    Until: 16:00, 0.2297506685,
-                             !- Field 83
-    Until: 17:00, 0.259718147,
-                             !- Field 85
-    Until: 18:00, 0.259718147,
-                             !- Field 87
-    Until: 19:00, 0.239739828,
-                             !- Field 89
-    Until: 20:00, 0.219761509,
-                             !- Field 91
-    Until: 21:00, 0.19978319,!- Field 93
-    Until: 22:00, 0.179804871,
-                             !- Field 95
-    Until: 23:00, 0.0899024355,
-                             !- Field 97
-    Until: 24:00, 0.0299674785,
-                             !- Field 99
+    Until: 01:00,0.0299674785, !- Field 52
+    Until: 02:00,0.01990145, !- Field 54
+    Until: 03:00,0.029852175,!- Field 56
+    Until: 04:00,0.01990145, !- Field 58
+    Until: 05:00,0.049753625,!- Field 60
+    Until: 06:00,0.1194087,  !- Field 62
+    Until: 07:00,0.1298590735, !- Field 64
+    Until: 08:00,0.1498373925, !- Field 66
+    Until: 09:00,0.179804871,!- Field 68
+    Until: 10:00,0.2097723495, !- Field 70
+    Until: 11:00,0.259718147,!- Field 72
+    Until: 12:00,0.2896856255, !- Field 74
+    Until: 13:00,0.2697073065, !- Field 76
+    Until: 14:00,0.2497289875, !- Field 78
+    Until: 15:00,0.2297506685, !- Field 80
+    Until: 16:00,0.2297506685, !- Field 82
+    Until: 17:00,0.259718147,!- Field 84
+    Until: 18:00,0.259718147,!- Field 86
+    Until: 19:00,0.239739828,!- Field 88
+    Until: 20:00,0.219761509,!- Field 90
+    Until: 21:00,0.19978319, !- Field 92
+    Until: 22:00,0.179804871,!- Field 94
+    Until: 23:00,0.0899024355, !- Field 96
+    Until: 24:00,0.0299674785, !- Field 98
     For: SummerDesignDay,    !- Field 100
-    Until: 24:00, 0.29,      !- Field 102
+    Until: 24:00,0.29,       !- Field 101
     For: WinterDesignDay,    !- Field 103
-    Until: 24:00, 0.0,       !- Field 105
-    For: Sunday Holidays AllOtherDays,  !- Field 106
-    Until: 01:00, 0.0299674785,
-                             !- Field 108
-    Until: 02:00, 0.01990145,!- Field 110
-    Until: 03:00, 0.029852175,
-                             !- Field 112
-    Until: 04:00, 0.01990145,!- Field 114
-    Until: 05:00, 0.049753625,
-                             !- Field 116
-    Until: 06:00, 0.1194087, !- Field 118
-    Until: 07:00, 0.1298590735,
-                             !- Field 120
-    Until: 08:00, 0.1498373925,
-                             !- Field 122
-    Until: 09:00, 0.179804871,
-                             !- Field 124
-    Until: 10:00, 0.2097723495,
-                             !- Field 126
-    Until: 11:00, 0.259718147,
-                             !- Field 128
-    Until: 12:00, 0.2896856255,
-                             !- Field 130
-    Until: 13:00, 0.2697073065,
-                             !- Field 132
-    Until: 14:00, 0.2497289875,
-                             !- Field 134
-    Until: 15:00, 0.2297506685,
-                             !- Field 136
-    Until: 16:00, 0.2297506685,
-                             !- Field 138
-    Until: 17:00, 0.259718147,
-                             !- Field 140
-    Until: 18:00, 0.259718147,
-                             !- Field 142
-    Until: 19:00, 0.239739828,
-                             !- Field 144
-    Until: 20:00, 0.219761509,
-                             !- Field 146
-    Until: 21:00, 0.19978319,!- Field 148
-    Until: 22:00, 0.179804871,
-                             !- Field 150
-    Until: 23:00, 0.0899024355,
-                             !- A154
-    Until: 24:00, 0.0299674785;
+    Until: 24:00,0.0,        !- Field 104
+    For: Sunday Holidays AllOtherDays, !- Field 106
+    Until: 01:00,0.0299674785, !- Field 107
+    Until: 02:00,0.01990145, !- Field 109
+    Until: 03:00,0.029852175,!- Field 111
+    Until: 04:00,0.01990145, !- Field 113
+    Until: 05:00,0.049753625,!- Field 115
+    Until: 06:00,0.1194087,  !- Field 117
+    Until: 07:00,0.1298590735, !- Field 119
+    Until: 08:00,0.1498373925, !- Field 121
+    Until: 09:00,0.179804871,!- Field 123
+    Until: 10:00,0.2097723495, !- Field 125
+    Until: 11:00,0.259718147,!- Field 127
+    Until: 12:00,0.2896856255, !- Field 129
+    Until: 13:00,0.2697073065, !- Field 131
+    Until: 14:00,0.2497289875, !- Field 133
+    Until: 15:00,0.2297506685, !- Field 135
+    Until: 16:00,0.2297506685, !- Field 137
+    Until: 17:00,0.259718147,!- Field 139
+    Until: 18:00,0.259718147,!- Field 141
+    Until: 19:00,0.239739828,!- Field 143
+    Until: 20:00,0.219761509,!- Field 145
+    Until: 21:00,0.19978319, !- Field 147
+    Until: 22:00,0.179804871,!- Field 149
+    Until: 23:00,0.0899024355, !- <none>
+    Until: 24:00,0.0299674785; !- <none>
+
                              !- A156
 
-Schedule:Compact,
+  Schedule:Compact,
     FF_GAS_EQUIP_SCH,        !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays Saturday,  !- Field 2
-    Until: 01:00, 0.03,      !- Field 4
-    Until: 02:00, 0.02,      !- Field 6
-    Until: 03:00, 0.03,      !- Field 8
-    Until: 04:00, 0.02,      !- Field 10
-    Until: 05:00, 0.05,      !- Field 12
-    Until: 06:00, 0.12,      !- Field 14
-    Until: 07:00, 0.13,      !- Field 16
-    Until: 08:00, 0.15,      !- Field 18
-    Until: 09:00, 0.18,      !- Field 20
-    Until: 10:00, 0.21,      !- Field 22
-    Until: 11:00, 0.26,      !- Field 24
-    Until: 12:00, 0.29,      !- Field 26
-    Until: 13:00, 0.27,      !- Field 28
-    Until: 14:00, 0.25,      !- Field 30
-    Until: 15:00, 0.23,      !- Field 32
-    Until: 16:00, 0.23,      !- Field 34
-    Until: 17:00, 0.26,      !- Field 36
-    Until: 18:00, 0.26,      !- Field 38
-    Until: 19:00, 0.24,      !- Field 40
-    Until: 20:00, 0.22,      !- Field 42
-    Until: 21:00, 0.20,      !- Field 44
-    Until: 22:00, 0.18,      !- Field 46
-    Until: 23:00, 0.09,      !- Field 48
-    Until: 24:00, 0.03,      !- Field 50
+    Until: 01:00,0.03,       !- Field 3
+    Until: 02:00,0.02,       !- Field 5
+    Until: 03:00,0.03,       !- Field 7
+    Until: 04:00,0.02,       !- Field 9
+    Until: 05:00,0.05,       !- Field 11
+    Until: 06:00,0.12,       !- Field 13
+    Until: 07:00,0.13,       !- Field 15
+    Until: 08:00,0.15,       !- Field 17
+    Until: 09:00,0.18,       !- Field 19
+    Until: 10:00,0.21,       !- Field 21
+    Until: 11:00,0.26,       !- Field 23
+    Until: 12:00,0.29,       !- Field 25
+    Until: 13:00,0.27,       !- Field 27
+    Until: 14:00,0.25,       !- Field 29
+    Until: 15:00,0.23,       !- Field 31
+    Until: 16:00,0.23,       !- Field 33
+    Until: 17:00,0.26,       !- Field 35
+    Until: 18:00,0.26,       !- Field 37
+    Until: 19:00,0.24,       !- Field 39
+    Until: 20:00,0.22,       !- Field 41
+    Until: 21:00,0.20,       !- Field 43
+    Until: 22:00,0.18,       !- Field 45
+    Until: 23:00,0.09,       !- Field 47
+    Until: 24:00,0.03,       !- Field 49
     For: SummerDesignDay,    !- Field 51
-    Until: 24:00, 0.29,      !- Field 53
+    Until: 24:00,0.29,       !- Field 52
     For: WinterDesignDay,    !- Field 54
-    Until: 24:00, 0.0,       !- Field 56
-    For: Sunday Holidays AllOtherDays,  !- Field 57
-    Until: 01:00, 0.03,      !- Field 59
-    Until: 02:00, 0.02,      !- Field 61
-    Until: 03:00, 0.03,      !- Field 63
-    Until: 04:00, 0.02,      !- Field 65
-    Until: 05:00, 0.05,      !- Field 67
-    Until: 06:00, 0.12,      !- Field 69
-    Until: 07:00, 0.13,      !- Field 71
-    Until: 08:00, 0.15,      !- Field 73
-    Until: 09:00, 0.18,      !- Field 75
-    Until: 10:00, 0.21,      !- Field 77
-    Until: 11:00, 0.26,      !- Field 79
-    Until: 12:00, 0.29,      !- Field 81
-    Until: 13:00, 0.27,      !- Field 83
-    Until: 14:00, 0.25,      !- Field 85
-    Until: 15:00, 0.23,      !- Field 87
-    Until: 16:00, 0.23,      !- Field 89
-    Until: 17:00, 0.26,      !- Field 91
-    Until: 18:00, 0.26,      !- Field 93
-    Until: 19:00, 0.24,      !- Field 95
-    Until: 20:00, 0.22,      !- Field 97
-    Until: 21:00, 0.20,      !- Field 99
-    Until: 22:00, 0.18,      !- Field 101
-    Until: 23:00, 0.09,      !- Field 103
-    Until: 24:00, 0.03;      !- Field 105
+    Until: 24:00,0.0,        !- Field 55
+    For: Sunday Holidays AllOtherDays, !- Field 57
+    Until: 01:00,0.03,       !- Field 58
+    Until: 02:00,0.02,       !- Field 60
+    Until: 03:00,0.03,       !- Field 62
+    Until: 04:00,0.02,       !- Field 64
+    Until: 05:00,0.05,       !- Field 66
+    Until: 06:00,0.12,       !- Field 68
+    Until: 07:00,0.13,       !- Field 70
+    Until: 08:00,0.15,       !- Field 72
+    Until: 09:00,0.18,       !- Field 74
+    Until: 10:00,0.21,       !- Field 76
+    Until: 11:00,0.26,       !- Field 78
+    Until: 12:00,0.29,       !- Field 80
+    Until: 13:00,0.27,       !- Field 82
+    Until: 14:00,0.25,       !- Field 84
+    Until: 15:00,0.23,       !- Field 86
+    Until: 16:00,0.23,       !- Field 88
+    Until: 17:00,0.26,       !- Field 90
+    Until: 18:00,0.26,       !- Field 92
+    Until: 19:00,0.24,       !- Field 94
+    Until: 20:00,0.22,       !- Field 96
+    Until: 21:00,0.20,       !- Field 98
+    Until: 22:00,0.18,       !- Field 100
+    Until: 23:00,0.09,       !- Field 102
+    Until: 24:00,0.03;       !- Field 104
 
-Schedule:Compact,
+  Schedule:Compact,
     BLDG_OCC_SCH,            !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 01:00, 0.05,      !- Field 4
-    Until: 05:00, 0.0,       !- Field 6
-    Until: 06:00, 0.05,      !- Field 8
-    Until: 07:00, 0.1,       !- Field 10
-    Until: 10:00, 0.4,       !- Field 12
-    Until: 11:00, 0.2,       !- Field 14
-    Until: 12:00, 0.5,       !- Field 16
-    Until: 13:00, 0.8,       !- Field 18
-    Until: 14:00, 0.7,       !- Field 20
-    Until: 15:00, 0.4,       !- Field 22
-    Until: 16:00, 0.2,       !- Field 24
-    Until: 17:00, 0.25,      !- Field 26
-    Until: 18:00, 0.5,       !- Field 28
-    Until: 21:00, 0.8,       !- Field 30
-    Until: 22:00, 0.5,       !- Field 32
-    Until: 23:00, 0.35,      !- Field 34
-    Until: 24:00, 0.2,       !- Field 36
+    Until: 01:00,0.05,       !- Field 3
+    Until: 05:00,0.0,        !- Field 5
+    Until: 06:00,0.05,       !- Field 7
+    Until: 07:00,0.1,        !- Field 9
+    Until: 10:00,0.4,        !- Field 11
+    Until: 11:00,0.2,        !- Field 13
+    Until: 12:00,0.5,        !- Field 15
+    Until: 13:00,0.8,        !- Field 17
+    Until: 14:00,0.7,        !- Field 19
+    Until: 15:00,0.4,        !- Field 21
+    Until: 16:00,0.2,        !- Field 23
+    Until: 17:00,0.25,       !- Field 25
+    Until: 18:00,0.5,        !- Field 27
+    Until: 21:00,0.8,        !- Field 29
+    Until: 22:00,0.5,        !- Field 31
+    Until: 23:00,0.35,       !- Field 33
+    Until: 24:00,0.2,        !- Field 35
     For: SummerDesignDay,    !- Field 37
-    Until: 24:00, 1.0,       !- Field 39
+    Until: 24:00,1.0,        !- Field 38
     For: WinterDesignDay,    !- Field 40
-    Until: 24:00, 0.0,       !- Field 42
+    Until: 24:00,0.0,        !- Field 41
     For: Saturday,           !- Field 43
-    Until: 01:00, 0.05,      !- Field 45
-    Until: 06:00, 0.0,       !- Field 47
-    Until: 07:00, 0.05,      !- Field 49
-    Until: 09:00, 0.5,       !- Field 51
-    Until: 10:00, 0.4,       !- Field 53
-    Until: 11:00, 0.2,       !- Field 55
-    Until: 12:00, 0.45,      !- Field 57
-    Until: 14:00, 0.5,       !- Field 59
-    Until: 15:00, 0.35,      !- Field 61
-    Until: 18:00, 0.3,       !- Field 63
-    Until: 19:00, 0.7,       !- Field 65
-    Until: 20:00, 0.9,       !- Field 67
-    Until: 21:00, 0.7,       !- Field 69
-    Until: 22:00, 0.65,      !- Field 71
-    Until: 23:00, 0.55,      !- Field 73
-    Until: 24:00, 0.35,      !- Field 75
-    For: Sunday Holidays AllOtherDays,  !- Field 76
-    Until: 01:00, 0.05,      !- Field 78
-    Until: 06:00, 0.0,       !- Field 80
-    Until: 07:00, 0.05,      !- Field 82
-    Until: 09:00, 0.5,       !- Field 84
-    Until: 11:00, 0.2,       !- Field 86
-    Until: 12:00, 0.3,       !- Field 88
-    Until: 14:00, 0.5,       !- Field 90
-    Until: 15:00, 0.3,       !- Field 92
-    Until: 16:00, 0.2,       !- Field 94
-    Until: 17:00, 0.25,      !- Field 96
-    Until: 18:00, 0.35,      !- Field 98
-    Until: 19:00, 0.55,      !- Field 100
-    Until: 20:00, 0.65,      !- Field 102
-    Until: 21:00, 0.7,       !- Field 104
-    Until: 22:00, 0.35,      !- Field 106
-    Until: 24:00, 0.2;       !- Field 108
+    Until: 01:00,0.05,       !- Field 44
+    Until: 06:00,0.0,        !- Field 46
+    Until: 07:00,0.05,       !- Field 48
+    Until: 09:00,0.5,        !- Field 50
+    Until: 10:00,0.4,        !- Field 52
+    Until: 11:00,0.2,        !- Field 54
+    Until: 12:00,0.45,       !- Field 56
+    Until: 14:00,0.5,        !- Field 58
+    Until: 15:00,0.35,       !- Field 60
+    Until: 18:00,0.3,        !- Field 62
+    Until: 19:00,0.7,        !- Field 64
+    Until: 20:00,0.9,        !- Field 66
+    Until: 21:00,0.7,        !- Field 68
+    Until: 22:00,0.65,       !- Field 70
+    Until: 23:00,0.55,       !- Field 72
+    Until: 24:00,0.35,       !- Field 74
+    For: Sunday Holidays AllOtherDays, !- Field 76
+    Until: 01:00,0.05,       !- Field 77
+    Until: 06:00,0.0,        !- Field 79
+    Until: 07:00,0.05,       !- Field 81
+    Until: 09:00,0.5,        !- Field 83
+    Until: 11:00,0.2,        !- Field 85
+    Until: 12:00,0.3,        !- Field 87
+    Until: 14:00,0.5,        !- Field 89
+    Until: 15:00,0.3,        !- Field 91
+    Until: 16:00,0.2,        !- Field 93
+    Until: 17:00,0.25,       !- Field 95
+    Until: 18:00,0.35,       !- Field 97
+    Until: 19:00,0.55,       !- Field 99
+    Until: 20:00,0.65,       !- Field 101
+    Until: 21:00,0.7,        !- Field 103
+    Until: 22:00,0.35,       !- Field 105
+    Until: 24:00,0.2;        !- Field 107
 
-Schedule:Compact,
+  Schedule:Compact,
     INFIL_SCH_PNNL,          !- Name
     fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay,  !- Field 2
-    Until: 01:00, 0.25,      !- Field 4
-    Until: 05:00, 1.0,       !- Field 6
-    Until: 24:00, 0.25,      !- Field 8
-    For: Saturday WinterDesignDay,  !- Field 9
-    Until: 01:00, 0.25,      !- Field 11
-    Until: 05:00, 1.0,       !- Field 13
-    Until: 24:00, 0.25,      !- Field 15
-    For: Sunday Holidays AllOtherDays,  !- Field 16
-    Until: 01:00, 0.25,      !- Field 18
-    Until: 05:00, 1.0,       !- Field 20
-    Until: 24:00, 0.25;      !- Field 22
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 01:00,0.25,       !- Field 3
+    Until: 05:00,1.0,        !- Field 5
+    Until: 24:00,0.25,       !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 01:00,0.25,       !- Field 10
+    Until: 05:00,1.0,        !- Field 12
+    Until: 24:00,0.25,       !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 01:00,0.25,       !- Field 17
+    Until: 05:00,1.0,        !- Field 19
+    Until: 24:00,0.25;       !- Field 21
 
-Schedule:Compact,
+  Schedule:Compact,
     DOOR_INFIL_SCH,          !- Name
     fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 06:00, 0.0,       !- Field 4
-    Until: 07:00, 0.144,     !- Field 6
-    Until: 10:00, 0.462,     !- Field 8
-    Until: 11:00, 0.258,     !- Field 10
-    Until: 12:00, 0.558,     !- Field 12
-    Until: 13:00, 0.829,     !- Field 14
-    Until: 14:00, 0.74,      !- Field 16
-    Until: 15:00, 0.462,     !- Field 18
-    Until: 16:00, 0.258,     !- Field 20
-    Until: 17:00, 0.363,     !- Field 22
-    Until: 18:00, 0.558,     !- Field 24
-    Until: 21:00, 0.829,     !- Field 26
-    Until: 22:00, 0.558,     !- Field 28
-    Until: 23:00, 0.363,     !- Field 30
-    Until: 24:00, 0.258,     !- Field 32
+    Until: 06:00,0.0,        !- Field 3
+    Until: 07:00,0.144,      !- Field 5
+    Until: 10:00,0.462,      !- Field 7
+    Until: 11:00,0.258,      !- Field 9
+    Until: 12:00,0.558,      !- Field 11
+    Until: 13:00,0.829,      !- Field 13
+    Until: 14:00,0.74,       !- Field 15
+    Until: 15:00,0.462,      !- Field 17
+    Until: 16:00,0.258,      !- Field 19
+    Until: 17:00,0.363,      !- Field 21
+    Until: 18:00,0.558,      !- Field 23
+    Until: 21:00,0.829,      !- Field 25
+    Until: 22:00,0.558,      !- Field 27
+    Until: 23:00,0.363,      !- Field 29
+    Until: 24:00,0.258,      !- Field 31
     For: SummerDesignDay,    !- Field 33
-    Until: 24:00, 1.0,       !- Field 35
+    Until: 24:00,1.0,        !- Field 34
     For: WinterDesignDay,    !- Field 36
-    Until: 24:00, 0.0,       !- Field 38
+    Until: 24:00,0.0,        !- Field 37
     For: Saturday,           !- Field 39
-    Until: 06:00, 0.0,       !- Field 41
-    Until: 07:00, 0.144,     !- Field 43
-    Until: 09:00, 0.558,     !- Field 45
-    Until: 10:00, 0.462,     !- Field 47
-    Until: 11:00, 0.258,     !- Field 49
-    Until: 12:00, 0.462,     !- Field 51
-    Until: 14:00, 0.558,     !- Field 53
-    Until: 15:00, 0.462,     !- Field 55
-    Until: 18:00, 0.363,     !- Field 57
-    Until: 19:00, 0.74,      !- Field 59
-    Until: 20:00, 0.915,     !- Field 61
-    Until: 21:00, 0.74,      !- Field 63
-    Until: 22:00, 0.65,      !- Field 65
-    Until: 23:00, 0.558,     !- Field 67
-    Until: 24:00, 0.363,     !- Field 69
-    For: Sunday Holidays AllOtherDays,  !- Field 70
-    Until: 06:00, 0.0,       !- Field 72
-    Until: 07:00, 0.144,     !- Field 74
-    Until: 09:00, 0.558,     !- Field 76
-    Until: 11:00, 0.258,     !- Field 78
-    Until: 12:00, 0.363,     !- Field 80
-    Until: 14:00, 0.558,     !- Field 82
-    Until: 15:00, 0.363,     !- Field 84
-    Until: 16:00, 0.258,     !- Field 86
-    Until: 17:00, 0.363,     !- Field 88
-    Until: 18:00, 0.462,     !- Field 90
-    Until: 19:00, 0.558,     !- Field 92
-    Until: 20:00, 0.65,      !- Field 94
-    Until: 21:00, 0.74,      !- Field 96
-    Until: 22:00, 0.462,     !- Field 98
-    Until: 24:00, 0.258;     !- Field 100
+    Until: 06:00,0.0,        !- Field 40
+    Until: 07:00,0.144,      !- Field 42
+    Until: 09:00,0.558,      !- Field 44
+    Until: 10:00,0.462,      !- Field 46
+    Until: 11:00,0.258,      !- Field 48
+    Until: 12:00,0.462,      !- Field 50
+    Until: 14:00,0.558,      !- Field 52
+    Until: 15:00,0.462,      !- Field 54
+    Until: 18:00,0.363,      !- Field 56
+    Until: 19:00,0.74,       !- Field 58
+    Until: 20:00,0.915,      !- Field 60
+    Until: 21:00,0.74,       !- Field 62
+    Until: 22:00,0.65,       !- Field 64
+    Until: 23:00,0.558,      !- Field 66
+    Until: 24:00,0.363,      !- Field 68
+    For: Sunday Holidays AllOtherDays, !- Field 70
+    Until: 06:00,0.0,        !- Field 71
+    Until: 07:00,0.144,      !- Field 73
+    Until: 09:00,0.558,      !- Field 75
+    Until: 11:00,0.258,      !- Field 77
+    Until: 12:00,0.363,      !- Field 79
+    Until: 14:00,0.558,      !- Field 81
+    Until: 15:00,0.363,      !- Field 83
+    Until: 16:00,0.258,      !- Field 85
+    Until: 17:00,0.363,      !- Field 87
+    Until: 18:00,0.462,      !- Field 89
+    Until: 19:00,0.558,      !- Field 91
+    Until: 20:00,0.65,       !- Field 93
+    Until: 21:00,0.74,       !- Field 95
+    Until: 22:00,0.462,      !- Field 97
+    Until: 24:00,0.258;      !- Field 99
 
-Schedule:Compact,
+  Schedule:Compact,
     VESTIBULE_DOOR_INFIL_SCH,!- Name
     fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 06:00, 0.0,       !- Field 4
-    Until: 07:00, 0.131,     !- Field 6
-    Until: 10:00, 0.445,     !- Field 8
-    Until: 11:00, 0.241,     !- Field 10
-    Until: 12:00, 0.542,     !- Field 12
-    Until: 13:00, 0.821,     !- Field 14
-    Until: 14:00, 0.73,      !- Field 16
-    Until: 15:00, 0.445,     !- Field 18
-    Until: 16:00, 0.241,     !- Field 20
-    Until: 17:00, 0.345,     !- Field 22
-    Until: 18:00, 0.542,     !- Field 24
-    Until: 21:00, 0.821,     !- Field 26
-    Until: 22:00, 0.542,     !- Field 28
-    Until: 23:00, 0.345,     !- Field 30
-    Until: 24:00, 0.241,     !- Field 32
+    Until: 06:00,0.0,        !- Field 3
+    Until: 07:00,0.131,      !- Field 5
+    Until: 10:00,0.445,      !- Field 7
+    Until: 11:00,0.241,      !- Field 9
+    Until: 12:00,0.542,      !- Field 11
+    Until: 13:00,0.821,      !- Field 13
+    Until: 14:00,0.73,       !- Field 15
+    Until: 15:00,0.445,      !- Field 17
+    Until: 16:00,0.241,      !- Field 19
+    Until: 17:00,0.345,      !- Field 21
+    Until: 18:00,0.542,      !- Field 23
+    Until: 21:00,0.821,      !- Field 25
+    Until: 22:00,0.542,      !- Field 27
+    Until: 23:00,0.345,      !- Field 29
+    Until: 24:00,0.241,      !- Field 31
     For: SummerDesignDay,    !- Field 33
-    Until: 24:00, 1.0,       !- Field 35
+    Until: 24:00,1.0,        !- Field 34
     For: WinterDesignDay,    !- Field 36
-    Until: 24:00, 0.0,       !- Field 38
+    Until: 24:00,0.0,        !- Field 37
     For: Saturday,           !- Field 39
-    Until: 06:00, 0.0,       !- Field 41
-    Until: 07:00, 0.131,     !- Field 43
-    Until: 09:00, 0.542,     !- Field 45
-    Until: 10:00, 0.445,     !- Field 47
-    Until: 11:00, 0.241,     !- Field 49
-    Until: 12:00, 0.445,     !- Field 51
-    Until: 14:00, 0.542,     !- Field 53
-    Until: 15:00, 0.445,     !- Field 55
-    Until: 18:00, 0.345,     !- Field 57
-    Until: 19:00, 0.73,      !- Field 59
-    Until: 20:00, 0.911,     !- Field 61
-    Until: 21:00, 0.73,      !- Field 63
-    Until: 22:00, 0.637,     !- Field 65
-    Until: 23:00, 0.542,     !- Field 67
-    Until: 24:00, 0.345,     !- Field 69
-    For: Sunday Holidays AllOtherDays,  !- Field 70
-    Until: 06:00, 0.0,       !- Field 72
-    Until: 07:00, 0.131,     !- Field 74
-    Until: 09:00, 0.542,     !- Field 76
-    Until: 11:00, 0.241,     !- Field 78
-    Until: 12:00, 0.345,     !- Field 80
-    Until: 14:00, 0.542,     !- Field 82
-    Until: 15:00, 0.345,     !- Field 84
-    Until: 16:00, 0.241,     !- Field 86
-    Until: 17:00, 0.345,     !- Field 88
-    Until: 18:00, 0.445,     !- Field 90
-    Until: 19:00, 0.542,     !- Field 92
-    Until: 20:00, 0.637,     !- Field 94
-    Until: 21:00, 0.73,      !- Field 96
-    Until: 22:00, 0.445,     !- Field 98
-    Until: 24:00, 0.241;     !- Field 100
+    Until: 06:00,0.0,        !- Field 40
+    Until: 07:00,0.131,      !- Field 42
+    Until: 09:00,0.542,      !- Field 44
+    Until: 10:00,0.445,      !- Field 46
+    Until: 11:00,0.241,      !- Field 48
+    Until: 12:00,0.445,      !- Field 50
+    Until: 14:00,0.542,      !- Field 52
+    Until: 15:00,0.445,      !- Field 54
+    Until: 18:00,0.345,      !- Field 56
+    Until: 19:00,0.73,       !- Field 58
+    Until: 20:00,0.911,      !- Field 60
+    Until: 21:00,0.73,       !- Field 62
+    Until: 22:00,0.637,      !- Field 64
+    Until: 23:00,0.542,      !- Field 66
+    Until: 24:00,0.345,      !- Field 68
+    For: Sunday Holidays AllOtherDays, !- Field 70
+    Until: 06:00,0.0,        !- Field 71
+    Until: 07:00,0.131,      !- Field 73
+    Until: 09:00,0.542,      !- Field 75
+    Until: 11:00,0.241,      !- Field 77
+    Until: 12:00,0.345,      !- Field 79
+    Until: 14:00,0.542,      !- Field 81
+    Until: 15:00,0.345,      !- Field 83
+    Until: 16:00,0.241,      !- Field 85
+    Until: 17:00,0.345,      !- Field 87
+    Until: 18:00,0.445,      !- Field 89
+    Until: 19:00,0.542,      !- Field 91
+    Until: 20:00,0.637,      !- Field 93
+    Until: 21:00,0.73,       !- Field 95
+    Until: 22:00,0.445,      !- Field 97
+    Until: 24:00,0.241;      !- Field 99
 
-Schedule:Compact,
+  Schedule:Compact,
     BLDG_SWH_SCH,            !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays,           !- Field 2
-    Until: 01:00, 0.00,      !- Field 4
-    Until: 06:00, 0.00,      !- Field 6
-    Until: 07:00, 0.15,      !- Field 8
-    Until: 08:00, 0.15,      !- Field 10
-    Until: 09:00, 0.33,      !- Field 12
-    Until: 10:00, 0.13,      !- Field 14
-    Until: 11:00, 0.10,      !- Field 16
-    Until: 12:00, 0.72,      !- Field 18
-    Until: 13:00, 0.31,      !- Field 20
-    Until: 14:00, 0.98,      !- Field 22
-    Until: 15:00, 0.92,      !- Field 24
-    Until: 16:00, 0.22,      !- Field 26
-    Until: 17:00, 0.31,      !- Field 28
-    Until: 18:00, 0.23,      !- Field 30
-    Until: 19:00, 0.16,      !- Field 32
-    Until: 20:00, 0.10,      !- Field 34
-    Until: 21:00, 0.40,      !- Field 36
-    Until: 22:00, 0.42,      !- Field 38
-    Until: 23:00, 0.43,      !- Field 40
-    Until: 24:00, 0.15,      !- Field 42
-    For: SummerDesignDay WinterDesignDay,  !- Field 43
-    Until: 01:00, 0.00,      !- Field 45
-    Until: 06:00, 0.00,      !- Field 47
-    Until: 07:00, 0.00,      !- Field 49
-    Until: 08:00, 0.15,      !- Field 51
-    Until: 09:00, 0.15,      !- Field 53
-    Until: 10:00, 0.15,      !- Field 55
-    Until: 11:00, 0.10,      !- Field 57
-    Until: 12:00, 0.72,      !- Field 59
-    Until: 13:00, 0.60,      !- Field 61
-    Until: 14:00, 0.98,      !- Field 63
-    Until: 15:00, 0.92,      !- Field 65
-    Until: 16:00, 0.25,      !- Field 67
-    Until: 17:00, 0.25,      !- Field 69
-    Until: 18:00, 0.23,      !- Field 71
-    Until: 19:00, 0.16,      !- Field 73
-    Until: 20:00, 0.10,      !- Field 75
-    Until: 21:00, 0.40,      !- Field 77
-    Until: 22:00, 0.42,      !- Field 79
-    Until: 23:00, 0.43,      !- Field 81
-    Until: 24:00, 0.15,      !- Field 83
-    For: Sunday Holidays AllOtherDays,  !- Field 84
-    Until: 01:00, 0.00,      !- Field 86
-    Until: 06:00, 0.00,      !- Field 88
-    Until: 07:00, 0.00,      !- Field 90
-    Until: 08:00, 0.15,      !- Field 92
-    Until: 09:00, 0.15,      !- Field 94
-    Until: 10:00, 0.15,      !- Field 96
-    Until: 11:00, 0.10,      !- Field 98
-    Until: 12:00, 0.72,      !- Field 100
-    Until: 13:00, 0.60,      !- Field 102
-    Until: 14:00, 0.98,      !- Field 104
-    Until: 15:00, 0.92,      !- Field 106
-    Until: 16:00, 0.25,      !- Field 108
-    Until: 17:00, 0.25,      !- Field 110
-    Until: 18:00, 0.23,      !- Field 112
-    Until: 19:00, 0.16,      !- Field 114
-    Until: 20:00, 0.10,      !- Field 116
-    Until: 21:00, 0.40,      !- Field 118
-    Until: 22:00, 0.42,      !- Field 120
-    Until: 23:00, 0.43,      !- Field 122
-    Until: 24:00, 0.00;      !- Field 124
+    Until: 01:00,0.00,       !- Field 3
+    Until: 06:00,0.00,       !- Field 5
+    Until: 07:00,0.15,       !- Field 7
+    Until: 08:00,0.15,       !- Field 9
+    Until: 09:00,0.33,       !- Field 11
+    Until: 10:00,0.13,       !- Field 13
+    Until: 11:00,0.10,       !- Field 15
+    Until: 12:00,0.72,       !- Field 17
+    Until: 13:00,0.31,       !- Field 19
+    Until: 14:00,0.98,       !- Field 21
+    Until: 15:00,0.92,       !- Field 23
+    Until: 16:00,0.22,       !- Field 25
+    Until: 17:00,0.31,       !- Field 27
+    Until: 18:00,0.23,       !- Field 29
+    Until: 19:00,0.16,       !- Field 31
+    Until: 20:00,0.10,       !- Field 33
+    Until: 21:00,0.40,       !- Field 35
+    Until: 22:00,0.42,       !- Field 37
+    Until: 23:00,0.43,       !- Field 39
+    Until: 24:00,0.15,       !- Field 41
+    For: SummerDesignDay WinterDesignDay, !- Field 43
+    Until: 01:00,0.00,       !- Field 44
+    Until: 06:00,0.00,       !- Field 46
+    Until: 07:00,0.00,       !- Field 48
+    Until: 08:00,0.15,       !- Field 50
+    Until: 09:00,0.15,       !- Field 52
+    Until: 10:00,0.15,       !- Field 54
+    Until: 11:00,0.10,       !- Field 56
+    Until: 12:00,0.72,       !- Field 58
+    Until: 13:00,0.60,       !- Field 60
+    Until: 14:00,0.98,       !- Field 62
+    Until: 15:00,0.92,       !- Field 64
+    Until: 16:00,0.25,       !- Field 66
+    Until: 17:00,0.25,       !- Field 68
+    Until: 18:00,0.23,       !- Field 70
+    Until: 19:00,0.16,       !- Field 72
+    Until: 20:00,0.10,       !- Field 74
+    Until: 21:00,0.40,       !- Field 76
+    Until: 22:00,0.42,       !- Field 78
+    Until: 23:00,0.43,       !- Field 80
+    Until: 24:00,0.15,       !- Field 82
+    For: Sunday Holidays AllOtherDays, !- Field 84
+    Until: 01:00,0.00,       !- Field 85
+    Until: 06:00,0.00,       !- Field 87
+    Until: 07:00,0.00,       !- Field 89
+    Until: 08:00,0.15,       !- Field 91
+    Until: 09:00,0.15,       !- Field 93
+    Until: 10:00,0.15,       !- Field 95
+    Until: 11:00,0.10,       !- Field 97
+    Until: 12:00,0.72,       !- Field 99
+    Until: 13:00,0.60,       !- Field 101
+    Until: 14:00,0.98,       !- Field 103
+    Until: 15:00,0.92,       !- Field 105
+    Until: 16:00,0.25,       !- Field 107
+    Until: 17:00,0.25,       !- Field 109
+    Until: 18:00,0.23,       !- Field 111
+    Until: 19:00,0.16,       !- Field 113
+    Until: 20:00,0.10,       !- Field 115
+    Until: 21:00,0.40,       !- Field 117
+    Until: 22:00,0.42,       !- Field 119
+    Until: 23:00,0.43,       !- Field 121
+    Until: 24:00,0.00;       !- Field 123
 
-Schedule:Compact,
+  Schedule:Compact,
     Hours_of_operation,      !- Name
     on/off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekday SummerDesignDay,  !- Field 2
-    Until: 01:00, 1.0,       !- Field 4
-    Until: 05:00, 0.0,       !- Field 6
-    Until: 24:00, 1.0,       !- Field 8
-    For: Saturday WinterDesignDay,  !- Field 9
-    Until: 01:00, 1.0,       !- Field 11
-    Until: 05:00, 0.0,       !- Field 13
-    Until: 24:00, 1.0,       !- Field 15
-    For: Sunday Holidays AllOtherDays,  !- Field 16
-    Until: 01:00, 1.0,       !- Field 18
-    Until: 05:00, 0.0,       !- Field 20
-    Until: 24:00, 1.0;       !- Field 22
+    For: Weekday SummerDesignDay, !- Field 2
+    Until: 01:00,1.0,        !- Field 3
+    Until: 05:00,0.0,        !- Field 5
+    Until: 24:00,1.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 01:00,1.0,        !- Field 10
+    Until: 05:00,0.0,        !- Field 12
+    Until: 24:00,1.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 01:00,1.0,        !- Field 17
+    Until: 05:00,0.0,        !- Field 19
+    Until: 24:00,1.0;        !- Field 21
 
-Schedule:Compact,
+  Schedule:Compact,
     PlantOnSched,            !- Name
     On/Off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 1.0;       !- Field 4
+    Until: 24:00,1.0;        !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     ALWAYS_ON,               !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 1.0;       !- Field 4
+    Until: 24:00,1.0;        !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     Exterior_Lgt_ALWAYS_ON,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 1;         !- Field 4
+    Until: 24:00,1;          !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     Exterior_Lgt_189_1,      !- Name
     fraction,                !- Schedule Type Limits Name
     Through:12/31,           !- Field 1
     For:Weekdays,            !- Field 2
-    Until:  1:00, 1.0,       !- Field 4
-    Until:  9:00, 0.5,       !- Field 6
-    Until: 24:00, 1.0,       !- Field 8
+    Until:  1:00,1.0,        !- Field 3
+    Until:  9:00,0.5,        !- Field 5
+    Until: 24:00,1.0,        !- Field 7
     For:Saturday,            !- Field 9
-    Until:  1:00, 1.0,       !- Field 11
-    Until:  9:00, 0.5,       !- Field 13
-    Until: 24:00, 1.0,       !- Field 15
-    For:Sunday Holidays AllOtherDays,  !- Field 16
-    Until:  1:00, 1.0,       !- Field 18
-    Until:  9:00, 0.5,       !- Field 20
-    Until: 24:00, 1.0;       !- Field 22
+    Until:  1:00,1.0,        !- Field 10
+    Until:  9:00,0.5,        !- Field 12
+    Until: 24:00,1.0,        !- Field 14
+    For:Sunday Holidays AllOtherDays, !- Field 16
+    Until:  1:00,1.0,        !- Field 17
+    Until:  9:00,0.5,        !- Field 19
+    Until: 24:00,1.0;        !- Field 21
 
-Schedule:Compact,
+  Schedule:Compact,
     ALWAYS_OFF,              !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 0.0;       !- Field 4
+    Until: 24:00,0.0;        !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     HVACOperationSchd,       !- Name
     on/off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekday SummerDesignDay,  !- Field 2
-    Until: 01:00, 1.0,       !- Field 4
-    Until: 05:00, 0.0,       !- Field 6
-    Until: 24:00, 1.0,       !- Field 8
-    For: Saturday WinterDesignDay,  !- Field 9
-    Until: 01:00, 1.0,       !- Field 11
-    Until: 05:00, 0.0,       !- Field 13
-    Until: 24:00, 1.0,       !- Field 15
-    For: Sunday Holidays AllOtherDays,  !- Field 16
-    Until: 01:00, 1.0,       !- Field 18
-    Until: 05:00, 0.0,       !- Field 20
-    Until: 24:00, 1.0;       !- Field 22
+    For: Weekday SummerDesignDay, !- Field 2
+    Until: 01:00,1.0,        !- Field 3
+    Until: 05:00,0.0,        !- Field 5
+    Until: 24:00,1.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 01:00,1.0,        !- Field 10
+    Until: 05:00,0.0,        !- Field 12
+    Until: 24:00,1.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 01:00,1.0,        !- Field 17
+    Until: 05:00,0.0,        !- Field 19
+    Until: 24:00,1.0;        !- Field 21
 
-Schedule:Compact,
+  Schedule:Compact,
     FAN_SCH,                 !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 1.0;       !- Field 4
+    Until: 24:00,1.0;        !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen_Exhaust_SCH,     !- Name
     on/off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekday SummerDesignDay,  !- Field 2
-    Until: 06:00, 0.0,       !- Field 4
-    Until: 24:00, 1.0,       !- Field 6
-    For: Saturday WinterDesignDay,  !- Field 7
-    Until: 06:00, 0.0,       !- Field 9
-    Until: 24:00, 1.0,       !- Field 11
-    For: Sunday Holidays AllOtherDays,  !- Field 12
-    Until: 06:00, 0.0,       !- Field 14
-    Until: 24:00, 1.0;       !- Field 16
+    For: Weekday SummerDesignDay, !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 24:00,1.0,        !- Field 5
+    For: Saturday WinterDesignDay, !- Field 7
+    Until: 06:00,0.0,        !- Field 8
+    Until: 24:00,1.0,        !- Field 10
+    For: Sunday Holidays AllOtherDays, !- Field 12
+    Until: 06:00,0.0,        !- Field 13
+    Until: 24:00,1.0;        !- Field 15
 
-Schedule:Compact,
+  Schedule:Compact,
     HTGSETP_SCH_YES_OPTIMUM, !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: WinterDesignDay,    !- Field 2
-    Until: 05:00, 15.56,     !- Field 4
-    Until: 06:00, 18.33,     !- Field 6
-    Until: 24:00, 21.11,     !- Field 8
+    Until: 05:00,15.56,      !- Field 3
+    Until: 06:00,18.33,      !- Field 5
+    Until: 24:00,21.11,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 15.56,     !- Field 11
-    Until: 04:00, 17.8,      !- Field 13
-    Until: 05:00, 20.0,      !- Field 15
-    Until: 24:00, 21.11,     !- Field 17
+    Until: 03:00,15.56,      !- Field 10
+    Until: 04:00,17.8,       !- Field 12
+    Until: 05:00,20.0,       !- Field 14
+    Until: 24:00,21.11,      !- Field 16
     For: SummerDesignDay,    !- Field 18
-    Until: 24:00, 15.56,     !- Field 20
+    Until: 24:00,15.56,      !- Field 19
     For: Saturday,           !- Field 21
-    Until: 03:00, 15.56,     !- Field 23
-    Until: 04:00, 17.8,      !- Field 25
-    Until: 05:00, 20.0,      !- Field 27
-    Until: 24:00, 21.11,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 15.56,     !- Field 32
-    Until: 04:00, 17.8,      !- Field 34
-    Until: 05:00, 20.0,      !- Field 36
-    Until: 24:00, 21.11;     !- Field 38
+    Until: 03:00,15.56,      !- Field 22
+    Until: 04:00,17.8,       !- Field 24
+    Until: 05:00,20.0,       !- Field 26
+    Until: 24:00,21.11,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,15.56,      !- Field 31
+    Until: 04:00,17.8,       !- Field 33
+    Until: 05:00,20.0,       !- Field 35
+    Until: 24:00,21.11;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     HTGSETP_SCH_NO_OPTIMUM,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: WinterDesignDay,    !- Field 2
-    Until: 05:00, 15.56,     !- Field 4
-    Until: 06:00, 18.33,     !- Field 6
-    Until: 24:00, 21.11,     !- Field 8
+    Until: 05:00,15.56,      !- Field 3
+    Until: 06:00,18.33,      !- Field 5
+    Until: 24:00,21.11,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 15.56,     !- Field 11
-    Until: 04:00, 21.11,     !- Field 13
-    Until: 05:00, 21.11,     !- Field 15
-    Until: 24:00, 21.11,     !- Field 17
+    Until: 03:00,15.56,      !- Field 10
+    Until: 04:00,21.11,      !- Field 12
+    Until: 05:00,21.11,      !- Field 14
+    Until: 24:00,21.11,      !- Field 16
     For: SummerDesignDay,    !- Field 18
-    Until: 24:00, 15.56,     !- Field 20
+    Until: 24:00,15.56,      !- Field 19
     For: Saturday,           !- Field 21
-    Until: 03:00, 15.56,     !- Field 23
-    Until: 04:00, 21.11,     !- Field 25
-    Until: 05:00, 21.11,     !- Field 27
-    Until: 24:00, 21.11,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 15.56,     !- Field 32
-    Until: 04:00, 21.11,     !- Field 34
-    Until: 05:00, 21.11,     !- Field 36
-    Until: 24:00, 21.11;     !- Field 38
+    Until: 03:00,15.56,      !- Field 22
+    Until: 04:00,21.11,      !- Field 24
+    Until: 05:00,21.11,      !- Field 26
+    Until: 24:00,21.11,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,15.56,      !- Field 31
+    Until: 04:00,21.11,      !- Field 33
+    Until: 05:00,21.11,      !- Field 35
+    Until: 24:00,21.11;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     CLGSETP_SCH_YES_OPTIMUM, !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: SummerDesignDay,    !- Field 2
-    Until: 05:00, 30.00,     !- Field 4
-    Until: 06:00, 26.67,     !- Field 6
-    Until: 24:00, 23.89,     !- Field 8
+    Until: 05:00,30.00,      !- Field 3
+    Until: 06:00,26.67,      !- Field 5
+    Until: 24:00,23.89,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 30.00,     !- Field 11
-    Until: 04:00, 27.8,      !- Field 13
-    Until: 05:00, 25.6,      !- Field 15
-    Until: 24:00, 23.89,     !- Field 17
+    Until: 03:00,30.00,      !- Field 10
+    Until: 04:00,27.8,       !- Field 12
+    Until: 05:00,25.6,       !- Field 14
+    Until: 24:00,23.89,      !- Field 16
     For: Saturday,           !- Field 18
-    Until: 03:00, 30.00,     !- Field 20
-    Until: 04:00, 27.8,      !- Field 22
-    Until: 05:00, 25.6,      !- Field 24
-    Until: 24:00, 23.89,     !- Field 26
+    Until: 03:00,30.00,      !- Field 19
+    Until: 04:00,27.8,       !- Field 21
+    Until: 05:00,25.6,       !- Field 23
+    Until: 24:00,23.89,      !- Field 25
     For: WinterDesignDay,    !- Field 27
-    Until: 24:00, 30.00,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 30.00,     !- Field 32
-    Until: 04:00, 27.8,      !- Field 34
-    Until: 05:00, 25.6,      !- Field 36
-    Until: 24:00, 23.89;     !- Field 38
+    Until: 24:00,30.00,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,30.00,      !- Field 31
+    Until: 04:00,27.8,       !- Field 33
+    Until: 05:00,25.6,       !- Field 35
+    Until: 24:00,23.89;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     CLGSETP_SCH_NO_OPTIMUM,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: SummerDesignDay,    !- Field 2
-    Until: 05:00, 30.00,     !- Field 4
-    Until: 06:00, 26.67,     !- Field 6
-    Until: 24:00, 23.89,     !- Field 8
+    Until: 05:00,30.00,      !- Field 3
+    Until: 06:00,26.67,      !- Field 5
+    Until: 24:00,23.89,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 30.00,     !- Field 11
-    Until: 04:00, 23.89,     !- Field 13
-    Until: 05:00, 23.89,     !- Field 15
-    Until: 24:00, 23.89,     !- Field 17
+    Until: 03:00,30.00,      !- Field 10
+    Until: 04:00,23.89,      !- Field 12
+    Until: 05:00,23.89,      !- Field 14
+    Until: 24:00,23.89,      !- Field 16
     For: Saturday,           !- Field 18
-    Until: 03:00, 30.00,     !- Field 20
-    Until: 04:00, 23.89,     !- Field 22
-    Until: 05:00, 23.89,     !- Field 24
-    Until: 24:00, 23.89,     !- Field 26
+    Until: 03:00,30.00,      !- Field 19
+    Until: 04:00,23.89,      !- Field 21
+    Until: 05:00,23.89,      !- Field 23
+    Until: 24:00,23.89,      !- Field 25
     For: WinterDesignDay,    !- Field 27
-    Until: 24:00, 30.00,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 30.00,     !- Field 32
-    Until: 04:00, 23.89,     !- Field 34
-    Until: 05:00, 23.89,     !- Field 36
-    Until: 24:00, 23.89;     !- Field 38
+    Until: 24:00,30.00,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,30.00,      !- Field 31
+    Until: 04:00,23.89,      !- Field 33
+    Until: 05:00,23.89,      !- Field 35
+    Until: 24:00,23.89;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     CLGSETP_SCH_NO_SETBACK,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: SummerDesignDay,    !- Field 2
-    Until: 05:00, 30.00,     !- Field 4
-    Until: 06:00, 26.67,     !- Field 6
-    Until: 24:00, 23.89,     !- Field 8
+    Until: 05:00,30.00,      !- Field 3
+    Until: 06:00,26.67,      !- Field 5
+    Until: 24:00,23.89,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 23.89,     !- Field 11
-    Until: 04:00, 23.89,     !- Field 13
-    Until: 05:00, 23.89,     !- Field 15
-    Until: 24:00, 23.89,     !- Field 17
+    Until: 03:00,23.89,      !- Field 10
+    Until: 04:00,23.89,      !- Field 12
+    Until: 05:00,23.89,      !- Field 14
+    Until: 24:00,23.89,      !- Field 16
     For: Saturday,           !- Field 18
-    Until: 03:00, 23.89,     !- Field 20
-    Until: 04:00, 23.89,     !- Field 22
-    Until: 05:00, 23.89,     !- Field 24
-    Until: 24:00, 23.89,     !- Field 26
+    Until: 03:00,23.89,      !- Field 19
+    Until: 04:00,23.89,      !- Field 21
+    Until: 05:00,23.89,      !- Field 23
+    Until: 24:00,23.89,      !- Field 25
     For: WinterDesignDay,    !- Field 27
-    Until: 24:00, 30.00,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 23.89,     !- Field 32
-    Until: 04:00, 23.89,     !- Field 34
-    Until: 05:00, 23.89,     !- Field 36
-    Until: 24:00, 23.89;     !- Field 38
+    Until: 24:00,30.00,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,23.89,      !- Field 31
+    Until: 04:00,23.89,      !- Field 33
+    Until: 05:00,23.89,      !- Field 35
+    Until: 24:00,23.89;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     HTGSETP_KITCHEN_SCH_YES_OPTIMUM,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: WinterDesignDay,    !- Field 2
-    Until: 05:00, 15.56,     !- Field 4
-    Until: 06:00, 17.22,     !- Field 6
-    Until: 24:00, 18.89,     !- Field 8
+    Until: 05:00,15.56,      !- Field 3
+    Until: 06:00,17.22,      !- Field 5
+    Until: 24:00,18.89,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 15.56,     !- Field 11
-    Until: 04:00, 16.7,      !- Field 13
-    Until: 05:00, 17.8,      !- Field 15
-    Until: 24:00, 18.89,     !- Field 17
+    Until: 03:00,15.56,      !- Field 10
+    Until: 04:00,16.7,       !- Field 12
+    Until: 05:00,17.8,       !- Field 14
+    Until: 24:00,18.89,      !- Field 16
     For: SummerDesignDay,    !- Field 18
-    Until: 24:00, 15.56,     !- Field 20
+    Until: 24:00,15.56,      !- Field 19
     For: Saturday,           !- Field 21
-    Until: 03:00, 15.56,     !- Field 23
-    Until: 04:00, 16.7,      !- Field 25
-    Until: 05:00, 17.8,      !- Field 27
-    Until: 24:00, 18.89,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 15.56,     !- Field 32
-    Until: 04:00, 16.7,      !- Field 34
-    Until: 05:00, 17.8,      !- Field 36
-    Until: 24:00, 18.89;     !- Field 38
+    Until: 03:00,15.56,      !- Field 22
+    Until: 04:00,16.7,       !- Field 24
+    Until: 05:00,17.8,       !- Field 26
+    Until: 24:00,18.89,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,15.56,      !- Field 31
+    Until: 04:00,16.7,       !- Field 33
+    Until: 05:00,17.8,       !- Field 35
+    Until: 24:00,18.89;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     HTGSETP_KITCHEN_SCH_NO_OPTIMUM,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: WinterDesignDay,    !- Field 2
-    Until: 05:00, 15.56,     !- Field 4
-    Until: 06:00, 17.22,     !- Field 6
-    Until: 24:00, 18.89,     !- Field 8
+    Until: 05:00,15.56,      !- Field 3
+    Until: 06:00,17.22,      !- Field 5
+    Until: 24:00,18.89,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 15.56,     !- Field 11
-    Until: 04:00, 18.89,     !- Field 13
-    Until: 05:00, 18.89,     !- Field 15
-    Until: 24:00, 18.89,     !- Field 17
+    Until: 03:00,15.56,      !- Field 10
+    Until: 04:00,18.89,      !- Field 12
+    Until: 05:00,18.89,      !- Field 14
+    Until: 24:00,18.89,      !- Field 16
     For: SummerDesignDay,    !- Field 18
-    Until: 24:00, 15.56,     !- Field 20
+    Until: 24:00,15.56,      !- Field 19
     For: Saturday,           !- Field 21
-    Until: 03:00, 15.56,     !- Field 23
-    Until: 04:00, 18.89,     !- Field 25
-    Until: 05:00, 18.89,     !- Field 27
-    Until: 24:00, 18.89,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 15.56,     !- Field 32
-    Until: 04:00, 18.89,     !- Field 34
-    Until: 05:00, 18.89,     !- Field 36
-    Until: 24:00, 18.89;     !- Field 38
+    Until: 03:00,15.56,      !- Field 22
+    Until: 04:00,18.89,      !- Field 24
+    Until: 05:00,18.89,      !- Field 26
+    Until: 24:00,18.89,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,15.56,      !- Field 31
+    Until: 04:00,18.89,      !- Field 33
+    Until: 05:00,18.89,      !- Field 35
+    Until: 24:00,18.89;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     CLGSETP_KITCHEN_SCH_YES_OPTIMUM,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: SummerDesignDay,    !- Field 2
-    Until: 05:00, 30.00,     !- Field 4
-    Until: 06:00, 28.33,     !- Field 6
-    Until: 24:00, 26.11,     !- Field 8
+    Until: 05:00,30.00,      !- Field 3
+    Until: 06:00,28.33,      !- Field 5
+    Until: 24:00,26.11,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 30.0,      !- Field 11
-    Until: 04:00, 28.9,      !- Field 13
-    Until: 05:00, 27.8,      !- Field 15
-    Until: 24:00, 26.11,     !- Field 17
+    Until: 03:00,30.0,       !- Field 10
+    Until: 04:00,28.9,       !- Field 12
+    Until: 05:00,27.8,       !- Field 14
+    Until: 24:00,26.11,      !- Field 16
     For: Saturday,           !- Field 18
-    Until: 03:00, 30.00,     !- Field 20
-    Until: 04:00, 28.9,      !- Field 22
-    Until: 05:00, 27.8,      !- Field 24
-    Until: 24:00, 26.11,     !- Field 26
+    Until: 03:00,30.00,      !- Field 19
+    Until: 04:00,28.9,       !- Field 21
+    Until: 05:00,27.8,       !- Field 23
+    Until: 24:00,26.11,      !- Field 25
     For: WinterDesignDay,    !- Field 27
-    Until: 24:00, 30.00,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 30.00,     !- Field 32
-    Until: 04:00, 28.9,      !- Field 34
-    Until: 05:00, 27.8,      !- Field 36
-    Until: 24:00, 26.11;     !- Field 38
+    Until: 24:00,30.00,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,30.00,      !- Field 31
+    Until: 04:00,28.9,       !- Field 33
+    Until: 05:00,27.8,       !- Field 35
+    Until: 24:00,26.11;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     CLGSETP_KITCHEN_SCH_NO_OPTIMUM,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: SummerDesignDay,    !- Field 2
-    Until: 05:00, 30.00,     !- Field 4
-    Until: 06:00, 28.33,     !- Field 6
-    Until: 24:00, 26.11,     !- Field 8
+    Until: 05:00,30.00,      !- Field 3
+    Until: 06:00,28.33,      !- Field 5
+    Until: 24:00,26.11,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 30.00,     !- Field 11
-    Until: 04:00, 26.11,     !- Field 13
-    Until: 05:00, 26.11,     !- Field 15
-    Until: 24:00, 26.11,     !- Field 17
+    Until: 03:00,30.00,      !- Field 10
+    Until: 04:00,26.11,      !- Field 12
+    Until: 05:00,26.11,      !- Field 14
+    Until: 24:00,26.11,      !- Field 16
     For: Saturday,           !- Field 18
-    Until: 03:00, 30.00,     !- Field 20
-    Until: 04:00, 26.11,     !- Field 22
-    Until: 05:00, 26.11,     !- Field 24
-    Until: 24:00, 26.11,     !- Field 26
+    Until: 03:00,30.00,      !- Field 19
+    Until: 04:00,26.11,      !- Field 21
+    Until: 05:00,26.11,      !- Field 23
+    Until: 24:00,26.11,      !- Field 25
     For: WinterDesignDay,    !- Field 27
-    Until: 24:00, 30.00,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 30.00,     !- Field 32
-    Until: 04:00, 26.11,     !- Field 34
-    Until: 05:00, 26.11,     !- Field 36
-    Until: 24:00, 26.11;     !- Field 38
+    Until: 24:00,30.00,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,30.00,      !- Field 31
+    Until: 04:00,26.11,      !- Field 33
+    Until: 05:00,26.11,      !- Field 35
+    Until: 24:00,26.11;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     CLGSETP_KITCHEN_SCH_NO_SETBACK,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: SummerDesignDay,    !- Field 2
-    Until: 05:00, 30.00,     !- Field 4
-    Until: 06:00, 28.33,     !- Field 6
-    Until: 24:00, 26.11,     !- Field 8
+    Until: 05:00,30.00,      !- Field 3
+    Until: 06:00,28.33,      !- Field 5
+    Until: 24:00,26.11,      !- Field 7
     For: Weekdays,           !- Field 9
-    Until: 03:00, 26.11,     !- Field 11
-    Until: 04:00, 26.11,     !- Field 13
-    Until: 05:00, 26.11,     !- Field 15
-    Until: 24:00, 26.11,     !- Field 17
+    Until: 03:00,26.11,      !- Field 10
+    Until: 04:00,26.11,      !- Field 12
+    Until: 05:00,26.11,      !- Field 14
+    Until: 24:00,26.11,      !- Field 16
     For: Saturday,           !- Field 18
-    Until: 03:00, 26.11,     !- Field 20
-    Until: 04:00, 26.11,     !- Field 22
-    Until: 05:00, 26.11,     !- Field 24
-    Until: 24:00, 26.11,     !- Field 26
+    Until: 03:00,26.11,      !- Field 19
+    Until: 04:00,26.11,      !- Field 21
+    Until: 05:00,26.11,      !- Field 23
+    Until: 24:00,26.11,      !- Field 25
     For: WinterDesignDay,    !- Field 27
-    Until: 24:00, 30.00,     !- Field 29
-    For: Sunday Holidays AllOtherDays,  !- Field 30
-    Until: 03:00, 26.11,     !- Field 32
-    Until: 04:00, 26.11,     !- Field 34
-    Until: 05:00, 26.11,     !- Field 36
-    Until: 24:00, 26.11;     !- Field 38
+    Until: 24:00,30.00,      !- Field 28
+    For: Sunday Holidays AllOtherDays, !- Field 30
+    Until: 03:00,26.11,      !- Field 31
+    Until: 04:00,26.11,      !- Field 33
+    Until: 05:00,26.11,      !- Field 35
+    Until: 24:00,26.11;      !- Field 37
 
-Schedule:Compact,
+  Schedule:Compact,
     MinOA_Sched,             !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 1.0;       !- Field 4
+    Until: 24:00,1.0;        !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     MinOA_MotorizedDamper_Sched,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekday SummerDesignDay,  !- Field 2
-    Until: 01:00, 1.0,       !- Field 4
-    Until: 06:00, 0.0,       !- Field 6
-    Until: 24:00, 1.0,       !- Field 8
-    For: Saturday WinterDesignDay,  !- Field 9
-    Until: 01:00, 1.0,       !- Field 11
-    Until: 06:00, 0.0,       !- Field 13
-    Until: 24:00, 1.0,       !- Field 15
-    For: Sunday Holidays AllOtherDays,  !- Field 16
-    Until: 01:00, 1.0,       !- Field 18
-    Until: 06:00, 0.0,       !- Field 20
-    Until: 24:00, 1.0;       !- Field 22
+    For: Weekday SummerDesignDay, !- Field 2
+    Until: 01:00,1.0,        !- Field 3
+    Until: 06:00,0.0,        !- Field 5
+    Until: 24:00,1.0,        !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 01:00,1.0,        !- Field 10
+    Until: 06:00,0.0,        !- Field 12
+    Until: 24:00,1.0,        !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 01:00,1.0,        !- Field 17
+    Until: 06:00,0.0,        !- Field 19
+    Until: 24:00,1.0;        !- Field 21
 
-Schedule:Compact,
+  Schedule:Compact,
     MinOA_FFKitch_Sched,     !- Name
     On/Off,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay,  !- Field 2
-    Until: 06:00, 0.0,       !- Field 4
-    Until: 24:00, 1.0,       !- Field 6
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 06:00,0.0,        !- Field 3
+    Until: 24:00,1.0,        !- Field 5
     For: Saturday,           !- Field 7
-    Until: 06:00, 0.0,       !- Field 9
-    Until: 24:00, 1.0,       !- Field 11
+    Until: 06:00,0.0,        !- Field 8
+    Until: 24:00,1.0,        !- Field 10
     For: WinterDesignDay,    !- Field 12
-    Until: 24:00, 1.0,       !- Field 14
-    For: Sunday Holidays AllOtherDays,  !- Field 15
-    Until: 06:00, 0.0,       !- Field 17
-    Until: 24:00, 1.0;       !- Field 19
+    Until: 24:00,1.0,        !- Field 13
+    For: Sunday Holidays AllOtherDays, !- Field 15
+    Until: 06:00,0.0,        !- Field 16
+    Until: 24:00,1.0;        !- Field 18
 
-Schedule:Compact,
+  Schedule:Compact,
     Dual Zone Control Type Sched,  !- Name
     Control Type,            !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 4;         !- Field 4
+    Until: 24:00,4;          !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     ACTIVITY_SCH,            !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 120.;      !- Field 4
+    Until: 24:00,120.;       !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     WORK_EFF_SCH,            !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 0.0;       !- Field 4
+    Until: 24:00,0.0;        !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     AIR_VELO_SCH,            !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 0.2;       !- Field 4
+    Until: 24:00,0.2;        !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     CLOTHING_SCH,            !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 04/30,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 1.0,       !- Field 4
+    Until: 24:00,1.0,        !- Field 3
     Through: 09/30,          !- Field 5
     For: AllDays,            !- Field 6
-    Until: 24:00, 0.5,       !- Field 8
+    Until: 24:00,0.5,        !- Field 7
     Through: 12/31,          !- Field 9
     For: AllDays,            !- Field 10
-    Until: 24:00, 1.0;       !- Field 12
+    Until: 24:00,1.0;        !- Field 11
 
-Schedule:Compact,
+  Schedule:Compact,
     SHADING_SCH,             !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 0.0;       !- Field 4
+    Until: 24:00,0.0;        !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen Water Equipment Latent fract sched,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 0.05;      !- Field 4
+    Until: 24:00,0.05;       !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen Water Equipment Sensible fract sched,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 0.2;       !- Field 4
+    Until: 24:00,0.2;        !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen Water Equipment Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 60.0;      !- Field 4
+    Until: 24:00,60.0;       !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen Water Equipment Hot Supply Temp Sched,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 55;        !- Field 4
+    Until: 24:00,55;         !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen_Case:1_WALKINFREEZER_CaseDefrost2aDaySched,  !- Name
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
     Interpolate:Average,     !- Field 3
-    Until: 11:00, 0,         !- Field 5
-    Until: 11:20, 1,         !- Field 7
-    Until: 23:00, 0,         !- Field 9
-    Until: 23:20, 1,         !- Field 11
-    Until: 24:00, 0;         !- Field 13
+    Until: 11:00,0,          !- Field 4
+    Until: 11:20,1,          !- Field 6
+    Until: 23:00,0,          !- Field 8
+    Until: 23:20,1,          !- Field 10
+    Until: 24:00,0;          !- Field 12
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen_Case:1_WALKINFREEZER_CaseDripDown2aDaySched,  !- Name
     ON/OFF,                  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
     Interpolate:Average,     !- Field 3
-    Until: 11:00, 0,         !- Field 5
-    Until: 11:30, 1,         !- Field 7
-    Until: 23:00, 0,         !- Field 9
-    Until: 23:30, 1,         !- Field 11
-    Until: 24:00, 0;         !- Field 13
+    Until: 11:00,0,          !- Field 4
+    Until: 11:30,1,          !- Field 6
+    Until: 23:00,0,          !- Field 8
+    Until: 23:30,1,          !- Field 10
+    Until: 24:00,0;          !- Field 12
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen_Case:1_WALKINFREEZER_WalkInStockingSched,  !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Tuesday Friday,     !- Field 2
-    Until: 4:00, 0.0,        !- Field 4
-    Until: 5:00, 725.0,      !- Field 6
-    Until: 6:00, 417.0,      !- Field 8
-    Until: 7:00, 290.0,      !- Field 10
-    Until: 24:00, 0.0,       !- Field 12
+    Until: 4:00,0.0,         !- Field 3
+    Until: 5:00,725.0,       !- Field 5
+    Until: 6:00,417.0,       !- Field 7
+    Until: 7:00,290.0,       !- Field 9
+    Until: 24:00,0.0,        !- Field 11
     For: AllOtherDays,       !- Field 13
-    Until: 4:00, 0.0,        !- Field 15
-    Until: 5:00, 125.0,      !- Field 17
-    Until: 6:00, 117.0,      !- Field 19
-    Until: 7:00, 90.0,       !- Field 21
-    Until: 19:00, 0.0,       !- Field 23
-    Until: 20:00, 125.0,     !- Field 25
-    Until: 21:00, 117.0,     !- Field 27
-    Until: 22:00, 90.0,      !- Field 29
-    Until: 24:00, 0.0;       !- Field 31
+    Until: 4:00,0.0,         !- Field 14
+    Until: 5:00,125.0,       !- Field 16
+    Until: 6:00,117.0,       !- Field 18
+    Until: 7:00,90.0,        !- Field 20
+    Until: 19:00,0.0,        !- Field 22
+    Until: 20:00,125.0,      !- Field 24
+    Until: 21:00,117.0,      !- Field 26
+    Until: 22:00,90.0,       !- Field 28
+    Until: 24:00,0.0;        !- Field 30
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen_Case:1_WALKINFREEZER_CaseCreditReduxSched,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
     Interpolate:No,          !- Field 3
-    Until: 7:00, 0.2,        !- Field 5
-    Until: 21:00, 0.4,       !- Field 7
-    Until: 24:00, 0.2;       !- Field 9
+    Until: 7:00,0.2,         !- Field 4
+    Until: 21:00,0.4,        !- Field 6
+    Until: 24:00,0.2;        !- Field 8
 
-Schedule:Compact,
+  Schedule:Compact,
     Kitchen_Case:2_SELFCONTAINEDDISPLAYCASE_CaseStockingSched,  !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For:AllDays,             !- Field 2
-    Until: 6:00, 0.0,        !- Field 4
-    Until: 7:00, 50.0,       !- Field 6
-    Until: 9:00, 70.0,       !- Field 8
-    Until: 10:00, 80.0,      !- Field 10
-    Until: 11:00, 70.0,      !- Field 12
-    Until: 13:00, 50.0,      !- Field 14
-    Until: 14:00, 80.0,      !- Field 16
-    Until: 15:00, 90.0,      !- Field 18
-    Until: 16:00, 80.0,      !- Field 20
-    Until: 24:00, 0.0;       !- Field 22
+    Until: 6:00,0.0,         !- Field 3
+    Until: 7:00,50.0,        !- Field 5
+    Until: 9:00,70.0,        !- Field 7
+    Until: 10:00,80.0,       !- Field 9
+    Until: 11:00,70.0,       !- Field 11
+    Until: 13:00,50.0,       !- Field 13
+    Until: 14:00,80.0,       !- Field 15
+    Until: 15:00,90.0,       !- Field 17
+    Until: 16:00,80.0,       !- Field 19
+    Until: 24:00,0.0;        !- Field 21
 
-Schedule:Compact,
+  Schedule:Compact,
     SHWSys1-Loop-Temp-Schedule,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 60;        !- Field 4
+    Until: 24:00,60;         !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     SHWSys1 Water Heater Setpoint Temperature Schedule Name,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 60.0;      !- Field 4
+    Until: 24:00,60.0;       !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     SHWSys1 Water Heater Ambient Temperature Schedule Name,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00, 22.0;      !- Field 4
+    Until: 24:00,22.0;       !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     walkin_occ_lght_SCH,     !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekday,            !- Field 2
-    Until: 5:00, 0.15,       !- Field 4
-    Until: 6:00, 0.104,      !- Field 6
-    Until: 8:00, 0.208,      !- Field 8
-    Until: 10:00, 0.312,     !- Field 10
-    Until: 22:00, 0.468,     !- Field 12
-    Until: 23:00, 0.26,      !- Field 14
-    Until: 24:00, 0.156,     !- Field 16
+    Until: 5:00,0.15,        !- Field 3
+    Until: 6:00,0.104,       !- Field 5
+    Until: 8:00,0.208,       !- Field 7
+    Until: 10:00,0.312,      !- Field 9
+    Until: 22:00,0.468,      !- Field 11
+    Until: 23:00,0.26,       !- Field 13
+    Until: 24:00,0.156,      !- Field 15
     For: Saturday,           !- Field 17
-    Until: 1:00, 0.2,        !- Field 19
-    Until: 6:00, 0.15,       !- Field 21
-    Until: 8:00, 0.156,      !- Field 23
-    Until: 10:00, 0.312,     !- Field 25
-    Until: 17:00, 0.416,     !- Field 27
-    Until: 22:00, 0.468,     !- Field 29
-    Until: 23:00, 0.26,      !- Field 31
-    Until: 24:00, 0.156,     !- Field 33
+    Until: 1:00,0.2,         !- Field 18
+    Until: 6:00,0.15,        !- Field 20
+    Until: 8:00,0.156,       !- Field 22
+    Until: 10:00,0.312,      !- Field 24
+    Until: 17:00,0.416,      !- Field 26
+    Until: 22:00,0.468,      !- Field 28
+    Until: 23:00,0.26,       !- Field 30
+    Until: 24:00,0.156,      !- Field 32
     For: SummerDesignDay,    !- Field 34
-    Until: 24:00, 1,         !- Field 36
+    Until: 24:00,1,          !- Field 35
     For: WinterDesignDay,    !- Field 37
-    Until: 24:00, 0,         !- Field 39
-    For: Sunday Holidays AllOtherDays,  !- Field 40
-    Until: 1:00, 0.2,        !- Field 42
-    Until: 6:00, 0.15,       !- Field 44
-    Until: 8:00, 0.156,      !- Field 46
-    Until: 10:00, 0.260,     !- Field 48
-    Until: 16:00, 0.364,     !- Field 50
-    Until: 22:00, 0.312,     !- Field 52
-    Until: 23:00, 0.26,      !- Field 54
-    Until: 24:00, 0.156;     !- Field 56
+    Until: 24:00,0,          !- Field 38
+    For: Sunday Holidays AllOtherDays, !- Field 40
+    Until: 1:00,0.2,         !- Field 41
+    Until: 6:00,0.15,        !- Field 43
+    Until: 8:00,0.156,       !- Field 45
+    Until: 10:00,0.260,      !- Field 47
+    Until: 16:00,0.364,      !- Field 49
+    Until: 22:00,0.312,      !- Field 51
+    Until: 23:00,0.26,       !- Field 53
+    Until: 24:00,0.156;      !- Field 55
 
-Schedule:Compact,
+  Schedule:Compact,
     Exterior_lighting_schedule_a,  !- Name
     fraction,                !- Schedule Type Limits Name
     Through:12/31,           !- Field 1
     For:AllDays,             !- Field 2
-    Until: 01:00, 1,         !- Field 4
-    Until: 06:00, 0,         !- Field 6
-    Until: 24:00, 1;         !- Field 8
+    Until: 01:00,1,          !- Field 3
+    Until: 06:00,0,          !- Field 5
+    Until: 24:00,1;          !- Field 7
 
-Schedule:Compact,
+  Schedule:Compact,
     Exterior_lighting_schedule_b,  !- Name
     fraction,                !- Schedule Type Limits Name
     Through:12/31,           !- Field 1
     For:AllDays,             !- Field 2
-    Until: 01:00, 1,         !- Field 4
-    Until: 06:00, 0.7,       !- Field 6
-    Until: 24:00, 1;         !- Field 8
+    Until: 01:00,1,          !- Field 3
+    Until: 06:00,0.7,        !- Field 5
+    Until: 24:00,1;          !- Field 7
 
-Schedule:Compact,
+  Schedule:Compact,
     Exterior_lighting_schedule_a_IECC2015,  !- Name
     fraction,                !- Schedule Type Limits Name
     Through:12/31,           !- Field 1
-    For:Weekdays SummerDesignDay,  !- Field 2
-    Until: 01:00, 1,         !- Field 4
-    Until: 06:00, 0,         !- Field 6
-    Until: 24:00, 1,         !- Field 8
+    For:Weekdays SummerDesignDay, !- Field 2
+    Until: 01:00,1,          !- Field 3
+    Until: 06:00,0,          !- Field 5
+    Until: 24:00,1,          !- Field 7
     For:Saturdays,           !- Field 9
-    Until: 01:00, 1,         !- Field 11
-    Until: 06:00, 0,         !- Field 13
-    Until: 24:00, 1,         !- Field 15
+    Until: 01:00,1,          !- Field 10
+    Until: 06:00,0,          !- Field 12
+    Until: 24:00,1,          !- Field 14
     For:AllOtherDays,        !- Field 16
-    Until: 01:00, 1,         !- Field 18
-    Until: 06:00, 0,         !- Field 20
-    Until: 24:00, 1;         !- Field 22
+    Until: 01:00,1,          !- Field 17
+    Until: 06:00,0,          !- Field 19
+    Until: 24:00,1;          !- Field 21
 
-Schedule:Compact,
+  Schedule:Compact,
     Exterior_lighting_schedule_b_2016,  !- Name
     fraction,                !- Schedule Type Limits Name
     Through:12/31,           !- Field 1
     For:AllDays,             !- Field 2
-    Until: 06:00, 0.5,       !- Field 4
-    Until: 24:00, 1;         !- Field 6
+    Until: 06:00,0.5,        !- Field 3
+    Until: 24:00,1;          !- Field 5
 
-Schedule:Compact,
+                             !- Field 4
+                             !- Field 8
+                             !- Field 11
+                             !- Field 15
+                             !- Field 18
+
+  Schedule:Compact,
     Kitchen Exhaust Fan Balanced Exhaust Fraction Schedule,  !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekday SummerDesignDay,  !- Field 2
-    Until: 01:00, 0.26715046324248,
-                             !- Field 4
-    Until: 05:00, 0.0,       !- Field 6
-    Until: 24:00, 0.26715046324248,
-                             !- Field 8
-    For: Saturday WinterDesignDay,  !- Field 9
-    Until: 01:00, 0.26715046324248,
-                             !- Field 11
-    Until: 05:00, 0.0,       !- Field 13
-    Until: 24:00, 0.26715046324248,
-                             !- Field 15
-    For: Sunday Holidays AllOtherDays,  !- Field 16
-    Until: 01:00, 0.26715046324248,
-                             !- Field 18
-    Until: 05:00, 0.0,       !- Field 20
-    Until: 24:00, 0.26715046324248;
+    For: Weekday SummerDesignDay, !- Field 2
+    Until: 01:00,0.26715046324248, !- Field 3
+    Until: 05:00,0.0,        !- Field 5
+    Until: 24:00,0.26715046324248, !- Field 7
+    For: Saturday WinterDesignDay, !- Field 9
+    Until: 01:00,0.26715046324248, !- Field 10
+    Until: 05:00,0.0,        !- Field 12
+    Until: 24:00,0.26715046324248, !- Field 14
+    For: Sunday Holidays AllOtherDays, !- Field 16
+    Until: 01:00,0.26715046324248, !- Field 17
+    Until: 05:00,0.0,        !- Field 19
+    Until: 24:00,0.26715046324248; !- Field 21
+
                              !- Field 22
-
-
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:CONSTANT ===========
 
-Schedule:Constant,SZ_system_OA_Max_Frac_SCH,Fraction,0.75;
+  Schedule:Constant,SZ_system_OA_Max_Frac_SCH,Fraction,0.75;
 
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
 
-
-Material,
+  Material,
     Std Wood 6inch,          !- Name
     MediumSmooth,            !- Roughness
     0.15,                    !- Thickness {m}
@@ -1553,7 +1538,7 @@ Material,
     0.7000000,               !- Solar Absorptance
     0.7000000;               !- Visible Absorptance
 
-Material,
+  Material,
     AC02 Acoustic Ceiling,   !- Name
     MediumSmooth,            !- Roughness
     1.2700000E-02,           !- Thickness {m}
@@ -1564,7 +1549,7 @@ Material,
     0.7000000,               !- Solar Absorptance
     0.2000000;               !- Visible Absorptance
 
-Material,
+  Material,
     F07 25mm stucco,         !- Name
     Smooth,                  !- Roughness
     0.0254,                  !- Thickness {m}
@@ -1575,7 +1560,7 @@ Material,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material,
+  Material,
     F08 Metal surface,       !- Name
     Smooth,                  !- Roughness
     0.0008,                  !- Thickness {m}
@@ -1583,7 +1568,7 @@ Material,
     7824,                    !- Density {kg/m3}
     500;                     !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     F08 Metal roof surface,  !- Name
     Smooth,                  !- Roughness
     0.0008,                  !- Thickness {m}
@@ -1593,7 +1578,7 @@ Material,
     0.9,                     !- Thermal Absorptance
     0.7;                     !- Solar Absorptance
 
-Material,
+  Material,
     F12 Asphalt shingles,    !- Name
     VeryRough,               !- Roughness
     0.0032,                  !- Thickness {m}
@@ -1603,7 +1588,7 @@ Material,
     0.9,                     !- Thermal Absorptance
     0.7;                     !- Solar Absorptance
 
-Material,
+  Material,
     F13 Built-up roofing,    !- Name
     Rough,                   !- Roughness
     0.0095,                  !- Thickness {m}
@@ -1613,7 +1598,7 @@ Material,
     0.9,                     !- Thermal Absorptance
     0.7;                     !- Solar Absorptance
 
-Material,
+  Material,
     G01 13mm gypsum board,   !- Name
     Smooth,                  !- Roughness
     0.0127,                  !- Thickness {m}
@@ -1624,7 +1609,7 @@ Material,
     0.7000,                  !- Solar Absorptance
     0.5000;                  !- Visible Absorptance
 
-Material,
+  Material,
     G01 16mm gypsum board,   !- Name
     MediumSmooth,            !- Roughness
     0.0159,                  !- Thickness {m}
@@ -1632,7 +1617,7 @@ Material,
     800,                     !- Density {kg/m3}
     1090;                    !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     G02 16mm plywood,        !- Name
     Smooth,                  !- Roughness
     0.0159,                  !- Thickness {m}
@@ -1640,7 +1625,7 @@ Material,
     544,                     !- Density {kg/m3}
     1210;                    !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     M14 150mm heavyweight concrete roof,  !- Name
     MediumRough,             !- Roughness
     0.1524,                  !- Thickness {m}
@@ -1648,7 +1633,7 @@ Material,
     2322,                    !- Density {kg/m3}
     832;                     !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     100mm Normalweight concrete wall,  !- Name
     MediumRough,             !- Roughness
     0.1016,                  !- Thickness {m}
@@ -1656,7 +1641,7 @@ Material,
     2322,                    !- Density {kg/m3}
     832;                     !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     200mm Normalweight concrete wall,  !- Name
     MediumRough,             !- Roughness
     0.2032,                  !- Thickness {m}
@@ -1664,7 +1649,7 @@ Material,
     2322,                    !- Density {kg/m3}
     832;                     !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     100mm Normalweight concrete floor,  !- Name
     MediumRough,             !- Roughness
     0.1016,                  !- Thickness {m}
@@ -1672,7 +1657,7 @@ Material,
     2322,                    !- Density {kg/m3}
     832;                     !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     150mm Normalweight concrete floor,  !- Name
     MediumRough,             !- Roughness
     0.1524,                  !- Thickness {m}
@@ -1680,7 +1665,7 @@ Material,
     2322,                    !- Density {kg/m3}
     832;                     !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     200mm Normalweight concrete floor,  !- Name
     MediumRough,             !- Roughness
     0.2032,                  !- Thickness {m}
@@ -1688,7 +1673,7 @@ Material,
     2322,                    !- Density {kg/m3}
     832;                     !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     M10 200mm concrete block wall,  !- Name
     MediumRough,             !- Roughness
     0.2032,                  !- Thickness {m}
@@ -1696,7 +1681,7 @@ Material,
     800,                     !- Density {kg/m3}
     832;                     !- Specific Heat {J/kg-K}
 
-Material,
+  Material,
     M10 200mm concrete block basement wall,  !- Name
     MediumRough,             !- Roughness
     0.2032,                  !- Thickness {m}
@@ -1704,10 +1689,9 @@ Material,
     1842,                    !- Density {kg/m3}
     912;                     !- Specific Heat {J/kg-K}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL:NOMASS ===========
 
-Material:NoMass,
+  Material:NoMass,
     Opaque Door panel_con,   !- Name
     MediumRough,             !- Roughness
     0.475963827,             !- Thermal Resistance {m2-K/W}
@@ -1715,7 +1699,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     CP02 CARPET PAD,         !- Name
     VeryRough,               !- Roughness
     0.21648,                 !- Thermal Resistance {m2-K/W}
@@ -1723,14 +1707,14 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.8;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Air_Wall_Material,       !- Name
     Rough,                   !- Roughness
     0.2079491,               !- Thermal Resistance {m2-K/W}
     0.9,                     !- Thermal Absorptance
     0.7;                     !- Solar Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Nonres_Roof_Insulation,  !- Name
     MediumSmooth,            !- Roughness
     8.09877526034121,        !- Thermal Resistance {m2-K/W}
@@ -1738,7 +1722,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Res_Roof_Insulation,     !- Name
     MediumSmooth,            !- Roughness
     0.0299387330245182,      !- Thermal Resistance {m2-K/W}
@@ -1746,7 +1730,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Semiheated_Roof_Insulation,  !- Name
     MediumSmooth,            !- Roughness
     0.0299387330245182,      !- Thermal Resistance {m2-K/W}
@@ -1754,7 +1738,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Nonres_Exterior_Wall_Insulation,  !- Name
     MediumSmooth,            !- Roughness
     3.06957956753551,        !- Thermal Resistance {m2-K/W}
@@ -1762,7 +1746,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Res_Exterior_Wall_Insulation,  !- Name
     MediumSmooth,            !- Roughness
     0.0299387330245182,      !- Thermal Resistance {m2-K/W}
@@ -1770,7 +1754,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Semiheated_Exterior_Wall_Insulation,  !- Name
     MediumSmooth,            !- Roughness
     0.0299387330245182,      !- Thermal Resistance {m2-K/W}
@@ -1778,7 +1762,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Nonres_Floor_Insulation, !- Name
     MediumSmooth,            !- Roughness
     0.0299387330245182,      !- Thermal Resistance {m2-K/W}
@@ -1786,7 +1770,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Res_Floor_Insulation,    !- Name
     MediumSmooth,            !- Roughness
     0.0299387330245182,      !- Thermal Resistance {m2-K/W}
@@ -1794,7 +1778,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Semiheated_Floor_Insulation,  !- Name
     MediumSmooth,            !- Roughness
     0.0299387330245182,      !- Thermal Resistance {m2-K/W}
@@ -1802,7 +1786,7 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-Material:NoMass,
+  Material:NoMass,
     Std Opaque Door Panel,   !- Name
     MediumRough,             !- Roughness
     0.123456790123457,       !- Thermal Resistance {m2-K/W}
@@ -1810,222 +1794,219 @@ Material:NoMass,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WINDOWMATERIAL:SIMPLEGLAZINGSYSTEM ===========
 
-WindowMaterial:SimpleGlazingSystem,
+  WindowMaterial:SimpleGlazingSystem,
     Nonres Window Glazing Layer,  !- Name
     2.0441736,               !- U-Factor {W/m2-K}
     0.38,                    !- Solar Heat Gain Coefficient
     0.418;                   !- Visible Transmittance
 
-WindowMaterial:SimpleGlazingSystem,
+  WindowMaterial:SimpleGlazingSystem,
     Nonres East West Glazing Layer,  !- Name
     2.0441736,               !- U-Factor {W/m2-K}
     0.38,                    !- Solar Heat Gain Coefficient
     0.418;                   !- Visible Transmittance
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
-Construction,
+  Construction,
     Swinging Door_con,       !- Name
     Opaque Door panel_con;   !- Outside Layer
 
-Construction,
+  Construction,
     InteriorFurnishings,     !- Name
     Std Wood 6inch;          !- Outside Layer
 
-Construction,
+  Construction,
     Air_Wall,                !- Name
     Air_Wall_Material;       !- Outside Layer
 
-Construction,
+  Construction,
     DropCeiling,             !- Name
     AC02 Acoustic Ceiling;   !- Outside Layer
 
-Construction,
+  Construction,
     OpaqueDoor,              !- Name
     Std Opaque Door Panel;   !- Outside Layer
 
-Construction,
+  Construction,
     AtticRoofDeck,           !- Name
     F12 Asphalt shingles,    !- Outside Layer
     G02 16mm plywood;        !- Layer 2
 
-Construction,
+  Construction,
     int_wall,                !- Name
     G01 13mm gypsum board,   !- Outside Layer
     G01 13mm gypsum board;   !- Layer 2
 
-Construction,
+  Construction,
     ext_slab_8in_with_carpet,!- Name
     200mm Normalweight concrete floor,  !- Outside Layer
     CP02 CARPET PAD;         !- Layer 2
 
-Construction,
+  Construction,
     ext_slab_8in,            !- Name
     200mm Normalweight concrete floor;  !- Outside Layer
 
-Construction,
+  Construction,
     ext_slab_6in_with_carpet,!- Name
     150mm Normalweight concrete floor,  !- Outside Layer
     CP02 CARPET PAD;         !- Layer 2
 
-Construction,
+  Construction,
     ext_slab_6in,            !- Name
     150mm Normalweight concrete floor;  !- Outside Layer
 
-Construction,
+  Construction,
     int_slab_floor,          !- Name
     100mm Normalweight concrete floor,  !- Outside Layer
     CP02 CARPET PAD;         !- Layer 2
 
-Construction,
+  Construction,
     int_slab_ceiling,        !- Name
     CP02 CARPET PAD,         !- Outside Layer
     100mm Normalweight concrete floor;  !- Layer 2
 
-Construction,
+  Construction,
     basement_wall,           !- Name
     M10 200mm concrete block basement wall;  !- Outside Layer
 
-Construction,
+  Construction,
     int_wood_floor,          !- Name
     AC02 Acoustic Ceiling,   !- Outside Layer
     G02 16mm plywood,        !- Layer 2
     CP02 CARPET PAD;         !- Layer 3
 
-Construction,
+  Construction,
     ext_soffit_floor,        !- Name
     G02 16mm plywood;        !- Outside Layer
 
-Construction,
+  Construction,
     nonres_roof,             !- Name
     Nonres_Roof_Insulation,  !- Outside Layer
     G01 16mm gypsum board;   !- Layer 2
 
-Construction,
+  Construction,
     res_roof,                !- Name
     Res_Roof_Insulation,     !- Outside Layer
     G01 16mm gypsum board;   !- Layer 2
 
-Construction,
+  Construction,
     semiheated_roof,         !- Name
     Semiheated_Roof_Insulation,  !- Outside Layer
     G01 16mm gypsum board;   !- Layer 2
 
-Construction,
+  Construction,
     nonres_roof_floor,       !- Name
     G01 16mm gypsum board,   !- Outside Layer
     Nonres_Roof_Insulation;  !- Layer 2
 
-Construction,
+  Construction,
     res_roof_floor,          !- Name
     G01 16mm gypsum board,   !- Outside Layer
     Res_Roof_Insulation;     !- Layer 2
 
-Construction,
+  Construction,
     semiheated_roof_floor,   !- Name
     G01 16mm gypsum board,   !- Outside Layer
     Semiheated_Roof_Insulation;  !- Layer 2
 
-Construction,
+  Construction,
     nonres_ext_wall,         !- Name
     F07 25mm stucco,         !- Outside Layer
     G01 16mm gypsum board,   !- Layer 2
     Nonres_Exterior_Wall_Insulation,  !- Layer 3
     G01 16mm gypsum board;   !- Layer 4
 
-Construction,
+  Construction,
     res_ext_wall,            !- Name
     F07 25mm stucco,         !- Outside Layer
     G01 16mm gypsum board,   !- Layer 2
     Res_Exterior_Wall_Insulation,  !- Layer 3
     G01 16mm gypsum board;   !- Layer 4
 
-Construction,
+  Construction,
     semiheated_ext_wall,     !- Name
     F07 25mm stucco,         !- Outside Layer
     G01 16mm gypsum board,   !- Layer 2
     Semiheated_Exterior_Wall_Insulation,  !- Layer 3
     G01 16mm gypsum board;   !- Layer 4
 
-Construction,
+  Construction,
     nonres_floor,            !- Name
     Nonres_Floor_Insulation, !- Outside Layer
     100mm Normalweight concrete floor,  !- Layer 2
     CP02 CARPET PAD;         !- Layer 3
 
-Construction,
+  Construction,
     res_floor,               !- Name
     Res_Floor_Insulation,    !- Outside Layer
     100mm Normalweight concrete floor,  !- Layer 2
     CP02 CARPET PAD;         !- Layer 3
 
-Construction,
+  Construction,
     semiheated_floor,        !- Name
     Semiheated_Floor_Insulation,  !- Outside Layer
     100mm Normalweight concrete floor,  !- Layer 2
     CP02 CARPET PAD;         !- Layer 3
 
-Construction,
+  Construction,
     nonres_floor_ceiling,    !- Name
     CP02 CARPET PAD,         !- Outside Layer
     100mm Normalweight concrete floor,  !- Layer 2
     Nonres_Floor_Insulation; !- Layer 3
 
-Construction,
+  Construction,
     res_floor_ceiling,       !- Name
     CP02 CARPET PAD,         !- Outside Layer
     100mm Normalweight concrete floor,  !- Layer 2
     Res_Floor_Insulation;    !- Layer 3
 
-Construction,
+  Construction,
     semiheated_floor_ceiling,!- Name
     CP02 CARPET PAD,         !- Outside Layer
     100mm Normalweight concrete floor,  !- Layer 2
     Semiheated_Floor_Insulation;  !- Layer 3
 
-Construction,
+  Construction,
     NonresWindow_U_0.36_SHGC_0.38,  !- Name
     Nonres Window Glazing Layer;  !- Outside Layer
 
-Construction,
+  Construction,
     NonreseastwestWindow_U_0.36_SHGC_0.38,  !- Name
     Nonres East West Glazing Layer;  !- Outside Layer
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION:FFACTORGROUNDFLOOR ===========
 
-Construction:FfactorGroundFloor,
+  Construction:FfactorGroundFloor,
     Dining_Floor_Ffactor,    !- Name
     0.90012,                 !- F-Factor {W/m-K}
     116.17147592,            !- Area {m2}
     30.4856;                 !- PerimeterExposed {m}
 
-Construction:FfactorGroundFloor,
+  Construction:FfactorGroundFloor,
     Kitchen_Floor_Ffactor,   !- Name
     0.90012,                 !- F-Factor {W/m-K}
     116.17147592,            !- Area {m2}
     30.4856;                 !- PerimeterExposed {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========
 
-GlobalGeometryRules,
+  GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
     Relative,                !- Coordinate System
     Relative;                !- Daylighting Reference Point Coordinate System
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 
-Zone,
+  Zone,
     Dining,                  !- Name
     0.0000,                  !- Direction of Relative North {deg}
-    0.0000, 0.0000, 0.0000,             !- X,Y,Z  {m}
+    0.0000,                  !- X Origin {m}
+    0.0000,                  !- Y Origin {m}
+    0.0000,                  !- Z Origin {m}
     1,                       !- Type
     1.0000,                  !- Multiplier
     3.0488,                  !- Ceiling Height {m}
@@ -2035,10 +2016,12 @@ Zone,
     ,                        !- Zone Outside Convection Algorithm
     Yes;                     !- Part of Total Floor Area
 
-Zone,
+  Zone,
     Kitchen,                 !- Name
     0.0000,                  !- Direction of Relative North {deg}
-    0.0000, 0.0000, 0.0000,             !- X,Y,Z  {m}
+    0.0000,                  !- X Origin {m}
+    0.0000,                  !- Y Origin {m}
+    0.0000,                  !- Z Origin {m}
     1,                       !- Type
     1.0000,                  !- Multiplier
     3.0488,                  !- Ceiling Height {m}
@@ -2048,10 +2031,12 @@ Zone,
     ,                        !- Zone Outside Convection Algorithm
     Yes;                     !- Part of Total Floor Area
 
-Zone,
+  Zone,
     attic,                   !- Name
     0.0000,                  !- Direction of Relative North {deg}
-    0.0000, 0.0000, 3.0488,             !- X,Y,Z  {m}
+    0.0000,                  !- X Origin {m}
+    0.0000,                  !- Y Origin {m}
+    3.0488,                  !- Z Origin {m}
     1,                       !- Type
     1.0000,                  !- Multiplier
     -9999.0000,              !- Ceiling Height {m}
@@ -2061,10 +2046,9 @@ Zone,
     ,                        !- Zone Outside Convection Algorithm
     No;                      !- Part of Total Floor Area
 
-
 !-   ===========  ALL OBJECTS IN CLASS: BUILDINGSURFACE:DETAILED ===========
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Dining_Wall_East,        !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
@@ -2075,12 +2059,12 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2428, 0.0000, 3.0488,            !- X,Y,Z  1 {m}
-    15.2428, 0.0000, 0.0000,            !- X,Y,Z  2 {m}
-    15.2428, 7.6214, 0.0000,            !- X,Y,Z  3 {m}
-    15.2428, 7.6214, 3.0488;            !- X,Y,Z  4 {m}
+    15.2428,0.0000,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2428,0.0000,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.2428,7.6214,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.2428,7.6214,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Dining_Wall_South,       !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
@@ -2091,12 +2075,12 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0000, 0.0000, 3.0488,             !- X,Y,Z  1 {m}
-    0.0000, 0.0000, 0.0000,             !- X,Y,Z  2 {m}
-    15.2428, 0.0000, 0.0000,            !- X,Y,Z  3 {m}
-    15.2428, 0.0000, 3.0488;            !- X,Y,Z  4 {m}
+    0.0000,0.0000,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,0.0000,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.2428,0.0000,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.2428,0.0000,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Dining_Wall_West,        !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
@@ -2107,12 +2091,12 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0000, 7.6214, 3.0488,             !- X,Y,Z  1 {m}
-    0.0000, 7.6214, 0.0000,             !- X,Y,Z  2 {m}
-    0.0000, 0.0000, 0.0000,             !- X,Y,Z  3 {m}
-    0.0000, 0.0000, 3.0488;             !- X,Y,Z  4 {m}
+    0.0000,7.6214,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,7.6214,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,0.0000,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000,0.0000,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Dining_Ceiling,          !- Name
     Ceiling,                 !- Surface Type
     nonres_roof,             !- Construction Name
@@ -2123,12 +2107,12 @@ BuildingSurface:Detailed,
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0000, 7.6214, 3.0488,             !- X,Y,Z  1 {m}
-    0.0000, 0.0000, 3.0488,             !- X,Y,Z  2 {m}
-    15.2428, 0.0000, 3.0488,            !- X,Y,Z  3 {m}
-    15.2428, 7.6214, 3.0488;            !- X,Y,Z  4 {m}
+    0.0000,7.6214,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,0.0000,3.0488,  !- X,Y,Z ==> Vertex 2 {m}
+    15.2428,0.0000,3.0488,  !- X,Y,Z ==> Vertex 3 {m}
+    15.2428,7.6214,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Dining_Floor,            !- Name
     Floor,                   !- Surface Type
     Dining_Floor_Ffactor,    !- Construction Name
@@ -2139,12 +2123,12 @@ BuildingSurface:Detailed,
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2428, 7.6214, 0.0000,            !- X,Y,Z  1 {m}
-    15.2428, 0.0000, 0.0000,            !- X,Y,Z  2 {m}
-    0.0000, 0.0000, 0.0000,             !- X,Y,Z  3 {m}
-    0.0000, 7.6214, 0.0000;             !- X,Y,Z  4 {m}
+    15.2428,7.6214,0.0000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2428,0.0000,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,0.0000,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000,7.6214,0.0000;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Dining_Wall_North,       !- Name
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
@@ -2155,12 +2139,12 @@ BuildingSurface:Detailed,
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2428, 7.6214, 3.0488,            !- X,Y,Z  1 {m}
-    15.2428, 7.6214, 0.0000,            !- X,Y,Z  2 {m}
-    0.0000, 7.6214, 0.0000,             !- X,Y,Z  3 {m}
-    0.0000, 7.6214, 3.0488;             !- X,Y,Z  4 {m}
+    15.2428,7.6214,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2428,7.6214,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,7.6214,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000,7.6214,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Kitchen_Wall_North,      !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
@@ -2171,12 +2155,12 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2428, 15.2428, 3.0488,           !- X,Y,Z  1 {m}
-    15.2428, 15.2428, 0.0000,           !- X,Y,Z  2 {m}
-    0.0000, 15.2428, 0.0000,            !- X,Y,Z  3 {m}
-    0.0000, 15.2428, 3.0488;            !- X,Y,Z  4 {m}
+    15.2428,15.2428,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2428,15.2428,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,15.2428,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000,15.2428,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Kitchen_Wall_East,       !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
@@ -2187,12 +2171,12 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2428, 7.6214, 3.0488,            !- X,Y,Z  1 {m}
-    15.2428, 7.6214, 0.0000,            !- X,Y,Z  2 {m}
-    15.2428, 15.2428, 0.0000,           !- X,Y,Z  3 {m}
-    15.2428, 15.2428, 3.0488;           !- X,Y,Z  4 {m}
+    15.2428,7.6214,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2428,7.6214,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.2428,15.2428,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.2428,15.2428,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Kitchen_Wall_West,       !- Name
     Wall,                    !- Surface Type
     nonres_ext_wall,         !- Construction Name
@@ -2203,12 +2187,12 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0000, 15.2428, 3.0488,            !- X,Y,Z  1 {m}
-    0.0000, 15.2428, 0.0000,            !- X,Y,Z  2 {m}
-    0.0000, 7.6214, 0.0000,             !- X,Y,Z  3 {m}
-    0.0000, 7.6214, 3.0488;             !- X,Y,Z  4 {m}
+    0.0000,15.2428,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,15.2428,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,7.6214,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000,7.6214,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Kitchen_Ceiling,         !- Name
     Ceiling,                 !- Surface Type
     nonres_roof,             !- Construction Name
@@ -2219,12 +2203,12 @@ BuildingSurface:Detailed,
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0000, 15.2428, 3.0488,            !- X,Y,Z  1 {m}
-    0.0000, 7.6214, 3.0488,             !- X,Y,Z  2 {m}
-    15.2428, 7.6214, 3.0488,            !- X,Y,Z  3 {m}
-    15.2428, 15.2428, 3.0488;           !- X,Y,Z  4 {m}
+    0.0000,15.2428,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,7.6214,3.0488,  !- X,Y,Z ==> Vertex 2 {m}
+    15.2428,7.6214,3.0488,  !- X,Y,Z ==> Vertex 3 {m}
+    15.2428,15.2428,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Kitchen_Floor,           !- Name
     Floor,                   !- Surface Type
     Kitchen_Floor_Ffactor,   !- Construction Name
@@ -2235,12 +2219,12 @@ BuildingSurface:Detailed,
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2428, 15.2428, 0.0000,           !- X,Y,Z  1 {m}
-    15.2428, 7.6214, 0.0000,            !- X,Y,Z  2 {m}
-    0.0000, 7.6214, 0.0000,             !- X,Y,Z  3 {m}
-    0.0000, 15.2428, 0.0000;            !- X,Y,Z  4 {m}
+    15.2428,15.2428,0.0000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2428,7.6214,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,7.6214,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000,15.2428,0.0000;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     Dining_Wall_North-PPAutoCreateOther,  !- Name
     Wall,                    !- Surface Type
     int_wall,                !- Construction Name
@@ -2251,12 +2235,12 @@ BuildingSurface:Detailed,
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0000, 7.6214, 3.0488,             !- X,Y,Z  1 {m}
-    0.0000, 7.6214, 0.0000,             !- X,Y,Z  2 {m}
-    15.2428, 7.6214, 0.0000,            !- X,Y,Z  3 {m}
-    15.2428, 7.6214, 3.0488;            !- X,Y,Z  4 {m}
+    0.0000,7.6214,3.0488,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,7.6214,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.2428,7.6214,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.2428,7.6214,3.0488;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     attic-floor-dinning,     !- Name
     Floor,                   !- Surface Type
     nonres_roof_floor,       !- Construction Name
@@ -2267,12 +2251,12 @@ BuildingSurface:Detailed,
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0000, 0.0000, 0.0000,             !- X,Y,Z  1 {m}
-    0.0000, 7.6214, 0.0000,             !- X,Y,Z  2 {m}
-    15.2428, 7.6214, 0.0000,            !- X,Y,Z  3 {m}
-    15.2428, 0.0000, 0.0000;            !- X,Y,Z  4 {m}
+    0.0000,0.0000,0.0000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,7.6214,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.2428,7.6214,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.2428,0.0000,0.0000;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     attic-floor-kitchen,     !- Name
     Floor,                   !- Surface Type
     nonres_roof_floor,       !- Construction Name
@@ -2283,12 +2267,12 @@ BuildingSurface:Detailed,
     NoWind,                  !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2428, 15.2428, 0.0000,           !- X,Y,Z  1 {m}
-    15.2428, 7.6214, 0.0000,            !- X,Y,Z  2 {m}
-    0.0000, 7.6214, 0.0000,             !- X,Y,Z  3 {m}
-    0.0000, 15.2428, 0.0000;            !- X,Y,Z  4 {m}
+    15.2428,15.2428,0.0000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2428,7.6214,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    0.0000,7.6214,0.0000,  !- X,Y,Z ==> Vertex 3 {m}
+    0.0000,15.2428,0.0000;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     west-roof,               !- Name
     Roof,                    !- Surface Type
     AtticRoofDeck,           !- Construction Name
@@ -2299,11 +2283,11 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     3,                       !- Number of Vertices
-    0.0000, 15.2428, 0.0000,            !- X,Y,Z  1 {m}
-    0.0000, 0.0000, 0.0000,             !- X,Y,Z  2 {m}
-    2.5405, 7.6214, 2.5405;             !- X,Y,Z  3 {m}
+    0.0000,15.2428,0.0000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,0.0000,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    2.5405,7.6214,2.5405;  !- X,Y,Z ==> Vertex 3 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     east-roof,               !- Name
     Roof,                    !- Surface Type
     AtticRoofDeck,           !- Construction Name
@@ -2314,11 +2298,11 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     3,                       !- Number of Vertices
-    15.2428, 0.0000, 0.0000,            !- X,Y,Z  1 {m}
-    15.2428, 15.2428, 0.0000,           !- X,Y,Z  2 {m}
-    12.7023, 7.6214, 2.5405;            !- X,Y,Z  3 {m}
+    15.2428,0.0000,0.0000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2428,15.2428,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    12.7023,7.6214,2.5405;  !- X,Y,Z ==> Vertex 3 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     north-roof,              !- Name
     Roof,                    !- Surface Type
     AtticRoofDeck,           !- Construction Name
@@ -2329,12 +2313,12 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    15.2428, 15.2428, 0.0000,           !- X,Y,Z  1 {m}
-    0.0000, 15.2428, 0.0000,            !- X,Y,Z  2 {m}
-    2.5405, 7.6214, 2.5405,             !- X,Y,Z  3 {m}
-    12.7023, 7.6214, 2.5405;            !- X,Y,Z  4 {m}
+    15.2428,15.2428,0.0000,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0000,15.2428,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    2.5405,7.6214,2.5405,  !- X,Y,Z ==> Vertex 3 {m}
+    12.7023,7.6214,2.5405;  !- X,Y,Z ==> Vertex 4 {m}
 
-BuildingSurface:Detailed,
+  BuildingSurface:Detailed,
     south-roof,              !- Name
     Roof,                    !- Surface Type
     AtticRoofDeck,           !- Construction Name
@@ -2345,15 +2329,14 @@ BuildingSurface:Detailed,
     WindExposed,             !- Wind Exposure
     AutoCalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0.0000, 0.0000, 0.0000,             !- X,Y,Z  1 {m}
-    15.2428, 0.0000, 0.0000,            !- X,Y,Z  2 {m}
-    12.7023, 7.6214, 2.5405,            !- X,Y,Z  3 {m}
-    2.5405, 7.6214, 2.5405;             !- X,Y,Z  4 {m}
-
+    0.0000,0.0000,0.0000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.2428,0.0000,0.0000,  !- X,Y,Z ==> Vertex 2 {m}
+    12.7023,7.6214,2.5405,  !- X,Y,Z ==> Vertex 3 {m}
+    2.5405,7.6214,2.5405;  !- X,Y,Z ==> Vertex 4 {m}
 
 !-   ===========  ALL OBJECTS IN CLASS: FENESTRATIONSURFACE:DETAILED ===========
 
-FenestrationSurface:Detailed,
+  FenestrationSurface:Detailed,
     Dining_Wall_East_Window, !- Name
     Window,                  !- Surface Type
     NonreseastwestWindow_U_0.36_SHGC_0.38,  !- Construction Name
@@ -2363,12 +2346,12 @@ FenestrationSurface:Detailed,
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
-    15.243, 0.2540, 1.9817,             !- X,Y,Z  1 {m}
-    15.243, 0.2540, 1.0671,             !- X,Y,Z  2 {m}
-    15.243, 7.3673, 1.0671,             !- X,Y,Z  3 {m}
-    15.243, 7.3673, 1.9817;             !- X,Y,Z  4 {m}
+    15.243,0.2540,1.9817,  !- X,Y,Z ==> Vertex 1 {m}
+    15.243,0.2540,1.0671,  !- X,Y,Z ==> Vertex 2 {m}
+    15.243,7.3673,1.0671,  !- X,Y,Z ==> Vertex 3 {m}
+    15.243,7.3673,1.9817;  !- X,Y,Z ==> Vertex 4 {m}
 
-FenestrationSurface:Detailed,
+  FenestrationSurface:Detailed,
     Dining_Wall_South_Window,!- Name
     Window,                  !- Surface Type
     NonresWindow_U_0.36_SHGC_0.38,  !- Construction Name
@@ -2378,12 +2361,12 @@ FenestrationSurface:Detailed,
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
-    0.508, 0.0000, 1.9817,              !- X,Y,Z  1 {m}
-    0.508, 0.0000, 1.0671,              !- X,Y,Z  2 {m}
-    14.735, 0.0000, 1.0671,             !- X,Y,Z  3 {m}
-    14.735, 0.0000, 1.9817;             !- X,Y,Z  4 {m}
+    0.508,0.0000,1.9817,  !- X,Y,Z ==> Vertex 1 {m}
+    0.508,0.0000,1.0671,  !- X,Y,Z ==> Vertex 2 {m}
+    14.735,0.0000,1.0671,  !- X,Y,Z ==> Vertex 3 {m}
+    14.735,0.0000,1.9817;  !- X,Y,Z ==> Vertex 4 {m}
 
-FenestrationSurface:Detailed,
+  FenestrationSurface:Detailed,
     Dining_Wall_West_Window, !- Name
     Window,                  !- Surface Type
     NonreseastwestWindow_U_0.36_SHGC_0.38,  !- Construction Name
@@ -2393,12 +2376,16 @@ FenestrationSurface:Detailed,
     ,                        !- Frame and Divider Name
     1.0000,                  !- Multiplier
     4,                       !- Number of Vertices
-    0.000, 7.3673, 1.9817,              !- X,Y,Z  1 {m}
-    0.000, 7.3673, 1.0671,              !- X,Y,Z  2 {m}
-    0.000, 0.2540, 1.0671,              !- X,Y,Z  3 {m}
-    0.000, 0.2540, 1.9817;              !- X,Y,Z  4 {m}
+    0.000,7.3673,1.9817,  !- X,Y,Z ==> Vertex 1 {m}
+    0.000,7.3673,1.0671,  !- X,Y,Z ==> Vertex 2 {m}
+    0.000,0.2540,1.0671,  !- X,Y,Z ==> Vertex 3 {m}
+    0.000,0.2540,1.9817;  !- X,Y,Z ==> Vertex 4 {m}
 
-FenestrationSurface:Detailed,
+                                        !- X,Y,Z  1 {m}
+                                        !- X,Y,Z  2 {m}
+                                        !- X,Y,Z  3 {m}
+
+  FenestrationSurface:Detailed,
     Kitchen_Wall_East_Door,  !- Name
     Door,                    !- Surface Type
     Swinging Door_con,       !- Construction Name
@@ -2408,34 +2395,29 @@ FenestrationSurface:Detailed,
     ,                        !- Frame and Divider Name
     1,                       !- Multiplier
     4,                       !- Number of Vertices
-    15.242800000000, 10.148690892281, 2.133600000000,
-                                        !- X,Y,Z  1 {m}
-    15.242800000000, 10.148690892281, 0.000000000000,
-                                        !- X,Y,Z  2 {m}
-    15.242800000000, 11.063090892281, 0.000000000000,
-                                        !- X,Y,Z  3 {m}
-    15.242800000000, 11.063090892281, 2.133600000000;
+    15.242800000000,10.148690892281,2.133600000000,  !- X,Y,Z ==> Vertex 1 {m}
+    15.242800000000,10.148690892281,0.000000000000,  !- X,Y,Z ==> Vertex 2 {m}
+    15.242800000000,11.063090892281,0.000000000000,  !- X,Y,Z ==> Vertex 3 {m}
+    15.242800000000,11.063090892281,2.133600000000;  !- X,Y,Z ==> Vertex 4 {m}
+
                                         !- X,Y,Z  4 {m}
-
-
 !-   ===========  ALL OBJECTS IN CLASS: INTERNALMASS ===========
 
-InternalMass,
+  InternalMass,
     Dining_InternalMass_1,   !- Name
     InteriorFurnishings,     !- Construction Name
     Dining,                  !- Zone or ZoneList Name
     232.3430;                !- Surface Area {m2}
 
-InternalMass,
+  InternalMass,
     Kitchen_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
     Kitchen,                 !- Zone or ZoneList Name
     232.3430;                !- Surface Area {m2}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
 
-People,
+  People,
     Dining,                  !- Name
     Dining,                  !- Zone or ZoneList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
@@ -2457,7 +2439,7 @@ People,
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
     FANGER;                  !- Thermal Comfort Model 1 Type
 
-People,
+  People,
     Kitchen,                 !- Name
     Kitchen,                 !- Zone or ZoneList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
@@ -2479,10 +2461,9 @@ People,
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
     FANGER;                  !- Thermal Comfort Model 1 Type
 
-
 !-   ===========  ALL OBJECTS IN CLASS: LIGHTS ===========
 
-Lights,
+  Lights,
     Dining_Lights,           !- Name
     Dining,                  !- Zone or ZoneList Name
     BLDG_LIGHT_DINING_SCH,   !- Schedule Name
@@ -2497,7 +2478,7 @@ Lights,
     LightsWired,             !- End-Use Subcategory
     No;                      !- Return Air Fraction Calculated from Plenum Temperature
 
-Lights,
+  Lights,
     Kitchen_Lights,          !- Name
     Kitchen,                 !- Zone or ZoneList Name
     BLDG_LIGHT_KITCHEN_SCH,  !- Schedule Name
@@ -2512,10 +2493,9 @@ Lights,
     LightsWired,             !- End-Use Subcategory
     No;                      !- Return Air Fraction Calculated from Plenum Temperature
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ELECTRICEQUIPMENT ===========
 
-ElectricEquipment,
+  ElectricEquipment,
     Dining_MiscElec_Equip,   !- Name
     Dining,                  !- Zone or ZoneList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
@@ -2528,7 +2508,7 @@ ElectricEquipment,
     0.0000,                  !- Fraction Lost
     Cooking;                 !- End-Use Subcategory
 
-ElectricEquipment,
+  ElectricEquipment,
     Kitchen_MiscElec_Equip,  !- Name
     Kitchen,                 !- Zone or ZoneList Name
     BLDG_EQUIP_SCH,          !- Schedule Name
@@ -2541,7 +2521,7 @@ ElectricEquipment,
     0.3000,                  !- Fraction Lost
     Cooking;                 !- End-Use Subcategory
 
-ElectricEquipment,
+  ElectricEquipment,
     Kitchen_Reach-in-Freezer,!- Name
     Kitchen,                 !- Zone or ZoneList Name
     Always_on,               !- Schedule Name
@@ -2554,7 +2534,7 @@ ElectricEquipment,
     0.0000,                  !- Fraction Lost
     ReachInFreezer;          !- End-Use Subcategory
 
-ElectricEquipment,
+  ElectricEquipment,
     Kitchen_Reach-in-Refrigerator,  !- Name
     Kitchen,                 !- Zone or ZoneList Name
     Always_on,               !- Schedule Name
@@ -2567,10 +2547,9 @@ ElectricEquipment,
     0.0000,                  !- Fraction Lost
     ReachInRefrigerator;     !- End-Use Subcategory
 
-
 !-   ===========  ALL OBJECTS IN CLASS: GASEQUIPMENT ===========
 
-GasEquipment,
+  GasEquipment,
     Kitchen_MiscGas_Equip,   !- Name
     Kitchen,                 !- Zone or ZoneList Name
     FF_GAS_EQUIP_SCH,        !- Schedule Name
@@ -2584,10 +2563,9 @@ GasEquipment,
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     Cooking;                 !- End-Use Subcategory
 
-
 !-   ===========  ALL OBJECTS IN CLASS: DAYLIGHTING:CONTROLS ===========
 
-Daylighting:Controls,
+  Daylighting:Controls,
     Dining_DaylCtrl,         !- Name
     Dining,                  !- Zone Name
     SplitFlux,               !- Daylighting Method
@@ -2608,27 +2586,25 @@ Daylighting:Controls,
     0.38,                    !- Fraction of Zone Controlled by Reference Point 2
     215.0;                   !- Illuminance Setpoint at Reference Point 2 {lux}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: DAYLIGHTING:REFERENCEPOINT ===========
 
-Daylighting:ReferencePoint,
+  Daylighting:ReferencePoint,
     Dining_DaylRefPt1,       !- Name
     Dining,                  !- Zone Name
     2.654800,                !- X-Coordinate of Reference Point {m}
     2.654800,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
-Daylighting:ReferencePoint,
+  Daylighting:ReferencePoint,
     Dining_DaylRefPt2,       !- Name
     Dining,                  !- Zone Name
     12.588000,               !- X-Coordinate of Reference Point {m}
     2.654800,                !- Y-Coordinate of Reference Point {m}
     0.762000;                !- Z-Coordinate of Reference Point {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION:DESIGNFLOWRATE ===========
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     Dining_Infiltration,     !- Name
     Dining,                  !- Zone or ZoneList Name
     INFIL_SCH_PNNL,          !- Schedule Name
@@ -2642,7 +2618,7 @@ ZoneInfiltration:DesignFlowRate,
     0.2240,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     Dining_Door_Infiltration,!- Name
     Dining,                  !- Zone or ZoneList Name
     VESTIBULE_DOOR_INFIL_SCH,!- Schedule Name
@@ -2656,7 +2632,7 @@ ZoneInfiltration:DesignFlowRate,
     0.0,                     !- Velocity Term Coefficient
     0.0;                     !- Velocity Squared Term Coefficient
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     Kitchen_Infiltration,    !- Name
     Kitchen,                 !- Zone or ZoneList Name
     INFIL_SCH_PNNL,          !- Schedule Name
@@ -2670,7 +2646,7 @@ ZoneInfiltration:DesignFlowRate,
     0.2240,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     attic_Infiltration,      !- Name
     attic,                   !- Zone or ZoneList Name
     ALWAYS_ON,               !- Schedule Name
@@ -2684,52 +2660,48 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-
 !-   ===========  ALL OBJECTS IN CLASS: EXTERIOR:LIGHTS ===========
 
-Exterior:Lights,
+  Exterior:Lights,
     Exterior_Lights_a,       !- Name
     Exterior_lighting_schedule_a,  !- Schedule Name
     122.81,                  !- Design Level {W}
     AstronomicalClock,       !- Control Option
     General;                 !- End-Use Subcategory
 
-Exterior:Lights,
+  Exterior:Lights,
     Exterior_Lights_b,       !- Name
     Exterior_lighting_schedule_b_2016,  !- Schedule Name
     649.5,                   !- Design Level {W}
     AstronomicalClock,       !- Control Option
     General;                 !- End-Use Subcategory
 
-
 !-   ===========  ALL OBJECTS IN CLASS: DESIGNSPECIFICATION:OUTDOORAIR ===========
 
-DesignSpecification:OutdoorAir,
+  DesignSpecification:OutdoorAir,
     SZ DSOA Dining,          !- Name
     FLOW/AREA,               !- Outdoor Air Method
     ,                        !- Outdoor Air Flow per Person {m3/s-person}
     0.003581176,             !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
-DesignSpecification:OutdoorAir,
+  DesignSpecification:OutdoorAir,
     SZ DSOA Kitchen,         !- Name
     Maximum,                 !- Outdoor Air Method
     ,                        !- Outdoor Air Flow per Person {m3/s-person}
     0.000792347,             !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     1.14135922046138;        !- Outdoor Air Flow per Zone {m3/s}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:PARAMETERS ===========
 
-Sizing:Parameters,
+  Sizing:Parameters,
     1.2000,                  !- Heating Sizing Factor
     1.2000,                  !- Cooling Sizing Factor
     6;                       !- Timesteps in Averaging Window
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:ZONE ===========
 
-Sizing:Zone,
+  Sizing:Zone,
     Dining,                  !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
     12.8,                    !- Zone Cooling Design Supply Air Temperature {C}
@@ -2758,7 +2730,7 @@ Sizing:Zone,
     autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
     autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
-Sizing:Zone,
+  Sizing:Zone,
     Kitchen,                 !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
     12.8,                    !- Zone Cooling Design Supply Air Temperature {C}
@@ -2787,10 +2759,9 @@ Sizing:Zone,
     autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
     autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:SYSTEM ===========
 
-Sizing:System,
+  Sizing:System,
     PSZ-AC_1:1,              !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
@@ -2829,7 +2800,7 @@ Sizing:System,
     ,                        !- Fraction of Autosized Heating Design Capacity
     OnOff;                   !- Central Cooling Capacity Control Method
 
-Sizing:System,
+  Sizing:System,
     PSZ-AC_2:2,              !- AirLoop Name
     Sensible,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
@@ -2868,81 +2839,75 @@ Sizing:System,
     ,                        !- Fraction of Autosized Heating Design Capacity
     OnOff;                   !- Central Cooling Capacity Control Method
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:PLANT ===========
 
-Sizing:Plant,
+  Sizing:Plant,
     SHWSys1,                 !- Plant or Condenser Loop Name
     Heating,                 !- Loop Type
     60,                      !- Design Loop Exit Temperature {C}
     5.0;                     !- Loop Design Temperature Difference {deltaC}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:THERMOSTAT ===========
 
-ZoneControl:Thermostat,
+  ZoneControl:Thermostat,
     Dining Thermostat,       !- Name
     Dining,                  !- Zone or ZoneList Name
     Dual Zone Control Type Sched,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     Dining DualSPSched;      !- Control 1 Name
 
-ZoneControl:Thermostat,
+  ZoneControl:Thermostat,
     Kitchen Thermostat,      !- Name
     Kitchen,                 !- Zone or ZoneList Name
     Dual Zone Control Type Sched,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     Kitchen DualSPSched;     !- Control 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: THERMOSTATSETPOINT:DUALSETPOINT ===========
 
-ThermostatSetpoint:DualSetpoint,
+  ThermostatSetpoint:DualSetpoint,
     Dining DualSPSched,      !- Name
     HTGSETP_SCH_NO_OPTIMUM,  !- Heating Setpoint Temperature Schedule Name
     CLGSETP_SCH_NO_OPTIMUM;  !- Cooling Setpoint Temperature Schedule Name
 
-ThermostatSetpoint:DualSetpoint,
+  ThermostatSetpoint:DualSetpoint,
     Kitchen DualSPSched,     !- Name
     HTGSETP_KITCHEN_SCH_NO_OPTIMUM,  !- Heating Setpoint Temperature Schedule Name
     CLGSETP_KITCHEN_SCH_NO_OPTIMUM;  !- Cooling Setpoint Temperature Schedule Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
 
-AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Dining Direct Air,       !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     Dining Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
     Dining Direct Air Inlet Node Name,  !- Air Outlet Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Kitchen Direct Air,      !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     Kitchen Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
     Kitchen Direct Air Inlet Node Name,  !- Air Outlet Node Name
     AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:AIRDISTRIBUTIONUNIT ===========
 
-ZoneHVAC:AirDistributionUnit,
+  ZoneHVAC:AirDistributionUnit,
     Dining Direct Air ADU,   !- Name
     Dining Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
     Dining Direct Air;       !- Air Terminal Name
 
-ZoneHVAC:AirDistributionUnit,
+  ZoneHVAC:AirDistributionUnit,
     Kitchen Direct Air ADU,  !- Name
     Kitchen Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
     Kitchen Direct Air;      !- Air Terminal Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
 
-ZoneHVAC:EquipmentList,
+  ZoneHVAC:EquipmentList,
     Dining Equipment,        !- Name
     SequentialLoad,          !- Load Distribution Scheme
     Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type
@@ -2956,7 +2921,7 @@ ZoneHVAC:EquipmentList,
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
-ZoneHVAC:EquipmentList,
+  ZoneHVAC:EquipmentList,
     Kitchen Equipment,       !- Name
     SequentialLoad,          !- Load Distribution Scheme
     Fan:ZoneExhaust,         !- Zone Equipment 1 Object Type
@@ -2970,10 +2935,9 @@ ZoneHVAC:EquipmentList,
     2,                       !- Zone Equipment 2 Cooling Sequence
     2;                       !- Zone Equipment 2 Heating or No-Load Sequence
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
-ZoneHVAC:EquipmentConnections,
+  ZoneHVAC:EquipmentConnections,
     Dining,                  !- Zone Name
     Dining Equipment,        !- Zone Conditioning Equipment List Name
     Dining Inlet Nodes,      !- Zone Air Inlet Node or NodeList Name
@@ -2981,7 +2945,7 @@ ZoneHVAC:EquipmentConnections,
     Dining Air Node,         !- Zone Air Node Name
     Dining Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
-ZoneHVAC:EquipmentConnections,
+  ZoneHVAC:EquipmentConnections,
     Kitchen,                 !- Zone Name
     Kitchen Equipment,       !- Zone Conditioning Equipment List Name
     Kitchen Inlet Nodes,     !- Zone Air Inlet Node or NodeList Name
@@ -2989,10 +2953,9 @@ ZoneHVAC:EquipmentConnections,
     Kitchen Air Node,        !- Zone Air Node Name
     Kitchen Return Air Node Name;  !- Zone Return Air Node or NodeList Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: FAN:SYSTEMMODEL ===========
 
-Fan:SystemModel,
+  Fan:SystemModel,
     PSZ-AC_1:1_addAQ Fan,    !- Name
     HVACOperationSchd,       !- Availability Schedule Name
     PSZ-AC_1:1_HeatC-PSZ-AC_1:1 FanNode,  !- Air Inlet Node Name
@@ -3020,7 +2983,7 @@ Fan:SystemModel,
     1,                       !- Speed 2 Flow Fraction
     1;                       !- Speed 2 Electric Power Fraction
 
-Fan:SystemModel,
+  Fan:SystemModel,
     PSZ-AC_2:2_addAQ Fan,    !- Name
     HVACOperationSchd,       !- Availability Schedule Name
     PSZ-AC_2:2_HeatC-PSZ-AC_2:2 FanNode,  !- Air Inlet Node Name
@@ -3048,10 +3011,9 @@ Fan:SystemModel,
     1,                       !- Speed 2 Flow Fraction
     1;                       !- Speed 2 Electric Power Fraction
 
-
 !-   ===========  ALL OBJECTS IN CLASS: FAN:ZONEEXHAUST ===========
 
-Fan:ZoneExhaust,
+  Fan:ZoneExhaust,
     Dining Exhaust Fan,      !- Name
     Hours_of_operation,      !- Availability Schedule Name
     1,                       !- Fan Total Efficiency
@@ -3061,7 +3023,7 @@ Fan:ZoneExhaust,
     Dining Exhaust Fan Outlet Node Name,  !- Air Outlet Node Name
     General;                 !- End-Use Subcategory
 
-Fan:ZoneExhaust,
+  Fan:ZoneExhaust,
     Kitchen Exhaust Fan,     !- Name
     Hours_of_operation,      !- Availability Schedule Name
     0.385,                   !- Fan Total Efficiency
@@ -3075,10 +3037,9 @@ Fan:ZoneExhaust,
     ,                        !- Minimum Zone Temperature Limit Schedule Name
     Kitchen Exhaust Fan Balanced Exhaust Fraction Schedule;  !- Balanced Exhaust Fraction Schedule Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:MULTISPEED ===========
 
-Coil:Cooling:DX:MultiSpeed,
+  Coil:Cooling:DX:MultiSpeed,
     PSZ-AC_1:1_CoolC DXCoil, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     PSZ-AC_1:1_OA-PSZ-AC_1:1_CoolCNode,  !- Air Inlet Node Name
@@ -3136,7 +3097,7 @@ Coil:Cooling:DX:MultiSpeed,
     ,                        !- Speed 2 Evaporative Condenser Air Flow Rate {m3/s}
     ;                        !- Speed 2 Rated Evaporative Condenser Pump Power Consumption {W}
 
-Coil:Cooling:DX:MultiSpeed,
+  Coil:Cooling:DX:MultiSpeed,
     PSZ-AC_2:2_CoolC DXCoil, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     PSZ-AC_2:2_OA-PSZ-AC_2:2_CoolCNode,  !- Air Inlet Node Name
@@ -3194,10 +3155,9 @@ Coil:Cooling:DX:MultiSpeed,
     ,                        !- Speed 2 Evaporative Condenser Air Flow Rate {m3/s}
     ;                        !- Speed 2 Rated Evaporative Condenser Pump Power Consumption {W}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
-Coil:Heating:Fuel,
+  Coil:Heating:Fuel,
     PSZ-AC_1:1_HeatC,        !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3206,7 +3166,7 @@ Coil:Heating:Fuel,
     PSZ-AC_1:1_CoolC-PSZ-AC_1:1_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC_1:1_HeatC-PSZ-AC_1:1 FanNode;  !- Air Outlet Node Name
 
-Coil:Heating:Fuel,
+  Coil:Heating:Fuel,
     PSZ-AC_2:2_HeatC,        !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     NaturalGas,              !- Fuel Type
@@ -3215,10 +3175,9 @@ Coil:Heating:Fuel,
     PSZ-AC_2:2_CoolC-PSZ-AC_2:2_HeatCNode,  !- Air Inlet Node Name
     PSZ-AC_2:2_HeatC-PSZ-AC_2:2 FanNode;  !- Air Outlet Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARYSYSTEM ===========
 
-AirLoopHVAC:UnitarySystem,
+  AirLoopHVAC:UnitarySystem,
     PSZ-AC_1:1,              !- Name
     Load,                    !- Control Type
     Dining,                  !- Controlling Zone or Thermostat Location
@@ -3273,7 +3232,7 @@ AirLoopHVAC:UnitarySystem,
     UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Object Type
     PSZ-AC_1:1_Unitary_Package_DX_Perf;  !- Design Specification Multispeed Object Name
 
-AirLoopHVAC:UnitarySystem,
+  AirLoopHVAC:UnitarySystem,
     PSZ-AC_2:2,              !- Name
     Load,                    !- Control Type
     Kitchen,                 !- Controlling Zone or Thermostat Location
@@ -3328,10 +3287,9 @@ AirLoopHVAC:UnitarySystem,
     UnitarySystemPerformance:Multispeed,  !- Design Specification Multispeed Object Type
     PSZ-AC_2:2_Unitary_Package_DX_Perf;  !- Design Specification Multispeed Object Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: UNITARYSYSTEMPERFORMANCE:MULTISPEED ===========
 
-UnitarySystemPerformance:Multispeed,
+  UnitarySystemPerformance:Multispeed,
     PSZ-AC_1:1_Unitary_Package_DX_Perf,  !- Name
     2,                       !- Number of Speeds for Heating
     2,                       !- Number of Speeds for Cooling
@@ -3342,7 +3300,7 @@ UnitarySystemPerformance:Multispeed,
     1,                       !- Heating Speed 2 Supply Air Flow Ratio
     1;                       !- Cooling Speed 2 Supply Air Flow Ratio
 
-UnitarySystemPerformance:Multispeed,
+  UnitarySystemPerformance:Multispeed,
     PSZ-AC_2:2_Unitary_Package_DX_Perf,  !- Name
     2,                       !- Number of Speeds for Heating
     2,                       !- Number of Speeds for Cooling
@@ -3353,10 +3311,9 @@ UnitarySystemPerformance:Multispeed,
     1,                       !- Heating Speed 2 Supply Air Flow Ratio
     1;                       !- Cooling Speed 2 Supply Air Flow Ratio
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTDOORAIR ===========
 
-Controller:OutdoorAir,
+  Controller:OutdoorAir,
     PSZ-AC_1:1_OA_Controller,!- Name
     PSZ-AC_1:1_OARelief Node,!- Relief Air Outlet Node Name
     PSZ-AC_1:1 Supply Equipment Inlet Node,  !- Return Air Node Name
@@ -3377,7 +3334,7 @@ Controller:OutdoorAir,
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     SZ_system_OA_Max_Frac_SCH;  !- Maximum Fraction of Outdoor Air Schedule Name
 
-Controller:OutdoorAir,
+  Controller:OutdoorAir,
     PSZ-AC_2:2_OA_Controller,!- Name
     PSZ-AC_2:2_OARelief Node,!- Relief Air Outlet Node Name
     PSZ-AC_2:2 Supply Equipment Inlet Node,  !- Return Air Node Name
@@ -3396,23 +3353,21 @@ Controller:OutdoorAir,
     FixedMinimum,            !- Minimum Limit Type
     MINOA_FFKITCH_SCHED;     !- Minimum Outdoor Air Schedule Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:CONTROLLERLIST ===========
 
-AirLoopHVAC:ControllerList,
+  AirLoopHVAC:ControllerList,
     PSZ-AC_1:1_OA_Controllers,  !- Name
     Controller:OutdoorAir,   !- Controller 1 Object Type
     PSZ-AC_1:1_OA_Controller;!- Controller 1 Name
 
-AirLoopHVAC:ControllerList,
+  AirLoopHVAC:ControllerList,
     PSZ-AC_2:2_OA_Controllers,  !- Name
     Controller:OutdoorAir,   !- Controller 1 Object Type
     PSZ-AC_2:2_OA_Controller;!- Controller 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC ===========
 
-AirLoopHVAC,
+  AirLoopHVAC,
     PSZ-AC_1:1,              !- Name
     ,                        !- Controller List Name
     PSZ-AC_1:1 Availability Manager List,  !- Availability Manager List Name
@@ -3424,7 +3379,7 @@ AirLoopHVAC,
     PSZ-AC_1:1 Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
     PSZ-AC_1:1 Supply Equipment Outlet Node;  !- Supply Side Outlet Node Names
 
-AirLoopHVAC,
+  AirLoopHVAC,
     PSZ-AC_2:2,              !- Name
     ,                        !- Controller List Name
     PSZ-AC_2:2 Availability Manager List,  !- Availability Manager List Name
@@ -3436,111 +3391,103 @@ AirLoopHVAC,
     PSZ-AC_2:2 Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
     PSZ-AC_2:2 Supply Equipment Outlet Node;  !- Supply Side Outlet Node Names
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM:EQUIPMENTLIST ===========
 
-AirLoopHVAC:OutdoorAirSystem:EquipmentList,
+  AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     PSZ-AC_1:1_OA_Equipment, !- Name
     OutdoorAir:Mixer,        !- Component 1 Object Type
     PSZ-AC_1:1_OAMixing Box; !- Component 1 Name
 
-AirLoopHVAC:OutdoorAirSystem:EquipmentList,
+  AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     PSZ-AC_2:2_OA_Equipment, !- Name
     OutdoorAir:Mixer,        !- Component 1 Object Type
     PSZ-AC_2:2_OAMixing Box; !- Component 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM ===========
 
-AirLoopHVAC:OutdoorAirSystem,
+  AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_1:1_OA,           !- Name
     PSZ-AC_1:1_OA_Controllers,  !- Controller List Name
     PSZ-AC_1:1_OA_Equipment, !- Outdoor Air Equipment List Name
     PSZ-AC_1:1 Availability Manager List;  !- Availability Manager List Name
 
-AirLoopHVAC:OutdoorAirSystem,
+  AirLoopHVAC:OutdoorAirSystem,
     PSZ-AC_2:2_OA,           !- Name
     PSZ-AC_2:2_OA_Controllers,  !- Controller List Name
     PSZ-AC_2:2_OA_Equipment, !- Outdoor Air Equipment List Name
     PSZ-AC_2:2 Availability Manager List;  !- Availability Manager List Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 
-OutdoorAir:Mixer,
+  OutdoorAir:Mixer,
     PSZ-AC_1:1_OAMixing Box, !- Name
     PSZ-AC_1:1_OA-PSZ-AC_1:1_CoolCNode,  !- Mixed Air Node Name
     PSZ-AC_1:1_OAInlet Node, !- Outdoor Air Stream Node Name
     PSZ-AC_1:1_OARelief Node,!- Relief Air Stream Node Name
     PSZ-AC_1:1 Supply Equipment Inlet Node;  !- Return Air Stream Node Name
 
-OutdoorAir:Mixer,
+  OutdoorAir:Mixer,
     PSZ-AC_2:2_OAMixing Box, !- Name
     PSZ-AC_2:2_OA-PSZ-AC_2:2_CoolCNode,  !- Mixed Air Node Name
     PSZ-AC_2:2_OAInlet Node, !- Outdoor Air Stream Node Name
     PSZ-AC_2:2_OARelief Node,!- Relief Air Stream Node Name
     PSZ-AC_2:2 Supply Equipment Inlet Node;  !- Return Air Stream Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:ZONESPLITTER ===========
 
-AirLoopHVAC:ZoneSplitter,
+  AirLoopHVAC:ZoneSplitter,
     PSZ-AC_1:1 Supply Air Splitter,  !- Name
     PSZ-AC_1:1 Zone Equipment Inlet Node,  !- Inlet Node Name
     Dining Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
-AirLoopHVAC:ZoneSplitter,
+  AirLoopHVAC:ZoneSplitter,
     PSZ-AC_2:2 Supply Air Splitter,  !- Name
     PSZ-AC_2:2 Zone Equipment Inlet Node,  !- Inlet Node Name
     Kitchen Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========
 
-AirLoopHVAC:SupplyPath,
+  AirLoopHVAC:SupplyPath,
     PSZ-AC_1:1,              !- Name
     PSZ-AC_1:1 Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name
     AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
     PSZ-AC_1:1 Supply Air Splitter;  !- Component 1 Name
 
-AirLoopHVAC:SupplyPath,
+  AirLoopHVAC:SupplyPath,
     PSZ-AC_2:2,              !- Name
     PSZ-AC_2:2 Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name
     AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
     PSZ-AC_2:2 Supply Air Splitter;  !- Component 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:ZONEMIXER ===========
 
-AirLoopHVAC:ZoneMixer,
+  AirLoopHVAC:ZoneMixer,
     PSZ-AC_1:1 Return Air Mixer,  !- Name
     PSZ-AC_1:1 Zone Equipment Outlet Node,  !- Outlet Node Name
     Dining Return Air Node Name;  !- Inlet 1 Node Name
 
-AirLoopHVAC:ZoneMixer,
+  AirLoopHVAC:ZoneMixer,
     PSZ-AC_2:2 Return Air Mixer,  !- Name
     PSZ-AC_2:2 Zone Equipment Outlet Node,  !- Outlet Node Name
     Kitchen Return Air Node Name;  !- Inlet 1 Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:RETURNPATH ===========
 
-AirLoopHVAC:ReturnPath,
+  AirLoopHVAC:ReturnPath,
     PSZ-AC_1:1 Return Air Path,  !- Name
     PSZ-AC_1:1 Zone Equipment Outlet Node,  !- Return Air Path Outlet Node Name
     AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
     PSZ-AC_1:1 Return Air Mixer;  !- Component 1 Name
 
-AirLoopHVAC:ReturnPath,
+  AirLoopHVAC:ReturnPath,
     PSZ-AC_2:2 Return Air Path,  !- Name
     PSZ-AC_2:2 Zone Equipment Outlet Node,  !- Return Air Path Outlet Node Name
     AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
     PSZ-AC_2:2 Return Air Mixer;  !- Component 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: BRANCH ===========
 
-Branch,
+  Branch,
     PSZ-AC_1:1 Air Loop Main Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
@@ -3552,7 +3499,7 @@ Branch,
     PSZ-AC_1:1_OA-PSZ-AC_1:1_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC_1:1 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
-Branch,
+  Branch,
     PSZ-AC_2:2 Air Loop Main Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
@@ -3564,7 +3511,7 @@ Branch,
     PSZ-AC_2:2_OA-PSZ-AC_2:2_CoolCNode,  !- Component 2 Inlet Node Name
     PSZ-AC_2:2 Supply Equipment Outlet Node;  !- Component 2 Outlet Node Name
 
-Branch,
+  Branch,
     SHWSys1 Supply Inlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pump:ConstantSpeed,      !- Component 1 Object Type
@@ -3572,7 +3519,7 @@ Branch,
     SHWSys1 Supply Inlet Node,  !- Component 1 Inlet Node Name
     SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SHWSys1 Supply Equipment Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     WaterHeater:Mixed,       !- Component 1 Object Type
@@ -3580,7 +3527,7 @@ Branch,
     SHWSys1 Pump-SHWSys1 Water HeaterNode,  !- Component 1 Inlet Node Name
     SHWSys1 Supply Equipment Outlet Node;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SHWSys1 Supply Equipment Bypass Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3588,7 +3535,7 @@ Branch,
     SHWSys1 Supply Equip Bypass Inlet Node,  !- Component 1 Inlet Node Name
     SHWSys1 Supply Equip Bypass Outlet Node;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SHWSys1 Supply Outlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3596,7 +3543,7 @@ Branch,
     SHWSys1 Supply Mixer-SHWSys1 Supply Outlet Pipe,  !- Component 1 Inlet Node Name
     SHWSys1 Supply Outlet Node;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SHWSys1 Demand Inlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3604,7 +3551,7 @@ Branch,
     SHWSys1 Demand Inlet Node,  !- Component 1 Inlet Node Name
     SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SHWSys1 Demand Load Branch 1,  !- Name
     ,                        !- Pressure Drop Curve Name
     WaterUse:Connections,    !- Component 1 Object Type
@@ -3612,7 +3559,7 @@ Branch,
     Kitchen Water Equipment Water Inlet Node,  !- Component 1 Inlet Node Name
     Kitchen Water Equipment Water Outlet Node;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SHWSys1 Demand Bypass Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3620,7 +3567,7 @@ Branch,
     SHWSys1 Demand Bypass Pipe Inlet Node,  !- Component 1 Inlet Node Name
     SHWSys1 Demand Bypass Pipe Outlet Node;  !- Component 1 Outlet Node Name
 
-Branch,
+  Branch,
     SHWSys1 Demand Outlet Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Pipe:Adiabatic,          !- Component 1 Object Type
@@ -3628,161 +3575,152 @@ Branch,
     SHWSys1 Demand Mixer-SHWSys1 Demand Outlet Pipe,  !- Component 1 Inlet Node Name
     SHWSys1 Demand Outlet Node;  !- Component 1 Outlet Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
 
-BranchList,
+  BranchList,
     PSZ-AC_1:1 Air Loop Branches,  !- Name
     PSZ-AC_1:1 Air Loop Main Branch;  !- Branch 1 Name
 
-BranchList,
+  BranchList,
     PSZ-AC_2:2 Air Loop Branches,  !- Name
     PSZ-AC_2:2 Air Loop Main Branch;  !- Branch 1 Name
 
-BranchList,
+  BranchList,
     SHWSys1 Supply Branches, !- Name
     SHWSys1 Supply Inlet Branch,  !- Branch 1 Name
     SHWSys1 Supply Equipment Branch,  !- Branch 2 Name
     SHWSys1 Supply Equipment Bypass Branch,  !- Branch 3 Name
     SHWSys1 Supply Outlet Branch;  !- Branch 4 Name
 
-BranchList,
+  BranchList,
     SHWSys1 Demand Branches, !- Name
     SHWSys1 Demand Inlet Branch,  !- Branch 1 Name
     SHWSys1 Demand Load Branch 1,  !- Branch 2 Name
     SHWSys1 Demand Bypass Branch,  !- Branch 3 Name
     SHWSys1 Demand Outlet Branch;  !- Branch 4 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CONNECTOR:SPLITTER ===========
 
-Connector:Splitter,
+  Connector:Splitter,
     SHWSys1 Supply Splitter, !- Name
     SHWSys1 Supply Inlet Branch,  !- Inlet Branch Name
     SHWSys1 Supply Equipment Branch,  !- Outlet Branch 1 Name
     SHWSys1 Supply Equipment Bypass Branch;  !- Outlet Branch 2 Name
 
-Connector:Splitter,
+  Connector:Splitter,
     SHWSys1 Demand Splitter, !- Name
     SHWSys1 Demand Inlet Branch,  !- Inlet Branch Name
     SHWSys1 Demand Load Branch 1,  !- Outlet Branch 1 Name
     SHWSys1 Demand Bypass Branch;  !- Outlet Branch 2 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CONNECTOR:MIXER ===========
 
-Connector:Mixer,
+  Connector:Mixer,
     SHWSys1 Supply Mixer,    !- Name
     SHWSys1 Supply Outlet Branch,  !- Outlet Branch Name
     SHWSys1 Supply Equipment Branch,  !- Inlet Branch 1 Name
     SHWSys1 Supply Equipment Bypass Branch;  !- Inlet Branch 2 Name
 
-Connector:Mixer,
+  Connector:Mixer,
     SHWSys1 Demand Mixer,    !- Name
     SHWSys1 Demand Outlet Branch,  !- Outlet Branch Name
     SHWSys1 Demand Load Branch 1,  !- Inlet Branch 1 Name
     SHWSys1 Demand Bypass Branch;  !- Inlet Branch 2 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CONNECTORLIST ===========
 
-ConnectorList,
+  ConnectorList,
     SHWSys1 Supply Connectors,  !- Name
     Connector:Splitter,      !- Connector 1 Object Type
     SHWSys1 Supply Splitter, !- Connector 1 Name
     Connector:Mixer,         !- Connector 2 Object Type
     SHWSys1 Supply Mixer;    !- Connector 2 Name
 
-ConnectorList,
+  ConnectorList,
     SHWSys1 Demand Connectors,  !- Name
     Connector:Splitter,      !- Connector 1 Object Type
     SHWSys1 Demand Splitter, !- Connector 1 Name
     Connector:Mixer,         !- Connector 2 Object Type
     SHWSys1 Demand Mixer;    !- Connector 2 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: NODELIST ===========
 
-NodeList,
+  NodeList,
     Dining Inlet Nodes,      !- Name
     Dining Direct Air Inlet Node Name;  !- Node 1 Name
 
-NodeList,
+  NodeList,
     Dining Exhaust Nodes,    !- Name
     Dining Exhaust Fan Node; !- Node 1 Name
 
-NodeList,
+  NodeList,
     Kitchen Inlet Nodes,     !- Name
     Kitchen Direct Air Inlet Node Name;  !- Node 1 Name
 
-NodeList,
+  NodeList,
     Kitchen Exhaust Nodes,   !- Name
     Kitchen Exhaust Fan Node;!- Node 1 Name
 
-NodeList,
+  NodeList,
     PSZ-AC_1:1_OANode List,  !- Name
     PSZ-AC_1:1_OAInlet Node; !- Node 1 Name
 
-NodeList,
+  NodeList,
     PSZ-AC_2:2_OANode List,  !- Name
     PSZ-AC_2:2_OAInlet Node; !- Node 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:NODE ===========
 
-OutdoorAir:Node,
+  OutdoorAir:Node,
     RACK1_condenserInlet;    !- Name
 
-OutdoorAir:Node,
+  OutdoorAir:Node,
     RACK2_condenserInlet;    !- Name
 
-OutdoorAir:Node,
+  OutdoorAir:Node,
     PSZ-AC_1:1_CoolCOA Ref node;  !- Name
 
-OutdoorAir:Node,
+  OutdoorAir:Node,
     PSZ-AC_2:2_CoolCOA Ref node;  !- Name
-
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:NODELIST ===========
 
-OutdoorAir:NodeList,
+  OutdoorAir:NodeList,
     PSZ-AC_1:1_OANode List;  !- Node or NodeList Name 1
 
-OutdoorAir:NodeList,
+  OutdoorAir:NodeList,
     PSZ-AC_2:2_OANode List;  !- Node or NodeList Name 1
-
 
 !-   ===========  ALL OBJECTS IN CLASS: PIPE:ADIABATIC ===========
 
-Pipe:Adiabatic,
+  Pipe:Adiabatic,
     SHWSys1 Supply Equipment Bypass Pipe,  !- Name
     SHWSys1 Supply Equip Bypass Inlet Node,  !- Inlet Node Name
     SHWSys1 Supply Equip Bypass Outlet Node;  !- Outlet Node Name
 
-Pipe:Adiabatic,
+  Pipe:Adiabatic,
     SHWSys1 Supply Outlet Pipe,  !- Name
     SHWSys1 Supply Mixer-SHWSys1 Supply Outlet Pipe,  !- Inlet Node Name
     SHWSys1 Supply Outlet Node;  !- Outlet Node Name
 
-Pipe:Adiabatic,
+  Pipe:Adiabatic,
     SHWSys1 Demand Inlet Pipe,  !- Name
     SHWSys1 Demand Inlet Node,  !- Inlet Node Name
     SHWSys1 Demand Inlet Pipe-SHWSys1 Demand Mixer;  !- Outlet Node Name
 
-Pipe:Adiabatic,
+  Pipe:Adiabatic,
     SHWSys1 Demand Bypass Pipe,  !- Name
     SHWSys1 Demand Bypass Pipe Inlet Node,  !- Inlet Node Name
     SHWSys1 Demand Bypass Pipe Outlet Node;  !- Outlet Node Name
 
-Pipe:Adiabatic,
+  Pipe:Adiabatic,
     SHWSys1 Demand Outlet Pipe,  !- Name
     SHWSys1 Demand Mixer-SHWSys1 Demand Outlet Pipe,  !- Inlet Node Name
     SHWSys1 Demand Outlet Node;  !- Outlet Node Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: PUMP:CONSTANTSPEED ===========
 
-Pump:ConstantSpeed,
+  Pump:ConstantSpeed,
     SHWSys1 Pump,            !- Name
     SHWSys1 Supply Inlet Node,  !- Inlet Node Name
     SHWSys1 Pump-SHWSys1 Water HeaterNodeviaConnector,  !- Outlet Node Name
@@ -3793,10 +3731,9 @@ Pump:ConstantSpeed,
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent;            !- Pump Control Type
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WATERHEATER:MIXED ===========
 
-WaterHeater:Mixed,
+  WaterHeater:Mixed,
     SHWSys1 Water Heater,    !- Name
     0.3785412,               !- Tank Volume {m3}
     SHWSys1 Water Heater Setpoint Temperature Schedule Name,  !- Setpoint Temperature Schedule Name
@@ -3837,10 +3774,9 @@ WaterHeater:Mixed,
     AUTOSIZE,                !- Source Side Design Flow Rate {m3/s}
     1.5;                     !- Indirect Water Heating Recovery Time {hr}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: PLANTLOOP ===========
 
-PlantLoop,
+  PlantLoop,
     SHWSys1,                 !- Name
     Water,                   !- Fluid Type
     ,                        !- User Defined Fluid Type
@@ -3861,126 +3797,117 @@ PlantLoop,
     SHWSys1 Demand Connectors,  !- Demand Side Connector List Name
     Optimal;                 !- Load Distribution Scheme
 
-
 !-   ===========  ALL OBJECTS IN CLASS: PLANTEQUIPMENTLIST ===========
 
-PlantEquipmentList,
+  PlantEquipmentList,
     SHWSys1 Equipment List,  !- Name
     WaterHeater:Mixed,       !- Equipment 1 Object Type
     SHWSys1 Water Heater;    !- Equipment 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: PLANTEQUIPMENTOPERATION:HEATINGLOAD ===========
 
-PlantEquipmentOperation:HeatingLoad,
+  PlantEquipmentOperation:HeatingLoad,
     SHWSys1 Operation Scheme,!- Name
     0.0,                     !- Load Range 1 Lower Limit {W}
     1000000000000000,        !- Load Range 1 Upper Limit {W}
     SHWSys1 Equipment List;  !- Range 1 Equipment List Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: PLANTEQUIPMENTOPERATIONSCHEMES ===========
 
-PlantEquipmentOperationSchemes,
+  PlantEquipmentOperationSchemes,
     SHWSys1 Loop Operation Scheme List,  !- Name
     PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type
     SHWSys1 Operation Scheme,!- Control Scheme 1 Name
     PlantOnSched;            !- Control Scheme 1 Schedule Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:SENSOR ===========
 
-EnergyManagementSystem:Sensor,
+  EnergyManagementSystem:Sensor,
     OAT_F,                   !- Name
     ,                        !- Output:Variable or Output:Meter Index Key Name
     Site Outdoor Air Drybulb Temperature;  !- Output:Variable or Output:Meter Name
 
-EnergyManagementSystem:Sensor,
+  EnergyManagementSystem:Sensor,
     Dining_LSr,              !- Name
     Dining,                  !- Output:Variable or Output:Meter Index Key Name
     Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
-EnergyManagementSystem:Sensor,
+  EnergyManagementSystem:Sensor,
     Dining_Occ_Sensor,       !- Name
     Dining,                  !- Output:Variable or Output:Meter Index Key Name
     People Occupant Count;   !- Output:Variable or Output:Meter Name
 
-EnergyManagementSystem:Sensor,
+  EnergyManagementSystem:Sensor,
     Kitchen_LSr,             !- Name
     Kitchen,                 !- Output:Variable or Output:Meter Index Key Name
     Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
-EnergyManagementSystem:Sensor,
+  EnergyManagementSystem:Sensor,
     Kitchen_Occ_Sensor,      !- Name
     Kitchen,                 !- Output:Variable or Output:Meter Index Key Name
     People Occupant Count;   !- Output:Variable or Output:Meter Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:ACTUATOR ===========
 
-EnergyManagementSystem:Actuator,
+  EnergyManagementSystem:Actuator,
     Dining_Light_Actuator,   !- Name
     Dining_lights,           !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
     Electricity Rate;        !- Actuated Component Control Type
 
-EnergyManagementSystem:Actuator,
+  EnergyManagementSystem:Actuator,
     Kitchen_Light_Actuator,  !- Name
     Kitchen_lights,          !- Actuated Component Unique Name
     Lights,                  !- Actuated Component Type
     Electricity Rate;        !- Actuated Component Control Type
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:PROGRAMCALLINGMANAGER ===========
 
-EnergyManagementSystem:ProgramCallingManager,
+  EnergyManagementSystem:ProgramCallingManager,
     SET_Dining_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_Dining_Light_EMS_Program;  !- Program Name 1
 
-EnergyManagementSystem:ProgramCallingManager,
+  EnergyManagementSystem:ProgramCallingManager,
     SET_Kitchen_Light_EMS_Program_Prog_Manager,  !- Name
     BeginTimestepBeforePredictor,  !- EnergyPlus Model Calling Point
     SET_Kitchen_Light_EMS_Program;  !- Program Name 1
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:PROGRAM ===========
 
-EnergyManagementSystem:Program,
+  EnergyManagementSystem:Program,
     SET_Dining_Light_EMS_Program,  !- Name
     SET Dining_LSr_IP=0.093*Dining_LSr/Dining_Area,  !- Program Line 1
     IF (Dining_Occ_Sensor <= 0) && (Dining_LSr_IP >= 0.02),  !- Program Line 2
-    SET Dining_Light_Actuator = 0.02*Dining_Area/0.09290304,  !- A4
-    ELSE,                    !- A5
-    SET Dining_Light_Actuator = NULL,  !- A6
-    ENDIF;                   !- A7
+    SET Dining_Light_Actuator = 0.02*Dining_Area/0.09290304,  !- <none>
+    ELSE,                    !- <none>
+    SET Dining_Light_Actuator = NULL,  !- <none>
+    ENDIF;                   !- <none>
 
-EnergyManagementSystem:Program,
+  EnergyManagementSystem:Program,
     SET_Kitchen_Light_EMS_Program,  !- Name
     SET Kitchen_LSr_IP=0.093*Kitchen_LSr/Kitchen_Area,  !- Program Line 1
     IF (Kitchen_Occ_Sensor <= 0) && (Kitchen_LSr_IP >= 0.02),  !- Program Line 2
-    SET Kitchen_Light_Actuator = 0.02*Kitchen_Area/0.09290304,  !- A4
-    ELSE,                    !- A5
-    SET Kitchen_Light_Actuator = NULL,  !- A6
-    ENDIF;                   !- A7
-
+    SET Kitchen_Light_Actuator = 0.02*Kitchen_Area/0.09290304,  !- <none>
+    ELSE,                    !- <none>
+    SET Kitchen_Light_Actuator = NULL,  !- <none>
+    ENDIF;                   !- <none>
 
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:INTERNALVARIABLE ===========
 
-EnergyManagementSystem:InternalVariable,
+  EnergyManagementSystem:InternalVariable,
     Dining_Area,             !- Name
     Dining,                  !- Internal Data Index Key Name
     Zone Floor Area;         !- Internal Data Type
 
-EnergyManagementSystem:InternalVariable,
+  EnergyManagementSystem:InternalVariable,
     Kitchen_Area,            !- Name
     Kitchen,                 !- Internal Data Index Key Name
     Zone Floor Area;         !- Internal Data Type
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AVAILABILITYMANAGER:NIGHTCYCLE ===========
 
-AvailabilityManager:NightCycle,
+  AvailabilityManager:NightCycle,
     PSZ-AC_1:1 Availability Manager,  !- Name
     Always_On,               !- Applicability Schedule Name
     HVACOperationSchd,       !- Fan Schedule Name
@@ -3989,7 +3916,7 @@ AvailabilityManager:NightCycle,
     FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
-AvailabilityManager:NightCycle,
+  AvailabilityManager:NightCycle,
     PSZ-AC_2:2 Availability Manager,  !- Name
     Always_On,               !- Applicability Schedule Name
     HVACOperationSchd,       !- Fan Schedule Name
@@ -3998,32 +3925,29 @@ AvailabilityManager:NightCycle,
     FixedRunTime,            !- Cycling Run Time Control Type
     1800;                    !- Cycling Run Time {s}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: AVAILABILITYMANAGERASSIGNMENTLIST ===========
 
-AvailabilityManagerAssignmentList,
+  AvailabilityManagerAssignmentList,
     PSZ-AC_1:1 Availability Manager List,  !- Name
     AvailabilityManager:NightCycle,  !- Availability Manager 1 Object Type
     PSZ-AC_1:1 Availability Manager;  !- Availability Manager 1 Name
 
-AvailabilityManagerAssignmentList,
+  AvailabilityManagerAssignmentList,
     PSZ-AC_2:2 Availability Manager List,  !- Name
     AvailabilityManager:NightCycle,  !- Availability Manager 1 Object Type
     PSZ-AC_2:2 Availability Manager;  !- Availability Manager 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SETPOINTMANAGER:SCHEDULED ===========
 
-SetpointManager:Scheduled,
+  SetpointManager:Scheduled,
     SHWSys1 Loop Setpoint Manager,  !- Name
     Temperature,             !- Control Variable
     SHWSys1-Loop-Temp-Schedule,  !- Schedule Name
     SHWSys1 Supply Outlet Node;  !- Setpoint Node or NodeList Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SETPOINTMANAGER:SINGLEZONE:HEATING ===========
 
-SetpointManager:SingleZone:Heating,
+  SetpointManager:SingleZone:Heating,
     SupAirTemp MngrDining - Htg,  !- Name
     Temperature,             !- Control Variable
     12.8,                    !- Minimum Supply Air Temperature {C}
@@ -4033,7 +3957,7 @@ SetpointManager:SingleZone:Heating,
     Dining Direct Air Inlet Node Name,  !- Zone Inlet Node Name
     PSZ-AC_1:1 Zone Equipment Inlet Node;  !- Setpoint Node or NodeList Name
 
-SetpointManager:SingleZone:Heating,
+  SetpointManager:SingleZone:Heating,
     SupAirTemp MngrKitchen - Htg,  !- Name
     Temperature,             !- Control Variable
     12.8,                    !- Minimum Supply Air Temperature {C}
@@ -4043,10 +3967,9 @@ SetpointManager:SingleZone:Heating,
     Kitchen Direct Air Inlet Node Name,  !- Zone Inlet Node Name
     PSZ-AC_2:2 Zone Equipment Inlet Node;  !- Setpoint Node or NodeList Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SETPOINTMANAGER:SINGLEZONE:COOLING ===========
 
-SetpointManager:SingleZone:Cooling,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp MngrDining - Clg,  !- Name
     Temperature,             !- Control Variable
     12.8,                    !- Minimum Supply Air Temperature {C}
@@ -4056,7 +3979,7 @@ SetpointManager:SingleZone:Cooling,
     Dining Direct Air Inlet Node Name,  !- Zone Inlet Node Name
     PSZ-AC_1:1 Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
-SetpointManager:SingleZone:Cooling,
+  SetpointManager:SingleZone:Cooling,
     SupAirTemp MngrKitchen - Clg,  !- Name
     Temperature,             !- Control Variable
     12.8,                    !- Minimum Supply Air Temperature {C}
@@ -4066,10 +3989,9 @@ SetpointManager:SingleZone:Cooling,
     Kitchen Direct Air Inlet Node Name,  !- Zone Inlet Node Name
     PSZ-AC_2:2 Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SETPOINTMANAGER:MIXEDAIR ===========
 
-SetpointManager:MixedAir,
+  SetpointManager:MixedAir,
     PSZ-AC_1:1_CoolC SAT Manager,  !- Name
     Temperature,             !- Control Variable
     PSZ-AC_1:1 Supply Equipment Outlet Node,  !- Reference Setpoint Node Name
@@ -4077,7 +3999,7 @@ SetpointManager:MixedAir,
     PSZ-AC_1:1 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
     PSZ-AC_1:1_CoolC-PSZ-AC_1:1_HeatCNode;  !- Setpoint Node or NodeList Name
 
-SetpointManager:MixedAir,
+  SetpointManager:MixedAir,
     PSZ-AC_1:1_HeatC MixedAir Manager,  !- Name
     Temperature,             !- Control Variable
     PSZ-AC_1:1 Zone Equipment Inlet Node,  !- Reference Setpoint Node Name
@@ -4085,7 +4007,7 @@ SetpointManager:MixedAir,
     PSZ-AC_1:1 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
     PSZ-AC_1:1_HeatC-PSZ-AC_1:1 FanNode;  !- Setpoint Node or NodeList Name
 
-SetpointManager:MixedAir,
+  SetpointManager:MixedAir,
     PSZ-AC_1:1_OAMixed Air Temp Manager,  !- Name
     Temperature,             !- Control Variable
     PSZ-AC_1:1 Supply Equipment Outlet Node,  !- Reference Setpoint Node Name
@@ -4093,7 +4015,7 @@ SetpointManager:MixedAir,
     PSZ-AC_1:1 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
     PSZ-AC_1:1_OA-PSZ-AC_1:1_CoolCNode;  !- Setpoint Node or NodeList Name
 
-SetpointManager:MixedAir,
+  SetpointManager:MixedAir,
     PSZ-AC_2:2_CoolC SAT Manager,  !- Name
     Temperature,             !- Control Variable
     PSZ-AC_2:2 Supply Equipment Outlet Node,  !- Reference Setpoint Node Name
@@ -4101,7 +4023,7 @@ SetpointManager:MixedAir,
     PSZ-AC_2:2 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
     PSZ-AC_2:2_CoolC-PSZ-AC_2:2_HeatCNode;  !- Setpoint Node or NodeList Name
 
-SetpointManager:MixedAir,
+  SetpointManager:MixedAir,
     PSZ-AC_2:2_HeatC MixedAir Manager,  !- Name
     Temperature,             !- Control Variable
     PSZ-AC_2:2 Zone Equipment Inlet Node,  !- Reference Setpoint Node Name
@@ -4109,7 +4031,7 @@ SetpointManager:MixedAir,
     PSZ-AC_2:2 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
     PSZ-AC_2:2_HeatC-PSZ-AC_2:2 FanNode;  !- Setpoint Node or NodeList Name
 
-SetpointManager:MixedAir,
+  SetpointManager:MixedAir,
     PSZ-AC_2:2_OAMixed Air Temp Manager,  !- Name
     Temperature,             !- Control Variable
     PSZ-AC_2:2 Supply Equipment Outlet Node,  !- Reference Setpoint Node Name
@@ -4117,10 +4039,9 @@ SetpointManager:MixedAir,
     PSZ-AC_2:2 Supply Equipment Outlet Node,  !- Fan Outlet Node Name
     PSZ-AC_2:2_OA-PSZ-AC_2:2_CoolCNode;  !- Setpoint Node or NodeList Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: REFRIGERATION:CASE ===========
 
-Refrigeration:Case,
+  Refrigeration:Case,
     Kitchen_Case:1_WALKINFREEZER,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     Kitchen,                 !- Zone Name
@@ -4155,7 +4076,7 @@ Refrigeration:Case,
     Kitchen_Case:1_WALKINFREEZER_WalkInStockingSched,  !- Refrigerated Case Restocking Schedule Name
     Kitchen_Case:1_WALKINFREEZER_CaseCreditReduxSched;  !- Case Credit Fraction Schedule Name
 
-Refrigeration:Case,
+  Refrigeration:Case,
     Kitchen_Case:2_SELFCONTAINEDDISPLAYCASE,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
     Kitchen,                 !- Zone Name
@@ -4189,10 +4110,9 @@ Refrigeration:Case,
     0.0500,                  !- Under Case HVAC Return Air Fraction
     Kitchen_Case:2_SELFCONTAINEDDISPLAYCASE_CaseStockingSched;  !- Refrigerated Case Restocking Schedule Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: REFRIGERATION:COMPRESSORRACK ===========
 
-Refrigeration:CompressorRack,
+  Refrigeration:CompressorRack,
     RACK1,                   !- Name
     ZONE,                    !- Heat Rejection Location
     2.51,                    !- Design Compressor Rack COP {W/W}
@@ -4219,7 +4139,7 @@ Refrigeration:CompressorRack,
     LowTempRefrigeration,    !- End-Use Subcategory
     RACK1CaseList;           !- Refrigeration Case Name or WalkIn Name or CaseAndWalkInList Name
 
-Refrigeration:CompressorRack,
+  Refrigeration:CompressorRack,
     RACK2,                   !- Name
     ZONE,                    !- Heat Rejection Location
     7.29,                    !- Design Compressor Rack COP {W/W}
@@ -4246,21 +4166,19 @@ Refrigeration:CompressorRack,
     MedTempRefrigeration,    !- End-Use Subcategory
     RACK2CaseList;           !- Refrigeration Case Name or WalkIn Name or CaseAndWalkInList Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: REFRIGERATION:CASEANDWALKINLIST ===========
 
-Refrigeration:CaseAndWalkInList,
+  Refrigeration:CaseAndWalkInList,
     RACK1CaseList,           !- Name
     Kitchen_Case:1_WALKINFREEZER;  !- Case or WalkIn 1 Name
 
-Refrigeration:CaseAndWalkInList,
+  Refrigeration:CaseAndWalkInList,
     RACK2CaseList,           !- Name
     Kitchen_Case:2_SELFCONTAINEDDISPLAYCASE;  !- Case or WalkIn 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WATERUSE:EQUIPMENT ===========
 
-WaterUse:Equipment,
+  WaterUse:Equipment,
     Kitchen Water Equipment, !- Name
     WaterUse,                !- End-Use Subcategory
     9.598E-5,                !- Peak Flow Rate {m3/s}
@@ -4272,10 +4190,9 @@ WaterUse:Equipment,
     Kitchen Water Equipment Sensible fract sched,  !- Sensible Fraction Schedule Name
     Kitchen Water Equipment Latent fract sched;  !- Latent Fraction Schedule Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WATERUSE:CONNECTIONS ===========
 
-WaterUse:Connections,
+  WaterUse:Connections,
     Kitchen Water Equipment, !- Name
     Kitchen Water Equipment Water Inlet Node,  !- Inlet Node Name
     Kitchen Water Equipment Water Outlet Node,  !- Outlet Node Name
@@ -4288,10 +4205,9 @@ WaterUse:Connections,
     ,                        !- Drain Water Heat Exchanger U-Factor Times Area {W/K}
     Kitchen Water Equipment; !- Water Use Equipment 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CURVE:QUADRATIC ===========
 
-Curve:Quadratic,
+  Curve:Quadratic,
     RACK1_RackCOPfTCurve,    !- Name
     1.7603,                  !- Coefficient1 Constant
     -0.0377,                 !- Coefficient2 x
@@ -4299,7 +4215,7 @@ Curve:Quadratic,
     10.0000,                 !- Minimum Value of x
     35.0000;                 !- Maximum Value of x
 
-Curve:Quadratic,
+  Curve:Quadratic,
     RACK1_RackCondFanCurve2, !- Name
     0.0000,                  !- Coefficient1 Constant
     0.0286,                  !- Coefficient2 x
@@ -4307,7 +4223,7 @@ Curve:Quadratic,
     0.0000,                  !- Minimum Value of x
     35.0000;                 !- Maximum Value of x
 
-Curve:Quadratic,
+  Curve:Quadratic,
     RACK2_RackCOPfTCurve,    !- Name
     1.0000,                  !- Coefficient1 Constant
     0.0000,                  !- Coefficient2 x
@@ -4315,7 +4231,7 @@ Curve:Quadratic,
     0.0000,                  !- Minimum Value of x
     50.0000;                 !- Maximum Value of x
 
-Curve:Quadratic,
+  Curve:Quadratic,
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Name
     0.77136,                 !- Coefficient1 Constant
     0.34053,                 !- Coefficient2 x
@@ -4323,7 +4239,7 @@ Curve:Quadratic,
     0.75918,                 !- Minimum Value of x
     1.13877;                 !- Maximum Value of x
 
-Curve:Quadratic,
+  Curve:Quadratic,
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Name
     1.20550,                 !- Coefficient1 Constant
     -0.32953,                !- Coefficient2 x
@@ -4331,7 +4247,7 @@ Curve:Quadratic,
     0.75918,                 !- Minimum Value of x
     1.13877;                 !- Maximum Value of x
 
-Curve:Quadratic,
+  Curve:Quadratic,
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Name
     0.77100,                 !- Coefficient1 Constant
     0.22900,                 !- Coefficient2 x
@@ -4339,10 +4255,9 @@ Curve:Quadratic,
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CURVE:CUBIC ===========
 
-Curve:Cubic,
+  Curve:Cubic,
     Kitchen_Case:1_WALKINFREEZERSingleShelfHorizontal_LatentEnergyMult,  !- Name
     0.0236,                  !- Coefficient1 Constant
     0.0006,                  !- Coefficient2 x
@@ -4351,7 +4266,7 @@ Curve:Cubic,
     -35.0,                   !- Minimum Value of x
     20.0;                    !- Maximum Value of x
 
-Curve:Cubic,
+  Curve:Cubic,
     Kitchen_Case:2_SELFCONTAINEDDISPLAYCASEMultiShelfVertical_LatentEnergyMult,  !- Name
     0.026526281,             !- Coefficient1 Constant
     0.001078032,             !- Coefficient2 x
@@ -4360,10 +4275,9 @@ Curve:Cubic,
     -35.0,                   !- Minimum Value of x
     20.0;                    !- Maximum Value of x
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CURVE:BIQUADRATIC ===========
 
-Curve:Biquadratic,
+  Curve:Biquadratic,
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Name
     0.42415,                 !- Coefficient1 Constant
     0.04426,                 !- Coefficient2 x
@@ -4376,7 +4290,7 @@ Curve:Biquadratic,
     29.00000,                !- Minimum Value of y
     46.00000;                !- Maximum Value of y
 
-Curve:Biquadratic,
+  Curve:Biquadratic,
     PSZ-AC_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Name
     1.23649,                 !- Coefficient1 Constant
     -0.02431,                !- Coefficient2 x
@@ -4389,33 +4303,30 @@ Curve:Biquadratic,
     29.00000,                !- Minimum Value of y
     46.00000;                !- Maximum Value of y
 
-
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
-Output:VariableDictionary,IDF;
+  Output:VariableDictionary,IDF;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:SURFACES:LIST ===========
 
-Output:Surfaces:List,Details;
+  Output:Surfaces:List,Details;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:SURFACES:DRAWING ===========
 
-Output:Surfaces:Drawing,DXF;
+  Output:Surfaces:Drawing,DXF;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:CONSTRUCTIONS ===========
 
-Output:Constructions,Constructions;
+  Output:Constructions,Constructions;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:TABLE:SUMMARYREPORTS ===========
 
-
-Output:Table:SummaryReports,
+  Output:Table:SummaryReports,
     AllSummaryAndMonthly;    !- Report 1 Name
-
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:TABLE:MONTHLY ===========
 
-Output:Table:Monthly,
+  Output:Table:Monthly,
     NameHolderMonthlySummary TaskPurpose ProgressIndicator,  !- Name
     3,                       !- Digits After Decimal
     Site Outdoor Air Drybulb,!- Variable or Meter 1 Name
@@ -4423,7 +4334,7 @@ Output:Table:Monthly,
     Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-Output:Table:Monthly,
+  Output:Table:Monthly,
     NameHolderMonthlySummary CodeName ASHRAE901,  !- Name
     3,                       !- Digits After Decimal
     Site Outdoor Air Drybulb,!- Variable or Meter 1 Name
@@ -4431,7 +4342,7 @@ Output:Table:Monthly,
     Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-Output:Table:Monthly,
+  Output:Table:Monthly,
     NameHolderMonthlySummary CodeYear 2019,  !- Name
     3,                       !- Digits After Decimal
     Site Outdoor Air Drybulb,!- Variable or Meter 1 Name
@@ -4439,7 +4350,7 @@ Output:Table:Monthly,
     Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-Output:Table:Monthly,
+  Output:Table:Monthly,
     NameHolderMonthlySummary CodeAmendment NoneAmend,  !- Name
     3,                       !- Digits After Decimal
     Site Outdoor Air Drybulb,!- Variable or Meter 1 Name
@@ -4447,7 +4358,7 @@ Output:Table:Monthly,
     Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-Output:Table:Monthly,
+  Output:Table:Monthly,
     NameHolderMonthlySummary PrototypeName RestaurantFastFood,  !- Name
     3,                       !- Digits After Decimal
     Site Outdoor Air Drybulb,!- Variable or Meter 1 Name
@@ -4455,7 +4366,7 @@ Output:Table:Monthly,
     Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-Output:Table:Monthly,
+  Output:Table:Monthly,
     NameHolderMonthlySummary TaskScope National,  !- Name
     3,                       !- Digits After Decimal
     Site Outdoor Air Drybulb,!- Variable or Meter 1 Name
@@ -4463,7 +4374,7 @@ Output:Table:Monthly,
     Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-Output:Table:Monthly,
+  Output:Table:Monthly,
     NameHolderMonthlySummary State National,  !- Name
     3,                       !- Digits After Decimal
     Site Outdoor Air Drybulb,!- Variable or Meter 1 Name
@@ -4471,7 +4382,7 @@ Output:Table:Monthly,
     Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-Output:Table:Monthly,
+  Output:Table:Monthly,
     NameHolderMonthlySummary ClimateZone 5B,  !- Name
     3,                       !- Digits After Decimal
     Site Outdoor Air Drybulb,!- Variable or Meter 1 Name
@@ -4479,7 +4390,7 @@ Output:Table:Monthly,
     Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-Output:Table:Monthly,
+  Output:Table:Monthly,
     NameHolderMonthlySummary RepresentCity USA_CO_Denver,  !- Name
     3,                       !- Digits After Decimal
     Site Outdoor Air Drybulb,!- Variable or Meter 1 Name
@@ -4487,24 +4398,26 @@ Output:Table:Monthly,
     Heating:NaturalGas,      !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUTCONTROL:TABLE:STYLE ===========
 
-OutputControl:Table:Style,
+  OutputControl:Table:Style,
     commaAndHTML;            !- Column Separator
-
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUTCONTROL:REPORTINGTOLERANCES ===========
 
-OutputControl:ReportingTolerances,
+  OutputControl:ReportingTolerances,
     0.556,                   !- Tolerance for Time Heating Setpoint Not Met {deltaC}
     0.556;                   !- Tolerance for Time Cooling Setpoint Not Met {deltaC}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 
-Output:Meter:MeterFileOnly,Electricity:Facility,hourly;
-Output:Meter:MeterFileOnly,Electricity:Building,hourly;
-Output:Meter:MeterFileOnly,ElectricityNet:Facility,hourly;
-Output:Meter:MeterFileOnly,Electricity:HVAC,hourly;
-Output:Meter:MeterFileOnly,NaturalGas:Facility,hourly;
+  Output:Meter:MeterFileOnly,Electricity:Facility,hourly;
+
+  Output:Meter:MeterFileOnly,Electricity:Building,hourly;
+
+  Output:Meter:MeterFileOnly,ElectricityNet:Facility,hourly;
+
+  Output:Meter:MeterFileOnly,Electricity:HVAC,hourly;
+
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,hourly;
+
