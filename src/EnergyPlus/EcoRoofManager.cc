@@ -1191,10 +1191,9 @@ namespace EcoRoofManager {
     }
 
     void CalculateEcoRoofSolar(EnergyPlusData &state,
-                               Real64 &RS,  // Solar on roof (assumed horizontal)
-                               Real64 &f1,  // Solar term for Stomatal Resistance
-                               int const SurfNum
-    )
+                               Real64 &RS, // Solar on roof (assumed horizontal)
+                               Real64 &f1, // Solar term for Stomatal Resistance
+                               int const SurfNum)
     {
 
         // Use SOLCOS(3) here to calculate RS since as stated in comments above this is only done for one surface currently.
@@ -1205,7 +1204,6 @@ namespace EcoRoofManager {
              state.dataSolarShading->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
         Real64 f1inv = min(1.0, (0.004 * RS + 0.005) / (0.81 * (0.004 * RS + 1.0)));
         f1 = 1.0 / f1inv;
-
     }
 
 } // namespace EcoRoofManager

@@ -97,7 +97,7 @@ TEST_F(EnergyPlusFixture, EcoRoof_CalculateEcoRoofSolarTest)
     EXPECT_NEAR(resultf1, expectedf1, 0.001);
 
     // Test 3: inverse of f1 greater than 1
-    state->dataEnvrn->SOLCOS(3) =1.0;
+    state->dataEnvrn->SOLCOS(3) = 1.0;
     state->dataEnvrn->BeamSolarRad = 1500.0;
     state->dataSolarShading->SurfAnisoSkyMult(SurfNum) = 0.0;
     state->dataEnvrn->DifSolarRad = 0.0;
@@ -106,7 +106,6 @@ TEST_F(EnergyPlusFixture, EcoRoof_CalculateEcoRoofSolarTest)
     CalculateEcoRoofSolar(*state, resultRS, resultf1, SurfNum);
     EXPECT_NEAR(resultRS, expectedRS, 0.001);
     EXPECT_NEAR(resultf1, expectedf1, 0.001);
-
 }
 
 } // namespace EnergyPlus
