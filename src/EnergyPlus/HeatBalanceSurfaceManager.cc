@@ -7500,6 +7500,16 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 }
 
+void updateQdotConvInRep(EnergyPlusData &state,
+                         int const SurfNum)
+{
+    Real64 HConvIn = state.dataHeatBal->HConvIn(SurfNum) * state.dataHeatBal->CoeffAdjRatioIn(SurfNum);
+    Real64 const HConvInTemp_fac = -HConvIn * (state.dataHeatBalSurf->TempSurfIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
+    state.dataHeatBalSurf->QdotConvInRep(SurfNum) = state.dataSurface->Surface(SurfNum).Area * HConvInTemp_fac;
+    state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum) = HConvInTemp_fac;
+    state.dataHeatBalSurf->QConvInReport(SurfNum) = state.dataHeatBalSurf->QdotConvInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+}
+
 void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                        const int FirstZone,             // First zone to simulate
                                        const int LastZone,              // Last zone to simulate
@@ -8113,18 +8123,13 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
 
     } // ...end of main inside heat balance iteration loop (ends when Converged)
 
-    Real64 HConvIn;
     // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
     for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
         int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
         int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
-            HConvIn = state.dataHeatBal->HConvIn(surfNum) * state.dataHeatBal->CoeffAdjRatioIn(surfNum);
-            auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->TempSurfIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
-            state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
-            state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
-            state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
+            updateQdotConvInRep(state, surfNum);
 
             // The QdotConvInRep which is called "Surface Inside Face Convection Heat Gain" is stored during
             // sizing for both the normal and pulse cases so that load components can be derived later.

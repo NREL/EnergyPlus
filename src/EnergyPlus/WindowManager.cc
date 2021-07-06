@@ -2184,6 +2184,39 @@ namespace WindowManager {
         }
     }
 
+    // update the following:
+    // state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum)
+    // state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum)
+    // state.dataHeatBalSurf->QConvOutReport(SurfNum)
+    void updateQdotConvOutRep(EnergyPlusData &state,
+                                    int const SurfNum,
+                                    Real64 const Tsout) {
+        auto &surface(state.dataSurface->Surface(SurfNum));
+        state.dataHeatBalSurf->QdotConvOutRep(SurfNum) =
+        -surface.Area * state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
+        state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum) =
+            -state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
+        state.dataHeatBalSurf->QConvOutReport(SurfNum) = state.dataHeatBalSurf->QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+    }
+
+    void updateQdotRadOutRepHeatEmi(EnergyPlusData &state,
+                             int const SurfNum,
+                             Real64 const Tsout,
+                             Real64 const rad_out_per_area,
+                             Real64 const rad_out_air_per_area)
+    {
+        auto const &surface = state.dataSurface->Surface(SurfNum);
+        state.dataHeatBalSurf->QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
+        state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = rad_out_per_area * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
+        state.dataHeatBalSurf->QRadOutReport(SurfNum) = state.dataHeatBalSurf->QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        // Radiation emission to air rate
+        state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
+        state.dataHeatBalSurf->QHeatEmiReport(SurfNum) = surface.Area * state.dataWindowManager->hcout *
+                                                             state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) *
+                                                             (Tsout - state.dataWindowManager->tout) +
+                                                         state.dataHeatBalSurf->QAirExtReport(SurfNum);
+    }
+
     void CalcWindowHeatBalanceInternalRoutines(EnergyPlusData &state,
                                                int const SurfNum,          // Surface number
                                                Real64 const HextConvCoeff, // Outside air film conductance coefficient
@@ -2902,11 +2935,7 @@ namespace WindowManager {
         }
         // update exterior environment surface heat loss reporting
         Tsout = SurfOutsideTemp + state.dataWindowManager->TKelvin;
-        state.dataHeatBalSurf->QdotConvOutRep(SurfNum) =
-            -surface.Area * state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
-        state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum) =
-            -state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
-        state.dataHeatBalSurf->QConvOutReport(SurfNum) = state.dataHeatBalSurf->QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        updateQdotConvOutRep(state, SurfNum, Tsout);
 
         Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
         Real64 const Tout_4(pow_4(state.dataWindowManager->tout));
@@ -2934,15 +2963,8 @@ namespace WindowManager {
         Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
 
         state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
-        state.dataHeatBalSurf->QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
-        state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
-        state.dataHeatBalSurf->QRadOutReport(SurfNum) = state.dataHeatBalSurf->QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+        updateQdotRadOutRepHeatEmi(state, SurfNum, Tsout, rad_out_per_area, rad_out_air_per_area);
 
-        // Radiation emission to air rate
-        state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
-        state.dataHeatBalSurf->QHeatEmiReport(SurfNum) =
-            surface.Area * state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout) +
-            state.dataHeatBalSurf->QAirExtReport(SurfNum);
     }
 
     //****************************************************************************
@@ -7185,10 +7207,6 @@ namespace WindowManager {
         static std::string const RoutineName("WindowTempsForNominalCond");
 
         int i;                      // Counter
-        Real64 gr;                  // Grashof number of gas in a gap
-        Real64 con;                 // Gap gas conductivity
-        Real64 pr;                  // Gap gas Prandtl number
-        Real64 nu;                  // Gap gas Nusselt number
         Array1D<Real64> hr(10);     // Radiative conductance (W/m2-K)
         Array1D<Real64> hrprev(10); // Value of hr from previous iteration
         Real64 hcinprev;            // Value of hcin from previous iteration
