@@ -128,8 +128,10 @@ namespace MixedAir {
         Humidifier,
         Fan_System_Object,
         UnitarySystemModel,
-        VRFTerminalUnit
+        VRFTerminalUnit,
+        CoilSystemWater
     };
+    constexpr int CoilSystemWater(25);
 
     enum class iControllerType
     {

@@ -104,6 +104,7 @@ namespace SimAirServingZones {
     constexpr int Fan_System_Object(28);
     constexpr int UnitarySystemModel(29);
     constexpr int ZoneVRFasAirLoopEquip(30);
+    constexpr int CoilSystemWater(31);
 
     void ManageAirLoops(EnergyPlusData &state,
                         bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
@@ -153,7 +154,11 @@ namespace SimAirServingZones {
                              bool FirstHVACIteration,     // TRUE if first full HVAC iteration in an HVAC timestep
                              int AirLoopNum,              // Primary air loop number
                              int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
-                             HVACSystemData *CompPointer);
+                             HVACSystemData *CompPointer, // equipment actual pointer
+                             int const &airLoopNum,       // index to AirloopHVAC
+                             int const &branchNum,        // index to AirloopHVAC branch
+                             int const &compNum           // index to AirloopHVAC branch component
+    );
 
     void UpdateBranchConnections(EnergyPlusData &state,
                                  int AirLoopNum, // primary air system number
