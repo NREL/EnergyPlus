@@ -1,3 +1,4 @@
+<<<<<<< HEAD:testfiles/ASHRAE901_OfficeMedium_STD2019_Denver.idf
 !-Generator IDFEditor 1.51
 !-Option SortedOrder UseSpecialFormat
 
@@ -21,6 +22,126 @@ SimulationControl,
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
+=======
+! The 90.1 Prototype Building Models were developed by Pacific Northwest National Laboratory (PNNL),
+! under contract with the U.S. Department of Energy (DOE).  These building models were derived from
+! DOE’s Commercial Reference Building Models with modifications based on input from the ASHRAE Standard 90.1 committee,
+! the Advanced Energy Design Guide series, and building industry experts.
+! The prototypes models were developed to quantify energy saving impacts from
+! newly published editions of ASHRAE Standard 90.1.  The basic building descriptions can be found in the Scorecards
+! posted at this website.  Detailed descriptions of the prototype model development and addenda modeling
+! strategies can be found in the following  reports:
+! "Achieving 30% Goal: Energy and Cost Saving Analysis of ASHRAE/IES Standard 90.1-2010."
+! "Enhancements to ASHRAE Standard 90.1 Prototype Building Models"
+! "Energy Savings Analysis: ANSI/ASHRAE/IES Standard 90.1-2016"
+! "ANSI/ASHRAE/IES Standard 90.1-2013 Determination of Energy Savings: Quantitative Analysis"
+!
+! BEGIN ECONOMIZER MAP
+! Economizer Name, DX COIL Name
+! PACU_VAV_bot_OA_Controller, PACU_VAV_bot_CoolC DXCoil
+! PACU_VAV_mid_OA_Controller, PACU_VAV_mid_CoolC DXCoil
+! PACU_VAV_top_OA_Controller, PACU_VAV_top_CoolC DXCoil
+! END ECONOMIZER MAP
+! WeatherFile:  USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+! GPARM parameters as input:
+!    Case = DOE.determination2016_OfficeMedium_STD2016_Boise
+!    weatherfile = USA_ID_Boise_TMY2.epw
+!    annual_run = yes
+!    slab_gtp = Zone5B_nonres_R15_2ftV_OfficeMedium_Denver_STD2016.gtp
+!    basement_tempt = OfficeMedium_STD2007_Boise_bsmt.idf
+!    avg_oa_tempt_ip = 49.91
+!    maxdiff_oa_tempt_ip = 42.66
+!    ext_wall_type = SteelFramedWall
+!    nonres_ext_wall_ufactor = 0.312304465
+!    roof_type = LightweightRoof
+!    nonres_roof_ufactor = 0.181704416
+!    roof_emissivity = 0.9
+!    roof_solar_absorp = 0.7
+!    nonres_window = Window_U_0.41_SHGC_0.38
+!    economizer = DifferentialDryBulb
+!    skip_economizer_control = No
+!    sidelighting_control = yes_AY
+!    LPD_office = 8.503489229
+!    exterior_lights_watts = 0
+!    exterior_lights_watts_a = 519.2
+!    exterior_lights_watts_b = 375.7
+!    avg_oa_tempt = 9.95
+!    maxdiff_oa_tempt = 23.7
+!    infil = 0.00056896
+!    oa_flow_per_area = 0.000431773
+!    SAT_reset_switch = Yes
+!    SAT_reset_T = 15.6
+!    door_infil = 0.678659786
+!    frac_ofpk = 0.131
+!    damper_sched = MinOA_MotorizedDamper_Sched
+!    economizer_lockout = NoLockout
+!    heating_damper_act = Normal
+!    add_ck_pacu_vav_bot = Yes
+!    add_ck_pacu_vav_mid = Yes
+!    add_ck_pacu_vav_top = Yes
+!    core_bottom_mdp = 0.3
+!    perimeter_bot_zn_1_mdp = 0.3
+!    perimeter_bot_zn_2_mdp = 0.3
+!    perimeter_bot_zn_3_mdp = 0.305230058147285
+!    perimeter_bot_zn_4_mdp = 0.3
+!    core_mid_mdp = 0.307432099778152
+!    perimeter_mid_zn_1_mdp = 0.3
+!    perimeter_mid_zn_2_mdp = 0.3
+!    perimeter_mid_zn_3_mdp = 0.3
+!    perimeter_mid_zn_4_mdp = 0.3
+!    core_top_mdp = 0.3
+!    perimeter_top_zn_1_mdp = 0.3
+!    perimeter_top_zn_2_mdp = 0.3
+!    perimeter_top_zn_3_mdp = 0.3
+!    perimeter_top_zn_4_mdp = 0.3
+!    pacu_vav_bot_oaf = 1.19508883333333
+!    pacu_vav_mid_oaf = 1.19508883333333
+!    pacu_vav_top_oaf = 1.1865461959444
+!    BLDG_ELEVATORS_LIGHTS_FAN_SCH = ELEV_LIGHT_FAN_SCH_ADD_DF
+!    BLDG_ELEVATORS_LIGHTS_FAN_POWER = 125
+!    BLDG_EQUIP_SCH = BLDG_EQUIP_SCH_ADV
+!    addendum_cd = 2016AS
+!    pv_generator = no
+!    pv_surface_area = 0
+!    STD189_overhang = no
+!    swh_et = 0.808039999
+!    swh_ua = 7.561562668
+!    ext_lgt_sch = Exterior_Lgt_ALWAYS_ON
+!    PACU_VAV_bot_ERV = No
+!    PACU_VAV_mid_ERV = No
+!    PACU_VAV_top_ERV = No
+!    LTG_SCH_SET = LTG_SET_STD2013
+!    transformer_size = 45000
+!    transformer_eff = 0.984
+!    PACU_VAV_bot_ERV_power = 907.476237916664
+!    PACU_VAV_mid_ERV_power = 907.476237916664
+!    PACU_VAV_top_ERV_power = 901.346895590107
+!    OA_BASED_OPTIMUM_START_EMS = yes
+!    OPTIMUM_START_SF_DEPENDENT_EMS = no
+!    wwr = 0.33
+!    pipe_heat_loss = 1886.44
+!    skip_EMSprogram = yes
+!    HtgSetP_Sch_PACU_VAV_bot = HTGSETP_SCH_YES_OPTIMUM
+!    HtgSetP_Sch_PACU_VAV_mid = HTGSETP_SCH_YES_OPTIMUM
+!    HtgSetP_Sch_PACU_VAV_top = HTGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch_PACU_VAV_bot = CLGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch_PACU_VAV_mid = CLGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch_PACU_VAV_top = CLGSETP_SCH_YES_OPTIMUM
+!    Wfile_TMY3 = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    loadProfile = No
+!    receptacle_ctrl_occ_reduction_frac = 0.95308699
+!    receptacle_ctrl_unocc_reduction_frac = 0.769184602
+!    SHW_Pump_Head = 29891
+!    CodeName = ASHRAE90.1_STD2016
+!    CZ_City_Old = Boise
+!    CZ_Label = 5B
+!    exterior_lights_watts_c = 4341.6
+!    Addendum_AH = Yes
+!    LPD_Ctrl = 0.02
+!    con_swingdoor_r = 0.475963827
+
+  Version,9.6;
+>>>>>>> 42846a95e03cabcc18ef22f9778ca58ae6468128:testfiles/ASHRAE9012016_OfficeMedium_Denver.idf
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 

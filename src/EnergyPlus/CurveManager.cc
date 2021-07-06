@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -180,7 +181,7 @@ namespace CurveManager {
         // Return value
         Real64 CurveValue(0.0);
 
-        // need to be careful on where and how resetting curve outputs to some "iactive value" is done
+        // need to be careful on where and how resetting curve outputs to some "inactive value" is done
         // EMS can intercept curves and modify output
         if (state.dataGlobal->BeginEnvrnFlag && state.dataCurveManager->CurveValueMyBeginTimeStepFlag) {
             ResetPerformanceCurveOutput(state);
@@ -195,15 +196,17 @@ namespace CurveManager {
             ShowFatalError(state, "CurveValue: Invalid curve passed.");
         }
 
-        {
-            auto const SELECT_CASE_var(state.dataCurveManager->PerfCurve(CurveIndex).InterpolationType);
-            if (SELECT_CASE_var == InterpTypeEnum::EvaluateCurveToLimits) {
-                CurveValue = PerformanceCurveObject(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
-            } else if (SELECT_CASE_var == InterpTypeEnum::BtwxtMethod) {
-                CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
-            } else {
-                ShowFatalError(state, "CurveValue: Invalid Interpolation Type");
-            }
+        switch (state.dataCurveManager->PerfCurve(CurveIndex).InterpolationType) {
+        case InterpTypeEnum::EvaluateCurveToLimits: {
+            CurveValue = PerformanceCurveObject(state, CurveIndex, Var1, Var2, Var3, Var4, Var5);
+            break;
+        }
+        case InterpTypeEnum::BtwxtMethod: {
+            CurveValue = BtwxtTableInterpolation(state, CurveIndex, Var1, Var2, Var3, Var4, Var5, Var6);
+            break;
+        }
+        default:
+            ShowFatalError(state, "CurveValue: Invalid Interpolation Type");
         }
 
         if (state.dataCurveManager->PerfCurve(CurveIndex).EMSOverrideOn)
@@ -290,8 +293,6 @@ namespace CurveManager {
         std::string CurrentModuleObject; // for ease in renaming.
         int MaxTableNums(0);             // Maximum number of numeric input fields in Tables
         //   certain object in the input file
-
-        std::string FileName; // name of external table data file
 
         // Find the number of each type of curve (note: Current Module object not used here, must rename manually)
 
@@ -1341,7 +1342,7 @@ namespace CurveManager {
             }
         }
 
-        // Loop over Fan Pressure Rise curves and load data - udated 15Sep2010 for unit types
+        // Loop over Fan Pressure Rise curves and load data
         CurrentModuleObject = "Curve:FanPressureRise";
         for (CurveIndex = 1; CurveIndex <= NumFanPressRise; ++CurveIndex) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -1991,13 +1992,15 @@ namespace CurveManager {
                         std::vector<double> axis;
 
                         if (indVarInstance.count("external_file_name")) {
-                            std::string filePath = indVarInstance.at("external_file_name");
+                            std::string tmp = indVarInstance.at("external_file_name");
+                            fs::path filePath(tmp);
                             if (!indVarInstance.count("external_file_column_number")) {
-                                ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
                                 ErrorsFound = true;
                             }
                             if (!indVarInstance.count("external_file_starting_row_number")) {
-                                ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                                ShowSevereError(state,
+                                                contextString + ": No starting row number defined for external file \"" + filePath.string() + "\"");
                                 ErrorsFound = true;
                             }
 
@@ -2188,14 +2191,15 @@ namespace CurveManager {
 
                 std::vector<double> lookupValues;
                 if (fields.count("external_file_name")) {
-                    std::string filePath = fields.at("external_file_name");
+                    std::string tmp = fields.at("external_file_name");
+                    fs::path filePath(tmp);
 
                     if (!fields.count("external_file_column_number")) {
-                        ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(state, contextString + ": No column number defined for external file \"" + filePath.string() + "\"");
                         ErrorsFound = true;
                     }
                     if (!fields.count("external_file_starting_row_number")) {
-                        ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath + "\"");
+                        ShowSevereError(state, contextString + ": No starting row number defined for external file \"" + filePath.string() + "\"");
                         ErrorsFound = true;
                     }
 
@@ -2320,14 +2324,13 @@ namespace CurveManager {
         tableFiles.clear();
     }
 
-    bool TableFile::load(EnergyPlusData &state, std::string path)
+    bool TableFile::load(EnergyPlusData &state, fs::path const &path)
     {
-        filePath = path;
-        bool fileFound;
-        std::string fullPath;
+        this->filePath = path;
         std::string contextString = "CurveManager::TableFile::load: ";
-        DataSystemVariables::CheckForActualFileName(state, path, fileFound, fullPath, contextString);
-        if (!fileFound) {
+        fs::path fullPath = DataSystemVariables::CheckForActualFilePath(state, path, contextString);
+        if (fullPath.empty()) {
+            // Note: we return 'ErrorsFound' apparently
             return true;
         }
         std::ifstream file(fullPath);
@@ -2373,12 +2376,12 @@ namespace CurveManager {
             std::size_t row = colAndRow.second; // 0 indexed
             auto &content = contents[col];
             if (col >= numColumns) {
-                ShowFatalError(state,
-                               format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath, col + 1, numColumns));
+                ShowFatalError(
+                    state, format("File \"{}\" : Requested column ({}) exceeds the number of columns ({}).", filePath.string(), col + 1, numColumns));
             }
             if (row >= numRows) {
-                ShowFatalError(state,
-                               format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath, row + 1, numRows));
+                ShowFatalError(
+                    state, format("File \"{}\" : Requested starting row ({}) exceeds the number of rows ({}).", filePath.string(), row + 1, numRows));
             }
             std::vector<double> array(numRows - row);
             std::transform(content.begin() + row, content.end(), array.begin(), [](const std::string &str) {
@@ -2549,13 +2552,12 @@ namespace CurveManager {
     }
 
     Real64 PerformanceCurveObject(EnergyPlusData &state,
-                                  int const CurveIndex,                        // index of curve in curve array
-                                  Real64 const Var1,                           // 1st independent variable
-                                  Optional<Real64 const> Var2,                 // 2nd independent variable
-                                  Optional<Real64 const> Var3,                 // 3rd independent variable
-                                  Optional<Real64 const> Var4,                 // 4th independent variable
-                                  Optional<Real64 const> Var5,                 // 5th independent variable
-                                  [[maybe_unused]] Optional<Real64 const> Var6 // 6th independent variable
+                                  int const CurveIndex,        // index of curve in curve array
+                                  Real64 const Var1,           // 1st independent variable
+                                  Optional<Real64 const> Var2, // 2nd independent variable
+                                  Optional<Real64 const> Var3, // 3rd independent variable
+                                  Optional<Real64 const> Var4, // 4th independent variable
+                                  Optional<Real64 const> Var5  // 5th independent variable
     )
     {
 
@@ -2591,7 +2593,6 @@ namespace CurveManager {
         Real64 const V3(Var3.present() ? max(min(Var3, Curve.Var3Max), Curve.Var3Min) : 0.0); // 3rd independent variable after limits imposed
         Real64 const V4(Var4.present() ? max(min(Var4, Curve.Var4Max), Curve.Var4Min) : 0.0); // 4th independent variable after limits imposed
         Real64 const V5(Var5.present() ? max(min(Var5, Curve.Var5Max), Curve.Var5Min) : 0.0); // 5th independent variable after limits imposed
-        // Real64 const V6(Var6.present() ? max(min(Var6, Curve.Var6Max), Curve.Var6Min) : 0.0); // 6th independent variable after limits imposed
 
         {
             auto const SELECT_CASE_var(Curve.CurveType);
@@ -2802,10 +2803,10 @@ namespace CurveManager {
     bool CheckCurveDims(EnergyPlusData &state,
                         int const CurveIndex,
                         std::vector<int> validDims,
-                        std::string routineName,
-                        std::string objectType,
-                        std::string objectName,
-                        std::string curveFieldText)
+                        std::string_view routineName,
+                        const std::string &objectType,
+                        const std::string &objectName,
+                        const std::string &curveFieldText)
     {
         // Returns true if errors found
         int curveDim = state.dataCurveManager->PerfCurve(CurveIndex).NumDims;
@@ -2814,7 +2815,7 @@ namespace CurveManager {
             return false;
         } else {
             // Not compatible
-            ShowSevereError(state, routineName + objectType + "=\"" + objectName + "\"");
+            ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName));
             ShowContinueError(state, "...Invalid curve for " + curveFieldText + ".");
             std::string validString = fmt::to_string(validDims[0]);
             for (std::size_t i = 1; i < validDims.size(); i++) {

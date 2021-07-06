@@ -63,7 +63,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
-#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -133,9 +132,6 @@ namespace StandardRatings {
     Real64 const OADBTempLowReducedCapacityTest(18.3);                          // Outdoor air dry-bulb temp in degrees C (65F)
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
-    // Defrost control  (heat pump only)
-    int const Timed(1);                                                     // defrost cycle is timed
-    int const OnDemand(2);                                                  // defrost cycle occurs only when required
     int const TotalNumOfStandardDHRs(16);                                   // Total number of standard design heating requirements
     Array1D_int const TotalNumOfTemperatureBins(6, {9, 10, 13, 15, 18, 9}); // Total number of temperature
     // bins for a region
@@ -406,15 +402,15 @@ namespace StandardRatings {
                     Par(11) = OpenMotorEff;
                     CondenserOutletTemp0 = EnteringWaterTempReduced + 0.1;
                     CondenserOutletTemp1 = EnteringWaterTempReduced + 10.0;
-                    TempSolveRoot::SolveRoot(state,
-                                             Acc,
-                                             IterMax,
-                                             SolFla,
-                                             CondenserOutletTemp,
-                                             ReformEIRChillerCondInletTempResidual,
-                                             CondenserOutletTemp0,
-                                             CondenserOutletTemp1,
-                                             Par);
+                    General::SolveRoot(state,
+                                       Acc,
+                                       IterMax,
+                                       SolFla,
+                                       CondenserOutletTemp,
+                                       ReformEIRChillerCondInletTempResidual,
+                                       CondenserOutletTemp0,
+                                       CondenserOutletTemp1,
+                                       Par);
                     if (SolFla == -1) {
                         ShowWarningError(state, "Iteration limit exceeded in calculating Reform Chiller IPLV");
                         ShowContinueError(state, "Reformulated Chiller IPLV calculation failed for " + ChillerName);
@@ -781,9 +777,9 @@ namespace StandardRatings {
         Optional<Real64 const>
             OATempCompressorOn, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
         Optional_bool_const
-            OATempCompressorOnOffBlank,      // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
-        Optional_int_const DefrostControl,   // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
-        Optional_bool_const ASHRAE127StdRprt // true if user wishes to report ASHRAE 127 standard ratings
+            OATempCompressorOnOffBlank, // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
+        Optional<HPdefrostControl const> DefrostControl, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+        Optional_bool_const ASHRAE127StdRprt             // true if user wishes to report ASHRAE 127 standard ratings
     )
     {
 
@@ -1175,7 +1171,7 @@ namespace StandardRatings {
         Optional<Real64 const> MinOATCompressor,          // Minimum OAT for heat pump compressor operation [C]
         Optional<Real64 const> OATempCompressorOn,        // The outdoor temperature when the compressor is automatically turned
         Optional_bool_const OATempCompressorOnOffBlank,   // Flag used to determine low temperature cut out factor
-        Optional_int_const DefrostControl                 // defrost control; 1=timed, 2=on-demand
+        Optional<HPdefrostControl const> DefrostControl   // defrost control; 1=timed, 2=on-demand
 
     )
     {
@@ -1503,7 +1499,7 @@ namespace StandardRatings {
 
         TotalElectricalEnergy = TotalHeatPumpElectricalEnergy + TotalResistiveSpaceHeatingElectricalEnergy;
 
-        if (DefrostControl == Timed) {
+        if (DefrostControl == HPdefrostControl::Timed) {
             DemandDeforstCredit = 1.0; // Timed defrost control
         } else {
             DemandDeforstCredit = 1.03; // Demand defrost control
@@ -2040,7 +2036,7 @@ namespace StandardRatings {
         Optional<Real64 const> MinOATCompressor,                   // Minimum OAT for heat pump compressor operation [C]
         Optional<Real64 const> OATempCompressorOn,                 // The outdoor temperature when the compressor is automatically turned
         Optional_bool_const OATempCompressorOnOffBlank,            // Flag used to determine low temperature cut out factor
-        Optional_int_const DefrostControl                          // defrost control; 1=timed, 2=on-demand
+        Optional<HPdefrostControl const> DefrostControl            // defrost control; 1=timed, 2=on-demand
     )
     {
 
@@ -2407,7 +2403,7 @@ namespace StandardRatings {
             TotHeatingElecPowerWeighted += (TotHeatElecPowerBinnedHP + TotHeatElecPowerBinnedRH) * FractionalBinHours;
         }
 
-        if (DefrostControl == Timed) {
+        if (DefrostControl == HPdefrostControl::Timed) {
             DemandDeforstCredit = 1.0; // Timed defrost control
         } else {
             DemandDeforstCredit = 1.03; // Demand defrost control

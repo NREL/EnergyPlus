@@ -1,3 +1,4 @@
+<<<<<<< HEAD:testfiles/ASHRAE901_HotelSmall_STD2019_Denver.idf
 !-Generator IDFEditor 1.51
 !-Option SortedOrder UseSpecialFormat
 
@@ -8,6 +9,135 @@
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
 Version,9.5;
+=======
+! The 90.1 Prototype Building Models were developed by Pacific Northwest National Laboratory (PNNL),
+! under contract with the U.S. Department of Energy (DOE).  These building models were derived from
+! DOE’s Commercial Reference Building Models with modifications based on input from the ASHRAE Standard 90.1 committee,
+! the Advanced Energy Design Guide series, and building industry experts.
+! The prototypes models were developed to quantify energy saving impacts from
+! newly published editions of ASHRAE Standard 90.1.  The basic building descriptions can be found in the Scorecards
+! posted at this website.  Detailed descriptions of the prototype model development and addenda modeling
+! strategies can be found in the following  reports:
+! "Achieving 30% Goal: Energy and Cost Saving Analysis of ASHRAE/IES Standard 90.1-2010."
+! "Enhancements to ASHRAE Standard 90.1 Prototype Building Models"
+! "Energy Savings Analysis: ANSI/ASHRAE/IES Standard 90.1-2016"
+! "ANSI/ASHRAE/IES Standard 90.1-2013 Determination of Energy Savings: Quantitative Analysis"
+!
+! BEGIN ECONOMIZER MAP
+! Economizer Name, DX COIL Name
+! SAC_FrontOffice OA Controller, SAC_FrontOffice Cooling Coil
+! SAC_FrontLounge OA Controller, SAC_FrontLounge Cooling Coil
+! SAC_MeetingRoom OA Controller, SAC_MeetingRoom Cooling Coil
+! SAC_Exc_EmpLge_RestRm OA Controller, SAC_Exc_EmpLge_RestRm Cooling Coil
+! MAU OA Controller, MAU Cooling Coil
+! END ECONOMIZER MAP
+!
+!
+! BEGIN EMS PROGRAM MAP
+! EMS PROGRAM, DX COIL Name
+! SAC_FO, SAC_FrontOffice Cooling Coil
+! SAC_FL, SAC_FrontLounge Cooling Coil
+! SAC_MR, SAC_MeetingRoom Cooling Coil
+! SAC_Exc, SAC_Exc_EmpLge_RestRm Cooling Coil
+! END EMS PROGRAM MAP
+!
+!
+! WeatherFile:  USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+! GPARM parameters as input:
+!    Case = DOE.determination2016_HotelSmall_STD2016_Boise
+!    weatherfile = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    ground_tempt = Zone5B_nonres_R15_2ftV_HotelSmall_Denver_STD2016.gtp
+!    avg_oa_tempt_ip = 49.91
+!    maxdiff_oa_tempt_ip = 42.66
+!    ext_wall_type = SteelFramedWall
+!    nonres_ext_wall_ufactor = 0.312304465
+!    res_ext_wall_ufactor = 0.312304465
+!    roof_type = LightweightRoof
+!    res_roof_ufactor = 0.181704416
+!    nonres_window = Window_U_0.42_SHGC_0.40
+!    res_window = Window_U_0.42_SHGC_0.40
+!    sidelighting_control = yes_AY
+!    roof_emissivity = 0.9
+!    roof_solar_absorp = 0.77
+!    LPD_guestroom = 8.288211021
+!    LPD_corridor = 8.52501705
+!    LPD_stair = 6.243068042
+!    LPD_lobby = 11.40974504
+!    LPD_storage = 4.951398792
+!    LPD_office = 10.01043669
+!    LPD_laundry = 4.628481479
+!    LPD_meeting = 11.51738415
+!    LPD_restroom = 9.149323854
+!    LPD_exercise = 6.45834625
+!    LPD_lounge = 6.673624459
+!    LPD_mechanical = 10.2257149
+!    LPD_elevator = 0
+!    guestroom_ltg_sch = Guestroom_Ltg_Sch_Base
+!    guestroom_eqp_sch = Guestroom_Eqp_Sch_Adva
+!    lights_exterior = 2819.7
+!    economizer = DifferentialDryBulb
+!    skip_economizer_control = No
+!    MAU_flowrate = 1.1828
+!    avg_oa_tempt = 9.95
+!    maxdiff_oa_tempt = 23.7
+!    infil = 0.00056896
+!    OA_guestroom = 0.000413173
+!    OA_suite = 0.000405419
+!    OA_corridor = 0.000304682
+!    OA_stair = 0.000304682
+!    OA_lobby = 0.001447242
+!    OA_storage = 0.000609365
+!    OA_office = 0.000431633
+!    OA_laundry = 0
+!    OA_meeting = 0.001574193
+!    OA_restroom = 0
+!    OA_exercise = 0.001320291
+!    OA_lounge = 0.001574193
+!    OA_mechanical = 0
+!    OA_elevator = 0
+!    door_infil = 0.591821538
+!    frac_ofpk = 0.131
+!    PTAC_COP = 3.81
+!    n_thermostatctrl_guestroom = N Adva VentCtrl OccGuestRoom Thermostat Dual SP Control
+!    economizer_lockout = NoLockout
+!    BLDG_ELEVATORS_LIGHTS_FAN_SCH = ELEV_LIGHT_FAN_SCH_ADD_DF
+!    BLDG_ELEVATORS_LIGHTS_FAN_POWER = 125
+!    orientation = 180
+!    BLDG_EQUIP_SCH = BLDG_EQUIP_SCH_ADV
+!    pv_generator = no
+!    pv_surface_area = 0
+!    STD189_overhang = no
+!    overhang_pf_ew = 0
+!    swh_et1 = 0.803988738
+!    swh_ua1 = 11.25413987
+!    swh_et2 = 0.80512672
+!    swh_ua2 = 9.643286505
+!    ext_lgt_sch = Exterior_Lgt_ALWAYS_ON
+!    MAU_ERV = No
+!    LTG_SCH_SET = LTG_SET_STD2013
+!    MAU_ERV_power = NA
+!    pipe_heat_loss = 7231.83
+!    skip_EMSprogram = no
+!    Wfile_TMY3 = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    loadProfile = 0
+!    vent_setback_flag = 1
+!    s_thermostatctrl_guestroom = S Adva VentCtrl OccGuestRoom Thermostat Dual SP Control
+!    office_receptacle_ctrl_occ_reduction_frac = 0.92575
+!    emp_lounge_receptacle_ctrl_occ_reduction_frac = 0.958413346
+!    emp_lounge_receptacle_ctrl_unocc_reduction_frac = 0.722755641
+!    meetingroom_receptacle_ctrl_occ_reduction_frac = 0.887275
+!    meetingroom_receptacle_ctrl_unocc_reduction_frac = 0.6625
+!    CodeName = ASHRAE90.1_STD2016
+!    CZ_City_Old = Boise
+!    CZ_Label = 5B
+!    vac_guestroom_htg_stpt = 15.556
+!    vac_guestroom_clg_stpt = 26.667
+!    vac_guestroom_fan_sch = Vac_Guestroom_Vent_Ctrl
+!    occ_guestroom_fan_sch = Occ_Guestroom_Vent_Ctrl
+!    con_swingdoor_r = 0.475963827
+
+  Version,9.6;
+>>>>>>> 42846a95e03cabcc18ef22f9778ca58ae6468128:testfiles/ASHRAE9012016_HotelSmall_Denver.idf
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

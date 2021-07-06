@@ -676,7 +676,7 @@ namespace WeatherManager {
             // Throw a Fatal now that we have said it'll terminalte
             if (ErrorsFound) {
                 CloseWeatherFile(state); // will only close if opened.
-                ShowFatalError(state, RoutineName + "Errors found in Weater Data Input. Program terminates.");
+                ShowFatalError(state, RoutineName + "Errors found in Weather Data Input. Program terminates.");
             }
 
             state.dataEnvrn->CurrentOverallSimDay = 0;
@@ -2035,7 +2035,7 @@ namespace WeatherManager {
         state.dataWeatherManager->TodayDifSolarRad = state.dataWeatherManager->TomorrowDifSolarRad;
         state.dataWeatherManager->TodayLiquidPrecip = state.dataWeatherManager->TomorrowLiquidPrecip;
         state.dataWeatherManager->TodayTotalSkyCover = state.dataWeatherManager->TomorrowTotalSkyCover;
-        state.dataWeatherManager->TodayOpaqueSkyCover = state.dataWeatherManager->TomorrowTotalSkyCover;
+        state.dataWeatherManager->TodayOpaqueSkyCover = state.dataWeatherManager->TomorrowOpaqueSkyCover;
 
         // Update Global Data
 
@@ -3523,7 +3523,9 @@ namespace WeatherManager {
         Pos = index(Line, ',');
         if (Pos != std::string::npos) {
             if (Pos != 0) {
-                if (!readItem(Line.substr(0, Pos), PrecipWater)) {
+                bool error = false;
+                PrecipWater = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                if (error) {
                     ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
             } else {
@@ -3533,7 +3535,9 @@ namespace WeatherManager {
             Pos = index(Line, ',');
             if (Pos != std::string::npos) {
                 if (Pos != 0) {
-                    if (!readItem(Line.substr(0, Pos), AerosolOptDepth)) {
+                    bool error = false;
+                    AerosolOptDepth = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                    if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                 } else {
@@ -3543,7 +3547,9 @@ namespace WeatherManager {
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
                     if (Pos != 0) {
-                        if (!readItem(Line.substr(0, Pos), SnowDepth)) {
+                        bool error = false;
+                        SnowDepth = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                        if (error) {
                             ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                     } else {
@@ -3553,7 +3559,9 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         if (Pos != 0) {
-                            if (!readItem(Line.substr(0, Pos), DaysSinceLastSnow)) {
+                            bool error = false;
+                            DaysSinceLastSnow = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                            if (error) {
                                 ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                             }
                         } else {
@@ -3563,7 +3571,9 @@ namespace WeatherManager {
                         Pos = index(Line, ',');
                         if (Pos != std::string::npos) {
                             if (Pos != 0) {
-                                if (!readItem(Line.substr(0, Pos), Albedo)) {
+                                bool error = false;
+                                Albedo = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                                if (error) {
                                     ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                 }
                             } else {
@@ -3573,7 +3583,9 @@ namespace WeatherManager {
                             Pos = index(Line, ',');
                             if (Pos != std::string::npos) {
                                 if (Pos != 0) {
-                                    if (!readItem(Line.substr(0, Pos), LiquidPrecip)) {
+                                    bool error = false;
+                                    LiquidPrecip = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), error);
+                                    if (error) {
                                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                     }
                                 } else {
@@ -3589,14 +3601,18 @@ namespace WeatherManager {
                             LiquidPrecip = 999.0;
                         }
                     } else {
-                        if (!readItem(Line, DaysSinceLastSnow)) {
+                        bool error = false;
+                        DaysSinceLastSnow = UtilityRoutines::ProcessNumber(Line, error);
+                        if (error) {
                             ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                         Albedo = 999.0;
                         LiquidPrecip = 999.0;
                     }
                 } else {
-                    if (!readItem(Line, SnowDepth)) {
+                    bool error = false;
+                    SnowDepth = UtilityRoutines::ProcessNumber(Line, error);
+                    if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                     DaysSinceLastSnow = 999.0;
@@ -3604,7 +3620,9 @@ namespace WeatherManager {
                     LiquidPrecip = 999.0;
                 }
             } else {
-                if (!readItem(Line, AerosolOptDepth)) {
+                bool error = false;
+                AerosolOptDepth = UtilityRoutines::ProcessNumber(Line, error);
+                if (error) {
                     ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
                 SnowDepth = 999.0;
@@ -3613,7 +3631,9 @@ namespace WeatherManager {
                 LiquidPrecip = 999.0;
             }
         } else {
-            if (!readItem(Line, PrecipWater)) {
+            bool error = false;
+            PrecipWater = UtilityRoutines::ProcessNumber(Line, error);
+            if (error) {
                 ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
             }
             AerosolOptDepth = 999.0;
@@ -4644,7 +4664,7 @@ namespace WeatherManager {
         // exists in the working directory and calls appropriate routines to
         // open the files and set up for use.
 
-        state.dataWeatherManager->WeatherFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
+        state.dataWeatherManager->WeatherFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
         if (state.dataWeatherManager->WeatherFileExists) {
             OpenEPlusWeatherFile(state, ErrorsFound, true);
         }
@@ -4680,7 +4700,7 @@ namespace WeatherManager {
                                             "DATA PERIODS"});
 
         state.files.inputWeatherFile.close();
-        state.files.inputWeatherFile.fileName = state.files.inputWeatherFileName.fileName;
+        state.files.inputWeatherFile.filePath = state.files.inputWeatherFilePath.filePath;
         state.files.inputWeatherFile.open();
         if (!state.files.inputWeatherFile.good()) {
             ShowFatalError(state, "OpenWeatherFile: Could not OPEN EPW Weather File", OptionalOutputFileRef(state.files.eso));
@@ -9339,15 +9359,15 @@ namespace WeatherManager {
         Array1D<Real64> MonthlyAverageDryBulbTemp(12, 0.0); // monthly-daily average outside air temperature
 
         if (!this->OADryBulbWeatherDataProcessed) {
-            const auto statFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
-            const auto epwFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
+            const auto statFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
+            const auto epwFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
             if (statFileExists) {
-                auto statFile = state.files.inputWeatherFileName.try_open();
+                auto statFile = state.files.inputWeatherFilePath.try_open();
                 if (!statFile.good()) {
                     ShowSevereError(state,
-                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFileName.fileName +
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + state.files.inputWeatherFilePath.filePath.string() +
                                         " for input (read).");
-                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
 
@@ -9375,11 +9395,12 @@ namespace WeatherManager {
                 this->MonthlyDailyAverageDryBulbTemp = MonthlyAverageDryBulbTemp;
                 this->OADryBulbWeatherDataProcessed = true;
             } else if (epwFileExists) {
-                auto epwFile = state.files.inputWeatherFileName.try_open();
+                auto epwFile = state.files.inputWeatherFilePath.try_open();
                 bool epwHasLeapYear(false);
                 if (!epwFile.good()) {
-                    ShowSevereError(state, "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + epwFile.fileName + " for input (read).");
-                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed deafult value of 10.0 C.");
+                    ShowSevereError(state,
+                                    "CalcAnnualAndMonthlyDryBulbTemp: Could not open file " + epwFile.filePath.string() + " for input (read).");
+                    ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
                 for (int i = 1; i <= 8; ++i) { // Headers
@@ -9437,8 +9458,8 @@ namespace WeatherManager {
                 this->OADryBulbWeatherDataProcessed = true;
             } else {
                 ShowSevereError(state, "CalcAnnualAndMonthlyDryBulbTemp: weather file or stat file does not exist.");
-                ShowContinueError(state, "Weather file: " + state.files.inputWeatherFileName.fileName + ".");
-                ShowContinueError(state, "Stat file: " + state.files.inStatFileName.fileName + ".");
+                ShowContinueError(state, "Weather file: " + state.files.inputWeatherFilePath.filePath.string() + ".");
+                ShowContinueError(state, "Stat file: " + state.files.inStatFilePath.filePath.string() + ".");
                 ShowContinueError(state, "Water Mains Monthly Temperature cannot be calculated using CorrelationFromWeatherFile method.");
                 ShowContinueError(state, "Instead a fixed default value of 10.0 C will be used.");
             }

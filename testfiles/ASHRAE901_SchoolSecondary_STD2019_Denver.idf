@@ -1,3 +1,4 @@
+<<<<<<< HEAD:testfiles/ASHRAE901_SchoolSecondary_STD2019_Denver.idf
 !-Generator IDFEditor 1.51
 !-Option SortedOrder UseSpecialFormat
 
@@ -8,6 +9,251 @@
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
 Version,9.5;
+=======
+! The 90.1 Prototype Building Models were developed by Pacific Northwest National Laboratory (PNNL),
+! under contract with the U.S. Department of Energy (DOE).  These building models were derived from
+! DOE’s Commercial Reference Building Models with modifications based on input from the ASHRAE Standard 90.1 committee,
+! the Advanced Energy Design Guide series, and building industry experts.
+! The prototypes models were developed to quantify energy saving impacts from
+! newly published editions of ASHRAE Standard 90.1.  The basic building descriptions can be found in the Scorecards
+! posted at this website.  Detailed descriptions of the prototype model development and addenda modeling
+! strategies can be found in the following  reports:
+! "Achieving 30% Goal: Energy and Cost Saving Analysis of ASHRAE/IES Standard 90.1-2010."
+! "Enhancements to ASHRAE Standard 90.1 Prototype Building Models"
+! "Energy Savings Analysis: ANSI/ASHRAE/IES Standard 90.1-2016"
+! "ANSI/ASHRAE/IES Standard 90.1-2013 Determination of Energy Savings: Quantitative Analysis"
+!
+!BEGIN ECONOMIZER MAP
+! Economizer Name, DX COIL Name
+! PSZ-AC_1:5_OA_Controller, PSZ-AC_1:5_CoolC DXCoil
+! PSZ-AC_2:6_OA_Controller, PSZ-AC_2:6_CoolC DXCoil
+! PSZ-AC_3:7_OA_Controller, PSZ-AC_3:7_CoolC DXCoil
+! PSZ-AC_4:8_OA_Controller, PSZ-AC_4:8_CoolC DXCoil
+! PSZ-AC_5:9_OA_Controller, PSZ-AC_5:9_CoolC DXCoil
+! END ECONOMIZER MAP
+!
+!
+! BEGIN EMS PROGRAM MAP
+! EMS PROGRAM, DX COIL Name
+! PSZ1_5, PSZ-AC_1:5_COOLC DXCOIL
+! PSZ2_6, PSZ-AC_2:6_COOLC DXCOIL
+! PSZ3_7, PSZ-AC_3:7_COOLC DXCOIL
+! PSZ4_8, PSZ-AC_4:8_COOLC DXCOIL
+! PSZ5_9, PSZ-AC_5:9_COOLC DXCOIL
+! END EMS PROGRAM MAP
+!
+!
+! WeatherFile:  USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+! GPARM parameters as input:
+!    Case = DOE.determination2016_SchoolSecondary_STD2016_Boise
+!    weatherfile = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    ground_tempt = Zone5B_nonres_R15_2ftV_SchoolSecondary_Denver_STD2016.gtp
+!    avg_oa_tempt_ip = 49.91
+!    maxdiff_oa_tempt_ip = 42.66
+!    ext_wall_type = SteelFramedWall
+!    nonres_ext_wall_ufactor = 0.312304465
+!    roof_type = LightweightRoof
+!    nonres_roof_ufactor = 0.181704416
+!    nonres_window = Window_U_0.40_SHGC_0.38
+!    nonres_skylight = Window_U_0.50_SHGC_0.40
+!    daylighting_control = yes
+!    sidelighting_control = yes_AY
+!    audi_sidelighting_control = yes
+!    roof_emissivity = 0.9
+!    roof_solar_absorp = 0.77
+!    LPD_classroom = 9.902797584
+!    LPD_corridor = 7.104180875
+!    LPD_lobby = 10.76391042
+!    LPD_mechanical = 10.2257149
+!    LPD_bath = 9.149323854
+!    LPD_office = 10.01043669
+!    LPD_gym = 5.381955209
+!    LPD_kitchen = 11.40974504
+!    LPD_cafeteria = 6.781263563
+!    LPD_library = 8.395850125
+!    LPD_auditorium = 6.781263563
+!    exterior_lights_watts = 0
+!    exterior_lights_watts_a = 441.8
+!    exterior_lights_watts_b = 2994.5
+!    wcc_economizer = DifferentialDryBulb
+!    skip_economizer_control = No
+!    cc_sa_humidity = 0.007
+!    DX_damper_sch = MinOA_MotorizedDamper_Sched
+!    wcc_damper_sch = MinOA_MotorizedDamper_Sched
+!    OA_classroom = 0.00238745
+!    OA_corridor = 0.000304781
+!    OA_lobby = 0.000304781
+!    OA_computer_room = 0.00238745
+!    OA_mechanical = 0
+!    OA_bath = 0
+!    OA_office = 0.000431773
+!    OA_gym = 0.001523905
+!    OA_aux_gym = 0.001523905
+!    OA_kitchen = 0.001178183
+!    OA_cafeteria = 0.004724104
+!    OA_auditorium = 0.004114542
+!    OA_library = 0.000863546
+!    auditorium_OA_per_area = 0.000304781
+!    auditorium_OA_per_person = 0.002359604
+!    classroom_OA_per_area = 0.000609562
+!    classroom_OA_per_person = 0.004719207
+!    cafeteria_OA_per_area = 0.000914343
+!    cafeteria_OA_per_person = 0.003539405
+!    PSZ_AC_5_9_DCV = Yes
+!    PSZ_AC_3_7_DCV = Yes
+!    PSZ_AC_1_5_DCV = Yes
+!    PSZ_AC_2_6_DCV = Yes
+!    VAV_POD_1_DCV = Yes
+!    VAV_POD_2_DCV = Yes
+!    VAV_POD_3_DCV = Yes
+!    chilledwater_pump_head = 44761.27683
+!    chilledwater_pump_secondary_head = 134283.8305
+!    Gym_SZ_VAV = No
+!    Aux_Gym_SZ_VAV = No
+!    Auditorium_SZ_VAV = No
+!    Kitchen_SZ_VAV = No
+!    Cafeteria_SZ_VAV = No
+!    avg_oa_tempt = 9.95
+!    maxdiff_oa_tempt = 23.7
+!    infil = 0.00056896
+!    SAT_reset_switch = Yes
+!    SAT_reset_T = 15.6
+!    door_infil = 5.114489639
+!    frac_ofpk = 0.144
+!    VAV_Pod_1_ERV = No
+!    VAV_Pod_2_ERV = No
+!    VAV_Pod_3_ERV = No
+!    PSZ_AC_1_5_ERV = No
+!    PSZ_AC_2_6_ERV = No
+!    PSZ_AC_3_7_ERV = No
+!    PSZ_AC_5_9_ERV = No
+!    economizer_lockout = NoLockout
+!    eco_max_temp_limit = na
+!    Transfer_Air = all_exhaust
+!    BLDG_ELEVATORS_LIGHTS_FAN_SCH = ELEV_LIGHT_FAN_SCH_ADD_DF
+!    BLDG_ELEVATORS_LIGHTS_FAN_POWER = 125
+!    frame_width = 0
+!    frame_cond = 0
+!    frame = Skylight_Frame
+!    BLDG_EQUIP_SCH = BLDG_EQUIP_SCH_ADV
+!    addendum_cd = 2016AS
+!    VAVReheat_flag = yes
+!    PumpCurve_flag = pump_ride_on_curve
+!    pv_generator = no
+!    pv_surface_area = 0
+!    STD189_overhang = no
+!    swh_et = 0.802764687
+!    swh_ua = 15.60100579
+!    ext_lgt_sch = Exterior_Lgt_ALWAYS_ON
+!    VAV_OTHER_ERV = No
+!    mdp_VAVother = 0.4
+!    add_ck_vav_other = Yes
+!    add_ck_vav_pod_1 = Yes
+!    add_ck_vav_pod_2 = Yes
+!    add_ck_vav_pod_3 = Yes
+!    Bathrooms_ZN_1_FLR_1_mdp = 0.2
+!    Bathrooms_ZN_1_FLR_2_mdp = 0.2
+!    Library_Media_Center_ZN_1_FLR_2_mdp = 0.544613050629622
+!    Lobby_ZN_1_FLR_1_mdp = 0.332601058680307
+!    Lobby_ZN_1_FLR_2_mdp = 0.2
+!    Main_Corridor_ZN_1_FLR_1_mdp = 0.385235269037899
+!    Main_Corridor_ZN_1_FLR_2_mdp = 0.226852945177268
+!    Mech_ZN_1_FLR_1_mdp = 0.2
+!    Mech_ZN_1_FLR_2_mdp = 0.2
+!    Offices_ZN_1_FLR_1_mdp = 0.344594638667384
+!    Offices_ZN_1_FLR_2_mdp = 0.223877090571467
+!    Corner_Class_1_Pod_1_ZN_1_FLR_1_mdp = 0.7
+!    Corner_Class_1_Pod_1_ZN_1_FLR_2_mdp = 0.7
+!    Corner_Class_2_Pod_1_ZN_1_FLR_1_mdp = 0.7
+!    Corner_Class_2_Pod_1_ZN_1_FLR_2_mdp = 0.7
+!    Corridor_Pod_1_ZN_1_FLR_1_mdp = 0.227868274105745
+!    Corridor_Pod_1_ZN_1_FLR_2_mdp = 0.2
+!    Mult_Class_1_Pod_1_ZN_1_FLR_1_mdp = 0.950338807664063
+!    Mult_Class_1_Pod_1_ZN_1_FLR_2_mdp = 0.7
+!    Mult_Class_2_Pod_1_ZN_1_FLR_1_mdp = 1
+!    Mult_Class_2_Pod_1_ZN_1_FLR_2_mdp = 0.810321763508802
+!    Corner_Class_1_Pod_2_ZN_1_FLR_1_mdp = 0.7
+!    Corner_Class_1_Pod_2_ZN_1_FLR_2_mdp = 0.7
+!    Corner_Class_2_Pod_2_ZN_1_FLR_1_mdp = 0.7
+!    Corner_Class_2_Pod_2_ZN_1_FLR_2_mdp = 0.7
+!    Corridor_Pod_2_ZN_1_FLR_1_mdp = 0.229855294478094
+!    Corridor_Pod_2_ZN_1_FLR_2_mdp = 0.2
+!    Mult_Class_1_Pod_2_ZN_1_FLR_1_mdp = 0.992314596167755
+!    Mult_Class_1_Pod_2_ZN_1_FLR_2_mdp = 0.7
+!    Mult_Class_2_Pod_2_ZN_1_FLR_1_mdp = 1
+!    Mult_Class_2_Pod_2_ZN_1_FLR_2_mdp = 0.808148116608476
+!    Corner_Class_1_Pod_3_ZN_1_FLR_1_mdp = 0.7
+!    Corner_Class_1_Pod_3_ZN_1_FLR_2_mdp = 0.7
+!    Corner_Class_2_Pod_3_ZN_1_FLR_1_mdp = 0.7
+!    Corner_Class_2_Pod_3_ZN_1_FLR_2_mdp = 0.7
+!    Corridor_Pod_3_ZN_1_FLR_1_mdp = 0.227294180697604
+!    Corridor_Pod_3_ZN_1_FLR_2_mdp = 0.2
+!    Mult_Class_1_Pod_3_ZN_1_FLR_1_mdp = 0.982530812567157
+!    Mult_Class_1_Pod_3_ZN_1_FLR_2_mdp = 0.7
+!    Mult_Class_2_Pod_3_ZN_1_FLR_1_mdp = 1
+!    Mult_Class_2_Pod_3_ZN_1_FLR_2_mdp = 0.7
+!    vav_other_oaf = 3.34614666666667
+!    vav_pod_1_oaf = 8.28963
+!    vav_pod_2_oaf = 8.24508
+!    vav_pod_3_oaf = 9.49289966666667
+!    heating_damper_act = REVERSE
+!    LTG_SCH_SET = LTG_SET_STD2013
+!    transformer_size = 225000
+!    transformer_eff = 0.989
+!    VAV_Pod_1_ERV_power = 5997.809525
+!    VAV_Pod_2_ERV_power = 5965.8449
+!    VAV_Pod_3_ERV_power = 6861.15551083334
+!    PSZ_AC_1_5_ERV_power = 2210.5647
+!    PSZ_AC_2_6_ERV_power = 1414.563025
+!    PSZ_AC_3_7_ERV_power = 2966.759475
+!    PSZ_AC_5_9_ERV_power = 2165.0752
+!    VAV_OTHER_ERV_power = 2450.86023333334
+!    freezer_power = 915
+!    refrigerator_power = 570
+!    HtgSetP_Sch = HTGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch = CLGSETP_SCH_YES_OPTIMUM
+!    OA_BASED_OPTIMUM_START_EMS = yes
+!    OPTIMUM_START_SF_DEPENDENT_EMS = no
+!    wwr = 0.35
+!    swh_et_booster = 1
+!    swh_ua_booster = 1.591045154
+!    pipe_heat_loss = 1205.08
+!    evap_fan_power_case1 = 19.51428571
+!    evap_fan_power_case2 = 15.71428571
+!    walkin_lighting_sch = walkin_occ_lght_sch
+!    fan_total_eff = 0.385
+!    kitchen_exh_fan_power = 914
+!    skip_EMSprogram = no
+!    BoilerAM = Yes
+!    HtgSetP_Sch_PSZ_AC_5_9 = HTGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch_PSZ_AC_5_9 = CLGSETP_SCH_YES_OPTIMUM
+!    HtgSetP_Sch_PSZ_AC_4_8 = HTGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch_PSZ_AC_4_8 = CLGSETP_SCH_YES_OPTIMUM
+!    HtgSetP_Sch_PSZ_AC_3_7 = HTGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch_PSZ_AC_3_7 = CLGSETP_SCH_YES_OPTIMUM
+!    HtgSetP_Sch_PSZ_AC_2_6 = HTGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch_PSZ_AC_2_6 = CLGSETP_SCH_YES_OPTIMUM
+!    HtgSetP_Sch_PSZ_AC_1_5 = HTGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch_PSZ_AC_1_5 = CLGSETP_SCH_YES_OPTIMUM
+!    Wfile_TMY3 = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    loadProfile = No
+!    receptacle_ctrl_occ_reduction_frac = 0.951231605
+!    receptacle_ctrl_unocc_reduction_frac = 0.844639049
+!    HOTW_ST_Reset = No
+!    CHW_ST_Reset = No
+!    SHW_Pump_Head = 34026
+!    CodeName = ASHRAE90.1_STD2016
+!    CZ_City_Old = Boise
+!    CZ_Label = 5B
+!    exterior_lights_watts_c = 2973.7
+!    Addendum_AH = Yes
+!    LPD_Ctrl = 0.02
+!    con_swingdoor_r = 0.475963827
+!    CHW_deltaT = 8.33
+!    HOTW_PumpCurve_flag = pump_ride_on_curve
+
+  Version,9.6;
+>>>>>>> 42846a95e03cabcc18ef22f9778ca58ae6468128:testfiles/ASHRAE9012016_SchoolSecondary_Denver.idf
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

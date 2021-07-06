@@ -124,31 +124,10 @@ namespace PlantComponentTemperatureSources {
         // Uses the status flags to trigger initializations.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+
         static std::string const RoutineName("InitWaterSource");
 
-        if (this->MyFlag) {
-            // setup output variables once here
-            this->setupOutputVars(state);
-            // Locate the component on the plant loops for later usage
-            bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::TypeOf_WaterSource,
-                                                    this->Location.loopNum,
-                                                    this->Location.loopSideNum,
-                                                    this->Location.branchNum,
-                                                    this->Location.compNum,
-                                                    errFlag,
-                                                    _,
-                                                    _,
-                                                    _,
-                                                    this->InletNodeNum,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
-            }
-            this->MyFlag = false;
-        }
+        this->oneTimeInit(state);
 
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (this->MyEnvironFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -449,6 +428,34 @@ namespace PlantComponentTemperatureSources {
         this->initialize(state, myLoad);
         this->autosize(state);
     }
+    void WaterSourceSpecs::oneTimeInit(EnergyPlusData &state)
+    {
+        static std::string const RoutineName("InitWaterSource");
+
+        if (this->MyFlag) {
+            // setup output variables once here
+            this->setupOutputVars(state);
+            // Locate the component on the plant loops for later usage
+            bool errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(state,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_WaterSource,
+                                                    this->Location.loopNum,
+                                                    this->Location.loopSideNum,
+                                                    this->Location.branchNum,
+                                                    this->Location.compNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    this->InletNodeNum,
+                                                    _);
+            if (errFlag) {
+                ShowFatalError(state, RoutineName + ": Program terminated due to previous condition(s).");
+            }
+            this->MyFlag = false;
+        }
+    }
 
     void GetWaterSourceInput(EnergyPlusData &state)
     {
@@ -519,7 +526,7 @@ namespace PlantComponentTemperatureSources {
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Inlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             state.dataPlantCompTempSrc->WaterSource(SourceNum).OutletNodeNum =
                 NodeInputManager::GetOnlySingleNode(state,
@@ -529,7 +536,7 @@ namespace PlantComponentTemperatureSources {
                                                     state.dataIPShortCut->cAlphaArgs(1),
                                                     DataLoopNode::NodeFluidType::Water,
                                                     DataLoopNode::NodeConnectionType::Outlet,
-                                                    1,
+                                                    NodeInputManager::compFluidStream::Primary,
                                                     DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                cCurrentModuleObject,

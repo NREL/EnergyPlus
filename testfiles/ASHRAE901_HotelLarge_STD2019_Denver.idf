@@ -1,3 +1,4 @@
+<<<<<<< HEAD:testfiles/ASHRAE901_HotelLarge_STD2019_Denver.idf
 !-Generator IDFEditor 1.51
 !-Option SortedOrder UseSpecialFormat ViewInIPunits
 
@@ -8,6 +9,177 @@
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
 Version,9.5;
+=======
+! The 90.1 Prototype Building Models were developed by Pacific Northwest National Laboratory (PNNL),
+! under contract with the U.S. Department of Energy (DOE).  These building models were derived from
+! DOE’s Commercial Reference Building Models with modifications based on input from the ASHRAE Standard 90.1 committee,
+! the Advanced Energy Design Guide series, and building industry experts.
+! The prototypes models were developed to quantify energy saving impacts from
+! newly published editions of ASHRAE Standard 90.1.  The basic building descriptions can be found in the Scorecards
+! posted at this website.  Detailed descriptions of the prototype model development and addenda modeling
+! strategies can be found in the following  reports:
+! "Achieving 30% Goal: Energy and Cost Saving Analysis of ASHRAE/IES Standard 90.1-2010."
+! "Enhancements to ASHRAE Standard 90.1 Prototype Building Models"
+! "Energy Savings Analysis: ANSI/ASHRAE/IES Standard 90.1-2016"
+! "ANSI/ASHRAE/IES Standard 90.1-2013 Determination of Energy Savings: Quantitative Analysis"
+!
+!
+! WeatherFile:  USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+! GPARM parameters as input:
+!    Case = DOE.determination2016_HotelLarge_STD2016_Boise
+!    weatherfile = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    basement_tempt = Zone5B_nonres_R7.5_HotelLarge_Denver_STD2016_out.idf
+!    avg_oa_tempt_ip = 49.91
+!    maxdiff_oa_tempt_ip = 42.66
+!    annual_run = no
+!    ext_wall_type = MassWall
+!    nonres_ext_wall_ufactor = 0.51104367
+!    res_ext_wall_ufactor = 0.45426104
+!    roof_type = LightweightRoof
+!    nonres_roof_ufactor = 0.181704416
+!    roof_emissivity = 0.9
+!    roof_solar_absorp = 0.77
+!    floor_type = LightweightFloor
+!    nonres_floor_ufactor = 0.215773994
+!    nonres_window = Window_U_0.42_SHGC_0.40
+!    res_window = Window_U_0.42_SHGC_0.40
+!    sidelighting_control = yes_AY
+!    LPD_basement = 8.503489229
+!    LPD_retail = 11.40974504
+!    LPD_mechanic = 10.2257149
+!    LPD_storage = 4.951398792
+!    LPD_laundry = 4.628481479
+!    LPD_dining = 7.642376396
+!    LPD_lobby = 11.40974504
+!    LPD_guestroom = 8.288211021
+!    LPD_corridor_flr3 = 7.104180875
+!    LPD_corridor_flr6 = 7.104180875
+!    LPD_kitchen = 11.40974504
+!    guestroom_ltg_sch = Guestroom_Ltg_Sch_Base
+!    guestroom_eqp_sch = Guestroom_Eqp_Sch_Adva
+!    exterior_lights_watts = 11632.5
+!    economizer = DifferentialDryBulb
+!    skip_economizer_control = Yes
+!    VAV_WITH_REHEAT_DCV = No
+!    cafe_OA_per_area = 0.000914047
+!    cafe_OA_per_person = 0.00354
+!    lobby_OA_per_area = 0.000304682
+!    lobby_OA_per_person = 0.00354
+!    banquet_OA_per_area = 0.000914047
+!    banquet_OA_per_person = 0.00354
+!    dining_OA_per_area = 0.000914047
+!    dining_OA_per_person = 0.00354
+!    damper_sche = MinOA_MotorizedDamper_Sched
+!    avg_oa_tempt = 9.95
+!    maxdiff_oa_tempt = 23.7
+!    infil = 0.00056896
+!    OA_Basement = 0.000431633
+!    OA_Retail_1 = 0.001180644
+!    OA_Retail_2 = 0.001180644
+!    OA_Mechanical = 0
+!    OA_Storage = 0.000609365
+!    OA_Laundry = 0
+!    OA_Cafe = 0.003580019
+!    OA_Lobby = 0.001447242
+!    OA_Room_L = 0.000395372
+!    OA_Room_S = 0.000448954
+!    OA_Corridor_M = 0.000304682
+!    OA_Banquet = 0.003580019
+!    OA_Dining = 0.003580019
+!    OA_Kitchen = 0.003554628
+!    OA_Corridor_T = 0.000304682
+!    n_thermostatctrl_guestroom = N Adva VentCtrl OccGuestRoom Thermostat Dual SP Control
+!    chilledwater_pump_head = 44761.27683
+!    chilledwater_pump_secondary_head = 134283.8305
+!    SAT_reset_switch = Yes
+!    SAT_reset_T = 15.6
+!    economizer_lockout = NoLockout
+!    eco_max_temp_limit = na
+!    heating_damper_act = REVERSE
+!    add_ck_vav_with_reheat = No
+!    banquet_flr_6_mdp = 0.88
+!    basement_mdp = 0.495192844936737
+!    cafe_flr_1_mdp = 0.9
+!    corridor_flr_3_mdp = 0.493834078556694
+!    corridor_flr_6_mdp = 0.217150732865788
+!    dining_flr_6_mdp = 0.86
+!    kitchen_flr_6_mdp = 0.2
+!    laundry_flr_1_mdp = 0.2
+!    lobby_flr_1_mdp = 0.64
+!    mech_flr_1_mdp = 0.2
+!    retail_1_flr_1_mdp = 0.24298093393002
+!    retail_2_flr_1_mdp = 0.5
+!    storage_flr_1_mdp = 0.720093091371375
+!    vav_with_reheat_oaf = 11.7891428333333
+!    Transfer_Air = all_exhaust
+!    BLDG_ELEVATORS_LIGHTS_FAN_SCH = ELEV_LIGHT_FAN_SCH_ADD_DF
+!    BLDG_ELEVATORS_LIGHTS_FAN_POWER = 375.9
+!    bsmt_new = Zone5B_nonres_R7.5_HotelLarge_Denver_STD2016_out.idf
+!    osc_key_wall = surfPropOthSdCoefBasementAvgWall
+!    osc_key_floor = surfPropOthSdCoefBasementAvgFloor
+!    BLDG_EQUIP_SCH = BLDG_EQUIP_SCH_ADV
+!    PumpCurve_flag = pump_ride_on_curve
+!    VAV_WITH_REHEAT_ERV = Yes
+!    FLR_3_DOAS_ERV = Yes
+!    FLR_6_DOAS_ERV = No
+!    VAV_WITH_REHEAT_ERV_power = 8508.70998291664
+!    FLR_3_DOAS_ERV_power = 1510.213811
+!    FLR_6_DOAS_ERV_power = N/A
+!    pv_generator = no
+!    pv_surface_area = 0
+!    STD189_overhang = no
+!    swh_et = 0.802764687
+!    swh_ua = 15.60100579
+!    ext_lgt_sch = Exterior_Lgt_ALWAYS_ON
+!    LTG_SCH_SET = LTG_SET_STD2013
+!    transformer_size = 150000
+!    transformer_eff = 0.988
+!    freezer_power = 457.5
+!    refrigerator_power = 285
+!    swh_et_booster = 1
+!    swh_ua_booster = 1.053159296
+!    swh_et_laundry = 0.803988738
+!    swh_ua_laundry = 11.25413987
+!    pipe_heat_loss = 15908.9
+!    evap_fan_power_case1 = 9.714285714
+!    evap_fan_power_case2 = 15.71428571
+!    walkin_lighting_sch = walkin_occ_lght_sch
+!    fan_total_eff = 0.385
+!    fan_motor_eff = 0.7
+!    kitchen_exh_fan_power = 609
+!    skip_EMSprogram = yes
+!    BoilerAM = Yes
+!    Wfile_TMY3 = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    loadProfile = No
+!    OA_DOAS = 2.051199045
+!    OA_DOAS_RoomL = 0.015433284
+!    OA_DOAS_RoomS = 0.011012535
+!    vent_setback_flag = 1
+!    s_thermostatctrl_guestroom = S Adva VentCtrl OccGuestRoom Thermostat Dual SP Control
+!    receptacle_ctrl_occ_reduction_frac = 0.952414364
+!    receptacle_ctrl_unocc_reduction_frac = 0.765167925
+!    CHW_ST_Reset = No
+!    HOTW_ST_Reset = No
+!    CodeName = ASHRAE90.1_STD2016
+!    CZ_City_Old = Boise
+!    CZ_Label = 5B
+!    occ_based_vent_sch = OCCUPANCY_BASED_VENTILATION_SCHEDULE
+!    vac_vent_sch = VAC_GUESTROOM_VENTILATION_SCHEDULE
+!    vac_guestroom_htg_stpt = 15.556
+!    vac_guestroom_clg_stpt = 26.667
+!    vac_guestroom_people_sch = ALWAYS_OFF
+!    vac_guestroom_thm_sch = VacGuestRoom Thermostat Dual SP Control
+!    s_actuated_component_guestroom_ClgSP_sch = S Adva_VentCtrl_OccGuestRoom_ClgSP_Sch
+!    s_actuated_component_guestroom_HtgSP_sch = S Adva_VentCtrl_OccGuestRoom_HtgSP_Sch
+!    n_actuated_component_guestroom_ClgSP_sch = N Adva_VentCtrl_OccGuestRoom_ClgSP_Sch
+!    n_actuated_component_guestroom_HtgSP_sch = N Adva_VentCtrl_OccGuestRoom_HtgSP_Sch
+!    con_swingdoor_r = 0.475963827
+!    con_overheaddoor_r = 0.567741935
+!    CHW_deltaT = 8.33
+!    HOTW_PumpCurve_flag = pump_ride_on_curve
+
+  Version,9.6;
+>>>>>>> 42846a95e03cabcc18ef22f9778ca58ae6468128:testfiles/ASHRAE9012016_HotelLarge_Denver.idf
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

@@ -420,7 +420,7 @@ namespace DataAirSystems {
 struct AirSystemsData : BaseGlobalStruct
 {
 
-    Array1D<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
+    EPVector<DataAirSystems::DefinePrimaryAirSystem> PrimaryAirSystems;
     Array1D<DataAirSystems::ConnectionPoint> DemandSideConnect;               // Connections between loops
     Array1D<DataAirSystems::ConnectZoneComp> ZoneCompToPlant;                 // Connections between loops
     Array1D<DataAirSystems::ConnectZoneSubComp> ZoneSubCompToPlant;           // Connections between loops

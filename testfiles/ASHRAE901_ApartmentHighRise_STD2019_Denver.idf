@@ -7,7 +7,11 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
+<<<<<<< HEAD:testfiles/ASHRAE901_ApartmentHighRise_STD2019_Denver.idf
 Version,9.5;
+=======
+  Version,9.6;
+>>>>>>> 42846a95e03cabcc18ef22f9778ca58ae6468128:testfiles/ASHRAE9012016_ApartmentHighRise_Denver.idf
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

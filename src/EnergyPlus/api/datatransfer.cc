@@ -438,9 +438,9 @@ Real64 getInternalVariableValue(EnergyPlusState state, int handle)
     auto thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     if (handle >= 1 && handle <= (int)thisState->dataRuntimeLang->numEMSInternalVarsAvailable) {
         auto thisVar = thisState->dataRuntimeLang->EMSInternalVarsAvailable(handle);
-        if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrReal) {
+        if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Real) {
             return *thisVar.RealValue;
-        } else if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrInteger) {
+        } else if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PtrDataType::Integer) {
             return (Real64)(*thisVar.IntValue);
         } else {
             // Doesn't look like this struct actually has a logical member type, so uh, throw here?
@@ -1184,5 +1184,12 @@ Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour,
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
     }
+    return value;
+}
+
+Real64 currentSimTime(EnergyPlusState state)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    Real64 value = (thisState->dataGlobal->DayOfSim - 1) * 24 + currentTime(state);
     return value;
 }

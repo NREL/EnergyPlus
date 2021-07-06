@@ -137,6 +137,8 @@ namespace PlantComponentTemperatureSources {
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetWaterSourceInput(EnergyPlusData &state);
@@ -148,7 +150,7 @@ struct PlantCompTempSrcData : BaseGlobalStruct
 
     int NumSources = 0;
     bool getWaterSourceInput = true;
-    Array1D<PlantComponentTemperatureSources::WaterSourceSpecs> WaterSource;
+    EPVector<PlantComponentTemperatureSources::WaterSourceSpecs> WaterSource;
 
     void clear_state() override
     {

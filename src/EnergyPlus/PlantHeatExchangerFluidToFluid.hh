@@ -218,6 +218,8 @@ namespace PlantHeatExchangerFluidToFluid {
                                       Real64 DmdSideMassFlowRate,
                                       Array1D<Real64> const &Par // Par(1) = HX index number
         );
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetFluidHeatExchangerInput(EnergyPlusData &state);
@@ -229,7 +231,7 @@ struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct
 
     int NumberOfPlantFluidHXs = 0;
     bool GetInput = true;
-    Array1D<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
+    EPVector<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
 
     void clear_state() override
     {

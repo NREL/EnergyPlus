@@ -1,3 +1,4 @@
+<<<<<<< HEAD:testfiles/ASHRAE901_OfficeLarge_STD2019_Denver.idf
 !-Generator IDFEditor 1.51
 !-Option SortedOrder UseSpecialFormat
 
@@ -21,6 +22,145 @@ SimulationControl,
     No,                      !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
+=======
+! The 90.1 Prototype Building Models were developed by Pacific Northwest National Laboratory (PNNL),
+! under contract with the U.S. Department of Energy (DOE).  These building models were derived from
+! DOE’s Commercial Reference Building Models with modifications based on input from the ASHRAE Standard 90.1 committee,
+! the Advanced Energy Design Guide series, and building industry experts.
+! The prototypes models were developed to quantify energy saving impacts from
+! newly published editions of ASHRAE Standard 90.1.  The basic building descriptions can be found in the Scorecards
+! posted at this website.  Detailed descriptions of the prototype model development and addenda modeling
+! strategies can be found in the following  reports:
+! "Achieving 30% Goal: Energy and Cost Saving Analysis of ASHRAE/IES Standard 90.1-2010."
+! "Enhancements to ASHRAE Standard 90.1 Prototype Building Models"
+! "Energy Savings Analysis: ANSI/ASHRAE/IES Standard 90.1-2016"
+! "ANSI/ASHRAE/IES Standard 90.1-2013 Determination of Energy Savings: Quantitative Analysis"
+!
+! BEGIN ECONOMIZER MAP
+! NOTE: no economizer map is created for this prototype due to water cooling
+! END ECONOMIZER MAP
+! Start SimMetaData
+! CodeStandard=ASHRAE 90.1-2004
+! Std62Version=2004
+! RoofConstruction=Insulation Entirely Above Deck
+! ExtWallConstruction=Mass
+! End SimMetaData
+! WeatherFile:  USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+! GPARM parameters as input:
+!    Case = DOE.determination2016_OfficeLarge_STD2016_Boise
+!    weatherfile = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    basement_tempt = Zone5B_nonres_R7.5_OfficeLarge_Denver_STD2016_out.idf
+!    avg_oa_tempt_ip = 49.91
+!    maxdiff_oa_tempt_ip = 42.66
+!    ext_wall_type = MassWall
+!    nonres_ext_wall_ufactor = 0.51104367
+!    roof_type = MetalDeckRoof
+!    nonres_roof_ufactor = 0.181704416
+!    roof_solar_absorp = 0.7
+!    roof_emissivity = 0.9
+!    nonres_window = Window_U_0.41_SHGC_0.38
+!    sidelighting_control = yes_AY
+!    LPD_office = 8.503489229
+!    exterior_lights_watts = 0
+!    exterior_lights_watts_a = 12979.2
+!    exterior_lights_watts_b = 968.1
+!    economizer = DifferentialDryBulb
+!    skip_economizer_control = Yes
+!    damper_sche = MinOA_MotorizedDamper_Sched
+!    cc_sa_humidity = 0.007
+!    condenser_pump_head = 148556.6249
+!    chilledwater_pump_head = 44761.27683
+!    chilledwater_pump_secondary_head = 134283.8305
+!    avg_oa_tempt = 9.95
+!    maxdiff_oa_tempt = 23.7
+!    infil = 0.00056896
+!    oa_flow_per_area = 0.000431773
+!    SAT_reset_switch = Yes
+!    SAT_reset_T = 15.6
+!    CAV_bas_ERV = No
+!    economizer_lockout = NoLockout
+!    eco_max_temp_limit = na
+!    heating_damper_act = reverse
+!    add_ck_vav_bot = Yes
+!    add_ck_vav_mid = Yes
+!    add_ck_vav_top = Yes
+!    core_bottom_mdp = 0.305906985142732
+!    perimeter_bot_zn_1_mdp = 0.2
+!    perimeter_bot_zn_2_mdp = 0.2
+!    perimeter_bot_zn_3_mdp = 0.229781370035446
+!    perimeter_bot_zn_4_mdp = 0.2
+!    core_mid_mdp = 0.308442284517356
+!    perimeter_mid_zn_1_mdp = 0.2
+!    perimeter_mid_zn_2_mdp = 0.2
+!    perimeter_mid_zn_3_mdp = 0.237774990163064
+!    perimeter_mid_zn_4_mdp = 0.2
+!    core_top_mdp = 0.308030312246294
+!    perimeter_top_zn_1_mdp = 0.2
+!    perimeter_top_zn_2_mdp = 0.2
+!    perimeter_top_zn_3_mdp = 0.214330451326358
+!    perimeter_top_zn_4_mdp = 0.2
+!    vav_bot_oaf = 2.53804133333333
+!    vav_mid_oaf = 25.3803333333333
+!    vav_top_oaf = 2.53804133333333
+!    BLDG_ELEVATORS_LIGHTS_FAN_SCH = ELEV_LIGHT_FAN_SCH_ADD_DF
+!    BLDG_ELEVATORS_LIGHTS_FAN_POWER = 752
+!    bsmt_new = Zone5B_nonres_R7.5_OfficeLarge_Denver_STD2016_out.idf
+!    osc_key_wall = surfPropOthSdCoefBasementAvgWall
+!    osc_key_floor = surfPropOthSdCoefBasementAvgFloor
+!    BLDG_EQUIP_SCH = BLDG_EQUIP_SCH_ADV
+!    addendum_cd = 2016AS
+!    PumpCurve_flag = pump_ride_on_curve
+!    pv_generator = no
+!    pv_surface_area = 0
+!    STD189_overhang = no
+!    swh_et = 0.803988738
+!    swh_ua = 11.25413987
+!    ext_lgt_sch = Exterior_Lgt_ALWAYS_ON
+!    VAV_bot_WITH_REHEAT_ERV = No
+!    VAV_mid_WITH_REHEAT_ERV = No
+!    VAV_top_WITH_REHEAT_ERV = No
+!    CAV_bas_ERV_power = 911.0574
+!    VAV_bot_WITH_REHEAT_ERV_power = 1871.04465666666
+!    VAV_mid_WITH_REHEAT_ERV_power = 1871.03891666666
+!    VAV_top_WITH_REHEAT_ERV_power = 1871.04465666666
+!    LTG_SCH_SET = LTG_SET_STD2013
+!    transformer_size = 500000
+!    transformer_eff = 0.991
+!    economizer_coredatacenter = DifferentialDryBulb
+!    economizer_itcloset = NoEconomizer
+!    HtgSetP_Sch = HTGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch = CLGSETP_SCH_YES_OPTIMUM
+!    wwr = 0.4
+!    pipe_heat_loss = 7280.88
+!    add_as = yes
+!    preheatcoil_exists = no
+!    AddendumAF_TowerFan = Yes
+!    skip_EMSprogram = yes
+!    BoilerAM = Yes
+!    OA_BASED_OPTIMUM_START_EMS = yes
+!    OPTIMUM_START_SF_DEPENDENT_EMS = no
+!    HtgSetP_Sch_CAV_bas = HTGSETP_SCH_YES_OPTIMUM
+!    ClgSetP_Sch_CAV_bas = CLGSETP_SCH_YES_OPTIMUM
+!    Wfile_TMY3 = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    loadProfile = No
+!    addendum_DV = yes
+!    receptacle_ctrl_occ_reduction_frac = 0.949143263
+!    receptacle_ctrl_unocc_reduction_frac = 0.736941088
+!    HOTW_ST_Reset = No
+!    CHW_ST_Reset = No
+!    SHW_Pump_Head = 29891
+!    CodeName = ASHRAE90.1_STD2016
+!    CZ_City_Old = Boise
+!    CZ_Label = 5B
+!    exterior_lights_watts_c = 26026.9
+!    Addendum_AH = Yes
+!    LPD_Ctrl = 0.02
+!    con_swingdoor_r = 0.475963827
+!    CHW_deltaT = 8.33
+!    HOTW_PumpCurve_flag = pump_ride_on_curve
+
+  Version,9.6;
+>>>>>>> 42846a95e03cabcc18ef22f9778ca58ae6468128:testfiles/ASHRAE9012016_OfficeLarge_Denver.idf
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 

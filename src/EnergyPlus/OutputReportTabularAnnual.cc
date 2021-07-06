@@ -172,7 +172,7 @@ void AnnualTable::setupGathering(EnergyPlusData &state)
 // input fields, and ems variables are gathered.
 {
     int keyCount = 0;
-    int typeVar = 0;
+    OutputProcessor::VariableType typeVar = OutputProcessor::VariableType::NotFound;
     OutputProcessor::StoreType avgSumVar;
     OutputProcessor::TimeStepType stepTypeVar;
     OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
@@ -338,7 +338,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
     std::vector<AnnualFieldSet>::iterator fldStRemainIt;
     for (unsigned int row = 0; row != m_objectNames.size(); row++) { // loop through by row.
         for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
-            int curTypeOfVar = fldStIt->m_typeOfVar;
+            OutputProcessor::VariableType curTypeOfVar = fldStIt->m_typeOfVar;
             OutputProcessor::TimeStepType curStepType = fldStIt->m_varStepType;
             if (curStepType == kindOfTimeStep) // this is a much simpler conditional than the code in monthly gathering
             {
@@ -498,7 +498,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                                 break; // for fldStRemainIt
                             } else if (fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::valueWhenMaxMin) {
                                 // this case is when the value should be set
-                                int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
+                                OutputProcessor::VariableType scanTypeOfVar = fldStRemainIt->m_typeOfVar;
                                 // int scanStepType = fldStRemainIt->m_varStepType;
                                 int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
                                 if (scanVarNum > 0) {
@@ -518,7 +518,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                     // and accumulate
                     if (activeHoursShown) {
                         for (fldStRemainIt = fldStIt + 1; fldStRemainIt != m_annualFields.end(); ++fldStRemainIt) {
-                            int scanTypeOfVar = fldStRemainIt->m_typeOfVar;
+                            OutputProcessor::VariableType scanTypeOfVar = fldStRemainIt->m_typeOfVar;
                             // int scanStepType = fldStRemainIt->m_varStepType;
                             int scanVarNum = fldStRemainIt->m_cell[row].indexesForKeyVar;
                             Real64 oldScanValue = fldStRemainIt->m_cell[row].result;
@@ -1363,9 +1363,9 @@ void AnnualTable::columnHeadersToTitleCase(EnergyPlusData &state)
         if (fldStIt->m_variMeter == fldStIt->m_colHead) {
             if (fldStIt->m_indexesForKeyVar.size() > 0) {
                 int varNum = fldStIt->m_indexesForKeyVar[0];
-                if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Real) {
+                if (fldStIt->m_typeOfVar == OutputProcessor::VariableType::Real) {
                     fldStIt->m_colHead = state.dataOutputProcessor->RVariableTypes(varNum).VarNameOnly;
-                } else if (fldStIt->m_typeOfVar == OutputProcessor::VarType_Meter) {
+                } else if (fldStIt->m_typeOfVar == OutputProcessor::VariableType::Meter) {
                     fldStIt->m_colHead = state.dataOutputProcessor->EnergyMeters(varNum).Name;
                 }
             }
@@ -1407,7 +1407,7 @@ std::vector<std::string> AnnualTable::inspectTableFieldSets(int fldIndex)
     std::string outStr = std::to_string(fldSt.m_showDigits);
     // ints
     ret.push_back(outStr);
-    outStr = std::to_string(fldSt.m_typeOfVar);
+    outStr = std::to_string(static_cast<int>(fldSt.m_typeOfVar));
     ret.push_back(outStr);
     outStr = std::to_string(fldSt.m_keyCount);
     ret.push_back(outStr);

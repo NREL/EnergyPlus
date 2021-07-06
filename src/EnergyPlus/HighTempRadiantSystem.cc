@@ -584,7 +584,7 @@ namespace HighTempRadiantSystem {
                 }
 
                 if (state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->Surface(state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr(SurfNum)) = true;
                 }
 
                 AllFracsSummed += state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribToSurf(SurfNum);
@@ -945,7 +945,7 @@ namespace HighTempRadiantSystem {
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
             SetPtTemp = GetCurrentScheduleValue(state, state.dataHighTempRadSys->HighTempRadSys(RadSysNum).SetptSchedPtr);
             OffTemp = SetPtTemp + 0.5 * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
-            OpTemp = (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
+            OpTemp = (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
 
             // Determine the fraction of maximum power to the unit (limiting the fraction range from zero to unity)
             {
@@ -953,9 +953,9 @@ namespace HighTempRadiantSystem {
                 if (SELECT_CASE_var == RadControlType::MATControl) {
                     HeatFrac = (OffTemp - state.dataHeatBalFanSys->MAT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
                 } else if (SELECT_CASE_var == RadControlType::MRTControl) {
-                    HeatFrac = (OffTemp - state.dataHeatBal->MRT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
+                    HeatFrac = (OffTemp - state.dataHeatBal->ZoneMRT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
                 } else if (SELECT_CASE_var == RadControlType::OperativeControl) {
-                    OpTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                    OpTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
                     HeatFrac = (OffTemp - OpTemp) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
                 }
             }
@@ -1057,9 +1057,9 @@ namespace HighTempRadiantSystem {
                 if (SELECT_CASE_var == RadControlType::MATSPControl) {
                     ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 } else if (SELECT_CASE_var == RadControlType::MRTSPControl) {
-                    ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
+                    ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
                 } else if (SELECT_CASE_var == RadControlType::OperativeSPControl) {
-                    ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                    ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
                 } else {
                     assert(false);
                 }
@@ -1099,9 +1099,9 @@ namespace HighTempRadiantSystem {
                         if (SELECT_CASE_var == RadControlType::MATControl) {
                             ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                         } else if (SELECT_CASE_var == RadControlType::MRTControl) {
-                            ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
+                            ZoneTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
                         } else if (SELECT_CASE_var == RadControlType::OperativeControl) {
-                            ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                            ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->ZoneMRT(ZoneNum));
                         }
                     }
 
@@ -1469,20 +1469,19 @@ namespace HighTempRadiantSystem {
 
                 if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
-                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) *
+                                  (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempIn(SurfNum);
                 }
 
                 if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 &&
                     !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
-                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                                  state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) *
+                                  (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempIn(SurfNum);
                 }
             }
 
-            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * state.dataHeatBalSurf->TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBalSurf->SurfHConvInt(SurfNum) * Area * state.dataHeatBalSurf->SurfTempInTmp(SurfNum);
         }
 
         return SumHATsurf;

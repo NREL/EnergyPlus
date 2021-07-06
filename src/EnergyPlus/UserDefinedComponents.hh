@@ -201,6 +201,8 @@ namespace UserDefinedComponents {
         void initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad);
 
         void report(EnergyPlusData &state, int LoopNum);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct UserCoilComponentStruct
@@ -349,10 +351,10 @@ struct UserDefinedComponentsData : BaseGlobalStruct
     Array1D_bool CheckUserAirTerminal;
 
     // Object Data
-    Array1D<UserDefinedComponents::UserPlantComponentStruct> UserPlantComp;
-    Array1D<UserDefinedComponents::UserCoilComponentStruct> UserCoil;
-    Array1D<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
-    Array1D<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
+    EPVector<UserDefinedComponents::UserPlantComponentStruct> UserPlantComp;
+    EPVector<UserDefinedComponents::UserCoilComponentStruct> UserCoil;
+    EPVector<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
+    EPVector<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
 
     bool lDummy_EMSActuatedPlantComp = false;
     bool lDummy_GetUserDefComp = false;

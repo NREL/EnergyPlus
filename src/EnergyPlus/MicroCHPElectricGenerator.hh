@@ -228,6 +228,8 @@ namespace MicroCHPElectricGenerator {
         void UpdateMicroCHPGeneratorRecords(EnergyPlusData &state);
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetMicroCHPGeneratorInput(EnergyPlusData &state);
@@ -273,8 +275,8 @@ struct MicroCHPElectricGeneratorData : BaseGlobalStruct
 
     int NumMicroCHPs = 0;
     int NumMicroCHPParams = 0;
-    Array1D<MicroCHPElectricGenerator::MicroCHPDataStruct> MicroCHP;
-    Array1D<MicroCHPElectricGenerator::MicroCHPParamsNonNormalized> MicroCHPParamInput;
+    EPVector<MicroCHPElectricGenerator::MicroCHPDataStruct> MicroCHP;
+    EPVector<MicroCHPElectricGenerator::MicroCHPParamsNonNormalized> MicroCHPParamInput;
     bool getMicroCHPInputFlag = true;
     bool MyOneTimeFlag = true;
     bool MyEnvrnFlag = true;

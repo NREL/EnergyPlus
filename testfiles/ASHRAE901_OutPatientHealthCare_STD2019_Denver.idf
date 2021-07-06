@@ -1,3 +1,4 @@
+<<<<<<< HEAD:testfiles/ASHRAE901_OutPatientHealthCare_STD2019_Denver.idf
 !-Generator IDFEditor 1.51
 !-Option SortedOrder UseSpecialFormat
 
@@ -8,6 +9,219 @@
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
 Version,9.5;
+=======
+! The 90.1 Prototype Building Models were developed by Pacific Northwest National Laboratory (PNNL),
+! under contract with the U.S. Department of Energy (DOE).  These building models were derived from
+! DOE’s Commercial Reference Building Models with modifications based on input from the ASHRAE Standard 90.1 committee,
+! the Advanced Energy Design Guide series, and building industry experts.
+! The prototypes models were developed to quantify energy saving impacts from
+! newly published editions of ASHRAE Standard 90.1.  The basic building descriptions can be found in the Scorecards
+! posted at this website.  Detailed descriptions of the prototype model development and addenda modeling
+! strategies can be found in the following  reports:
+! "Achieving 30% Goal: Energy and Cost Saving Analysis of ASHRAE/IES Standard 90.1-2010."
+! "Enhancements to ASHRAE Standard 90.1 Prototype Building Models"
+! "Energy Savings Analysis: ANSI/ASHRAE/IES Standard 90.1-2016"
+! "ANSI/ASHRAE/IES Standard 90.1-2013 Determination of Energy Savings: Quantitative Analysis"
+!
+! BEGIN ECONOMIZER MAP
+! Economizer Name, DX COIL Name
+! AHU-2_OA_Controller, AHU-2_CoolC DXCoil
+! END ECONOMIZER MAP
+! WeatherFile:  USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+! GPARM parameters as input:
+!    Case = DOE.determination2016_OutPatientHealthCare_STD2016_Boise
+!    weatherfile = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    annual_run = no
+!    slab_gtp = Zone5B_nonres_R15_2ftV_OutpatientHealthCare_Denver_STD2016.gtp
+!    ext_wall_type = SteelFramedWall
+!    nonres_ext_wall_ufactor = 0.312304465
+!    roof_type = MetalDeckRoof
+!    nonres_roof_ufactor = 0.181704416
+!    roof_emissivity = 0.9
+!    roof_solar_absorp = 0.7
+!    nonres_window = Window_U_0.40_SHGC_0.38
+!    sidelighting_control = yes_AY
+!    LPD_anesthesia = 18.0833695
+!    LPD_clean = 18.0833695
+!    LPD_conference = 11.51738415
+!    LPD_corridor = 8.52501705
+!    LPD_dining = 6.781263563
+!    LPD_exam = 18.0833695
+!    LPD_lobby = 10.76391042
+!    LPD_lounge = 8.395850125
+!    LPD_nurse = 8.718767438
+!    LPD_office = 10.01043669
+!    LPD_operation = 23.3576856
+!    LPD_patient = 6.673624459
+!    LPD_phy_therapy = 9.04168475
+!    LPD_procedure = 18.0833695
+!    LPD_radiology = 11.40974504
+!    LPD_reception = 10.76391042
+!    LPD_recovery = 11.08682773
+!    LPD_soiled = 18.0833695
+!    LPD_storage = 4.951398792
+!    LPD_toilet = 10.54863221
+!    LPD_utility = 18.0833695
+!    ext_lights_watts = 8375
+!    cc_sa_humidity = 0.007
+!    avg_oa_tempt = 9.95
+!    maxdiff_oa_tempt = 23.7
+!    infil = 0.00056896
+!    oa_Anesthesia = 0.001523905
+!    oa_Clean = 0.001523905
+!    oa_Conference = 0.001574701
+!    oa_Corridor = 0.000304781
+!    oa_Dining = 0.004724104
+!    oa_ExamRoom = 0.001523905
+!    oa_FoodPrep = 0.003555777
+!    oa_Lobby = 0.000558765
+!    oa_Lounge = 0.000685757
+!    oa_NurseStation = 0.000812749
+!    oa_Office = 0.000431773
+!    oa_OperatingRoom = 0.00558765
+!    oa_PatientRoom = 0.002963148
+!    oa_PhysicalTherapy = 0.001523905
+!    oa_ProcedureRoom = 0.004063745
+!    oa_Radiology = 0.001523905
+!    oa_ReceptionArea = 0.001066733
+!    oa_RecoveryRoom = 0.003217132
+!    oa_Soiled = 0.001523905
+!    oa_Storage = 0.000609562
+!    oa_ToiletRoom = 0
+!    oa_Utility = 0
+!    tsa_Anesthesia = 0
+!    tsa_Clean = 0.003386454
+!    tsa_ExamRoom = 0.005079682
+!    tsa_FoodPrep = 0.008466136
+!    tsa_OperatingRoom = 0.016932272
+!    tsa_PatientRoom = 0.005079682
+!    tsa_PhysicalTherapy = 0.005079682
+!    tsa_ProcedureRoom = 0.012699204
+!    tsa_RecoveryRoom = 0.005079682
+!    tsa_Soiled = 0
+!    tsa_ToiletRoom = 0
+!    exh_Anesthesia = 0.006772909
+!    exh_Soiled = 0.008466136
+!    exh_ToiletRoom = 0.008466136
+!    economizer = DifferentialDryBulb
+!    skip_economizer_control = No
+!    SAT_reset_switch = Yes
+!    SAT_reset_T = 15.6
+!    door_infil = 0.776824762
+!    frac_ofpk = 0.131
+!    economizer_lockout = NoLockout
+!    damper_position = 0.2
+!    add_ck_ahu_2 = Yes
+!    floor_2_conference_mdp = 0.314210067828354
+!    floor_2_conference_toilet_mdp = 1
+!    floor_2_dictation_mdp = 0.2
+!    floor_2_exam_1_mdp = 0.51
+!    floor_2_exam_2_mdp = 1
+!    floor_2_exam_3_mdp = 1
+!    floor_2_exam_4_mdp = 0.64
+!    floor_2_exam_5_mdp = 0.69
+!    floor_2_exam_6_mdp = 0.94
+!    floor_2_exam_7_mdp = 1
+!    floor_2_exam_8_mdp = 0.93
+!    floor_2_exam_9_mdp = 1
+!    floor_2_exam_hall_1_mdp = 0.2
+!    floor_2_exam_hall_2_mdp = 0.2
+!    floor_2_exam_hall_3_mdp = 0.2
+!    floor_2_exam_hall_4_mdp = 0.2
+!    floor_2_exam_hall_5_mdp = 0.2
+!    floor_2_exam_hall_6_mdp = 0.2
+!    floor_2_janitor_mdp = 0.2
+!    floor_2_lounge_mdp = 0.2
+!    floor_2_nurse_station_1_mdp = 0.277306604428601
+!    floor_2_nurse_station_2_mdp = 0.272099823846287
+!    floor_2_office_mdp = 0.2
+!    floor_2_office_hall_mdp = 0.2
+!    floor_2_reception_mdp = 0.303343384097116
+!    floor_2_reception_hall_mdp = 0.2
+!    floor_2_reception_toilet_mdp = 1
+!    floor_2_scheduling_1_mdp = 0.208051712117732
+!    floor_2_scheduling_2_mdp = 0.2
+!    floor_2_storage_1_mdp = 0.307827866450996
+!    floor_2_storage_2_mdp = 0.369548345102662
+!    floor_2_storage_3_mdp = 0.348837887200092
+!    floor_2_utility_mdp = 0.2
+!    floor_2_work_mdp = 0.237871822943452
+!    floor_2_work_hall_mdp = 0.2
+!    floor_2_work_toilet_mdp = 1
+!    floor_2_x_ray_mdp = 0.232892223721024
+!    floor_3_dressing_room_mdp = 0.2
+!    floor_3_elevator_hall_mdp = 0.2
+!    floor_3_humid_mdp = 0.2
+!    floor_3_janitor_mdp = 0.307781809199424
+!    floor_3_locker_mdp = 0.2
+!    floor_3_lounge_mdp = 0.2
+!    floor_3_lounge_toilet_mdp = 1
+!    floor_3_mechanical_mdp = 0.2
+!    floor_3_mechanical_hall_mdp = 0.2
+!    floor_3_office_mdp = 0.211197433077753
+!    floor_3_office_hall_mdp = 0.2
+!    floor_3_office_toilet_mdp = 1
+!    floor_3_physical_therapy_1_mdp = 0.69
+!    floor_3_physical_therapy_2_mdp = 0.83
+!    floor_3_physical_therapy_toilet_mdp = 1
+!    floor_3_storage_1_mdp = 1
+!    floor_3_storage_2_mdp = 0.313035253306611
+!    floor_3_treatment_mdp = 0.81
+!    floor_3_undeveloped_1_mdp = 0.253784293487037
+!    floor_3_undeveloped_2_mdp = 0.251499920964143
+!    floor_3_utility_mdp = 0.473625677874027
+!    floor_3_work_mdp = 0.2
+!    ne_stair_mdp = 0.2
+!    nw_elevator_mdp = 0.2
+!    nw_stair_mdp = 0.2
+!    sw_stair_mdp = 0.2
+!    ahu_2_oaf = 3.14654366666667
+!    BLDG_ELEVATORS_LIGHTS_FAN_SCH = ELEV_LIGHT_FAN_SCH_ADD_DF
+!    BLDG_ELEVATORS_LIGHTS_FAN_POWER = 188
+!    BLDG_EQUIP_SCH = BLDG_EQUIP_SCH_ADV
+!    VAVReheat_flag = yes
+!    pv_generator = no
+!    pv_surface_area = 0
+!    STD189_overhang = no
+!    swh_et = 0.805126721
+!    swh_ua = 9.643286184
+!    ext_lgt_sch = Exterior_Lgt_ALWAYS_ON
+!    heating_damper_act = REVERSE
+!    LTG_SCH_SET = LTG_SET_STD2013
+!    AHU_2_ERV = No
+!    AHU_2_ERV_power = 2307.64508083334
+!    CLGSETP_SCH = CLGSETP_SCH_YES_OPTIMUM
+!    HtgSetP_Sch = HTGSETP_SCH_YES_OPTIMUM
+!    pipe_heat_loss = 6496.32
+!    add_as = yes
+!    preheatcoil_exists = no
+!    fan_total_eff = 0.385
+!    skip_EMSprogram = yes
+!    addendum_cd = 2016AS
+!    exterior_lights_watts_a = 173.8
+!    exterior_lights_watts_b = 1402
+!    BoilerAM = Yes
+!    OA_BASED_OPTIMUM_START_EMS = yes
+!    Wfile_TMY3 = USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw
+!    loadProfile = No
+!    addendum_DI = yes
+!    receptacle_ctrl_occ_reduction_frac = 0.990460515
+!    receptacle_ctrl_unocc_reduction_frac = 0.955490683
+!    OR_VAV_zone_mdp = 0.2
+!    HOTW_ST_Reset = No
+!    SHW_Pump_Head = 29891
+!    CodeName = ASHRAE90.1_STD2016
+!    CZ_City_Old = Boise
+!    CZ_Label = 5B
+!    exterior_lights_watts_c = 4148.2
+!    con_swingdoor_r = 0.475963827
+!    con_overheaddoor_r = 0.567741935
+!    HOTW_PumpCurve_flag = pump_ride_on_curve
+!    tsa_Radiology = 0
+!    Transfer_Air = all_exhaust
+
+  Version,9.6;
+>>>>>>> 42846a95e03cabcc18ef22f9778ca58ae6468128:testfiles/ASHRAE9012016_OutPatientHealthCare_Denver.idf
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

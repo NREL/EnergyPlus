@@ -99,7 +99,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                None
 
-  Version,9.5;
+  Version,9.6;
 
   Timestep,6;
 

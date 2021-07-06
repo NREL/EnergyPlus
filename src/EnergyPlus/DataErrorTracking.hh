@@ -138,7 +138,7 @@ namespace DataErrorTracking {
                                  "Output:Surfaces:List,Details;<CR>to inspect your surfaces.<CRE>"); // Incorrect Roof/Ceiling Tilt
     auto constexpr MoreDetails_10(
         "Incomplete view factors can result from incorrect floor specifications (such as tilting 0<CR>instead of 180) or not enough "
-        "surfaces in a zone to make an enclosure.  The error message<CR>also shows an enforced repciprocity value.  You can decide if "
+        "surfaces in a zone to make an enclosure.  The error message<CR>also shows an enforced reciprocity value.  You can decide if "
         "you need to make geometry<CR>changes based on that value.<CRE>"); // Incomplete View factors
     auto constexpr MoreDetails_11("Unbalanced exhaust air flow errors can occur when exhaust fans are running but there is no<CR>supply air. Turn "
                                   "off exhaust fans when the system is not running may help resolve the problem.<CR>Time shown is first "

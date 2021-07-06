@@ -75,147 +75,160 @@ namespace DataRuntimeLanguage {
 
     enum class ErlKeywordParam // keyword parameters for types of Erl statements
     {
-        KeywordNone,     // statement type not set
-        KeywordReturn,   // Return statement, as in leave program
-        KeywordGoto,     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
-        KeywordSet,      // Set statement, as in assign RHS to LHS
-        KeywordRun,      // Run statement, used to call a subroutine from a main program
-        KeywordIf,       // If statement, begins an IF-ElseIf-Else-EndIf logic block
-        KeywordElseIf,   // ElseIf statement, begins an ElseIf block
-        KeywordElse,     // Else statement, begins an Else block
-        KeywordEndIf,    // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
-        KeywordWhile,    // While statement, begins a While block
-        KeywordEndWhile, // EndWhile statement, terminates a While block
+        Unassigned = -1,
+        None,     // statement type not set
+        Return,   // Return statement, as in leave program
+        Goto,     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
+        Set,      // Set statement, as in assign RHS to LHS
+        Run,      // Run statement, used to call a subroutine from a main program
+        If,       // If statement, begins an IF-ElseIf-Else-EndIf logic block
+        ElseIf,   // ElseIf statement, begins an ElseIf block
+        Else,     // Else statement, begins an Else block
+        EndIf,    // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
+        While,    // While statement, begins a While block
+        EndWhile, // EndWhile statement, terminates a While block
     };
 
-    // MODULE PARAMETER DEFINITIONS:
-    int constexpr ValueNull(0);       // Erl entity type, "Null" value
-    int constexpr ValueNumber(1);     // Erl entity type,  hard numeric value
-    int constexpr ValueString(2);     // Erl entity type,  character data
-    int constexpr ValueArray(3);      // Erl entity type,  not used yet, for future array type
-    int constexpr ValueVariable(4);   // Erl entity type,  Erl variable
-    int constexpr ValueExpression(5); // Erl entity type,  Erl expression
-    int constexpr ValueTrend(6);      // Erl entity type,  Erl trend variable
-    int constexpr ValueError(7);      // Erl entity type, processing of an expression failed, returned error
+    enum class Value
+    {
+        Unassigned = -1,
+        Null,       // Erl entity type, "Null" value
+        Number,     // Erl entity type,  hard numeric value
+        String,     // Erl entity type,  character data
+        Array,      // Erl entity type,  not used yet, for future array type
+        Variable,   // Erl entity type,  Erl variable
+        Expression, // Erl entity type,  Erl expression
+        Trend,      // Erl entity type,  Erl trend variable
+        Error       // Erl entity type, processing of an expression failed, returned error
+    };
 
-    int constexpr PntrReal(301);    // data type for overloaded pointer management, double real
-    int constexpr PntrInteger(302); // data type for overloaded pointer management, integer
-    int constexpr PntrLogical(303); // data type for overloaded pointer management, logical
+    enum class PtrDataType
+    {
+        Unassigned = -1,
+        Real,    // data type for overloaded pointer management, double real
+        Integer, // data type for overloaded pointer management, integer
+        Logical  // data type for overloaded pointer management, logical
+    };
 
     // Parameters for identifying operator types in Erl
     // The number of these parameters indicates the order of precedence
-    int constexpr OperatorLiteral(1);         // Just stores a literal value
-    int constexpr OperatorNegative(2);        // -  (unary) No LHS?
-    int constexpr OperatorDivide(3);          // /
-    int constexpr OperatorMultiply(4);        // *
-    int constexpr OperatorSubtract(5);        // -  (binary)
-    int constexpr OperatorAdd(6);             // +  (binary)
-    int constexpr OperatorEqual(7);           // ==
-    int constexpr OperatorNotEqual(8);        // <>
-    int constexpr OperatorLessOrEqual(9);     // <=
-    int constexpr OperatorGreaterOrEqual(10); // >=
-    int constexpr OperatorLessThan(11);       // <
-    int constexpr OperatorGreaterThan(12);    // >
-    int constexpr OperatorRaiseToPower(13);   // ^
-    int constexpr OperatorLogicalAND(14);     // &&
-    int constexpr OperatorLogicalOR(15);      // ||
-    // note there is an important check "> 15" to distinguish operators from functions
-    //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
+    enum class ErlFunc
+    {
+        Unassigned = -1,
+        Null,
+        Literal,        // Just stores a literal value
+        Negative,       // -  (unary) No LHS?
+        Divide,         // /
+        Multiply,       // *
+        Subtract,       // -  (binary)
+        Add,            // +  (binary)
+        Equal,          // ==
+        NotEqual,       // <>
+        LessOrEqual,    // <=
+        GreaterOrEqual, // >=
+        LessThan,       // <
+        GreaterThan,    // >
+        RaiseToPower,   // ^
+        LogicalAND,     // &&
+        LogicalOR,      // ||
+        // note there is an important check "> 15" to distinguish operators from functions
+        //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
-    // parameters for built-in Erl functions, these are processed like operators and numbering
-    // must be sequential with the operators.
-    // math functions
-    int constexpr FuncRound(16);    // accessor for Fortran's DNINT()
-    int constexpr FuncMod(17);      // accessor for Fortran's MOD()
-    int constexpr FuncSin(18);      // accessor for Fortran's SIN()
-    int constexpr FuncCos(19);      // accessor for Fortran's COS()
-    int constexpr FuncArcSin(20);   // accessor for Fortran's ASIN()
-    int constexpr FuncArcCos(21);   // accessor for Fortran's ACOS()
-    int constexpr FuncDegToRad(22); // Multiplies degrees by DegToRad
-    int constexpr FuncRadToDeg(23); // Divides radians by DegToRad
-    int constexpr FuncExp(24);      // accessor for Fortran's EXP()
-    int constexpr FuncLn(25);       // accessor for Fortran's LOG()
-    int constexpr FuncMax(26);      // accessor for Fortran's MAX()
-    int constexpr FuncMin(27);      // accessor for Fortran's MIN()
-    int constexpr FuncABS(28);      // accessor for Fortran's ABS()
-    int constexpr FuncRandU(29);    // accessor for Fortran's Random_Number() intrinsic, uniform distribution
-    int constexpr FuncRandG(30);    // accessor for Gaussian/normal distribution random number
-    int constexpr FuncRandSeed(31); // accessor for Fortran's Random_Seed() intrinsic
+        // parameters for built-in Erl functions, these are processed like operators and numbering
+        // must be sequential with the operators.
+        // math functions
+        Round,    // accessor for Fortran's DNINT()
+        Mod,      // accessor for Fortran's MOD()
+        Sin,      // accessor for Fortran's SIN()
+        Cos,      // accessor for Fortran's COS()
+        ArcSin,   // accessor for Fortran's ASIN()
+        ArcCos,   // accessor for Fortran's ACOS()
+        DegToRad, // Multiplies degrees by DegToRad
+        RadToDeg, // Divides radians by DegToRad
+        Exp,      // accessor for Fortran's EXP()
+        Ln,       // accessor for Fortran's LOG()
+        Max,      // accessor for Fortran's MAX()
+        Min,      // accessor for Fortran's MIN()
+        ABS,      // accessor for Fortran's ABS()
+        RandU,    // accessor for Fortran's Random_Number() intrinsic, uniform distribution
+        RandG,    // accessor for Gaussian/normal distribution random number
+        RandSeed, // accessor for Fortran's Random_Seed() intrinsic
 
-    // begin psychrometric routines
-    int constexpr FuncRhoAirFnPbTdbW(32);    // accessor for E+ psych routine
-    int constexpr FuncCpAirFnW(33);          // accessor for E+ psych routine
-    int constexpr FuncHfgAirFnWTdb(34);      // accessor for E+ psych routine
-    int constexpr FuncHgAirFnWTdb(35);       // accessor for E+ psych routine
-    int constexpr FuncTdpFnTdbTwbPb(36);     // accessor for E+ psych routine
-    int constexpr FuncTdpFnWPb(37);          // accessor for E+ psych routine
-    int constexpr FuncHFnTdbW(38);           // accessor for E+ psych routine
-    int constexpr FuncHFnTdbRhPb(39);        // accessor for E+ psych routine
-    int constexpr FuncTdbFnHW(40);           // accessor for E+ psych routine
-    int constexpr FuncRhovFnTdbRh(41);       // accessor for E+ psych routine
-    int constexpr FuncRhovFnTdbRhLBnd0C(42); // accessor for E+ psych routine
-    int constexpr FuncRhovFnTdbWPb(43);      // accessor for E+ psych routine
-    int constexpr FuncRhFnTdbRhov(44);       // accessor for E+ psych routine
-    int constexpr FuncRhFnTdbRhovLBnd0C(45); // accessor for E+ psych routine
-    int constexpr FuncRhFnTdbWPb(46);        // accessor for E+ psych routine
-    int constexpr FuncTwbFnTdbWPb(47);       // accessor for E+ psych routine
-    int constexpr FuncVFnTdbWPb(48);         // accessor for E+ psych routine
-    int constexpr FuncWFnTdpPb(49);          // accessor for E+ psych routine
-    int constexpr FuncWFnTdbH(50);           // accessor for E+ psych routine
-    int constexpr FuncWFnTdbTwbPb(51);       // accessor for E+ psych routine
-    int constexpr FuncWFnTdbRhPb(52);        // accessor for E+ psych routine
-    int constexpr FuncPsatFnTemp(53);        // accessor for E+ psych routine
-    int constexpr FuncTsatFnHPb(54);         // accessor for E+ psych routine
-    int constexpr FuncTsatFnPb(55);          // not public in PsychRoutines.cc so not really available in EMS.
-    int constexpr FuncCpCW(56);              // accessor for E+ psych routine
-    int constexpr FuncCpHW(57);              // accessor for E+ psych routine
-    int constexpr FuncRhoH2O(58);            // accessor for E+ psych routine
+        // begin psychrometric routines
+        RhoAirFnPbTdbW,    // accessor for E+ psych routine
+        CpAirFnW,          // accessor for E+ psych routine
+        HfgAirFnWTdb,      // accessor for E+ psych routine
+        HgAirFnWTdb,       // accessor for E+ psych routine
+        TdpFnTdbTwbPb,     // accessor for E+ psych routine
+        TdpFnWPb,          // accessor for E+ psych routine
+        HFnTdbW,           // accessor for E+ psych routine
+        HFnTdbRhPb,        // accessor for E+ psych routine
+        TdbFnHW,           // accessor for E+ psych routine
+        RhovFnTdbRh,       // accessor for E+ psych routine
+        RhovFnTdbRhLBnd0C, // accessor for E+ psych routine
+        RhovFnTdbWPb,      // accessor for E+ psych routine
+        RhFnTdbRhov,       // accessor for E+ psych routine
+        RhFnTdbRhovLBnd0C, // accessor for E+ psych routine
+        RhFnTdbWPb,        // accessor for E+ psych routine
+        TwbFnTdbWPb,       // accessor for E+ psych routine
+        VFnTdbWPb,         // accessor for E+ psych routine
+        WFnTdpPb,          // accessor for E+ psych routine
+        WFnTdbH,           // accessor for E+ psych routine
+        WFnTdbTwbPb,       // accessor for E+ psych routine
+        WFnTdbRhPb,        // accessor for E+ psych routine
+        PsatFnTemp,        // accessor for E+ psych routine
+        TsatFnHPb,         // accessor for E+ psych routine
+        TsatFnPb,          // not public in PsychRoutines.cc so not really available in EMS.
+        CpCW,              // accessor for E+ psych routine
+        CpHW,              // accessor for E+ psych routine
+        RhoH2O,            // accessor for E+ psych routine
 
-    // Simulation Management Functions
-    int constexpr FuncFatalHaltEp(59);  // accessor for E+ error management, "Fatal" level
-    int constexpr FuncSevereWarnEp(60); // accessor for E+ error management, "Severe" level
-    int constexpr FuncWarnEp(61);       // accessor for E+ error management, "Warning" level
+        // Simulation Management Functions
+        FatalHaltEp,  // accessor for E+ error management, "Fatal" level
+        SevereWarnEp, // accessor for E+ error management, "Severe" level
+        WarnEp,       // accessor for E+ error management, "Warning" level
 
-    // Trend variable handling Functions
-    int constexpr FuncTrendValue(62);     // accessor for Erl Trend variables, instance value
-    int constexpr FuncTrendAverage(63);   // accessor for Erl Trend variables, average value
-    int constexpr FuncTrendMax(64);       // accessor for Erl Trend variables, max value
-    int constexpr FuncTrendMin(65);       // accessor for Erl Trend variables, min value
-    int constexpr FuncTrendDirection(66); // accessor for Erl Trend variables, slope value
-    int constexpr FuncTrendSum(67);       // accessor for Erl Trend variables, sum value
+        // Trend variable handling Functions
+        TrendValue,     // accessor for Erl Trend variables, instance value
+        TrendAverage,   // accessor for Erl Trend variables, average value
+        TrendMax,       // accessor for Erl Trend variables, max value
+        TrendMin,       // accessor for Erl Trend variables, min value
+        TrendDirection, // accessor for Erl Trend variables, slope value
+        TrendSum,       // accessor for Erl Trend variables, sum value
 
-    // Curve and Table access function
-    int constexpr FuncCurveValue(68);
+        // Curve and Table access function
+        CurveValue,
 
-    // Weather data query functions
-    int constexpr FuncTodayIsRain(69);             // Access TodayIsRain(hour, timestep)
-    int constexpr FuncTodayIsSnow(70);             // Access TodayIsSnow(hour, timestep)
-    int constexpr FuncTodayOutDryBulbTemp(71);     // Access TodayOutDryBulbTemp(hour, timestep)
-    int constexpr FuncTodayOutDewPointTemp(72);    // Access TodayOutDewPointTemp(hour, timestep)
-    int constexpr FuncTodayOutBaroPress(73);       // Access TodayOutBaroPress(hour, timestep)
-    int constexpr FuncTodayOutRelHum(74);          // Access TodayOutRelHum(hour, timestep)
-    int constexpr FuncTodayWindSpeed(75);          // Access TodayWindSpeed(hour, timestep)
-    int constexpr FuncTodayWindDir(76);            // Access TodayWindDir(hour, timestep)
-    int constexpr FuncTodaySkyTemp(77);            // Access TodaySkyTemp(hour, timestep)
-    int constexpr FuncTodayHorizIRSky(78);         // Access TodayHorizIRSky(hour, timestep)
-    int constexpr FuncTodayBeamSolarRad(79);       // Access TodayBeamSolarRad(hour, timestep)
-    int constexpr FuncTodayDifSolarRad(80);        // Access TodayDifSolarRad(hour, timestep)
-    int constexpr FuncTodayAlbedo(81);             // Access TodayAlbedo(hour, timestep)
-    int constexpr FuncTodayLiquidPrecip(82);       // Access TodayLiquidPrecip(hour, timestep)
-    int constexpr FuncTomorrowIsRain(83);          // Access TomorrowIsRain(hour, timestep)
-    int constexpr FuncTomorrowIsSnow(84);          // Access TomorrowIsSnow(hour, timestep)
-    int constexpr FuncTomorrowOutDryBulbTemp(85);  // Access TomorrowOutDryBulbTemp(hour, timestep)
-    int constexpr FuncTomorrowOutDewPointTemp(86); // Access TomorrowOutDewPointTemp(hour, timestep)
-    int constexpr FuncTomorrowOutBaroPress(87);    // Access TomorrowOutBaroPress(hour, timestep)
-    int constexpr FuncTomorrowOutRelHum(88);       // Access TomorrowOutRelHum(hour, timestep)
-    int constexpr FuncTomorrowWindSpeed(89);       // Access TomorrowWindSpeed(hour, timestep)
-    int constexpr FuncTomorrowWindDir(90);         // Access TomorrowWindDir(hour, timestep)
-    int constexpr FuncTomorrowSkyTemp(91);         // Access TomorrowSkyTemp(hour, timestep)
-    int constexpr FuncTomorrowHorizIRSky(92);      // Access TomorrowHorizIRSky(hour, timestep)
-    int constexpr FuncTomorrowBeamSolarRad(93);    // Access TomorrowBeamSolarRad(hour, timestep)
-    int constexpr FuncTomorrowDifSolarRad(94);     // Access TomorrowDifSolarRad(hour, timestep)
-    int constexpr FuncTomorrowAlbedo(95);          // Access TomorrowAlbedo(hour, timestep)
-    int constexpr FuncTomorrowLiquidPrecip(96);    // Access TomorrowLiquidPrecip(hour, timestep)
+        // Weather data query functions
+        TodayIsRain,             // Access TodayIsRain(hour, timestep)
+        TodayIsSnow,             // Access TodayIsSnow(hour, timestep)
+        TodayOutDryBulbTemp,     // Access TodayOutDryBulbTemp(hour, timestep)
+        TodayOutDewPointTemp,    // Access TodayOutDewPointTemp(hour, timestep)
+        TodayOutBaroPress,       // Access TodayOutBaroPress(hour, timestep)
+        TodayOutRelHum,          // Access TodayOutRelHum(hour, timestep)
+        TodayWindSpeed,          // Access TodayWindSpeed(hour, timestep)
+        TodayWindDir,            // Access TodayWindDir(hour, timestep)
+        TodaySkyTemp,            // Access TodaySkyTemp(hour, timestep)
+        TodayHorizIRSky,         // Access TodayHorizIRSky(hour, timestep)
+        TodayBeamSolarRad,       // Access TodayBeamSolarRad(hour, timestep)
+        TodayDifSolarRad,        // Access TodayDifSolarRad(hour, timestep)
+        TodayAlbedo,             // Access TodayAlbedo(hour, timestep)
+        TodayLiquidPrecip,       // Access TodayLiquidPrecip(hour, timestep)
+        TomorrowIsRain,          // Access TomorrowIsRain(hour, timestep)
+        TomorrowIsSnow,          // Access TomorrowIsSnow(hour, timestep)
+        TomorrowOutDryBulbTemp,  // Access TomorrowOutDryBulbTemp(hour, timestep)
+        TomorrowOutDewPointTemp, // Access TomorrowOutDewPointTemp(hour, timestep)
+        TomorrowOutBaroPress,    // Access TomorrowOutBaroPress(hour, timestep)
+        TomorrowOutRelHum,       // Access TomorrowOutRelHum(hour, timestep)
+        TomorrowWindSpeed,       // Access TomorrowWindSpeed(hour, timestep)
+        TomorrowWindDir,         // Access TomorrowWindDir(hour, timestep)
+        TomorrowSkyTemp,         // Access TomorrowSkyTemp(hour, timestep)
+        TomorrowHorizIRSky,      // Access TomorrowHorizIRSky(hour, timestep)
+        TomorrowBeamSolarRad,    // Access TomorrowBeamSolarRad(hour, timestep)
+        TomorrowDifSolarRad,     // Access TomorrowDifSolarRad(hour, timestep)
+        TomorrowAlbedo,          // Access TomorrowAlbedo(hour, timestep)
+        TomorrowLiquidPrecip     // Access TomorrowLiquidPrecip(hour, timestep)
+    };
 
     int constexpr NumPossibleOperators(96); // total number of operators and built-in functions
 
@@ -230,14 +243,14 @@ namespace DataRuntimeLanguage {
         std::string UniqueKeyName; // unique key name associated with output variable
         std::string OutputVarName; // name of output variable
         bool CheckedOkay;          // set to true once checked out okay
-        int Type;                  // type of output var, 1=integer, 2=real, 3=meter
-        int Index;                 // ref index in output processor, points to variable
-        int VariableNum;           // ref to global variable in runtime language
-        int SchedNum;              // ref index ptr to schedule service (filled if Schedule Value)
+        OutputProcessor::VariableType VariableType;
+        int Index;       // ref index in output processor, points to variable
+        int VariableNum; // ref to global variable in runtime language
+        int SchedNum;    // ref index ptr to schedule service (filled if Schedule Value)
         //  INTEGER                                 :: VarType       = 0
 
         // Default Constructor
-        OutputVarSensorType() : CheckedOkay(false), Type(0), Index(0), VariableNum(0), SchedNum(0)
+        OutputVarSensorType() : CheckedOkay(false), VariableType(OutputProcessor::VariableType::NotFound), Index(0), VariableNum(0), SchedNum(0)
         {
         }
     };
@@ -246,15 +259,15 @@ namespace DataRuntimeLanguage {
     {
         // Members
         // structure for internal data available for use in Erl that are not sourced by output variables
-        std::string DataTypeName; // general internal variable name registered, All uppercase
-        std::string UniqueIDName; // unique id for internal var, All uppercase
-        std::string Units;        // registered units, used for reporting and checks.
-        int PntrVarTypeUsed;      // data type used: integer (PntrInteger) or real (PntrReal)
-        Real64 *RealValue;        // POINTER to the REAL value that is being accessed
-        int *IntValue;            // POINTER to the Integer value that is being accessed
+        std::string DataTypeName;    // general internal variable name registered, All uppercase
+        std::string UniqueIDName;    // unique id for internal var, All uppercase
+        std::string Units;           // registered units, used for reporting and checks.
+        PtrDataType PntrVarTypeUsed; // data type used: integer (PntrInteger) or real (PntrReal)
+        Real64 *RealValue;           // POINTER to the REAL value that is being accessed
+        int *IntValue;               // POINTER to the Integer value that is being accessed
 
         // Default Constructor
-        InternalVarsAvailableType() : PntrVarTypeUsed(0), RealValue(nullptr), IntValue(nullptr)
+        InternalVarsAvailableType() : PntrVarTypeUsed(PtrDataType::Unassigned), RealValue(nullptr), IntValue(nullptr)
         {
         }
     };
@@ -286,14 +299,15 @@ namespace DataRuntimeLanguage {
         std::string Units;             // control value units, used for reporting and checks.
         int handleCount;               // Number of times you tried to get a handle on this actuator,
                                        // whether from EMS:Actuator or getActuatorHandle (API)
-        int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal) or logical (PntrLogical)
+        PtrDataType PntrVarTypeUsed;   // data type used: integer (PntrInteger), real (PntrReal) or logical (PntrLogical)
         bool *Actuated;                // POINTER to the logical value that signals EMS is actuating
         Real64 *RealValue;             // POINTER to the REAL value that is being actuated
         int *IntValue;                 // POINTER to the Integer value that is being actuated
         bool *LogValue;                // POINTER to the Logical value that is being actuated
 
         // Default Constructor
-        EMSActuatorAvailableType() : handleCount(0), PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
+        EMSActuatorAvailableType()
+            : handleCount(0), PntrVarTypeUsed(PtrDataType::Unassigned), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
         {
         }
     };
@@ -335,7 +349,7 @@ namespace DataRuntimeLanguage {
     {
         // Members
         // instance data structure for the values taken by Erl variables, nested structure in ErlVariable
-        int Type;           // value type, eg. ValueNumber,
+        Value Type;         // value type, eg. ValueNumber,
         Real64 Number;      // numeric value instance for Erl variable
         std::string String; // string data types in Erl (not used yet)
         int Variable;       // Pointer to another Erl variable
@@ -347,12 +361,12 @@ namespace DataRuntimeLanguage {
         bool initialized;    // true if number value has been SET (ie. has been on LHS in SET expression)
 
         // Default Constructor
-        ErlValueType() : Type(0), Number(0.0), Variable(0), Expression(0), TrendVariable(false), TrendVarPointer(0), initialized(false)
+        ErlValueType() : Type(Value::Null), Number(0.0), Variable(0), Expression(0), TrendVariable(false), TrendVarPointer(0), initialized(false)
         {
         }
 
         // Member Constructor
-        ErlValueType(int const Type,            // value type, eg. ValueNumber,
+        ErlValueType(Value const Type,          // value type, eg. ValueNumber,
                      Real64 const Number,       // numeric value instance for Erl variable
                      std::string const &String, // string data types in Erl (not used yet)
                      int const Variable,        // Pointer to another Erl variable
@@ -393,7 +407,7 @@ namespace DataRuntimeLanguage {
         int Argument2;                                // Index to a variable, function, expression, or stack
 
         // Default Constructor
-        InstructionType() : LineNum(0), Keyword(DataRuntimeLanguage::ErlKeywordParam::KeywordNone), Argument1(0), Argument2(0)
+        InstructionType() : LineNum(0), Keyword(DataRuntimeLanguage::ErlKeywordParam::None), Argument1(0), Argument2(0)
         {
         }
     };
@@ -418,12 +432,12 @@ namespace DataRuntimeLanguage {
     struct ErlExpressionType
     {
         // Members
-        int Operator;                  // indicates the type of operator or function 1..64
+        ErlFunc Operator;              // indicates the type of operator or function 1..64
         int NumOperands;               // count of operands in expression
         Array1D<ErlValueType> Operand; // holds Erl values for operands in expression
 
         // Default Constructor
-        ErlExpressionType() : Operator(0), NumOperands(0)
+        ErlExpressionType() : Operator(ErlFunc::Unassigned), NumOperands(0)
         {
         }
     };
@@ -433,11 +447,11 @@ namespace DataRuntimeLanguage {
         // Members
         // structure for operators and functions, used to look up information about each operator or function
         std::string Symbol; // string representation of operator or function (for reporting)
-        int Code;           // integer code 1..64, identifies operator or function
+        ErlFunc Code;       // integer code 1..64, identifies operator or function
         int NumOperands;    // count of operands or function arguments.
 
         // Default Constructor
-        OperatorType() : Code(0), NumOperands(0)
+        OperatorType() : Code(ErlFunc::Unassigned), NumOperands(0)
         {
         }
     };
@@ -557,12 +571,12 @@ struct RuntimeLanguageData : BaseGlobalStruct
     Array1D<DataRuntimeLanguage::InternalVarsAvailableType> EMSInternalVarsAvailable; // internal data that could be used
     Array1D<DataRuntimeLanguage::InternalVarsUsedType> EMSInternalVarsUsed;           // internal data that are used
     Array1D<DataRuntimeLanguage::EMSProgramCallManagementType> EMSProgramCallManager; // program calling managers
-    DataRuntimeLanguage::ErlValueType Null =
-        DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true); // special "null" Erl variable value instance
-    DataRuntimeLanguage::ErlValueType False =
-        DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true); // special "false" Erl variable value instance
-    DataRuntimeLanguage::ErlValueType True =
-        DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true); // special "True" Erl variable value instance, gets reset
+    DataRuntimeLanguage::ErlValueType Null = DataRuntimeLanguage::ErlValueType(
+        DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true); // special "null" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType False = DataRuntimeLanguage::ErlValueType(
+        DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true); // special "false" Erl variable value instance
+    DataRuntimeLanguage::ErlValueType True = DataRuntimeLanguage::ErlValueType(
+        DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true); // special "True" Erl variable value instance, gets reset
 
     // EMS Actuator fast duplicate check lookup support
     std::unordered_set<std::tuple<std::string, std::string, std::string>, DataRuntimeLanguage::EMSActuatorKey_hash>
@@ -617,9 +631,9 @@ struct RuntimeLanguageData : BaseGlobalStruct
         this->EMSInternalVarsUsed.deallocate();
         this->EMSProgramCallManager.deallocate();
         this->EMSActuator_lookup.clear();
-        this->Null = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
-        this->False = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
-        this->True = DataRuntimeLanguage::ErlValueType(0, 0.0, "", 0, 0, false, 0, "", true);
+        this->Null = DataRuntimeLanguage::ErlValueType(DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true);
+        this->False = DataRuntimeLanguage::ErlValueType(DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true);
+        this->True = DataRuntimeLanguage::ErlValueType(DataRuntimeLanguage::Value::Null, 0.0, "", 0, 0, false, 0, "", true);
     }
 };
 
