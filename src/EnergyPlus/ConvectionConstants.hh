@@ -65,10 +65,15 @@ Real64 constexpr OneSixth{1.0 / 6.0};   // 1/6 in highest precision
 Real64 constexpr FourFifths{4.0 / 5.0}; // 4/5 in highest precision
 
 // parameters for identifying more specific hc model equations, inside face
+int constexpr HcInt_ASHRAESimple{1};
+int constexpr HcInt_ASHRAETARP{2};
+int constexpr HcInt_CeilingDiffuser{3};
+int constexpr HcInt_TrombeWall{4};
+int constexpr HcInt_AdaptiveConvectionAlgorithm{9};
+int constexpr HcInt_ASTMC1340{10};
 int constexpr HcInt_UserValue{200};
 int constexpr HcInt_UserSchedule{201};
 int constexpr HcInt_UserCurve{202};
-int constexpr HcInt_ASHRAESimple{1};
 int constexpr HcInt_ASHRAEVerticalWall{203};
 int constexpr HcInt_WaltonUnstableHorizontalOrTilt{204};
 int constexpr HcInt_WaltonStableHorizontalOrTilt{205};
@@ -99,13 +104,16 @@ int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserWalls{229};
 int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserFloor{230};
 
 // parameters for identifying more specific hc model equations, outside face
-int constexpr HcExt_None{300}; // none is allowed because Hn and Hf are split
-int constexpr HcExt_UserValue{301};
-int constexpr HcExt_UserSchedule{302};
+int constexpr HcExt_ASHRAESimple{1};
+int constexpr HcExt_ASHRAETARP{2};
 int constexpr HcExt_TarpHcOutside{5};
 int constexpr HcExt_MoWiTTHcOutside{6};
 int constexpr HcExt_DOE2HcOutside{7};
+int constexpr HcExt_BLASTHcOutside{8};
 int constexpr HcExt_AdaptiveConvectionAlgorithm{9};
+int constexpr HcExt_None{300}; // none is allowed because Hn and Hf are split
+int constexpr HcExt_UserValue{301};
+int constexpr HcExt_UserSchedule{302};
 int constexpr HcExt_UserCurve{303};
 int constexpr HcExt_ASHRAESimpleCombined{304};
 int constexpr HcExt_NaturalASHRAEVerticalWall{305};

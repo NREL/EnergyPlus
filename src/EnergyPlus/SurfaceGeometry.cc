@@ -750,36 +750,34 @@ namespace SurfaceGeometry {
 
             {
                 auto const SELECT_CASE_var(state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo);
-                if (SELECT_CASE_var == ASHRAESimple) {
+                if (SELECT_CASE_var == ConvectionConstants::HcInt_ASHRAESimple) {
                     String1 = "Simple";
-                } else if (SELECT_CASE_var == ASHRAETARP) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcInt_ASHRAETARP) {
                     String1 = "TARP";
-                } else if (SELECT_CASE_var == CeilingDiffuser) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcInt_CeilingDiffuser) {
                     String1 = "CeilingDiffuser";
-                } else if (SELECT_CASE_var == TrombeWall) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcInt_TrombeWall) {
                     String1 = "TrombeWall";
-                } else if (SELECT_CASE_var == AdaptiveConvectionAlgorithm) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) {
                     String1 = "AdaptiveConvectionAlgorithm";
-                } else if (SELECT_CASE_var == ASTMC1340) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcInt_ASTMC1340) {
                     String1 = "ASTMC1340";
                 }
             }
 
             {
                 auto const SELECT_CASE_var(state.dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo);
-                if (SELECT_CASE_var == ASHRAESimple) {
+                if (SELECT_CASE_var == ConvectionConstants::HcExt_ASHRAESimple) {
                     String2 = "Simple";
-                } else if (SELECT_CASE_var == ASHRAETARP) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcExt_ASHRAETARP) {
                     String2 = "TARP";
-                } else if (SELECT_CASE_var == TarpHcOutside) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcExt_TarpHcOutside) {
                     String2 = "TARP";
-                } else if (SELECT_CASE_var == MoWiTTHcOutside) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcExt_MoWiTTHcOutside) {
                     String2 = "MoWitt";
-                } else if (SELECT_CASE_var == DOE2HcOutside) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcExt_DOE2HcOutside) {
                     String2 = "DOE-2";
-                    //      CASE (BLASTHcOutside)
-                    //        String2='BLAST'
-                } else if (SELECT_CASE_var == AdaptiveConvectionAlgorithm) {
+                } else if (SELECT_CASE_var == ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm) {
                     String2 = "AdaptiveConvectionAlgorithm";
                 }
             }

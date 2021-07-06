@@ -162,13 +162,13 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
             allocated(state.dataLoopNodes->Node)) {
             state.dataConvectionCoefficient->NodeCheck = false;
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (Zone(ZoneNum).InsideConvectionAlgo != CeilingDiffuser) continue;
+                if (Zone(ZoneNum).InsideConvectionAlgo != ConvectionConstants::HcInt_CeilingDiffuser) continue;
                 if (Zone(ZoneNum).SystemZoneNodeNumber != 0) continue;
                 ShowSevereError(state,
                                 "InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, but no system inlet node defined, Zone=" +
                                     Zone(ZoneNum).Name);
                 ShowContinueError(state, "Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone=" + Zone(ZoneNum).Name);
-                Zone(ZoneNum).InsideConvectionAlgo = ASHRAETARP;
+                Zone(ZoneNum).InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAETARP;
             }
             // insert one-time setup for adpative inside face
         }
@@ -183,13 +183,13 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
     if (state.dataGlobal->BeginEnvrnFlag && state.dataConvectionCoefficient->MyEnvirnFlag) {
         bool anyAdaptiveConvectionAlgorithm = false;
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == DataHeatBalance::AdaptiveConvectionAlgorithm) {
+            if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) {
                 anyAdaptiveConvectionAlgorithm = true;
                 break;
             }
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == DataHeatBalance::AdaptiveConvectionAlgorithm) {
+            if (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) {
                 anyAdaptiveConvectionAlgorithm = true;
                 break;
             }
@@ -239,10 +239,10 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
             auto const SELECT_CASE_var(Zone(ZoneNum).InsideConvectionAlgo);
             // Ceiling Diffuser and Trombe Wall only make sense at Zone Level
             // Interior convection coeffs are first calculated here and then at surface level
-            if (SELECT_CASE_var == CeilingDiffuser) {
+            if (SELECT_CASE_var == ConvectionConstants::HcInt_CeilingDiffuser) {
                 CalcCeilingDiffuserIntConvCoeff(state, ZoneNum, SurfaceTemperatures);
 
-            } else if (SELECT_CASE_var == TrombeWall) {
+            } else if (SELECT_CASE_var == ConvectionConstants::HcInt_TrombeWall) {
                 CalcTrombeWallIntConvCoeff(state, ZoneNum, SurfaceTemperatures);
 
             } else {
@@ -275,13 +275,13 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
             if (standardAlgo) {
                 auto const SELECT_CASE_var1(algoNum);
 
-                if (SELECT_CASE_var1 == ASHRAESimple) {
+                if (SELECT_CASE_var1 == ConvectionConstants::HcInt_ASHRAESimple) {
                     CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 
-                } else if (SELECT_CASE_var1 == ASHRAETARP) {
+                } else if (SELECT_CASE_var1 == ConvectionConstants::HcInt_ASHRAETARP) {
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                         CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                     } else {
@@ -292,14 +292,15 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 
-                } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
+                } else if (SELECT_CASE_var1 == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) {
 
                     ManageInsideAdaptiveConvectionAlgo(state, SurfNum);
 
-                } else if ((SELECT_CASE_var1 == CeilingDiffuser) || (SELECT_CASE_var1 == TrombeWall)) {
+                } else if ((SELECT_CASE_var1 == ConvectionConstants::HcInt_CeilingDiffuser) ||
+                           (SELECT_CASE_var1 == ConvectionConstants::HcInt_TrombeWall)) {
                     // Already done above and can't be at individual surface
 
-                } else if (SELECT_CASE_var1 == ASTMC1340) {
+                } else if (SELECT_CASE_var1 == ConvectionConstants::HcInt_ASTMC1340) {
                     CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
 
                 } else {
@@ -433,7 +434,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
 
         auto const SELECT_CASE_var1(algoNum);
 
-        if (SELECT_CASE_var1 == ASHRAESimple) {
+        if (SELECT_CASE_var1 == ConvectionConstants::HcExt_ASHRAESimple) {
 
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = [](double, double, double, double windSpeed) -> double {
@@ -446,7 +447,8 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                 HExt = CalcASHRAESimpExtConvectCoeff(Roughness, SurfWindSpeed); // includes radiation to sky, ground, and air
             }
 
-        } else if ((SELECT_CASE_var1 == ASHRAETARP) || (SELECT_CASE_var1 == BLASTHcOutside) || (SELECT_CASE_var1 == TarpHcOutside)) {
+        } else if ((SELECT_CASE_var1 == ConvectionConstants::HcExt_ASHRAETARP) || (SELECT_CASE_var1 == ConvectionConstants::HcExt_BLASTHcOutside) ||
+                   (SELECT_CASE_var1 == ConvectionConstants::HcExt_TarpHcOutside)) {
             //   Convection is split into forced and natural components. The total
             //   convective heat transfer coefficient is the sum of these components.
             //   Coefficients for subsurfaces are handled in a special way.  The values for perimeter and gross area
@@ -510,7 +512,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                 HExt = Hn + Hf;
             }
 
-        } else if (SELECT_CASE_var1 == MoWiTTHcOutside) {
+        } else if (SELECT_CASE_var1 == ConvectionConstants::HcExt_MoWiTTHcOutside) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
                 if (Surface(SurfNum).Class == SurfaceClass::Wall) {
@@ -539,7 +541,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                 }
             }
 
-        } else if (SELECT_CASE_var1 == DOE2HcOutside) {
+        } else if (SELECT_CASE_var1 == ConvectionConstants::HcExt_DOE2HcOutside) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 if (Surface(SurfNum).Class == SurfaceClass::Wall) {
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
@@ -581,7 +583,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                 HExt = Hn + Hf;
             }
 
-        } else if (SELECT_CASE_var1 == AdaptiveConvectionAlgorithm) {
+        } else if (SELECT_CASE_var1 == ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm) {
 
             ManageOutsideAdaptiveConvectionAlgo(state, SurfNum, HExt);
 
@@ -603,7 +605,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
         }
     }
 
-    if (TSurf == TSky || algoNum == ASHRAESimple) {
+    if (TSurf == TSky || algoNum == ConvectionConstants::HcExt_ASHRAESimple) {
         HSky = 0.0;
     } else {
         // Compute sky radiation coefficient
@@ -611,7 +613,7 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                (pow_4(TSurf) - pow_4(TSky)) / (TSurf - TSky);
     }
 
-    if (TSurf == TAir || algoNum == ASHRAESimple) {
+    if (TSurf == TAir || algoNum == ConvectionConstants::HcExt_ASHRAESimple) {
         HGround = 0.0;
         HAir = 0.0;
     } else {
@@ -1791,18 +1793,19 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
         ErrorsFound = true;
     }
 
-    if (state.dataHeatBal->DefaultOutsideConvectionAlgo == ASHRAESimple ||
-        std::any_of(
-            Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) { return e.OutsideConvectionAlgo == DataHeatBalance::ASHRAESimple; })) {
+    if (state.dataHeatBal->DefaultOutsideConvectionAlgo == ConvectionConstants::HcExt_ASHRAESimple ||
+        std::any_of(Zone.begin(), Zone.end(), [](DataHeatBalance::ZoneData const &e) {
+            return e.OutsideConvectionAlgo == ConvectionConstants::HcExt_ASHRAESimple;
+        })) {
         Count = 0;
         for (int Loop = 1; Loop <= state.dataSurface->TotExtConvCoeff; ++Loop) {
             SurfNum = state.dataSurface->UserExtConvectionCoeffs(Loop).WhichSurface;
             // Tests show that Zone will override the simple convection specification of global.
             if (SurfNum <= 0) continue;               // ignore this error condition
             if (Surface(SurfNum).Zone == 0) continue; // ignore this error condition
-            if (Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple &&
+            if (Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ConvectionConstants::HcExt_ASHRAESimple &&
                 ((state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType == ConvCoefSpecifiedModel &&
-                  state.dataSurface->UserExtConvectionCoeffs(Loop).HcModelEq != ASHRAESimple) ||
+                  state.dataSurface->UserExtConvectionCoeffs(Loop).HcModelEq != ConvectionConstants::HcExt_ASHRAESimple) ||
                  state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
                 ++Count;
                 if (state.dataGlobal->DisplayExtraWarnings) {
