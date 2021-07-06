@@ -264,7 +264,8 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
             if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) <= -1) { // Set by user using one of the standard algorithms...
                 algoNum = std::abs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum));
                 standardAlgo = true;
-            } else if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == 0) { // Not set by user, uses Zone Setting
+            } else if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) ==
+                       ConvectionConstants::HcInt_SetByZone) { // Not set by user, uses Zone Setting
                 algoNum = Zone(ZoneNum).InsideConvectionAlgo;
                 standardAlgo = true;
             } else {
@@ -864,8 +865,12 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                                "ALLINTERIORFLOORS"};
 
     const std::unordered_map<std::string, int> HcInt_ConvectionTypesMap = {
-        {"VALUE", -999},
-        {"SCHEDULE", -999},
+        {"VALUE", ConvectionConstants::HcInt_Value},
+        {"SCHEDULE", ConvectionConstants::HcInt_Schedule},
+        {"SIMPLE", ConvectionConstants::HcInt_ASHRAESimple},
+        {"TARP", ConvectionConstants::HcInt_ASHRAETARP},
+        {"ADAPTIVECONVECTIONALGORITHM", ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm},
+        {"ASTMC1340", ConvectionConstants::HcInt_ASTMC1340},
         {"USERCURVE", ConvectionConstants::HcInt_UserCurve},
         {"ASHRAEVERTICALWALL", ConvectionConstants::HcInt_ASHRAEVerticalWall},
         {"WALTONUNSTABLEHORIZONTALORTILT", ConvectionConstants::HcInt_WaltonUnstableHorizontalOrTilt},
@@ -898,8 +903,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     };
 
     std::unordered_map<std::string, int> HcExt_ConvectionTypesMap = {
-        {"VALUE", -999},
-        {"SCHEDULE", -999},
+        {"VALUE", ConvectionConstants::HcExt_Value},
+        {"SCHEDULE", ConvectionConstants::HcExt_Schedule},
         {"TARP", ConvectionConstants::HcExt_TarpHcOutside},
         {"MOWITT", ConvectionConstants::HcExt_MoWiTTHcOutside},
         {"DOE-2", ConvectionConstants::HcExt_DOE2HcOutside},
@@ -1315,10 +1320,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
                         ExtValue = HcExt_ConvectionTypesMap.at(equationName);
 
-                        if ((equationName == "SIMPLECOMBINED") || (equationName == "TARP") || (equationName == "MOWITT") ||
-                            (equationName == "DOE-2") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
+                        if ((ExtValue == ConvectionConstants::HcExt_ASHRAESimpleCombined) || (ExtValue == ConvectionConstants::HcExt_TarpHcOutside) ||
+                            (ExtValue == ConvectionConstants::HcExt_MoWiTTHcOutside) || (ExtValue == ConvectionConstants::HcExt_DOE2HcOutside) ||
+                            (ExtValue == ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm)) {
                             PotentialAssignedValue = -ExtValue;
-                        } else if (equationName == "VALUE") {
+                        } else if (ExtValue == ConvectionConstants::HcExt_Value) {
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
@@ -1346,7 +1352,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                       state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                             }
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
-                        } else if (equationName == "SCHEDULE") { // Schedule
+                        } else if (ExtValue == ConvectionConstants::HcExt_Schedule) { // Schedule
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
@@ -1405,10 +1411,11 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
                         IntValue = HcInt_ConvectionTypesMap.at(equationName);
-                        if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM") ||
-                            (equationName == "ASTMC1340")) {
+                        if ((IntValue == ConvectionConstants::HcInt_ASHRAESimple) || (IntValue == ConvectionConstants::HcInt_ASHRAETARP) ||
+                            (IntValue == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) ||
+                            (IntValue == ConvectionConstants::HcInt_ASTMC1340)) {
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
-                        } else if (equationName == "VALUE") {
+                        } else if (IntValue == ConvectionConstants::HcInt_Value) {
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
@@ -1436,7 +1443,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                       state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                             }
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
-                        } else if (equationName == "SCHEDULE") {
+                        } else if (IntValue == ConvectionConstants::HcInt_Value) {
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;

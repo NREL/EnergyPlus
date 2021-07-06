@@ -65,6 +65,9 @@ Real64 constexpr OneSixth{1.0 / 6.0};   // 1/6 in highest precision
 Real64 constexpr FourFifths{4.0 / 5.0}; // 4/5 in highest precision
 
 // parameters for identifying more specific hc model equations, inside face
+int constexpr HcInt_Value{-999};
+int constexpr HcInt_Schedule{-999};
+int constexpr HcInt_SetByZone{0};
 int constexpr HcInt_ASHRAESimple{1};
 int constexpr HcInt_ASHRAETARP{2};
 int constexpr HcInt_CeilingDiffuser{3};
@@ -104,6 +107,8 @@ int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserWalls{229};
 int constexpr HcInt_GoldsteinNovoselacCeilingDiffuserFloor{230};
 
 // parameters for identifying more specific hc model equations, outside face
+int constexpr HcExt_Value{-999};
+int constexpr HcExt_Schedule{-999};
 int constexpr HcExt_ASHRAESimple{1};
 int constexpr HcExt_ASHRAETARP{2};
 int constexpr HcExt_TarpHcOutside{5};
