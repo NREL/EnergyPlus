@@ -435,7 +435,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirAverageValue_Test)
 }
 TEST_F(EnergyPlusFixture, Psychrometrics_Interpolation_Test)
 {
-    //verify sample data for interpolation
+    // verify sample data for interpolation
     InitializePsychRoutines(*state);
     Real64 tsat_psy;
     Real64 error = 0.0;
@@ -709,11 +709,9 @@ TEST_F(EnergyPlusFixture, Psychrometrics_Interpolation_Test)
         101.1359293};
     for (i = 0; i < 1651; ++i) {
         tsat_psy = PsyTsatFnPb_org(*state, tsat_fn_pb_pressure[i]);
-        error=max(abs(tsat_psy-tsat_fn_pb_tsat[i]), error);
+        error = max(abs(tsat_psy - tsat_fn_pb_tsat[i]), error);
     }
-    
+
     // check error
     EXPECT_LE(error, 1E-7);
-
-
 }

@@ -1378,17 +1378,17 @@ namespace Psychrometrics {
         state.dataPsychrometrics->Press_Save = Press;
         // int n_sample = 217; //sample bin size =512 Pa; continous sample size =217
         // int n_sample = 52; // sample bin size = 512 Pa; discontinous sample size = 52
-         int n_sample = 413; //sample bin size =256 Pa; continous sample size =413
+        int n_sample = 413; // sample bin size =256 Pa; continous sample size =413
         // int n_sample = 81; // sample bin size = 256 Pa; discontinous sample size = 81
         // int n_sample = 826; // sample bin size = 128 Pa; continous sample size = 826
-        //int n_sample = 160;  // sample bin size = 128 Pa; discontinous sample size = 160
+        // int n_sample = 160;  // sample bin size = 128 Pa; discontinous sample size = 160
         // int n_sample = 1651; // sample bin size = 64 Pa; continous sample size = 1651
-        //int n_sample = 317; // sample bin size = 64 Pa; discontinous sample size = 317
+        // int n_sample = 317; // sample bin size = 64 Pa; discontinous sample size = 317
         // linear interpolation
-        //tSat=linearint(state, n_sample, Press); // linear interpolation for y
+        tSat = linearint(state, n_sample, Press); // linear interpolation for y
 
         // CSpline interpolation
-        tSat = CSplineint(state, n_sample, Press); // Cubic spline interpolation for y
+        // tSat = CSplineint(state, n_sample, Press); // Cubic spline interpolation for y
 
         // Uses an iterative process to determine the saturation temperature at a given
         // pressure by correlating saturated water vapor as a function of temperature.
@@ -1493,59 +1493,59 @@ namespace Psychrometrics {
         int x_int = static_cast<int>(x);
         // int j = x_int / 512 - 1;
         //********continous sample start
-        //int j = (x_int >> 9) - 1; // sample bin 512, sample size=217
-        int j = (x_int >> 8) - 1; // sample bin 256, sample size=413
-        //int j = (x_int >> 7) - 1; // sample bin 128, sample size=826
-        //int j = (x_int >> 6) - 1; // sample bin 64, sample size=1651
+        // int j = (x_int >> 9) - 1; // sample bin 512, sample size=217
+        // int j = (x_int >> 8) - 1; // sample bin 256, sample size=413
+        // int j = (x_int >> 7) - 1; // sample bin 128, sample size=826
+        int j = (x_int >> 6) - 1; // sample bin 64, sample size=1651
         if (j < 0) j = 0;
         if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(512); // sample bin 512, sample size=217
-        static constexpr Real64 h(256); // sample bin 256, sample size=413
-        //static constexpr Real64 h(128); // sample bin 128, sample size=826
-        //static constexpr Real64 h(64); // sample bin 64, sample size=1651
+        // static constexpr Real64 h(512); // sample bin 512, sample size=217
+        // static constexpr Real64 h(256); // sample bin 256, sample size=413
+        // static constexpr Real64 h(128); // sample bin 128, sample size=826
+        static constexpr Real64 h(64); // sample bin 64, sample size=1651
         //********continous sample end
         //********sample bin 512 start
-        //int j = (x_int >> 9) - 1;
+        // int j = (x_int >> 9) - 1;
         // check bounds
-        //if (j < 0) j = 0;
-        //if (x > 10752 && x <= 95744) j = 21; // address the gap between two sample sets. bin size: 512 pa
-        //if (x > 95744) j = j - 165;          // address the gap between two sample sets. bin size: 512 pa
-        //if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(512); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
-        //if (x > 10752 && x <= 95744) static constexpr Real64 h(84992); // address the gap between two sample sets. bin size 512 pa for the rest
+        // if (j < 0) j = 0;
+        // if (x > 10752 && x <= 95744) j = 21; // address the gap between two sample sets. bin size: 512 pa
+        // if (x > 95744) j = j - 165;          // address the gap between two sample sets. bin size: 512 pa
+        // if (j > (n - 2)) j = n - 2;
+        // static constexpr Real64 h(512); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        // if (x > 10752 && x <= 95744) static constexpr Real64 h(84992); // address the gap between two sample sets. bin size 512 pa for the rest
         //********sample bin 512 end
 
         //********sample bin 256 start
-        //int j = (x_int >> 8) - 1;
+        // int j = (x_int >> 8) - 1;
         // check bounds
-        //if (j < 0) j = 0;
-        //if (x > 10752 && x <= 96000) j = 42; // address the gap between two sample sets. bin size: 256 pa
-        //if (x > 96000) j = j - 333;          // address the gap between two sample sets. bin size: 256 pa
-        //if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(256); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
-        //if (x > 10752 && x <= 96000) static constexpr Real64 h(85248); // address the gap between two sample sets. bin size 512 pa for the rest
+        // if (j < 0) j = 0;
+        // if (x > 10752 && x <= 96000) j = 42; // address the gap between two sample sets. bin size: 256 pa
+        // if (x > 96000) j = j - 333;          // address the gap between two sample sets. bin size: 256 pa
+        // if (j > (n - 2)) j = n - 2;
+        // static constexpr Real64 h(256); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        // if (x > 10752 && x <= 96000) static constexpr Real64 h(85248); // address the gap between two sample sets. bin size 512 pa for the rest
         //********sample bin 256 end
 
         //********sample bin 128 start
-        //int j = (x_int >> 7) - 1;
+        // int j = (x_int >> 7) - 1;
         // check bounds
-        //if (j < 0) j = 0;
-        //if (x > 10624 && x <= 96000) j = 83; // address the gap between two sample sets. bin size: 128 pa
-        //if (x > 96000) j = j - 666;          // address the gap between two sample sets. bin size: 128 pa
-        //if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(128); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
-        //if (x > 10624 && x <= 96000) static constexpr Real64 h(85376); // address the gap between two sample sets. bin size 512 pa for the rest
+        // if (j < 0) j = 0;
+        // if (x > 10624 && x <= 96000) j = 83; // address the gap between two sample sets. bin size: 128 pa
+        // if (x > 96000) j = j - 666;          // address the gap between two sample sets. bin size: 128 pa
+        // if (j > (n - 2)) j = n - 2;
+        // static constexpr Real64 h(128); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        // if (x > 10624 && x <= 96000) static constexpr Real64 h(85376); // address the gap between two sample sets. bin size 512 pa for the rest
         //********sample bin 128 end
 
         //********sample bin 64 start
-        //int j = (x_int >> 6) - 1;
+        // int j = (x_int >> 6) - 1;
         // check bounds
-        //if (j < 0) j = 0;
-        //if (x > 10560 && x <= 96000) j = 165; // address the gap between two sample sets. bin size: 64 pa
-        //if (x > 96000) j = j - 1334;          // address the gap between two sample sets. bin size: 128 pa
-        //if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(128); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
-        //if (x > 10560 && x <= 96000) static constexpr Real64 h(85440); // address the gap between two sample sets. bin size 512 pa for the rest
+        // if (j < 0) j = 0;
+        // if (x > 10560 && x <= 96000) j = 165; // address the gap between two sample sets. bin size: 64 pa
+        // if (x > 96000) j = j - 1334;          // address the gap between two sample sets. bin size: 128 pa
+        // if (j > (n - 2)) j = n - 2;
+        // static constexpr Real64 h(128); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        // if (x > 10560 && x <= 96000) static constexpr Real64 h(85440); // address the gap between two sample sets. bin size 512 pa for the rest
         //********sample bin 64 end
         A = (tsat_fn_pb_x[j + 1] - x) / h;
         B = 1 - A;
@@ -1561,60 +1561,61 @@ namespace Psychrometrics {
         Real64 A, B, y;
         // find location of x in arrays without searching since array bins are equally sized
         int x_int = static_cast<int>(x);
-        //********continous sample start 
-        //int j = (x_int >> 9) - 1; //sample bin 512, sample size=217
-        int j = (x_int >> 8) - 1; // sample bin 256, sample size=413
-        //int j = (x_int >> 7) - 1; // sample bin 128, sample size=826
-        //int j = (x_int >> 6) - 1; // sample bin 64, sample size=1651
+        //********continous sample start
+        // int j = (x_int >> 9) - 1; //sample bin 512, sample size=217
+        // int j = (x_int >> 8) - 1; // sample bin 256, sample size=413
+        // int j = (x_int >> 7) - 1; // sample bin 128, sample size=826
+        int j = (x_int >> 6) - 1; // sample bin 64, sample size=1651
         if (j < 0) j = 0;
         if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(512);//sample bin 512, sample size=217
-        static constexpr Real64 h(256); // sample bin 256, sample size=413
-        //static constexpr Real64 h(128); // sample bin 128, sample size=826
-        // static constexpr Real64 h(64); // sample bin 64, sample size=1651
+        // static constexpr Real64 h(512);//sample bin 512, sample size=217
+        // static constexpr Real64 h(256); // sample bin 256, sample size=413
+        // static constexpr Real64 h(128); // sample bin 128, sample size=826
+        static constexpr Real64 h(64); // sample bin 64, sample size=1651
         //********continous sample end
         //********sample bin 512 start
-        //int j = (x_int >>9) - 1;
+        // int j = (x_int >>9) - 1;
         // check bounds
-        //if (j < 0) j = 0;
-        //if (x > 10752 && x <= 95744) j = 21; // address the gap between two sample sets. bin size: 512 pa
-        //if (x > 95744) j = j - 165;          // address the gap between two sample sets. bin size: 512 pa
-        //if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(512); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
-        //if (x > 10752 && x <= 95744) static constexpr Real64 h(84992); // address the gap between two sample sets A = (tsat_fn_pb_x[j + 1] - x) / h;
-        //********sample bin 512 end 
+        // if (j < 0) j = 0;
+        // if (x > 10752 && x <= 95744) j = 21; // address the gap between two sample sets. bin size: 512 pa
+        // if (x > 95744) j = j - 165;          // address the gap between two sample sets. bin size: 512 pa
+        // if (j > (n - 2)) j = n - 2;
+        // static constexpr Real64 h(512); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        // if (x > 10752 && x <= 95744) static constexpr Real64 h(84992); // address the gap between two sample sets A = (tsat_fn_pb_x[j + 1] - x) /
+        // h;
+        //********sample bin 512 end
 
         //********sample bin 256 start
-        //int j = (x_int >> 8) - 1;
+        // int j = (x_int >> 8) - 1;
         // check bounds
-        //if (j < 0) j = 0;
-        //if (x > 10752 && x <= 96000) j = 42; // address the gap between two sample sets. bin size: 256 pa
-        //if (x > 96000) j = j - 333;          // address the gap between two sample sets. bin size: 256 pa
-        //if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(256); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
-       // if (x > 10752 && x <= 96000) static constexpr Real64 h(85248); // address the gap between two sample sets. bin size 512 pa for the rest
+        // if (j < 0) j = 0;
+        // if (x > 10752 && x <= 96000) j = 42; // address the gap between two sample sets. bin size: 256 pa
+        // if (x > 96000) j = j - 333;          // address the gap between two sample sets. bin size: 256 pa
+        // if (j > (n - 2)) j = n - 2;
+        // static constexpr Real64 h(256); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        // if (x > 10752 && x <= 96000) static constexpr Real64 h(85248); // address the gap between two sample sets. bin size 512 pa for the rest
         //********sample bin 256 end
 
         //********sample bin 128 start
-        //int j = (x_int >> 7) - 1;
+        // int j = (x_int >> 7) - 1;
         // check bounds
-        //if (j < 0) j = 0;
-        //if (x > 10624 && x <= 96000) j = 83; // address the gap between two sample sets. bin size: 128 pa
-        //if (x > 96000) j = j - 666;          // address the gap between two sample sets. bin size: 128 pa
-        //if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(128); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
-        //if (x > 10624 && x <= 96000) static constexpr Real64 h(85376); // address the gap between two sample sets. bin size 512 pa for the rest
+        // if (j < 0) j = 0;
+        // if (x > 10624 && x <= 96000) j = 83; // address the gap between two sample sets. bin size: 128 pa
+        // if (x > 96000) j = j - 666;          // address the gap between two sample sets. bin size: 128 pa
+        // if (j > (n - 2)) j = n - 2;
+        // static constexpr Real64 h(128); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        // if (x > 10624 && x <= 96000) static constexpr Real64 h(85376); // address the gap between two sample sets. bin size 512 pa for the rest
         //********sample bin 128 end
 
         //********sample bin 64 start
-        //int j = (x_int >> 6) - 1;
+        // int j = (x_int >> 6) - 1;
         // check bounds
-        //if (j < 0) j = 0;
-        //if (x > 10560 && x <= 96000) j = 165; // address the gap between two sample sets. bin size: 64 pa
-        //if (x > 96000) j = j - 1334;          // address the gap between two sample sets. bin size: 128 pa
-        //if (j > (n - 2)) j = n - 2;
-        //static constexpr Real64 h(128); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
-        //if (x > 10560 && x <= 96000) static constexpr Real64 h(85440); // address the gap between two sample sets. bin size 512 pa for the rest
+        // if (j < 0) j = 0;
+        // if (x > 10560 && x <= 96000) j = 165; // address the gap between two sample sets. bin size: 64 pa
+        // if (x > 96000) j = j - 1334;          // address the gap between two sample sets. bin size: 128 pa
+        // if (j > (n - 2)) j = n - 2;
+        // static constexpr Real64 h(128); // based on bin size: state.dataPsychrometrics->x_sample[j + 1] - state.dataPsychrometrics->x_sample[j];
+        // if (x > 10560 && x <= 96000) static constexpr Real64 h(85440); // address the gap between two sample sets. bin size 512 pa for the rest
         //********sample bin 64 end
         A = (tsat_fn_pb_x[j + 1] - x) / h;
         B = 1 - A;
@@ -1623,11 +1624,11 @@ namespace Psychrometrics {
         return y;
     }
 
-    //original Psychrometrics PsyTsatFnPb
+    // original Psychrometrics PsyTsatFnPb
 
     Real64 PsyTsatFnPb_org(EnergyPlusData &state,
-                       Real64 const Press              // barometric pressure {Pascals}
-                      // std::string_view const CalledFrom // routine this function was called from (error messages)
+                           Real64 const Press // barometric pressure {Pascals}
+                                              // std::string_view const CalledFrom // routine this function was called from (error messages)
     )
 
     {
@@ -1672,7 +1673,6 @@ namespace Psychrometrics {
         Real64 tSat;    // Water temperature guess
         int iter;       // Iteration counter
 
-
         // Check press in range.
         FlagError = false;
         if (Press == state.dataPsychrometrics->Press_Save) {
@@ -1688,58 +1688,55 @@ namespace Psychrometrics {
         iter = 0;
 
         // If above 1555000,set value of Temp corresponding to Saturation Pressure of 1555000 Pascal.
-         if (Press >= 1555000.0) {
+        if (Press >= 1555000.0) {
             tSat = 200.0;
-        // If below 0.0017,set value of Temp corresponding to Saturation Pressure of 0.0017 Pascal.
+            // If below 0.0017,set value of Temp corresponding to Saturation Pressure of 0.0017 Pascal.
         } else if (Press <= 0.0017) {
-          tSat = -100.0;
+            tSat = -100.0;
 
-        // Setting Value of PsyTsatFnPb= 0C, due to non-continuous function for Saturation Pressure at 0C.
-         } else if ((Press > 611.000) && (Press < 611.25)) {
+            // Setting Value of PsyTsatFnPb= 0C, due to non-continuous function for Saturation Pressure at 0C.
+        } else if ((Press > 611.000) && (Press < 611.25)) {
             tSat = 0.0;
 
-         } else {
-        // Iterate to find the saturation temperature
-        // of water given the total pressure
+        } else {
+            // Iterate to find the saturation temperature
+            // of water given the total pressure
 
-        // Set iteration loop parameters
-        // make sure these are initialized
-         Real64 pSat;    // Pressure corresponding to temp. guess
-         Real64 error;   // Deviation of dependent variable in iteration
-         Real64 X1;      // Previous value of independent variable in ITERATE
-         Real64 Y1;      // Previous value of dependent variable in ITERATE
-         Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
-         //bool const CalledFrom_empty(CalledFrom.empty());
-         int icvg; // Iteration convergence flag
-         for (iter = 1; iter <= itmax; ++iter) {
+            // Set iteration loop parameters
+            // make sure these are initialized
+            Real64 pSat;    // Pressure corresponding to temp. guess
+            Real64 error;   // Deviation of dependent variable in iteration
+            Real64 X1;      // Previous value of independent variable in ITERATE
+            Real64 Y1;      // Previous value of dependent variable in ITERATE
+            Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
+            // bool const CalledFrom_empty(CalledFrom.empty());
+            int icvg; // Iteration convergence flag
+            for (iter = 1; iter <= itmax; ++iter) {
 
-        // Calculate saturation pressure for estimated boiling temperature
-        //pSat = PsyPsatFnTemp(state, tSat, (CalledFrom_empty ? RoutineName : CalledFrom));
-        pSat = PsyPsatFnTemp(state, tSat);
-        // Compare with specified pressure and update estimate of temperature
-         error = Press - pSat;
-         Iterate(ResultX, convTol, tSat, error, X1, Y1, iter, icvg);
-         tSat = ResultX;
-        // If converged leave loop iteration
-         if (icvg == 1) break;
+                // Calculate saturation pressure for estimated boiling temperature
+                // pSat = PsyPsatFnTemp(state, tSat, (CalledFrom_empty ? RoutineName : CalledFrom));
+                pSat = PsyPsatFnTemp(state, tSat);
+                // Compare with specified pressure and update estimate of temperature
+                error = Press - pSat;
+                Iterate(ResultX, convTol, tSat, error, X1, Y1, iter, icvg);
+                tSat = ResultX;
+                // If converged leave loop iteration
+                if (icvg == 1) break;
 
-        // Water temperature not converged, repeat calculations with new
-        // estimate of water temperature
-          }
+                // Water temperature not converged, repeat calculations with new
+                // estimate of water temperature
+            }
 
-        // Saturation temperature has not converged after maximum specified
-        // iterations. Print error message, set return error flag, and RETURN
+            // Saturation temperature has not converged after maximum specified
+            // iterations. Print error message, set return error flag, and RETURN
 
-         } // End If for the Pressure Range Checking
-
-
+        } // End If for the Pressure Range Checking
 
         // Result is SatTemperature
         Real64 const Temp = state.dataPsychrometrics->tSat_Save = tSat; // result=> saturation temperature {C}
 
         return Temp;
     }
-
 
 } // namespace Psychrometrics
 
