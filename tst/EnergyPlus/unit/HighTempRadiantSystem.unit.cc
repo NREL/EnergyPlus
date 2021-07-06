@@ -98,11 +98,13 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE1";
-    Surface.allocate(1);
-    Surface(1).Name = "WALL1";
-    Surface(1).Zone = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE1";
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "WALL1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->SurfIntConvSurfGetsRadiantHeat.allocate(1);
+    state->dataSurface->SurfIntConvSurfGetsRadiantHeat = 0.0;
 
     ErrorsFound = false;
 
@@ -132,26 +134,26 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     int RadSysNum;
     int SizingTypesNum;
 
-    DataSizing::DataScalableCapSizingON = false;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->DataScalableCapSizingON = false;
+    state->dataSize->CurZoneEqNum = 1;
 
     RadSysNum = 1;
-    HighTempRadSys.allocate(RadSysNum);
-    HighTempRadSysNumericFields.allocate(RadSysNum);
-    HighTempRadSysNumericFields(RadSysNum).FieldNames.allocate(1);
-    HighTempRadSys(RadSysNum).Name = "TESTSCALABLEFLAG";
-    HighTempRadSys(RadSysNum).ZonePtr = 1;
-    HighTempRadSys(RadSysNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
-    HighTempRadSys(RadSysNum).ScaledHeatingCapacity = 100.0;
-    DataSizing::ZoneEqSizing.allocate(1);
-    DataHeatBalance::Zone.allocate(1);
-    Zone(1).FloorArea = 10.0;
+    state->dataHighTempRadSys->HighTempRadSys.allocate(RadSysNum);
+    state->dataHighTempRadSys->HighTempRadSysNumericFields.allocate(RadSysNum);
+    state->dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames.allocate(1);
+    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).Name = "TESTSCALABLEFLAG";
+    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr = 1;
+    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+    state->dataHighTempRadSys->HighTempRadSys(RadSysNum).ScaledHeatingCapacity = 100.0;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
     SizingTypesNum = DataHVACGlobals::NumOfSizingTypes;
     if (SizingTypesNum < 1) SizingTypesNum = 1;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
     SizeHighTempRadiantSystem(*state, RadSysNum);
-    EXPECT_FALSE(DataSizing::DataScalableSizingON);
+    EXPECT_FALSE(state->dataSize->DataScalableSizingON);
 }
 
 } // namespace EnergyPlus

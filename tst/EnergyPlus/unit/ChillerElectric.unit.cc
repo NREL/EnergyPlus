@@ -142,12 +142,12 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
 
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.001;
-    DataSizing::PlantSizData(2).DeltaT = 5.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.001;
+    state->dataSize->PlantSizData(2).DeltaT = 5.0;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataPlnt->PlantFirstSizesOkayToReport = true;
@@ -156,7 +156,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
     bool RunFlag(true);
     Real64 MyLoad(-20000.0);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     auto &thisChiller = state->dataPlantChillers->ElectricChiller(1);
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.size(*state);
@@ -199,7 +199,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
-    DataHVACGlobals::TimeStepSys = 60;
+    state->dataHVACGlobal->TimeStepSys = 60;
 
     std::string const idf_objects = delimited_string({
         "  Chiller:Electric,",
@@ -269,12 +269,12 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataPlantChillers->ElectricChiller(1).CondInletNodeNum;
     state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataPlantChillers->ElectricChiller(1).CondOutletNodeNum;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
 
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.001;
-    DataSizing::PlantSizData(2).DeltaT = 5.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.001;
+    state->dataSize->PlantSizData(2).DeltaT = 5.0;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataPlnt->PlantFirstSizesOkayToReport = true;
@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
     bool RunFlag(true);
     Real64 MyLoad(-20000.0);
 
-    Psychrometrics::InitializePsychRoutines();
+    Psychrometrics::InitializePsychRoutines(*state);
     auto &thisChiller = state->dataPlantChillers->ElectricChiller(1);
     thisChiller.initialize(*state, RunFlag, MyLoad);
     thisChiller.size(*state);

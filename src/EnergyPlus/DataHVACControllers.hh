@@ -60,52 +60,64 @@ namespace EnergyPlus {
 
 namespace DataHVACControllers {
 
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
+    int constexpr ControllerSimple_Type(1);
 
-    // MODULE PARAMETER DEFINITIONS:
+    enum class ControllerAction // Controller action used in modules HVACControllers and ZoneControllers
+    {
+        NoAction = -1,
+        ReverseAction,
+        NormalAction
+    };
 
-    extern int const ControllerSimple_Type;
-    extern Array1D_string const ControllerTypes;
+    enum class ControllerMode // Controller mode used in modules HVACControllers and ZoneControllers
+    {
+        invalid = -1, // Controller error. E.g., bad action
+        None,         // Controller mode not yet determined
+        Off,          // Controller off (no air flow in loop)
+        Inactive,     // Controller inactive (equip not available for current step)
+        Active,       // Controller active (schedule>0 and min<actuated<max)
+        MinActive,    // Controller active and min-constrained (equip available and actuated=min)
+        MaxActive     // Controller active and max-constrained (equip available and actuated=max)
+    };
 
-    // Controller action used in modules HVACControllers and ZoneControllers
-    extern int const iNoAction;
-    extern int const iReverseAction;
-    extern int const iNormalAction;
-    extern Array1D_string const ActionTypes;
+    int constexpr iFirstMode(static_cast<int>(ControllerMode::invalid));  // First operating mode in range
+    int constexpr iLastMode(static_cast<int>(ControllerMode::MaxActive)); // Last operating mode in range
 
-    // Controller mode used in modules HVACControllers and ZoneControllers
-    extern int const iModeWrongAction; // Controller error. E.g., bad action
-    extern int const iModeNone;        // Controller mode not yet determined
-    extern int const iModeOff;         // Controller off (no air flow in loop)
-    extern int const iModeInactive;    // Controller inactive (equip not available for current step)
-    extern int const iModeActive;      // Controller active (schedule>0 and min<actuated<max)
-    extern int const iModeMinActive;   // Controller active and min-constrained (equip available and actuated=min)
-    extern int const iModeMaxActive;   // Controller active and max-constrained (equip available and actuated=max)
+    enum class ControllerOperation // Controller operation used in module HVACControllers
+    {
+        Unassigned = -1,
+        ColdStart,   // Reset for cold start
+        WarmRestart, // Reset for warm restart with previous solution
+        Iterate,     // Check convergence and estimate next guess if needed
+        End          // Check convergence only and trace
 
-    extern int const iFirstMode; // First operating mode in range
-    extern int const iLastMode;  // Last operating mode in range
-    extern Array1D_string const ControllerModeTypes;
+    };
 
-    // Controller operation used in module HVACControllers
-    extern int const iControllerOpColdStart;   // Reset for cold start
-    extern int const iControllerOpWarmRestart; // Reset for warm restart with previous solution
-    extern int const iControllerOpIterate;     // Check convergence and estimate next guess if needed
-    extern int const iControllerOpEnd;         // Check convergence only and trace
-
-    // Controller restart flag used in module HVACControllers
-    extern int const iControllerWarmRestartNone;    // Indicates that warm restart was not attempted
-    extern int const iControllerWarmRestartFail;    // Indicates that warm restart failed
-    extern int const iControllerWarmRestartSuccess; // Indicates that warm restart was successful
+    enum class ControllerWarmRestart // Controller restart flag used in module HVACControllers
+    {
+        None = -1, // Indicates that warm restart was not attempted
+        Fail,      // Indicates that warm restart failed
+        Success    // Indicates that warm restart was successful
+    };
 
 } // namespace DataHVACControllers
 
-struct HVACCtrlData : BaseGlobalStruct {
+struct HVACCtrlData : BaseGlobalStruct
+{
+    Array1D_string const ControllerTypes = Array1D_string(1, std::string("Controller:WaterCoil"));
+    Array1D_string const ActionTypes = Array1D_string({-1, 1}, {"No action", "Reverse action", "Normal action"});
+    Array1D_string const ControllerModeTypes = Array1D_string({-1, 5},
+                                                              {"Wrong action mode",
+                                                               "No controller mode",
+                                                               "Off controller mode",
+                                                               "Inactive controller mode",
+                                                               "Active unconstrained controller mode",
+                                                               "Active min-constrained controller mode",
+                                                               "Active max-constrained controller mode"});
 
     void clear_state() override
     {
-
+        // nothing to clear, it's all constant
     }
 };
 

@@ -74,13 +74,13 @@ public:
     Real64 aveGroundTempAmplitude;
     Real64 phaseShiftInSecs;
 
-    static std::shared_ptr<KusudaGroundTempsModel> KusudaGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
+    static std::shared_ptr<KusudaGroundTempsModel> KusudaGTMFactory(EnergyPlusData &state, GroundTempObjType objectType, std::string objectName);
 
-    Real64 getGroundTemp(EnergyPlusData& state) override;
+    Real64 getGroundTemp(EnergyPlusData &state) override;
 
-    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData &state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(EnergyPlusData &state, Real64 const depth, int const monthOfSim) override;
 };
 
 } // namespace EnergyPlus

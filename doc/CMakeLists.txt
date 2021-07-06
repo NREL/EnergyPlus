@@ -1,26 +1,30 @@
 project(EnergyPlusDocs LANGUAGES NONE)
 
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.12)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-if(NOT EXISTS ${PYTHON_EXECUTABLE})
-  # we are making *a Python 3.6 Interpreter* a required dependency, so find it here
-  find_package(PythonInterp 3.6 REQUIRED)
+if(NOT EXISTS ${Python_EXECUTABLE})
+  # If running docs standalone, Python isn't found yet.
+  find_package(Python 3.6 COMPONENTS Interpreter REQUIRED)
 endif()
 
-option( DOCS_TESTING "Test the docs for issues" OFF )
+option(DOCS_TESTING "Test the docs for issues" OFF)
 
 # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
 find_package(LATEX)
 # so we'll create a cache variable which will be available to the add_subdirectory call below
-set(XELATEX "XeLaTeX Compiler" CACHE INTERNAL "")
+set(XELATEX
+    "XeLaTeX Compiler"
+    CACHE INTERNAL "")
 # and we'll simply take the found pdflatex compiler path and replace pdflatex with xelatex
 string(REPLACE pdflatex xelatex XELATEX ${PDFLATEX_COMPILER})
 # and then verify it actually exists at that location...which it should pretty much every time...
-set(TEX_INTERACTION "batchmode" CACHE STRING "Choose the interaction mode for TeX.")
+set(TEX_INTERACTION
+    "batchmode"
+    CACHE STRING "Choose the interaction mode for TeX.")
 set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
-if( EXISTS ${XELATEX} )
+if(EXISTS ${XELATEX})
   # and if it does, just add the doc/CMakeLists commands
   # let's create a folder to drop ONLY PDFs in once they are built, this will allow easy upload to s3
   file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/pdf)
@@ -64,5 +68,5 @@ if( EXISTS ${XELATEX} )
 
 else()
   # and if it doesn't, clearly state why it fails
-  message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
+  message(FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
 endif()

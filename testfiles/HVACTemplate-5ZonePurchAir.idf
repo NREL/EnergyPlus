@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Building,
     Building,                !- Name
@@ -1930,6 +1930,16 @@
 
   Output:Variable,*,Zone Ideal Loads Heat Recovery Active Time,hourly;
 
+  Output:Variable,*,Zone Ideal Loads Supply Air Temperature,hourly;
+
+  Output:Variable,*,Zone Ideal Loads Supply Air Humidity Ratio,hourly;
+
+  Output:Variable,*,Zone Ideal Loads Mixed Air Temperature,hourly;
+
+  Output:Variable,*,Zone Ideal Loads Mixed Air Humidity Ratio,hourly;
+
+  Output:Variable,*,System Node Mass Flow Rate,hourly;
+
   Output:Variable,SPACE2-1 Ideal Loads Outdoor Air Inlet,System Node Standard Density Volume Flow Rate,hourly;
 
   Output:Variable,SPACE3-1 Ideal Loads Outdoor Air Inlet,System Node Standard Density Volume Flow Rate,hourly;
@@ -1969,4 +1979,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-

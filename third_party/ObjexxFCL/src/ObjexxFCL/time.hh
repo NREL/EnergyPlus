@@ -56,43 +56,15 @@ CLOCK();
 
 // System Clock
 void
-SYSTEM_CLOCK_64(
- Optional< std::int64_t > count = _,
- Optional< std::int64_t > count_rate = _,
- Optional< std::int64_t > count_max = _
-);
-
-// System Clock
-void
-SYSTEM_CLOCK_32(
- Optional< std::int32_t > count = _,
- Optional< std::int32_t > count_rate = _,
- Optional< std::int32_t > count_max = _
-);
-
-// System Clock
-void
 SYSTEM_CLOCK(
  Optional< std::int32_t > count = _,
  Optional< std::int32_t > count_rate = _,
  Optional< std::int32_t > count_max = _
 );
 
-// System Clock
-void
-SYSTEM_CLOCK_16(
- Optional< std::int16_t > count = _,
- Optional< std::int16_t > count_rate = _,
- Optional< std::int16_t > count_max = _
-);
-
 // Process CPU Time (s)
 void
 CPU_TIME( double & time );
-
-// Process CPU Time (us)
-void
-CLOCKX( double & time );
 
 // Current Date: DD, MM, YYYY
 void
@@ -133,10 +105,6 @@ JDATE();
 // Current Julian Date String: YYDDD (Not Y2K Compliant)
 std::string
 jdate();
-
-// Current Julian Date String: YYYYDDD
-std::string
-JDATE4();
 
 // Current Julian Date String: YYYYDDD
 std::string

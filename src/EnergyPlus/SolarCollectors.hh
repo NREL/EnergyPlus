@@ -230,9 +230,14 @@ namespace SolarCollectors {
 
         void initialize(EnergyPlusData &state);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
-        void CalcTransRefAbsOfCover(EnergyPlusData &state, Real64 IncidentAngle,              // Angle of incidence (radians)
+        void CalcTransRefAbsOfCover(EnergyPlusData &state,
+                                    Real64 IncidentAngle,              // Angle of incidence (radians)
                                     Real64 &TransSys,                  // cover system solar transmittance
                                     Real64 &ReflSys,                   // cover system solar reflectance
                                     Real64 &AbsCover1,                 // Inner cover solar absorbtance
@@ -249,7 +254,8 @@ namespace SolarCollectors {
 
         void CalcHeatTransCoeffAndCoverTemp(EnergyPlusData &state);
 
-        static void ICSCollectorAnalyticalSolution(EnergyPlusData &state, Real64 SecInTimeStep,     // seconds in a time step
+        static void ICSCollectorAnalyticalSolution(EnergyPlusData &state,
+                                                   Real64 SecInTimeStep,     // seconds in a time step
                                                    Real64 a1,                // coefficient of ODE for Tp
                                                    Real64 a2,                // coefficient of ODE for Tp
                                                    Real64 a3,                // coefficient of ODE for Tp
@@ -281,14 +287,17 @@ namespace SolarCollectors {
 
         void update(EnergyPlusData &state);
 
-        void report();
+        void report(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetSolarCollectorInput(EnergyPlusData &state);
 
 } // namespace SolarCollectors
 
-struct SolarCollectorsData : BaseGlobalStruct {
+struct SolarCollectorsData : BaseGlobalStruct
+{
 
     Array1D_bool CheckEquipName;
     int NumOfCollectors = 0;

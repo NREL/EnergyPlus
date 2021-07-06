@@ -124,35 +124,36 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
 
     bool foundErrors(false);
     HeatBalanceManager::GetProjectControlData(*state, foundErrors); // read project control data
-    EXPECT_FALSE(foundErrors);                              // expect no errors
+    EXPECT_FALSE(foundErrors);                                      // expect no errors
 
     HeatBalanceManager::GetMaterialData(*state, foundErrors); // read material data
-    EXPECT_FALSE(foundErrors);                        // expect no errors
+    EXPECT_FALSE(foundErrors);                                // expect no errors
 
     HeatBalanceManager::GetConstructData(*state, foundErrors); // read construction data
     compare_err_stream("");
     EXPECT_FALSE(foundErrors); // expect no errors
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-DataHeatBalance::Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
-    EXPECT_FALSE(foundErrors);                    // expect no errors
+    EXPECT_FALSE(foundErrors);                            // expect no errors
 
     // reset eio stream
     has_eio_output(true);
 
     DetailsForSurfaces(*state, 10); // 10 = Details Only, Surface details report
     std::string const eiooutput = delimited_string(
-        {"! <Zone Surfaces>,Zone Name,# Surfaces", "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces",
+        {"! <Zone Surfaces>,Zone Name,# Surfaces",
+         "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces",
          "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm,Construction,Nominal U (w/o film coefs) "
          "{W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt "
          "{deg},~Width {m},~Height {m},Reveal "
@@ -168,7 +169,8 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
          "Zone Surfaces,SPACE1,1",
          "HeatTransfer Surface,FRONT-1,Wall,,CTF - "
          "ConductionTransferFunction,INT-WALL-1,2.811,1.978,,73.20,73.20,73.20,180.00,90.00,30.50,2.40,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,"
-         "SunExposed,WindExposed,0.50,0.50,0.50,0.50,4"}, "\n");
+         "SunExposed,WindExposed,0.50,0.50,0.50,0.50,4"},
+        "\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }

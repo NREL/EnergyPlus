@@ -84,10 +84,10 @@ Real64 HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
                 } else {
                     DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
-                this->autoSizedValue =
-                    this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                                                              this->zoneEqSizing(this->curZoneEqNum),
-                                                              this->finalZoneSizing(this->curZoneEqNum));
+                this->autoSizedValue = this->setHeatCoilInletTempForZoneEqSizing(
+                    this->setOAFracForZoneEqSizing(state, DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                    this->zoneEqSizing(this->curZoneEqNum),
+                    this->finalZoneSizing(this->curZoneEqNum));
             }
         }
     } else if (this->curSysNum > 0) {
@@ -124,7 +124,8 @@ Real64 HeatingWaterDesAirInletTempSizer::size(EnergyPlusData &state, Real64 _ori
     // report not written for OA coils and needs to be corrected
     if (this->curSysNum <= this->numPrimaryAirSys) {
         if (this->isCoilReportObject)
-            coilSelectionReportObj->setCoilEntAirTemp(state, this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(
+                state, this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
     }
     return this->autoSizedValue;
 }

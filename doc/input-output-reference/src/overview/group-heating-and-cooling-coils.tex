@@ -1348,7 +1348,7 @@ This field is the average parasitic gas consumption rate of the heating coil (e.
 
 \subsection{Coil:Heating:Gas:MultiStage}\label{coilheatinggasmultistage}
 
-The multi stage gas heating coil is a simple capacity model with a user inputted gas burner efficiencies at different stages. This coil will only have air nodes to connect it in the system. The coil can be used in the air loop simulation or in the zone equipment as a reheat coil. Depending on where it is used determines if this coil is temperature or capacity controlled. If used in the air loop simulation it will be controlled to a specified temperature scheduled from the Setpoint Manager. If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand. For the time being, this coil model can only be called by the parent object \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed}.
+The multi stage gas heating coil is a simple capacity model with a user inputted gas burner efficiencies at different stages. This coil will only have air nodes to connect it in the system. The coil can be used in the air loop simulation or in the zone equipment as a reheat coil. Depending on where it is used determines if this coil is temperature or capacity controlled. If used in the air loop simulation it will be controlled to a specified temperature scheduled from the Setpoint Manager. If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand. For the time being, this coil model can only be called by the parent objects \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} or \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed}.
 
 \subsubsection{Inputs}\label{inputs-11-005}
 
@@ -3691,9 +3691,9 @@ This numeric field defines the coefficient of performance (COP = the gross heati
 
 This numeric field defines the volume air flow rate, in m\(^{3}\) per second, across the DX heating coil at rated conditions. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated heating capacity. The gross rated heating capacity and gross rated COP should be performance information for the unit with outdoor air dry-bulb temperature of 8.33 C, outdoor air wet-bulb temperature of 6.11 C, heating coil entering air dry-bulb temperature of 21.11 C, heating coil entering air wet-bulb temperature of 15.55 C, and the rated air volume flow rate defined here.
 
-\paragraph{Field: Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-rated-evaporator-fan-power-per-volume-flow-rate-1}
+\paragraph{Field: Rated Supply Fan Power Per Volume Flow Rate}\label{field-rated-evaporator-fan-power-per-volume-flow-rate-1}
 
-This field is the electric power for the evaporator (heating coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Heating Coil, Standard Ratings). This value is not used for modeling the evaporator (heating coil) fan during simulations; instead, it is used for calculating the above standard ratings to assist the user in verifying their inputs for modeling this type of equipment.
+This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Heating Coil, Standard Ratings). This value is not used for modeling the evaporator (heating coil) fan during simulations; instead, it is used for calculating the above standard ratings to assist the user in verifying their inputs for modeling this type of equipment.
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-13}
 
@@ -3818,28 +3818,28 @@ Following is an example input for the object.
 
 Coil:Heating:DX:SingleSpeed,
   Heat Pump DX Heating Coil 1,     ! Name of heating coil
-  FanAndCoilAvailSched,                   ! Heating coil schedule
-  35000,                                                 ! Gross Rated Heating Capacity
-  2.75,                                                   ! Gross Rated Heating COP
-  1.7,                                                     !rated air flow rate (m3/s)
-  ,                                                       !rated evaporator fan power per volume flow rate (m3/s)
-  Heating Coil Air Inlet Node,     !heating coil air side inlet node
-  SuppHeating Coil Air Inlet Node, !Heating coil air side outlet node
-  HPACHeatCapFT,     ! heating cap modifier curve (temperature, C)
-  HPACHeatCapFFF,   ! heating cap modifier curve (flow fraction)
-  HPACHeatEIRFT,     ! energy input ratio modifier curve (temperature, C)
-  HPACHeatEIRFFF,   ! energy input ratio modifier curve (flow fraction)
-  HPACCOOLPLFFPLR, ! part load fraction modifier curve (function of part load ratio)
-  ,                 ! defrost EIR modifier curve (temp, C) not required for resistive defrost
-  -5.0,                       ! minimum OAT for compressor operation   (C)
-  ,                               ! outdoor dry-bulb temperature to turn on compressor   (C)
-  5.0,                         ! maximum outdoor dry-bulb temp for defrost operation (C)
-  200.0,                     ! Crankcase heater capacity (W)
-  10.0,                       ! Maximum outdoor temp for crankcase heater operation (C)
-  Resistive,             ! Defrost strategy (resistive or reverse-cycle)
-  Timed,                     ! Defrost control (timed or on-demand)
-  0.166667,             ! Defrost time period fraction (used for timed defrost control only)
-  20000;! Resistive defrost heater capacity (used for resistive defrost strategy only)
+  FanAndCoilAvailSched,            ! Heating coil schedule
+  35000,                           ! Gross Rated Heating Capacity
+  2.75,                            ! Gross Rated Heating COP
+  1.7,                             ! Rated air flow rate (m3/s)
+  ,                                ! Rated supply fan power per volume flow rate (m3/s)
+  Heating Coil Air Inlet Node,     ! Heating coil air side inlet node
+  SuppHeating Coil Air Inlet Node, ! Heating coil air side outlet node
+  HPACHeatCapFT,                   ! Heating cap modifier curve (temperature, C)
+  HPACHeatCapFFF,                  ! Heating cap modifier curve (flow fraction)
+  HPACHeatEIRFT,                   ! Energy input ratio modifier curve (temperature, C)
+  HPACHeatEIRFFF,                  ! Energy input ratio modifier curve (flow fraction)
+  HPACCOOLPLFFPLR,                 ! Part load fraction modifier curve (function of part load ratio)
+  ,                                ! Defrost EIR modifier curve (temp, C) not required for resistive defrost
+  -5.0,                            ! Minimum OAT for compressor operation (C)
+  ,                                ! Outdoor dry-bulb temperature to turn on compressor (C)
+  5.0,                             ! Maximum outdoor dry-bulb temp for defrost operation (C)
+  200.0,                           ! Crankcase heater capacity (W)
+  10.0,                            ! Maximum outdoor temp for crankcase heater operation (C)
+  Resistive,                       ! Defrost strategy (resistive or reverse-cycle)
+  Timed,                           ! Defrost control (timed or on-demand)
+  0.166667,                        ! Defrost time period fraction (used for timed defrost control only)
+  20000;                           ! Resistive defrost heater capacity (used for resistive defrost strategy only)
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-15-000}
@@ -6194,21 +6194,21 @@ All inputs for Speed 1 are required, followed by the optional inputs for other s
 \textbf{Speeds should be ordered from lower capacity to higher capacity/airflow rate, or a Fatal error will be thrown.}
 
 
-\paragraph{Field: Rated Water Heating Capacity at Speed \textless{}x\textgreater{} caca}\label{vshpwhheating-rated-water-heating-capacity-at-speed-x}
+\paragraph{Field: Rated Water Heating Capacity at Speed \textless{}x\textgreater{}}\label{vshpwhheating-rated-water-heating-capacity-at-speed-x}
 
 This numeric field defines the DX coil heating capacity in Watts at the rated evaporator inlet air temperatures, rated condenser inlet water temperature, rated evaporator air flow rate, and rated condenser water flow rate specified below for this speed.
 
 Values must be greater than 0. This value represents water heating capacity, and it may or may not include the impact of condenser pump heat (see field Condenser Pump Heat Included in Rated Heating Capacity above).
 
 
-\paragraph{Field: Rated Water Heating COP at Speed \textless{}x\textgreater{} caca}\label{vshpwhheating-rated-water-heating-cop-at-speed-x}
+\paragraph{Field: Rated Water Heating COP at Speed \textless{}x\textgreater{}}\label{vshpwhheating-rated-water-heating-cop-at-speed-x}
 
 This numeric field defines the DX coil's water heating coefficient of performance (COP = water heating capacity in watts divided by electrical power input in watts) at rated conditions (rated inlet temperatures and flow rates specified below).
 This input not only determines the electric energy use of the heat pump DX coil, but also the amount of total air cooling provided by the evaporator.
 The rated COP includes compressor power, and may or may not include condenser pump power or evaporator fan power (see field Evaporator Fan Power Included in Rated COP and field Condenser Pump Power Included in Rated COP). Values must be greater than 0. If this field is left blank, the default value is 3.2.
 
 
-\paragraph{Field: Rated Sensible Heat Ratio at Speed \textless{}x\textgreater{} caca}\label{vshpwhheating-rated-sensible-heat-ratio-at-speed-x}
+\paragraph{Field: Rated Sensible Heat Ratio at Speed \textless{}x\textgreater{}}\label{vshpwhheating-rated-sensible-heat-ratio-at-speed-x}
 
 This numeric field defines the gross air-side sensible heat ratio (SHR = gross sensible cooling capacity divided by gross total cooling capacity) of the DX coil at rated conditions (rated inlet temperatures and flow rates specified below). This value should not include the effect of evaporator fan heat, only sensible cooling and dehumidification by the coil alone.
 Values must be greater than or equal to 0.5, and less than or equal to 1.0. The default value is 0.85.
@@ -6775,17 +6775,17 @@ This numeric field contains the gross rated sensible capacity of the heat pump i
 
 This numeric field contains the rated cooling coefficient of performance of the heat pump.
 
-\paragraph{Field: Total Cooling Capacity Coefficient 1 to 5}\label{field-total-cooling-capacity-coefficient-1-to-5}
+\paragraph{Field: Total Cooling Capacity Curve Name}\label{field-total-cooling-capacity-curve-name}
 
-These numeric fields contain the first to fifth coefficient for the heat pump total cooling capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump total cooling capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
-\paragraph{Field: Sensible Cooling Capacity Coefficient 1 to 6}\label{field-sensible-cooling-capacity-coefficient-1-to-6}
+\paragraph{Field: Sensible Cooling Capacity Curve Name}\label{field-sensible-cooling-capacity-curve-name}
 
-These numeric fields contain the first to sixth coefficient for the heat pump sensible cooling capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+This alpha field specifies the name of a \textbf{quintlinear} performance curve object (ref: Performance Curves) for the heat pump sensible cooling capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
-\paragraph{Field: Cooling Power Consumption Coefficient 1 to 5}\label{field-cooling-power-consumption-coefficient-1-to-5}
+\paragraph{Field: Cooling Power Consumption Curve Name}\label{field-cooling-power-consumption-curve-name}
 
-These numeric fields contain the first to fifth coefficient for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
 \paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin-4}
 
@@ -6800,34 +6800,78 @@ Following is an example of the input for Coil:WaterToAirHP:EquationFit:Cooling c
 \begin{lstlisting}
 
 Coil:Cooling:WaterToAirHeatPump:EquationFit,
-  Heat Pump Cooling Mode,!- Name of Coil
-  Water to Air Heat Pump Source Side1 Inlet Node,!- Coil Water Inlet Node Name
+  Heat Pump Cooling Mode,                         !- Name of Coil
+  Water to Air Heat Pump Source Side1 Inlet Node, !- Coil Water Inlet Node Name
   Water to Air Heat Pump Source Side1 Outlet Node,!- Coil Water Outlet Node Name
-  Cooling Coil Air Inlet Node,!- Coil Air Inlet Node Name
-  Heating Coil Air Inlet Node,!- Coil Air Outlet Node Name
-  4.6015E-01,!- Rated Air Volumetric Flow Rate
-  2.8391E-04,!- Rated Water Volumetric Flow Rate
-  23125.59,!- Gross Rated Total Cooling Capacity
-  16267.05,!- Gross Rated Sensible Cooling Capacity
-  4.7,!- Rated Cooling Coefficient of Performance
-  -0.68126221,!- Total Cooling Capacity Coefficient 1
-  1.99529297,!- Total Cooling Capacity Coefficient 2
-  -0.93611888,!- Total Cooling Capacity Coefficient 3
-  0.02081177,!- Total Cooling Capacity Coefficient 4
-  0.008438868,!- Total Cooling Capacity Coefficient 5
-  2.24209455,!- Sensible Cooling Capacity Coefficient 1
-  7.28913391,!- Sensible Cooling Capacity Coefficient 2
-  -9.06079896,!- Sensible Cooling Capacity Coefficient 3
-  -0.36729404,!- Sensible Cooling Capacity Coefficient 4
-  0.218826161,!- Sensible Cooling Capacity Coefficient 5
-  0.00901534,!- Sensible Cooling Capacity Coefficient 6
-  -3.20456384,!- Cooling Power Consumption Coefficient 1
-  0.47656454,!- Cooling Power Consumption Coefficient 2
-  3.16734236,!- Cooling Power Consumption Coefficient 3
-  0.10244637,!- Cooling Power Consumption Coefficient 4
-  -0.038132556,!- Cooling Power Consumption Coefficient 5
-  0,!- Nominal Time for Condensate Removal to Begin
-  0;!- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
+  Cooling Coil Air Inlet Node,                    !- Coil Air Inlet Node Name
+  Heating Coil Air Inlet Node,                    !- Coil Air Outlet Node Name
+  4.6015E-01,                                     !- Rated Air Volumetric Flow Rate
+  2.8391E-04,                                     !- Rated Water Volumetric Flow Rate
+  23125.59,                                       !- Gross Rated Total Cooling Capacity
+  16267.05,                                       !- Gross Rated Sensible Cooling Capacity
+  4.7,                                            !- Rated Cooling Coefficient of Performance
+  TotCoolCapCurve,                                !- Total Cooling Capacity Curve Name
+  CoolSensCapCurve,                               !- Sensible Cooling Capacity Curve Name
+  CoolPowCurve,                                   !- Cooling Power Consumption Curve Name
+  0,                                              !- Nominal Time for Condensate Removal to Begin
+  0;                                              !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
+  
+  Curve:QuadLinear,
+  TotCoolCapCurve,     ! Curve Name
+  -0.68126221,         ! CoefficientC1
+  1.99529297,          ! CoefficientC2
+  -0.93611888,         ! CoefficientC3
+  0.02081177,          ! CoefficientC4
+  0.008438868,         ! CoefficientC5
+  -100,                ! Minimum Value of w
+  100,                 ! Maximum Value of w
+  -100,                ! Minimum Value of x
+  100,                 ! Maximum Value of x
+  0,                   ! Minimum Value of y
+  100,                 ! Maximum Value of y
+  0,                   ! Minimum Value of z
+  100,                 ! Maximum Value of z
+  0,                   ! Minimum Curve Output
+  38;                  ! Maximum Curve Output
+
+  Curve:QuintLinear,
+  CoolSensCapCurve,    ! Curve Name
+  2.24209455,          ! CoefficientC1
+  7.28913391,          ! CoefficientC2
+  -9.06079896,         ! CoefficientC3
+  -0.36729404,         ! CoefficientC4
+  0.218826161,         ! CoefficientC5
+  0.00901534,          ! CoefficientC6
+  -100,                ! Minimum Value of v
+  100,                 ! Maximum Value of v
+  -100,                ! Minimum Value of w
+  100,                 ! Maximum Value of w
+  -100,                ! Minimum Value of x
+  100,                 ! Maximum Value of x
+  0,                   ! Minimum Value of y
+  100,                 ! Maximum Value of y
+  0,                   ! Minimum Value of z
+  100,                 ! Maximum Value of z
+  0,                   ! Minimum Curve Output
+  38;                  ! Maximum Curve Output
+
+  Curve:QuadLinear,
+  CoolPowCurve,        ! Curve Name
+  -3.20456384,         ! CoefficientC1
+  0.47656454,          ! CoefficientC2
+  3.16734236,          ! CoefficientC3
+  0.10244637,          ! CoefficientC4
+  -0.038132556,        ! CoefficientC5
+  -100,                ! Minimum Value of w
+  100,                 ! Maximum Value of w
+  -100,                ! Minimum Value of x
+  100,                 ! Maximum Value of x
+  0,                   ! Minimum Value of y
+  100,                 ! Maximum Value of y
+  0,                   ! Minimum Value of z
+  100,                 ! Maximum Value of z
+  0,                   ! Minimum Curve Output
+  38;                  ! Maximum Curve Output
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-25}
@@ -7661,13 +7705,13 @@ This numeric field contains the gross heating capacity of the heat pump at the r
 
 This numeric field contains the gross rated heating coefficient of performance of the heat pump. The gross rated COP of the heat pump should not account for the effect of supply air fan heat.
 
-\paragraph{Field: Heating Capacity Coefficient 1-5}\label{field-heating-capacity-coefficient-1-5}
+\paragraph{Field: Heating Capacity Curve Name}\label{field-heating-capacity-curve-name}
 
-These numeric fields contain the first to fifth coefficient for the heat pump capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding these coefficients.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump capacity. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding these coefficients.
 
-\paragraph{Field: Heating Power Consumption Coefficient 1-5}\label{field-heating-power-consumption-coefficient-1-5}
+\paragraph{Field: Heating Power Consumption Curve Name}\label{field-heating-power-consumption-curve-name}
 
-These numeric fields contain the first to fifth coefficient for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
 \subsubsection{Outputs}\label{outputs-27}
 
@@ -8280,7 +8324,7 @@ This field determines how the TES coil is to be controlled in terms of which ope
 
 \paragraph{Field: Operation Mode Control Schedule Name}\label{field-operation-mode-control-schedule-name}
 
-This field is used (and required) if the operating model control method is set to ScheduledModes in the previous input field. The control schedule consists of a series of integer values that indicate what mode the TES coil should operate in for a given time period. The values for various operating modes have been programmed to be as follows:
+This field is used (and required) if the operating mode control method is set to ScheduledModes in the previous input field. The control schedule consists of a series of integer values that indicate what mode the TES coil should operate in for a given time period. The values for various operating modes have been programmed to be as follows:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -9152,7 +9196,7 @@ Coil:Cooling:DX:MultiSpeed,
   NORTH ZONE;              !- Zone Name for Condenser Placement
 \end{lstlisting}
 
-\textbf{Heating Operating Mode}: When a heat pump operates in heating mode then energy is extracted from the secondary zone. Total energy extracted from a secondary zone may contain sensible and latent components. The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction. If the coil operation is dry, then the SHR is set to 1.0. In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside. Thus, defrosting energy is not included in the zone energy balance. The six optioal input fields required in the DX heating coils are the following. The last five input fields are extensible depending on the speed of the heating DX coil:
+\textbf{Heating Operating Mode}: When a heat pump operates in heating mode then energy is extracted from the secondary zone. Total energy extracted from a secondary zone may contain sensible and latent components. The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction. If the coil operation is dry, then the SHR is set to 1.0. In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside. Thus, defrosting energy is not included in the zone energy balance. The six optioal input fields required in the DX heating coils are the following. This object is extensible by repeating the last five input fields depending on the speed of the heating DX coil:
 
 \subsubsection{Field: Zone Name for Evaporator Placement}\label{field-zone-name-for-evaporator-placement-2}
 

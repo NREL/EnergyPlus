@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.6;
 
   Timestep,4;
 
@@ -798,6 +798,10 @@
   Output:Variable,*,Site Outdoor Air Relative Humidity,Timestep;
 
   Output:Variable,*,Site Outdoor Air Barometric Pressure,Timestep;
+
+  Output:Variable,*,Site Total Sky Cover,Timestep;
+
+  Output:Variable,*,Site Opaque Sky Cover,Timestep;
 
   Output:Variable,*,Site Sky Temperature,Timestep;
 

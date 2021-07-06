@@ -6897,11 +6897,11 @@
             "variable_details": [
                 {
                     "aggregation_type_for_variable_or_meter": "SumOrAverage",
-                    "variable_or_meter_name": "Cooling Coil Electric Power"
+                    "variable_or_meter_name": "Cooling Coil Electricity Rate"
                 },
                 {
                     "aggregation_type_for_variable_or_meter": "Maximum",
-                    "variable_or_meter_name": "Cooling Coil Electric Power"
+                    "variable_or_meter_name": "Cooling Coil Electricity Rate"
                 }
             ]
         },
@@ -6943,11 +6943,11 @@
             "variable_details": [
                 {
                     "aggregation_type_for_variable_or_meter": "SumOrAverage",
-                    "variable_or_meter_name": "Fan Electric Power"
+                    "variable_or_meter_name": "Fan Electricity Rate"
                 },
                 {
                     "aggregation_type_for_variable_or_meter": "Maximum",
-                    "variable_or_meter_name": "Fan Electric Power"
+                    "variable_or_meter_name": "Fan Electricity Rate"
                 }
             ]
         },
@@ -9799,7 +9799,7 @@
     },
     "Version": {
         "Version 1": {
-            "version_identifier": "9.4"
+            "version_identifier": "9.6"
         }
     },
     "WaterHeater:Mixed": {

@@ -298,15 +298,16 @@ TEST_F(EnergyPlusFixture, MicroCHPTest_InitGeneratorDynamics)
     MicroCHP2.Name = "MICROCOGEN2";
     MicroCHP1.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN1");
     MicroCHP2.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(*state, "MICROCOGEN2");
-    EXPECT_EQ(MicroCHPElectricGenerator::NumMicroCHPs, 2);
+    EXPECT_EQ(state->dataCHPElectGen->NumMicroCHPs, 2);
 
     bool FirstHVACIteration = true;
-    bool InitLoopEquip = true;
     bool GetCompSizFac = false;
-    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP1.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
-    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (MicroCHP2.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
-    MicroCHP1.simulate(*state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
-    MicroCHP2.simulate(*state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(MicroCHP1.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
+    dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(MicroCHP2.compPtr)->InitMicroCHPNoNormalizeGenerators(*state);
+    MicroCHP1.initLoopEquip(*state, GetCompSizFac);
+    MicroCHP1.simulate(*state, FirstHVACIteration);
+    MicroCHP2.initLoopEquip(*state, GetCompSizFac);
+    MicroCHP2.simulate(*state, FirstHVACIteration);
     EXPECT_EQ(state->dataGenerator->GeneratorDynamics(1).Name, MicroCHP1.Name);
     EXPECT_EQ(state->dataGenerator->GeneratorDynamics(2).Name, MicroCHP2.Name);
 }

@@ -271,7 +271,7 @@ This alpha field defines the supply air flow method when neither cooling or heat
 
 \paragraph{Field: No Load Supply Air Flow Rate}\label{field-no-load-supply-air-flow-rate-000}
 
-This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., main cooling/heating coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation. Values must be greater than or equal to 0, or this field is autosizable. If this field is autosized, then it is sized to the minimum of the heating and cooling lowest speed supply air flow rate. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
+This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., main cooling/heating coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation or when the Control Type is specified as SingleZoneVAV. Values must be greater than or equal to 0, or this field is autosizable. If this field is autosized, then it is sized to the minimum of the heating and cooling lowest speed supply air flow rate. If the Control Type is specified as SingleZoneVAV and this field is autosized, then the no load supply air flow rate is set equal to 0.5 or 0.667 times the maximum flow rate for water or coils, respectively. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation). This field should not be set to 0 when Control Type is specified as SingleZoneVAV.
 
 \paragraph{Field: No Load Supply Air Flow Rate Per Floor Area}\label{field-no-load-supply-air-flow-rate-per-floor-area}
 
@@ -483,7 +483,15 @@ AirLoopHVAC:UnitarySystem,
 \item
   HVAC,Average,Unitary System Latent Heating Rate {[}W{]}
 \item
+  HVAC,Average,Unitary System Electricity Rate {[}W{]}
+\item
+  HVAC,Sum,Unitary System Electricity Energy {[}J{]}
+\item
   HVAC,Average,Unitary System Ancillary Electricity Rate {[}W{]}
+\item
+  HVAC,Sum,Unitary System Cooling Ancillary Electricity Energy {[}J{]}
+\item
+  HVAC,Sum,Unitary System Heating Ancillary Electricity Energy {[}J{]}
 \end{itemize}
 
 Load based and SingleZoneVAV control outputs
@@ -514,14 +522,6 @@ Multi speed coil outputs
   HVAC,Average,Unitary System DX Coil Speed Ratio {[]}
 \item
   HVAC,Average,Unitary System DX Coil Speed Level {[]}
-\item
-  HVAC,Average,Unitary System Electricity Rate {[}W{]}
-\item
-  HVAC,Sum,Unitary System Electricity Energy {[}J{]}
-\item
-  HVAC,Sum,Unitary System Cooling Ancillary Electricity Energy {[}J{]}
-\item
-  HVAC,Sum,Unitary System Heating Ancillary Electricity Energy {[}J{]}
 \end{itemize}
 
 Multi speed coil outputs(If heat recovery is specified)
@@ -1024,7 +1024,7 @@ This alpha field contains the unitary system inlet node name.
 
 This alpha field contains the unitary system outlet node name.
 
-\textbf{\emph{Field: Supply Air Fan Operating Mode Schedule Name}}
+\subsubsection{Field: Supply Air Fan Operating Mode Schedule Name}\label{field-supply-air-fan-operating-mode-schedule-name-4}
 
 This alpha field specifies the name of the supply air fan operating mode schedule. The supply air fan operating mode may vary during the simulation based on time-of-day or with a change of season. Schedule values of 0 denote that the unitary system supply air fan and the heating or cooling coil cycle on and off together to meet the heating or cooling load (a.k.a. AUTO fan). Schedule values other than 0 denote that the supply fan runs continuously while the heating or cooling coil cycles to meet the load.
 

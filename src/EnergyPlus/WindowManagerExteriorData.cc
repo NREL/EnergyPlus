@@ -70,9 +70,9 @@ using namespace MultiLayerOptics;
 
 namespace WindowManager {
 
-    bool isSurfaceHit(const int t_SurfNum, const Vector &t_Ray)
+    bool isSurfaceHit(EnergyPlusData &state, const int t_SurfNum, const Vector &t_Ray)
     {
-        Real64 DotProd = dot(t_Ray, Surface(t_SurfNum).NewellSurfaceNormalVector);
+        Real64 DotProd = dot(t_Ray, state.dataSurface->Surface(t_SurfNum).NewellSurfaceNormalVector);
         return (DotProd > 0);
     }
 
@@ -82,8 +82,8 @@ namespace WindowManager {
         Real64 Phi = 0;
 
         // get window tilt and azimuth
-        Real64 Gamma = DataGlobalConstants::DegToRadians * Surface(t_SurfNum).Tilt;
-        Real64 Alpha = DataGlobalConstants::DegToRadians * Surface(t_SurfNum).Azimuth;
+        Real64 Gamma = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Tilt;
+        Real64 Alpha = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Azimuth;
 
         int RadType = state.dataWindowComplexManager->Front_Incident;
 
@@ -102,7 +102,8 @@ namespace WindowManager {
 
     std::pair<Real64, Real64> getSunWCEAngles(EnergyPlusData &state, const int t_SurfNum, const BSDFHemisphere t_Direction)
     {
-        return getWCECoordinates(state, t_SurfNum, state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, {1, 3}), t_Direction);
+        return getWCECoordinates(
+            state, t_SurfNum, state.dataBSDFWindow->SUNCOSTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay), t_Direction);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -148,7 +149,7 @@ namespace WindowManager {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(int const t_SampleDataPtr)
+    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(EnergyPlusData &state, int const t_SampleDataPtr)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -160,7 +161,7 @@ namespace WindowManager {
         // Reads spectral data value
         assert(t_SampleDataPtr != 0); // It must not be called for zero value
         std::shared_ptr<CSpectralSampleData> aSampleData = std::make_shared<CSpectralSampleData>();
-        auto spectralData = SpectralData(t_SampleDataPtr);
+        auto spectralData = state.dataHeatBal->SpectralData(t_SampleDataPtr);
         int numOfWl = spectralData.NumOfWavelengths;
         for (auto i = 1; i <= numOfWl; ++i) {
             Real64 wl = spectralData.WaveLength(i);
@@ -229,7 +230,8 @@ namespace WindowManager {
         aMap.at(t_ConstrNum).push_back(t_Layer);
     }
 
-    std::shared_ptr<CMultiLayerScattered> CWindowConstructionsSimplified::getEquivalentLayer(EnergyPlusData &state, WavelengthRange const t_Range, int const t_ConstrNum)
+    std::shared_ptr<CMultiLayerScattered>
+    CWindowConstructionsSimplified::getEquivalentLayer(EnergyPlusData &state, WavelengthRange const t_Range, int const t_ConstrNum)
     {
         auto it = m_Equivalent.find(std::make_pair(t_Range, t_ConstrNum));
         if (it == m_Equivalent.end()) {

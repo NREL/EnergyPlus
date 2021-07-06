@@ -67,25 +67,41 @@ struct EnergyPlusData;
 
 namespace SetPointManager {
 
-    enum class CtrlNodeType: int {
+    enum class CtrlNodeType : int
+    {
         control,
         reference
     };
 
-    enum class SupplyFlowTempStrategy {
-        MaxTemp, MinTemp, Unknown
+    enum class SupplyFlowTempStrategy
+    {
+        MaxTemp,
+        MinTemp,
+        Unknown
     };
-    enum class ControlStrategy {
-        TempFirst, FlowFirst, Unknown
+    enum class ControlStrategy
+    {
+        TempFirst,
+        FlowFirst,
+        Unknown
     };
-    enum class ReferenceTempType {
-        WetBulb, DryBulb, Unknown
+    enum class ReferenceTempType
+    {
+        WetBulb,
+        DryBulb,
+        Unknown
     };
-    enum class ReferenceGroundTempObjectType {
-        BuildingSurface, Shallow, Deep, FCFactorMethod, Unknown
+    enum class ReferenceGroundTempObjectType
+    {
+        BuildingSurface,
+        Shallow,
+        Deep,
+        FCFactorMethod,
+        Unknown
     };
 
-    enum class iCtrlVarType {
+    enum class iCtrlVarType
+    {
         Unknown,
         Temp,
         MaxTemp,
@@ -98,33 +114,35 @@ namespace SetPointManager {
         MinMassFlow
     };
     int constexpr NumValidCtrlTypes = 9;
-    inline const char* controlTypeName(iCtrlVarType cvt) {
-        switch(cvt) {
-            case iCtrlVarType::Temp:
-                return "Temperature";
-            case iCtrlVarType::MaxTemp:
-                return "MaximumTemperature";
-            case iCtrlVarType::MinTemp:
-                return "MinimumTemperature";
-            case iCtrlVarType::HumRat:
-                return "HumidityRatio";
-            case iCtrlVarType::MaxHumRat:
-                return "MaximumHumidityRatio";
-            case iCtrlVarType::MinHumRat:
-                return "MinimumHumidityRatio";
-            case iCtrlVarType::MassFlow:
-                return "MassFlowRate";
-            case iCtrlVarType::MaxMassFlow:
-                return "MaximumMassFlowRate";
-            case iCtrlVarType::MinMassFlow:
-                return "MinimumMassFlowRate";
-            case iCtrlVarType::Unknown:
-                return "*UNKNOWN*";
+    inline const char *controlTypeName(iCtrlVarType cvt)
+    {
+        switch (cvt) {
+        case iCtrlVarType::Temp:
+            return "Temperature";
+        case iCtrlVarType::MaxTemp:
+            return "MaximumTemperature";
+        case iCtrlVarType::MinTemp:
+            return "MinimumTemperature";
+        case iCtrlVarType::HumRat:
+            return "HumidityRatio";
+        case iCtrlVarType::MaxHumRat:
+            return "MaximumHumidityRatio";
+        case iCtrlVarType::MinHumRat:
+            return "MinimumHumidityRatio";
+        case iCtrlVarType::MassFlow:
+            return "MassFlowRate";
+        case iCtrlVarType::MaxMassFlow:
+            return "MaximumMassFlowRate";
+        case iCtrlVarType::MinMassFlow:
+            return "MinimumMassFlowRate";
+        case iCtrlVarType::Unknown:
+            return "*UNKNOWN*";
         }
-        return "*UNKNOWN*";  // not sure how we would get here, the switch block cases are exhaustive
+        return "*UNKNOWN*"; // not sure how we would get here, the switch block cases are exhaustive
     }
 
-    enum class SetPointManagerType {
+    enum class SetPointManagerType
+    {
         Scheduled,
         ScheduledDual,
         OutsideAir,
@@ -158,91 +176,95 @@ namespace SetPointManager {
         Unknown
     };
     int constexpr NumValidSPMTypes = 30;
-    inline const char* managerTypeName(SetPointManagerType t) {
-        switch(t) {
-            case SetPointManagerType::Scheduled:
-                return "SetpointManager:Scheduled";
-            case SetPointManagerType::ScheduledDual:
-                return "SetpointManager:Scheduled:DualSetpoint";
-            case SetPointManagerType::OutsideAir:
-                return "SetpointManager:OutdoorAirReset";
-            case SetPointManagerType::SZReheat:
-                return "SetpointManager:SingleZone:Reheat";
-            case SetPointManagerType::SZHeating:
-                return "SetpointManager:SingleZone:Heating";
-            case SetPointManagerType::SZCooling:
-                return "SetpointManager:SingleZone:Cooling";
-            case SetPointManagerType::SZMinHum:
-                return "SetpointManager:SingleZone:Humidity:Minimum";
-            case SetPointManagerType::SZMaxHum:
-                return "SetpointManager:SingleZone:Humidity:Maximum";
-            case SetPointManagerType::MixedAir:
-                return "SetpointManager:MixedAir";
-            case SetPointManagerType::OutsideAirPretreat:
-                return "SetpointManager:OutdoorAirPretreat";
-            case SetPointManagerType::Warmest:
-                return "SetpointManager:Warmest";
-            case SetPointManagerType::Coldest:
-                return "SetpointManager:Coldest";
-            case SetPointManagerType::WarmestTempFlow:
-                return "SetpointManager:WarmestTemperatureFlow";
-            case SetPointManagerType::RAB:
-                return "SetpointManager:ReturnAirBypassFlow";
-            case SetPointManagerType::MZCoolingAverage:
-                return "SetpointManager:MultiZone:Cooling:Average";
-            case SetPointManagerType::MZHeatingAverage:
-                return "SetpointManager:MultiZone:Heating:Average";
-            case SetPointManagerType::MZMinHumAverage:
-                return "SetpointManager:MultiZone:MinimumHumidity:Average";
-            case SetPointManagerType::MZMaxHumAverage:
-                return "SetpointManager:MultiZone:MaximumHumidity:Average";
-            case SetPointManagerType::MZMinHum:
-                return "SetpointManager:MultiZone:Humidity:Minimum";
-            case SetPointManagerType::MZMaxHum:
-                return "SetpointManager:MultiZone:Humidity:Maximum";
-            case SetPointManagerType::FollowOATemp:
-                return "SetpointManager:FollowOutdoorAirTemperature";
-            case SetPointManagerType::FollowSysNodeTemp:
-                return "SetpointManager:FollowSystemNodeTemperature";
-            case SetPointManagerType::GroundTemp:
-                return "SetpointManager:FollowGroundTemperature";
-            case SetPointManagerType::CondEntReset:
-                return "SetpointManager:CondenserEnteringReset";
-            case SetPointManagerType::IdealCondEntReset:
-                return "SetpointManager:CondenserEnteringReset:Ideal";
-            case SetPointManagerType::SZOneStageCooling:
-                return "SetpointManager:SingleZone:OneStageCooling";
-            case SetPointManagerType::SZOneStageHeating:
-                return "SetpointManager:SingleZone:OneStageHeating";
-            case SetPointManagerType::ReturnWaterResetChW:
-                return "SetpointManager:ReturnTemperature:ChilledWater";
-            case SetPointManagerType::ReturnWaterResetHW:
-                return "SetpointManager:ReturnTemperature:HotWater";
-            case SetPointManagerType::TESScheduled:
-                return "SetpointManager:ScheduledTES";
-            case SetPointManagerType::Unknown:
-                return "*UNKNOWN*";
+    inline const char *managerTypeName(SetPointManagerType t)
+    {
+        switch (t) {
+        case SetPointManagerType::Scheduled:
+            return "SetpointManager:Scheduled";
+        case SetPointManagerType::ScheduledDual:
+            return "SetpointManager:Scheduled:DualSetpoint";
+        case SetPointManagerType::OutsideAir:
+            return "SetpointManager:OutdoorAirReset";
+        case SetPointManagerType::SZReheat:
+            return "SetpointManager:SingleZone:Reheat";
+        case SetPointManagerType::SZHeating:
+            return "SetpointManager:SingleZone:Heating";
+        case SetPointManagerType::SZCooling:
+            return "SetpointManager:SingleZone:Cooling";
+        case SetPointManagerType::SZMinHum:
+            return "SetpointManager:SingleZone:Humidity:Minimum";
+        case SetPointManagerType::SZMaxHum:
+            return "SetpointManager:SingleZone:Humidity:Maximum";
+        case SetPointManagerType::MixedAir:
+            return "SetpointManager:MixedAir";
+        case SetPointManagerType::OutsideAirPretreat:
+            return "SetpointManager:OutdoorAirPretreat";
+        case SetPointManagerType::Warmest:
+            return "SetpointManager:Warmest";
+        case SetPointManagerType::Coldest:
+            return "SetpointManager:Coldest";
+        case SetPointManagerType::WarmestTempFlow:
+            return "SetpointManager:WarmestTemperatureFlow";
+        case SetPointManagerType::RAB:
+            return "SetpointManager:ReturnAirBypassFlow";
+        case SetPointManagerType::MZCoolingAverage:
+            return "SetpointManager:MultiZone:Cooling:Average";
+        case SetPointManagerType::MZHeatingAverage:
+            return "SetpointManager:MultiZone:Heating:Average";
+        case SetPointManagerType::MZMinHumAverage:
+            return "SetpointManager:MultiZone:MinimumHumidity:Average";
+        case SetPointManagerType::MZMaxHumAverage:
+            return "SetpointManager:MultiZone:MaximumHumidity:Average";
+        case SetPointManagerType::MZMinHum:
+            return "SetpointManager:MultiZone:Humidity:Minimum";
+        case SetPointManagerType::MZMaxHum:
+            return "SetpointManager:MultiZone:Humidity:Maximum";
+        case SetPointManagerType::FollowOATemp:
+            return "SetpointManager:FollowOutdoorAirTemperature";
+        case SetPointManagerType::FollowSysNodeTemp:
+            return "SetpointManager:FollowSystemNodeTemperature";
+        case SetPointManagerType::GroundTemp:
+            return "SetpointManager:FollowGroundTemperature";
+        case SetPointManagerType::CondEntReset:
+            return "SetpointManager:CondenserEnteringReset";
+        case SetPointManagerType::IdealCondEntReset:
+            return "SetpointManager:CondenserEnteringReset:Ideal";
+        case SetPointManagerType::SZOneStageCooling:
+            return "SetpointManager:SingleZone:OneStageCooling";
+        case SetPointManagerType::SZOneStageHeating:
+            return "SetpointManager:SingleZone:OneStageHeating";
+        case SetPointManagerType::ReturnWaterResetChW:
+            return "SetpointManager:ReturnTemperature:ChilledWater";
+        case SetPointManagerType::ReturnWaterResetHW:
+            return "SetpointManager:ReturnTemperature:HotWater";
+        case SetPointManagerType::TESScheduled:
+            return "SetpointManager:ScheduledTES";
+        case SetPointManagerType::Unknown:
+            return "*UNKNOWN*";
         }
-        return "*UNKNOWN*";  // not sure how we would get here, the switch block cases are exhaustive
+        return "*UNKNOWN*"; // not sure how we would get here, the switch block cases are exhaustive
     }
 
-    struct SPBase {
+    struct SPBase
+    {
         std::string Name;
         iCtrlVarType CtrlTypeMode; // set to iCtrlVarType::*
         std::string CtrlVarType;
-        SPBase() : CtrlTypeMode(iCtrlVarType::Unknown) {}
+        SPBase() : CtrlTypeMode(iCtrlVarType::Unknown)
+        {
+        }
     };
 
     struct DataSetPointManager : SPBase // Derived type for all Setpoint Managers
     {
         // Members
-        SetPointManagerType SPMType;             // integer representing type of setpoint manager
-        int SPMIndex;            // index to specific set point manager
-        int NumCtrlNodes;        // number of control nodes
-        Array1D_int CtrlNodes;   // index to control node
-        int AirLoopNum;          // index to air loop
-        std::string AirLoopName; // name of air loop
-        int RefNode;             // index to reference node
+        SetPointManagerType SPMType; // integer representing type of setpoint manager
+        int SPMIndex;                // index to specific set point manager
+        int NumCtrlNodes;            // number of control nodes
+        Array1D_int CtrlNodes;       // index to control node
+        int AirLoopNum;              // index to air loop
+        std::string AirLoopName;     // name of air loop
+        int RefNode;                 // index to reference node
 
         // Default Constructor
         DataSetPointManager() : SPMType(SetPointManagerType::Unknown), SPMIndex(0), NumCtrlNodes(0), AirLoopNum(0), RefNode(0)
@@ -292,16 +314,16 @@ namespace SetPointManager {
     struct DefineOutsideAirSetPointManager : SPBase // Derived type for Outside Air Setpoint Manager Data
     {
         // Members
-        Real64 OutLowSetPt1;     // 1st setpoint at outside low
-        Real64 OutLow1;          // 1st Outside low
-        Real64 OutHighSetPt1;    // 1st setpoint at outside high
-        Real64 OutHigh1;         // 1st Outside high
-        std::string Sched;       // Optional schedule
-        int SchedPtr;            // Schedule index
-        Real64 OutLowSetPt2;     // 2nd setpoint at outside low (optional)
-        Real64 OutLow2;          // 2nd Outside low (optional)
-        Real64 OutHighSetPt2;    // 2nd setpoint at outside high (optional)
-        Real64 OutHigh2;         // 2nd Outside high (optional)
+        Real64 OutLowSetPt1;  // 1st setpoint at outside low
+        Real64 OutLow1;       // 1st Outside low
+        Real64 OutHighSetPt1; // 1st setpoint at outside high
+        Real64 OutHigh1;      // 1st Outside high
+        std::string Sched;    // Optional schedule
+        int SchedPtr;         // Schedule index
+        Real64 OutLowSetPt2;  // 2nd setpoint at outside low (optional)
+        Real64 OutLow2;       // 2nd Outside low (optional)
+        Real64 OutHighSetPt2; // 2nd setpoint at outside high (optional)
+        Real64 OutHigh2;      // 2nd Outside high (optional)
         int NumCtrlNodes;
         std::string CtrlNodeListName;
         Array1D_int CtrlNodes;
@@ -309,8 +331,8 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineOutsideAirSetPointManager()
-            : OutLowSetPt1(0.0), OutLow1(0.0), OutHighSetPt1(0.0), OutHigh1(0.0), SchedPtr(0), OutLowSetPt2(0.0), OutLow2(0.0),
-              OutHighSetPt2(0.0), OutHigh2(0.0), NumCtrlNodes(0), SetPt(0.0)
+            : OutLowSetPt1(0.0), OutLow1(0.0), OutHighSetPt1(0.0), OutHigh1(0.0), SchedPtr(0), OutLowSetPt2(0.0), OutLow2(0.0), OutHighSetPt2(0.0),
+              OutHigh2(0.0), NumCtrlNodes(0), SetPt(0.0)
 
         {
         }
@@ -342,8 +364,8 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineSZReheatSetPointManager()
-            : ControlZoneNum(0), ZoneNodeNum(0), ZoneInletNodeNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), MixedAirNode(0),
-              FanNodeIn(0), FanNodeOut(0), AirLoopNum(0), OAInNode(0), RetNode(0), LoopInNode(0), NumCtrlNodes(0), SetPt(0.0)
+            : ControlZoneNum(0), ZoneNodeNum(0), ZoneInletNodeNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), MixedAirNode(0), FanNodeIn(0), FanNodeOut(0),
+              AirLoopNum(0), OAInNode(0), RetNode(0), LoopInNode(0), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -449,8 +471,8 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineMixedAirSetPointManager()
-            : RefNode(0), FanInNode(0), FanOutNode(0), NumCtrlNodes(0), SetPt(0.0), MySetPointCheckFlag(true),
-              FreezeCheckEnable(false), CoolCoilInNode(0), CoolCoilOutNode(0), MinCoolCoilOutTemp(7.2)
+            : RefNode(0), FanInNode(0), FanOutNode(0), NumCtrlNodes(0), SetPt(0.0), MySetPointCheckFlag(true), FreezeCheckEnable(false),
+              CoolCoilInNode(0), CoolCoilOutNode(0), MinCoolCoilOutTemp(7.2)
 
         {
         }
@@ -476,8 +498,8 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineOAPretreatSetPointManager()
-            : RefNode(0), MixedOutNode(0), OAInNode(0), ReturnInNode(0), MinSetTemp(0.0), MaxSetTemp(0.0), MinSetHumRat(0.0),
-              MaxSetHumRat(0.0), NumCtrlNodes(0), SetPt(0.0), MySetPointCheckFlag(true)
+            : RefNode(0), MixedOutNode(0), OAInNode(0), ReturnInNode(0), MinSetTemp(0.0), MaxSetTemp(0.0), MinSetHumRat(0.0), MaxSetHumRat(0.0),
+              NumCtrlNodes(0), SetPt(0.0), MySetPointCheckFlag(true)
         {
         }
 
@@ -487,18 +509,19 @@ namespace SetPointManager {
     struct DefineWarmestSetPointManager : SPBase
     {
         // Members
-        std::string AirLoopName; // name of air loop that will use "warmest zone" strategy
-        int AirLoopNum;          // index of named air loop
-        Real64 MinSetTemp;       // minimum supply air setpoint temperature
-        Real64 MaxSetTemp;       // maximum supply air setpoint temperature
-        SupplyFlowTempStrategy Strategy;            // supply flow and temperature set strategy
+        std::string AirLoopName;         // name of air loop that will use "warmest zone" strategy
+        int AirLoopNum;                  // index of named air loop
+        Real64 MinSetTemp;               // minimum supply air setpoint temperature
+        Real64 MaxSetTemp;               // maximum supply air setpoint temperature
+        SupplyFlowTempStrategy Strategy; // supply flow and temperature set strategy
         // 1 = MaxTemp
         int NumCtrlNodes;      // number of nodes whose temperature is being set
         Array1D_int CtrlNodes; // nodes where temperature is being set
         Real64 SetPt;          // the setpoint
 
         // Default Constructor
-        DefineWarmestSetPointManager() : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
+        DefineWarmestSetPointManager()
+            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -508,18 +531,19 @@ namespace SetPointManager {
     struct DefineColdestSetPointManager : SPBase
     {
         // Members
-        std::string AirLoopName; // name of air loop that will use "coldest zone" strategy
-        int AirLoopNum;          // index of named air loop
-        Real64 MinSetTemp;       // minimum supply air setpoint temperature
-        Real64 MaxSetTemp;       // maximum supply air setpoint temperature
-        SupplyFlowTempStrategy Strategy;            // supply flow and temperature set strategy
+        std::string AirLoopName;         // name of air loop that will use "coldest zone" strategy
+        int AirLoopNum;                  // index of named air loop
+        Real64 MinSetTemp;               // minimum supply air setpoint temperature
+        Real64 MaxSetTemp;               // maximum supply air setpoint temperature
+        SupplyFlowTempStrategy Strategy; // supply flow and temperature set strategy
         // 2 = MinTemp
         int NumCtrlNodes;      // number of nodes whose temperature is being set
         Array1D_int CtrlNodes; // nodes where temperature is being set
         Real64 SetPt;          // the setpoint
 
         // Default Constructor
-        DefineColdestSetPointManager() : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
+        DefineColdestSetPointManager()
+            : AirLoopNum(0), MinSetTemp(0.0), MaxSetTemp(0.0), Strategy(SupplyFlowTempStrategy::Unknown), NumCtrlNodes(0), SetPt(0.0)
         {
         }
 
@@ -529,11 +553,11 @@ namespace SetPointManager {
     struct DefWarmestSetPtManagerTempFlow : SPBase
     {
         // Members
-        std::string AirLoopName; // name of air loop that will use "warmest zone" strategy
-        int AirLoopNum;          // index of named air loop
-        Real64 MinSetTemp;       // minimum supply air setpoint temperature
-        Real64 MaxSetTemp;       // maximum supply air setpoint temperature
-        ControlStrategy Strategy;            // supply flow and temperature set strategy
+        std::string AirLoopName;  // name of air loop that will use "warmest zone" strategy
+        int AirLoopNum;           // index of named air loop
+        Real64 MinSetTemp;        // minimum supply air setpoint temperature
+        Real64 MaxSetTemp;        // maximum supply air setpoint temperature
+        ControlStrategy Strategy; // supply flow and temperature set strategy
         // 1 = TempFirst, 2 = FlowFirst
         int NumCtrlNodes;      // number of nodes whose temperature is being set
         Array1D_int CtrlNodes; // nodes where temperature is being set
@@ -572,8 +596,8 @@ namespace SetPointManager {
 
         // Default Constructor
         DefRABFlowSetPointManager()
-            : NumCtrlNodes(0), AirLoopNum(0), SchedPtr(0), FlowSetPt(0.0), RABMixInNode(0), SupMixInNode(0), MixOutNode(0),
-              RABSplitOutNode(0), SysOutNode(0), AllSetPtMgrIndex(0)
+            : NumCtrlNodes(0), AirLoopNum(0), SchedPtr(0), FlowSetPt(0.0), RABMixInNode(0), SupMixInNode(0), MixOutNode(0), RABSplitOutNode(0),
+              SysOutNode(0), AllSetPtMgrIndex(0)
         {
         }
 
@@ -697,14 +721,14 @@ namespace SetPointManager {
     struct DefineFollowOATempSetPointManager : SPBase
     {
         // Members
-        std::string RefTempType; // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
-        ReferenceTempType RefTypeMode;         // set to iRefTempType_WetBulb or iRefTempType_DryBulb
-        Real64 Offset;           // Offset temperature difference
-        Real64 MinSetTemp;       // Minimum supply air setpoint temperature
-        Real64 MaxSetTemp;       // Maximum supply air setpoint temperature
-        int NumCtrlNodes;        // number of nodes whose temperature is being set
-        Array1D_int CtrlNodes;   // nodes where temperature is being set
-        Real64 SetPt;            // the setpoint
+        std::string RefTempType;       // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
+        ReferenceTempType RefTypeMode; // set to iRefTempType_WetBulb or iRefTempType_DryBulb
+        Real64 Offset;                 // Offset temperature difference
+        Real64 MinSetTemp;             // Minimum supply air setpoint temperature
+        Real64 MaxSetTemp;             // Maximum supply air setpoint temperature
+        int NumCtrlNodes;              // number of nodes whose temperature is being set
+        Array1D_int CtrlNodes;         // nodes where temperature is being set
+        Real64 SetPt;                  // the setpoint
 
         // Default Constructor
         DefineFollowOATempSetPointManager()
@@ -718,15 +742,15 @@ namespace SetPointManager {
     struct DefineFollowSysNodeTempSetPointManager : SPBase
     {
         // Members
-        int RefNodeNum;          // reference node number
-        std::string RefTempType; // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
-        ReferenceTempType RefTypeMode;         // set to iRefTempType_WetBulb or iRefTempType_DryBulb
-        Real64 Offset;           // Offset temperature difference
-        Real64 MinSetTemp;       // Minimum supply air setpoint temperature
-        Real64 MaxSetTemp;       // Maximum supply air setpoint temperature
-        int NumCtrlNodes;        // number of nodes whose temperature is being set
-        Array1D_int CtrlNodes;   // nodes where temperature is being set
-        Real64 SetPt;            // the setpoint
+        int RefNodeNum;                // reference node number
+        std::string RefTempType;       // Reference Temperature type (choice OutdoorAirWetBulb/OutdoorAirDryBulb)
+        ReferenceTempType RefTypeMode; // set to iRefTempType_WetBulb or iRefTempType_DryBulb
+        Real64 Offset;                 // Offset temperature difference
+        Real64 MinSetTemp;             // Minimum supply air setpoint temperature
+        Real64 MaxSetTemp;             // Maximum supply air setpoint temperature
+        int NumCtrlNodes;              // number of nodes whose temperature is being set
+        Array1D_int CtrlNodes;         // nodes where temperature is being set
+        Real64 SetPt;                  // the setpoint
 
         // Default Constructor
         DefineFollowSysNodeTempSetPointManager()
@@ -734,7 +758,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineGroundTempSetPointManager : SPBase
@@ -745,13 +769,13 @@ namespace SetPointManager {
         // Site:GroundTemperature:Shallow
         // Site:GroundTemperature:Deep
         // Site:GroundTemperature:FCfactorMethod
-        ReferenceGroundTempObjectType RefTypeMode;       // set to iRefGroundTempObjType_xxxx based on RefGroundTempObjType
-        Real64 Offset;         // Offset temperature difference
-        Real64 MinSetTemp;     // Minimum supply air setpoint temperature
-        Real64 MaxSetTemp;     // Maximum supply air setpoint temperature
-        int NumCtrlNodes;      // number of nodes whose temperature is being set
-        Array1D_int CtrlNodes; // nodes where temperature is being set
-        Real64 SetPt;          // the setpoint
+        ReferenceGroundTempObjectType RefTypeMode; // set to iRefGroundTempObjType_xxxx based on RefGroundTempObjType
+        Real64 Offset;                             // Offset temperature difference
+        Real64 MinSetTemp;                         // Minimum supply air setpoint temperature
+        Real64 MaxSetTemp;                         // Maximum supply air setpoint temperature
+        int NumCtrlNodes;                          // number of nodes whose temperature is being set
+        Array1D_int CtrlNodes;                     // nodes where temperature is being set
+        Real64 SetPt;                              // the setpoint
 
         // Default Constructor
         DefineGroundTempSetPointManager()
@@ -787,9 +811,9 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineCondEntSetPointManager()
-            : CondEntTempSchedPtr(0), TowerDsnInletAirWetBulb(0.0), MinTwrWbCurve(0), MinOaWbCurve(0), OptCondEntCurve(0),
-              MinimumLiftTD(0.0), MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), ChillerIndexDemandSide(0),
-              BranchIndexPlantSide(0), BranchIndexDemandSide(0), LoopIndexPlantSide(0), LoopIndexDemandSide(0), TypeNum(0)
+            : CondEntTempSchedPtr(0), TowerDsnInletAirWetBulb(0.0), MinTwrWbCurve(0), MinOaWbCurve(0), OptCondEntCurve(0), MinimumLiftTD(0.0),
+              MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), ChillerIndexDemandSide(0), BranchIndexPlantSide(0),
+              BranchIndexDemandSide(0), LoopIndexPlantSide(0), LoopIndexDemandSide(0), TypeNum(0)
         {
         }
 
@@ -799,41 +823,42 @@ namespace SetPointManager {
     struct DefineIdealCondEntSetPointManager : SPBase // derived type for SetpointManager:CondenserEnteringReset:Ideal data
     {
         // Members
-         // type of variable to be set
-        Real64 MinimumLiftTD;    // minimum lift
-        Real64 MaxCondEntTemp;   // maximum condenser entering water temp
-        int NumCtrlNodes;        // number of nodes whose temperature is being set
+        // type of variable to be set
+        Real64 MinimumLiftTD;  // minimum lift
+        Real64 MaxCondEntTemp; // maximum condenser entering water temp
+        int NumCtrlNodes;      // number of nodes whose temperature is being set
         std::string CtrlNodeListName;
-        Array1D_int CtrlNodes;           // nodes where temperature is being set
-        Real64 SetPt;                    // the temperature set point [C]
-        int ChillerIndexPlantSide;       // plant side chiller index
-        int BranchIndexPlantSide;        // plant side branch index
-        int LoopIndexPlantSide;          // plant side loop index
-        int ChllrVarType;                // report variable type
-        int ChllrVarIndex;               // report variable index
-        int ChlPumpVarType;              // report variable type
-        int ChlPumpVarIndex;             // report variable index
-        Array1D_int ClTowerVarType;      // report variable type
-        Array1D_int ClTowerVarIndex;     // report variable index
-        int CndPumpVarType;              // report variable type
-        int CndPumpVarIndex;             // report variable index
-        int TypeNum;                     // chiller type number
-        Array1D_int TowerNum;            // cooling tower number
-        int CondLoopNum;                 // condenser loop number
-        Array1D_int CondTowerBranchNum;  // condenser branch number
-        int numTowers;                   // number of towers to query
-        int CondPumpNum;                 // condenser pump number
-        int CondPumpBranchNum;           // condenser branch number for pump
-        int ChilledPumpNum;              // chilled water pump number
-        int ChilledPumpBranchNum;        // chilled water branch number for pump
-        bool SetupIdealCondEntSetPtVars; // flag for initialization of meters and such
+        Array1D_int CtrlNodes;                                 // nodes where temperature is being set
+        Real64 SetPt;                                          // the temperature set point [C]
+        int ChillerIndexPlantSide;                             // plant side chiller index
+        int BranchIndexPlantSide;                              // plant side branch index
+        int LoopIndexPlantSide;                                // plant side loop index
+        OutputProcessor::VariableType ChllrVarType;            // report variable type
+        int ChllrVarIndex;                                     // report variable index
+        OutputProcessor::VariableType ChlPumpVarType;          // report variable type
+        int ChlPumpVarIndex;                                   // report variable index
+        Array1D<OutputProcessor::VariableType> ClTowerVarType; // report variable type
+        Array1D_int ClTowerVarIndex;                           // report variable index
+        OutputProcessor::VariableType CndPumpVarType;          // report variable type
+        int CndPumpVarIndex;                                   // report variable index
+        int TypeNum;                                           // chiller type number
+        Array1D_int TowerNum;                                  // cooling tower number
+        int CondLoopNum;                                       // condenser loop number
+        Array1D_int CondTowerBranchNum;                        // condenser branch number
+        int numTowers;                                         // number of towers to query
+        int CondPumpNum;                                       // condenser pump number
+        int CondPumpBranchNum;                                 // condenser branch number for pump
+        int ChilledPumpNum;                                    // chilled water pump number
+        int ChilledPumpBranchNum;                              // chilled water branch number for pump
+        bool SetupIdealCondEntSetPtVars;                       // flag for initialization of meters and such
 
         // Default Constructor
         DefineIdealCondEntSetPointManager()
-            : MinimumLiftTD(0.0), MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0),
-              BranchIndexPlantSide(0), LoopIndexPlantSide(0), ChllrVarType(0), ChllrVarIndex(0), ChlPumpVarType(0), ChlPumpVarIndex(0),
-              CndPumpVarType(0), CndPumpVarIndex(0), TypeNum(0), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0),
-              ChilledPumpNum(0), ChilledPumpBranchNum(0), SetupIdealCondEntSetPtVars(true)
+            : MinimumLiftTD(0.0), MaxCondEntTemp(0.0), NumCtrlNodes(0), SetPt(0.0), ChillerIndexPlantSide(0), BranchIndexPlantSide(0),
+              LoopIndexPlantSide(0), ChllrVarType(OutputProcessor::VariableType::NotFound), ChllrVarIndex(0),
+              ChlPumpVarType(OutputProcessor::VariableType::NotFound), ChlPumpVarIndex(0), CndPumpVarType(OutputProcessor::VariableType::NotFound),
+              CndPumpVarIndex(0), TypeNum(0), CondLoopNum(0), numTowers(0), CondPumpNum(0), CondPumpBranchNum(0), ChilledPumpNum(0),
+              ChilledPumpBranchNum(0), SetupIdealCondEntSetPtVars(true)
         {
         }
 
@@ -936,9 +961,9 @@ namespace SetPointManager {
 
         // Default Constructor
         DefineReturnWaterHWSetPointManager()
-            : returnNodeIndex(0), supplyNodeIndex(0), maximumHotWaterSetpoint(0.0), minimumHotWaterSetpoint(0.0),
-              returnTemperatureScheduleIndex(0), returnTemperatureConstantTarget(0.0), currentSupplySetPt(0.0), plantLoopIndex(0),
-              plantSetpointNodeIndex(0), useReturnTempSetpoint(false)
+            : returnNodeIndex(0), supplyNodeIndex(0), maximumHotWaterSetpoint(0.0), minimumHotWaterSetpoint(0.0), returnTemperatureScheduleIndex(0),
+              returnTemperatureConstantTarget(0.0), currentSupplySetPt(0.0), plantLoopIndex(0), plantSetpointNodeIndex(0),
+              useReturnTempSetpoint(false)
         {
         }
 
@@ -967,8 +992,6 @@ namespace SetPointManager {
         // Calculation method
         void calculate(EnergyPlusData &state);
     };
-
-    void clear_state();
 
     void ManageSetPoints(EnergyPlusData &state);
 
@@ -1014,7 +1037,8 @@ namespace SetPointManager {
 
 } // namespace SetPointManager
 
-struct SetPointManagerData : BaseGlobalStruct {
+struct SetPointManagerData : BaseGlobalStruct
+{
     // MODULE VARIABLE DECLARATIONS:
     int NumAllSetPtMgrs = 0;                 // Number of all Setpoint Managers found in input
     int NumSchSetPtMgrs = 0;                 // Number of Scheduled Setpoint Managers found in input
@@ -1047,6 +1071,15 @@ struct SetPointManagerData : BaseGlobalStruct {
     int NumReturnWaterResetChWSetPtMgrs = 0; // number of return water reset setpoint managers
     int NumReturnWaterResetHWSetPtMgrs = 0;  // number of hot-water return water reset setpoint managers
     int NumSchTESSetPtMgrs = 0;              // number of TES scheduled setpoint managers (created internally, not by user input)
+
+    Real64 TSupNoHC = 0.0;     // supply temperature with no heating or cooling
+    Real64 ExtrRateNoHC = 0.0; // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
+
+    int GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
+    int GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
+    int InitSetPointManagerTypeNum = 0;
+    int InitSetPointManagerNumChiller = 0;
+    int InitSetPointManagerTypeOf_Num = 0;
 
     bool ManagerOn = false;
     bool GetInputFlag = true; // First time, input is "gotten"
@@ -1113,6 +1146,13 @@ struct SetPointManagerData : BaseGlobalStruct {
     Array1D<SetPointManager::DefineReturnWaterHWSetPointManager> ReturnWaterResetHWSetPtMgr;      // hot-water return water reset
     Array1D<SetPointManager::DefineScheduledTESSetPointManager> SchTESSetPtMgr;                   // Array for TES Scheduled Setpoint Manager data
 
+    Real64 CondWaterSetPoint = 0; // Condenser entering water temperature setpoint this timestep, C
+    Real64 EvapOutletTemp = 0;    // Evaporator water outlet temperature (C)
+    Real64 CondTempLimit = 0;     // Condenser entering water temperature setpoint lower limit
+    Real64 CurLoad = 0;           // Current cooling load, W
+    Real64 TotEnergy = 0;         // Total energy consumptions at this time step
+    Real64 TotEnergyPre = 0;      // Total energy consumptions at the previous time step
+
     void clear_state() override
     {
 
@@ -1164,6 +1204,15 @@ struct SetPointManagerData : BaseGlobalStruct {
         DCESPMCondInletTemp = 0.0;
         DCESPMEvapOutletTemp = 0.0;
 
+        TSupNoHC = 0.0;     // supply temperature with no heating or cooling
+        ExtrRateNoHC = 0.0; // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
+
+        GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
+        GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
+        InitSetPointManagerTypeNum = 0;
+        InitSetPointManagerNumChiller = 0;
+        InitSetPointManagerTypeOf_Num = 0;
+
         ManagerOn = false;
         GetInputFlag = true; // First time, input is "gotten"
         // Object Data
@@ -1208,8 +1257,13 @@ struct SetPointManagerData : BaseGlobalStruct {
         InitSetPointManagersMyEnvrnFlag = true;
         RunSubOptCondEntTemp = false;
         RunFinalOptCondEntTemp = false;
+        CondWaterSetPoint = 0;
+        EvapOutletTemp = 0;
+        CondTempLimit = 0;
+        CurLoad = 0;
+        TotEnergy = 0;
+        TotEnergyPre = 0;
     }
-
 };
 
 } // namespace EnergyPlus

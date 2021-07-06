@@ -55,20 +55,20 @@ using namespace EnergyPlus;
 
 TEST_F(EnergyPlusFixture, readItem)
 {
-  int i = 0;
+    int i = 0;
 
-  // should read just 12
-  EXPECT_TRUE(EnergyPlus::readItem("12", i));
-  EXPECT_EQ(i, 12);
+    // should read just 12
+    EXPECT_TRUE(EnergyPlus::readItem("12", i));
+    EXPECT_EQ(i, 12);
 
-  // should fail if unable to process entire input string
-  EXPECT_FALSE(EnergyPlus::readItem("1234fgq", i));
-  // value is in an unknown state if read failed
-  // EXPECT_EQ(i, 12);
+    // should fail if unable to process entire input string
+    EXPECT_FALSE(EnergyPlus::readItem("1234fgq", i));
+    // value is in an unknown state if read failed
+    // EXPECT_EQ(i, 12);
 
-  // should read nothing
-  EXPECT_FALSE(EnergyPlus::readItem("abc123", i));
-  EXPECT_EQ(i, 0);
+    // should read nothing
+    EXPECT_FALSE(EnergyPlus::readItem("abc123", i));
+    EXPECT_EQ(i, 0);
 }
 
 TEST_F(EnergyPlusFixture, readList)
@@ -81,14 +81,14 @@ TEST_F(EnergyPlusFixture, readList)
     // with commas
     EXPECT_TRUE(EnergyPlus::readList("1,3.4,a,hello", i, f, c, s));
     EXPECT_EQ(i, 1);
-    EXPECT_FLOAT_EQ(f, 3.4);
+    EXPECT_FLOAT_EQ(f, 3.4f);
     EXPECT_EQ(c, 'a');
-    EXPECT_EQ(s,"hello");
+    EXPECT_EQ(s, "hello");
 
     // without
     EXPECT_TRUE(EnergyPlus::readList("bob q 1.5 10", s, c, f, i));
     EXPECT_EQ(i, 10);
-    EXPECT_FLOAT_EQ(f, 1.5);
+    EXPECT_FLOAT_EQ(f, 1.5f);
     EXPECT_EQ(c, 'q');
     EXPECT_EQ(s, "bob");
 

@@ -64,7 +64,8 @@ struct EnergyPlusData;
 
 namespace PlantCentralGSHP {
 
-    enum class iCondType {
+    enum class iCondType
+    {
         Unassigned,
         WaterCooled,
         SmartMixing,
@@ -391,7 +392,8 @@ namespace PlantCentralGSHP {
 
         void getSizingFactor(Real64 &SizFac) override;
 
-        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void setupOutputVars(EnergyPlusData &state);
 
@@ -400,7 +402,11 @@ namespace PlantCentralGSHP {
                         int LoopNum    // Loop Number Index
         );
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
 
         void SizeWrapper(EnergyPlusData &state);
 
@@ -410,12 +416,13 @@ namespace PlantCentralGSHP {
 
         void CalcChillerHeaterModel(EnergyPlusData &state);
 
-        void UpdateChillerHeaterRecords();
+        void UpdateChillerHeaterRecords(EnergyPlusData &state);
 
-        void UpdateChillerRecords();
+        void UpdateChillerRecords(EnergyPlusData &state);
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetWrapperInput(EnergyPlusData &state);
@@ -424,7 +431,8 @@ namespace PlantCentralGSHP {
 
 } // namespace PlantCentralGSHP
 
-struct PlantCentralGSHPData : BaseGlobalStruct {
+struct PlantCentralGSHPData : BaseGlobalStruct
+{
 
     bool getWrapperInputFlag = true;   // When TRUE, calls subroutine to read input file.
     int numWrappers = 0;               // Number of Wrappers specified in input
@@ -435,8 +443,8 @@ struct PlantCentralGSHPData : BaseGlobalStruct {
     Real64 ChillerPartLoadRatio = 0.0; // Chiller/heater part-load ratio (PLR)
     Real64 ChillerCyclingRatio = 0.0;  // Chiller/heater cycling ratio
     Real64 ChillerFalseLoadRate = 0.0; // Chiller/heater false load over and above the water-side load [W]
-    Array1D<PlantCentralGSHP::WrapperSpecs> Wrapper;
-    Array1D<PlantCentralGSHP::ChillerHeaterSpecs> ChillerHeater;
+    EPVector<PlantCentralGSHP::WrapperSpecs> Wrapper;
+    EPVector<PlantCentralGSHP::ChillerHeaterSpecs> ChillerHeater;
 
     void clear_state() override
     {

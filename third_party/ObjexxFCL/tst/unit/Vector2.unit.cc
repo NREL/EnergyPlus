@@ -37,7 +37,7 @@ using namespace ObjexxFCL;
 
 TEST( Vector2Test, Basic )
 {
-	Vector2_float v( 15.0 ); // Uniform value construction
+	Vector2<float> v( 15.0 ); // Uniform value construction
 	EXPECT_EQ( 15.0f, v.x );
 	EXPECT_EQ( 15.0f, v.y );
 	v.normalize();
@@ -67,7 +67,7 @@ TEST( Vector2Test, Basic )
 
 TEST( Vector2Test, InitializerList )
 {
-	Vector2_int v( { 33, 52 } );
+	Vector2<int> v( { 33, 52 } );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
 	EXPECT_EQ( 33, v.x1() );
@@ -99,7 +99,7 @@ TEST( Vector2Test, InitializerList )
 TEST( Vector2Test, StdArray )
 {
 	std::array< int, 2 > arr = {{ 33, 52 }};
-	Vector2_int v( arr );
+	Vector2<int> v( arr );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
 	arr = {{ 133, 152 }};
@@ -124,7 +124,7 @@ TEST( Vector2Test, StdArray )
 TEST( Vector2Test, StdVector )
 {
 	std::vector< int > vec( { 33, 52 } );
-	Vector2_int v( vec );
+	Vector2<int> v( vec );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
 	vec = { 133, 152 };
@@ -149,7 +149,7 @@ TEST( Vector2Test, StdVector )
 TEST( Vector2Test, Array )
 {
 	Array1D_int a( 2, { 33, 52 } );
-	Vector2_int v( a );
+	Vector2<int> v( a );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
 	a = { 133, 152 };
@@ -173,10 +173,10 @@ TEST( Vector2Test, Array )
 
 TEST( Vector2Test, MinMax )
 {
-	Vector2_double v( 1.0, 5.0 );
-	Vector2_double w( 3.0, 2.0 );
-	Vector2_double min_vw( min( v, w ) );
-	Vector2_double max_vw( max( v, w ) );
+	Vector2<double> v( 1.0, 5.0 );
+	Vector2<double> w( 3.0, 2.0 );
+	Vector2<double> min_vw( min( v, w ) );
+	Vector2<double> max_vw( max( v, w ) );
 	EXPECT_EQ( 1.0, min_vw.x );
 	EXPECT_EQ( 2.0, min_vw.y );
 	EXPECT_EQ( 3.0, max_vw.x );
@@ -190,8 +190,8 @@ TEST( Vector2Test, MinMax )
 
 TEST( Vector2Test, Comparisons )
 {
-	Vector2_double v( 1.0, 2.0 );
-	Vector2_double w( 1.0, 2.0 );
+	Vector2<double> v( 1.0, 2.0 );
+	Vector2<double> w( 1.0, 2.0 );
 
 	EXPECT_EQ( v, w );
 
@@ -225,41 +225,41 @@ TEST( Vector2Test, Comparisons )
 
 TEST( Vector2Test, Generators )
 {
-	Vector2_double v( 1.0, 12.0 );
-	Vector2_double w( 2.0, 6.0 );
-	EXPECT_EQ( Vector2_double( 3.0, 18.0 ), v + w );
-	EXPECT_EQ( Vector2_double( -1.0, 6.0 ), v - w );
-	EXPECT_EQ( Vector2_double( 2.0, 72.0 ), v * w );
-	EXPECT_EQ( Vector2_double( 0.5, 2.0 ), v / w );
+	Vector2<double> v( 1.0, 12.0 );
+	Vector2<double> w( 2.0, 6.0 );
+	EXPECT_EQ( Vector2<double>( 3.0, 18.0 ), v + w );
+	EXPECT_EQ( Vector2<double>( -1.0, 6.0 ), v - w );
+	EXPECT_EQ( Vector2<double>( 2.0, 72.0 ), v * w );
+	EXPECT_EQ( Vector2<double>( 0.5, 2.0 ), v / w );
 }
 
 TEST( Vector2Test, Distance )
 {
-	Vector2_double v( 3.0, 3.0 );
-	Vector2_double w( 3.0, 2.0 );
+	Vector2<double> v( 3.0, 3.0 );
+	Vector2<double> w( 3.0, 2.0 );
 	EXPECT_DOUBLE_EQ( 1.0, distance( v, w ) );
 	EXPECT_DOUBLE_EQ( 1.0, distance_squared( v, w ) );
 }
 
 TEST( Vector2Test, Dot )
 {
-	Vector2_double x( 3.0, 0.0 );
-	Vector2_double y( 0.0, 2.0 );
+	Vector2<double> x( 3.0, 0.0 );
+	Vector2<double> y( 0.0, 2.0 );
 	EXPECT_EQ( 0.0, dot( x, y ) );
 }
 
 TEST( Vector2Test, Cross )
 {
-	Vector2_double x( 3.0, 0.0 );
-	Vector2_double y( 0.0, 2.0 );
+	Vector2<double> x( 3.0, 0.0 );
+	Vector2<double> y( 0.0, 2.0 );
 	EXPECT_EQ( 6.0, cross( x, y ) );
 }
 
 TEST( Vector2Test, Center )
 {
-	Vector2_double x( 4.0, 0.0 );
-	Vector2_double y( 0.0, 4.0 );
-	EXPECT_EQ( Vector2_double( 2.0, 2.0 ), cen( x, y ) );
+	Vector2<double> x( 4.0, 0.0 );
+	Vector2<double> y( 0.0, 4.0 );
+	EXPECT_EQ( Vector2<double>( 2.0, 2.0 ), cen( x, y ) );
 }
 
 TEST( Vector2Test, Angle )
@@ -267,8 +267,8 @@ TEST( Vector2Test, Angle )
 	double const Pi( std::acos( -1.0 ) );
 	double const Pi_2( std::asin( 1.0 ) );
 	{
-		Vector2_double a( 4.0, 0.0 );
-		Vector2_double b( 0.0, 4.0 );
+		Vector2<double> a( 4.0, 0.0 );
+		Vector2<double> b( 0.0, 4.0 );
 		EXPECT_DOUBLE_EQ( Pi_2, angle( a, b ) );
 		EXPECT_DOUBLE_EQ( 0.0, cos( a, b ) );
 		EXPECT_DOUBLE_EQ( 1.0, sin( a, b ) );
@@ -277,8 +277,8 @@ TEST( Vector2Test, Angle )
 		EXPECT_DOUBLE_EQ( 1.0, dir_sin( a, b ) );
 	}
 	{
-		Vector2_double a( 4.0, 0.0 );
-		Vector2_double b( 0.0, -4.0 );
+		Vector2<double> a( 4.0, 0.0 );
+		Vector2<double> b( 0.0, -4.0 );
 		EXPECT_DOUBLE_EQ( Pi_2, angle( a, b ) );
 		EXPECT_DOUBLE_EQ( 0.0, cos( a, b ) );
 		EXPECT_DOUBLE_EQ( 1.0, sin( a, b ) );
@@ -287,8 +287,8 @@ TEST( Vector2Test, Angle )
 		EXPECT_DOUBLE_EQ( -1.0, dir_sin( a, b ) );
 	}
 	{
-		Vector2_double a( 4.0, 0.0 );
-		Vector2_double b( -1.0, 0.0 );
+		Vector2<double> a( 4.0, 0.0 );
+		Vector2<double> b( -1.0, 0.0 );
 		EXPECT_DOUBLE_EQ( Pi, angle( a, b ) );
 		EXPECT_DOUBLE_EQ( -1.0, cos( a, b ) );
 		EXPECT_DOUBLE_EQ( 0.0, sin( a, b ) );
@@ -300,16 +300,16 @@ TEST( Vector2Test, Angle )
 
 TEST( Vector2Test, BinaryOperations )
 {
-	Vector2_double v( 1.0, 2.0 );
-	Vector2_double w( 1.0, 2.0 );
-	Vector2_double const original( v );
+	Vector2<double> v( 1.0, 2.0 );
+	Vector2<double> w( 1.0, 2.0 );
+	Vector2<double> const original( v );
 
 	// Check dot product of equal vectors
 	EXPECT_DOUBLE_EQ( v.length_squared(), dot( v, w ) ); // v == w here
 
 	// Check midpoint (should match original vector)
 	v += 1.0; w -= 1.0;
-	Vector2_double const midpoint( mid( v, w ) );
+	Vector2<double> const midpoint( mid( v, w ) );
 	EXPECT_DOUBLE_EQ( original.x, midpoint.x );
 	EXPECT_DOUBLE_EQ( original.y, midpoint.y );
 }
@@ -317,10 +317,10 @@ TEST( Vector2Test, BinaryOperations )
 TEST( Vector2Test, String )
 {
 	std::string const X( "X" );
-	Vector2_string v( X );
+	Vector2<std::string> v( X );
 	EXPECT_EQ( X, v.x );
 	EXPECT_EQ( X, v.y );
-	Vector2_string w;
+	Vector2<std::string> w;
 	w = v;
 	EXPECT_EQ( X, w.x );
 	EXPECT_EQ( X, w.y );

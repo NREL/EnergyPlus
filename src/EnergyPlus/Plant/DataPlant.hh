@@ -92,7 +92,8 @@ namespace DataPlant {
     constexpr Real64 LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
     constexpr Real64 DeltaTempTol(0.0001); // minimum significant loop temperature difference
 
-    constexpr std::string_view cPressureSimType(DataPlant::iPressSimType const &d) {
+    constexpr std::string_view cPressureSimType(DataPlant::iPressSimType const &d)
+    {
         switch (d) {
         case DataPlant::iPressSimType::NoPressure:
             return "NONE";
@@ -106,7 +107,6 @@ namespace DataPlant {
             assert(false);
             return "";
         }
-
     }
 
     // Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
@@ -219,15 +219,16 @@ namespace DataPlant {
     // const Real64 sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
     // const Real64 square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
     // const Real64 sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
-     constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
-     constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
-     constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
+    constexpr Real64 sum_ConvergenceHistoryARR(-10.0);
+    constexpr Real64 square_sum_ConvergenceHistoryARR(100.0);
+    constexpr Real64 sum_square_ConvergenceHistoryARR(30.0);
 
 } // namespace DataPlant
 
-struct DataPlantData : BaseGlobalStruct {
+struct DataPlantData : BaseGlobalStruct
+{
 
-    int TotNumLoops = 0;   // number of plant and condenser loops
+    int TotNumLoops = 0;     // number of plant and condenser loops
     int TotNumHalfLoops = 0; // number of half loops (2 * TotNumLoops)
     bool PlantFirstSizeCompleted = false;
     bool PlantFirstSizesOkayToFinalize = false; // true if plant sizing is finishing and can save results
