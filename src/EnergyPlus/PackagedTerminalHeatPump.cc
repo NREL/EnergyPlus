@@ -8496,7 +8496,7 @@ void CalcVarSpeedHeatPump(EnergyPlusData &state,
     using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    constexpr Real64 ErrTolerance(0.001);                               // convergence limit for hotwater coil
+    constexpr Real64 ErrTolerance(0.001); // convergence limit for hotwater coil
     constexpr int SolveMaxIter(50);
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

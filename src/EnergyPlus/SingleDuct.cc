@@ -5978,11 +5978,11 @@ void GetATMixers(EnergyPlusData &state)
     int ATMixerNum; // Index of inlet side mixer air terminal unit
     int IOStat;
     static constexpr std::string_view RoutineName("GetATMixers: "); // include trailing blank space
-    bool ErrorsFound(false);                               // Error flag
-    int NodeNum;                                           // Index to node number
-    int CtrlZone;                                          // Index to control zone
-    bool ZoneNodeNotFound;                                 // Flag for error checking
-    bool errFlag;                                          // error flag from component validation
+    bool ErrorsFound(false);                                        // Error flag
+    int NodeNum;                                                    // Index to node number
+    int CtrlZone;                                                   // Index to control zone
+    bool ZoneNodeNotFound;                                          // Flag for error checking
+    bool errFlag;                                                   // error flag from component validation
 
     if (!state.dataSingleDuct->GetATMixerFlag) {
         return;

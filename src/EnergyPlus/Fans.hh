@@ -276,8 +276,8 @@ namespace Fans {
     );
 
     Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
-                                      std::string_view FanType,     // must match fan types in this module
-                                      std::string_view FanName,     // must match fan names for the fan type
+                                      std::string_view FanType,       // must match fan types in this module
+                                      std::string_view FanName,       // must match fan names for the fan type
                                       bool &ErrorsFound,              // set to true if problem
                                       Optional_int_const FanIndex = _ // index to fan
     );
@@ -285,7 +285,7 @@ namespace Fans {
     int GetFanInletNode(EnergyPlusData &state,
                         std::string_view FanType, // must match fan types in this module
                         std::string_view FanName, // must match fan names for the fan type
-                        bool &ErrorsFound           // set to true if problem
+                        bool &ErrorsFound         // set to true if problem
     );
 
     int getFanInNodeIndex(EnergyPlusData &state,

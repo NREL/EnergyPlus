@@ -174,13 +174,13 @@ namespace SurfaceGeometry {
 
     void CheckWindowShadingControlFrameDivider(EnergyPlusData &state,
                                                std::string_view const cRoutineName, // routine name calling this one (for error messages)
-                                               bool &ErrorsFound,               // true if errors have been found or are found here
-                                               int const SurfNum,               // current surface number
-                                               int const FrameField             // field number for frame/divider
+                                               bool &ErrorsFound,                   // true if errors have been found or are found here
+                                               int const SurfNum,                   // current surface number
+                                               int const FrameField                 // field number for frame/divider
     );
 
     void CheckSubSurfaceMiscellaneous(EnergyPlusData &state,
-                                      std::string_view const cRoutineName,           // routine name calling this one (for error messages)
+                                      std::string_view const cRoutineName,       // routine name calling this one (for error messages)
                                       bool &ErrorsFound,                         // true if errors have been found or are found here
                                       int const SurfNum,                         // current surface number
                                       std::string const &SubSurfaceName,         // name of the surface

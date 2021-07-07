@@ -239,16 +239,16 @@ namespace UnitHeater {
         using WaterCoils::GetCoilWaterInletNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ErrorsFound(false);                                      // Set to true if errors in input, fatal at end of routine
-        int IOStatus;                                                 // Used in GetObjectItem
-        bool IsNotOK;                                                 // TRUE if there was a problem with a list name
-        bool errFlag(false);                                          // interim error flag
-        int NumAlphas;                                                // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                                               // Number of Numbers for each GetObjectItem call
-        int NumFields;                                                // Total number of fields in object
-        int UnitHeatNum;                                              // Item to be "gotten"
+        bool ErrorsFound(false);                                               // Set to true if errors in input, fatal at end of routine
+        int IOStatus;                                                          // Used in GetObjectItem
+        bool IsNotOK;                                                          // TRUE if there was a problem with a list name
+        bool errFlag(false);                                                   // interim error flag
+        int NumAlphas;                                                         // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                                                        // Number of Numbers for each GetObjectItem call
+        int NumFields;                                                         // Total number of fields in object
+        int UnitHeatNum;                                                       // Item to be "gotten"
         static constexpr std::string_view RoutineName("GetUnitHeaterInput: "); // include trailing blank space
-        Real64 FanVolFlow;                                            // Fan volumetric flow rate
+        Real64 FanVolFlow;                                                     // Fan volumetric flow rate
         std::string CurrentModuleObject;
         Array1D_string Alphas;         // Alpha items for object
         Array1D<Real64> Numbers;       // Numeric items for object

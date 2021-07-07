@@ -162,10 +162,10 @@ namespace PoweredInductionUnits {
 
     void SimPIU(EnergyPlusData &state,
                 std::string_view CompName, // name of the PIU
-                bool FirstHVACIteration,     // TRUE if first HVAC iteration in time step
-                int ZoneNum,                 // index of zone served by PIU
-                int ZoneNodeNum,             // zone node number of zone served by PIU
-                int &CompIndex               // PIU Index in PIU names
+                bool FirstHVACIteration,   // TRUE if first HVAC iteration in time step
+                int ZoneNum,               // index of zone served by PIU
+                int ZoneNodeNum,           // zone node number of zone served by PIU
+                int &CompIndex             // PIU Index in PIU names
     );
 
     void GetPIUs(EnergyPlusData &state);

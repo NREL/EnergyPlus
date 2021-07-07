@@ -341,8 +341,8 @@ namespace HVACDXSystem {
         int NumNums;
         int IOStat;
         static constexpr std::string_view RoutineName("GetDXCoolingSystemInput: "); // include trailing blank space
-        bool ErrorsFound(false);                                           // If errors detected in input
-        bool IsNotOK;                                                      // Flag to verify name
+        bool ErrorsFound(false);                                                    // If errors detected in input
+        bool IsNotOK;                                                               // Flag to verify name
         int DXCoolSysNum;
         bool FanErrorsFound;             // flag returned on fan operating mode check
         bool DXErrorsFound;              // flag returned on DX coil name check

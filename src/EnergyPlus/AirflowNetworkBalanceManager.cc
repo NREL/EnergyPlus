@@ -12388,9 +12388,9 @@ namespace AirflowNetworkBalanceManager {
         auto &NumHybridVentSysAvailMgrs = state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const HybridVentCtrl_Close(2);                                  // Open windows or doors
-        int const IndividualCtrlType(0);                                    // Individual window or door control
-        int const GlobalCtrlType(1);                                        // Global window or door control
+        int const HybridVentCtrl_Close(2);                                           // Open windows or doors
+        int const IndividualCtrlType(0);                                             // Individual window or door control
+        int const GlobalCtrlType(1);                                                 // Global window or door control
         static constexpr std::string_view RoutineName("HybridVentilationControl: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

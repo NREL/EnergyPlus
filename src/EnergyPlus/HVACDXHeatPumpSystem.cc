@@ -270,7 +270,7 @@ namespace HVACDXHeatPumpSystem {
         int NumNums;
         int IOStat;
         static constexpr std::string_view RoutineName("GetDXHeatPumpSystemInput: "); // include trailing blank space
-        bool IsNotOK;                                                       // Flag to verify name
+        bool IsNotOK;                                                                // Flag to verify name
         int DXHeatSysNum;
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string Alphas;           // Alpha input items for object

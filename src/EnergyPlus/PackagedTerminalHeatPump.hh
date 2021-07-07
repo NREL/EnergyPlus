@@ -338,12 +338,12 @@ namespace PackagedTerminalHeatPump {
 
     void SimPackagedTerminalUnit(EnergyPlusData &state,
                                  std::string_view CompName, // name of the packaged terminal heat pump
-                                 int ZoneNum,                 // number of zone being served
-                                 bool FirstHVACIteration,     // TRUE if 1st HVAC simulation of system timestep
-                                 Real64 &QUnitOut,            // sensible capacity delivered to zone
-                                 Real64 &LatOutputProvided,   // Latent add/removal by packaged terminal unit (kg/s), dehumid = negative
-                                 int PTUnitType,              // indicates whether PTAC, PTHP or PTWSHP
-                                 int &CompIndex               // index to Packaged Terminal Heat Pump
+                                 int ZoneNum,               // number of zone being served
+                                 bool FirstHVACIteration,   // TRUE if 1st HVAC simulation of system timestep
+                                 Real64 &QUnitOut,          // sensible capacity delivered to zone
+                                 Real64 &LatOutputProvided, // Latent add/removal by packaged terminal unit (kg/s), dehumid = negative
+                                 int PTUnitType,            // indicates whether PTAC, PTHP or PTWSHP
+                                 int &CompIndex             // index to Packaged Terminal Heat Pump
     );
 
     void SimPTUnit(EnergyPlusData &state,

@@ -250,7 +250,7 @@ void GetFanInput(EnergyPlusData &state)
     int NumNums;
     int checkNum;
     int IOStat;
-    bool ErrorsFound(false);                               // If errors detected in input
+    bool ErrorsFound(false);                                        // If errors detected in input
     static constexpr std::string_view RoutineName("GetFanInput: "); // include trailing blank space
     Array1D_string cAlphaFieldNames;
     Array1D_string cNumericFieldNames;

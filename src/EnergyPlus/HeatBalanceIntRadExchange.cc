@@ -2086,7 +2086,7 @@ namespace HeatBalanceIntRadExchange {
             ShowSevereError(state,
                             std::string{routineName} + "Somehow  the surface enclosure number is zero for" + cCurrentModuleObject + " = " +
                                 RadSysName + " and Surface = " + SurfaceName); // LCOV_EXCL_LINE
-            ErrorsFound = true;                                   // LCOV_EXCL_LINE
+            ErrorsFound = true;                                                // LCOV_EXCL_LINE
         } else if (surfRadEnclNum != radSysEnclNum) {
             ShowSevereError(
                 state, std::string{routineName} + "Surface = " + SurfaceName + " is not in the same zone or enclosure as the radiant equipment.");

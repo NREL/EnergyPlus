@@ -6856,7 +6856,7 @@ namespace UnitarySystems {
                 }
                 input_spec.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_inlet_node_name")));   // required
                 input_spec.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_outlet_node_name"))); // required
-                if (fields.find("supply_fan_object_type") != fields.end()) {                                         // not required field
+                if (fields.find("supply_fan_object_type") != fields.end()) {                                                   // not required field
                     input_spec.supply_fan_object_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("supply_fan_object_type")));
                 }
 

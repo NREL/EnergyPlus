@@ -762,7 +762,7 @@ void GetDXCoils(EnergyPlusData &state)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetDXCoils: "); // include trailing blank space
-    constexpr Real64 minOATCompDXCooling = -25.0;         // min OAT for compressor operation for DX cooling coils
+    constexpr Real64 minOATCompDXCooling = -25.0;                  // min OAT for compressor operation for DX cooling coils
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int DXCoilIndex;                 // loop index

@@ -78,20 +78,18 @@ void CloseOutOpenFiles();
 int EndEnergyPlus(EnergyPlusData &state);
 
 void ConvertCaseToUpper(std::string_view InputString, // Input string
-                        std::string &OutputString       // Output string (in UpperCase)
+                        std::string &OutputString     // Output string (in UpperCase)
 );
 
 void ConvertCaseToLower(std::string_view InputString, // Input string
-                        std::string &OutputString       // Output string (in LowerCase)
+                        std::string &OutputString     // Output string (in LowerCase)
 );
-
 
 // useful for forcing a conversion to a string reference for JSON objects
 inline const std::string &AsString(const std::string &value)
 {
     return value;
 }
-
 
 std::string::size_type FindNonSpace(std::string const &String); // String to be scanned
 
@@ -277,7 +275,8 @@ namespace UtilityRoutines {
 
     template <typename Container, class = typename std::enable_if<!std::is_same<typename Container::value_type, std::string>::value>::type>
     // Container needs operator[i] and value_type
-    inline int FindItemInList(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
+    inline int
+    FindItemInList(std::string_view const String, Container const &ListOfItems, std::string Container::value_type::*name_p, int const NumItems)
     {
         for (typename Container::size_type i = 0, e = NumItems; i < e; ++i) {
             if (String == ListOfItems[i].*name_p) return int(i + 1); // 1-based return index
@@ -299,7 +298,8 @@ namespace UtilityRoutines {
         return FindItemInSortedList(String, ListOfItems, ListOfItems.isize());
     }
 
-    template <typename A> inline int FindItemInSortedList(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
+    template <typename A>
+    inline int FindItemInSortedList(std::string_view const String, MArray1<A, std::string> const &ListOfItems, int const NumItems)
     {
         int Probe(0);
         int LBnd(0);
@@ -427,7 +427,6 @@ namespace UtilityRoutines {
     {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
-
 
     std::string MakeUPPERCase(std::string_view const InputString); // Input String
 

@@ -154,7 +154,7 @@ namespace TranspiredCollector {
 
     void SimTranspiredCollector(EnergyPlusData &state,
                                 std::string_view CompName, // component name
-                                int &CompIndex               // component index (to reduce string compares during simulation)
+                                int &CompIndex             // component index (to reduce string compares during simulation)
     );
 
     void GetTranspiredCollectorInput(EnergyPlusData &state);

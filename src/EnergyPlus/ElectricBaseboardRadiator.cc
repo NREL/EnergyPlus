@@ -189,8 +189,8 @@ namespace ElectricBaseboardRadiator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
-        Real64 const MaxFraction(1.0);                               // Maximum limit of fractional values
-        Real64 const MinFraction(0.0);                               // Minimum limit of fractional values
+        Real64 const MaxFraction(1.0);                                        // Maximum limit of fractional values
+        Real64 const MinFraction(0.0);                                        // Minimum limit of fractional values
         //    INTEGER,PARAMETER :: MaxDistribSurfaces   = 20      ! Maximum number of surfaces that a baseboard heater can radiate to
         int const MinDistribSurfaces(1);                  // Minimum number of surfaces that a baseboard heater can radiate to
         int const iHeatCAPMAlphaNum(3);                   // get input index to HW baseboard heating capacity sizing method

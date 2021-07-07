@@ -141,12 +141,12 @@ namespace BranchNodeConnections {
                          bool &ErrorsFound);
 
     void SetUpCompSets(EnergyPlusData &state,
-                       std::string_view ParentType,        // Parent Object Type
-                       std::string_view ParentName,        // Parent Object Name
-                       std::string_view CompType,          // Component Type
-                       std::string_view CompName,          // Component Name
-                       std::string_view InletNode,         // Inlet Node Name
-                       std::string_view OutletNode,        // Outlet Node Name
+                       std::string_view ParentType,          // Parent Object Type
+                       std::string_view ParentName,          // Parent Object Name
+                       std::string_view CompType,            // Component Type
+                       std::string_view CompName,            // Component Name
+                       std::string_view InletNode,           // Inlet Node Name
+                       std::string_view OutletNode,          // Outlet Node Name
                        Optional_string_const Description = _ // Description
     );
 
@@ -154,7 +154,7 @@ namespace BranchNodeConnections {
 
     void TestCompSet(EnergyPlusData &state,
                      std::string const &CompType,   // Component Type
-                     std::string_view CompName,   // Component Name
+                     std::string_view CompName,     // Component Name
                      std::string const &InletNode,  // Inlet Node Name
                      std::string const &OutletNode, // Outlet Node Name
                      std::string const &Description // Description of Node Pair (for warning message)

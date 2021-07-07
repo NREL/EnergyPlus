@@ -878,7 +878,7 @@ namespace OutputProcessor {
 
     TimeStepType ValidateTimeStepType(EnergyPlusData &state,
                                       std::string const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
-                                      std::string_view CalledFrom       // Routine called from (for error messages)
+                                      std::string_view CalledFrom         // Routine called from (for error messages)
     )
     {
 

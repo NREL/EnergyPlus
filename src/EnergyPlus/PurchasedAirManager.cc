@@ -218,12 +218,12 @@ void GetPurchasedAir(EnergyPlusData &state)
     int NumAlphas;
     int NumNums;
     int IOStat;
-    int CtrlZone;                                              // zone index
-    int NodeNum;                                               // node index
+    int CtrlZone;                                                       // zone index
+    int NodeNum;                                                        // node index
     static constexpr std::string_view RoutineName("GetPurchasedAir: "); // include trailing blank space
-    bool ErrorsFound(false);                                   // If errors detected in input
-    bool IsOANodeListed;                                       // Flag for OA node name listed in OutdoorAir:Node or Nodelist
-    bool UniqueNodeError;                                      // Flag for non-unique node error(s)
+    bool ErrorsFound(false);                                            // If errors detected in input
+    bool IsOANodeListed;                                                // Flag for OA node name listed in OutdoorAir:Node or Nodelist
+    bool UniqueNodeError;                                               // Flag for non-unique node error(s)
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "ZoneHVAC:IdealLoadsAirSystem";
 

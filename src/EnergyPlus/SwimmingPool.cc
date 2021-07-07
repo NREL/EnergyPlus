@@ -155,11 +155,11 @@ void GetSwimmingPool(EnergyPlusData &state)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetSwimmingPool: "); // include trailing blank space
-    Real64 const MinCoverFactor(0.0);                          // minimum value for cover factors
-    Real64 const MaxCoverFactor(1.0);                          // maximum value for cover factors
-    Real64 const MinDepth(0.05);                               // minimum average pool depth (to avoid obvious input errors)
-    Real64 const MaxDepth(10.0);                               // maximum average pool depth (to avoid obvious input errors)
-    Real64 const MinPowerFactor(0.0);                          // minimum power factor for miscellaneous equipment
+    Real64 const MinCoverFactor(0.0);                                   // minimum value for cover factors
+    Real64 const MaxCoverFactor(1.0);                                   // maximum value for cover factors
+    Real64 const MinDepth(0.05);                                        // minimum average pool depth (to avoid obvious input errors)
+    Real64 const MaxDepth(10.0);                                        // maximum average pool depth (to avoid obvious input errors)
+    Real64 const MinPowerFactor(0.0);                                   // minimum power factor for miscellaneous equipment
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound(false);         // Set to true if something goes wrong

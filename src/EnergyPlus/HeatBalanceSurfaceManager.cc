@@ -163,7 +163,6 @@ using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 using namespace MultiLayerOptics;
 
-
 // These are now external subroutines
 // PUBLIC  CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
 // PUBLIC  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate

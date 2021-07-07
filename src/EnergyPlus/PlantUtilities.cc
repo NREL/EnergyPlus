@@ -1768,10 +1768,10 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
 }
 
 void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
-                              std::string_view const CallerName,  // really used for error messages
-                              int const NodeNum,                  // index in Node structure of node to be scanned
-                              int &LoopNum,                       // return value for plant loop
-                              int &LoopSideNum,                   // return value for plant loop side
+                              std::string_view const CallerName, // really used for error messages
+                              int const NodeNum,                 // index in Node structure of node to be scanned
+                              int &LoopNum,                      // return value for plant loop
+                              int &LoopSideNum,                  // return value for plant loop side
                               int &BranchNum,
                               Optional_int CompNum)
 {

@@ -804,8 +804,8 @@ namespace UnitarySystems {
         {
         }
 
-        static void getUnitarySystemInputData(
-            EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+        static void
+        getUnitarySystemInputData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
@@ -842,9 +842,9 @@ namespace UnitarySystems {
 
         static void getUnitarySysHeatCoolCoil(EnergyPlusData &state,
                                               std::string_view UnitarySysName, // Name of Unitary System object
-                                              bool &CoolingCoil,                 // Cooling coil exists
-                                              bool &HeatingCoil,                 // Heating coil exists
-                                              int const ZoneOAUnitNum            // index to zone OA unit
+                                              bool &CoolingCoil,               // Cooling coil exists
+                                              bool &HeatingCoil,               // Heating coil exists
+                                              int const ZoneOAUnitNum          // index to zone OA unit
         );
 
         static Real64 calcUnitarySystemWaterFlowResidual(EnergyPlusData &state,
