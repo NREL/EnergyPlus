@@ -106,6 +106,44 @@ namespace SimAirServingZones {
     constexpr int ZoneVRFasAirLoopEquip(30);
     constexpr int CoilSystemWater(31);
 
+    enum class CompType
+    {
+        Unassigned = -1,
+        OAMixer_Num,
+        Fan_Simple_CV,
+        Fan_Simple_VAV,
+        WaterCoil_SimpleCool,
+        WaterCoil_Cooling,
+        WaterCoil_SimpleHeat,
+        SteamCoil_AirHeat,
+        WaterCoil_DetailedCool,
+        Coil_ElectricHeat,
+        Coil_GasHeat,
+        WaterCoil_CoolingHXAsst,
+        DXCoil_CoolingHXAsst,
+        Coil_DeSuperHeat,
+        DXSystem,
+        HeatXchngr,
+        Desiccant,
+        Unglazed_SolarCollector,
+        EvapCooler,
+        Furnace_UnitarySys_HeatOnly,
+        Furnace_UnitarySys_HeatCool,
+        Humidifier,
+        Duct,
+        UnitarySystem_BypassVAVSys,
+        UnitarySystem_MSHeatPump,
+        Fan_ComponentModel,
+        DXHeatPumpSystem,
+        CoilUserDefined,
+        Fan_System_Object,
+        UnitarySystemModel,
+        ZoneVRFasAirLoopEquip,
+        PVT_AirBased,
+        VRFTerminalUnit,
+        CoilSystemWater
+    };
+
     void ManageAirLoops(EnergyPlusData &state,
                         bool FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &SimAir,            // TRUE means air loops must be (re)simulated
@@ -150,7 +188,7 @@ namespace SimAirServingZones {
 
     void SimAirLoopComponent(EnergyPlusData &state,
                              std::string const &CompName, // the component Name
-                             int CompType_Num,            // numeric equivalent for component type
+                             CompType CompType_Num,       // numeric equivalent for component type
                              bool FirstHVACIteration,     // TRUE if first full HVAC iteration in an HVAC timestep
                              int AirLoopNum,              // Primary air loop number
                              int &CompIndex,              // numeric pointer for CompType/CompName -- passed back from other routines
@@ -194,14 +232,17 @@ namespace SimAirServingZones {
                           Real64 &SystemCoolingEv // system ventilation efficiency
     );
 
-    void CheckWaterCoilIsOnAirLoop(
-        EnergyPlusData &state, int CoilTypeNum, std::string const &CompType, std::string const &CompName, bool &WaterCoilOnAirLoop);
+    void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state,
+                                   SimAirServingZones::CompType CompTypeNum,
+                                   std::string const &CompType,
+                                   std::string const &CompName,
+                                   bool &WaterCoilOnAirLoop);
 
-    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
+    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, SimAirServingZones::CompType CompTypeNum, std::string const &CompName);
 
-    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
+    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, SimAirServingZones::CompType CompTypeNum, std::string const &CompName);
 
-    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int CoilTypeNum, std::string const &CompName);
+    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, SimAirServingZones::CompType CoilTypeNum, std::string const &CompName);
 
 } // namespace SimAirServingZones
 

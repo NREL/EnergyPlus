@@ -235,7 +235,7 @@ namespace UnitarySystems {
         Real64 m_DesignCoolingCapacity;
         Real64 m_MaxCoolAirVolFlow;
         int m_CondenserNodeNum;
-        int m_CondenserType;
+        DataHeatBalance::RefrigCondenserType m_CondenserType;
         int m_CoolingCoilIndex;
         bool m_HeatPump;
         int m_ActualDXCoilIndexForHXAssisted;
