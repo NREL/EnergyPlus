@@ -2350,7 +2350,7 @@ namespace WindowManager {
                 state.dataWindowManager->thetas(i) = window.ThetaFace(i);
             }
             state.dataWindowManager->hcout = HextConvCoeff;
-            state.dataWindowManager->hcin = state.dataHeatBal->HConvIn(SurfNum);
+            state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
             state.dataWindowManager->tin = state.dataHeatBalFanSys->MAT(surface.Zone) + state.dataWindowManager->TKelvin; // Inside air temperature
 
             // This is code repeating and it is necessary to calculate report variables.  Do not know
@@ -2436,7 +2436,7 @@ namespace WindowManager {
             state.dataWindowManager->tilt = surface.Tilt;
             state.dataWindowManager->tiltr = state.dataWindowManager->tilt * DataGlobalConstants::DegToRadians;
             SurfNumAdj = surface.ExtBoundCond;
-            state.dataWindowManager->hcin = state.dataHeatBal->HConvIn(SurfNum); // Room-side surface convective film conductance
+            state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum); // Room-side surface convective film conductance
 
             // determine reference air temperature for this surface
             {
@@ -2497,7 +2497,7 @@ namespace WindowManager {
                     state.dataHeatBal->LowHConvLimit) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
                     //  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
                     state.dataWindowManager->hcin = state.dataHeatBal->LowHConvLimit;
-                    state.dataHeatBal->HConvIn(SurfNum) = state.dataWindowManager->hcin; // store for accurate reporting.
+                    state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataWindowManager->hcin; // store for accurate reporting.
                 }
             }
 
@@ -2899,17 +2899,17 @@ namespace WindowManager {
             InsideGlassTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->TKelvin;
             RoomHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(surface.Zone);
             RoomDewPoint = PsyTdpFnWPb(state, RoomHumRat, state.dataEnvrn->OutBaroPress);
-            state.dataSurface->InsideGlassCondensationFlag(SurfNum) = 0;
-            if (InsideGlassTemp < RoomDewPoint) state.dataSurface->InsideGlassCondensationFlag(SurfNum) = 1;
+            state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfNum) = 0;
+            if (InsideGlassTemp < RoomDewPoint) state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfNum) = 1;
             // If airflow window, is there condensation on either glass face of the airflow gap?
             if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
                 Tleft = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer - 2) - state.dataWindowManager->TKelvin;
                 Tright = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer - 1) - state.dataWindowManager->TKelvin;
                 if (state.dataSurface->SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
-                    if (Tleft < RoomDewPoint || Tright < RoomDewPoint) state.dataSurface->InsideGlassCondensationFlag(SurfNum) = 1;
+                    if (Tleft < RoomDewPoint || Tright < RoomDewPoint) state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfNum) = 1;
                 } else if (state.dataSurface->SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_OutdoorAir) {
                     if (Tleft < state.dataEnvrn->OutDewPointTemp || Tright < state.dataEnvrn->OutDewPointTemp)
-                        state.dataSurface->InsideGlassCondensationFlag(SurfNum) = 1;
+                        state.dataSurface->SurfWinInsideGlassCondensationFlag(SurfNum) = 1;
                 }
             }
 
@@ -2924,13 +2924,13 @@ namespace WindowManager {
                                             state.dataWindowManager->Outir,
                                             ConstrNum);
             if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
-                state.dataSurface->InsideFrameCondensationFlag(SurfNum) = 0;
-                if (state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) < RoomDewPoint) state.dataSurface->InsideFrameCondensationFlag(SurfNum) = 1;
+                state.dataSurface->SurfWinInsideFrameCondensationFlag(SurfNum) = 0;
+                if (state.dataSurface->SurfWinFrameTempIn(SurfNum) < RoomDewPoint) state.dataSurface->SurfWinInsideFrameCondensationFlag(SurfNum) = 1;
             }
             if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0) {
-                state.dataSurface->InsideDividerCondensationFlag(SurfNum) = 0;
-                if (state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) < RoomDewPoint)
-                    state.dataSurface->InsideDividerCondensationFlag(SurfNum) = 1;
+                state.dataSurface->SurfWinInsideDividerCondensationFlag(SurfNum) = 0;
+                if (state.dataSurface->SurfWinDividerTempIn(SurfNum) < RoomDewPoint)
+                    state.dataSurface->SurfWinInsideDividerCondensationFlag(SurfNum) = 1;
             }
         }
         // update exterior environment surface heat loss reporting
@@ -3932,7 +3932,7 @@ namespace WindowManager {
                                                SurfNum,
                                                state.dataWindowManager->thetas(InsideFaceIndex) - DataGlobalConstants::KelvinConv,
                                                state.dataWindowManager->tin - DataGlobalConstants::KelvinConv);
-                state.dataWindowManager->hcin = state.dataHeatBal->HConvIn(SurfNum);
+                state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
             }
 
             Aface = 0.0;
@@ -6469,7 +6469,7 @@ namespace WindowManager {
             TInRadFr = TInRad * root_4((1.0 + 0.5 * ProjCorrFrIn) / (1.0 + ProjCorrFrIn));
             FrameCon = state.dataSurface->SurfWinFrameConductance(SurfNum);
             HInRad = 0.5 * state.dataSurface->SurfWinFrameEmis(SurfNum) * state.dataWindowManager->sigma *
-                     pow_3(TInRadFr + state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) + state.dataWindowManager->TKelvin);
+                     pow_3(TInRadFr + state.dataSurface->SurfWinFrameTempIn(SurfNum) + state.dataWindowManager->TKelvin);
             HInConvFr = HInConv;
             HOutRad = 0.5 * state.dataSurface->SurfWinFrameEmis(SurfNum) * state.dataWindowManager->sigma *
                       pow_3(TOutRadFr + state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) + state.dataWindowManager->TKelvin);
@@ -6494,16 +6494,15 @@ namespace WindowManager {
             Bfac = FrameCon / (HOutRad + FrameCon + HOutConvFr);
             Dfac = (HInRad * TInRadFr + HInConvFr * tin + state.dataSurface->SurfWinFrameQRadInAbs(SurfNum)) / (HInRad + FrameCon + HInConvFr);
             Efac = FrameCon / (HInRad + FrameCon + HInConvFr);
-            state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) = (Dfac + Efac * Afac) / (1.0 - Efac * Bfac) - state.dataWindowManager->TKelvin;
+            state.dataSurface->SurfWinFrameTempIn(SurfNum) = (Dfac + Efac * Afac) / (1.0 - Efac * Bfac) - state.dataWindowManager->TKelvin;
             state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) =
-                Afac + Bfac * (state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) + state.dataWindowManager->TKelvin) -
-                state.dataWindowManager->TKelvin;
+                Afac + Bfac * (state.dataSurface->SurfWinFrameTempIn(SurfNum) + state.dataWindowManager->TKelvin) - state.dataWindowManager->TKelvin;
             // Heat gain to zone from frame
 
             FrameHeatTransfer = state.dataSurface->SurfWinFrameArea(SurfNum) * FrameCon *
-                                (state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) - state.dataSurface->SurfWinFrameTempSurfIn(SurfNum));
+                                (state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) - state.dataSurface->SurfWinFrameTempIn(SurfNum));
             FrameHeatGain = state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
-                            (HInConvFr * (state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) + state.dataWindowManager->TKelvin - tin));
+                            (HInConvFr * (state.dataSurface->SurfWinFrameTempIn(SurfNum) + state.dataWindowManager->TKelvin - tin));
 
             if (FrameHeatGain > 0.0) {
                 state.dataSurface->SurfWinFrameHeatGain(SurfNum) = FrameHeatGain;
@@ -6539,7 +6538,7 @@ namespace WindowManager {
             TInRadDiv = TInRad * root_4((1.0 + state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) /
                                         (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)));
             HInRad = 0.5 * DivEmisIn * state.dataWindowManager->sigma *
-                     pow_3(TInRadDiv + state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) + state.dataWindowManager->TKelvin);
+                     pow_3(TInRadDiv + state.dataSurface->SurfWinDividerTempIn(SurfNum) + state.dataWindowManager->TKelvin);
             HOutRad = 0.5 * DivEmisOut * state.dataWindowManager->sigma *
                       pow_3(TOutRadDiv + state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) + state.dataWindowManager->TKelvin);
             HOutConvDiv = HOutConv;
@@ -6572,17 +6571,17 @@ namespace WindowManager {
             Bfac = DivCon / (HOutRad + DivCon + HOutConvDiv);
             Dfac = (HInRad * TInRadDiv + HInConvDiv * tin + state.dataSurface->SurfWinDividerQRadInAbs(SurfNum)) / (HInRad + DivCon + HInConvDiv);
             Efac = DivCon / (HInRad + DivCon + HInConvDiv);
-            state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) = (Dfac + Efac * Afac) / (1 - Efac * Bfac) - state.dataWindowManager->TKelvin;
+            state.dataSurface->SurfWinDividerTempIn(SurfNum) = (Dfac + Efac * Afac) / (1 - Efac * Bfac) - state.dataWindowManager->TKelvin;
             state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) =
-                Afac + Bfac * (state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) + state.dataWindowManager->TKelvin) -
+                Afac + Bfac * (state.dataSurface->SurfWinDividerTempIn(SurfNum) + state.dataWindowManager->TKelvin) -
                 state.dataWindowManager->TKelvin;
             // Contribution of divider to window heat gain
             ProjCorrWinHeatGain = 1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum);
 
             DividerHeatGain = state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
-                              (HInConvDiv * (state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) + state.dataWindowManager->TKelvin - tin));
+                              (HInConvDiv * (state.dataSurface->SurfWinDividerTempIn(SurfNum) + state.dataWindowManager->TKelvin - tin));
             DividerHeatTransfer = state.dataSurface->SurfWinDividerArea(SurfNum) * DivCon *
-                                  (state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) - state.dataSurface->SurfWinDividerTempSurfIn(SurfNum));
+                                  (state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) - state.dataSurface->SurfWinDividerTempIn(SurfNum));
 
             if (DividerHeatGain > 0.0) {
                 state.dataSurface->SurfWinDividerHeatGain(SurfNum) = DividerHeatGain;

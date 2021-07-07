@@ -2117,7 +2117,6 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> SurfQRadSWOutIncBmToBmReflObs;      // Exterior beam solar incident from beam-to-beam reflection from obstructions (W/m2)
     Array1D<Real64> SurfQRadSWOutIncBmToDiffReflObs;    // Exterior diffuse solar incident from beam-to-diffuse reflection from obstructions (W/m2)
     Array1D<Real64> SurfQRadSWOutIncSkyDiffReflObs;     // Exterior diffuse solar incident from sky diffuse reflection from obstructions (W/m2)
-    Array1D<Real64> SurfCosIncidenceAngle;              // Cosine of beam solar incidence angle (for reporting)
     Array1D<Real64> SurfSWInAbsTotalReport;             // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
     Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
     Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
@@ -2137,31 +2136,14 @@ struct HeatBalanceData : BaseGlobalStruct
     Array2D<Real64> SurfWinInitialDifSolwinAbs;         // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
     Array1D<Real64> SurfOpaqSWOutAbsTotalReport;        // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
     Array1D<Real64> SurfOpaqSWOutAbsEnergyReport;       // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
+    Array1D<Real64> SurfTempEffBulkAir;                 // air temperature adjacent to the surface used for inside surface heat balances
 
     // Material
     Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
     Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
     Array1D<Real64> CoeffAdjRatio;                  // Conductive and radiative coefficient adjustment ratio
-
-    // todo - rename and reordering
-    Array1D<Real64> SurfTempEffBulkAir;     // air temperature adjacent to the surface used for inside surface heat balances
-    Array1D<Real64> HConvIn;                // INSIDE CONVECTION COEFFICIENT
     Array1D<Real64> CoeffAdjRatioIn;        // INSIDE convective and radiative coefficient adjustment ratio
-    Array1D<Real64> SurfAnisoSkyMult;       // Multiplier on exterior-surface sky view factor to account for
-                                            // anisotropy of sky radiance; = 1.0 for for isotropic sky
-    Array1D<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array3D<Real64> DifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array1D<Real64> curDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array1D<Real64> DifShdgRatioHoriz;      // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-    Array3D<Real64> DifShdgRatioHorizHRTS;  // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-    Array1D<Real64> WithShdgIsoSky;         // Diffuse solar irradiance from sky on surface, with shading
-    Array1D<Real64> WoShdgIsoSky;           // Diffuse solar from sky on surface, without shading
-    Array1D<Real64> WithShdgHoriz;          // Diffuse solar irradiance from horizon portion of sky on surface, with shading
-    Array1D<Real64> WoShdgHoriz;            // Diffuse solar irradiance from horizon portion of sky on surface, without shading
-    Array1D<Real64> MultIsoSky;             // Contribution to eff sky view factor from isotropic sky
-    Array1D<Real64> MultCircumSolar;        // Contribution to eff sky view factor from circumsolar brightening
-    Array1D<Real64> MultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
 
     Array1D<Real64>
         EnclSolQSWRad; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
@@ -2181,22 +2163,25 @@ struct HeatBalanceData : BaseGlobalStruct
     // from interior surfaces, and beam entering through interior windows
     // (considered diffuse)
     // Originally QD, now used only for EnclSolQSDifSol calc for daylighting
+
     Array1D<Real64> EnclSolVMULT;        // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     Array1D<Real64> EnclRadQThermalRad;  // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
     Array1D<Real64> EnclRadThermAbsMult; // EnclRadThermAbsMult  - MULTIPLIER TO COMPUTE 'ITABSF'
     Array1D<bool> ZoneSolAbsFirstCalc;   // for error message
     Array1D<bool> EnclRadReCalc;         // Enclosure solar or thermal radiation properties needs to be recalc due to window/shading status change
-    bool EnclRadAlwaysReCalc = false;    // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
-    // todo - the following in absorptance branch
-    Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
-    Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
-    Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
-    Array3D<Real64> SunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction  without shadowing by the reveal
-    Array3D<Real64> CosIncAng;               // TimeStep cosine of beam radiation incidence angle on surface
-    Array4D_int
-        BackSurfaces; // For a given hour and timestep, a list of up to 20 surfaces receiving  beam solar radiation from a given exterior window
-    Array4D<Real64> OverlapAreas; // For a given hour and timestep, the areas of the exterior window sending beam solar radiation to the surfaces
-                                  // listed in BackSurfaces
+
+    bool EnclRadAlwaysReCalc = false; // Enclosure solar or thermal radiation properties always needs to be recalc at any time step
+
+    Array1D<Real64> SurfCosIncidenceAngle;       // Cosine of beam solar incidence angle (for reporting)
+    Array2D<Real64> SurfSunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
+    Array2D<Real64> SurfCosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
+    Array3D<Real64> SurfSunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
+    Array3D<Real64> SurfSunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction  without shadowing by the reveal
+    Array3D<Real64> SurfCosIncAng;               // TimeStep cosine of beam radiation incidence angle on surface
+    Array4D_int SurfWinBackSurfaces;     // For a given hour and timestep, a list of up to 20 surfaces receiving  beam solar radiation from a given
+                                         // exterior window
+    Array4D<Real64> SurfWinOverlapAreas; // For a given hour and timestep, the areas of the exterior window sending beam solar radiation to the
+                                         // surfaces listed in BackSurfaces
     Real64 zeroPointerVal = 0.0;
     int NumAirBoundaryMixing = 0;             // Number of air boundary simple mixing objects needed
     std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
@@ -2422,7 +2407,6 @@ struct HeatBalanceData : BaseGlobalStruct
         this->SurfQRadSWOutIncBmToBmReflObs.deallocate();
         this->SurfQRadSWOutIncBmToDiffReflObs.deallocate();
         this->SurfQRadSWOutIncSkyDiffReflObs.deallocate();
-        this->SurfCosIncidenceAngle.deallocate();
         this->SurfSWInAbsTotalReport.deallocate();
         this->SurfBmIncInsSurfAmountRepEnergy.deallocate();
         this->SurfIntBmIncInsSurfAmountRepEnergy.deallocate();
@@ -2441,27 +2425,12 @@ struct HeatBalanceData : BaseGlobalStruct
         this->SurfWinInitialDifSolwinAbs.deallocate();
         this->SurfOpaqSWOutAbsTotalReport.deallocate();
         this->SurfOpaqSWOutAbsEnergyReport.deallocate();
+        this->SurfTempEffBulkAir.deallocate();
         this->NominalR.deallocate();
         this->NominalRforNominalUCalculation.deallocate();
         this->NominalU.deallocate();
         this->CoeffAdjRatio.deallocate();
-        this->SurfTempEffBulkAir.deallocate();
-        this->HConvIn.deallocate();
         this->CoeffAdjRatioIn.deallocate();
-        this->SurfAnisoSkyMult.deallocate();
-        this->DifShdgRatioIsoSky.deallocate();
-        this->DifShdgRatioIsoSkyHRTS.deallocate();
-        this->curDifShdgRatioIsoSky.deallocate();
-        this->DifShdgRatioHoriz.deallocate();
-        this->DifShdgRatioHorizHRTS.deallocate();
-        this->WithShdgIsoSky.deallocate();
-        this->WoShdgIsoSky.deallocate();
-        this->WithShdgHoriz.deallocate();
-        this->WoShdgHoriz.deallocate();
-        this->MultIsoSky.deallocate();
-        this->MultCircumSolar.deallocate();
-        this->MultHorizonZenith.deallocate();
-
         this->EnclSolQSWRad.deallocate();
         this->EnclSolQSWRadLights.deallocate();
         this->EnclSolDB.deallocate();
@@ -2475,13 +2444,14 @@ struct HeatBalanceData : BaseGlobalStruct
         this->EnclRadThermAbsMult.deallocate();
         this->ZoneSolAbsFirstCalc.deallocate();
         this->EnclRadReCalc.deallocate();
-        this->SunlitFracHR.deallocate();
-        this->CosIncAngHR.deallocate();
-        this->SunlitFrac.deallocate();
-        this->SunlitFracWithoutReveal.deallocate();
-        this->CosIncAng.deallocate();
-        this->BackSurfaces.deallocate();
-        this->OverlapAreas.deallocate();
+        this->SurfCosIncidenceAngle.deallocate();
+        this->SurfSunlitFracHR.deallocate();
+        this->SurfCosIncAngHR.deallocate();
+        this->SurfSunlitFrac.deallocate();
+        this->SurfSunlitFracWithoutReveal.deallocate();
+        this->SurfCosIncAng.deallocate();
+        this->SurfWinBackSurfaces.deallocate();
+        this->SurfWinOverlapAreas.deallocate();
         this->zeroPointerVal = 0.0;
         this->NumAirBoundaryMixing = 0;
         this->AirBoundaryMixingZone1.clear();
