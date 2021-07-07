@@ -2999,6 +2999,12 @@ namespace UnitarySystems {
             errorsFound = true;
         }
 
+        Real64 loc_m_DesignHRWaterVolumeFlow = input_data.design_heat_recovery_water_flow_rate;
+        this->m_DesignHRWaterVolumeFlow = loc_m_DesignHRWaterVolumeFlow;
+        if (this->m_DesignHRWaterVolumeFlow > 0.0) {
+            this->m_HeatRecActive = true;
+        }
+
         // Early calls to ATMixer don't have enough info to pass GetInput. Need to get the data next time through.
         if (sysNum == -1 || !state.dataZoneEquip->ZoneEquipInputsFilled) {
             return;
@@ -3048,7 +3054,6 @@ namespace UnitarySystems {
         Real64 loc_m_FanDelayTime = input_data.heat_pump_fan_delay_time;
         Real64 loc_m_AncillaryOnPower = input_data.ancillary_on_cycle_electric_power;
         Real64 loc_m_AncillaryOffPower = input_data.ancillary_off_cycle_electric_power;
-        Real64 loc_m_DesignHRWaterVolumeFlow = input_data.design_heat_recovery_water_flow_rate;
         Real64 loc_m_MaxHROutletWaterTemp = input_data.maximum_temperature_for_heat_recovery;
         std::string loc_heatRecoveryInletNodeName = input_data.heat_recovery_water_inlet_node_name;
         std::string loc_heatRecoveryOutletNodeName = input_data.heat_recovery_water_outlet_node_name;
