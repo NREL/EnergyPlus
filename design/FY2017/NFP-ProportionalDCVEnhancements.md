@@ -1102,7 +1102,7 @@ If a user does not specify “OutdoorAirFlowRateFractionSchedule” and “Propo
 						if ( thisVentilationMechanical.SystemOAMethod == SOAM_ProportionalControlDesOARate ) {
 							if ( thisVentilationMechanical.ZoneOASchPtr( ventMechZoneNum ) == 0 ) {
 								if ( thisVentilationMechanical.OAPropCtlMinRate( ventMechZoneNum ) == 0.0 && thisVentilationMechanical.ZoneOAPeopleRate( ventMechZoneNum ) == 0.0 && thisVentilationMechanical.ZoneOAAreaRate( ventMechZoneNum ) == 0.0 ) {
-									ShowSevereError( std::string{RoutineName} + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid input with System Outdoor Air Method = ProportionalControlBasedOnDesignOARate." );
+									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + thisVentilationMechanical.Name + "\", invalid input with System Outdoor Air Method = ProportionalControlBasedOnDesignOARate." );
 									ShowContinueError( " When fields of Outdoor Air Schedule Name and Base Ventilation Air Flow Rate are blank in DesignSpecification:OutdoorAir = " + curOARequirements.Name + ", " );
 									ShowContinueError( " the values of Outdoor Air Flow per Person and Outdoor Air Flow per Zone Floor Area in the same object can not be zero." );
 									ErrorsFound = true;
@@ -1128,7 +1128,7 @@ Check min and max zone OA values. If min is greater than max, it min value will 
 											ZoneOAMin = ZoneOAMax;
 											++this->OAMaxMinLimitErrorCount;
 											if ( this->OAMaxMinLimitErrorCount < 2 ) {
-												ShowSevereError( std::string{RoutineName} + CurrentModuleObject + " = \"" + this->Name + "\"." );
+												ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + this->Name + "\"." );
 												ShowContinueError( "For System Outdoor Air Method = ProportionalControlBasedOnDesignOARate, maximum zone outdoor air rate (" + RoundSigDigits( ZoneOAMax, 4 ) + "), is not greater than minimum zone outdoor air rate (" + RoundSigDigits( ZoneOAMin, 4 ) + ")." );
 												ShowContinueError( " The minimum zone outdoor air rate is set to the maximum zone outdoor air rate. Simulation continues..." );
 												ShowContinueErrorTimeStamp( "" );

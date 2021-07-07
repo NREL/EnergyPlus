@@ -59,7 +59,7 @@ In order to replace all of these calls with a new approach, a phased approach wi
 Modification of event calls requires translating each call, such as
 
 ```
-ShowSevereError(std::string{RoutineName} + "An AirLoop branch, " + PrimaryAirSystem(1).Branch(BranchNum).Name +
+ShowSevereError(RoutineName + "An AirLoop branch, " + PrimaryAirSystem(1).Branch(BranchNum).Name +
                 ", has two or more fans: " + FanNames);
 ShowContinueError("The AirflowNetwork model allows a single supply fan in an AirLoop only. Please make changes in the input file accordingly.");
 ```
