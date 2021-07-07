@@ -605,10 +605,10 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
             if (this->NomCapWasAutoSized) {
                 this->NomCap = tmpNomCap;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, "Boiler:HotWater", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                    BaseSizer::reportSizerOutput(state, "Boiler:HotWater", this->Name, "Autosized Nominal Capacity [W]", tmpNomCap);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, "Boiler:HotWater", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                    BaseSizer::reportSizerOutput(state, "Boiler:HotWater", this->Name, "Initial Autosized Nominal Capacity [W]", tmpNomCap);
                 }
             } else { // Hard-sized with sizing data
                 if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
@@ -617,7 +617,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "Boiler:HotWater",
                                                      this->Name,
-                                                     "Design Size Nominal Capacity [W]",
+                                                     "Autosized Nominal Capacity [W]",
                                                      tmpNomCap,
                                                      "User-Specified Nominal Capacity [W]",
                                                      NomCapUser);
@@ -625,7 +625,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
                             if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
-                                ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
+                                ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", tmpNomCap));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -656,11 +656,11 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
                 this->VolFlowRate = tmpBoilerVolFlowRate;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "Boiler:HotWater", this->Name, "Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
+                        state, "Boiler:HotWater", this->Name, "Autosized Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "Boiler:HotWater", this->Name, "Initial Design Size Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
+                        state, "Boiler:HotWater", this->Name, "Initial Autosized Design Water Flow Rate [m3/s]", tmpBoilerVolFlowRate);
                 }
             } else {
                 if (this->VolFlowRate > 0.0 && tmpBoilerVolFlowRate > 0.0) {
@@ -669,7 +669,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "Boiler:HotWater",
                                                      this->Name,
-                                                     "Design Size Design Water Flow Rate [m3/s]",
+                                                     "Autosized Design Water Flow Rate [m3/s]",
                                                      tmpBoilerVolFlowRate,
                                                      "User-Specified Design Water Flow Rate [m3/s]",
                                                      VolFlowRateUser);
@@ -678,7 +678,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
                                 ShowMessage(state, "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, format("User-Specified Design Water Flow Rate of {:.2R} [m3/s]", VolFlowRateUser));
                                 ShowContinueError(state,
-                                                  format("differs from Design Size Design Water Flow Rate of {:.2R} [m3/s]", tmpBoilerVolFlowRate));
+                                                  format("differs from Autosized Design Water Flow Rate of {:.2R} [m3/s]", tmpBoilerVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

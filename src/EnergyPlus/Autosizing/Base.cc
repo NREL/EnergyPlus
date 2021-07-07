@@ -353,7 +353,7 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
         } else if (this->wasAutoSized && this->dataFractionUsedForSizing > 0.0 && this->dataConstantUsedForSizing > 0.0) {
             this->autoSizedValue = this->dataFractionUsedForSizing * this->dataConstantUsedForSizing;
             this->reportSizerOutput(
-                state, this->compType, this->compName, "Design Size " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+                state, this->compType, this->compName, "Autosized " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
         } else if (!this->wasAutoSized &&
                    (this->autoSizedValue == this->originalValue || this->autoSizedValue == 0.0)) { // no sizing run done or autosizes to 0
             this->autoSizedValue = this->originalValue;
@@ -372,7 +372,7 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
                 this->reportSizerOutput(
                     state, this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
             } else {
-                this->reportSizerOutput(state, this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
+                this->reportSizerOutput(state, this->compType, this->compName, "Autosized " + this->sizingString, this->autoSizedValue);
             }
         } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
             if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > state.dataSize->AutoVsHardSizingThreshold) {
@@ -380,7 +380,7 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
                     this->reportSizerOutput(state,
                                             this->compType,
                                             this->compName,
-                                            "Design Size " + this->sizingString,
+                                            "Autosized " + this->sizingString,
                                             this->autoSizedValue,
                                             "User-Specified " + this->sizingStringScalable + this->sizingString,
                                             this->originalValue);
@@ -400,7 +400,7 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
                     msg = format("User-Specified {}{} = {:.5R}", this->sizingStringScalable, this->sizingString, this->originalValue);
                     this->addErrorMessage(msg);
                     ShowContinueError(state, msg);
-                    msg = format("differs from Design Size {} = {:.5R}", this->sizingString, this->autoSizedValue);
+                    msg = format("differs from Autosized {} = {:.5R}", this->sizingString, this->autoSizedValue);
                     this->addErrorMessage(msg);
                     ShowContinueError(state, msg);
                     msg = "This may, or may not, indicate mismatched component sizes.";
@@ -481,19 +481,19 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                 this->reportSizerOutput(
                     state, this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
             } else {
-                this->reportSizerOutput(state, this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
+                this->reportSizerOutput(state, this->compType, this->compName, "Autosized " + this->sizingString, this->autoSizedValue);
             }
             if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                 this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
                 this->reportSizerOutput(
-                    state, this->compType, this->compName, "Design Size " + this->sizingString + " ( non-bypassed )", this->autoSizedValue);
+                    state, this->compType, this->compName, "Autosized " + this->sizingString + " ( non-bypassed )", this->autoSizedValue);
             }
         } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
             if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > state.dataSize->AutoVsHardSizingThreshold) {
                 this->reportSizerOutput(state,
                                         this->compType,
                                         this->compName,
-                                        "Design Size " + this->sizingString,
+                                        "Autosized " + this->sizingString,
                                         this->autoSizedValue,
                                         "User-Specified " + this->sizingStringScalable + this->sizingString,
                                         this->originalValue);
@@ -503,7 +503,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                     this->reportSizerOutput(state,
                                             this->compType,
                                             this->compName,
-                                            "Design Size " + this->sizingString + " ( non-bypassed )",
+                                            "Autosized " + this->sizingString + " ( non-bypassed )",
                                             this->autoSizedValue,
                                             "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
                                             this->originalValue);
@@ -531,7 +531,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                     msg = format("User-Specified {}{} = {:.5R}", this->sizingStringScalable, this->sizingString, this->originalValue);
                     this->addErrorMessage(msg);
                     ShowContinueError(state, msg);
-                    msg = format("differs from Design Size {} = {:.5R}", this->sizingString, this->autoSizedValue);
+                    msg = format("differs from Autosized {} = {:.5R}", this->sizingString, this->autoSizedValue);
                     this->addErrorMessage(msg);
                     ShowContinueError(state, msg);
                     msg = "This may, or may not, indicate mismatched component sizes.";

@@ -61,7 +61,7 @@ struct HeatingWaterDesCoilLoadUsedForUASizer : BaseSizer
     HeatingWaterDesCoilLoadUsedForUASizer()
     {
         this->sizingType = AutoSizingType::HeatingWaterDesCoilLoadUsedForUASizing;
-        this->sizingString = "Water Heating Design Coil Load for UA Sizing";
+        this->sizingString = "Design Water Heating Design Coil Load for UA Sizing";
     }
     ~HeatingWaterDesCoilLoadUsedForUASizer() = default;
 

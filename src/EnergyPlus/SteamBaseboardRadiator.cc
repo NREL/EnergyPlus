@@ -1219,7 +1219,7 @@ namespace SteamBaseboardRadiator {
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
-                                                     "Design Size Maximum Steam Flow Rate [m3/s]",
+                                                     "Autosized Design Maximum Steam Flow Rate [m3/s]",
                                                      SteamVolFlowRateMaxDes);
                     } else { // Hard size with sizing data
                         if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax > 0.0 &&
@@ -1228,22 +1228,23 @@ namespace SteamBaseboardRadiator {
                             BaseSizer::reportSizerOutput(state,
                                                          state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                                          state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
-                                                         "Design Size Maximum Steam Flow Rate [m3/s]",
+                                                         "Autosized Design Maximum Steam Flow Rate [m3/s]",
                                                          SteamVolFlowRateMaxDes,
-                                                         "User-Speicified Maximum Steam Flow Rate [m3/s]",
+                                                         "User-Specified Design Maximum Steam Flow Rate [m3/s]",
                                                          SteamVolFlowRateMaxUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                // Report difference between design size and user-specified values
+                                // Report difference between autosized and user-specified values
                                 if ((std::abs(SteamVolFlowRateMaxDes - SteamVolFlowRateMaxUser) / SteamVolFlowRateMaxUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state,
                                                 "SizeSteamBaseboard: Potential issue with equipment sizing for "
                                                 "ZoneHVAC:Baseboard:RadiantConvective:Steam=\"" +
                                                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID + "\".");
-                                    ShowContinueError(state,
-                                                      format("User-Specified Maximum Steam Flow Rate of {:.5R} [m3/s]", SteamVolFlowRateMaxUser));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Maximum Steam Flow Rate of {:.5R} [m3/s]", SteamVolFlowRateMaxDes));
+                                        state, format("User-Specified Design Maximum Steam Flow Rate of {:.5R} [m3/s]", SteamVolFlowRateMaxUser));
+                                    ShowContinueError(
+                                        state,
+                                        format("differs from Autosized Design Maximum Steam Flow Rate of {:.5R} [m3/s]", SteamVolFlowRateMaxDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

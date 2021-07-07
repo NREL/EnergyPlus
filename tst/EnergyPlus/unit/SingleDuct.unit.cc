@@ -1004,7 +1004,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         " 30.5, 0.0, 2.4,           !- X, Y, Z == > Vertex 3 {m}",
         " 26.8, 3.7, 2.4;           !- X, Y, Z == > Vertex 4 {m}",
 
-        // Issue 5273 - zone floor area = 0 causes overflow of TU Design Size Maximum Flow per Zone Floor Area during Reheat
+        // Issue 5273 - zone floor area = 0 causes overflow of TU Autosized Maximum Flow per Zone Floor Area during Reheat
         //"BuildingSurface:Detailed,",
         //" SPACE-F1,                     !- Name",
         //" FLOOR,                    !- Surface Type",

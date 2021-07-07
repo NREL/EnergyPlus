@@ -1077,14 +1077,14 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Electric:ReformulatedEIR",
                                                  this->Name,
-                                                 "Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                 "Autosized Reference Chilled Water Flow Rate [m3/s]",
                                                  tmpEvapVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Electric:ReformulatedEIR",
                                                  this->Name,
-                                                 "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                 "Initial Autosized Reference Chilled Water Flow Rate [m3/s]",
                                                  tmpEvapVolFlowRate);
                 }
             } else { // Hard-size with sizing data
@@ -1094,7 +1094,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:Electric:ReformulatedEIR",
                                                      this->Name,
-                                                     "Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                     "Autosized Reference Chilled Water Flow Rate [m3/s]",
                                                      tmpEvapVolFlowRate,
                                                      "User-Specified Reference Chilled Water Flow Rate [m3/s]",
                                                      EvapVolFlowRateUser);
@@ -1105,7 +1105,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                                 ShowContinueError(state,
                                                   format("User-Specified Reference Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Reference Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                    state, format("differs from Autosized Reference Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1161,11 +1161,11 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                 this->RefCap = tmpNomCap;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "Chiller:Electric:ReformulatedEIR", this->Name, "Design Size Reference Capacity [W]", tmpNomCap);
+                        state, "Chiller:Electric:ReformulatedEIR", this->Name, "Autosized Reference Capacity [W]", tmpNomCap);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(
-                        state, "Chiller:Electric:ReformulatedEIR", this->Name, "Initial Design Size Reference Capacity [W]", tmpNomCap);
+                        state, "Chiller:Electric:ReformulatedEIR", this->Name, "Initial Autosized Reference Capacity [W]", tmpNomCap);
                 }
             } else {
                 if (this->RefCap > 0.0 && tmpNomCap > 0.0) {
@@ -1174,7 +1174,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:Electric:ReformulatedEIR",
                                                      this->Name,
-                                                     "Design Size Reference Capacity [W]",
+                                                     "Autosized Reference Capacity [W]",
                                                      tmpNomCap,
                                                      "User-Specified Reference Capacity [W]",
                                                      RefCapUser);
@@ -1182,7 +1182,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                             if ((std::abs(tmpNomCap - RefCapUser) / RefCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "Size:ChillerElectricReformulatedEIR: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, format("User-Specified Reference Capacity of {:.2R} [W]", RefCapUser));
-                                ShowContinueError(state, format("differs from Design Size Reference Capacity of {:.2R} [W]", tmpNomCap));
+                                ShowContinueError(state, format("differs from Autosized Reference Capacity of {:.2R} [W]", tmpNomCap));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1230,14 +1230,14 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Electric:ReformulatedEIR",
                                                  this->Name,
-                                                 "Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                 "Autosized Reference Condenser Water Flow Rate [m3/s]",
                                                  tmpCondVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Electric:ReformulatedEIR",
                                                  this->Name,
-                                                 "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                 "Initial Autosized Reference Condenser Water Flow Rate [m3/s]",
                                                  tmpCondVolFlowRate);
                 }
             } else {
@@ -1247,7 +1247,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:Electric:ReformulatedEIR",
                                                      this->Name,
-                                                     "Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                     "Autosized Reference Condenser Water Flow Rate [m3/s]",
                                                      tmpCondVolFlowRate,
                                                      "User-Specified Reference Condenser Water Flow Rate [m3/s]",
                                                      CondVolFlowRateUser);
@@ -1258,8 +1258,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                                 ShowContinueError(state,
                                                   format("User-Specified Reference Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                 ShowContinueError(
-                                    state,
-                                    format("differs from Design Size Reference Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                    state, format("differs from Autosized Reference Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1298,14 +1297,14 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Electric:ReformulatedEIR",
                                                  this->Name,
-                                                 "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
+                                                 "Autosized Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                  tmpHeatRecVolFlowRate);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "Chiller:Electric:ReformulatedEIR",
                                                  this->Name,
-                                                 "Initial Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
+                                                 "Initial Autosized Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                  tmpHeatRecVolFlowRate);
                 }
             } else {
@@ -1315,7 +1314,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                         BaseSizer::reportSizerOutput(state,
                                                      "Chiller:Electric:ReformulatedEIR",
                                                      this->Name,
-                                                     "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]",
+                                                     "Autosized Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                      tmpHeatRecVolFlowRate,
                                                      "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]",
                                                      DesignHeatRecVolFlowRateUser);
@@ -1328,7 +1327,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
                                     format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", DesignHeatRecVolFlowRateUser));
                                 ShowContinueError(
                                     state,
-                                    format("differs from Design Size Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
+                                    format("differs from Autosized Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]", tmpHeatRecVolFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

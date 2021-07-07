@@ -371,14 +371,14 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
 
     // EXPECT_TRUE( compare_eio_stream( delimited_string( {
     // 	"! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value",
-    // 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Design Size  [W], 0.00000",
+    // 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Autosized  [W], 0.00000",
     // 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, User-Specified  [W], 5000.00000",
     // 	" DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, 0.0, 0.0, 3.51, 4"} ) ) );
 
     // Output from CI, I don't know why it is different than above...
 
     // "! , Component Type, Component Name, Input Field Description, Value",
-    // " Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Design Size [W], 0.00000",
+    // " Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Autosized [W], 0.00000",
     // " Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, User-Specified [W], 5000.00000",
     // "! , Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W},
     // HSPF {Btu/W-h}, Region Number", " DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, 0.0, 0.0, 3.51, 4"
@@ -2275,11 +2275,11 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     };
 
     std::vector<TestQuery> testQueries({
-        TestQuery("Design Size High Speed Gross Rated Total Cooling Capacity", "W", ratedTotCap),
-        TestQuery("Design Size High Speed Evaporative Condenser Air Flow Rate", "m3/s", highSpeedCondAirFlow),
-        TestQuery("Design Size Low Speed Evaporative Condenser Air Flow Rate", "m3/s", lowSpeedCondAirFlow),
-        TestQuery("Design Size High Speed Evaporative Condenser Pump Rated Power Consumption", "W", highSpeedCondPumpPower),
-        TestQuery("Design Size Low Speed Evaporative Condenser Pump Rated Power Consumption", "W", lowSpeedCondPumpPower),
+        TestQuery("Autosized High Speed Gross Rated Total Cooling Capacity", "W", ratedTotCap),
+        TestQuery("Autosized High Speed Evaporative Condenser Air Flow Rate", "m3/s", highSpeedCondAirFlow),
+        TestQuery("Autosized Low Speed Evaporative Condenser Air Flow Rate", "m3/s", lowSpeedCondAirFlow),
+        TestQuery("Autosized High Speed Evaporative Condenser Pump Rated Power Consumption", "W", highSpeedCondPumpPower),
+        TestQuery("Autosized Low Speed Evaporative Condenser Pump Rated Power Consumption", "W", lowSpeedCondPumpPower),
     });
 
     for (auto &testQuery : testQueries) {
@@ -2492,9 +2492,9 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     };
 
     std::vector<TestQuery> testQueries({
-        TestQuery("Design Size Gross Rated Total Cooling Capacity", "W", ratedTotCap),
-        TestQuery("Design Size Evaporative Condenser Air Flow Rate", "m3/s", condAirFlow),
-        TestQuery("Design Size Evaporative Condenser Pump Rated Power Consumption", "W", condPumpPower),
+        TestQuery("Autosized Gross Rated Total Cooling Capacity", "W", ratedTotCap),
+        TestQuery("Autosized Evaporative Condenser Air Flow Rate", "m3/s", condAirFlow),
+        TestQuery("Autosized Evaporative Condenser Pump Rated Power Consumption", "W", condPumpPower),
     });
 
     for (auto &testQuery : testQueries) {

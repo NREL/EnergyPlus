@@ -1173,7 +1173,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                              state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                             "Design Size Maximum Primary Air Flow Rate [m3/s]",
+                                             "Autosized Maximum Primary Air Flow Rate [m3/s]",
                                              MaxPriAirVolFlowDes);
             } else {
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow > 0.0 && MaxPriAirVolFlowDes > 0.0) {
@@ -1181,7 +1181,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                 "Design Size Maximum Primary Air Flow Rate [m3/s]",
+                                                 "Autosized Maximum Primary Air Flow Rate [m3/s]",
                                                  MaxPriAirVolFlowDes,
                                                  "User-Specified Maximum Primary Air Flow Rate [m3/s]",
                                                  MaxPriAirVolFlowUser);
@@ -1192,7 +1192,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                         "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
                                             ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                             ShowContinueError(state, format("User-Specified Primary Air Flow Rate of {:.5R} [m3/s]", MaxPriAirVolFlowUser));
-                            ShowContinueError(state, format("differs from Design Size Primary Air Flow Rate of {:.5R} [m3/s]", MaxPriAirVolFlowDes));
+                            ShowContinueError(state, format("differs from Autosized Primary Air Flow Rate of {:.5R} [m3/s]", MaxPriAirVolFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1227,7 +1227,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                              state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                             "Design Size Maximum Air Flow Rate [m3/s]",
+                                             "Autosized Maximum Air Flow Rate [m3/s]",
                                              MaxTotAirVolFlowDes);
             } else {
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow > 0.0 && MaxTotAirVolFlowDes > 0.0) {
@@ -1235,7 +1235,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                 "Design Size Maximum Air Flow Rate [m3/s]",
+                                                 "Autosized Maximum Air Flow Rate [m3/s]",
                                                  MaxTotAirVolFlowDes,
                                                  "User-Specified Maximum Air Flow Rate [m3/s]",
                                                  MaxTotAirVolFlowUser);
@@ -1246,7 +1246,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                         "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
                                             ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                             ShowContinueError(state, format("User-Specified Maximum Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowUser));
-                            ShowContinueError(state, format("differs from Design Size Maximum Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowDes));
+                            ShowContinueError(state, format("differs from Autosized Maximum Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1281,7 +1281,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                              state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                             "Design Size Maximum Secondary Air Flow Rate [m3/s]",
+                                             "Autosized Maximum Secondary Air Flow Rate [m3/s]",
                                              MaxSecAirVolFlowDes);
             } else {
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow > 0.0 && MaxSecAirVolFlowDes > 0.0) {
@@ -1289,7 +1289,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                 "Design Size Maximum Secondary Air Flow Rate [m3/s]",
+                                                 "Autosized Maximum Secondary Air Flow Rate [m3/s]",
                                                  MaxSecAirVolFlowDes,
                                                  "User-Specified Maximum Secondary Air Flow Rate [m3/s]",
                                                  MaxSecAirVolFlowUser);
@@ -1300,8 +1300,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                         "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
                                             ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                             ShowContinueError(state, format("User-Specified Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowUser));
-                            ShowContinueError(
-                                state, format("differs from Design Size Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowDes));
+                            ShowContinueError(state,
+                                              format("differs from Autosized Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1338,7 +1338,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                              state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                             "Design Size Minimum Primary Air Flow Fraction",
+                                             "Autosized Minimum Primary Air Flow Fraction",
                                              MinPriAirFlowFracDes);
             } else {
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac > 0.0 && MinPriAirFlowFracDes > 0.0) {
@@ -1346,7 +1346,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                 "Design Size Minimum Primary Air Flow Fraction",
+                                                 "Autosized Minimum Primary Air Flow Fraction",
                                                  MinPriAirFlowFracDes,
                                                  "User-Specified Minimum Primary Air Flow Fraction",
                                                  MinPriAirFlowFracUser);
@@ -1358,7 +1358,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                             ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                             ShowContinueError(state, format("User-Specified Minimum Primary Air Flow Fraction of {:.1R}", MinPriAirFlowFracUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Minimum Primary Air Flow Fraction of {:.1R}", MinPriAirFlowFracDes));
+                                              format("differs from Autosized Minimum Primary Air Flow Fraction of {:.1R}", MinPriAirFlowFracDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1402,7 +1402,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                 BaseSizer::reportSizerOutput(state,
                                              state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                              state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                             "Design Size Fan On Flow Fraction",
+                                             "Autosized Fan On Flow Fraction",
                                              FanOnFlowFracDes);
             } else {
                 if (state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac > 0.0 && FanOnFlowFracDes > 0.0) {
@@ -1410,7 +1410,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                 "Design Size Fan On Flow Fraction",
+                                                 "Autosized Fan On Flow Fraction",
                                                  FanOnFlowFracDes,
                                                  "User-Specified Fan On Flow Fraction",
                                                  FanOnFlowFracUser);
@@ -1420,7 +1420,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                         "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType +
                                             ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                             ShowContinueError(state, format("User-Specified Fan On Flow Fraction of {:.1R}", FanOnFlowFracUser));
-                            ShowContinueError(state, format("differs from Design Size Fan On Flow Fraction of {:.1R}", FanOnFlowFracDes));
+                            ShowContinueError(state, format("differs from Autosized Fan On Flow Fraction of {:.1R}", FanOnFlowFracDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -1498,17 +1498,17 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                 "Design Size Maximum Reheat Water Flow Rate [m3/s]",
+                                                 "Autosized Maximum Reheat Water Flow Rate [m3/s]",
                                                  MaxVolHotWaterFlowDes);
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                 "Design Size Reheat Coil Inlet Air Temperature [C]",
+                                                 "Autosized Reheat Coil Inlet Air Temperature [C]",
                                                  state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                 "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]",
+                                                 "Autosized Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]",
                                                  state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                 } else { // Hardsize with sizing data
                     if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
@@ -1516,7 +1516,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                     "Design Size Maximum Reheat Water Flow Rate [m3/s]",
+                                                     "Autosized Maximum Reheat Water Flow Rate [m3/s]",
                                                      MaxVolHotWaterFlowDes,
                                                      "User-Specified Maximum Reheat Water Flow Rate [m3/s]",
                                                      MaxVolHotWaterFlowUser);
@@ -1530,7 +1530,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                 ShowContinueError(state,
                                                   format("User-Specified Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
                                 ShowContinueError(
-                                    state, format("differs from Design Size Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
+                                    state, format("differs from Autosized Maximum Reheat Water Flow Rate of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1609,7 +1609,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     BaseSizer::reportSizerOutput(state,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                 "Design Size Maximum Reheat Steam Flow [m3/s]",
+                                                 "Autosized Maximum Reheat Steam Flow [m3/s]",
                                                  MaxVolHotSteamFlowDes);
                 } else {
                     if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0) {
@@ -1617,7 +1617,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                         BaseSizer::reportSizerOutput(state,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).Name,
-                                                     "Design Size Maximum Reheat Steam Flow [m3/s]",
+                                                     "Autosized Maximum Reheat Steam Flow [m3/s]",
                                                      MaxVolHotSteamFlowDes,
                                                      "User-Specified Maximum Reheat Steam Flow [m3/s]",
                                                      MaxVolHotSteamFlowUser);
@@ -1629,8 +1629,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                                                 state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' +
                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowUser));
-                                ShowContinueError(
-                                    state, format("differs from Design Size Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
+                                ShowContinueError(state,
+                                                  format("differs from Autosized Maximum Reheat Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

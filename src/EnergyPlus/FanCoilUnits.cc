@@ -1662,7 +1662,7 @@ namespace FanCoilUnits {
                                                 FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Supply Air Maximum Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowUser));
                                 ShowContinueError(state,
-                                                  format("differs from Design Size Supply Air Maximum Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowDes));
+                                                  format("differs from Autosized Supply Air Maximum Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1716,7 +1716,7 @@ namespace FanCoilUnits {
                     BaseSizer::reportSizerOutput(state,
                                                  FanCoil(FanCoilNum).UnitType,
                                                  FanCoil(FanCoilNum).Name,
-                                                 "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
+                                                 "Autosized Maximum Outdoor Air Flow Rate [m3/s]",
                                                  OutAirVolFlowDes);
                 } else {
                     if (FanCoil(FanCoilNum).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0) {
@@ -1724,7 +1724,7 @@ namespace FanCoilUnits {
                         BaseSizer::reportSizerOutput(state,
                                                      FanCoil(FanCoilNum).UnitType,
                                                      FanCoil(FanCoilNum).Name,
-                                                     "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
+                                                     "Autosized Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowDes,
                                                      "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
                                                      OutAirVolFlowUser);
@@ -1734,8 +1734,8 @@ namespace FanCoilUnits {
                                             "SizeFanCoilUnit: Potential issue with equipment sizing for " + FanCoil(FanCoilNum).UnitType + ' ' +
                                                 FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowUser));
-                                ShowContinueError(
-                                    state, format("differs from Design Size Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
+                                ShowContinueError(state,
+                                                  format("differs from Autosized Maximum Outdoor Air Flow Rate of {:.5R} [m3/s]", OutAirVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -1898,7 +1898,7 @@ namespace FanCoilUnits {
                     BaseSizer::reportSizerOutput(state,
                                                  FanCoil(FanCoilNum).UnitType,
                                                  FanCoil(FanCoilNum).Name,
-                                                 "Design Size Maximum Hot Water Flow [m3/s]",
+                                                 "Autosized Maximum Hot Water Flow [m3/s]",
                                                  MaxHotWaterVolFlowDes);
                 } else { // Hard size with sizing data
                     if (FanCoil(FanCoilNum).MaxHotWaterVolFlow > 0.0 && MaxHotWaterVolFlowDes > 0.0) {
@@ -1906,7 +1906,7 @@ namespace FanCoilUnits {
                         BaseSizer::reportSizerOutput(state,
                                                      FanCoil(FanCoilNum).UnitType,
                                                      FanCoil(FanCoilNum).Name,
-                                                     "Design Size Maximum Hot Water Flow [m3/s]",
+                                                     "Autosized Maximum Hot Water Flow [m3/s]",
                                                      MaxHotWaterVolFlowDes,
                                                      "User-Specified Maximum Hot Water Flow [m3/s]",
                                                      MaxHotWaterVolFlowUser);
@@ -1918,7 +1918,7 @@ namespace FanCoilUnits {
                                                 FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Hot Water Flow of {:.5R} [m3/s]", MaxHotWaterVolFlowUser));
                                 ShowContinueError(state,
-                                                  format("differs from Design Size Maximum Hot Water Flow of {:.5R} [m3/s]", MaxHotWaterVolFlowDes));
+                                                  format("differs from Autosized Maximum Hot Water Flow of {:.5R} [m3/s]", MaxHotWaterVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -2090,7 +2090,7 @@ namespace FanCoilUnits {
                     BaseSizer::reportSizerOutput(state,
                                                  FanCoil(FanCoilNum).UnitType,
                                                  FanCoil(FanCoilNum).Name,
-                                                 "Design Size Maximum Cold Water Flow [m3/s]",
+                                                 "Autosized Maximum Cold Water Flow [m3/s]",
                                                  MaxColdWaterVolFlowDes);
                 } else { // Hard size with sizing data
                     if (FanCoil(FanCoilNum).MaxColdWaterVolFlow > 0.0 && MaxColdWaterVolFlowDes > 0.0) {
@@ -2098,7 +2098,7 @@ namespace FanCoilUnits {
                         BaseSizer::reportSizerOutput(state,
                                                      FanCoil(FanCoilNum).UnitType,
                                                      FanCoil(FanCoilNum).Name,
-                                                     "Design Size Maximum Cold Water Flow [m3/s]",
+                                                     "Autosized Maximum Cold Water Flow [m3/s]",
                                                      MaxColdWaterVolFlowDes,
                                                      "User-Specified Maximum Cold Water Flow [m3/s]",
                                                      MaxColdWaterVolFlowUser);
@@ -2110,7 +2110,7 @@ namespace FanCoilUnits {
                                                 FanCoil(FanCoilNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Cold Water Flow of {:.5R}[m3/s]", MaxColdWaterVolFlowUser));
                                 ShowContinueError(state,
-                                                  format("differs from Design Size Maximum Cold Water Flow of {:.5R}[m3/s]", MaxColdWaterVolFlowDes));
+                                                  format("differs from Autosized Maximum Cold Water Flow of {:.5R}[m3/s]", MaxColdWaterVolFlowDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }

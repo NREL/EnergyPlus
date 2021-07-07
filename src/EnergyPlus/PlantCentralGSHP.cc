@@ -247,14 +247,14 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
-                                                         "Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                         "Autosized Reference Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                                          "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
-                                                         "Initial Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                         "Initial Autosized Reference Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate);
                         }
                     } else {
@@ -266,7 +266,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
-                                                         "Design Size Reference Chilled Water Flow Rate [m3/s]",
+                                                         "Autosized Reference Chilled Water Flow Rate [m3/s]",
                                                          tmpEvapVolFlowRate,
                                                          "User-Specified Reference Chilled Water Flow Rate [m3/s]",
                                                          EvapVolFlowRateUser);
@@ -281,7 +281,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                                         state, format("User-Specified Reference Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
                                     ShowContinueError(
                                         state,
-                                        format("differs from Design Size Reference Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
+                                        format("differs from Autosized Reference Chilled Water Flow Rate of {:.5R} [m3/s]", tmpEvapVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -349,14 +349,14 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
-                                                         "Design Size Reference Capacity [W]",
+                                                         "Autosized Reference Capacity [W]",
                                                          tmpNomCap);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                                          "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
-                                                         "Initial Design Size Reference Capacity [W]",
+                                                         "Initial Autosized Reference Capacity [W]",
                                                          tmpNomCap);
                         }
                     } else {
@@ -368,7 +368,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
-                                                         "Design Size Reference Capacity [W]",
+                                                         "Autosized Reference Capacity [W]",
                                                          tmpNomCap,
                                                          "User-Specified Reference Capacity [W]",
                                                          NomCapUser);
@@ -379,7 +379,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                                                 "SizeChillerHeaterPerformanceElectricEIR: Potential issue with equipment sizing for " +
                                                     this->ChillerHeater(NumChillerHeater).Name);
                                     ShowContinueError(state, format("User-Specified Reference Capacity of {:.2R} [W]", NomCapUser));
-                                    ShowContinueError(state, format("differs from Design Size Reference Capacity of {:.2R} [W]", tmpNomCap));
+                                    ShowContinueError(state, format("differs from Autosized Reference Capacity of {:.2R} [W]", tmpNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -443,14 +443,14 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
-                                                         "Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                         "Autosized Reference Condenser Water Flow Rate [m3/s]",
                                                          tmpCondVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(state,
                                                          "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
-                                                         "Initial Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                         "Initial Autosized Reference Condenser Water Flow Rate [m3/s]",
                                                          tmpCondVolFlowRate);
                         }
                     } else {
@@ -462,7 +462,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                             BaseSizer::reportSizerOutput(state,
                                                          "ChillerHeaterPerformance:Electric:EIR",
                                                          this->ChillerHeater(NumChillerHeater).Name,
-                                                         "Design Size Reference Condenser Water Flow Rate [m3/s]",
+                                                         "Autosized Reference Condenser Water Flow Rate [m3/s]",
                                                          tmpCondVolFlowRate,
                                                          "User-Specified Reference Condenser Water Flow Rate [m3/s]",
                                                          CondVolFlowRateUser);
@@ -476,7 +476,7 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
                                         state, format("User-Specified Reference Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
                                     ShowContinueError(
                                         state,
-                                        format("differs from Design Size Reference Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
+                                        format("differs from Autosized Reference Condenser Water Flow Rate of {:.5R} [m3/s]", tmpCondVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

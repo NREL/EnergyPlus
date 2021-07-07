@@ -4839,7 +4839,7 @@ namespace VariableSpeedCoils {
                 BaseSizer::reportSizerOutput(state,
                                              "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                             "Design Size Rated Total Cooling Capacity [W]",
+                                             "Autosized Rated Total Cooling Capacity [W]",
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchCoolCoilTotCap,
@@ -4876,7 +4876,7 @@ namespace VariableSpeedCoils {
                     BaseSizer::reportSizerOutput(state,
                                                  "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                                 "Design Size Rated Total Cooling Capacity [W]",
+                                                 "Autosized Rated Total Cooling Capacity [W]",
                                                  RatedCapCoolTotalDes,
                                                  "User-Specified Rated Total Cooling Capacity [W]",
                                                  RatedCapCoolTotalUser);
@@ -4889,7 +4889,7 @@ namespace VariableSpeedCoils {
                             ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                             ShowContinueError(state, format("User-Specified Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalDes));
+                                              format("differs from Autosized Rated Total Cooling Capacity of {:.2R} [W]", RatedCapCoolTotalDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -4989,7 +4989,7 @@ namespace VariableSpeedCoils {
             BaseSizer::reportSizerOutput(state,
                                          "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                         "Design Size Nominal Heating Capacity [W]",
+                                         "Autosized Nominal Heating Capacity [W]",
                                          RatedCapHeatDes);
             PreDefTableEntry(state,
                              state.dataOutRptPredefined->pdchHeatCoilNomCap,
@@ -5013,7 +5013,7 @@ namespace VariableSpeedCoils {
                 BaseSizer::reportSizerOutput(state,
                                              "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                             "Design Size Nominal Heating Capacity [W]",
+                                             "Autosized Nominal Heating Capacity [W]",
                                              RatedCapHeatDes,
                                              "User-Specified Nominal Heating Capacity [W]",
                                              RatedCapHeatUser);
@@ -5024,7 +5024,7 @@ namespace VariableSpeedCoils {
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' + CurrentObjSubfix);
                         ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                         ShowContinueError(state, format("User-Specified Rated Total Heating Capacity of {:.2R} [W]", RatedCapHeatUser));
-                        ShowContinueError(state, format("differs from Design Size Rated Total Heating Capacity of {:.2R} [W]", RatedCapHeatDes));
+                        ShowContinueError(state, format("differs from Autosized Rated Total Heating Capacity of {:.2R} [W]", RatedCapHeatDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -5048,7 +5048,7 @@ namespace VariableSpeedCoils {
                 BaseSizer::reportSizerOutput(state,
                                              "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                             "Design Size Rated Air Flow Rate [m3/s]",
+                                             "Autosized Rated Air Flow Rate [m3/s]",
                                              RatedAirVolFlowRateDes);
             } else {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate > 0.0 && RatedAirVolFlowRateDes > 0.0) {
@@ -5056,7 +5056,7 @@ namespace VariableSpeedCoils {
                     BaseSizer::reportSizerOutput(state,
                                                  "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                                 "Design Size Rated Air Flow Rate [m3/s]",
+                                                 "Autosized Rated Air Flow Rate [m3/s]",
                                                  RatedAirVolFlowRateDes,
                                                  "User-Specified Rated Air Flow Rate [m3/s]",
                                                  RatedAirVolFlowRateUser);
@@ -5068,7 +5068,7 @@ namespace VariableSpeedCoils {
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' + CurrentObjSubfix);
                             ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                             ShowContinueError(state, format("User-Specified Rated Air Flow Rate of {:.5R} [m3/s]", RatedAirVolFlowRateUser));
-                            ShowContinueError(state, format("differs from Design Size Rated Air Flow Rate of {:.5R} [m3/s]", RatedAirVolFlowRateDes));
+                            ShowContinueError(state, format("differs from Autosized Rated Air Flow Rate of {:.5R} [m3/s]", RatedAirVolFlowRateDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -5390,7 +5390,7 @@ namespace VariableSpeedCoils {
             BaseSizer::reportSizerOutput(state,
                                          "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                         "Design Size Rated Water Flow Rate [m3/s]",
+                                         "Autosized Rated Water Flow Rate [m3/s]",
                                          RatedWaterVolFlowRateDes);
             // Ensure water flow rate at lower speed must be lower or
             // equal to the flow rate at higher speed. Otherwise, a severe error is isssued.
@@ -5417,7 +5417,7 @@ namespace VariableSpeedCoils {
                 BaseSizer::reportSizerOutput(state,
                                              "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                             "Design Size Rated Water Flow Rate [m3/s]",
+                                             "Autosized Rated Water Flow Rate [m3/s]",
                                              RatedWaterVolFlowRateDes,
                                              "User-Specified Rated Water Flow Rate [m3/s]",
                                              RatedWaterVolFlowRateUser);
@@ -5429,7 +5429,7 @@ namespace VariableSpeedCoils {
                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' + CurrentObjSubfix);
                         ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                         ShowContinueError(state, format("User-Specified Rated Water Flow Rate of {:.5R} [m3/s]", RatedWaterVolFlowRateUser));
-                        ShowContinueError(state, format("differs from Design Size Rated Water Flow Rate of {:.5R} [m3/s]", RatedWaterVolFlowRateDes));
+                        ShowContinueError(state, format("differs from Autosized Rated Water Flow Rate of {:.5R} [m3/s]", RatedWaterVolFlowRateDes));
                         ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                         ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                     }
@@ -5693,7 +5693,7 @@ namespace VariableSpeedCoils {
                 BaseSizer::reportSizerOutput(state,
                                              "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                             "Design Size Rated Sensible Cooling Capacity [W]",
+                                             "Autosized Rated Sensible Cooling Capacity [W]",
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolSens);
 
             } else {
@@ -5703,7 +5703,7 @@ namespace VariableSpeedCoils {
                     BaseSizer::reportSizerOutput(state,
                                                  "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                                 "Design Size Rated Sensible Cooling Capacity [W]",
+                                                 "Autosized Rated Sensible Cooling Capacity [W]",
                                                  RatedCapCoolSensDes); //, &
                 }
             }
@@ -5752,7 +5752,7 @@ namespace VariableSpeedCoils {
                 BaseSizer::reportSizerOutput(state,
                                              "AS VS COOLING COIL",
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                             "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
+                                             "Autosized Evaporative Condenser Pump Rated Power Consumption [W]",
                                              EvapCondPumpElecNomPowerDes);
             } else {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower > 0.0 && EvapCondPumpElecNomPowerDes > 0.0) {
@@ -5760,7 +5760,7 @@ namespace VariableSpeedCoils {
                     BaseSizer::reportSizerOutput(state,
                                                  "AS VS COOLING COIL",
                                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                                 "Design Size Evaporative Condenser Pump Rated Power Consumption [W]",
+                                                 "Autosized Evaporative Condenser Pump Rated Power Consumption [W]",
                                                  EvapCondPumpElecNomPowerDes,
                                                  "User-Specified Evaporative Condenser Pump Rated Power Consumption [W]",
                                                  EvapCondPumpElecNomPowerUser);
@@ -5775,7 +5775,7 @@ namespace VariableSpeedCoils {
                                               format("User-Specified Evaporative Condenser Pump Rated Power Consumption of {:.2R} [W]",
                                                      EvapCondPumpElecNomPowerUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Evaporative Condenser Pump Rated Power Consumption of {:.2R} [W]",
+                                              format("differs from Autosized Evaporative Condenser Pump Rated Power Consumption of {:.2R} [W]",
                                                      EvapCondPumpElecNomPowerDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
@@ -5804,7 +5804,7 @@ namespace VariableSpeedCoils {
                 BaseSizer::reportSizerOutput(state,
                                              "AS VS HEATING COIL",
                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                             "Design Size Resistive Defrost Heater Capacity [W]",
+                                             "Autosized Resistive Defrost Heater Capacity [W]",
                                              DefrostCapacityDes);
             } else {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0 && !HardSizeNoDesRun) {
@@ -5812,7 +5812,7 @@ namespace VariableSpeedCoils {
                     BaseSizer::reportSizerOutput(state,
                                                  "AS VS HEATING COIL",
                                                  state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                                 "Design Size Resistive Defrost Heater Capacity [W]",
+                                                 "Autosized Resistive Defrost Heater Capacity [W]",
                                                  DefrostCapacityDes,
                                                  "User-Specified Resistive Defrost Heater Capacity [W]",
                                                  DefrostCapacityUser);
@@ -5824,7 +5824,7 @@ namespace VariableSpeedCoils {
                             ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                             ShowContinueError(state, format("User-Specified Resistive Defrost Heater Capacity of {:.2R} [W]", DefrostCapacityUser));
                             ShowContinueError(state,
-                                              format("differs from Design Size Resistive Defrost Heater Capacity of {:.2R} [W]", DefrostCapacityDes));
+                                              format("differs from Autosized Resistive Defrost Heater Capacity of {:.2R} [W]", DefrostCapacityDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }

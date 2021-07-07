@@ -1271,7 +1271,7 @@ namespace UnitHeater {
                         BaseSizer::reportSizerOutput(state,
                                                      "ZoneHVAC:UnitHeater",
                                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
-                                                     "Design Size Maximum Hot Water Flow [m3/s]",
+                                                     "Autosized Maximum Hot Water Flow [m3/s]",
                                                      MaxVolHotWaterFlowDes);
                     } else {
                         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
@@ -1279,7 +1279,7 @@ namespace UnitHeater {
                             BaseSizer::reportSizerOutput(state,
                                                          "ZoneHVAC:UnitHeater",
                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
-                                                         "Design Size Maximum Hot Water Flow [m3/s]",
+                                                         "Autosized Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowDes,
                                                          "User-Specified Maximum Hot Water Flow [m3/s]",
                                                          MaxVolHotWaterFlowUser);
@@ -1292,7 +1292,7 @@ namespace UnitHeater {
                                     ShowContinueError(state,
                                                       format("User-Specified Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowUser));
                                     ShowContinueError(
-                                        state, format("differs from Design Size Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
+                                        state, format("differs from Autosized Maximum Hot Water Flow of {:.5R} [m3/s]", MaxVolHotWaterFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -1402,7 +1402,7 @@ namespace UnitHeater {
                         BaseSizer::reportSizerOutput(state,
                                                      "ZoneHVAC:UnitHeater",
                                                      state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
-                                                     "Design Size Maximum Steam Flow [m3/s]",
+                                                     "Autosized Maximum Steam Flow [m3/s]",
                                                      MaxVolHotSteamFlowDes);
                     } else {
                         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0) {
@@ -1410,7 +1410,7 @@ namespace UnitHeater {
                             BaseSizer::reportSizerOutput(state,
                                                          "ZoneHVAC:UnitHeater",
                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
-                                                         "Design Size Maximum Steam Flow [m3/s]",
+                                                         "Autosized Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowDes,
                                                          "User-Specified Maximum Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowUser);
@@ -1422,7 +1422,7 @@ namespace UnitHeater {
                                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
                                     ShowContinueError(state, format("User-Specified Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowUser));
                                     ShowContinueError(state,
-                                                      format("differs from Design Size Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
+                                                      format("differs from Autosized Maximum Steam Flow of {:.5R} [m3/s]", MaxVolHotSteamFlowDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

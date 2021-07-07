@@ -307,14 +307,11 @@ namespace PlantComponentTemperatureSources {
                     this->DesVolFlowRate = tmpVolFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, "PlantComponent:TemperatureSource", this->Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
+                            state, "PlantComponent:TemperatureSource", this->Name, "Autosized Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state,
-                                                     "PlantComponent:TemperatureSource",
-                                                     this->Name,
-                                                     "Initial Design Size Design Fluid Flow Rate [m3/s]",
-                                                     tmpVolFlowRate);
+                        BaseSizer::reportSizerOutput(
+                            state, "PlantComponent:TemperatureSource", this->Name, "Initial Autosized Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                 } else {
                     if (this->DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0) {
@@ -323,7 +320,7 @@ namespace PlantComponentTemperatureSources {
                             BaseSizer::reportSizerOutput(state,
                                                          "PlantComponent:TemperatureSource",
                                                          this->Name,
-                                                         "Design Size Design Fluid Flow Rate [m3/s]",
+                                                         "Autosized Design Fluid Flow Rate [m3/s]",
                                                          tmpVolFlowRate,
                                                          "User-Specified Design Fluid Flow Rate [m3/s]",
                                                          DesVolFlowRateUser);
@@ -334,7 +331,7 @@ namespace PlantComponentTemperatureSources {
                                                 "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Fluid Flow Rate of {:.5R} [m3/s]", DesVolFlowRateUser));
                                     ShowContinueError(state,
-                                                      format("differs from Design Size Design Fluid Flow Rate of {:.5R} [m3/s]", tmpVolFlowRate));
+                                                      format("differs from Autosized Design Fluid Flow Rate of {:.5R} [m3/s]", tmpVolFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

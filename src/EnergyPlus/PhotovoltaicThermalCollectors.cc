@@ -704,17 +704,14 @@ namespace PhotovoltaicThermalCollectors {
             if (this->DesignVolFlowRateWasAutoSized) {
                 this->DesignVolFlowRate = DesignVolFlowRateDes;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state,
-                                                 "SolarCollector:FlatPlate:PhotovoltaicThermal",
-                                                 this->Name,
-                                                 "Design Size Design Flow Rate [m3/s]",
-                                                 DesignVolFlowRateDes);
+                    BaseSizer::reportSizerOutput(
+                        state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name, "Autosized Design Flow Rate [m3/s]", DesignVolFlowRateDes);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                  this->Name,
-                                                 "Initial Design Size Design Flow Rate [m3/s]",
+                                                 "Initial Autosized Design Flow Rate [m3/s]",
                                                  DesignVolFlowRateDes);
                 }
                 PlantUtilities::RegisterPlantCompDesignFlow(state, this->PlantInletNodeNum, this->DesignVolFlowRate);
@@ -725,7 +722,7 @@ namespace PhotovoltaicThermalCollectors {
                     BaseSizer::reportSizerOutput(state,
                                                  "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                  this->Name,
-                                                 "Design Size Design Flow Rate [m3/s]",
+                                                 "Autosized Design Flow Rate [m3/s]",
                                                  DesignVolFlowRateDes,
                                                  "User-Specified Design Flow Rate [m3/s]",
                                                  DesignVolFlowRateUser);
@@ -734,7 +731,7 @@ namespace PhotovoltaicThermalCollectors {
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError(state, format("User-Specified Design Flow Rate of {:.5R} [W]", DesignVolFlowRateUser));
-                            ShowContinueError(state, format("differs from Design Size Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
+                            ShowContinueError(state, format("differs from Autosized Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
@@ -784,7 +781,7 @@ namespace PhotovoltaicThermalCollectors {
                         BaseSizer::reportSizerOutput(state,
                                                      "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                      this->Name,
-                                                     "Design Size Design Flow Rate [m3/s]",
+                                                     "Autosized Design Flow Rate [m3/s]",
                                                      DesignVolFlowRateDes);
                         this->SizingInit = false;
                     } else {
@@ -793,7 +790,7 @@ namespace PhotovoltaicThermalCollectors {
                             BaseSizer::reportSizerOutput(state,
                                                          "SolarCollector:FlatPlate:PhotovoltaicThermal",
                                                          this->Name,
-                                                         "Design Size Design Flow Rate [m3/s]",
+                                                         "Autosized Design Flow Rate [m3/s]",
                                                          DesignVolFlowRateDes,
                                                          "User-Specified Design Flow Rate [m3/s]",
                                                          DesignVolFlowRateUser);
@@ -802,7 +799,7 @@ namespace PhotovoltaicThermalCollectors {
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeSolarCollector: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Flow Rate of {:.5R} [W]", DesignVolFlowRateUser));
-                                    ShowContinueError(state, format("differs from Design Size Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
+                                    ShowContinueError(state, format("differs from Autosized Design Flow Rate of {:.5R} [W]", DesignVolFlowRateDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }

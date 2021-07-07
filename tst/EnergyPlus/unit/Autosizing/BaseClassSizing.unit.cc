@@ -612,7 +612,7 @@ TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
     // input values
     CompType = "BOILER:HOTWATER";
     CompName = "RESIDENTIAL BOILER ELECTRIC";
-    VarDesc = "Design Size Nominal Capacity [W]";
+    VarDesc = "Autosized Nominal Capacity [W]";
     VarValue = 105977.98934;
     UsrDesc = "User-Specified Nominal Capacity [W]";
     UsrValue = 26352.97405;
@@ -624,7 +624,7 @@ TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
     // check that there are two sizing result records
     ASSERT_EQ(2ul, result.size());
-    std::vector<std::string> testResult0{"1", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "Design Size Nominal Capacity", "105977.98934", "W"};
+    std::vector<std::string> testResult0{"1", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "Autosized Nominal Capacity", "105977.98934", "W"};
     std::vector<std::string> testResult1{
         "2", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "User-Specified Nominal Capacity", "26352.97405", "W"};
     EXPECT_EQ(testResult0, result[0]);

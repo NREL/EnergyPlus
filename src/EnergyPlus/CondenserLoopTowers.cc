@@ -2860,7 +2860,7 @@ namespace CondenserLoopTowers {
                                                "greater than {:.2T} C when autosizing the tower UA.",
                                                this->Name,
                                                this->DesInletAirWBTemp));
-                        ShowContinueError(state, format("The User-specified Design Loop Exit Temperature={:.2T}", DesTowerExitWaterTemp));
+                        ShowContinueError(state, format("The User-Specified Loop Exit Temperature={:.2T}", DesTowerExitWaterTemp));
                         ShowContinueError(
                             state,
                             format("is less than or equal to the design inlet air wet-bulb temperature of {:.2T} C.", this->DesInletAirWBTemp));
@@ -3575,7 +3575,7 @@ namespace CondenserLoopTowers {
                             BaseSizer::reportSizerOutput(state,
                                                          this->TowerType,
                                                          this->Name,
-                                                         "Design Nominal Capacity [W]",
+                                                         "Autosized Nominal Capacity [W]",
                                                          tmpNomTowerCap,
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
@@ -3583,7 +3583,7 @@ namespace CondenserLoopTowers {
                                 if ((std::abs(tmpNomTowerCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
-                                    ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomTowerCap));
+                                    ShowContinueError(state, format("differs from Autosized Nominal Capacity of {:.2R} [W]", tmpNomTowerCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3614,7 +3614,7 @@ namespace CondenserLoopTowers {
                             BaseSizer::reportSizerOutput(state,
                                                          this->TowerType,
                                                          this->Name,
-                                                         "Design Free Convection Nominal Capacity [W]",
+                                                         "Autosized Free Convection Nominal Capacity [W]",
                                                          tmpTowerFreeConvNomCap,
                                                          "User-Specified Free Convection Nominal Capacity [W]",
                                                          NomCapUser);
@@ -3624,7 +3624,7 @@ namespace CondenserLoopTowers {
                                     ShowContinueError(state, format("User-Specified Free Convection Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(
                                         state,
-                                        format("differs from Design Size Free Convection Nominal Capacity of {:.2R} [W]", tmpTowerFreeConvNomCap));
+                                        format("differs from Autosized Free Convection Nominal Capacity of {:.2R} [W]", tmpTowerFreeConvNomCap));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3642,11 +3642,12 @@ namespace CondenserLoopTowers {
 
                     this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
+                        BaseSizer::reportSizerOutput(
+                            state, this->TowerType, this->Name, "Autosized Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
+                            state, this->TowerType, this->Name, "Initial Autosized Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                     }
 
                 } else { // Hard-sized with sizing data
@@ -3657,7 +3658,7 @@ namespace CondenserLoopTowers {
                             BaseSizer::reportSizerOutput(state,
                                                          this->TowerType,
                                                          this->Name,
-                                                         "Design Water Flow Rate [m3/s]",
+                                                         "Autosized Design Water Flow Rate [m3/s]",
                                                          this->DesignWaterFlowRate,
                                                          "User-Specified Design Water Flow Rate [m3/s]",
                                                          NomDesWaterFlowUser);
@@ -3666,7 +3667,8 @@ namespace CondenserLoopTowers {
                                     state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Water Flow Rate of {:.2R} [m3/s]", NomDesWaterFlowUser));
-                                    ShowContinueError(state, format("differs from Design Water Flow Rate of {:.2R} [m3/s]", tmpDesignWaterFlowRate));
+                                    ShowContinueError(
+                                        state, format("differs from Autosized Design Water Flow Rate of {:.2R} [m3/s]", tmpDesignWaterFlowRate));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                     ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                                 }
@@ -3688,11 +3690,12 @@ namespace CondenserLoopTowers {
                 if (this->HighSpeedAirFlowRateWasAutoSized) {
                     this->HighSpeedAirFlowRate = tmpDesignAirFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
+                        BaseSizer::reportSizerOutput(
+                            state, this->TowerType, this->Name, "Autosized Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(
-                            state, this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
+                            state, this->TowerType, this->Name, "Initial Autosized Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                     }
                 } else { // Hard-sized with sizing data
                     Real64 DesignAirFlowRateUser(0.0);
@@ -3701,7 +3704,7 @@ namespace CondenserLoopTowers {
                         BaseSizer::reportSizerOutput(state,
                                                      this->TowerType,
                                                      this->Name,
-                                                     "Design Air Flow Rate [m3/s]",
+                                                     "Autosized Design Air Flow Rate [m3/s]",
                                                      tmpDesignAirFlowRate,
                                                      "User-Specified Design Air Flow Rate [m3/s]",
                                                      DesignAirFlowRateUser);
@@ -3710,7 +3713,8 @@ namespace CondenserLoopTowers {
                                 state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, format("User-Specified Design Air Flow Rate of {:.2R} [m3/s]", DesignAirFlowRateUser));
-                                ShowContinueError(state, format("differs from Design Air Flow Rate of {:.2R} [m3/s]", tmpDesignAirFlowRate));
+                                ShowContinueError(state,
+                                                  format("differs from Autosized Design Air Flow Rate of {:.2R} [m3/s]", tmpDesignAirFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -3725,14 +3729,17 @@ namespace CondenserLoopTowers {
                 if (this->FreeConvAirFlowRateWasAutoSized) {
                     this->FreeConvAirFlowRate = tmpFreeConvAirFlowRate;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                        BaseSizer::reportSizerOutput(
-                            state, this->TowerType, this->Name, "Design Free Convection Regime Air Flow Rate [m3/s]", this->FreeConvAirFlowRate);
+                        BaseSizer::reportSizerOutput(state,
+                                                     this->TowerType,
+                                                     this->Name,
+                                                     "Autosized Design Free Convection Regime Air Flow Rate [m3/s]",
+                                                     this->FreeConvAirFlowRate);
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
                                                      this->TowerType,
                                                      this->Name,
-                                                     "Initial Design Free Convection Regime Air Flow Rate [m3/s]",
+                                                     "Initial Autosized Design Free Convection Regime Air Flow Rate [m3/s]",
                                                      this->FreeConvAirFlowRate);
                     }
                 } else { // Hard-sized with sizing data
@@ -3742,7 +3749,7 @@ namespace CondenserLoopTowers {
                         BaseSizer::reportSizerOutput(state,
                                                      this->TowerType,
                                                      this->Name,
-                                                     "Design Free Convection Regime Air Flow Rate [m3/s]",
+                                                     "Autosized Design Free Convection Regime Air Flow Rate [m3/s]",
                                                      tmpFreeConvAirFlowRate,
                                                      "User-Specified Design Free Convection Regime Air Flow Rate [m3/s]",
                                                      FreeConvAirFlowUser);
@@ -3753,9 +3760,9 @@ namespace CondenserLoopTowers {
                                 ShowContinueError(
                                     state,
                                     format("User-Specified Design Free Convection Regime Air Flow Rate of {:.2R} [m3/s]", FreeConvAirFlowUser));
-                                ShowContinueError(
-                                    state,
-                                    format("differs from Design Free Convection Regime Air Flow Rate of {:.2R} [m3/s]", tmpFreeConvAirFlowRate));
+                                ShowContinueError(state,
+                                                  format("differs from Autosized Design Free Convection Regime Air Flow Rate of {:.2R} [m3/s]",
+                                                         tmpFreeConvAirFlowRate));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                                 ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                             }
@@ -3873,11 +3880,11 @@ namespace CondenserLoopTowers {
                             this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                                 BaseSizer::reportSizerOutput(
-                                    state, this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
+                                    state, this->TowerType, this->Name, "Autosized Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                             }
                             if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                                 BaseSizer::reportSizerOutput(
-                                    state, this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
+                                    state, this->TowerType, this->Name, "Initial Autosized Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                             }
                         }
                     } else {
@@ -3891,11 +3898,14 @@ namespace CondenserLoopTowers {
                                 this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                                     BaseSizer::reportSizerOutput(
-                                        state, this->TowerType, this->Name, "Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
+                                        state, this->TowerType, this->Name, "Autosized Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
                                 }
                                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                                    BaseSizer::reportSizerOutput(
-                                        state, this->TowerType, this->Name, "Initial Design Water Flow Rate [m3/s]", this->DesignWaterFlowRate);
+                                    BaseSizer::reportSizerOutput(state,
+                                                                 this->TowerType,
+                                                                 this->Name,
+                                                                 "Initial Autosized Design Water Flow Rate [m3/s]",
+                                                                 this->DesignWaterFlowRate);
                                 }
                             }
                         } else {
@@ -4213,11 +4223,11 @@ namespace CondenserLoopTowers {
                         this->HighSpeedAirFlowRate = tmpDesignAirFlowRate;
                         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(
-                                state, this->TowerType, this->Name, "Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
+                                state, this->TowerType, this->Name, "Autosized Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                             BaseSizer::reportSizerOutput(
-                                state, this->TowerType, this->Name, "Initial Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
+                                state, this->TowerType, this->Name, "Initial Autosized Design Air Flow Rate [m3/s]", this->HighSpeedAirFlowRate);
                         }
                     }
 
@@ -4295,10 +4305,11 @@ namespace CondenserLoopTowers {
 
                 this->HighSpeedFanPower = tmpHighSpeedFanPower;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Design Fan Power [W]", this->HighSpeedFanPower);
+                    BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Autosized Design Fan Power [W]", this->HighSpeedFanPower);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, this->TowerType, this->Name, "Initial Design Fan Power [W]", this->HighSpeedFanPower);
+                    BaseSizer::reportSizerOutput(
+                        state, this->TowerType, this->Name, "Initial Autosized Design Fan Power [W]", this->HighSpeedFanPower);
                 }
             } else { // Hard-sized with sizing data
                 Real64 HighSpeedFanPowerUser(0.0);
@@ -4307,7 +4318,7 @@ namespace CondenserLoopTowers {
                     BaseSizer::reportSizerOutput(state,
                                                  this->TowerType,
                                                  this->Name,
-                                                 "Design Fan Power [W]",
+                                                 "Autosized Design Fan Power [W]",
                                                  tmpHighSpeedFanPower,
                                                  "User-Specified Design Fan Power [W]",
                                                  HighSpeedFanPowerUser);
@@ -4316,7 +4327,7 @@ namespace CondenserLoopTowers {
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError(state, format("User-Specified Design Fan Power of {:.2R} [W]", HighSpeedFanPowerUser));
-                            ShowContinueError(state, format("differs from Design Fan Power of {:.2R} [W]", tmpHighSpeedFanPower));
+                            ShowContinueError(state, format("differs from Autosized Design Fan Power of {:.2R} [W]", tmpHighSpeedFanPower));
                             ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
