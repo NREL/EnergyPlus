@@ -375,7 +375,7 @@ namespace DataSurfaces {
     constexpr int InConvClass_E_StableFloor(41);         // flow regime E
     constexpr int InConvClass_E_UnstableFloor(42);       // flow regime E
     constexpr int InConvClass_E_StableCeiling(43);       // flow regime E
-    constexpr int InConvClass_E_UnstableCieling(44);     // flow regime E
+    constexpr int InConvClass_E_UnstableCeiling(44);     // flow regime E
     constexpr int InConvClass_E_Windows(45);             // flow regime E
 
     // Parameters for fenestration relative location in zone
