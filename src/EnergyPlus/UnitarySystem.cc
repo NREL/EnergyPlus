@@ -2983,6 +2983,22 @@ namespace UnitarySystems {
             this->m_FanExists = true;
         }
 
+        std::string loc_m_ControlType = input_data.control_type;
+
+        if (UtilityRoutines::SameString(loc_m_ControlType, "Load")) {
+            this->m_ControlType = ControlType::Load;
+        } else if (UtilityRoutines::SameString(loc_m_ControlType, "SetPoint")) {
+            this->m_ControlType = ControlType::Setpoint;
+        } else if (UtilityRoutines::SameString(loc_m_ControlType, "SingleZoneVAV")) {
+            this->m_ControlType = ControlType::CCMASHRAE;
+            this->m_ValidASHRAECoolCoil = true;
+            this->m_ValidASHRAEHeatCoil = true;
+        } else {
+            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+            ShowContinueError(state, "Invalid Control Type = " + loc_m_ControlType);
+            errorsFound = true;
+        }
+
         // Early calls to ATMixer don't have enough info to pass GetInput. Need to get the data next time through.
         if (sysNum == -1 || !state.dataZoneEquip->ZoneEquipInputsFilled) {
             return;
@@ -3064,22 +3080,6 @@ namespace UnitarySystems {
             }
         } else {
             this->m_SysAvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-        }
-
-        std::string loc_m_ControlType = input_data.control_type;
-
-        if (UtilityRoutines::SameString(loc_m_ControlType, "Load")) {
-            this->m_ControlType = ControlType::Load;
-        } else if (UtilityRoutines::SameString(loc_m_ControlType, "SetPoint")) {
-            this->m_ControlType = ControlType::Setpoint;
-        } else if (UtilityRoutines::SameString(loc_m_ControlType, "SingleZoneVAV")) {
-            this->m_ControlType = ControlType::CCMASHRAE;
-            this->m_ValidASHRAECoolCoil = true;
-            this->m_ValidASHRAEHeatCoil = true;
-        } else {
-            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-            ShowContinueError(state, "Invalid Control Type = " + loc_m_ControlType);
-            errorsFound = true;
         }
 
         std::string loc_controlZoneName = input_data.controlling_zone_or_thermostat_location;
