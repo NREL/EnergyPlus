@@ -2979,6 +2979,10 @@ namespace UnitarySystems {
             this->m_SuppCoilExists = true;
         }
 
+        if (input_data.supply_fan_object_type.size() > 0 && input_data.supply_fan_name.size() > 0) {
+            this->m_FanExists = true;
+        }
+
         // Early calls to ATMixer don't have enough info to pass GetInput. Need to get the data next time through.
         if (sysNum == -1 || !state.dataZoneEquip->ZoneEquipInputsFilled) {
             return;
