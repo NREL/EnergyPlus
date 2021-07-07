@@ -151,11 +151,11 @@ namespace OutAirNodeManager {
         int OutAirInletNodeListNum;  // OUTSIDE AIR INLET NODE LIST index
         int OutsideAirNodeSingleNum; // OUTSIDE AIR NODE index
         int AlphaNum;                // index into Alphas
-        int ListSize;                // size of OutAirInletNodeList
+        std::size_t ListSize;        // size of OutAirInletNodeList
         //  LOGICAL :: AlreadyInList ! flag used for checking for duplicate input
         bool ErrorsFound;
         bool ErrInList;
-        int CurSize;
+        std::size_t CurSize;
         int NextFluidStreamNum; // Fluid stream index (all outside air inlet nodes need a unique fluid stream number)
         Array1D_int TmpNums;
         std::string CurrentModuleObject; // Object type for getting and error messages
@@ -375,7 +375,7 @@ namespace OutAirNodeManager {
 
         if (ListSize > 0) {
             state.dataOutAirNodeMgr->NumOutsideAirNodes = ListSize;
-            state.dataOutAirNodeMgr->OutsideAirNodeList = TmpNums({1, ListSize});
+            state.dataOutAirNodeMgr->OutsideAirNodeList = TmpNums({1, static_cast<int>(ListSize)});
         }
     }
 
