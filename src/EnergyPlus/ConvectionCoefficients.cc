@@ -60,7 +60,6 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/ConvectionConstants.hh>
@@ -449,9 +448,8 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
                 HExt = CalcASHRAESimpExtConvectCoeff(Roughness, SurfWindSpeed); // includes radiation to sky, ground, and air
             }
 
-        } else if (BITF_TEST_ANY(BITF(SELECT_CASE_var1),
-                                 BITF(ConvectionConstants::HcExt_ASHRAETARP) | BITF(ConvectionConstants::HcExt_BLASTHcOutside) |
-                                     BITF(ConvectionConstants::HcExt_TarpHcOutside))) {
+        } else if ((SELECT_CASE_var1 == ConvectionConstants::HcExt_ASHRAETARP) || (SELECT_CASE_var1 == ConvectionConstants::HcExt_BLASTHcOutside) ||
+                   (SELECT_CASE_var1 == ConvectionConstants::HcExt_TarpHcOutside)) {
             //   Convection is split into forced and natural components. The total
             //   convective heat transfer coefficient is the sum of these components.
             //   Coefficients for subsurfaces are handled in a special way.  The values for perimeter and gross area
@@ -1323,7 +1321,6 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
                         ExtValue = HcExt_ConvectionTypesMap.at(equationName);
 
-                        // TODO: Use BITF Comparison
                         if ((ExtValue == ConvectionConstants::HcExt_ASHRAESimpleCombined) || (ExtValue == ConvectionConstants::HcExt_TarpHcOutside) ||
                             (ExtValue == ConvectionConstants::HcExt_MoWiTTHcOutside) || (ExtValue == ConvectionConstants::HcExt_DOE2HcOutside) ||
                             (ExtValue == ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm)) {
@@ -1415,10 +1412,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
                         IntValue = HcInt_ConvectionTypesMap.at(equationName);
-                        if (BITF_TEST_ANY(BITF(IntValue),
-                                          BITF(ConvectionConstants::HcInt_ASHRAESimple) | BITF(ConvectionConstants::HcInt_ASHRAETARP) |
-                                              BITF(ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) |
-                                              BITF(ConvectionConstants::HcInt_ASTMC1340))) {
+                        if ((IntValue == ConvectionConstants::HcInt_ASHRAESimple) || (IntValue == ConvectionConstants::HcInt_ASHRAETARP) ||
+                            (IntValue == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) ||
+                            (IntValue == ConvectionConstants::HcInt_ASTMC1340)) {
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
                         } else if (IntValue == ConvectionConstants::HcInt_Value) {
                             ++state.dataSurface->TotIntConvCoeff;
@@ -1563,10 +1559,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcExt_ConvectionTypesMap.find(equationName) != HcExt_ConvectionTypesMap.end()) {
                         ExtValue = HcExt_ConvectionTypesMap.at(equationName);
-                        if (BITF_TEST_ANY(BITF(ExtValue),
-                                          BITF(ConvectionConstants::HcExt_ASHRAESimple) | BITF(ConvectionConstants::HcExt_ASHRAETARP) |
-                                              BITF(ConvectionConstants::HcExt_MoWiTTHcOutside) | BITF(ConvectionConstants::HcExt_DOE2HcOutside) |
-                                              BITF(ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm))) {
+                        if ((ExtValue == ConvectionConstants::HcExt_ASHRAESimple) || (ExtValue == ConvectionConstants::HcExt_ASHRAETARP) ||
+                            (ExtValue == ConvectionConstants::HcExt_MoWiTTHcOutside) || (ExtValue == ConvectionConstants::HcExt_DOE2HcOutside) ||
+                            (ExtValue == ConvectionConstants::HcExt_AdaptiveConvectionAlgorithm)) {
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", -ExtValue);
                         } else if (ExtValue == ConvectionConstants::HcExt_Value) {
                             // SimpleValueAssignment via UserExtConvectionCoeffs array
@@ -1656,10 +1651,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                     std::string equationName = Alphas(Ptr + 1);
                     if (HcInt_ConvectionTypesMap.find(equationName) != HcInt_ConvectionTypesMap.end()) {
                         IntValue = HcInt_ConvectionTypesMap.at(equationName);
-                        if (BITF_TEST_ANY(BITF(IntValue),
-                                          BITF(ConvectionConstants::HcInt_ASHRAESimple) | BITF(ConvectionConstants::HcInt_ASHRAETARP) |
-                                              BITF(ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm) |
-                                              BITF(ConvectionConstants::HcInt_ASTMC1340))) {
+                        if ((IntValue == ConvectionConstants::HcInt_ASHRAESimple) || (IntValue == ConvectionConstants::HcInt_ASHRAETARP) ||
+                            (IntValue == ConvectionConstants::HcInt_AdaptiveConvectionAlgorithm ||
+                             (IntValue == ConvectionConstants::HcInt_ASTMC1340))) {
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
                         } else if (IntValue == ConvectionConstants::HcInt_Value) {
                             // SimpleValueAssignment via UserExtConvectionCoeffs array
@@ -5850,7 +5844,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                     auto const SELECT_CASE_var(
                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipType_Num(EquipNum));
 
-                    if (BITF_TEST_ANY(BITF(SELECT_CASE_var), BITF(AirDistUnit_Num) | BITF(PurchasedAir_Num))) { // central air equipment
+                    if ((SELECT_CASE_var == AirDistUnit_Num) || (SELECT_CASE_var == PurchasedAir_Num)) { // central air equipment
                         if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                             .EquipData(EquipNum)
                                             .OutletNodeNums)))
@@ -5882,10 +5876,11 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                         .CoolingPriority(EquipNum);
                             }
                         }
-                    } else if (BITF_TEST_ANY(BITF(SELECT_CASE_var),
-                                             BITF(WindowAC_Num) | BITF(PkgTermHPAirToAir_Num) | BITF(PkgTermACAirToAir_Num) |
-                                                 BITF(ZoneDXDehumidifier_Num) | BITF(PkgTermHPWaterToAir_Num) | BITF(FanCoil4Pipe_Num) |
-                                                 BITF(UnitVentilator_Num) | BITF(UnitHeater_Num) | BITF(OutdoorAirUnit_Num))) {
+                    } else if ((SELECT_CASE_var == WindowAC_Num) || (SELECT_CASE_var == PkgTermHPAirToAir_Num) ||
+                               (SELECT_CASE_var == PkgTermACAirToAir_Num) || (SELECT_CASE_var == ZoneDXDehumidifier_Num) ||
+                               (SELECT_CASE_var == PkgTermHPWaterToAir_Num) || (SELECT_CASE_var == FanCoil4Pipe_Num) ||
+                               (SELECT_CASE_var == UnitVentilator_Num) || (SELECT_CASE_var == UnitHeater_Num) ||
+                               (SELECT_CASE_var == OutdoorAirUnit_Num)) {
                         if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                             .EquipData(EquipNum)
                                             .OutletNodeNums)))
@@ -5916,9 +5911,9 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                         .CoolingPriority(EquipNum);
                             }
                         }
-                    } else if (BITF_TEST_ANY(BITF(SELECT_CASE_var),
-                                             BITF(CoolingPanel_Num) | BITF(BBSteam_Num) | BITF(BBWaterConvective_Num) |
-                                                 BITF(BBElectricConvective_Num) | BITF(BBWater_Num))) {
+                    } else if ((SELECT_CASE_var == CoolingPanel_Num) || (SELECT_CASE_var == BBSteam_Num) ||
+                               (SELECT_CASE_var == BBWaterConvective_Num) || (SELECT_CASE_var == BBElectricConvective_Num) ||
+                               (SELECT_CASE_var == BBWater_Num)) {
 
                         if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                             EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
@@ -5930,7 +5925,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                     .CoolingPriority(EquipNum);
                         }
-                    } else if (BITF_TEST_ANY(BITF(SELECT_CASE_var), BITF(BBElectric_Num) | BITF(HiTempRadiant_Num))) {
+                    } else if ((SELECT_CASE_var == BBElectric_Num) || (SELECT_CASE_var == HiTempRadiant_Num)) {
                         if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).ON) {
                             EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
                             FlowRegimeStack[EquipOnCount] = ConvectionConstants::InConvFlowRegime::B;
@@ -5941,7 +5936,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex)
                                     .CoolingPriority(EquipNum);
                         }
-                    } else if (BITF_TEST_ANY(BITF(SELECT_CASE_var), BITF(VentilatedSlab_Num) | BITF(LoTempRadiant_Num))) {
+                    } else if ((SELECT_CASE_var == VentilatedSlab_Num) || (SELECT_CASE_var == LoTempRadiant_Num)) {
 
                         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).InFloorActiveElement) {
                             for (SurfLoop = Zone(ZoneNum).HTSurfaceFirst; SurfLoop <= Zone(ZoneNum).HTSurfaceLast; ++SurfLoop) {
@@ -6045,7 +6040,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     }
 
     // now if flow regimes C or D, then check for Mixed regime or very low flow rates
-    if (BITF_TEST_ANY(BITF(FinalFlowRegime), BITF(ConvectionConstants::InConvFlowRegime::C) | BITF(ConvectionConstants::InConvFlowRegime::D))) {
+    if ((FinalFlowRegime == ConvectionConstants::InConvFlowRegime::C) || (FinalFlowRegime == ConvectionConstants::InConvFlowRegime::D)) {
 
         // Calculate Grashof, Reynolds, and Richardson numbers for the zone
         // Grashof for zone air based on largest delta T between surfaces and zone height
@@ -6392,14 +6387,14 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for B surface named" + Surface(SurfNum).Name);
             }
         } else if (SELECT_CASE_var == ConvectionConstants::InConvFlowRegime::C) {
-            if (BITF_TEST_ANY(BITF(Surface(SurfNum).Class), BITF(SurfaceClass::Wall) | BITF(SurfaceClass::Door))) {
+            if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_C_Walls;
             } else if (Surface(SurfNum).Class == SurfaceClass::Roof) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_C_Ceiling;
             } else if (Surface(SurfNum).Class == SurfaceClass::Floor) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_C_Floor;
-            } else if (BITF_TEST_ANY(BITF(Surface(SurfNum).Class),
-                                     BITF(SurfaceClass::Window) | BITF(SurfaceClass::GlassDoor) | BITF(SurfaceClass::TDD_Diffuser))) {
+            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
+                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_C_Windows;
             } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_C_Floor;
@@ -6470,8 +6465,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                         state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_D_StableTilted;
                     }
                 }
-            } else if (BITF_TEST_ANY(BITF(Surface(SurfNum).Class),
-                                     BITF(SurfaceClass::Window) | BITF(SurfaceClass::GlassDoor) | BITF(SurfaceClass::TDD_Diffuser))) {
+            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
+                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_D_Windows;
             } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
                 // assume horizontal upwards.
@@ -6524,8 +6519,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 } else {
                     state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_E_StableFloor;
                 }
-            } else if (BITF_TEST_ANY(BITF(Surface(SurfNum).Class),
-                                     BITF(SurfaceClass::Window) | BITF(SurfaceClass::GlassDoor) | BITF(SurfaceClass::TDD_Diffuser))) {
+            } else if ((Surface(SurfNum).Class == SurfaceClass::Window) || (Surface(SurfNum).Class == SurfaceClass::GlassDoor) ||
+                       (Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)) {
                 state.dataSurface->SurfIntConvClassification(SurfNum) = InConvClass_E_Windows;
             } else if (Surface(SurfNum).Class == SurfaceClass::IntMass) {
                 if (DeltaTemp > 0.0) {
