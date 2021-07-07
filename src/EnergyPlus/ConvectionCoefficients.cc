@@ -1444,7 +1444,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                                       state.dataIPShortCut->cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                             }
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
-                        } else if (IntValue == ConvectionConstants::HcInt_Value) {
+                        } else if (IntValue == ConvectionConstants::HcInt_Schedule) {
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
