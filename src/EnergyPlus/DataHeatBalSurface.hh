@@ -218,6 +218,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array2D<Real64> TsrcHistM;  // Master temperature history at the source location (SurfNum,Term)
     Array2D<Real64> TuserHistM; // Master temperature history at the user specified location (SurfNum,Term)
     Array2D<Real64> QsrcHistM;  // Master heat source/sink history for the surface (SurfNum,Term)
+    Array1D<Real64> SurfOutTempHistCurr;
+    Array1D<Real64> SurfInTempHistCurr;
 
     Array2D<Real64> ZoneFractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
     Array1D_bool EnclSolRecDifShortFromZ;  // True if Zone gets short radiation from another
@@ -332,6 +334,8 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->QsrcHist.deallocate();
         this->TsrcHistM.deallocate();
         this->QsrcHistM.deallocate();
+        this->SurfOutTempHistCurr.deallocate();
+        this->SurfInTempHistCurr.deallocate();
         this->ZoneFractDifShortZtoZ.deallocate();
         this->EnclSolRecDifShortFromZ.deallocate();
         this->InterZoneWindow = false;
