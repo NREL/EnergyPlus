@@ -112,6 +112,8 @@ namespace OutsideEnergySources {
         void calculate(EnergyPlusData &state, bool runFlag, Real64 curLoad);
 
         void size(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void GetOutsideEnergySourcesInput(EnergyPlusData &state);
