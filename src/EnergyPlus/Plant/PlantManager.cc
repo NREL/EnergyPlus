@@ -1399,16 +1399,6 @@ void GetPlantInput(EnergyPlusData &state)
                     this_comp.NodeNameOut = OutletNodeNames(CompNum);
                     this_comp.NodeNumOut = OutletNodeNumbers(CompNum);
                 }
-                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-                    // set up some references
-                    auto &this_comp(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
-
-//                    this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-//                    this_comp.TypeOf = this_comp_type;
-//                    this_comp.location = EnergyPlus::PlantLocation(LoopNum, LoopSideNum, BranchNum, CompNum);
-                    auto type = this_comp.TypeOf;
-                    this_comp.oneTimeInit(state);
-                }
 
                 // set branch inlet/outlet nodes
                 branch.NodeNumIn = branch.Comp(1).NodeNumIn;
@@ -1848,6 +1838,26 @@ void GetPlantInput(EnergyPlusData &state)
         } // loop over branches on the loop (ventilation report data)
 
     } // loop over plant supply loops (ventilation report data)
+
+    // OneTimeInit Here
+    for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+        auto &plantLoop = state.dataPlnt->PlantLoop(LoopNum);
+        plantLoop.LoopHasConnectionComp = false;
+
+        for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
+            auto &loopSide = plantLoop.LoopSide(LoopSideNum);
+
+            for (BranchNum = 1; BranchNum <= loopSide.TotalBranches; ++BranchNum) {
+
+                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                    //                    auto &this_comp_type(CompTypes(CompNum));
+                    auto &this_comp(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
+                    auto type = this_comp.TypeOf;
+                    this_comp.oneTimeInit(state);
+                }
+            }
+        }
+    }
 }
 
 void SetupReports(EnergyPlusData &state)

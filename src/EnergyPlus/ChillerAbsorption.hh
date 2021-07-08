@@ -170,7 +170,6 @@ namespace ChillerAbsorption {
         Real64 EvaporatorEnergy;                       // J - heat transfer to the evaporator coil
         Real64 QCondenser;                             // W - rate of heat transfer to the condenser coil
         Real64 CondenserEnergy;                        // J - heat transfer to the condenser coil
-        bool MyOneTimeFlag;
         bool MyEnvrnFlag;
         bool GenInputOutputNodesUsed;
         ReportVars Report;
