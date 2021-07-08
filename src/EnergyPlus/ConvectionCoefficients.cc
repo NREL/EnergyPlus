@@ -110,7 +110,7 @@ using namespace DataSurfaces;
 using namespace DataVectorTypes;
 
 // Coefficients that modify the convection coeff based on surface roughness
-Array1D<Real64> const RoughnessMultiplier(6, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
+Array1D<Real64> const RoughnessMultiplier({0, 5}, {2.17, 1.67, 1.52, 1.13, 1.11, 1.0});
 
 void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                                   const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
@@ -329,15 +329,15 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
 }
 
 void InitExteriorConvectionCoeff(EnergyPlusData &state,
-                                 int const SurfNum,      // Surface number (in Surface derived type)
-                                 Real64 const HMovInsul, // Equivalent convection coefficient of movable insulation
-                                 int const Roughness,    // Roughness index (1-6), see DataHeatBalance parameters
-                                 Real64 const AbsExt,    // Exterior thermal absorptance
-                                 Real64 const TempExt,   // Exterior surface temperature (C)
-                                 Real64 &HExt,           // Convection coefficient to exterior air
-                                 Real64 &HSky,           // "Convection" coefficient to sky temperature
-                                 Real64 &HGround,        // "Convection" coefficient to ground temperature
-                                 Real64 &HAir            // Radiation to Air Component
+                                 int const SurfNum,                              // Surface number (in Surface derived type)
+                                 Real64 const HMovInsul,                         // Equivalent convection coefficient of movable insulation
+                                 DataSurfaces::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                 Real64 const AbsExt,                            // Exterior thermal absorptance
+                                 Real64 const TempExt,                           // Exterior surface temperature (C)
+                                 Real64 &HExt,                                   // Convection coefficient to exterior air
+                                 Real64 &HSky,                                   // "Convection" coefficient to sky temperature
+                                 Real64 &HGround,                                // "Convection" coefficient to ground temperature
+                                 Real64 &HAir                                    // Radiation to Air Component
 )
 {
 
@@ -629,13 +629,13 @@ void InitExteriorConvectionCoeff(EnergyPlusData &state,
     }
 }
 
-Real64 CalcHfExteriorSparrow(Real64 const SurfWindSpeed, // Local wind speed at height of the heat transfer surface (m/s)
-                             Real64 const GrossArea,     // Gross surface area {m2}
-                             Real64 const Perimeter,     // Surface perimeter length {m}
-                             Real64 const CosTilt,       // Cosine of the Surface Tilt Angle
-                             Real64 const Azimuth,       // Facing angle (degrees) of the surface outward normal
-                             int const Roughness,        // Surface roughness index (6=very smooth, 5=smooth, 4=medium smooth,
-                             Real64 const WindDirection  // Wind (compass) direction (degrees)
+Real64 CalcHfExteriorSparrow(Real64 const SurfWindSpeed,                     // Local wind speed at height of the heat transfer surface (m/s)
+                             Real64 const GrossArea,                         // Gross surface area {m2}
+                             Real64 const Perimeter,                         // Surface perimeter length {m}
+                             Real64 const CosTilt,                           // Cosine of the Surface Tilt Angle
+                             Real64 const Azimuth,                           // Facing angle (degrees) of the surface outward normal
+                             DataSurfaces::SurfaceRoughness const Roughness, // Surface roughness index (6=very smooth, 5=smooth, 4=medium smooth,
+                             Real64 const WindDirection                      // Wind (compass) direction (degrees)
 )
 {
     if (Windward(CosTilt, Azimuth, WindDirection)) {
@@ -2448,8 +2448,9 @@ void ApplyConvectionValue(EnergyPlusData &state, std::string const &SurfaceTypes
     }
 }
 
-Real64 CalcASHRAESimpExtConvectCoeff(int const Roughness,       // Integer index for roughness, relates to parameter array indices
-                                     Real64 const SurfWindSpeed // Current wind speed, m/s
+Real64
+CalcASHRAESimpExtConvectCoeff(DataSurfaces::SurfaceRoughness const Roughness, // Integer index for roughness, relates to parameter array indices
+                              Real64 const SurfWindSpeed                      // Current wind speed, m/s
 )
 {
 
@@ -2475,11 +2476,12 @@ Real64 CalcASHRAESimpExtConvectCoeff(int const Roughness,       // Integer index
     Real64 CalcASHRAESimpExtConvectCoeff;
 
     // FUNCTION PARAMETER DEFINITIONS:
-    static Array1D<Real64> const D(6, {11.58, 12.49, 10.79, 8.23, 10.22, 8.23});
-    static Array1D<Real64> const E(6, {5.894, 4.065, 4.192, 4.00, 3.100, 3.33});
-    static Array1D<Real64> const F(6, {0.0, 0.028, 0.0, -0.057, 0.0, -0.036});
+    static Array1D<Real64> const D({0, 5}, {11.58, 12.49, 10.79, 8.23, 10.22, 8.23});
+    static Array1D<Real64> const E({0, 5}, {5.894, 4.065, 4.192, 4.00, 3.100, 3.33});
+    static Array1D<Real64> const F({0, 5}, {0.0, 0.028, 0.0, -0.057, 0.0, -0.036});
 
-    CalcASHRAESimpExtConvectCoeff = D(Roughness) + E(Roughness) * SurfWindSpeed + F(Roughness) * pow_2(SurfWindSpeed);
+    CalcASHRAESimpExtConvectCoeff =
+        D(static_cast<int>(Roughness)) + E(static_cast<int>(Roughness)) * SurfWindSpeed + F(static_cast<int>(Roughness)) * pow_2(SurfWindSpeed);
 
     return CalcASHRAESimpExtConvectCoeff;
 }
@@ -4880,7 +4882,8 @@ void EvaluateExtHcModels(EnergyPlusData &state, int const SurfNum, int const Nat
             SurfWindSpeed = state.dataSurface->SurfOutWindSpeed(SurfNum);
         }
 
-        int Roughness = state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+        DataSurfaces::SurfaceRoughness Roughness =
+            state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
 
         auto const SELECT_CASE_var(ForcedConvModelEqNum);
 
@@ -7952,7 +7955,8 @@ Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(EnergyPlusData &state,
     return CalcGoldsteinNovoselacCeilingDiffuserFloor(AirSystemFlowRate, ZoneExtPerimLength);
 }
 
-Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ)
+Real64
+CalcSparrowWindward(DataSurfaces::SurfaceRoughness const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ)
 {
 
     // FUNCTION INFORMATION:
@@ -7978,10 +7982,11 @@ Real64 CalcSparrowWindward(int const RoughnessIndex, Real64 const FacePerimeter,
     //   M.S. Thesis, Department of Mechanical and Industrial Engineering,
     //   University of Illinois at Urbana-Champaign.
 
-    return 2.537 * RoughnessMultiplier(RoughnessIndex) * std::sqrt(FacePerimeter * WindAtZ / FaceArea);
+    return 2.537 * RoughnessMultiplier(static_cast<int>(RoughnessIndex)) * std::sqrt(FacePerimeter * WindAtZ / FaceArea);
 }
 
-Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ)
+Real64
+CalcSparrowLeeward(DataSurfaces::SurfaceRoughness const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ)
 {
 
     // FUNCTION INFORMATION:
@@ -8010,8 +8015,12 @@ Real64 CalcSparrowLeeward(int const RoughnessIndex, Real64 const FacePerimeter, 
     return 0.5 * CalcSparrowWindward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
 }
 
-Real64 CalcSparrowWindward(
-    EnergyPlusData &state, int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
+Real64 CalcSparrowWindward(EnergyPlusData &state,
+                           DataSurfaces::SurfaceRoughness const RoughnessIndex,
+                           Real64 const FacePerimeter,
+                           Real64 const FaceArea,
+                           Real64 const WindAtZ,
+                           int const SurfNum)
 {
     auto &Surface(state.dataSurface->Surface);
 
@@ -8032,8 +8041,12 @@ Real64 CalcSparrowWindward(
     }
 }
 
-Real64 CalcSparrowLeeward(
-    EnergyPlusData &state, int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
+Real64 CalcSparrowLeeward(EnergyPlusData &state,
+                          DataSurfaces::SurfaceRoughness const RoughnessIndex,
+                          Real64 const FacePerimeter,
+                          Real64 const FaceArea,
+                          Real64 const WindAtZ,
+                          int const SurfNum)
 {
     auto &Surface(state.dataSurface->Surface);
 
@@ -8124,15 +8137,23 @@ Real64 CalcMoWITTLeeward(Real64 const DeltaTemp, Real64 const WindAtZ)
     return std::sqrt(pow_2(Hn) + pow_2(Hf));
 }
 
-Real64 CalcDOE2Forced(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const HfSmooth, int const RoughnessIndex)
+Real64 CalcDOE2Forced(Real64 const SurfaceTemp,
+                      Real64 const AirTemp,
+                      Real64 const CosineTilt,
+                      Real64 const HfSmooth,
+                      DataSurfaces::SurfaceRoughness const RoughnessIndex)
 {
     // This allows costly HfSmooth to be calculated independently (avoids excessive use of std::pow() in Kiva)
     Real64 Hn = CalcASHRAETARPNatural(SurfaceTemp, AirTemp, CosineTilt);
     Real64 HcSmooth = std::sqrt(pow_2(Hn) + pow_2(HfSmooth));
-    return RoughnessMultiplier(RoughnessIndex) * (HcSmooth - Hn);
+    return RoughnessMultiplier(static_cast<int>(RoughnessIndex)) * (HcSmooth - Hn);
 }
 
-Real64 CalcDOE2Windward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex)
+Real64 CalcDOE2Windward(Real64 const SurfaceTemp,
+                        Real64 const AirTemp,
+                        Real64 const CosineTilt,
+                        Real64 const WindAtZ,
+                        DataSurfaces::SurfaceRoughness const RoughnessIndex)
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         Brent Griffith
@@ -8156,7 +8177,11 @@ Real64 CalcDOE2Windward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 c
     return CalcDOE2Forced(SurfaceTemp, AirTemp, CosineTilt, HfSmooth, RoughnessIndex);
 }
 
-Real64 CalcDOE2Leeward(Real64 const SurfaceTemp, Real64 const AirTemp, Real64 const CosineTilt, Real64 const WindAtZ, int const RoughnessIndex)
+Real64 CalcDOE2Leeward(Real64 const SurfaceTemp,
+                       Real64 const AirTemp,
+                       Real64 const CosineTilt,
+                       Real64 const WindAtZ,
+                       DataSurfaces::SurfaceRoughness const RoughnessIndex)
 {
     // FUNCTION INFORMATION:
     //       AUTHOR         Brent Griffith
@@ -8457,7 +8482,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
                      Real64 const WindAtZ,
                      Real64 const RoofArea,
                      Real64 const RoofPerimeter,
-                     int const RoughnessIndex)
+                     DataSurfaces::SurfaceRoughness const RoughnessIndex)
 {
     // Using/Aliasing
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -8497,7 +8522,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
 
     Rex = WindAtZ * AirDensity * x / v;
 
-    Real64 Rf = RoughnessMultiplier(RoughnessIndex);
+    Real64 Rf = RoughnessMultiplier(static_cast<int>(RoughnessIndex));
     if (Rex > 0.1) { // avoid zero and crazy small denominators
         Real64 tmp = std::log(1.0 + GrLn / pow_2(Rex));
         eta = tmp / (1.0 + tmp);
@@ -8521,7 +8546,8 @@ Real64 CalcClearRoof(EnergyPlusData &state,
 
     Real64 x; // distance to roof edge toward wind direction
 
-    int const RoughnessIndex = state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
+    DataSurfaces::SurfaceRoughness const RoughnessIndex =
+        state.dataMaterial->Material(state.dataConstruction->Construct(Surface(SurfNum).Construction).LayerPoint(1)).Roughness;
     // find x, don't know x. avoid time consuming geometry algorithm
     x = std::sqrt(RoofArea) / 2.0; // quick simplification, geometry routines to develop
 

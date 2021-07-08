@@ -4888,9 +4888,6 @@ namespace SystemAvailabilityManager {
         using AirflowNetworkBalanceManager::GetZoneOutdoorAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
-        using DataHeatBalance::HybridControlTypeClose;
-        using DataHeatBalance::HybridControlTypeGlobal;
-        using DataHeatBalance::HybridControlTypeIndiv;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -5306,13 +5303,13 @@ namespace SystemAvailabilityManager {
                         // Setup flag for ventilation objects
                         for (i = 1; i <= state.dataHeatBal->TotVentilation; ++i) {
                             if (state.dataHeatBal->Ventilation(i).ZonePtr == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum) {
-                                state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeIndiv;
+                                state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Indiv;
                                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl ==
                                     state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                                    state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeClose;
+                                    state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Close;
                                 } else {
                                     if (SimpleControlType == 1) {
-                                        state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeGlobal;
+                                        state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Global;
                                         state.dataHeatBal->Ventilation(i).HybridControlMasterNum =
                                             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                                     }
@@ -5322,13 +5319,13 @@ namespace SystemAvailabilityManager {
                         // Setup flag for Mixing objects
                         for (i = 1; i <= state.dataHeatBal->TotMixing; ++i) {
                             if (state.dataHeatBal->Mixing(i).ZonePtr == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum) {
-                                state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeIndiv;
+                                state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Indiv;
                                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl ==
                                     state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                                    state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeClose;
+                                    state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Close;
                                 } else {
                                     if (SimpleControlType == 1) {
-                                        state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeGlobal;
+                                        state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Global;
                                         state.dataHeatBal->Mixing(i).HybridControlMasterNum =
                                             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                                     }
@@ -5346,13 +5343,13 @@ namespace SystemAvailabilityManager {
             for (i = 1; i <= state.dataHeatBal->TotVentilation; ++i) {
                 if (state.dataHeatBal->Ventilation(i).ZonePtr ==
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum) {
-                    state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeIndiv;
+                    state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Indiv;
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl ==
                         state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                        state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeClose;
+                        state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Close;
                     } else {
                         if (SimpleControlType == 1) {
-                            state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeGlobal;
+                            state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Global;
                             state.dataHeatBal->Ventilation(i).HybridControlMasterNum =
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                         }
@@ -5363,13 +5360,13 @@ namespace SystemAvailabilityManager {
             for (i = 1; i <= state.dataHeatBal->TotMixing; ++i) {
                 if (state.dataHeatBal->Mixing(i).ZonePtr ==
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum) {
-                    state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeIndiv;
+                    state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Indiv;
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl ==
                         state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                        state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeClose;
+                        state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Close;
                     } else {
                         if (SimpleControlType == 1) {
-                            state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeGlobal;
+                            state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Global;
                             state.dataHeatBal->Mixing(i).HybridControlMasterNum =
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                         }

@@ -6758,7 +6758,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     int VRFCond = 1;
     state->dataHVACVarRefFlow->VRF.allocate(1);
     state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum = 0;
-    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserType = 1; // DataHVACGlobals::AirCooled
+    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
     state->dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr = 1;
     state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity = 20000.0;
     state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity = 20000.0;
@@ -13321,7 +13321,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     int VRFCond = 1;
     state->dataHVACVarRefFlow->VRF.allocate(1);
     state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum = 0;
-    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserType = 1; // DataHVACGlobals::AirCooled
+    state->dataHVACVarRefFlow->VRF(VRFCond).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
     state->dataHVACVarRefFlow->VRF(VRFCond).ZoneTUListPtr = 1;
     state->dataHVACVarRefFlow->VRF(VRFCond).CoolingCapacity = 20000.0;
     state->dataHVACVarRefFlow->VRF(VRFCond).HeatingCapacity = 20000.0;
