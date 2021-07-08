@@ -6344,8 +6344,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
-    state->dataHeatingCoils->GetCoilsInputFlag = true;
-    state->dataHeatingCoils->HeatingCoil.deallocate();
+    //state->dataHeatingCoils->GetCoilsInputFlag = true;
+    //state->dataHeatingCoils->HeatingCoil.deallocate();
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -6529,8 +6529,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInputSZVAV)
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
-    state->dataHeatingCoils->GetCoilsInputFlag = true;
-    state->dataHeatingCoils->HeatingCoil.deallocate();
+    //state->dataHeatingCoils->GetCoilsInputFlag = true;
+    //state->dataHeatingCoils->HeatingCoil.deallocate();
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -12097,12 +12097,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_FALSE(thisSys->ATMixerExists);
     EXPECT_EQ(1, thisSys->ControlZoneNum);
-    EXPECT_EQ(state->dataLoopNodes->NodeID(2), "EAST ZONE UNITARY SYSTEM INLET");
-    EXPECT_EQ(2, thisSys->AirInNode);
-    EXPECT_EQ(state->dataLoopNodes->NodeID(3), "EAST ZONE SUPPLY INLET");
-    EXPECT_EQ(3, thisSys->AirOutNode);
-    EXPECT_EQ(state->dataLoopNodes->NodeID(5), "HEATING COIL AIR INLET NODE");
-    EXPECT_EQ(5, thisSys->HeatCoilInletNodeNum);
+    EXPECT_EQ(state->dataLoopNodes->NodeID(thisSys->AirInNode), "EAST ZONE UNITARY SYSTEM INLET");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(thisSys->AirOutNode), "EAST ZONE SUPPLY INLET");
+    EXPECT_EQ(state->dataLoopNodes->NodeID(thisSys->HeatCoilInletNodeNum), "HEATING COIL AIR INLET NODE");
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipmentBlankCtrlZone)
@@ -15860,7 +15857,8 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -50.0;
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -0.007806893;
     state->dataEnvrn->StdRhoAir = 1.2043;
-    state->dataLoopNodes->Node(3).MassFlowRateMax = 1.5 * state->dataEnvrn->StdRhoAir;
+    // set fan outlet node max flow
+    state->dataLoopNodes->Node(thisSys->CoolCoilInletNodeNum).MassFlowRateMax = 1.5 * state->dataEnvrn->StdRhoAir;
     int CompIndex = 1;
     bool HeatActive = false;
     bool CoolActive = true;
@@ -17092,28 +17090,21 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    InternalHeatGains::ManageInternalHeatGains(*state, true);
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
-    thisSys->AirInNode = 3;
-    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
-
-    state->dataZoneEquip->ZoneEquipInputsFilled = true; // indicate zone data is available
-    state->dataLoopNodes->NodeID.allocate(20);
-    state->dataLoopNodes->NodeID(20) = "East Zone Air Node";
-    state->dataHeatBal->ZoneIntGain.allocate(1);
-    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
-    state->dataHeatBal->RefrigCaseCredit.allocate(1);
-    state->dataHeatBal->RefrigCaseCredit(1).SenCaseCreditToZone = 0;
-    state->dataLoopNodes->Node.allocate(20);
-    state->dataLoopNodes->Node(20).Temp = 24.0;      // 24C db
-    state->dataLoopNodes->Node(20).HumRat = 0.00922; // 17C wb
-
-    RefrigeratedCase::ManageRefrigeratedCaseRacks(*state);
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = thisSys->AirInNode;
+
+    state->dataLoopNodes->Node(thisSys->NodeNumOfControlledZone).Temp = 24.0;      // 24C db
+    state->dataLoopNodes->Node(thisSys->NodeNumOfControlledZone).HumRat = 0.00922; // 17C wb
+
+    RefrigeratedCase::ManageRefrigeratedCaseRacks(*state);
 
     OutputReportPredefined::SetPredefinedTables(*state);
 
@@ -17147,20 +17138,22 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
 
     // set up node conditions to test UnitarySystem set point based control
     // Unitary system air inlet node = 3
-    state->dataLoopNodes->Node(3).MassFlowRate = thisSys->m_DesignMassFlowRate;
-    state->dataLoopNodes->Node(3).MassFlowRateMaxAvail = thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
+    state->dataLoopNodes->Node(thisSys->AirInNode).MassFlowRate = thisSys->m_DesignMassFlowRate;
+    state->dataLoopNodes->Node(thisSys->AirInNode).MassFlowRateMaxAvail =
+        thisSys->m_DesignMassFlowRate; // max avail at fan inlet so fan won't limit flow
 
     // test HEATING condition
-    state->dataLoopNodes->Node(3).Temp = 24.0;         // 24C db
-    state->dataLoopNodes->Node(3).HumRat = 0.00922;    // 17C wb
-    state->dataLoopNodes->Node(3).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    state->dataLoopNodes->Node(thisSys->AirInNode).Temp = 24.0;         // 24C db
+    state->dataLoopNodes->Node(thisSys->AirInNode).HumRat = 0.00922;    // 17C wb
+    state->dataLoopNodes->Node(thisSys->AirInNode).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
     // Heating coil air inlet node = 4
-    state->dataLoopNodes->Node(4).MassFlowRateMax = thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
+    state->dataLoopNodes->Node(thisSys->HeatCoilInletNodeNum).MassFlowRateMax =
+        thisSys->m_DesignMassFlowRate; // max at fan outlet so fan won't limit flow
     // Heating coil air outlet node = 5
-    state->dataLoopNodes->Node(5).TempSetPoint = 25.0;
+    state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).TempSetPoint = 25.0;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
@@ -17181,9 +17174,11 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
                       latOut);
 
     // check that heating coil air outlet node is at set point
-    EXPECT_NEAR(state->dataLoopNodes->Node(5).Temp, state->dataLoopNodes->Node(5).TempSetPoint, 0.001);
+    EXPECT_NEAR(state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).Temp,
+                state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).TempSetPoint,
+                0.001);
     // heating coil air inlet node temp is less than heating coil air outlet node temp
-    EXPECT_GT(state->dataLoopNodes->Node(5).Temp, state->dataLoopNodes->Node(4).Temp);
+    EXPECT_GT(state->dataLoopNodes->Node(thisSys->HeatCoilOutletNodeNum).Temp, state->dataLoopNodes->Node(thisSys->HeatCoilInletNodeNum).Temp);
 }
 
 TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
@@ -17249,7 +17244,7 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
+    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -17335,7 +17330,7 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
+    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -17437,7 +17432,7 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
+    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -17630,7 +17625,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     // check getinputs
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
+    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -17876,7 +17871,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     // check getinputs
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::UnitarySystemModel);
+    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);

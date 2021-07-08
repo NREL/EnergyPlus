@@ -2957,10 +2957,75 @@ namespace UnitarySystems {
                                                                    NodeInputManager::compFluidStream::Primary,
                                                                    DataLoopNode::ObjectIsParent);
 
+        // need to read in all information needed to SetupOutputVariable in setupAllOutputVars
+        // as soon as all systems are read in, regardless if all information is available, reports will be set up.
+        // make sure we have all the information needed to process reports (see IF blocks in setupAllOutputVars).
+        // all coil types, which comps exist, control type, heat recovery active, cooling coil index.
+        bool errFlag = false;
+        bool PrintMessage = false;
+
+        std::string loc_m_DesignSpecMultispeedHPType = input_data.design_specification_multispeed_object_type;
+        std::string loc_m_DesignSpecMultispeedHPName = input_data.design_specification_multispeed_object_name;
+        if (loc_m_DesignSpecMultispeedHPType != "" && loc_m_DesignSpecMultispeedHPName != "") {
+            this->m_DesignSpecMultispeedHPType = loc_m_DesignSpecMultispeedHPType;
+            this->m_DesignSpecMultispeedHPName = loc_m_DesignSpecMultispeedHPName;
+            int designSpecType_Num = 1;
+
+            DesignSpecMSHP thisDesignSpec;
+            this->m_CompPointerMSHP = thisDesignSpec.factory(state, designSpecType_Num, loc_m_DesignSpecMultispeedHPName);
+            this->m_DesignSpecMSHPIndex = getDesignSpecMSHPIndex(state, this->m_DesignSpecMultispeedHPName);
+        }
+
         // these are needed for call from GetOASysNumHeat(Cool)ingCoils
         std::string loc_heatingCoilType = input_data.heating_coil_object_type;
         if (loc_heatingCoilType.size() > 0) {
             this->m_HeatCoilExists = true;
+        }
+        std::string loc_m_HeatingCoilName = input_data.heating_coil_name;
+        if (this->m_HeatCoilExists && this->m_HeatingCoilType_Num == 0) {
+            if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:DX:VariableSpeed")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed;
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:DX:MultiSpeed")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedHeating;
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Water")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
+                if (this->m_DesignSpecMSHPIndex > -1) {
+                    this->m_NumOfSpeedHeating = this->m_CompPointerMSHP->numOfSpeedHeating;
+                    if (this->m_NumOfSpeedHeating > 1) {
+                        this->m_MultiSpeedHeatingCoil = true;
+                        this->m_MultiOrVarSpeedHeatCoil = true;
+                    }
+                }
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Steam")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:WaterToAirHeatPump:EquationFit")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWaterToAirHPSimple;
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWaterToAirHP;
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit;
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Electric:MultiStage")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingElectric_MultiStage;
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Gas:MultiStage")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingGas_MultiStage;
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Fuel") ||
+                       UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Electric") ||
+                       UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Desuperheater")) {
+                this->m_HeatingCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+            } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:UserDefined")) {
+                this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_UserDefined;
+            } else if (this->m_HeatCoilExists) {
+                this->m_HeatingCoilType_Num = DXCoils::GetCoilTypeNum(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag, PrintMessage);
+            }
+
+            if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
+                this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
+                this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
+                this->m_MultiSpeedHeatingCoil = true;
+            } else if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit ||
+                       this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) {
+                this->m_VarSpeedHeatingCoil = true;
+            }
         }
 
         std::string loc_coolingCoilType = input_data.cooling_coil_object_type;
@@ -2968,11 +3033,83 @@ namespace UnitarySystems {
             this->m_CoolCoilExists = true;
         }
 
-        // needed for checkUnitarySysCoilInOASysExists
-        if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
-            this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-        } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit")) {
-            this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
+        std::string loc_m_CoolingCoilName = input_data.cooling_coil_name;
+        // Find the type of coil. do not print message since this may not be the correct coil type.
+        errFlag = false;
+        if (this->m_CoolCoilExists && this->m_CoolingCoilType_Num == 0) {
+            if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:MultiSpeed")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:Water")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
+                if (this->m_DesignSpecMSHPIndex > -1) {
+                    this->m_NumOfSpeedCooling = this->m_CompPointerMSHP->numOfSpeedCooling;
+                    if (this->m_NumOfSpeedCooling > 1) {
+                        this->m_DiscreteSpeedCoolingCoil = true;
+                        this->m_MultiOrVarSpeedCoolCoil = true;
+                    }
+                }
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterDetailed;
+                if (this->m_DesignSpecMSHPIndex > -1) {
+                    this->m_NumOfSpeedCooling = this->m_CompPointerMSHP->numOfSpeedCooling;
+                    if (this->m_NumOfSpeedCooling > 1) {
+                        this->m_DiscreteSpeedCoolingCoil = true;
+                        this->m_MultiOrVarSpeedCoolCoil = true;
+                    }
+                }
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
+                this->m_CoolingCoilType_Num =
+                    HVACHXAssistedCoolingCoil::GetCoilGroupTypeNum(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag, PrintMessage);
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
+                this->m_CoolingCoilType_Num =
+                    HVACHXAssistedCoolingCoil::GetCoilGroupTypeNum(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag, PrintMessage);
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPSimple;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHP;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:TwoSpeed")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoSpeed;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:UserDefined")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_UserDefined;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
+                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_PackagedThermalStorageCooling;
+            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX")) { // CoilCoolingDX
+                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_Cooling;
+                this->m_CoolingCoilIndex = CoilCoolingDX::factory(state, loc_m_CoolingCoilName);
+                if (this->m_CoolingCoilIndex == -1) {
+                    ShowFatalError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                } else {
+                    // set variable speed coil flag as necessary
+                    auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
+                    this->m_NumOfSpeedCooling = (int)newCoil.performance.normalMode.speeds.size();
+                    if (this->m_NumOfSpeedCooling > 1) {
+                        if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::DISCRETE) {
+                            this->m_DiscreteSpeedCoolingCoil = true;
+                        } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::CONTINUOUS) {
+                            this->m_ContSpeedCoolingCoil = true;
+                        }
+                        this->m_MultiOrVarSpeedCoolCoil = true;
+                    }
+                }
+            } else {
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                ShowContinueError(state, "Illegal Cooling Coil Object Type = " + loc_coolingCoilType);
+            }
+
+            if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                this->m_DiscreteSpeedCoolingCoil = true;
+            } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit ||
+                       this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                this->m_ContSpeedCoolingCoil = true;
+            }
         }
 
         std::string loc_suppHeatCoilType = input_data.supplemental_heating_coil_object_type;
@@ -3020,9 +3157,7 @@ namespace UnitarySystems {
 
         this->m_IterationMode.resize(3);
 
-        std::string loc_m_HeatingCoilName = input_data.heating_coil_name;
         Real64 loc_m_HeatingSizingRatio = input_data.dx_heating_coil_sizing_ratio;
-        std::string loc_m_CoolingCoilName = input_data.cooling_coil_name;
         std::string loc_m_ISHundredPercentDOASDXCoil = input_data.use_doas_dx_cooling_coil;
         Real64 loc_DesignMinOutletTemp = input_data.minimum_supply_air_temperature;
         std::string loc_latentControlFlag = input_data.latent_load_control;
@@ -3058,8 +3193,6 @@ namespace UnitarySystems {
         Real64 loc_m_MaxHROutletWaterTemp = input_data.maximum_temperature_for_heat_recovery;
         std::string loc_heatRecoveryInletNodeName = input_data.heat_recovery_water_inlet_node_name;
         std::string loc_heatRecoveryOutletNodeName = input_data.heat_recovery_water_outlet_node_name;
-        std::string loc_m_DesignSpecMultispeedHPType = input_data.design_specification_multispeed_object_type;
-        std::string loc_m_DesignSpecMultispeedHPName = input_data.design_specification_multispeed_object_name;
 
         int FanInletNode = 0;
         int FanOutletNode = 0;
@@ -3071,7 +3204,7 @@ namespace UnitarySystems {
         int SupHeatCoilInletNode = 0;
         int SupHeatCoilOutletNode = 0;
 
-        bool errFlag = false;
+        errFlag = false;
         bool isNotOK = false;
 
         std::string loc_sysAvailSched = input_data.availability_schedule_name;
@@ -3534,7 +3667,7 @@ namespace UnitarySystems {
             }
         }
 
-        bool PrintMessage = true;
+        PrintMessage = true;
         // Get coil data
         this->m_HeatingSizingRatio = loc_m_HeatingSizingRatio;
         int HeatingCoilPLFCurveIndex = 0;
@@ -3544,34 +3677,6 @@ namespace UnitarySystems {
             PrintMessage = false;
         } else {
             this->m_ValidASHRAEHeatCoil = false;
-        }
-
-        if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:DX:VariableSpeed")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed;
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:DX:MultiSpeed")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedHeating;
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Water")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Steam")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:WaterToAirHeatPump:EquationFit")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWaterToAirHPSimple;
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:WaterToAirHeatPump:ParameterEstimation")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWaterToAirHP;
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit;
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Electric:MultiStage")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingElectric_MultiStage;
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Gas:MultiStage")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingGas_MultiStage;
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Fuel") ||
-                   UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Electric") ||
-                   UtilityRoutines::SameString(loc_heatingCoilType, "Coil:Heating:Desuperheater")) {
-            this->m_HeatingCoilType_Num = HeatingCoils::GetHeatingCoilTypeNum(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
-        } else if (UtilityRoutines::SameString(loc_heatingCoilType, "Coil:UserDefined")) {
-            this->m_HeatingCoilType_Num = DataHVACGlobals::Coil_UserDefined;
-        } else if (this->m_HeatCoilExists) {
-            this->m_HeatingCoilType_Num = DXCoils::GetCoilTypeNum(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag, PrintMessage);
         }
 
         if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
@@ -4175,45 +4280,6 @@ namespace UnitarySystems {
 
         // Get Cooling Coil Information IF available
         if (loc_coolingCoilType != "" && loc_m_CoolingCoilName != "") {
-
-            //       Find the type of coil. do not print message since this may not be the correct coil type.
-            errFlag = false;
-            if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:MultiSpeed")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:Water")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterDetailed;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
-                this->m_CoolingCoilType_Num =
-                    HVACHXAssistedCoolingCoil::GetCoilGroupTypeNum(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag, PrintMessage);
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
-                this->m_CoolingCoilType_Num =
-                    HVACHXAssistedCoolingCoil::GetCoilGroupTypeNum(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag, PrintMessage);
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPSimple;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHP;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:TwoSpeed")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoSpeed;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:UserDefined")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::Coil_UserDefined;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
-                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_PackagedThermalStorageCooling;
-            } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX")) { // CoilCoolingDX
-                this->m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_Cooling;
-            } else {
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
-                // ShowContinueError(state, "Illegal " + cAlphaFields(iCoolingCoilTypeAlphaNum) + " = " + Alphas(iCoolingCoilTypeAlphaNum));
-            }
 
             if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                 this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
