@@ -149,6 +149,7 @@ namespace PlantHeatExchangerFluidToFluid {
     {
         // Members
         std::string Name;
+        int TypeNum;
         int AvailSchedNum;
         iFluidHXType HeatExchangeModelType;
         Real64 UA;
@@ -226,14 +227,17 @@ namespace PlantHeatExchangerFluidToFluid {
 
 struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct
 {
-
     int NumberOfPlantFluidHXs = 0;
+    int NumberOfSteamToWaterHXs = 0;
+    int NumberOfHXs = 0;
     bool GetInput = true;
     EPVector<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
 
     void clear_state() override
     {
         this->NumberOfPlantFluidHXs = 0;
+        this->NumberOfSteamToWaterHXs = 0;
+        this->NumberOfHXs = 0;
         this->GetInput = true;
         this->FluidHX.deallocate();
     }

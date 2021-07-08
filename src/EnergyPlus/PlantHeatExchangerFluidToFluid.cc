@@ -90,6 +90,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
 // Simulate a generic plant heat exchanger with a variety of control options
 
 std::string const ComponentClassName("HeatExchanger:FluidToFluid");
+std::string const ComponentSteamClassName("HeatExchanger:SteamToWater");
 
 PlantComponent *HeatExchangerStruct::factory(EnergyPlusData &state, std::string const &objectName)
 {
@@ -191,14 +192,21 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
     Array1D<Real64> rNumericArgs;
     std::string cCurrentModuleObject;
 
-    cCurrentModuleObject = "HeatExchanger:FluidToFluid";
+    state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs =
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:FluidToFluid");
+    state.dataPlantHXFluidToFluid->NumberOfSteamToWaterHXs =
+        state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:SteamToWater");
+    state.dataPlantHXFluidToFluid->NumberOfHXs =
+        state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs + state.dataPlantHXFluidToFluid->NumberOfSteamToWaterHXs;
+    if (state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs == 0 && state.dataPlantHXFluidToFluid->NumberOfSteamToWaterHXs == 0) return;
 
-    state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    if (state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs == 0) return;
-
-    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "HeatExchanger:FluidToFluid", TotalArgs, NumAlphas, NumNums);
     MaxNumNumbers = NumNums;
     MaxNumAlphas = NumAlphas;
+
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "HeatExchanger:SteamToWater", TotalArgs, NumAlphas, NumNums);
+    MaxNumNumbers = max(MaxNumNumbers, NumNums);
+    MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
 
     cAlphaFieldNames.allocate(MaxNumAlphas);
     cAlphaArgs.allocate(MaxNumAlphas);
@@ -207,6 +215,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
     rNumericArgs.dimension(MaxNumNumbers, 0.0);
     lNumericFieldBlanks.dimension(MaxNumNumbers, false);
 
+    cCurrentModuleObject = "HeatExchanger:FluidToFluid";
     if (state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs > 0) {
         state.dataPlantHXFluidToFluid->FluidHX.allocate(state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs);
         for (int CompLoop = 1; CompLoop <= state.dataPlantHXFluidToFluid->NumberOfPlantFluidHXs; ++CompLoop) {
@@ -225,6 +234,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
             UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataPlantHXFluidToFluid->FluidHX(CompLoop).Name = cAlphaArgs(1);
+            state.dataPlantHXFluidToFluid->FluidHX(CompLoop).TypeNum = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
 
             if (lAlphaFieldBlanks(2)) {
                 state.dataPlantHXFluidToFluid->FluidHX(CompLoop).AvailSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
@@ -628,7 +638,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                this->TypeNum,
                                                 this->DemandSideLoop.loopNum,
                                                 this->DemandSideLoop.loopSideNum,
                                                 this->DemandSideLoop.branchNum,
@@ -641,16 +651,15 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                 _);
 
         if (this->DemandSideLoop.loopSideNum != DataPlant::DemandSide) { // throw error
-            ShowSevereError(state,
-                            RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) +
-                                " name = \"" + this->Name + "\"");
+            ShowSevereError(
+                state, RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + " name = \"" + this->Name + "\"");
             ShowContinueError(state, "The \"Loop Demand Side\" connections are not on the Demand Side of a plant loop");
             errFlag = true;
         }
 
         PlantUtilities::ScanPlantLoopsForObject(state,
                                                 this->Name,
-                                                DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                this->TypeNum,
                                                 this->SupplySideLoop.loopNum,
                                                 this->SupplySideLoop.loopSideNum,
                                                 this->SupplySideLoop.branchNum,
@@ -663,18 +672,16 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                 _);
 
         if (this->SupplySideLoop.loopSideNum != DataPlant::SupplySide) { // throw error
-            ShowSevereError(state,
-                            RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) +
-                                " name = \"" + this->Name + "\"");
+            ShowSevereError(
+                state, RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + " name = \"" + this->Name + "\"");
             ShowContinueError(state, "The \"Loop Supply Side\" connections are not on the Supply Side of a plant loop");
             errFlag = true;
         }
 
         // make sure it is not the same loop on both sides.
         if (this->SupplySideLoop.loopNum == this->DemandSideLoop.loopNum) { // user is being too tricky, don't allow
-            ShowSevereError(state,
-                            RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_FluidToFluidPlantHtExchg) +
-                                " name = \"" + this->Name + "\"");
+            ShowSevereError(
+                state, RoutineName + " Invalid connections for " + DataPlant::ccSimPlantEquipTypes(this->TypeNum) + " name = \"" + this->Name + "\"");
             ShowContinueError(state, R"(The "Loop Supply Side" and "Loop Demand Side" need to be on different loops.)");
             errFlag = true;
         } else {
@@ -684,7 +691,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                           this->SupplySideLoop.loopSideNum,
                                                           this->DemandSideLoop.loopNum,
                                                           this->DemandSideLoop.loopSideNum,
-                                                          DataPlant::TypeOf_FluidToFluidPlantHtExchg,
+                                                          this->TypeNum,
                                                           true);
         }
 
