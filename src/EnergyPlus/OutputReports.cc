@@ -1218,7 +1218,6 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
         // still have to do shading surfaces for zone
         surfcount = 0;
         for (int surf : state.dataSurface->AllSurfaceListReportOrder) {
-            // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
             if (state.dataSurface->Surface(surf).Class != SurfaceClass::Shading) continue;
             if (state.dataSurface->Surface(surf).ZoneName != state.dataHeatBal->Zone(zones).Name) continue;
             colorindex = ColorNo::ShdAtt;
@@ -1245,10 +1244,6 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             print(dxffile, Format_717, TempZoneName);
         }
     }
-
-    //  711 format('  0',/,'LINE',/,'  8',/,A,/,' 62',/,I3)
-    //  712 format(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,  &
-    //             ' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)
 
     DXFDaylightingReferencePoints(state, dxffile, false);
     DXFDaylightingReferencePoints(state, dxffile, true);
@@ -1570,35 +1565,41 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                            << format("{:.2R}", state.dataSurface->Surface(surf).Height) << ","
                            << format("{:.2R}", state.dataSurface->Surface(surf).Reveal) << ",";
                 if (state.dataSurface->SurfIntConvCoeffIndex(surf) > 0) {
-                    {
-                        auto const SELECT_CASE_var(
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(surf)).OverrideType);
-                        if (SELECT_CASE_var == ConvCoefValue) {
-                            IntConvCoeffCalc = "User Supplied Value";
-                        } else if (SELECT_CASE_var == ConvCoefSchedule) {
-                            IntConvCoeffCalc = "User Supplied Schedule";
-                        } else if (SELECT_CASE_var == ConvCoefUserCurve) {
-                            ExtConvCoeffCalc = "User Supplied Curve";
-                        } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
-                            ExtConvCoeffCalc = "User Specified Model";
-                        }
+                    switch (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(surf)).OverrideType) {
+                    case ConvectionConstants::ConvCoefOverrideType::Value:
+                        IntConvCoeffCalc = "User Supplied Value";
+                        break;
+                    case ConvectionConstants::ConvCoefOverrideType::Schedule:
+                        IntConvCoeffCalc = "User Supplied Schedule";
+                        break;
+                    case ConvectionConstants::ConvCoefOverrideType::UserCurve:
+                        ExtConvCoeffCalc = "User Supplied Curve";
+                        break;
+                    case ConvectionConstants::ConvCoefOverrideType::SpecifiedModel:
+                        ExtConvCoeffCalc = "User Specified Model";
+                        break;
+                    default:
+                        assert(false);
                     }
                 } else if (state.dataSurface->SurfIntConvCoeffIndex(surf) < 0) { // not in use yet.
                     IntConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfIntConvCoeffIndex(surf)));
                 }
                 if (state.dataSurface->SurfExtConvCoeffIndex(surf) > 0) {
-                    {
-                        auto const SELECT_CASE_var(
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(surf)).OverrideType);
-                        if (SELECT_CASE_var == ConvCoefValue) {
-                            ExtConvCoeffCalc = "User Supplied Value";
-                        } else if (SELECT_CASE_var == ConvCoefSchedule) {
-                            ExtConvCoeffCalc = "User Supplied Schedule";
-                        } else if (SELECT_CASE_var == ConvCoefUserCurve) {
-                            ExtConvCoeffCalc = "User Supplied Curve";
-                        } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
-                            ExtConvCoeffCalc = "User Specified Model";
-                        }
+                    switch (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(surf)).OverrideType) {
+                    case ConvectionConstants::ConvCoefOverrideType::Value:
+                        ExtConvCoeffCalc = "User Supplied Value";
+                        break;
+                    case ConvectionConstants::ConvCoefOverrideType::Schedule:
+                        ExtConvCoeffCalc = "User Supplied Schedule";
+                        break;
+                    case ConvectionConstants::ConvCoefOverrideType::UserCurve:
+                        ExtConvCoeffCalc = "User Supplied Curve";
+                        break;
+                    case ConvectionConstants::ConvCoefOverrideType::SpecifiedModel:
+                        ExtConvCoeffCalc = "User Specified Model";
+                        break;
+                    default:
+                        assert(false);
                     }
                 } else if (state.dataSurface->SurfExtConvCoeffIndex(surf) < 0) {
                     ExtConvCoeffCalc = ConvCoeffCalcs(std::abs(state.dataSurface->SurfExtConvCoeffIndex(surf)));
@@ -1820,7 +1821,7 @@ void CostInfoOut(EnergyPlusData &state)
         return;
     }
 
-    // need to determine unique surfacs... some surfaces are shared by zones and hence doubled
+    // need to determine unique surfaces... some surfaces are shared by zones and hence doubled
     uniqueSurf.dimension(state.dataSurface->TotSurfaces, true);
 
     for (int surf : state.dataSurface->AllSurfaceListReportOrder) {

@@ -1260,7 +1260,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                 ErrorsFound = true;
                             }
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::Value;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
@@ -1273,7 +1274,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSchedule;
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::Schedule;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex =
                                 GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
@@ -1289,7 +1291,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::UserCurve;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
@@ -1304,7 +1307,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
 
@@ -1351,7 +1355,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                 ErrorsFound = true;
                             }
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
+                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::Value;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
@@ -1364,7 +1369,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSchedule;
+                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::Schedule;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex =
                                 GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
@@ -1380,7 +1386,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
+                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::UserCurve;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
@@ -1395,7 +1402,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).HcModelEq = IntValue;
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
 
@@ -1499,7 +1507,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                 ErrorsFound = true;
                             }
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::Value;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
@@ -1512,7 +1521,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSchedule;
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::Schedule;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex =
                                 GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
@@ -1528,7 +1538,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::UserCurve;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
                             if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
@@ -1545,7 +1556,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
@@ -1553,7 +1565,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotExtConvCoeff;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
@@ -1591,7 +1604,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                                 ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                 ErrorsFound = true;
                             }
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
+                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::Value;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                             if (!state.dataIPShortCut->lAlphaFieldBlanks(Ptr + 2)) {
                                 ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
@@ -1604,7 +1618,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSchedule;
+                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::Schedule;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex =
                                 GetScheduleIndex(state, Alphas(Ptr + 2));
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
@@ -1620,7 +1635,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
+                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::UserCurve;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex =
                                 UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
                             if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
@@ -1637,7 +1653,8 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             ++state.dataSurface->TotIntConvCoeff;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
-                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                            state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType =
+                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
                             state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).HcModelEq = IntValue;
                             PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
@@ -1676,7 +1693,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     }
 
     for (int Loop = 1; Loop <= state.dataSurface->TotIntConvCoeff; ++Loop) {
-        if (state.dataSurface->UserIntConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
+        if (state.dataSurface->UserIntConvectionCoeffs(Loop).OverrideType != ConvectionConstants::ConvCoefOverrideType::Schedule) continue;
         if (state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
         if (CheckScheduleValueMinMax(state,
                                      state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleIndex,
@@ -1698,7 +1715,7 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
     }
 
     for (int Loop = 1; Loop <= state.dataSurface->TotExtConvCoeff; ++Loop) {
-        if (state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
+        if (state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvectionConstants::ConvCoefOverrideType::Schedule) continue;
         if (state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
         if (CheckScheduleValueMinMax(state,
                                      state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleIndex,
@@ -1730,9 +1747,9 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
             if (SurfNum <= 0) continue;               // ignore this error condition
             if (Surface(SurfNum).Zone == 0) continue; // ignore this error condition
             if (Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ConvectionConstants::HcExt_ASHRAESimple &&
-                ((state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType == ConvCoefSpecifiedModel &&
+                ((state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType == ConvectionConstants::ConvCoefOverrideType::SpecifiedModel &&
                   state.dataSurface->UserExtConvectionCoeffs(Loop).HcModelEq != ConvectionConstants::HcExt_ASHRAESimple) ||
-                 state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
+                 state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvectionConstants::ConvCoefOverrideType::SpecifiedModel)) {
                 ++Count;
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowSevereError(
@@ -3743,7 +3760,7 @@ Real64 SetExtConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
     auto &Surface(state.dataSurface->Surface);
 
     switch (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).OverrideType) {
-    case ConvCoefValue:
+    case ConvectionConstants::ConvCoefOverrideType::Value:
         HExt = state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).OverrideValue;
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
@@ -3752,7 +3769,7 @@ Real64 SetExtConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = ConvectionConstants::HcExt_UserValue; // reporting
         state.dataSurface->SurfOutConvHnModelEq(SurfNum) = ConvectionConstants::HcExt_None;      // reporting
         break;
-    case ConvCoefSchedule:
+    case ConvectionConstants::ConvCoefOverrideType::Schedule:
         HExt = GetCurrentScheduleValue(state,
                                        state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).ScheduleIndex);
         // Need to check for validity
@@ -3763,14 +3780,14 @@ Real64 SetExtConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = ConvectionConstants::HcExt_UserSchedule; // reporting
         state.dataSurface->SurfOutConvHnModelEq(SurfNum) = ConvectionConstants::HcExt_None;         // reporting
         break;
-    case ConvCoefUserCurve:
+    case ConvectionConstants::ConvCoefOverrideType::UserCurve:
         CalcUserDefinedOutsideHcModel(
             state, SurfNum, state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).UserCurveIndex, HExt);
         // Kiva convection handled in function above
         state.dataSurface->SurfOutConvHfModelEq(SurfNum) = ConvectionConstants::HcExt_UserCurve; // reporting
         state.dataSurface->SurfOutConvHnModelEq(SurfNum) = ConvectionConstants::HcExt_None;      // reporting
         break;
-    case ConvCoefSpecifiedModel:
+    case ConvectionConstants::ConvCoefOverrideType::SpecifiedModel:
         EvaluateExtHcModels(state,
                             SurfNum,
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->SurfExtConvCoeffIndex(SurfNum)).HcModelEq,
@@ -3817,14 +3834,14 @@ Real64 SetIntConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
     auto &Surface(state.dataSurface->Surface);
 
     switch (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).OverrideType) {
-    case ConvCoefValue:
+    case ConvectionConstants::ConvCoefOverrideType::Value:
         HInt = state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).OverrideValue;
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
         }
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = ConvectionConstants::HcInt_UserValue; // reporting
         break;
-    case ConvCoefSchedule:
+    case ConvectionConstants::ConvCoefOverrideType::Schedule:
         HInt = GetCurrentScheduleValue(state,
                                        state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).ScheduleIndex);
         // Need to check for validity
@@ -3833,13 +3850,13 @@ Real64 SetIntConvectionCoeff(EnergyPlusData &state, int const SurfNum) // Surfac
         }
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = ConvectionConstants::HcInt_UserSchedule; // reporting
         break;
-    case ConvCoefUserCurve:
+    case ConvectionConstants::ConvCoefOverrideType::UserCurve:
         CalcUserDefinedInsideHcModel(
             state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).UserCurveIndex, HInt);
         // Kiva convection handled in function above
         state.dataSurface->SurfIntConvHcModelEq(SurfNum) = ConvectionConstants::HcInt_UserCurve; // reporting
         break;
-    case ConvCoefSpecifiedModel:
+    case ConvectionConstants::ConvCoefOverrideType::SpecifiedModel:
         EvaluateIntHcModels(
             state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->SurfIntConvCoeffIndex(SurfNum)).HcModelEq, HInt);
         // Kiva convection handled in function above

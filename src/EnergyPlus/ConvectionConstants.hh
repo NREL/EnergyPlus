@@ -143,6 +143,16 @@ int constexpr HcExt_ISO15099Windows{323};
 int constexpr HcExt_AlamdariHammondStableHorizontal{324};
 int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
 
+// Parameters to indicate user specified convection coefficients (for surface)
+enum class ConvCoefOverrideType
+{
+    Invalid = -1,
+    Value,          // User specified "value" as the override type
+    Schedule,       // User specified "schedule" as the override type
+    UserCurve,      // User specified "UserCurve" as the override type
+    SpecifiedModel, // one of the direct named model equation keys
+};
+
 // parameters, by zone, for flow regimes for adaptive convection on inside face
 enum class InConvFlowRegime
 {

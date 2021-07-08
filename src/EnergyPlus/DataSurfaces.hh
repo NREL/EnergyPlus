@@ -59,6 +59,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BITF.hh>
+#include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -190,12 +191,6 @@ namespace DataSurfaces {
     constexpr int LowerLeftCorner(2);
     constexpr int LowerRightCorner(3);
     constexpr int UpperRightCorner(4);
-
-    // Parameters to indicate user specified convection coefficients (for surface)
-    constexpr int ConvCoefValue(1);          // User specified "value" as the override type
-    constexpr int ConvCoefSchedule(2);       // User specified "schedule" as the override type
-    constexpr int ConvCoefUserCurve(3);      // User specified "UserCurve" as the override type
-    constexpr int ConvCoefSpecifiedModel(4); // one of the direct named model equation keys
 
     // Parameters to indicate reference air temperatures for inside surface temperature calculations
     constexpr int ZoneMeanAirTemp(1);   // mean air temperature of the zone => MAT
@@ -992,17 +987,19 @@ namespace DataSurfaces {
     struct ConvectionCoefficient
     {
         // Members
-        int WhichSurface;         // Which surface number this is applied to
-        std::string SurfaceName;  // Which surface (name)
-        int OverrideType;         // Override type, 1=value, 2=schedule, 3=model, 4=user curve
-        Real64 OverrideValue;     // User specified value
-        std::string ScheduleName; // Which surface (name)
-        int ScheduleIndex;        // if type="schedule" is used
-        int UserCurveIndex;       // if type=UserCurve is used
-        int HcModelEq;            // if type is one of specific model equations
+        int WhichSurface;                                       // Which surface number this is applied to
+        std::string SurfaceName;                                // Which surface (name)
+        ConvectionConstants::ConvCoefOverrideType OverrideType; // Override type, 1=value, 2=schedule, 3=model, 4=user curve
+        Real64 OverrideValue;                                   // User specified value
+        std::string ScheduleName;                               // Which surface (name)
+        int ScheduleIndex;                                      // if type="schedule" is used
+        int UserCurveIndex;                                     // if type=UserCurve is used
+        int HcModelEq;                                          // if type is one of specific model equations
 
         // Default Constructor
-        ConvectionCoefficient() : WhichSurface(0), OverrideType(0), OverrideValue(0.0), ScheduleIndex(0), UserCurveIndex(0), HcModelEq(0)
+        ConvectionCoefficient()
+            : WhichSurface(0), OverrideType(ConvectionConstants::ConvCoefOverrideType::Invalid), OverrideValue(0.0), ScheduleIndex(0),
+              UserCurveIndex(0), HcModelEq(0)
         {
         }
     };
