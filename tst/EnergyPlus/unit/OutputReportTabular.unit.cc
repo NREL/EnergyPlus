@@ -3771,7 +3771,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(2);
     state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
-    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
+    state->dataDXCoils->DXCoil(1).CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
     state->dataDXCoils->DXCoil(1).FuelType = "NaturalGas";
     state->dataDXCoils->DXCoil(1).ElecCoolingConsumption = 100.0;
     state->dataDXCoils->DXCoil(1).TotalCoolingEnergy = 100.0;
@@ -9775,4 +9775,39 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
 
     // Clean up
     FileSystem::removeFile(state->dataStrGlobals->outputTblHtmFilePath);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_PredefinedTable_SigDigits_Force_NonZero)
+{
+
+    SetPredefinedTables(*state);
+
+    // < 1e8, not using scientific notation
+    Real64 value = 123.456;
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeMin, "MyPlant Sizing Pass 1", value, 2);
+    EXPECT_EQ("123.46", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeMin, "MyPlant Sizing Pass 1"));
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, "MyPlant Sizing Pass 1", value, 1);
+    EXPECT_EQ("123.5", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeDayOfSim, "MyPlant Sizing Pass 1"));
+
+    // Force reset to numSigDigits = 2
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeHour, "MyPlant Sizing Pass 1", value, 0);
+    EXPECT_EQ("123.", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPkTimeHour, "MyPlant Sizing Pass 1"));
+
+    // > 1e8, switch to scientific notation
+    value = 123456789.1;
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizDesDay, "MyPlant Sizing Pass 1", value, 3);
+    EXPECT_EQ("0.123E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizDesDay, "MyPlant Sizing Pass 1"));
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPrevVdot, "MyPlant Sizing Pass 1", value, 2);
+    EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizPrevVdot, "MyPlant Sizing Pass 1"));
+
+    // Force reset to numSigDigits = 2 since we switch to scientific notation
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizMeasVdot, "MyPlant Sizing Pass 1", value, 1);
+    EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizMeasVdot, "MyPlant Sizing Pass 1"));
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1", value, 0);
+    EXPECT_EQ("0.12E+09", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchPlantSizCalcVdot, "MyPlant Sizing Pass 1"));
 }

@@ -52,7 +52,6 @@ extern "C" {
 
 // C++ Headers
 #include <cstdlib>
-#include <exception>
 #include <iostream>
 
 // ObjexxFCL Headers
@@ -75,7 +74,6 @@ extern "C" {
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
@@ -88,7 +86,6 @@ extern "C" {
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
-#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -130,20 +127,22 @@ namespace UtilityRoutines {
         std::string::size_type const StringLen(PString.length());
         ErrorFlag = false;
         if (StringLen == 0) return rProcessNumber;
-        bool parseFailed = false;
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
             // make FORTRAN floating point number (containing 'd' or 'D')
             // standardized by replacing 'd' or 'D' with 'e'
             std::replace_if(
                 std::begin(PString), std::end(PString), [](const char c) { return c == 'D' || c == 'd'; }, 'e');
             // then parse as a normal floating point value
-            parseFailed = !readItem(PString, rProcessNumber);
-            ErrorFlag = false;
+            try {
+                rProcessNumber = std::stod(PString, nullptr);
+            } catch (std::invalid_argument &e) {
+                rProcessNumber = 0.0;
+                ErrorFlag = true;
+            } catch (std::out_of_range &e) {
+                rProcessNumber = 0.0;
+                ErrorFlag = true;
+            }
         } else {
-            rProcessNumber = 0.0;
-            ErrorFlag = true;
-        }
-        if (parseFailed) {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }

@@ -612,7 +612,7 @@ void GshpPeCoolingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     Real64 CompressInletTemp;     // Compressor inlet temperature
     Real64 MassRef;               // mass flow rate of refrigerant
     Real64 SourceSideOutletEnth;  // Enthalpy at Source Side pressure
-    Real64 LoadSideOutletEnth;    // Enthalpy at Condensor Pressure
+    Real64 LoadSideOutletEnth;    // Enthalpy at Condenser Pressure
     Real64 initialQSource;        // Guess Source Side Heat rate
     Real64 initialQLoad;          // Guess Load Side Heat rate
     Real64 qual;                  // quality
@@ -993,6 +993,9 @@ void GshpPeCoolingSpecs::update(EnergyPlusData &state)
         this->SourceSideWaterInletTemp = state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp;
         this->LoadSideWaterInletTemp = state.dataLoopNodes->Node(this->LoadSideInletNodeNum).Temp;
     }
+}
+void GshpPeCoolingSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
 }
 
 } // namespace EnergyPlus::HeatPumpWaterToWaterCOOLING

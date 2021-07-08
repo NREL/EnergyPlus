@@ -1348,7 +1348,7 @@ This field is the average parasitic gas consumption rate of the heating coil (e.
 
 \subsection{Coil:Heating:Gas:MultiStage}\label{coilheatinggasmultistage}
 
-The multi stage gas heating coil is a simple capacity model with a user inputted gas burner efficiencies at different stages. This coil will only have air nodes to connect it in the system. The coil can be used in the air loop simulation or in the zone equipment as a reheat coil. Depending on where it is used determines if this coil is temperature or capacity controlled. If used in the air loop simulation it will be controlled to a specified temperature scheduled from the Setpoint Manager. If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand. For the time being, this coil model can only be called by the parent object \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed}.
+The multi stage gas heating coil is a simple capacity model with a user inputted gas burner efficiencies at different stages. This coil will only have air nodes to connect it in the system. The coil can be used in the air loop simulation or in the zone equipment as a reheat coil. Depending on where it is used determines if this coil is temperature or capacity controlled. If used in the air loop simulation it will be controlled to a specified temperature scheduled from the Setpoint Manager. If it is used in zone equipment, it will be controlled from the zone thermostat by meeting the zone demand. For the time being, this coil model can only be called by the parent objects \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} or \hyperref[airloophvacunitaryheatpumpairtoairmultispeed]{AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed}.
 
 \subsubsection{Inputs}\label{inputs-11-005}
 
@@ -3691,9 +3691,9 @@ This numeric field defines the coefficient of performance (COP = the gross heati
 
 This numeric field defines the volume air flow rate, in m\(^{3}\) per second, across the DX heating coil at rated conditions. The value entered here must be greater than 0. The rated air volume flow rate should be between 0.00004027 m\(^{3}\)/s and 0.00006041 m\(^{3}\)/s per watt of the gross rated heating capacity. The gross rated heating capacity and gross rated COP should be performance information for the unit with outdoor air dry-bulb temperature of 8.33 C, outdoor air wet-bulb temperature of 6.11 C, heating coil entering air dry-bulb temperature of 21.11 C, heating coil entering air wet-bulb temperature of 15.55 C, and the rated air volume flow rate defined here.
 
-\paragraph{Field: Rated Evaporator Fan Power Per Volume Flow Rate}\label{field-rated-evaporator-fan-power-per-volume-flow-rate-1}
+\paragraph{Field: Rated Supply Fan Power Per Volume Flow Rate}\label{field-rated-evaporator-fan-power-per-volume-flow-rate-1}
 
-This field is the electric power for the evaporator (heating coil) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Heating Coil, Standard Ratings). This value is not used for modeling the evaporator (heating coil) fan during simulations; instead, it is used for calculating the above standard ratings to assist the user in verifying their inputs for modeling this type of equipment.
+This field is the electric power for the heating coil (condenser) fan per air volume flow rate through the coil at the rated conditions in W/(m\(^{3}\)/s). The default value is 773.3 W/(m\(^{3}\)/s) (365 W/1000 cfm) if this field is left blank. If a value is entered, it must be \textgreater{} = 0.0 and \textless{} = 1250 W/(m\(^{3}\)/s). This value is only used to calculate High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) which will be outputs in the EnergyPlus eio file (ref. EnergyPlus Engineering Reference, Single Speed DX Heating Coil, Standard Ratings). This value is not used for modeling the evaporator (heating coil) fan during simulations; instead, it is used for calculating the above standard ratings to assist the user in verifying their inputs for modeling this type of equipment.
 
 \paragraph{Field: Air Inlet Node Name}\label{field-air-inlet-node-name-13}
 
@@ -3818,28 +3818,28 @@ Following is an example input for the object.
 
 Coil:Heating:DX:SingleSpeed,
   Heat Pump DX Heating Coil 1,     ! Name of heating coil
-  FanAndCoilAvailSched,                   ! Heating coil schedule
-  35000,                                                 ! Gross Rated Heating Capacity
-  2.75,                                                   ! Gross Rated Heating COP
-  1.7,                                                     !rated air flow rate (m3/s)
-  ,                                                       !rated evaporator fan power per volume flow rate (m3/s)
-  Heating Coil Air Inlet Node,     !heating coil air side inlet node
-  SuppHeating Coil Air Inlet Node, !Heating coil air side outlet node
-  HPACHeatCapFT,     ! heating cap modifier curve (temperature, C)
-  HPACHeatCapFFF,   ! heating cap modifier curve (flow fraction)
-  HPACHeatEIRFT,     ! energy input ratio modifier curve (temperature, C)
-  HPACHeatEIRFFF,   ! energy input ratio modifier curve (flow fraction)
-  HPACCOOLPLFFPLR, ! part load fraction modifier curve (function of part load ratio)
-  ,                 ! defrost EIR modifier curve (temp, C) not required for resistive defrost
-  -5.0,                       ! minimum OAT for compressor operation   (C)
-  ,                               ! outdoor dry-bulb temperature to turn on compressor   (C)
-  5.0,                         ! maximum outdoor dry-bulb temp for defrost operation (C)
-  200.0,                     ! Crankcase heater capacity (W)
-  10.0,                       ! Maximum outdoor temp for crankcase heater operation (C)
-  Resistive,             ! Defrost strategy (resistive or reverse-cycle)
-  Timed,                     ! Defrost control (timed or on-demand)
-  0.166667,             ! Defrost time period fraction (used for timed defrost control only)
-  20000;! Resistive defrost heater capacity (used for resistive defrost strategy only)
+  FanAndCoilAvailSched,            ! Heating coil schedule
+  35000,                           ! Gross Rated Heating Capacity
+  2.75,                            ! Gross Rated Heating COP
+  1.7,                             ! Rated air flow rate (m3/s)
+  ,                                ! Rated supply fan power per volume flow rate (m3/s)
+  Heating Coil Air Inlet Node,     ! Heating coil air side inlet node
+  SuppHeating Coil Air Inlet Node, ! Heating coil air side outlet node
+  HPACHeatCapFT,                   ! Heating cap modifier curve (temperature, C)
+  HPACHeatCapFFF,                  ! Heating cap modifier curve (flow fraction)
+  HPACHeatEIRFT,                   ! Energy input ratio modifier curve (temperature, C)
+  HPACHeatEIRFFF,                  ! Energy input ratio modifier curve (flow fraction)
+  HPACCOOLPLFFPLR,                 ! Part load fraction modifier curve (function of part load ratio)
+  ,                                ! Defrost EIR modifier curve (temp, C) not required for resistive defrost
+  -5.0,                            ! Minimum OAT for compressor operation (C)
+  ,                                ! Outdoor dry-bulb temperature to turn on compressor (C)
+  5.0,                             ! Maximum outdoor dry-bulb temp for defrost operation (C)
+  200.0,                           ! Crankcase heater capacity (W)
+  10.0,                            ! Maximum outdoor temp for crankcase heater operation (C)
+  Resistive,                       ! Defrost strategy (resistive or reverse-cycle)
+  Timed,                           ! Defrost control (timed or on-demand)
+  0.166667,                        ! Defrost time period fraction (used for timed defrost control only)
+  20000;                           ! Resistive defrost heater capacity (used for resistive defrost strategy only)
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-15-000}
@@ -8324,7 +8324,7 @@ This field determines how the TES coil is to be controlled in terms of which ope
 
 \paragraph{Field: Operation Mode Control Schedule Name}\label{field-operation-mode-control-schedule-name}
 
-This field is used (and required) if the operating model control method is set to ScheduledModes in the previous input field. The control schedule consists of a series of integer values that indicate what mode the TES coil should operate in for a given time period. The values for various operating modes have been programmed to be as follows:
+This field is used (and required) if the operating mode control method is set to ScheduledModes in the previous input field. The control schedule consists of a series of integer values that indicate what mode the TES coil should operate in for a given time period. The values for various operating modes have been programmed to be as follows:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -9196,7 +9196,7 @@ Coil:Cooling:DX:MultiSpeed,
   NORTH ZONE;              !- Zone Name for Condenser Placement
 \end{lstlisting}
 
-\textbf{Heating Operating Mode}: When a heat pump operates in heating mode then energy is extracted from the secondary zone. Total energy extracted from a secondary zone may contain sensible and latent components. The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction. If the coil operation is dry, then the SHR is set to 1.0. In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside. Thus, defrosting energy is not included in the zone energy balance. The six optioal input fields required in the DX heating coils are the following. The last five input fields are extensible depending on the speed of the heating DX coil:
+\textbf{Heating Operating Mode}: When a heat pump operates in heating mode then energy is extracted from the secondary zone. Total energy extracted from a secondary zone may contain sensible and latent components. The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction. If the coil operation is dry, then the SHR is set to 1.0. In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside. Thus, defrosting energy is not included in the zone energy balance. The six optioal input fields required in the DX heating coils are the following. This object is extensible by repeating the last five input fields depending on the speed of the heating DX coil:
 
 \subsubsection{Field: Zone Name for Evaporator Placement}\label{field-zone-name-for-evaporator-placement-2}
 

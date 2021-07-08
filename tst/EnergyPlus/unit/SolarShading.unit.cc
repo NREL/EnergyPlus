@@ -88,26 +88,29 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     Real64 AvgEqOfTime(0.0);       // Average value of Equation of Time for period
     Real64 AvgSinSolarDeclin(1.0); // Average value of Sine of Solar Declination for period
     Real64 AvgCosSolarDeclin(0.0); // Average value of Cosine of Solar Declination for period
-    int NumTimeSteps(6);
+    int const NumTimeSteps(6);
+    int const HoursInDay(24);
 
     state->dataGlobal->TimeStep = 1;
     state->dataSurface->TotSurfaces = 3;
     state->dataBSDFWindow->MaxBkSurf = 3;
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SunlitFracHR.allocate(24, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SunlitFrac.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->SunlitFracWithoutReveal.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
-    state->dataSolarShading->CTHETA.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBal->CosIncAngHR.allocate(24, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->CosIncAng.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfSunlitFracHR.allocate(HoursInDay, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfSunlitFrac.allocate(HoursInDay, NumTimeSteps, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfSunlitFracWithoutReveal.allocate(HoursInDay, NumTimeSteps, state->dataSurface->TotSurfaces);
+    state->dataSolarShading->SurfSunCosTheta.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfCosIncAngHR.allocate(HoursInDay, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfCosIncAng.allocate(HoursInDay, NumTimeSteps, state->dataSurface->TotSurfaces);
     state->dataSurface->SurfOpaqAO.allocate(state->dataSurface->TotSurfaces);
-    state->dataHeatBal->BackSurfaces.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
-    state->dataHeatBal->OverlapAreas.allocate(NumTimeSteps, 24, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfSunCosHourly.dimension(24, 3, 0.0);
-
+    state->dataHeatBal->SurfWinBackSurfaces.allocate(HoursInDay, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
+    state->dataHeatBal->SurfWinOverlapAreas.allocate(HoursInDay, NumTimeSteps, state->dataBSDFWindow->MaxBkSurf, state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        for (int Hour = 1; Hour <= 24; ++Hour) {
+        for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 999.0;
             state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 888.0;
         }
@@ -117,7 +120,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     CalcPerSolarBeam(*state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        for (int Hour = 1; Hour <= 24; ++Hour) {
+        for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
             EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
         }
@@ -126,7 +129,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     // Test integrated option, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 only for the specified hour
     // Re-initialize to new values
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        for (int Hour = 1; Hour <= 24; ++Hour) {
+        for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 555.0;
             state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 444.0;
         }
@@ -137,7 +140,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     CalcPerSolarBeam(*state, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
-        for (int Hour = 1; Hour <= 24; ++Hour) {
+        for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             if (Hour == state->dataGlobal->HourOfDay) {
                 EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
                 EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
@@ -150,15 +153,15 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     // Clean up
     state->dataSurface->SurfaceWindow.deallocate();
-    state->dataHeatBal->SunlitFracHR.deallocate();
-    state->dataHeatBal->SunlitFrac.deallocate();
-    state->dataHeatBal->SunlitFracWithoutReveal.deallocate();
-    state->dataSolarShading->CTHETA.deallocate();
-    state->dataHeatBal->CosIncAngHR.deallocate();
-    state->dataHeatBal->CosIncAng.deallocate();
+    state->dataHeatBal->SurfSunlitFracHR.deallocate();
+    state->dataHeatBal->SurfSunlitFrac.deallocate();
+    state->dataHeatBal->SurfSunlitFracWithoutReveal.deallocate();
+    state->dataSolarShading->SurfSunCosTheta.deallocate();
+    state->dataHeatBal->SurfCosIncAngHR.deallocate();
+    state->dataHeatBal->SurfCosIncAng.deallocate();
     state->dataSurface->SurfOpaqAO.deallocate();
-    state->dataHeatBal->BackSurfaces.deallocate();
-    state->dataHeatBal->OverlapAreas.deallocate();
+    state->dataHeatBal->SurfWinBackSurfaces.deallocate();
+    state->dataHeatBal->SurfWinOverlapAreas.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_SurfaceScheduledSolarInc)
@@ -660,7 +663,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     state->dataSurface->ShadingTransmittanceVaries = true;
     state->dataSysVars->DetailedSkyDiffuseAlgorithm = true;
-    state->dataHeatBal->SolarDistribution = FullExterior;
+    state->dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
 
     state->dataSolarShading->CalcSkyDifShading = true;
     SolarShading::InitSolarCalculations(*state);
@@ -670,8 +673,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
     int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    EXPECT_NEAR(0.6504, state->dataHeatBal->DifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
-    EXPECT_NEAR(0.9152, state->dataHeatBal->DifShdgRatioHorizHRTS(4, 9, windowSurfNum), 0.0001);
+    EXPECT_NEAR(0.6504, state->dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
+    EXPECT_NEAR(0.9152, state->dataSolarShading->SurfDifShdgRatioHorizHRTS(4, 9, windowSurfNum), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
@@ -1055,7 +1058,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     state->dataSurface->ShadingTransmittanceVaries = true;
     state->dataSysVars->DetailedSkyDiffuseAlgorithm = true;
     state->dataSysVars->shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
-    state->dataHeatBal->SolarDistribution = FullExterior;
+    state->dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
 
     state->dataSolarShading->CalcSkyDifShading = true;
     SolarShading::InitSolarCalculations(*state);
@@ -1063,9 +1066,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     state->dataSolarShading->CalcSkyDifShading = false;
 
     ScheduleManager::UpdateScheduleValues(*state);
-    state->dataBSDFWindow->SUNCOSTS(4, 9, 1) = 0.1;
-    state->dataBSDFWindow->SUNCOSTS(4, 9, 2) = 0.1;
-    state->dataBSDFWindow->SUNCOSTS(4, 9, 3) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(1) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(2) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(3) = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
     EXPECT_TRUE(state->dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
@@ -1076,11 +1079,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
-    EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SunlitFrac(4, 9, surfNum));
+    EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));
     surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SunlitFrac(4, 9, surfNum));
+    EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));
     surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", state->dataSurface->Surface);
-    EXPECT_DOUBLE_EQ(0.5432, state->dataHeatBal->SunlitFrac(4, 9, surfNum));
+    EXPECT_DOUBLE_EQ(0.5432, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
@@ -1835,7 +1838,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     state->dataSurface->ShadingTransmittanceVaries = true;
     state->dataSysVars->DetailedSkyDiffuseAlgorithm = true;
-    state->dataHeatBal->SolarDistribution = FullExterior;
+    state->dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
     state->dataSysVars->SlaterBarsky = true;
 
     state->dataSolarShading->CalcSkyDifShading = true;
@@ -1845,8 +1848,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
     int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    EXPECT_NEAR(0.6504, state->dataHeatBal->DifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
-    EXPECT_NEAR(0.9152, state->dataHeatBal->DifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
+    EXPECT_NEAR(0.6504, state->dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
+    EXPECT_NEAR(0.9152, state->dataSolarShading->SurfDifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
 
     state->dataSysVars->SlaterBarsky = false;
 }

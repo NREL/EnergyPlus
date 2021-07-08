@@ -1344,98 +1344,65 @@ namespace SystemAvailabilityManager {
         // This routine gets the System Availability Manager List object input and stores
         // it for later retrieval of items from the Plant and Air Loops.
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
-        Array1D_bool lNumericFieldBlanks;
-        Array1D_bool lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
-        std::string cCurrentModuleObject;
-        int NumAlphas;
-        int NumNumbers;
-        int numArgs;
-        int Item;
-        int IOStatus;
-        bool ErrorsFound;
-        int list;
-        int itemnum;
-
         if (state.dataSystemAvailabilityManager->GetAvailMgrInputFlag) {
             GetSysAvailManagerInputs(state);
             state.dataSystemAvailabilityManager->GetAvailMgrInputFlag = false;
         }
 
-        ErrorsFound = false;
+        bool ErrorsFound = false;
+        std::string cCurrentModuleObject = "AvailabilityManagerAssignmentList";
+        auto &ip = state.dataInputProcessing->inputProcessor;
 
-        cCurrentModuleObject = "AvailabilityManagerAssignmentList";
-        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
-        cAlphaFieldNames.allocate(NumAlphas);
-        cAlphaArgs.allocate(NumAlphas);
-        lAlphaFieldBlanks.dimension(NumAlphas, false);
-        cNumericFieldNames.allocate(NumNumbers);
-        rNumericArgs.dimension(NumNumbers, 0.0);
-        lNumericFieldBlanks.dimension(NumNumbers, false);
-
-        cCurrentModuleObject = "AvailabilityManagerAssignmentList";
-        state.dataSystemAvailabilityManager->NumAvailManagerLists =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSystemAvailabilityManager->NumAvailManagerLists = ip->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataSystemAvailabilityManager->NumAvailManagerLists > 0) {
 
             state.dataSystemAvailabilityManager->SysAvailMgrListData.allocate(state.dataSystemAvailabilityManager->NumAvailManagerLists);
+            auto const instances = ip->epJSON.find(cCurrentModuleObject);
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
 
-            for (Item = 1; Item <= state.dataSystemAvailabilityManager->NumAvailManagerLists; ++Item) {
-                state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                         cCurrentModuleObject,
-                                                                         Item,
-                                                                         cAlphaArgs,
-                                                                         NumAlphas,
-                                                                         rNumericArgs,
-                                                                         NumNumbers,
-                                                                         IOStatus,
-                                                                         lNumericFieldBlanks,
-                                                                         lAlphaFieldBlanks,
-                                                                         cAlphaFieldNames,
-                                                                         cNumericFieldNames);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).Name = cAlphaArgs(1);
+            auto &instancesValue = instances.value();
+            int Item = 0;
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                ++Item;
+                auto const &objectFields = instance.value();
+                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).Name = thisObjectName;
 
-                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).NumItems = (NumAlphas - 1) / 2; // Subtract off the list name first
-                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName.allocate(
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).NumItems);
-                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName = "";
-                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType.allocate(
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).NumItems);
-                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType = "";
-                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType.allocate(
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).NumItems);
-                state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType = 0;
+                auto extensibles = objectFields.find("managers");
+                auto const &extensionSchemaProps = objectSchemaProps["managers"]["items"]["properties"];
+                if (extensibles != objectFields.end()) {
+                    auto extensiblesArray = extensibles.value();
+                    int numExtensibles = extensiblesArray.size();
+                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).NumItems = numExtensibles;
+                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName.allocate(numExtensibles);
+                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType.allocate(numExtensibles);
+                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType.allocate(numExtensibles);
+                    for (int extItem = 1; extItem <= numExtensibles; ++extItem) {
+                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName = "";
+                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType = "";
+                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType = 0;
+                    }
 
-                // retrieve data
-
-                itemnum = 1;
-                for (list = 1; list <= state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).NumItems; ++list) {
-                    ++itemnum;
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType(list) = cAlphaArgs(itemnum);
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(list) =
-                        ValidateAndSetSysAvailabilityManagerType(state, cAlphaArgs(itemnum));
-                    // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists
-                    ++itemnum;
-                    state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName(list) = cAlphaArgs(itemnum);
-                } // End of retrieving items
+                    int listItem = 0;
+                    for (auto extensibleInstance : extensiblesArray) {
+                        ++listItem;
+                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerName(listItem) =
+                            ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_name");
+                        std::string availManagerObjType =
+                            ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
+                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).cAvailManagerType(listItem) = availManagerObjType;
+                        state.dataSystemAvailabilityManager->SysAvailMgrListData(Item).AvailManagerType(listItem) =
+                            ValidateAndSetSysAvailabilityManagerType(state, availManagerObjType);
+                        // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists
+                    }
+                }
             }
-        }
 
-        cAlphaFieldNames.deallocate();
-        cAlphaArgs.deallocate();
-        lAlphaFieldBlanks.deallocate();
-        cNumericFieldNames.deallocate();
-        rNumericArgs.deallocate();
-        lNumericFieldBlanks.deallocate();
-
-        if (ErrorsFound) {
-            ShowFatalError(state, "GetSysAvailManagerListInputs: Program terminates due to preceding conditions.");
+            if (ErrorsFound) {
+                ShowFatalError(state, "GetSysAvailManagerListInputs: Program terminates due to preceding conditions.");
+            }
         }
     }
 
@@ -1657,9 +1624,9 @@ namespace SystemAvailabilityManager {
             state.dataSystemAvailabilityManager->GetAvailListsInput = false;
         }
 
-        if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).Input) { // when both air loop and zone eq avail managers are present, zone avail mngrs
-                                                                        // list name has not been read in first time through here (see end of if
-                                                                        // block)
+        if (ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).Input) { // when both air loop and zone eq avail managers are present, zone
+                                                                        // avail mngrs list name has not been read in first time through here
+                                                                        // (see end of if block)
             AvailabilityListName = ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerListName;
             Found = 0;
             if (state.dataSystemAvailabilityManager->NumAvailManagerLists > 0)
@@ -4920,9 +4887,6 @@ namespace SystemAvailabilityManager {
         using AirflowNetworkBalanceManager::GetZoneOutdoorAirChangeRate;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
         using CurveManager::CurveValue;
-        using DataHeatBalance::HybridControlTypeClose;
-        using DataHeatBalance::HybridControlTypeGlobal;
-        using DataHeatBalance::HybridControlTypeIndiv;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -5306,8 +5270,9 @@ namespace SystemAvailabilityManager {
             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl;
         if (state.dataHVACGlobal->HybridVentSysAvailVentCtrl(SysAvailNum) < 0) {
             // Fatal error
-            ShowFatalError(
-                state, "Hybrid ventilation control: the ventilation control status is beyond the range. Please check input of control mode schedule");
+            ShowFatalError(state,
+                           "Hybrid ventilation control: the ventilation control status is beyond the range. Please check input of control "
+                           "mode schedule");
         }
 
         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
@@ -5337,13 +5302,13 @@ namespace SystemAvailabilityManager {
                         // Setup flag for ventilation objects
                         for (i = 1; i <= state.dataHeatBal->TotVentilation; ++i) {
                             if (state.dataHeatBal->Ventilation(i).ZonePtr == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum) {
-                                state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeIndiv;
+                                state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Indiv;
                                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl ==
                                     state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                                    state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeClose;
+                                    state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Close;
                                 } else {
                                     if (SimpleControlType == 1) {
-                                        state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeGlobal;
+                                        state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Global;
                                         state.dataHeatBal->Ventilation(i).HybridControlMasterNum =
                                             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                                     }
@@ -5353,13 +5318,13 @@ namespace SystemAvailabilityManager {
                         // Setup flag for Mixing objects
                         for (i = 1; i <= state.dataHeatBal->TotMixing; ++i) {
                             if (state.dataHeatBal->Mixing(i).ZonePtr == state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum) {
-                                state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeIndiv;
+                                state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Indiv;
                                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl ==
                                     state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                                    state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeClose;
+                                    state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Close;
                                 } else {
                                     if (SimpleControlType == 1) {
-                                        state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeGlobal;
+                                        state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Global;
                                         state.dataHeatBal->Mixing(i).HybridControlMasterNum =
                                             state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                                     }
@@ -5377,13 +5342,13 @@ namespace SystemAvailabilityManager {
             for (i = 1; i <= state.dataHeatBal->TotVentilation; ++i) {
                 if (state.dataHeatBal->Ventilation(i).ZonePtr ==
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum) {
-                    state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeIndiv;
+                    state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Indiv;
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl ==
                         state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                        state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeClose;
+                        state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Close;
                     } else {
                         if (SimpleControlType == 1) {
-                            state.dataHeatBal->Ventilation(i).HybridControlType = HybridControlTypeGlobal;
+                            state.dataHeatBal->Ventilation(i).HybridControlType = DataHeatBalance::HybridCtrlType::Global;
                             state.dataHeatBal->Ventilation(i).HybridControlMasterNum =
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                         }
@@ -5394,13 +5359,13 @@ namespace SystemAvailabilityManager {
             for (i = 1; i <= state.dataHeatBal->TotMixing; ++i) {
                 if (state.dataHeatBal->Mixing(i).ZonePtr ==
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ActualZoneNum) {
-                    state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeIndiv;
+                    state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Indiv;
                     if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl ==
                         state.dataSystemAvailabilityManager->HybridVentCtrl_Close) {
-                        state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeClose;
+                        state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Close;
                     } else {
                         if (SimpleControlType == 1) {
-                            state.dataHeatBal->Mixing(i).HybridControlType = HybridControlTypeGlobal;
+                            state.dataHeatBal->Mixing(i).HybridControlType = DataHeatBalance::HybridCtrlType::Global;
                             state.dataHeatBal->Mixing(i).HybridControlMasterNum =
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationPtr;
                         }

@@ -208,7 +208,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
 
         // See if Material was defined with R only.  (No density is defined then and not applicable for EMPD).
         //  What about materials other than "regular materials" (e.g. Glass, Air, etc)
-        if (state.dataMaterial->Material(MaterNum).Group == RegularMaterial && MaterialProps(1) > 0.0) {
+        if (state.dataMaterial->Material(MaterNum).Group == DataHeatBalance::MaterialGroup::RegularMaterial && MaterialProps(1) > 0.0) {
             if (state.dataMaterial->Material(MaterNum).ROnly) {
                 //        CALL ShowSevereError('EMPD base material = "'//TRIM(dataMaterial.Material(MaterNum)%Name)//  &
                 //                             '" was Material:NoMass. It cannot be used for EMPD calculations.')
@@ -219,7 +219,7 @@ void GetMoistureBalanceEMPDInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        if (state.dataMaterial->Material(MaterNum).Group != RegularMaterial) {
+        if (state.dataMaterial->Material(MaterNum).Group != DataHeatBalance::MaterialGroup::RegularMaterial) {
             //      CALL ShowSevereError('GetMoistureBalanceEMPDInput: Only Material:Regular base materials are allowed '// &
             //                           'to have EMPD properties, material = '// TRIM(dataMaterial.Material(MaterNum)%Name))
             ShowSevereError(state,
@@ -415,7 +415,7 @@ void InitMoistureBalanceEMPD(EnergyPlusData &state)
 
 void CalcMoistureBalanceEMPD(EnergyPlusData &state,
                              int const SurfNum,
-                             Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
+                             Real64 const SurfTempIn, // INSIDE SURFACE TEMPERATURE at current time step
                              Real64 const TempZone,   // Zone temperature at current time step.
                              Real64 &TempSat          // Saturated surface temperature.
 )
@@ -515,7 +515,7 @@ void CalcMoistureBalanceEMPD(EnergyPlusData &state,
         return;
     }
 
-    Taver = TempSurfIn;
+    Taver = SurfTempIn;
     // Calculate average vapor density [kg/m^3], and RH for use in material property calculations.
     RVaver = rv_surface_old;
     RHaver = RVaver * 461.52 * (Taver + DataGlobalConstants::KelvinConv) * std::exp(-23.7093 + 4111.0 / (Taver + 237.7));
