@@ -458,7 +458,6 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
 void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
 {
 
-    if (this->OneTimeInitFlag) {
         // Locate the unit on the plant loops for later usage
         bool errFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(
@@ -473,8 +472,6 @@ void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
             state.dataPlnt->PlantLoop(this->LoopNum).MaxTemp;
         // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
-
-        this->OneTimeInitFlag = false;
 
         // this may need some help, if the objects change location later, due to a push_back,
         //  then the pointers to these output variables will be bad
@@ -511,7 +508,6 @@ void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
             state, reportVarPrefix + "Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
         SetupOutputVariable(
             state, reportVarPrefix + "Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
-    }
 }
 
 } // namespace EnergyPlus::OutsideEnergySources

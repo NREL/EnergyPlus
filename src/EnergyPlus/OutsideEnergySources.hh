@@ -83,7 +83,6 @@ namespace OutsideEnergySources {
         int BranchNum = 0;
         int CompNum = 0;
         // flags
-        bool OneTimeInitFlag = true;
         bool BeginEnvrnInitFlag = true;
         bool CheckEquipName = true;
         Real64 MassFlowRate = 0.0;
