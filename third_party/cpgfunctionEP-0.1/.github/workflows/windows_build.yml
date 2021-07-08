@@ -1,0 +1,59 @@
+name: Build and Test (Windows)
+
+on: [push]
+
+jobs:
+  windows_build:
+    runs-on: self-hosted
+    continue-on-error: ${{ matrix.allow_failure }}
+    strategy:
+      # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
+      fail-fast: false
+      matrix:
+        arch: [x64, x86]
+        include:
+        - arch: x64
+          allow_failure: false
+          vs-generator: x64
+          package-arch: x86_64
+        - arch: x86
+          allow_failure: false
+          vs-generator: Win32
+          package-arch: i386
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+        architecture: ${{ matrix.arch }}
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install aqtinstall
+
+    - name: Create Build Directory
+      run: cmake -E make_directory ./build/
+
+    - name: Configure CMake
+      working-directory: ./build
+      shell: bash
+      run: |
+        set -x
+        cmake -G "Visual Studio 16 2019" -A ${{ matrix.vs-generator }} \
+              -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON \
+              -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" \
+              ../
+
+    - name: Build Package
+      working-directory: ./build
+      shell: bash
+      run: cmake --build . -j 2
+
+    - name: Run Tests
+      working-directory: ./build
+      shell: bash
+      run: ctest -C Debug

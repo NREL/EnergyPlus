@@ -1,0 +1,38 @@
+name: Build and Test (Mac)
+
+on: [push]
+
+jobs:
+  mac_build:
+    runs-on: macos-10.15
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install aqtinstall
+
+    - name: Create Build Directory
+      run: cmake -E make_directory ./build/
+
+    - name: Configure CMake
+      working-directory: ./build
+      shell: bash
+      run: cmake -DCMAKE_BUILD_TYPE=Release ../
+
+    - name: Build Package
+      working-directory: ./build
+      shell: bash
+      run: cmake --build . -j 2
+
+    - name: Run Tests
+      working-directory: ./build
+      shell: bash
+      run: ctest --verbose
