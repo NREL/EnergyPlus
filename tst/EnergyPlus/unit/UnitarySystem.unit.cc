@@ -6344,8 +6344,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
-    //state->dataHeatingCoils->GetCoilsInputFlag = true;
-    //state->dataHeatingCoils->HeatingCoil.deallocate();
+    // state->dataHeatingCoils->GetCoilsInputFlag = true;
+    // state->dataHeatingCoils->HeatingCoil.deallocate();
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -6529,8 +6529,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInputSZVAV)
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read zone equipment configuration and list objects
 
-    //state->dataHeatingCoils->GetCoilsInputFlag = true;
-    //state->dataHeatingCoils->HeatingCoil.deallocate();
+    // state->dataHeatingCoils->GetCoilsInputFlag = true;
+    // state->dataHeatingCoils->HeatingCoil.deallocate();
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -17244,7 +17244,7 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
+    // EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -17330,7 +17330,7 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
+    // EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -17432,7 +17432,7 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
+    // EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -17625,7 +17625,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     // check getinputs
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
+    // EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
@@ -17871,7 +17871,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     // check getinputs
     EXPECT_EQ(state->dataUnitarySystems->numCoilWaterSystems, 1);
     EXPECT_EQ(state->dataUnitarySystems->numUnitarySystems, 1);
-    //EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
+    // EXPECT_EQ(thisSys.UnitarySystemType_Num, SimAirServingZones::CompType::UnitarySystemModel);
     EXPECT_EQ(thisSys.UnitType, "CoilSystem:Cooling:Water");
     EXPECT_EQ(thisSys.Name, "COIL SYSTEM WATER");
     EXPECT_EQ(thisSys.m_minAirToWaterTempOffset, 2.0);
