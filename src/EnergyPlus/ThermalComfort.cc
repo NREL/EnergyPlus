@@ -100,10 +100,7 @@ namespace ThermalComfort {
     // the people statements and perform the requested thermal comfort evaluations
 
     // Using/Aliasing
-    using DataHeatBalance::AngleFactor;
     using DataHeatBalance::PeopleData;
-    using DataHeatBalance::SurfaceWeighted;
-    using DataHeatBalance::ZoneAveraged;
     using Psychrometrics::PsyRhFnTdbWPb;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -2041,7 +2038,7 @@ namespace ThermalComfort {
         }
 
         for (Item = 1; Item <= state.dataHeatBal->TotPeople; ++Item) {
-            if (state.dataHeatBal->People(Item).MRTCalcType != AngleFactor) continue;
+            if (state.dataHeatBal->People(Item).MRTCalcType != DataHeatBalance::CalcMRT::AngleFactor) continue;
             state.dataHeatBal->People(Item).AngleFactorListPtr =
                 UtilityRoutines::FindItemInList(state.dataHeatBal->People(Item).AngleFactorListName, state.dataThermalComforts->AngleFactorList);
             WhichAFList = state.dataHeatBal->People(Item).AngleFactorListPtr;
@@ -2261,14 +2258,14 @@ namespace ThermalComfort {
         {
             auto const SELECT_CASE_var(state.dataHeatBal->People(PeopleListNum).MRTCalcType);
 
-            if (SELECT_CASE_var == ZoneAveraged) {
+            if (SELECT_CASE_var == DataHeatBalance::CalcMRT::ZoneAveraged) {
                 state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
-            } else if (SELECT_CASE_var == SurfaceWeighted) {
+            } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::SurfaceWeighted) {
                 ZoneRadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
                 SurfaceTemp = state.dataHeatBalSurf->SurfInTempHistCurr(state.dataHeatBal->People(PeopleListNum).SurfacePtr);
                 state.dataThermalComforts->RadTemp =
                     CalcSurfaceWeightedMRT(state, state.dataThermalComforts->ZoneNum, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
-            } else if (SELECT_CASE_var == AngleFactor) {
+            } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::AngleFactor) {
                 state.dataThermalComforts->RadTemp = CalcAngleFactorMRT(state, state.dataHeatBal->People(PeopleListNum).AngleFactorListPtr);
             }
         }
