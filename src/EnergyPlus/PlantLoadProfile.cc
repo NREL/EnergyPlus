@@ -189,9 +189,6 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     static std::string const RoutineName("InitPlantProfile");
     Real64 FluidDensityInit;
 
-    // Do the one time initializations
-    this->oneTimeInit(state);
-
     if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
         RegisterPlantCompDesignFlow(state, InletNode, this->PeakVolFlowRate);
         this->InitSizing = false;

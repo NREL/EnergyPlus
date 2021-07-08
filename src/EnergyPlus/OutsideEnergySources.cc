@@ -289,8 +289,6 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     // The mass flow rate could be an inter-connected-loop side trigger. This is not really the type of
     //  interconnect that that routine was written for, but it is the clearest example of using it.
 
-    this->oneTimeInit(state);
-
     // begin environment inits
     if (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
         // component model has not design flow rates, using data for overall plant loop
