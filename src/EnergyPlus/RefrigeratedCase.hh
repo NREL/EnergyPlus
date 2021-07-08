@@ -448,41 +448,41 @@ namespace RefrigeratedCase {
         Array1D_int CaseNum;
         Array1D_int CoilNum;
         Array1D_int WalkInNum;
-        iLocation HeatRejectionLocation;  // Refrigeration Compressor Rack heat rejection location
-        int CondenserType;                // Specifies cooling mode for outdoor condenser
-        Real64 LaggedUsedWaterHeater;     // Heat reclaim used to heat water in previous zone/load time step(W)
-        Real64 LaggedUsedHVACCoil;        // Heat reclaim used to heat HVAC coil in previous zone/load time step(W)
-        Real64 EvapEffect;                // Effectiveness of evaporative condenser
-        Real64 CondenserAirFlowRate;      // Evaporative condenser air volume flow rate (m3/s)
-        Real64 EvapPumpPower;             // Evaporative cooling water pump power (W)
-        Real64 ActualEvapPumpPower;       // Evaporative cooling water pump power, if adjusted (W)
-        Real64 EvapPumpConsumption;       // Evaporative cooling water pump electric consumption (J)
-        Real64 EvapWaterConsumpRate;      // Evaporative condenser water consumption rate (m3/s)
-        Real64 EvapWaterConsumption;      // Evaporative condenser water consumption (m3)
-        int EvapSchedPtr;                 // Index to the correct evap condenser availability schedule
-        Real64 BasinHeaterPowerFTempDiff; // Basin heater capacity per degree K below setpoint (W/K)
-        Real64 BasinHeaterSetPointTemp;   // Setpoint temperature for basin heater operation (C)
-        Real64 BasinHeaterPower;          // Power demand from basin heater (W)
-        Real64 BasinHeaterConsumption;    // Electric consumption from basin heater (J)
-        Real64 RatedCOP;                  // Rated coefficient of performance for compressor rack (W/W)
-        int COPFTempPtr;                  // Index to the correct COP curve object
-        int NumCases;                     // Total number of refrigerated cases attached to each rack
-        int NumCoils;                     // Total number of air chillers attached to each rack
-        int NumWalkIns;                   // Total number of walk-ins attached to each rack
-        WaterSupply EvapWaterSupplyMode;  // Source of water for evap condenser cooling
-        int EvapWaterSupTankID;           // TankID when evap condenser uses water from storage tank
-        int EvapWaterTankDemandARRID;     // Demand index when evap condenser uses water from storage tank
-        int OutsideAirNodeNum;            // Outside air node number
-        int HeatRejectionZoneNum;         // Heat rejection zone number used when walk-ins present and ht rej to zone
-        int HeatRejectionZoneNodeNum;     // Heat rejection zone node number used when walk-ins present and ht rej to zone
-        Real64 TotalRackLoad;             // Total capacity of all refrigerated cases on rack
-        Real64 RackCompressorCOP;         // Rack compressor COP at specific operating conditions
-        Real64 RackCompressorPower;       // Total rack compressor power (W)
-        Real64 RackElecConsumption;       // Total rack compressor electric consumption (J)
-        Real64 RackCapacity;              // Total rack delivered capacity (W)
-        Real64 RackCoolingEnergy;         // Total rack delivered energy (J)
-        Real64 CondenserFanPower;         // Condenser fan power (W)
-        int TotCondFTempPtr;              // Index for condenser fan power modifier curve
+        iLocation HeatRejectionLocation;                    // Refrigeration Compressor Rack heat rejection location
+        DataHeatBalance::RefrigCondenserType CondenserType; // Specifies cooling mode for outdoor condenser
+        Real64 LaggedUsedWaterHeater;                       // Heat reclaim used to heat water in previous zone/load time step(W)
+        Real64 LaggedUsedHVACCoil;                          // Heat reclaim used to heat HVAC coil in previous zone/load time step(W)
+        Real64 EvapEffect;                                  // Effectiveness of evaporative condenser
+        Real64 CondenserAirFlowRate;                        // Evaporative condenser air volume flow rate (m3/s)
+        Real64 EvapPumpPower;                               // Evaporative cooling water pump power (W)
+        Real64 ActualEvapPumpPower;                         // Evaporative cooling water pump power, if adjusted (W)
+        Real64 EvapPumpConsumption;                         // Evaporative cooling water pump electric consumption (J)
+        Real64 EvapWaterConsumpRate;                        // Evaporative condenser water consumption rate (m3/s)
+        Real64 EvapWaterConsumption;                        // Evaporative condenser water consumption (m3)
+        int EvapSchedPtr;                                   // Index to the correct evap condenser availability schedule
+        Real64 BasinHeaterPowerFTempDiff;                   // Basin heater capacity per degree K below setpoint (W/K)
+        Real64 BasinHeaterSetPointTemp;                     // Setpoint temperature for basin heater operation (C)
+        Real64 BasinHeaterPower;                            // Power demand from basin heater (W)
+        Real64 BasinHeaterConsumption;                      // Electric consumption from basin heater (J)
+        Real64 RatedCOP;                                    // Rated coefficient of performance for compressor rack (W/W)
+        int COPFTempPtr;                                    // Index to the correct COP curve object
+        int NumCases;                                       // Total number of refrigerated cases attached to each rack
+        int NumCoils;                                       // Total number of air chillers attached to each rack
+        int NumWalkIns;                                     // Total number of walk-ins attached to each rack
+        WaterSupply EvapWaterSupplyMode;                    // Source of water for evap condenser cooling
+        int EvapWaterSupTankID;                             // TankID when evap condenser uses water from storage tank
+        int EvapWaterTankDemandARRID;                       // Demand index when evap condenser uses water from storage tank
+        int OutsideAirNodeNum;                              // Outside air node number
+        int HeatRejectionZoneNum;                           // Heat rejection zone number used when walk-ins present and ht rej to zone
+        int HeatRejectionZoneNodeNum;                       // Heat rejection zone node number used when walk-ins present and ht rej to zone
+        Real64 TotalRackLoad;                               // Total capacity of all refrigerated cases on rack
+        Real64 RackCompressorCOP;                           // Rack compressor COP at specific operating conditions
+        Real64 RackCompressorPower;                         // Total rack compressor power (W)
+        Real64 RackElecConsumption;                         // Total rack compressor electric consumption (J)
+        Real64 RackCapacity;                                // Total rack delivered capacity (W)
+        Real64 RackCoolingEnergy;                           // Total rack delivered energy (J)
+        Real64 CondenserFanPower;                           // Condenser fan power (W)
+        int TotCondFTempPtr;                                // Index for condenser fan power modifier curve
         // (function of outdoor temperature)
         Real64 ActualCondenserFanPower; // Rack condenser fan power (W)
         Real64 CondenserFanConsumption; // Rack condenser fan electric consumption (J)
@@ -521,19 +521,20 @@ namespace RefrigeratedCase {
 
         // Default Constructor
         RefrigRackData()
-            : MyIdx(0), CoilFlag(false), EndUseSubcategory("General"), HeatRejectionLocation(iLocation::Unassigned), CondenserType(0),
-              LaggedUsedWaterHeater(0.0), LaggedUsedHVACCoil(0.0), EvapEffect(0.9), CondenserAirFlowRate(0.0), EvapPumpPower(0.0),
-              ActualEvapPumpPower(0.0), EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0), EvapSchedPtr(0),
-              BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), RatedCOP(0.0),
-              COPFTempPtr(0), NumCases(0), NumCoils(0), NumWalkIns(0), EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0),
-              EvapWaterTankDemandARRID(0), OutsideAirNodeNum(0), HeatRejectionZoneNum(0), HeatRejectionZoneNodeNum(0), TotalRackLoad(0.0),
-              RackCompressorCOP(0.0), RackCompressorPower(0.0), RackElecConsumption(0.0), RackCapacity(0.0), RackCoolingEnergy(0.0),
-              CondenserFanPower(0.0), TotCondFTempPtr(0), ActualCondenserFanPower(0.0), CondenserFanConsumption(0.0), SensZoneCreditHeatRate(0.0),
-              SensZoneCreditHeat(0.0), SensHVACCreditHeatRate(0.0), SensHVACCreditHeat(0.0), EvapFreezeWarnIndex(0), NoFlowWarnIndex(0),
-              HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0), InletTemp(0.0), OutletNode(0),
-              PlantTypeOfNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0), OutletTemp(0.0), OutletTempSchedPtr(0),
-              VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0), FlowType(iCndsrFlowType::VariableFlow),
-              VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
+            : MyIdx(0), CoilFlag(false), EndUseSubcategory("General"), HeatRejectionLocation(iLocation::Unassigned),
+              CondenserType(DataHeatBalance::RefrigCondenserType::Unassigned), LaggedUsedWaterHeater(0.0), LaggedUsedHVACCoil(0.0), EvapEffect(0.9),
+              CondenserAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0), EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0),
+              EvapWaterConsumption(0.0), EvapSchedPtr(0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0),
+              BasinHeaterConsumption(0.0), RatedCOP(0.0), COPFTempPtr(0), NumCases(0), NumCoils(0), NumWalkIns(0),
+              EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), OutsideAirNodeNum(0),
+              HeatRejectionZoneNum(0), HeatRejectionZoneNodeNum(0), TotalRackLoad(0.0), RackCompressorCOP(0.0), RackCompressorPower(0.0),
+              RackElecConsumption(0.0), RackCapacity(0.0), RackCoolingEnergy(0.0), CondenserFanPower(0.0), TotCondFTempPtr(0),
+              ActualCondenserFanPower(0.0), CondenserFanConsumption(0.0), SensZoneCreditHeatRate(0.0), SensZoneCreditHeat(0.0),
+              SensHVACCreditHeatRate(0.0), SensHVACCreditHeat(0.0), EvapFreezeWarnIndex(0), NoFlowWarnIndex(0), HighTempWarnIndex(0),
+              LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0), InletTemp(0.0), OutletNode(0), PlantTypeOfNum(0),
+              PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0), OutletTemp(0.0), OutletTempSchedPtr(0), VolFlowRate(0.0),
+              DesVolFlowRate(0.0), MassFlowRate(0.0), CondLoad(0.0), CondEnergy(0.0), FlowType(iCndsrFlowType::VariableFlow), VolFlowRateMax(0.0),
+              MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), TotalCoolingLoad(0.0), ShowCOPWarning(true)
         {
         }
 
@@ -570,6 +571,8 @@ namespace RefrigeratedCase {
                       bool FirstHVACIteration,
                       Real64 &CurLoad,
                       bool RunFlag) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct RefrigSystemData
@@ -916,47 +919,46 @@ namespace RefrigeratedCase {
     struct RefrigCondenserData : PlantComponent
     {
         // Members
-        std::string Name;               // Name of condenser
-        std::string SupplyTankName;     // Evap water supply tank name
-        std::string EndUseSubcategory;  // Rack end-use subcategory
-        bool CondenserRejectHeatToZone; // Flag to show air-cooled condenser located inside zone
-        bool CoilFlag;                  // Flag to show if coil type load on system served by condenser
-        Array1D_int SysNum;             // absolute Index of system placing load (allocated NumRefrigSystems)
-        int NumSysAttach;               // Number of systems attached to condenser, error if /=1
-        int CondenserType;              // Specifies cooling mode for condenser
-        // (1=Dry air, 2=Evap cooling, 3=Water-cooled, 4=Cascade)
-        int EvapFreezeWarnIndex;                      // Recurring freeze warning index
-        iCndsrFlowType FlowType;                      // Water-cooled condenser loop flow type
-        int CondCreditWarnIndex1;                     // Used to count warnings
-        int CondCreditWarnIndex2;                     // Used to count warnings
-        int CondCreditWarnIndex3;                     // Used to count warnings
-        int CondCreditWarnIndex4;                     // Used to count warnings
-        int CondCreditWarnIndex5;                     // Used to count warnings
-        int CondCreditWarnIndex6;                     // Used to count warnings
-        int CondCreditWarnIndex7;                     // Used to count warnings
-        int NoFlowWarnIndex;                          // No cooling water when needed warning index
-        int HighTempWarnIndex;                        // Water outlet high temp warning index
-        int LowTempWarnIndex;                         // Water outlet low temp warning index
-        int HighFlowWarnIndex;                        // Water outlet high flow warning index
-        int HighInletWarnIndex;                       // Water inlet high temp warning index
-        int InletNode;                                // Water-cooled condenser inlet node number
-        int EvapSchedPtr;                             // Index to the correct evap condenser availability schedule
-        WaterSupply EvapWaterSupplyMode;              // Source of water for evap condenser cooling
-        int EvapWaterSupTankID;                       // TankID when evap condenser uses water from storage tank
-        int EvapWaterTankDemandARRID;                 // Demand index when evap condenser uses water from storage tank
-        int OutletNode;                               // Water-cooled condenser outlet node number
-        int PlantTypeOfNum;                           // Water-cooled condenser plant equipment type
-        int PlantLoopNum;                             // Water-cooled condenser plant loop number
-        int PlantLoopSideNum;                         // Water-cooled condenser plant loop side number
-        int PlantBranchNum;                           // Water-cooled condenser plant branch number
-        int PlantCompNum;                             // Water-cooled condenser plant component number
-        int OutletTempSchedPtr;                       // Schedule pointer for condenser outlet temp setting
-        int InletAirNodeNum;                          // Inlet air node number, can be outside or in a zone
-        int InletAirZoneNum;                          // Inlet air zone number, if located in a zone
-        iFanSpeedCtrlType FanSpeedControlType;        // fixed, two-speed, or variable
-        int CapCurvePtr;                              // capcity curve pointer for air-cooled condensers
-        int CascadeSysID;                             // System ID number for system rejecting heat to cascade condenser
-        iCascadeCndsrTempCtrlType CascadeTempControl; // Determines whether cascade condenser evaporating temperature set by
+        std::string Name;                                   // Name of condenser
+        std::string SupplyTankName;                         // Evap water supply tank name
+        std::string EndUseSubcategory;                      // Rack end-use subcategory
+        bool CondenserRejectHeatToZone;                     // Flag to show air-cooled condenser located inside zone
+        bool CoilFlag;                                      // Flag to show if coil type load on system served by condenser
+        Array1D_int SysNum;                                 // absolute Index of system placing load (allocated NumRefrigSystems)
+        int NumSysAttach;                                   // Number of systems attached to condenser, error if /=1
+        DataHeatBalance::RefrigCondenserType CondenserType; // Specifies cooling mode for condenser
+        int EvapFreezeWarnIndex;                            // Recurring freeze warning index
+        iCndsrFlowType FlowType;                            // Water-cooled condenser loop flow type
+        int CondCreditWarnIndex1;                           // Used to count warnings
+        int CondCreditWarnIndex2;                           // Used to count warnings
+        int CondCreditWarnIndex3;                           // Used to count warnings
+        int CondCreditWarnIndex4;                           // Used to count warnings
+        int CondCreditWarnIndex5;                           // Used to count warnings
+        int CondCreditWarnIndex6;                           // Used to count warnings
+        int CondCreditWarnIndex7;                           // Used to count warnings
+        int NoFlowWarnIndex;                                // No cooling water when needed warning index
+        int HighTempWarnIndex;                              // Water outlet high temp warning index
+        int LowTempWarnIndex;                               // Water outlet low temp warning index
+        int HighFlowWarnIndex;                              // Water outlet high flow warning index
+        int HighInletWarnIndex;                             // Water inlet high temp warning index
+        int InletNode;                                      // Water-cooled condenser inlet node number
+        int EvapSchedPtr;                                   // Index to the correct evap condenser availability schedule
+        WaterSupply EvapWaterSupplyMode;                    // Source of water for evap condenser cooling
+        int EvapWaterSupTankID;                             // TankID when evap condenser uses water from storage tank
+        int EvapWaterTankDemandARRID;                       // Demand index when evap condenser uses water from storage tank
+        int OutletNode;                                     // Water-cooled condenser outlet node number
+        int PlantTypeOfNum;                                 // Water-cooled condenser plant equipment type
+        int PlantLoopNum;                                   // Water-cooled condenser plant loop number
+        int PlantLoopSideNum;                               // Water-cooled condenser plant loop side number
+        int PlantBranchNum;                                 // Water-cooled condenser plant branch number
+        int PlantCompNum;                                   // Water-cooled condenser plant component number
+        int OutletTempSchedPtr;                             // Schedule pointer for condenser outlet temp setting
+        int InletAirNodeNum;                                // Inlet air node number, can be outside or in a zone
+        int InletAirZoneNum;                                // Inlet air zone number, if located in a zone
+        iFanSpeedCtrlType FanSpeedControlType;              // fixed, two-speed, or variable
+        int CapCurvePtr;                                    // capcity curve pointer for air-cooled condensers
+        int CascadeSysID;                                   // System ID number for system rejecting heat to cascade condenser
+        iCascadeCndsrTempCtrlType CascadeTempControl;       // Determines whether cascade condenser evaporating temperature set by
         // Tevap for other loads on system (=2) or set at a constant (= 1)
         int CascadeSinkSystemID; // System ID number for system absorbing condenser heat
         // INTEGER     :: ServiceType      = 1       ! Index to warehouse or supermarket (only applies to cascade condensers)
@@ -1018,24 +1020,24 @@ namespace RefrigeratedCase {
 
         // Default Constructor
         RefrigCondenserData()
-            : EndUseSubcategory("General"), CondenserRejectHeatToZone(false), CoilFlag(false), NumSysAttach(0), CondenserType(0),
-              EvapFreezeWarnIndex(0), FlowType(iCndsrFlowType::VariableFlow), CondCreditWarnIndex1(0), CondCreditWarnIndex2(0),
-              CondCreditWarnIndex3(0), CondCreditWarnIndex4(0), CondCreditWarnIndex5(0), CondCreditWarnIndex6(0), CondCreditWarnIndex7(0),
-              NoFlowWarnIndex(0), HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0), HighInletWarnIndex(0), InletNode(0),
-              EvapSchedPtr(0), EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), OutletNode(0),
-              PlantTypeOfNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0), OutletTempSchedPtr(0), InletAirNodeNum(0),
-              InletAirZoneNum(0), FanSpeedControlType(iFanSpeedCtrlType::Unassigned), CapCurvePtr(0), CascadeSysID(0),
-              CascadeTempControl(iCascadeCndsrTempCtrlType::Unassigned), CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0), MinCondLoad(0.0),
-              TempSlope(0.0), EvapEffect(0.9), RatedAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0), EvapPumpConsumption(0.0),
-              EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(2.0),
-              BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), FanMinAirFlowRatio(0.0), RatedFanPower(0.0), ActualFanPower(0.0),
-              FanElecEnergy(0.0), InletTemp(0.0), OutletTemp(0.0), VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0), RatedTCondense(0.0),
-              CondLoad(0.0), CondEnergy(0.0), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0), RatedSubcool(0.0),
-              RatedDelT(0.0), RatedCapacity(0.0), RatedWaterInletT(0.0), RatedApproachT(0.0), MinCapFacEvap(0.0), MaxCapFacEvap(0.0), EvapCoeff1(0.0),
-              EvapCoeff2(0.0), EvapCoeff3(0.0), EvapCoeff4(0.0), EvapElevFact(1.0), RefOpCharge(0.0), RefReceiverInventory(0.0),
-              RefPipingInventory(0.0), TotalHeatRecoveredEnergy(0.0), TotalHeatRecoveredLoad(0.0), ExternalEnergyRecovered(0.0),
-              InternalEnergyRecovered(0.0), ExternalHeatRecoveredLoad(0.0), InternalHeatRecoveredLoad(0.0), LaggedUsedWaterHeater(0.0),
-              LaggedUsedHVACCoil(0.0)
+            : EndUseSubcategory("General"), CondenserRejectHeatToZone(false), CoilFlag(false), NumSysAttach(0),
+              CondenserType(DataHeatBalance::RefrigCondenserType::Unassigned), EvapFreezeWarnIndex(0), FlowType(iCndsrFlowType::VariableFlow),
+              CondCreditWarnIndex1(0), CondCreditWarnIndex2(0), CondCreditWarnIndex3(0), CondCreditWarnIndex4(0), CondCreditWarnIndex5(0),
+              CondCreditWarnIndex6(0), CondCreditWarnIndex7(0), NoFlowWarnIndex(0), HighTempWarnIndex(0), LowTempWarnIndex(0), HighFlowWarnIndex(0),
+              HighInletWarnIndex(0), InletNode(0), EvapSchedPtr(0), EvapWaterSupplyMode(WaterSupply::FromMains), EvapWaterSupTankID(0),
+              EvapWaterTankDemandARRID(0), OutletNode(0), PlantTypeOfNum(0), PlantLoopNum(0), PlantLoopSideNum(0), PlantBranchNum(0), PlantCompNum(0),
+              OutletTempSchedPtr(0), InletAirNodeNum(0), InletAirZoneNum(0), FanSpeedControlType(iFanSpeedCtrlType::Unassigned), CapCurvePtr(0),
+              CascadeSysID(0), CascadeTempControl(iCascadeCndsrTempCtrlType::Unassigned), CascadeSinkSystemID(0), CascadeRatedEvapTemp(0.0),
+              MinCondLoad(0.0), TempSlope(0.0), EvapEffect(0.9), RatedAirFlowRate(0.0), EvapPumpPower(0.0), ActualEvapPumpPower(0.0),
+              EvapPumpConsumption(0.0), EvapWaterConsumpRate(0.0), EvapWaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0),
+              BasinHeaterSetPointTemp(2.0), BasinHeaterPower(0.0), BasinHeaterConsumption(0.0), FanMinAirFlowRatio(0.0), RatedFanPower(0.0),
+              ActualFanPower(0.0), FanElecEnergy(0.0), InletTemp(0.0), OutletTemp(0.0), VolFlowRate(0.0), DesVolFlowRate(0.0), MassFlowRate(0.0),
+              RatedTCondense(0.0), CondLoad(0.0), CondEnergy(0.0), VolFlowRateMax(0.0), MassFlowRateMax(0.0), InletTempMin(10.0), OutletTempMax(55.0),
+              RatedSubcool(0.0), RatedDelT(0.0), RatedCapacity(0.0), RatedWaterInletT(0.0), RatedApproachT(0.0), MinCapFacEvap(0.0),
+              MaxCapFacEvap(0.0), EvapCoeff1(0.0), EvapCoeff2(0.0), EvapCoeff3(0.0), EvapCoeff4(0.0), EvapElevFact(1.0), RefOpCharge(0.0),
+              RefReceiverInventory(0.0), RefPipingInventory(0.0), TotalHeatRecoveredEnergy(0.0), TotalHeatRecoveredLoad(0.0),
+              ExternalEnergyRecovered(0.0), InternalEnergyRecovered(0.0), ExternalHeatRecoveredLoad(0.0), InternalHeatRecoveredLoad(0.0),
+              LaggedUsedWaterHeater(0.0), LaggedUsedHVACCoil(0.0)
         {
         }
 
@@ -1070,6 +1072,8 @@ namespace RefrigeratedCase {
                       bool FirstHVACIteration,
                       Real64 &CurLoad,
                       bool RunFlag) override;
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     struct RefrigGasCoolerData
@@ -1722,7 +1726,7 @@ namespace RefrigeratedCase {
     void GetRefrigeratedRackIndex(EnergyPlusData &state,
                                   std::string const &Name,
                                   int &IndexPtr,
-                                  int SysType,
+                                  DataHeatBalance::RefrigSystemType SysType,
                                   bool &ErrorsFound,
                                   Optional_string_const ThisObjectType = _,
                                   const Optional_bool_const &SuppressWarning = _);

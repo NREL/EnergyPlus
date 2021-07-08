@@ -948,5 +948,8 @@ void GshpPeHeatingSpecs::update(EnergyPlusData &state)
         this->QLoadEnergy = QLoad * ReportingConstant;
     }
 }
+void GshpPeHeatingSpecs::oneTimeInit([[maybe_unused]] EnergyPlusData &state)
+{
+}
 
 } // namespace EnergyPlus::HeatPumpWaterToWaterHEATING

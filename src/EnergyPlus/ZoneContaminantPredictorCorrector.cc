@@ -1874,7 +1874,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
             }
         }
 
-        if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+        if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 if (ShortenTimeStepSys && state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
                     if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
@@ -1999,13 +1999,13 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // the amount of CO2 that must be removed by the system.
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                    if (SELECT_CASE_var == Use3rdOrder) {
+                    if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                         LoadToCO2SetPoint = ((11.0 / 6.0) * C + A) * ZoneAirCO2SetPoint -
                                             (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) -
                                                       (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
                                                       (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum)));
                         // Exact solution
-                    } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                         if (A == 0.0) { // B=0
                             LoadToCO2SetPoint = C * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum)) - B;
                         } else {
@@ -2014,7 +2014,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                                     (1.0 - std::exp(min(700.0, -A / C))) -
                                 B;
                         }
-                    } else if (SELECT_CASE_var == UseEulerMethod) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                         LoadToCO2SetPoint = C * (ZoneAirCO2SetPoint - state.dataContaminantBalance->ZoneCO21(ZoneNum)) + A * ZoneAirCO2SetPoint - B;
                     }
                 }
@@ -2129,13 +2129,13 @@ void PredictZoneContaminants(EnergyPlusData &state,
                 // the amount of GC that must be removed by the system.
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                    if (SELECT_CASE_var == Use3rdOrder) {
+                    if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                         LoadToGCSetPoint = ((11.0 / 6.0) * C + A) * ZoneAirGCSetPoint -
                                            (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) -
                                                      (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
                                                      (1.0 / 3.0) * state.dataContaminantBalance->GCZoneTimeMinus3Temp(ZoneNum)));
                         // Exact solution
-                    } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                         if (A == 0.0) { // B=0
                             LoadToGCSetPoint = C * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum)) - B;
                         } else {
@@ -2144,7 +2144,7 @@ void PredictZoneContaminants(EnergyPlusData &state,
                                     (1.0 - std::exp(min(700.0, -A / C))) -
                                 B;
                         }
-                    } else if (SELECT_CASE_var == UseEulerMethod) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                         LoadToGCSetPoint = C * (ZoneAirGCSetPoint - state.dataContaminantBalance->ZoneGC1(ZoneNum)) + A * ZoneAirGCSetPoint - B;
                     }
                 }
@@ -2188,7 +2188,7 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
                 state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum); // using average for whole zone time step.
             state.dataContaminantBalance->ZoneAirCO2(ZoneNum) = state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum);
 
-            if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+            if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
                 state.dataContaminantBalance->ZoneCO2M2(ZoneNum) = state.dataContaminantBalance->ZoneCO2MX(ZoneNum);
                 state.dataContaminantBalance->ZoneCO2MX(ZoneNum) =
                     state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum); // using average for whole zone time step.
@@ -2203,7 +2203,7 @@ void PushZoneTimestepHistories(EnergyPlusData &state)
                 state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum); // using average for whole zone time step.
             state.dataContaminantBalance->ZoneAirGC(ZoneNum) = state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum);
 
-            if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+            if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
                 state.dataContaminantBalance->ZoneGCM2(ZoneNum) = state.dataContaminantBalance->ZoneGCMX(ZoneNum);
                 state.dataContaminantBalance->ZoneGCMX(ZoneNum) =
                     state.dataContaminantBalance->ZoneAirGCAvg(ZoneNum); // using average for whole zone time step.
@@ -2244,7 +2244,7 @@ void PushSystemTimestepHistories(EnergyPlusData &state)
         }
     } // zone loop
 
-    if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
+    if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                 state.dataContaminantBalance->ZoneCO2M2(ZoneNum) = state.dataContaminantBalance->ZoneCO2MX(ZoneNum);
@@ -2760,21 +2760,21 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             // smooth the changes using the zone air capacitance.
             {
                 auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == Use3rdOrder) {
+                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                     state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) =
                         (B + C * (3.0 * state.dataContaminantBalance->CO2ZoneTimeMinus1Temp(ZoneNum) -
                                   (3.0 / 2.0) * state.dataContaminantBalance->CO2ZoneTimeMinus2Temp(ZoneNum) +
                                   (1.0 / 3.0) * state.dataContaminantBalance->CO2ZoneTimeMinus3Temp(ZoneNum))) /
                         ((11.0 / 6.0) * C + A);
                     // Exact solution
-                } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                     if (A == 0.0) { // B=0
                         state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) = state.dataContaminantBalance->ZoneCO21(ZoneNum) + B / C;
                     } else {
                         state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) =
                             (state.dataContaminantBalance->ZoneCO21(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
                     }
-                } else if (SELECT_CASE_var == UseEulerMethod) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                     state.dataContaminantBalance->ZoneAirCO2Temp(ZoneNum) = (C * state.dataContaminantBalance->ZoneCO21(ZoneNum) + B) / (C + A);
                 }
             }
@@ -2834,21 +2834,21 @@ void CorrectZoneContaminants(EnergyPlusData &state,
             // smooth the changes using the zone air capacitance.
             {
                 auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
-                if (SELECT_CASE_var == Use3rdOrder) {
+                if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::ThirdOrder) {
                     state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) =
                         (B + C * (3.0 * state.dataContaminantBalance->GCZoneTimeMinus1Temp(ZoneNum) -
                                   (3.0 / 2.0) * state.dataContaminantBalance->GCZoneTimeMinus2Temp(ZoneNum) +
                                   (1.0 / 3.0) * state.dataContaminantBalance->GCZoneTimeMinus3Temp(ZoneNum))) /
                         ((11.0 / 6.0) * C + A);
                     // Exact solution
-                } else if (SELECT_CASE_var == UseAnalyticalSolution) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
                     if (A == 0.0) { // B=0
                         state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) = state.dataContaminantBalance->ZoneGC1(ZoneNum) + B / C;
                     } else {
                         state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) =
                             (state.dataContaminantBalance->ZoneGC1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
                     }
-                } else if (SELECT_CASE_var == UseEulerMethod) {
+                } else if (SELECT_CASE_var == DataHeatBalance::SolutionAlgo::EulerMethod) {
                     state.dataContaminantBalance->ZoneAirGCTemp(ZoneNum) = (C * state.dataContaminantBalance->ZoneGC1(ZoneNum) + B) / (C + A);
                 }
             }

@@ -325,67 +325,7 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     // The mass flow rate could be an inter-connected-loop side trigger. This is not really the type of
     //  interconnect that that routine was written for, but it is the clearest example of using it.
 
-    if (this->OneTimeInitFlag) {
-        // Locate the unit on the plant loops for later usage
-        bool errFlag = false;
-        PlantUtilities::ScanPlantLoopsForObject(
-            state, this->Name, this->EnergyType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
-        if (errFlag) {
-            ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
-        }
-        // set limits on outlet node temps to plant loop limits
-        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MinOutletTemp =
-            state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
-        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MaxOutletTemp =
-            state.dataPlnt->PlantLoop(this->LoopNum).MaxTemp;
-        // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
-        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
-
-        this->OneTimeInitFlag = false;
-
-        // this may need some help, if the objects change location later, due to a push_back,
-        //  then the pointers to these output variables will be bad
-        // for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
-        std::string hotOrChilled = "Hot Water ";
-        std::string reportVarPrefix = "District Heating ";
-        std::string heatingOrCooling = "Heating";
-        std::string typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchHotWater);
-        if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
-            hotOrChilled = "Chilled Water ";
-            reportVarPrefix = "District Cooling ";
-            heatingOrCooling = "Cooling";
-            typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
-        } else if (this->EnergyType == DataPlant::TypeOf_PurchSteam) {
-            hotOrChilled = "Steam ";
-            reportVarPrefix = "District Heating Steam ";
-            heatingOrCooling = "Heating";
-            typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchSteam);
-        }
-
-        SetupOutputVariable(state,
-                            reportVarPrefix + hotOrChilled + "Energy",
-                            OutputProcessor::Unit::J,
-                            this->EnergyTransfer,
-                            "System",
-                            "Sum",
-                            this->Name,
-                            _,
-                            typeName,
-                            heatingOrCooling,
-                            _,
-                            "Plant");
-        SetupOutputVariable(
-            state, reportVarPrefix + hotOrChilled + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
-
-        SetupOutputVariable(state, reportVarPrefix + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
-        SetupOutputVariable(state, reportVarPrefix + "Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
-            state, reportVarPrefix + "Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
-        SetupOutputVariable(
-            state, reportVarPrefix + "Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
-    }
-
-    //}
+    this->oneTimeInit(state);
 
     // begin environment inits
     if (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
@@ -562,56 +502,88 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
         if (MyLoad < 0.0) MyLoad = 0.0;
     }
 
-    if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater || this->EnergyType == DataPlant::TypeOf_PurchHotWater) {
-        // determine outlet temp based on inlet temp, cp, and MyLoad
-        if ((this->MassFlowRate > 0.0) && runFlag) {
-            this->OutletTemp = (MyLoad + this->MassFlowRate * Cp * this->InletTemp) / (this->MassFlowRate * Cp);
-            // apply loop limits on temperature result to keep in check
-            if (this->OutletTemp < LoopMinTemp) {
-                this->OutletTemp = max(this->OutletTemp, LoopMinTemp);
-                MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
-            }
-            if (this->OutletTemp > LoopMaxTemp) {
-                this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
-                MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
-            }
-        } else {
-            this->OutletTemp = this->InletTemp;
-            MyLoad = 0.0;
+    // determine outlet temp based on inlet temp, cp, and MyLoad
+    if ((this->MassFlowRate > 0.0) && runFlag) {
+        this->OutletTemp = (MyLoad + this->MassFlowRate * Cp * this->InletTemp) / (this->MassFlowRate * Cp);
+        // apply loop limits on temperature result to keep in check
+        if (this->OutletTemp < LoopMinTemp) {
+            this->OutletTemp = max(this->OutletTemp, LoopMinTemp);
+            MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
         }
-        int const OutletNode = this->OutletNodeNum;
-        state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
-        this->EnergyRate = std::abs(MyLoad);
-        this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
-    } else { // this->EnergyType == DataPlant::TypeOf_PurchSteam
-        // determine steam mass flow rate based on MyLoad
-        if ((this->MassFlowRate > 0.0) && runFlag) {
-            Real64 const tempSteam(100.0);
-            Real64 const EnthSteamDry = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                                              tempSteam,
-                                                                              1.0,
-                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                                              RoutineName);
-            Real64 const EnthSteamWet = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                                              tempSteam,
-                                                                              0.0,
-                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                                              RoutineName);
-            Real64 const LatentHeatSteam = EnthSteamDry - EnthSteamWet;
-            this->MassFlowRate = MyLoad / LatentHeatSteam;
-            this->OutletTemp = tempSteam;
-            this->OutletSteamQuality = 1.0;
-        } else {
-            this->OutletTemp = this->InletTemp;
-            MyLoad = 0.0;
+        if (this->OutletTemp > LoopMaxTemp) {
+            this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
+            MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
         }
-        int const OutletNode = this->OutletNodeNum;
-        state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
-        state.dataLoopNodes->Node(OutletNode).Quality = this->OutletSteamQuality;
-        this->EnergyRate = std::abs(MyLoad);
-        this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+    } else {
+        this->OutletTemp = this->InletTemp;
+        MyLoad = 0.0;
+    }
+    int const OutletNode = this->OutletNodeNum;
+    state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
+    this->EnergyRate = std::abs(MyLoad);
+    this->EnergyTransfer = this->EnergyRate * state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
+}
+
+void OutsideEnergySourceSpecs::oneTimeInit(EnergyPlusData &state)
+{
+    if (this->OneTimeInitFlag) {
+        // Locate the unit on the plant loops for later usage
+        bool errFlag = false;
+        PlantUtilities::ScanPlantLoopsForObject(
+            state, this->Name, this->EnergyType, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+        if (errFlag) {
+            ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
+        }
+        // set limits on outlet node temps to plant loop limits
+        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MinOutletTemp =
+            state.dataPlnt->PlantLoop(this->LoopNum).MinTemp;
+        state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MaxOutletTemp =
+            state.dataPlnt->PlantLoop(this->LoopNum).MaxTemp;
+        // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
+
+        this->OneTimeInitFlag = false;
+
+        // this may need some help, if the objects change location later, due to a push_back,
+        //  then the pointers to these output variables will be bad
+        // for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
+        std::string hotOrChilled = "Hot Water ";
+        std::string reportVarPrefix = "District Heating ";
+        std::string heatingOrCooling = "Heating";
+        std::string typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchHotWater);
+        if (this->EnergyType == DataPlant::TypeOf_PurchChilledWater) {
+            hotOrChilled = "Chilled Water ";
+            reportVarPrefix = "District Cooling ";
+            heatingOrCooling = "Cooling";
+            typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchChilledWater);
+        } else if (this->EnergyType == DataPlant::TypeOf_PurchSteam) {
+            hotOrChilled = "Steam ";
+            reportVarPrefix = "District Heating Steam ";
+            heatingOrCooling = "Heating";
+            typeName = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_PurchSteam);
+        }
+
+        SetupOutputVariable(state,
+                            reportVarPrefix + hotOrChilled + "Energy",
+                            OutputProcessor::Unit::J,
+                            this->EnergyTransfer,
+                            "System",
+                            "Sum",
+                            this->Name,
+                            _,
+                            typeName,
+                            heatingOrCooling,
+                            _,
+                            "Plant");
+        SetupOutputVariable(
+            state, reportVarPrefix + hotOrChilled + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
+
+        SetupOutputVariable(state, reportVarPrefix + "Rate", OutputProcessor::Unit::W, this->EnergyRate, "System", "Average", this->Name);
+        SetupOutputVariable(state, reportVarPrefix + "Inlet Temperature", OutputProcessor::Unit::C, this->InletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(
+            state, reportVarPrefix + "Outlet Temperature", OutputProcessor::Unit::C, this->OutletTemp, "System", "Average", this->Name);
+        SetupOutputVariable(
+            state, reportVarPrefix + "Mass Flow Rate", OutputProcessor::Unit::kg_s, this->MassFlowRate, "System", "Average", this->Name);
     }
 }
 
