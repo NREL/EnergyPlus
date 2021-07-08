@@ -48,6 +48,7 @@
 #include <cassert>
 
 // EnergyPlus headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -85,13 +86,13 @@ namespace WindowManager {
         // BSDF will be created in different ways that is based on material type
 
         std::shared_ptr<CWCELayerFactory> aFactory = nullptr;
-        if (t_Material.Group == WindowGlass) {
+        if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowGlass) {
             aFactory = std::make_shared<CWCESpecularLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == WindowBlind) {
+        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowBlind) {
             aFactory = std::make_shared<CWCEVenetianBlindLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Screen) {
+        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::Screen) {
             aFactory = std::make_shared<CWCEScreenLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Shade) {
+        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
         return aFactory->getBSDFLayer(state);
@@ -110,13 +111,13 @@ namespace WindowManager {
         // Scattering will be created in different ways that is based on material type
 
         std::shared_ptr<CWCELayerFactory> aFactory = nullptr;
-        if (t_Material.Group == WindowGlass) {
+        if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowGlass) {
             aFactory = std::make_shared<CWCESpecularLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == WindowBlind) {
+        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::WindowBlind) {
             aFactory = std::make_shared<CWCEVenetianBlindLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Screen) {
+        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::Screen) {
             aFactory = std::make_shared<CWCEScreenLayerFactory>(t_Material, t_Range);
-        } else if (t_Material.Group == Shade) {
+        } else if (t_Material.Group == DataHeatBalance::MaterialGroup::Shade) {
             aFactory = std::make_shared<CWCEDiffuseShadeLayerFactory>(t_Material, t_Range);
         }
         return aFactory->getLayer(state);
@@ -188,8 +189,10 @@ namespace WindowManager {
             if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
                     auto &material(state.dataMaterial->Material(construction.LayerPoint(LayNum)));
-                    if (material.Group != WindowGas && material.Group != WindowGasMixture && material.Group != ComplexWindowGap &&
-                        material.Group != ComplexWindowShade) {
+                    if BITF_TEST_NONE (BITF(material.Group),
+                                       BITF(DataHeatBalance::MaterialGroup::WindowGas) | BITF(DataHeatBalance::MaterialGroup::WindowGasMixture) |
+                                           BITF(DataHeatBalance::MaterialGroup::ComplexWindowGap) |
+                                           BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
                         // This is necessary because rest of EnergyPlus code relies on TransDiff property
                         // of construction. It will basically trigger Window optical calculations if this
                         // property is >0.
@@ -223,11 +226,13 @@ namespace WindowManager {
             auto IntBlind = false;
             auto ShadeLayPtr = 0;
             auto BlNum = 0;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == Shade) {
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group ==
+                DataHeatBalance::MaterialGroup::Shade) {
                 IntShade = true;
                 ShadeLayPtr = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay);
             }
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group == WindowBlind) {
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).Group ==
+                DataHeatBalance::MaterialGroup::WindowBlind) {
                 IntBlind = true;
                 BlNum = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay)).BlindDataPtr;
             }
@@ -260,7 +265,7 @@ namespace WindowManager {
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind
                     if (IntBlind) {
-                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == FixedSlats) break;
+                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == DataWindowEquivalentLayer::AngleType::Fixed) break;
                     }
                 } // End of slat angle loop
             }     // End of check if interior shade or interior blind

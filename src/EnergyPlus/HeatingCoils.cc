@@ -109,11 +109,6 @@ namespace HeatingCoils {
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
     using namespace DataGlobalConstants;
-    using DataHeatBalance::RefrigCondenserTypeAir;
-    using DataHeatBalance::RefrigCondenserTypeEvap;
-    using DataHeatBalance::RefrigCondenserTypeWater;
-    using DataHeatBalance::RefrigSystemTypeDetailed;
-    using DataHeatBalance::RefrigSystemTypeRack;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1109,8 +1104,12 @@ namespace HeatingCoils {
             // (when zone equipment heating coils are included in the input, the air loop DX equipment has not yet been read in)
             if (UtilityRoutines::SameString(Alphas(5), "Refrigeration:CompressorRack")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = HeatObjTypes::COMPRESSORRACK_REFRIGERATEDCASE;
-                GetRefrigeratedRackIndex(
-                    state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, RefrigSystemTypeRack, DXCoilErrFlag, Alphas(5));
+                GetRefrigeratedRackIndex(state,
+                                         Alphas(6),
+                                         HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum,
+                                         DataHeatBalance::RefrigSystemType::Rack,
+                                         DXCoilErrFlag,
+                                         Alphas(5));
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimRefrigeratedRack)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1134,8 +1133,12 @@ namespace HeatingCoils {
                        (UtilityRoutines::SameString(Alphas(5), "Refrigeration:Condenser:EvaporativeCooled")) ||
                        (UtilityRoutines::SameString(Alphas(5), "Refrigeration:Condenser:WaterCooled"))) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = HeatObjTypes::CONDENSER_REFRIGERATION;
-                GetRefrigeratedRackIndex(
-                    state, Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, RefrigSystemTypeDetailed, DXCoilErrFlag, Alphas(5));
+                GetRefrigeratedRackIndex(state,
+                                         Alphas(6),
+                                         HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum,
+                                         DataHeatBalance::RefrigSystemType::Detailed,
+                                         DXCoilErrFlag,
+                                         Alphas(5));
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimRefrigCondenser)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =

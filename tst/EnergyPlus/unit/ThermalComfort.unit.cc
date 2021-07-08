@@ -973,7 +973,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).CO2RateFactor = 3.82e-8;
     state->dataHeatBal->People(1).Show55Warning = true;
     state->dataHeatBal->People(1).Pierce = true;
-    state->dataHeatBal->People(1).MRTCalcType = ZoneAveraged;
+    state->dataHeatBal->People(1).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
     state->dataHeatBal->People(1).WorkEffPtr = 0;
     state->dataHeatBal->People(1).ClothingType = 1;
 

@@ -88,11 +88,10 @@ namespace Construction {
         Real64 OutsideAbsorpSolar;  // Outside Layer solar absorptance of an opaque surface; not used for windows.
         Real64 InsideAbsorpThermal; // Inside Layer Thermal absorptance for opaque surfaces or windows;
         // for windows, applies to innermost glass layer
-        Real64 OutsideAbsorpThermal; // Outside Layer Thermal absorptance
-        int OutsideRoughness;        // Outside Surface roughness index (6=very smooth, 5=smooth,
-        // 4=medium smooth, 3=medium rough, 2=rough, 1=very rough)
-        int DayltPropPtr;   // Pointer to Daylight Construction Properties
-        int W5FrameDivider; // FrameDivider number for window construction from Window5 data file;
+        Real64 OutsideAbsorpThermal;                     // Outside Layer Thermal absorptance
+        DataSurfaces::SurfaceRoughness OutsideRoughness; // Outside Surface roughness index
+        int DayltPropPtr;                                // Pointer to Daylight Construction Properties
+        int W5FrameDivider;                              // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
         // Conductive properties for the construction
         Array1D<Real64> CTFCross;     // Cross or Y terms of the CTF equation
@@ -185,35 +184,35 @@ namespace Construction {
         // bare glass or shade on
         Array1D<Real64> ReflSolBeamFrontCoef; // Coeffs of incidence-angle polynomial for beam sol front refl,
         // bare glass or shade on
-        Array1D<Real64> ReflSolBeamBackCoef;    // Like ReflSolBeamFrontCoef, but for back-incident beam solar
-        Array1D<Array1D<Real64>> tBareSolCoef;  // Isolated glass solar transmittance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> tBareVisCoef;  // Isolated glass visible transmittance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> rfBareSolCoef; // Isolated glass front solar reflectance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> rfBareVisCoef; // Isolated glass front visible reflectance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> rbBareSolCoef; // Isolated glass back solar reflectance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> rbBareVisCoef; // Isolated glass back visible reflectance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> afBareSolCoef; // Isolated glass front solar absorptance coeffs of inc. angle polynomial
-        Array1D<Array1D<Real64>> abBareSolCoef; // Isolated glass back solar absorptance coeffs of inc. angle polynomial
-        Array1D<Real64> tBareSolDiff;           // Isolated glass diffuse solar transmittance
-        Array1D<Real64> tBareVisDiff;           // Isolated glass diffuse visible transmittance
-        Array1D<Real64> rfBareSolDiff;          // Isolated glass diffuse solar front reflectance
-        Array1D<Real64> rfBareVisDiff;          // Isolated glass diffuse visible front reflectance
-        Array1D<Real64> rbBareSolDiff;          // Isolated glass diffuse solar back reflectance
-        Array1D<Real64> rbBareVisDiff;          // Isolated glass diffuse visible back reflectance
-        Array1D<Real64> afBareSolDiff;          // Isolated glass diffuse solar front absorptance
-        Array1D<Real64> abBareSolDiff;          // Isolated glass diffuse solar back absorptance
-        bool FromWindow5DataFile;               // True if this is a window construction extracted from the Window5 data file
-        Real64 W5FileMullionWidth;              // Width of mullion for construction from Window5 data file (m)
-        int W5FileMullionOrientation;           // Orientation of mullion, if present, for Window5 data file construction,
-        Real64 W5FileGlazingSysWidth;           // Glass width for construction from Window5 data file (m)
-        Real64 W5FileGlazingSysHeight;          // Glass height for construction form Window5 data file (m)
-        Real64 SummerSHGC;                      // Calculated ASHRAE SHGC for summer conditions
-        Real64 VisTransNorm;                    // The normal visible transmittance
-        Real64 SolTransNorm;                    // the normal solar transmittance
-        bool SourceSinkPresent;                 // .TRUE. if there is a source/sink within this construction
-        bool TypeIsWindow;                      // True if a window construction, false otherwise
-        bool WindowTypeBSDF;                    // True for complex window, false otherwise
-        bool TypeIsEcoRoof;                     // -- true for construction with ecoRoof outside, the flag
+        Array1D<Real64> ReflSolBeamBackCoef;                             // Like ReflSolBeamFrontCoef, but for back-incident beam solar
+        Array1D<Array1D<Real64>> tBareSolCoef;                           // Isolated glass solar transmittance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> tBareVisCoef;                           // Isolated glass visible transmittance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rfBareSolCoef;                          // Isolated glass front solar reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rfBareVisCoef;                          // Isolated glass front visible reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rbBareSolCoef;                          // Isolated glass back solar reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> rbBareVisCoef;                          // Isolated glass back visible reflectance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> afBareSolCoef;                          // Isolated glass front solar absorptance coeffs of inc. angle polynomial
+        Array1D<Array1D<Real64>> abBareSolCoef;                          // Isolated glass back solar absorptance coeffs of inc. angle polynomial
+        Array1D<Real64> tBareSolDiff;                                    // Isolated glass diffuse solar transmittance
+        Array1D<Real64> tBareVisDiff;                                    // Isolated glass diffuse visible transmittance
+        Array1D<Real64> rfBareSolDiff;                                   // Isolated glass diffuse solar front reflectance
+        Array1D<Real64> rfBareVisDiff;                                   // Isolated glass diffuse visible front reflectance
+        Array1D<Real64> rbBareSolDiff;                                   // Isolated glass diffuse solar back reflectance
+        Array1D<Real64> rbBareVisDiff;                                   // Isolated glass diffuse visible back reflectance
+        Array1D<Real64> afBareSolDiff;                                   // Isolated glass diffuse solar front absorptance
+        Array1D<Real64> abBareSolDiff;                                   // Isolated glass diffuse solar back absorptance
+        bool FromWindow5DataFile;                                        // True if this is a window construction extracted from the Window5 data file
+        Real64 W5FileMullionWidth;                                       // Width of mullion for construction from Window5 data file (m)
+        DataWindowEquivalentLayer::Orientation W5FileMullionOrientation; // Orientation of mullion, if present, for Window5 data file construction,
+        Real64 W5FileGlazingSysWidth;                                    // Glass width for construction from Window5 data file (m)
+        Real64 W5FileGlazingSysHeight;                                   // Glass height for construction form Window5 data file (m)
+        Real64 SummerSHGC;                                               // Calculated ASHRAE SHGC for summer conditions
+        Real64 VisTransNorm;                                             // The normal visible transmittance
+        Real64 SolTransNorm;                                             // the normal solar transmittance
+        bool SourceSinkPresent;                                          // .TRUE. if there is a source/sink within this construction
+        bool TypeIsWindow;                                               // True if a window construction, false otherwise
+        bool WindowTypeBSDF;                                             // True for complex window, false otherwise
+        bool TypeIsEcoRoof;                                              // -- true for construction with ecoRoof outside, the flag
         //-- is turned on when the outside layer is of type EcoRoof
         bool TypeIsIRT;          // -- true for construction with IRT material
         bool TypeIsCfactorWall;  // -- true for construction with Construction:CfactorUndergroundWall
@@ -273,26 +272,27 @@ namespace Construction {
         ConstructionProps()
             : TotLayers(0), TotSolidLayers(0), TotGlassLayers(0), LayerPoint(MaxLayersInConstruct, 0), IsUsed(false), IsUsedCTF(false),
               InsideAbsorpVis(0.0), OutsideAbsorpVis(0.0), InsideAbsorpSolar(0.0), OutsideAbsorpSolar(0.0), InsideAbsorpThermal(0.0),
-              OutsideAbsorpThermal(0.0), OutsideRoughness(0), DayltPropPtr(0), W5FrameDivider(0), CTFCross({0, MaxCTFTerms - 1}, 0.0),
-              CTFFlux(MaxCTFTerms - 1, 0.0), CTFInside({0, MaxCTFTerms - 1}, 0.0), CTFOutside({0, MaxCTFTerms - 1}, 0.0),
-              CTFSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0),
-              CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0), CTFTUserOut({0, MaxCTFTerms - 1}, 0.0),
-              CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0), NumHistories(0), NumCTFTerms(0), UValue(0.0),
-              SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0), userTemperatureLocationPerpendicular(0.0),
-              AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiffShade(0.0), AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0),
-              AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0),
-              AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0), ShadeAbsorpThermal(0.0), AbsBeamShadeCoef(6, 0.0), TransDiff(0.0),
-              BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0),
-              BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0), BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0),
-              ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffFront(0.0),
-              BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0), BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
-              ReflectVisDiffFront(0.0), BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0), TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0),
-              ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0), tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0),
-              rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0), abBareSolDiff(5, 0.0),
-              FromWindow5DataFile(false), W5FileMullionWidth(0.0), W5FileMullionOrientation(0), W5FileGlazingSysWidth(0.0),
-              W5FileGlazingSysHeight(0.0), SummerSHGC(0.0), VisTransNorm(0.0), SolTransNorm(0.0), SourceSinkPresent(false), TypeIsWindow(false),
-              WindowTypeBSDF(false), TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false), TypeIsFfactorFloor(false), TCFlag(0),
-              TCLayer(0), TCMasterConst(0), TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),
+              OutsideAbsorpThermal(0.0), OutsideRoughness(DataSurfaces::SurfaceRoughness::Unassigned), DayltPropPtr(0), W5FrameDivider(0),
+              CTFCross({0, MaxCTFTerms - 1}, 0.0), CTFFlux(MaxCTFTerms - 1, 0.0), CTFInside({0, MaxCTFTerms - 1}, 0.0),
+              CTFOutside({0, MaxCTFTerms - 1}, 0.0), CTFSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFSourceOut({0, MaxCTFTerms - 1}, 0.0),
+              CTFTSourceOut({0, MaxCTFTerms - 1}, 0.0), CTFTSourceIn({0, MaxCTFTerms - 1}, 0.0), CTFTSourceQ({0, MaxCTFTerms - 1}, 0.0),
+              CTFTUserOut({0, MaxCTFTerms - 1}, 0.0), CTFTUserIn({0, MaxCTFTerms - 1}, 0.0), CTFTUserSource({0, MaxCTFTerms - 1}, 0.0),
+              NumHistories(0), NumCTFTerms(0), UValue(0.0), SolutionDimensions(0), SourceAfterLayer(0), TempAfterLayer(0), ThicknessPerpend(0.0),
+              userTemperatureLocationPerpendicular(0.0), AbsDiffIn(0.0), AbsDiffOut(0.0), AbsDiffShade(0.0),
+              AbsDiffBlind(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBlindGnd(DataSurfaces::MaxSlatAngs, 0.0),
+              AbsDiffBlindSky(DataSurfaces::MaxSlatAngs, 0.0), AbsDiffBackShade(0.0), AbsDiffBackBlind(DataSurfaces::MaxSlatAngs, 0.0),
+              ShadeAbsorpThermal(0.0), AbsBeamShadeCoef(6, 0.0), TransDiff(0.0), BlTransDiff(DataSurfaces::MaxSlatAngs, 0.0),
+              BlTransDiffGnd(DataSurfaces::MaxSlatAngs, 0.0), BlTransDiffSky(DataSurfaces::MaxSlatAngs, 0.0), TransDiffVis(0.0),
+              BlTransDiffVis(DataSurfaces::MaxSlatAngs, 0.0), ReflectSolDiffBack(0.0), BlReflectSolDiffBack(DataSurfaces::MaxSlatAngs, 0.0),
+              ReflectSolDiffFront(0.0), BlReflectSolDiffFront(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffBack(0.0),
+              BlReflectVisDiffBack(DataSurfaces::MaxSlatAngs, 0.0), ReflectVisDiffFront(0.0), BlReflectVisDiffFront(DataSurfaces::MaxSlatAngs, 0.0),
+              TransSolBeamCoef(6, 0.0), TransVisBeamCoef(6, 0.0), ReflSolBeamFrontCoef(6, 0.0), ReflSolBeamBackCoef(6, 0.0), tBareSolDiff(5, 0.0),
+              tBareVisDiff(5, 0.0), rfBareSolDiff(5, 0.0), rfBareVisDiff(5, 0.0), rbBareSolDiff(5, 0.0), rbBareVisDiff(5, 0.0), afBareSolDiff(5, 0.0),
+              abBareSolDiff(5, 0.0), FromWindow5DataFile(false), W5FileMullionWidth(0.0),
+              W5FileMullionOrientation(DataWindowEquivalentLayer::Orientation::Unassigned), W5FileGlazingSysWidth(0.0), W5FileGlazingSysHeight(0.0),
+              SummerSHGC(0.0), VisTransNorm(0.0), SolTransNorm(0.0), SourceSinkPresent(false), TypeIsWindow(false), WindowTypeBSDF(false),
+              TypeIsEcoRoof(false), TypeIsIRT(false), TypeIsCfactorWall(false), TypeIsFfactorFloor(false), TCFlag(0), TCLayer(0), TCMasterConst(0),
+              TCLayerID(0), TCGlassID(0), CFactor(0.0), Height(0.0), FFactor(0.0), Area(0.0), PerimeterExposed(0.0),
               ReverseConstructionNumLayersWarning(false), ReverseConstructionLayersOrderWarning(false), WindowTypeEQL(false), EQLConsPtr(0),
               AbsDiffFrontEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0), AbsDiffBackEQL(DataWindowEquivalentLayer::CFSMAXNL, 0.0),
               TransDiffFrontEQL(0.0), TransDiffBackEQL(0.0), TypeIsAirBoundary(false), TypeIsAirBoundaryMixing(false), AirBoundaryACH(0.0),

@@ -2632,28 +2632,28 @@ void GetRefrigerationInput(EnergyPlusData &state)
             }
 
             if (UtilityRoutines::SameString(Alphas(5), "EvaporativelyCooled")) {
-                RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserTypeEvap;
+                RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserType::Evap;
                 if (RefrigRack(RackNum).HeatRejectionLocation == iLocation::Zone) {
                     ShowWarningError(state,
                                      CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\" Evap cooled " + cAlphaFieldNames(5) +
                                          " not available with " + cAlphaFieldNames(2) + " = Zone.");
                     ShowContinueError(state, cAlphaFieldNames(5) + " reset to Air Cooled and simulation continues.");
-                    RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserTypeAir;
+                    RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "WaterCooled")) {
-                RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserTypeWater;
+                RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserType::Water;
                 if (RefrigRack(RackNum).HeatRejectionLocation == iLocation::Zone) {
                     ShowWarningError(state,
                                      CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\" Water cooled " + cAlphaFieldNames(5) +
                                          " not available with " + cAlphaFieldNames(2) + " = Zone.");
                     ShowContinueError(state, cAlphaFieldNames(5) + " reset to Air Cooled and simulation continues.");
-                    RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserTypeAir;
+                    RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
                 }
             } else {
-                RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserTypeAir;
+                RefrigRack(RackNum).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
             }
             // Get water-cooled condenser input, if applicable
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
                 RefrigRack(RackNum).InletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                     Alphas(6),
                                                                                     ErrorsFound,
@@ -2756,7 +2756,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
             }
 
             RefrigRack(RackNum).CondenserAirFlowRate = Numbers(8);
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && RefrigRack(RackNum).CondenserAirFlowRate <= 0.0 &&
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap && RefrigRack(RackNum).CondenserAirFlowRate <= 0.0 &&
                 RefrigRack(RackNum).CondenserAirFlowRate != DataGlobalConstants::AutoCalculate) {
                 ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cNumericFieldNames(8) +
@@ -2766,21 +2766,22 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
             //   Basin heater power as a function of temperature must be greater than or equal to 0
             RefrigRack(RackNum).BasinHeaterPowerFTempDiff = Numbers(9);
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && Numbers(9) < 0.0) {
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap && Numbers(9) < 0.0) {
                 ShowSevereError(
                     state, RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cNumericFieldNames(9) + " must be >= 0");
                 ErrorsFound = true;
             }
 
             RefrigRack(RackNum).BasinHeaterSetPointTemp = Numbers(10);
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && RefrigRack(RackNum).BasinHeaterSetPointTemp < 2.0) {
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap &&
+                RefrigRack(RackNum).BasinHeaterSetPointTemp < 2.0) {
                 ShowWarningError(state,
                                  CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cNumericFieldNames(10) +
                                      " is less than 2 deg C. Freezing could occur.");
             }
 
             RefrigRack(RackNum).EvapPumpPower = Numbers(11);
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && RefrigRack(RackNum).EvapPumpPower < 0.0 &&
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap && RefrigRack(RackNum).EvapPumpPower < 0.0 &&
                 RefrigRack(RackNum).EvapPumpPower != DataGlobalConstants::AutoCalculate) {
                 ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + RefrigRack(RackNum).Name + "\", " + cNumericFieldNames(11) +
@@ -2976,12 +2977,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
             // set condenser air flow and evap water pump power if autocalculated
             // autocalculate condenser evap water pump if needed
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap &&
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap &&
                 RefrigRack(RackNum).EvapPumpPower == DataGlobalConstants::AutoCalculate) {
                 RefrigRack(RackNum).EvapPumpPower = CondPumpRatePower * RefrigRack(RackNum).TotalRackLoad;
             }
             // autocalculate evap condenser air volume flow rate if needed
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap &&
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap &&
                 RefrigRack(RackNum).CondenserAirFlowRate == DataGlobalConstants::AutoCalculate) {
                 RefrigRack(RackNum).CondenserAirFlowRate = AirVolRateEvapCond * RefrigRack(RackNum).TotalRackLoad;
             }
@@ -3048,7 +3049,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (!allocated(Condenser(CondNum).SysNum)) Condenser(CondNum).SysNum.allocate(state.dataRefrigCase->NumRefrigSystems);
 
                 // set CondenserType and rated temperature difference (51.7 - 35)C per ARI 460
-                Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserTypeAir;
+                Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
                 state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
                 Condenser(CondNum).RatedDelT = CondARI460DelT; //= 16.7d0 ,Rated sat cond temp - dry bulb air T for air-cooled Condensers, ARI460
                 Condenser(CondNum).RatedTCondense = CondARI460Tcond;
@@ -3175,7 +3176,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (!allocated(Condenser(CondNum).SysNum)) Condenser(CondNum).SysNum.allocate(state.dataRefrigCase->NumRefrigSystems);
 
                 // set CondenserType and rated Heat Rejection per ARI 490 rating
-                Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserTypeEvap;
+                Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserType::Evap;
                 state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
                 Condenser(CondNum).RatedTCondense = CondARI490Tcond;
                 Condenser(CondNum).RatedDelT = CondARI490DelT;
@@ -3416,7 +3417,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (!allocated(Condenser(CondNum).SysNum)) Condenser(CondNum).SysNum.allocate(state.dataRefrigCase->NumRefrigSystems);
 
                 // set CondenserType and rated Heat Rejection per ARI 450 rating
-                Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserTypeWater;
+                Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserType::Water;
                 state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).SourceType = CurrentModuleObject;
                 if ((!lNumericBlanks(1)) && (Numbers(1) > 0.0)) {
                     Condenser(CondNum).RatedCapacity = Numbers(1);
@@ -3590,7 +3591,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (!allocated(Condenser(CondNum).SysNum)) Condenser(CondNum).SysNum.allocate(state.dataRefrigCase->NumRefrigSystems);
 
                 // set CondenserType
-                Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserTypeCascade;
+                Condenser(CondNum).CondenserType = DataHeatBalance::RefrigCondenserType::Cascade;
 
                 if (!lNumericBlanks(1)) {
                     Condenser(CondNum).RatedTCondense = Numbers(1);
@@ -4719,7 +4720,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                             "\" : has a non-unique name : " + Alphas(AlphaListNum));
                         ErrorsFound = true;
                     } else if (LoadCascadeNum != 0) {
-                        if (Condenser(LoadCascadeNum).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) {
+                        if (Condenser(LoadCascadeNum).CondenserType != DataHeatBalance::RefrigCondenserType::Cascade) {
                             ShowSevereError(
                                 state,
                                 RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
@@ -5054,7 +5055,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 if (NumCascadeLoad > 0) {
                     for (int cascadeLoadIndex = 1; cascadeLoadIndex <= NumCascadeLoad; ++cascadeLoadIndex) {
                         int CondID = System(RefrigSysNum).CascadeLoadNum(cascadeLoadIndex);
-                        if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) {
+                        if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserType::Cascade) {
                             ShowSevereError(state,
                                             RoutineName + CurrentModuleObject + "=\"" + System(RefrigSysNum).Name + "\", has a  " +
                                                 cAlphaFieldNames(AlphaNum) + ": " + Alphas(AlphaNum) +
@@ -5128,12 +5129,12 @@ void GetRefrigerationInput(EnergyPlusData &state)
 
             System(RefrigSysNum).RefInventory +=
                 Condenser(CondNum).RefReceiverInventory + Condenser(CondNum).RefPipingInventory + Condenser(CondNum).RefOpCharge;
-            if (Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserTypeCascade) Condenser(CondNum).CascadeSysID = RefrigSysNum;
-            if ((Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserTypeAir) && (Condenser(CondNum).CondenserRejectHeatToZone))
+            if (Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserType::Cascade) Condenser(CondNum).CascadeSysID = RefrigSysNum;
+            if ((Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserType::Air) && (Condenser(CondNum).CondenserRejectHeatToZone))
                 System(RefrigSysNum).SystemRejectHeatToZone = true;
 
             // Now do evaporative condenser auto sizing because it is a function of the system's cooling load
-            if (Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+            if (Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 if (Condenser(CondNum).RatedAirFlowRate == DataGlobalConstants::AutoCalculate) {
                     Condenser(CondNum).RatedAirFlowRate = AirVolRateEvapCond * Condenser(CondNum).RatedCapacity;
                 }
@@ -5216,7 +5217,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                                     " must be defined.");
                 ErrorsFound = true;
             }
-            if ((Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserTypeCascade) &&
+            if ((Condenser(CondNum).CondenserType == DataHeatBalance::RefrigCondenserType::Cascade) &&
                 (System(RefrigSysNum).TCondenseMin > Condenser(CondNum).RatedTCondense))
                 ShowWarningError(state,
                                  CurrentModuleObject + "=\"" + System(RefrigSysNum).Name +
@@ -5550,7 +5551,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
             if (System(RefrigSysNum).NumCascadeLoads == 0) continue;
             if (System(RefrigSysNum).CoilFlag) { // system already identified as serving coils
                 for (int CondID = 1; CondID <= state.dataRefrigCase->NumRefrigCondensers; ++CondID) {
-                    if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) continue;
+                    if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserType::Cascade) continue;
                     if (RefrigSysNum != Condenser(CondID).CascadeSinkSystemID) continue; // this condenser is not a cascade load on this system
                     if (!Condenser(CondID).CoilFlag) {
                         // would mean system already serving coil loads and this condenser cooling system with case-type loads
@@ -5567,7 +5568,7 @@ void GetRefrigerationInput(EnergyPlusData &state)
                 bool CaseLoads = false;
                 int NumCascadeLoadsChecked = 0;
                 for (int CondID = 1; CondID <= state.dataRefrigCase->NumRefrigCondensers; ++CondID) { // look at All cascade condenser loads on system
-                    if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) continue;
+                    if (Condenser(CondID).CondenserType != DataHeatBalance::RefrigCondenserType::Cascade) continue;
                     if (RefrigSysNum != Condenser(CondID).CascadeSinkSystemID) continue; // this condenser is not a cascade load on this system
                     ++NumCascadeLoadsChecked;
                     if ((CaseLoads) && (!Condenser(CondID).CoilFlag) && (!System(RefrigSysNum).CoilFlag)) continue;
@@ -7675,7 +7676,7 @@ void SetupReportInput(EnergyPlusData &state)
                                     "Average",
                                     RefrigRack(rackNum).Name);
 
-                if (RefrigRack(rackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+                if (RefrigRack(rackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller Compressor Rack Evaporative Condenser Pump Electricity Rate",
                                         OutputProcessor::Unit::W,
@@ -7843,7 +7844,7 @@ void SetupReportInput(EnergyPlusData &state)
                                     "Average",
                                     RefrigRack(rackNum).Name);
 
-                if (RefrigRack(rackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+                if (RefrigRack(rackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                     SetupOutputVariable(state,
                                         "Refrigeration Compressor Rack Evaporative Condenser Pump Electricity Rate",
                                         OutputProcessor::Unit::W,
@@ -7944,7 +7945,7 @@ void SetupReportInput(EnergyPlusData &state)
                 } // location zone
             }     // Serves coils or case/walkin loads
 
-            if (RefrigRack(rackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) { // on HVAC time step no matter what
+            if (RefrigRack(rackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Water) { // on HVAC time step no matter what
                 SetupOutputVariable(state,
                                     "Refrigeration Compressor Rack Condenser Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
@@ -8611,7 +8612,7 @@ void SetupReportInput(EnergyPlusData &state)
                                     "Sum",
                                     Condenser(condNum).Name);
 
-                if (Condenser(condNum).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) {
+                if (Condenser(condNum).CondenserType != DataHeatBalance::RefrigCondenserType::Cascade) {
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller System Condenser Total Recovered Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
@@ -8656,7 +8657,7 @@ void SetupReportInput(EnergyPlusData &state)
                                         Condenser(condNum).Name);
                 } // not cascade because recovered energy on cascade systems passed up to higher temperature system
 
-                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeAir) {
+                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller System Condenser Fan Electricity Rate",
                                         OutputProcessor::Unit::W,
@@ -8678,7 +8679,7 @@ void SetupReportInput(EnergyPlusData &state)
                                         "Plant");
                 } // Air cooled
 
-                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller System Condenser Fan Electricity Rate",
                                         OutputProcessor::Unit::W,
@@ -8757,7 +8758,7 @@ void SetupReportInput(EnergyPlusData &state)
                                         "Plant");
                 } // Evaporative Condenser Variables
 
-                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
+                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
                     SetupOutputVariable(state,
                                         "Refrigeration Air Chiller System Condenser Fluid Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
@@ -8785,7 +8786,7 @@ void SetupReportInput(EnergyPlusData &state)
                                     "Sum",
                                     Condenser(condNum).Name);
 
-                if (Condenser(condNum).CondenserType != DataHeatBalance::RefrigCondenserTypeCascade) {
+                if (Condenser(condNum).CondenserType != DataHeatBalance::RefrigCondenserType::Cascade) {
                     SetupOutputVariable(state,
                                         "Refrigeration System Condenser Total Recovered Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
@@ -8830,7 +8831,7 @@ void SetupReportInput(EnergyPlusData &state)
                                         Condenser(condNum).Name);
                 } // not cascade because recovered energy on cascade systems passed up to higher temperature system
 
-                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeAir) {
+                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                     SetupOutputVariable(state,
                                         "Refrigeration System Condenser Fan Electricity Rate",
                                         OutputProcessor::Unit::W,
@@ -8852,7 +8853,7 @@ void SetupReportInput(EnergyPlusData &state)
                                         "Plant");
                 } // Air cooled
 
-                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                     SetupOutputVariable(state,
                                         "Refrigeration System Condenser Fan Electricity Rate",
                                         OutputProcessor::Unit::W,
@@ -8931,7 +8932,7 @@ void SetupReportInput(EnergyPlusData &state)
                                         "Plant");
                 } // Evaporative Condenser Variables
 
-                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
+                if (Condenser(condNum).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
                     SetupOutputVariable(state,
                                         "Refrigeration System Condenser Water Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
@@ -9779,7 +9780,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
     // initialize plant topology information, if applicable
     if (state.dataRefrigCase->MyReferPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
         for (int RefCondLoop = 1; RefCondLoop <= state.dataRefrigCase->NumRefrigCondensers; ++RefCondLoop) {
-            if (Condenser(RefCondLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
+            if (Condenser(RefCondLoop).CondenserType != DataHeatBalance::RefrigCondenserType::Water) continue;
 
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
@@ -9813,7 +9814,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
         }
 
         for (int RefCompRackLoop = 1; RefCompRackLoop <= state.dataRefrigCase->NumRefrigeratedRacks; ++RefCompRackLoop) {
-            if (RefrigRack(RefCompRackLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
+            if (RefrigRack(RefCompRackLoop).CondenserType != DataHeatBalance::RefrigCondenserType::Water) continue;
 
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(state,
@@ -9856,7 +9857,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
         // do plant inits, if applicable
         if (!state.dataRefrigCase->MyReferPlantScanFlag) {
             for (int RefCondLoop = 1; RefCondLoop <= state.dataRefrigCase->NumRefrigCondensers; ++RefCondLoop) {
-                if (Condenser(RefCondLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
+                if (Condenser(RefCondLoop).CondenserType != DataHeatBalance::RefrigCondenserType::Water) continue;
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(Condenser(RefCondLoop).PlantLoopNum).FluidName,
@@ -9881,7 +9882,7 @@ void InitRefrigerationPlantConnections(EnergyPlusData &state)
                                                    Condenser(RefCondLoop).PlantCompNum);
             }
             for (int RefCompRackLoop = 1; RefCompRackLoop <= state.dataRefrigCase->NumRefrigeratedRacks; ++RefCompRackLoop) {
-                if (RefrigRack(RefCompRackLoop).CondenserType != DataHeatBalance::RefrigCondenserTypeWater) continue;
+                if (RefrigRack(RefCompRackLoop).CondenserType != DataHeatBalance::RefrigCondenserType::Water) continue;
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(RefrigRack(RefCompRackLoop).PlantLoopNum).FluidName,
@@ -10058,7 +10059,7 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
         //  check.
         if (OutDbTemp < EvapCutOutTdb) EvapAvail = false;
 
-        if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && EvapAvail) {
+        if (this->CondenserType == DataHeatBalance::RefrigCondenserType::Evap && EvapAvail) {
             // determine temps for evap cooling
             if (this->OutsideAirNodeNum != 0) {
                 HumRatIn = state.dataLoopNodes->Node(this->OutsideAirNodeNum).HumRat;
@@ -10070,7 +10071,7 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
         } // evapAvail
 
         // Obtain water-cooled condenser inlet/outlet temps
-        if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
+        if (this->CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
             this->InletTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
             EffectTemp = state.dataLoopNodes->Node(this->InletNode).Temp + 5.0; // includes approach temp
             if (this->InletTemp < this->InletTempMin) {
@@ -10086,7 +10087,7 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
                                                this->LowTempWarnIndex);
                 // END IF  !LowTempWarn
             } // InletTempMin
-        }     // DataHeatBalance::RefrigCondenserTypeWater
+        }     // DataHeatBalance::RefrigCondenserType::Water
 
         COPFTempOutput = CurveManager::CurveValue(state, this->COPFTempPtr, EffectTemp);
     } // Location Zone
@@ -10107,7 +10108,7 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
 
     // calculate condenser fan usage here if not water-cooled; if water-cooled, fan is in separate tower object
     // fan loads > 0 only if the connected cases are operating
-    if (state.dataRefrigCase->TotalRackDeliveredCapacity > 0.0 && this->CondenserType != DataHeatBalance::RefrigCondenserTypeWater) {
+    if (state.dataRefrigCase->TotalRackDeliveredCapacity > 0.0 && this->CondenserType != DataHeatBalance::RefrigCondenserType::Water) {
         if (this->TotCondFTempPtr != 0) {
             if (this->HeatRejectionLocation == iLocation::Zone) {
                 CondenserFrac =
@@ -10126,7 +10127,7 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
 
     // calculate evap water use and water pump power, if applicable
     // assumes pump runs whenever evap cooling is available to minimize scaling
-    if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeEvap && EvapAvail) {
+    if (this->CondenserType == DataHeatBalance::RefrigCondenserType::Evap && EvapAvail) {
         state.dataRefrigCase->TotalCondenserPumpPower = this->EvapPumpPower;
         HumRatOut = Psychrometrics::PsyWFnTdbTwbPb(state, EffectTemp, OutWbTemp, BPress);
         state.dataRefrigCase->TotalEvapWaterUseRate = this->CondenserAirFlowRate * CondenserFrac *
@@ -10134,7 +10135,7 @@ void RefrigRackData::CalcRackSystem(EnergyPlusData &state)
                                                       Psychrometrics::RhoH2O(EffectTemp);
     } // evapAvail
     // calculate basin water heater load
-    if (this->CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+    if (this->CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         if ((state.dataRefrigCase->TotalRackDeliveredCapacity == 0.0) && (EvapAvail) && (OutDbTemp < this->BasinHeaterSetPointTemp)) {
             state.dataRefrigCase->TotalBasinHeatPower = max(0.0, this->BasinHeaterPowerFTempDiff * (this->BasinHeaterSetPointTemp - OutDbTemp));
             // provide warning if no heater power exists
@@ -11332,16 +11333,16 @@ void SimulateDetailedRefrigerationSystems(EnergyPlusData &state)
                     // Establish estimates to start solution loop
                     {
                         auto const SELECT_CASE_var(Condenser(System(SysNum).CondenserNum(1)).CondenserType); // only one condenser allowed now
-                        if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeAir) {
+                        if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Air) {
                             System(SysNum).TCondense = state.dataEnvrn->OutDryBulbTemp + 16.7;
                             // 16.7C is delta T at rating point for air-cooled condensers, just estimate, so ok for zone-located condensers
-                        } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeEvap) {
+                        } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Evap) {
                             System(SysNum).TCondense = state.dataEnvrn->OutDryBulbTemp + 15.0;
                             // 15C is delta T at rating point for evap-cooled condensers
-                        } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeWater) {
+                        } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Water) {
                             // define starting estimate at temperature of water exiting condenser
                             System(SysNum).TCondense = state.dataLoopNodes->Node(Condenser(System(SysNum).CondenserNum(1)).OutletNode).Temp;
-                        } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeCascade) {
+                        } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Cascade) {
                             //?Don't need estimate for cascade condenser because it doesn't iterate?
                         }
                     }
@@ -11989,7 +11990,7 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
     } // Sysloop over every system connected to this condenser
 
     // for cascade condensers, condenser defrost credit gets passed on to the primary system condenser
-    if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeCascade) TotalCondDefrostCreditLocal = 0.0;
+    if (condenser.CondenserType == DataHeatBalance::RefrigCondenserType::Cascade) TotalCondDefrostCreditLocal = 0.0;
 
     // Calculate Total Heat rejection needed.  Assume hermetic compressors - conservative assumption
     // Note that heat rejection load carried by desuperheater hvac coils or water heaters is the
@@ -12031,7 +12032,7 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
     //   Here, we just need load and condensing temperatures.
     //   Condensing temperature a fixed delta (the rated approach temperature) from inlet water temp so long as above minimum.
     //   Note, if condensing temperature falls below minimum, get warning and reset but no change in water-side calculations.
-    if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
+    if (condenser.CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
         // Obtain water-cooled condenser inlet/outlet temps
         condenser.InletTemp = state.dataLoopNodes->Node(condenser.InletNode).Temp;
         TCondCalc = state.dataLoopNodes->Node(condenser.InletNode).Temp + condenser.RatedApproachT;
@@ -12053,8 +12054,8 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
             this->TCondense = TCondCalc;
         }
 
-    } else if ((condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeAir) ||
-               (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeEvap)) {
+    } else if ((condenser.CondenserType == DataHeatBalance::RefrigCondenserType::Air) ||
+               (condenser.CondenserType == DataHeatBalance::RefrigCondenserType::Evap)) {
         // Condensing Temp, fan and other aux loads for air-cooled or evap-cooled
 
         // The rated capacity of air-cooled condenser was adjusted for elevation in get input step
@@ -12085,12 +12086,12 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
 
         // Check schedule to determine evap condenser availability
         // IF schedule exists, evap condenser can be scheduled OFF
-        if ((condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) && (condenser.EvapSchedPtr > 0) &&
+        if ((condenser.CondenserType == DataHeatBalance::RefrigCondenserType::Evap) && (condenser.EvapSchedPtr > 0) &&
             (ScheduleManager::GetCurrentScheduleValue(state, condenser.EvapSchedPtr) == 0))
             EvapAvail = false;
 
         // Calculate condensing temperatures for air-cooled and evap-cooled
-        if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+        if (condenser.CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
             // Manufacturer's HRCF regressed to produce a function of the form:
             // (Tcondense-Twb)=A1 + A2*hrcf + A3/hrcf + A4*Twb
             // HRCF defined as rated capacity divided by load
@@ -12129,13 +12130,13 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
             this->TCondense = this->TCondenseMin;
             TCondCalc = this->TCondenseMin;
             // recalculate CapFac at current delta T
-            if (condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeAir) {
+            if (condenser.CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                 // current maximum condenser capacity at delta T present for minimum condensing temperature [W]
                 Real64 CurMaxCapacity = CurveManager::CurveValue(state, condenser.CapCurvePtr, (this->TCondenseMin - OutDbTemp));
                 CapFac = state.dataRefrigCase->TotalCondenserHeat / CurMaxCapacity;
                 AirVolRatio = max(FanMinAirFlowRatio, std::pow(CapFac, CondAirVolExponentDry)); // Fans limited by minimum air flow ratio
                 AirVolRatio = min(AirVolRatio, 1.0);
-            } else { // condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeEvap
+            } else { // condenser.CondenserType == DataHeatBalance::RefrigCondenserType::Evap
                 HRCFFullFlow = HRCF;
                 // if evap condenser need to back calculate the operating capacity using HRCF relationship, given known Tcond
                 Real64 QuadBterm = condenser.EvapCoeff1 - (this->TCondense - SinkTemp) + condenser.EvapCoeff4 * SinkTemp;
@@ -12157,7 +12158,7 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
                     AirVolRatio = max(FanMinAirFlowRatio, std::pow(CapFac, CondAirVolExponentDry));  // Fans limited by minimum air flow ratio
                 }                                                                                    // evap available
                 AirVolRatio = min(AirVolRatio, 1.0);
-            } // condenser type = DataHeatBalance::RefrigCondenserTypeAir with else for evap
+            } // condenser type = DataHeatBalance::RefrigCondenserType::Air with else for evap
 
             {
                 auto const SELECT_CASE_var(condenser.FanSpeedControlType);
@@ -12179,7 +12180,7 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
             } // fan speed control type
         }     // Tcondense >= Tcondense minimum
 
-        if ((condenser.CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) && (EvapAvail)) {
+        if ((condenser.CondenserType == DataHeatBalance::RefrigCondenserType::Evap) && (EvapAvail)) {
             // calculate evap water use,  need to include bleed down/purge water as well as water
             // actually evaporated.  Use BAC Engineering Reference value of 3 gpm/100 tons because it's more
             // conservative than the ASHRAE value.
@@ -12224,7 +12225,7 @@ void RefrigSystemData::CalculateCondensers(EnergyPlusData &state, int const SysN
         }         // EvapAvail
 
     } else if (condenser.CondenserType ==
-               DataHeatBalance::RefrigCondenserTypeCascade) { // continuing Condenser type = water, (evap or air), or cascade
+               DataHeatBalance::RefrigCondenserType::Cascade) { // continuing Condenser type = water, (evap or air), or cascade
         // Cascade condenser does not iterate.  Condensing temperature specified as a load on higher temp system
         //    or floats to meet other loads on that system
         // therese ** future - here and for new phase change heat exchanger - need to handle unmet loads!
@@ -13331,7 +13332,7 @@ void RefrigSystemData::CalculateSubcoolers(EnergyPlusData &state)
 void GetRefrigeratedRackIndex(EnergyPlusData &state,
                               std::string const &Name,
                               int &IndexPtr,
-                              int const SysType,
+                              DataHeatBalance::RefrigSystemType const SysType,
                               bool &ErrorsFound,
                               Optional_string_const ThisObjectType,
                               const Optional_bool_const &SuppressWarning)
@@ -13353,7 +13354,7 @@ void GetRefrigeratedRackIndex(EnergyPlusData &state,
 
     {
         auto const SELECT_CASE_var(SysType);
-        if (SELECT_CASE_var == DataHeatBalance::RefrigSystemTypeRack) {
+        if (SELECT_CASE_var == DataHeatBalance::RefrigSystemType::Rack) {
             IndexPtr = UtilityRoutines::FindItemInList(Name, RefrigRack);
             if (IndexPtr == 0) {
                 if (present(SuppressWarning)) {
@@ -13367,7 +13368,7 @@ void GetRefrigeratedRackIndex(EnergyPlusData &state,
                 }
                 ErrorsFound = true;
             }
-        } else if (SELECT_CASE_var == DataHeatBalance::RefrigSystemTypeDetailed) {
+        } else if (SELECT_CASE_var == DataHeatBalance::RefrigSystemType::Detailed) {
             IndexPtr = UtilityRoutines::FindItemInList(Name, Condenser);
             if (IndexPtr == 0) {
                 if (present(SuppressWarning)) {
@@ -13554,11 +13555,11 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
             }
             {
                 auto const SELECT_CASE_var(RefrigRack(RackNum).CondenserType);
-                if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeAir) {
+                if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Air) {
                     ChrOut2 = "Air-Cooled";
-                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeEvap) {
+                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Evap) {
                     ChrOut2 = "Evap-Cooled";
-                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeWater) {
+                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Water) {
                     ChrOut2 = "Water-Cooled";
                 }
             }
@@ -13750,7 +13751,7 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
             int CondID = System(SystemNum).CondenserNum(1);
             {
                 auto const SELECT_CASE_var(Condenser(CondID).CondenserType);
-                if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeAir) {
+                if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Air) {
                     print(state.files.eio,
                           "   Refrigeration Condenser:Air-Cooled,{},{},{:.1R},{:.1R},{:.1R}\n",
                           CondID,
@@ -13758,14 +13759,14 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
                           Condenser(CondID).RatedTCondense,
                           Condenser(CondID).RatedCapacity,
                           Condenser(CondID).RatedFanPower);
-                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeEvap) {
+                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Evap) {
                     print(state.files.eio,
                           "   Refrigeration Condenser:Evaporative-Cooled,{},{},{:.1R},{:.1R}\n",
                           CondID,
                           Condenser(CondID).Name,
                           Condenser(CondID).RatedCapacity,
                           Condenser(CondID).RatedFanPower);
-                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeWater) {
+                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Water) {
                     print(state.files.eio,
                           "   Refrigeration Condenser:Water-Cooled,{},{},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                           CondID,
@@ -13774,7 +13775,7 @@ void ReportRefrigerationComponents(EnergyPlusData &state)
                           Condenser(CondID).RatedCapacity,
                           Condenser(CondID).InletTemp,
                           Condenser(CondID).DesVolFlowRate);
-                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeCascade) {
+                } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserType::Cascade) {
 
                     {
                         auto const SELECT_CASE_var1(Condenser(CondID).CascadeTempControl);
@@ -15625,7 +15626,7 @@ void ZeroHVACValues(EnergyPlusData &state)
         // HaveRefrigRacks is TRUE when NumRefrigeratedRAcks > 0
         // RefrigRack ALLOCATED to NumRefrigeratedRacks
         for (int RackNum = 1; RackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++RackNum) {
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
                 Real64 MassFlowRate = 0.0;
                 PlantUtilities::SetComponentFlowRate(state,
                                                      MassFlowRate,
@@ -15636,7 +15637,7 @@ void ZeroHVACValues(EnergyPlusData &state)
                                                      RefrigRack(RackNum).PlantBranchNum,
                                                      RefrigRack(RackNum).PlantCompNum);
             }
-            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+            if (RefrigRack(RackNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 if (RefrigRack(RackNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
                     DemandARRID = RefrigRack(RackNum).EvapWaterTankDemandARRID;
                     int TankID = RefrigRack(RackNum).EvapWaterSupTankID;
@@ -15649,7 +15650,7 @@ void ZeroHVACValues(EnergyPlusData &state)
     if (state.dataRefrigCase->NumRefrigCondensers > 0) {
         // Condenser ALLOCATED to DataHeatBalance::NumRefrigCondensers
         for (int CondID = 1; CondID <= state.dataRefrigCase->NumRefrigCondensers; ++CondID) {
-            if (Condenser(CondID).CondenserType == DataHeatBalance::RefrigCondenserTypeWater) {
+            if (Condenser(CondID).CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
                 Real64 MassFlowRate = 0.0;
                 PlantUtilities::SetComponentFlowRate(state,
                                                      MassFlowRate,
@@ -15660,7 +15661,7 @@ void ZeroHVACValues(EnergyPlusData &state)
                                                      Condenser(CondID).PlantBranchNum,
                                                      Condenser(CondID).PlantCompNum);
             }
-            if (Condenser(CondID).CondenserType == DataHeatBalance::RefrigCondenserTypeEvap) {
+            if (Condenser(CondID).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 if (Condenser(CondID).EvapWaterSupplyMode == WaterSupply::FromTank) {
                     DemandARRID = Condenser(CondID).EvapWaterTankDemandARRID;
                     int TankID = Condenser(CondID).EvapWaterSupTankID;

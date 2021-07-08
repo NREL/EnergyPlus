@@ -577,8 +577,8 @@ private:
     private:
         int const number;
         std::string const &name;
-        int const &group;
-        int const &roughness;
+        DataHeatBalance::MaterialGroup const &group;
+        DataSurfaces::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;
         double const &isoMoistCap;
@@ -629,7 +629,7 @@ private:
         double const &outsideAbsorpSolar;
         double const &insideAbsorpThermal;
         double const &outsideAbsorpThermal;
-        int const &outsideRoughness;
+        DataSurfaces::SurfaceRoughness const &outsideRoughness;
         bool const &typeIsWindow;
         double const &uValue;
 
@@ -723,7 +723,7 @@ private:
         bool const &fanger;
         bool const &pierce;
         bool const &ksu;
-        int const &mrtCalcType;
+        DataHeatBalance::CalcMRT const &mrtCalcType;
         int const &surfacePtr;
         std::string const &angleFactorListName;
         int const &angleFactorListPtr;

@@ -2207,8 +2207,8 @@ bool SQLite::Material::insertIntoSQLite(sqlite3_stmt *insertStmt)
 {
     sqliteBindInteger(insertStmt, 1, number);
     sqliteBindText(insertStmt, 2, name);
-    sqliteBindInteger(insertStmt, 3, group);
-    sqliteBindInteger(insertStmt, 4, roughness);
+    sqliteBindInteger(insertStmt, 3, static_cast<int>(group));
+    sqliteBindInteger(insertStmt, 4, static_cast<int>(roughness));
     sqliteBindDouble(insertStmt, 5, conductivity);
     sqliteBindDouble(insertStmt, 6, density);
     sqliteBindDouble(insertStmt, 7, isoMoistCap);
@@ -2238,7 +2238,7 @@ bool SQLite::Construction::insertIntoSQLite(sqlite3_stmt *insertStmt)
     sqliteBindDouble(insertStmt, 9, outsideAbsorpSolar);
     sqliteBindDouble(insertStmt, 10, insideAbsorpThermal);
     sqliteBindDouble(insertStmt, 11, outsideAbsorpThermal);
-    sqliteBindInteger(insertStmt, 12, outsideRoughness);
+    sqliteBindInteger(insertStmt, 12, static_cast<int>(outsideRoughness));
     sqliteBindLogical(insertStmt, 13, typeIsWindow);
     sqliteBindDouble(insertStmt, 14, uValue);
 
@@ -2305,7 +2305,7 @@ bool SQLite::NominalPeople::insertIntoSQLite(sqlite3_stmt *insertStmt)
     sqliteBindLogical(insertStmt, 12, fanger);
     sqliteBindLogical(insertStmt, 13, pierce);
     sqliteBindLogical(insertStmt, 14, ksu);
-    sqliteBindInteger(insertStmt, 15, mrtCalcType);
+    sqliteBindInteger(insertStmt, 15, static_cast<int>(mrtCalcType));
     sqliteBindForeignKey(insertStmt, 16, surfacePtr);
     sqliteBindText(insertStmt, 17, angleFactorListName);
     sqliteBindInteger(insertStmt, 18, angleFactorListPtr);

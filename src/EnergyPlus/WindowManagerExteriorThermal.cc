@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -343,13 +344,15 @@ namespace WindowManager {
 
         auto matGroup = material->Group;
 
-        if (matGroup == WindowGlass || matGroup == WindowSimpleGlazing || matGroup == WindowBlind || matGroup == Shade || matGroup == Screen ||
-            matGroup == ComplexWindowShade) {
+        if BITF_TEST_ANY (BITF(matGroup),
+                          BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing) |
+                              BITF(DataHeatBalance::MaterialGroup::WindowBlind) | BITF(DataHeatBalance::MaterialGroup::Shade) |
+                              BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::ComplexWindowShade)) {
             ++m_SolidLayerIndex;
             aLayer = getSolidLayer(state, m_Surface, *material, m_SolidLayerIndex, m_SurfNum);
-        } else if (matGroup == WindowGas || matGroup == WindowGasMixture) {
+        } else if (matGroup == DataHeatBalance::MaterialGroup::WindowGas || matGroup == DataHeatBalance::MaterialGroup::WindowGasMixture) {
             aLayer = getGapLayer(*material);
-        } else if (matGroup == ComplexWindowGap) {
+        } else if (matGroup == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
             aLayer = getComplexGapLayer(state, *material);
         }
 
@@ -387,7 +390,7 @@ namespace WindowManager {
         auto Aright = 0.0;
         auto Afront = 0.0;
 
-        if (material.Group == WindowGlass || material.Group == WindowSimpleGlazing) {
+        if (material.Group == DataHeatBalance::MaterialGroup::WindowGlass || material.Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing) {
             emissFront = material.AbsorpThermalFront;
             emissBack = material.AbsorpThermalBack;
             transThermalFront = material.TransThermal;
@@ -395,7 +398,7 @@ namespace WindowManager {
             thickness = material.Thickness;
             conductivity = material.Conductivity;
         }
-        if (material.Group == WindowBlind) {
+        if (material.Group == DataHeatBalance::MaterialGroup::WindowBlind) {
             auto blNum = state.dataSurface->SurfWinBlindNumber(m_SurfNum);
             auto blind = state.dataHeatBal->Blind(blNum);
             thickness = blind.SlatThickness;
@@ -417,7 +420,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == Shade) {
+        if (material.Group == DataHeatBalance::MaterialGroup::Shade) {
             emissFront = material.AbsorpThermal;
             emissBack = material.AbsorpThermal;
             transThermalFront = material.TransThermal;
@@ -433,7 +436,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == Screen) {
+        if (material.Group == DataHeatBalance::MaterialGroup::Screen) {
             // Simon: Existing code already takes into account geometry of Woven and scales down
             // emissivity for openning area.
             emissFront = material.AbsorpThermal;
@@ -451,7 +454,7 @@ namespace WindowManager {
                 m_ExteriorShade = true;
             }
         }
-        if (material.Group == ComplexWindowShade) {
+        if (material.Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
             auto shdPtr = material.ComplexShadePtr;
             auto &shade(state.dataHeatBal->ComplexShade(shdPtr));
             thickness = shade.Thickness;

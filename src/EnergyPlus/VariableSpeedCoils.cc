@@ -384,7 +384,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated = NumArray(6);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Gamma_Rated = NumArray(7);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HOTGASREHEATFLG = int(NumArray(8));
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = WaterCooled;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Water;
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum = GetOnlySingleNode(state,
                                                                                                         AlphArray(2),
@@ -996,9 +996,9 @@ namespace VariableSpeedCoils {
             }
 
             if ((UtilityRoutines::SameString(AlphArray(6), "AirCooled")) || lAlphaBlanks(6)) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = AirCooled;
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
             } else if (UtilityRoutines::SameString(AlphArray(6), "EvaporativelyCooled")) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = EvapCooled;
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Evap;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).ReportEvapCondVars = true;
             } else {
                 ShowSevereError(
@@ -1391,7 +1391,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat = NumArray(3);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = NumArray(5);
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = WaterCooled;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Water;
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum = GetOnlySingleNode(state,
                                                                                                         AlphArray(2),
@@ -2302,7 +2302,7 @@ namespace VariableSpeedCoils {
             VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).bIsDesuperheater = false;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = WaterHeater;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::WaterHeater;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType = "WATERHEATING";
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum = CoilDX_HeatPumpWaterHeaterVariableSpeed;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType = cAllCoilTypes(CoilDX_HeatPumpWaterHeaterVariableSpeed);
@@ -5284,7 +5284,7 @@ namespace VariableSpeedCoils {
         //   WSHP condenser can be on either a plant loop or condenser loop. Test each to find plant sizing number.
         //   first check to see if coil is connected to a plant loop, no warning on this CALL
         if (RatedWaterFlowAutoSized) {
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType == WaterCooled)
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Water)
                 PltSizNum = MyPlantSizingIndex(state,
                                                "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
@@ -6077,7 +6077,7 @@ namespace VariableSpeedCoils {
             }
 
             // AIR COOL OR EVAP COOLED CONDENSER
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType == EvapCooled) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 if ((SpeedNum == 1) || (SpeedNum > MaxSpeed) || (SpeedRatio == 1.0)) {
                     EvapCondEffectSped = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(SpeedCal);
                 } else {
@@ -6131,7 +6131,7 @@ namespace VariableSpeedCoils {
         if (state.dataVariableSpeedCoils->SourceSideMassFlowRate <= 0.0 || state.dataVariableSpeedCoils->LoadSideMassFlowRate <= 0.0) {
 
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed) &&
-                (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType == AirCooled) &&
+                (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Air) &&
                 (state.dataVariableSpeedCoils->LoadSideMassFlowRate > 0.0)) {
                 // ALLOW SIMULATION IF AIR-COOLED CONDENSER COIL
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = true;
@@ -6487,7 +6487,7 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower = 0.0;
 
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed) {
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType == EvapCooled) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
                 //******************
                 //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
                 //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir/s]

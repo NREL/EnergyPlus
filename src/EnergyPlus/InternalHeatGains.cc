@@ -821,7 +821,7 @@ namespace InternalHeatGains {
                         if (state.dataInternalHeatGains->UsingThermalComfort) {
 
                             // Set the default value of MRTCalcType as 'ZoneAveraged'
-                            state.dataHeatBal->People(Loop).MRTCalcType = ZoneAveraged;
+                            state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
 
                             bool ModelWithAdditionalInputs = state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce ||
                                                              state.dataHeatBal->People(Loop).KSU ||
@@ -833,10 +833,10 @@ namespace InternalHeatGains {
                                 auto const mrtType(AlphaName(7));
 
                                 if (mrtType == "ZONEAVERAGED") {
-                                    state.dataHeatBal->People(Loop).MRTCalcType = ZoneAveraged;
+                                    state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
 
                                 } else if (mrtType == "SURFACEWEIGHTED") {
-                                    state.dataHeatBal->People(Loop).MRTCalcType = SurfaceWeighted;
+                                    state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::SurfaceWeighted;
                                     state.dataHeatBal->People(Loop).SurfacePtr =
                                         UtilityRoutines::FindItemInList(AlphaName(8), state.dataSurface->Surface);
                                     if (state.dataHeatBal->People(Loop).SurfacePtr == 0 && ModelWithAdditionalInputs) {
@@ -863,7 +863,7 @@ namespace InternalHeatGains {
                                     }
 
                                 } else if (mrtType == "ANGLEFACTOR") {
-                                    state.dataHeatBal->People(Loop).MRTCalcType = AngleFactor;
+                                    state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::AngleFactor;
                                     state.dataHeatBal->People(Loop).AngleFactorListName = AlphaName(8);
 
                                 } else if (mrtType == "") { // Blank input field--just ignore this
@@ -5690,11 +5690,11 @@ namespace InternalHeatGains {
                 state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                 print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
 
-                if (state.dataHeatBal->People(Loop).MRTCalcType == ZoneAveraged) {
+                if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::ZoneAveraged) {
                     print(state.files.eio, "Zone Averaged,");
-                } else if (state.dataHeatBal->People(Loop).MRTCalcType == SurfaceWeighted) {
+                } else if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::SurfaceWeighted) {
                     print(state.files.eio, "Surface Weighted,");
-                } else if (state.dataHeatBal->People(Loop).MRTCalcType == AngleFactor) {
+                } else if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::AngleFactor) {
                     print(state.files.eio, "Angle Factor,");
                 } else {
                     print(state.files.eio, "N/A,");

@@ -2950,7 +2950,8 @@ namespace WindowComplexManager {
         for (Lay = 1; Lay <= TotLay; ++Lay) {
             LayPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
 
-            if ((state.dataMaterial->Material(LayPtr).Group == WindowGlass) || (state.dataMaterial->Material(LayPtr).Group == WindowSimpleGlazing)) {
+            if ((state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::WindowGlass) ||
+                (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::WindowSimpleGlazing)) {
                 ++IGlass;
                 LayerType(IGlass) = TARCOGParams::TARCOGLayerType::SPECULAR; // this marks specular layer type
                 thick(IGlass) = state.dataMaterial->Material(LayPtr).Thickness;
@@ -2961,7 +2962,7 @@ namespace WindowComplexManager {
                 tir(2 * IGlass) = state.dataMaterial->Material(LayPtr).TransThermal;
                 YoungsMod(IGlass) = state.dataMaterial->Material(LayPtr).YoungModulus;
                 PoissonsRat(IGlass) = state.dataMaterial->Material(LayPtr).PoissonsRatio;
-            } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowShade) {
+            } else if (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::ComplexWindowShade) {
                 ++IGlass;
                 TempInt = state.dataMaterial->Material(LayPtr).ComplexShadePtr;
                 LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
@@ -2986,7 +2987,7 @@ namespace WindowComplexManager {
                 SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
                 SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
                 SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
-            } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowGap) {
+            } else if (state.dataMaterial->Material(LayPtr).Group == DataHeatBalance::MaterialGroup::ComplexWindowGap) {
                 ++IGap;
                 gap(IGap) = state.dataMaterial->Material(LayPtr).Thickness;
                 presure(IGap) = state.dataMaterial->Material(LayPtr).Pressure;

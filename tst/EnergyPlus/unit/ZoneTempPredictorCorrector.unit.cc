@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
     state->dataHeatBalFanSys->MDotOA.allocate(1);
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
     state->dataHeatBalFanSys->ZoneAirHumRatTemp.allocate(1);
     state->dataHeatBalFanSys->ZoneW1.allocate(1);
 
@@ -1307,7 +1307,7 @@ TEST_F(EnergyPlusFixture, SetPointWithCutoutDeltaT_test)
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
     state->dataZoneCtrls->TempControlledZone(1).DeltaTCutSet = 2.0;
     state->dataZoneCtrls->TempControlledZone(1).ActualZoneNum = 1;
@@ -1442,7 +1442,7 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(1);
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = Use3rdOrder;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::ThirdOrder;
 
     state->dataZoneCtrls->TempControlledZone(1).DeltaTCutSet = 2.0;
     state->dataZoneCtrls->TempControlledZone(1).ActualZoneNum = 1;

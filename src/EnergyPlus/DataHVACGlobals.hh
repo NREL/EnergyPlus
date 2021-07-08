@@ -93,12 +93,6 @@ namespace DataHVACGlobals {
     int constexpr SystemCapacitySizing(21);               // request sizing for system capacity
     int constexpr AutoCalculateSizing(25);                // identifies an autocalulate input
 
-    // Condenser Type (using same numbering scheme as for chillers)
-    int constexpr AirCooled(1);   // Air-cooled condenser
-    int constexpr WaterCooled(2); // Water-cooled condenser
-    int constexpr EvapCooled(3);  // Evaporatively-cooled condenser
-    int constexpr WaterHeater(4); // Condenser heats water (e.g., in water heater tank)
-
     // The following parameters are used for system availability status
     int constexpr NoAction(0);
     int constexpr ForceOff(1);

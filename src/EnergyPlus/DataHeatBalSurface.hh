@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -227,12 +228,12 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<bool> SurfMovInsulIntPresent;       // True when interior movable insulation is present
     Array1D<bool> SurfMovInsulIntPresentPrevTS; // True when interior movable insulation was present during the previous time step
 
-    Array1D<Real64> SurfMovInsulHExt;  // Resistance or "h" value of exterior movable insulation
-    Array1D<Real64> SurfMovInsulHInt;  // Resistance or "h" value of interior movable insulation
-    Array1D<Real64> SurfAbsSolarExt;   // Solar Absorptivity of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsThermalExt; // Thermal Absorptivity of surface inside face or interior movable insulation if present
-    Array1D<Real64> SurfAbsSolarInt;   // Solar absorptivity of surface outside face or exterior movable insulation if present
-    Array1D<Real64> SurfRoughnessExt;  // Roughness of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfMovInsulHExt;                         // Resistance or "h" value of exterior movable insulation
+    Array1D<Real64> SurfMovInsulHInt;                         // Resistance or "h" value of interior movable insulation
+    Array1D<Real64> SurfAbsSolarExt;                          // Solar Absorptivity of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsThermalExt;                        // Thermal Absorptivity of surface inside face or interior movable insulation if present
+    Array1D<Real64> SurfAbsSolarInt;                          // Solar absorptivity of surface outside face or exterior movable insulation if present
+    Array1D<DataSurfaces::SurfaceRoughness> SurfRoughnessExt; // Roughness of surface inside face or interior movable insulation if present
     Array1D<Real64> SurfAbsThermalInt; // Thermal absorptivity of surface outside face or exterior movable insulation if present
     std::vector<int> SurfMovInsulIndexList;
     std::vector<int> SurfMovSlatsIndexList;

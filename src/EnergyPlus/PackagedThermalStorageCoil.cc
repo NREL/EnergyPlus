@@ -1647,9 +1647,9 @@ void GetTESCoilInput(EnergyPlusData &state)
             auto const SELECT_CASE_var(state.dataIPShortCut->cAlphaArgs(58));
 
             if (SELECT_CASE_var == "AIRCOOLED") {
-                state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserType = AirCooled;
+                state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserType = DataHeatBalance::RefrigCondenserType::Air;
             } else if (SELECT_CASE_var == "EVAPORATIVELYCOOLED") {
-                state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserType = EvapCooled;
+                state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserType = DataHeatBalance::RefrigCondenserType::Evap;
             } else {
                 ShowSevereError(
                     state, RoutineName + cCurrentModuleObject + "=\"" + state.dataPackagedThermalStorageCoil->TESCoil(item).Name + "\", invalid");
@@ -1930,7 +1930,7 @@ void GetTESCoilInput(EnergyPlusData &state)
                                 state.dataPackagedThermalStorageCoil->TESCoil(item).Name);
         }
 
-        if (state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserType == EvapCooled) {
+        if (state.dataPackagedThermalStorageCoil->TESCoil(item).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
             SetupOutputVariable(state,
                                 "Cooling Coil Condenser Inlet Temperature",
                                 OutputProcessor::Unit::C,
@@ -2689,7 +2689,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                      state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).IceStorageCapacity / 1.e+09);
     }
 
-    if ((state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) &&
+    if ((state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) &&
         (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecNomPower == AutoSize)) {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecNomPower =
             state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap * 0.004266; // w/w (15 w/ton)
@@ -2798,7 +2798,7 @@ void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum)
 
     UpdateColdWeatherProtection(state, TESCoilNum);
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
     }
 }
@@ -2876,7 +2876,7 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
     Real64 werror;
 
     // first deal with condenser
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == AirCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
         CondAirSidePressure = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
         if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
             CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -2887,7 +2887,7 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
             CondInletHumRat = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
         }
         CondAirMassFlow = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirMassFlow;
-    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         CondAirSidePressure = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
         if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
@@ -3121,7 +3121,7 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
 
     UpdateColdWeatherProtection(state, TESCoilNum);
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
         UpdateEvaporativeCondenserWaterUse(
             state, TESCoilNum, CondInletHumRat, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum);
@@ -3217,7 +3217,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     Real64 werror;
 
     // first deal with condenser
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == AirCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
         CondAirSidePressure = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
         if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
             CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -3228,7 +3228,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
             CondInletHumRat = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
         }
         CondAirMassFlow = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirMassFlow;
-    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         CondAirSidePressure = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
         if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
@@ -3627,7 +3627,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
 
     UpdateColdWeatherProtection(state, TESCoilNum);
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
         UpdateEvaporativeCondenserWaterUse(
             state, TESCoilNum, CondInletHumRat, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum);
@@ -3725,7 +3725,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
     Real64 werror;
 
     // first deal with condenser
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == AirCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
         CondAirSidePressure = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
         if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
             CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -3736,7 +3736,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
             CondInletHumRat = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
         }
         CondAirMassFlow = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirMassFlow;
-    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         CondAirSidePressure = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
         if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
@@ -4074,7 +4074,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
 
     UpdateColdWeatherProtection(state, TESCoilNum);
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
         UpdateEvaporativeCondenserWaterUse(
             state, TESCoilNum, CondInletHumRat, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum);
@@ -4140,7 +4140,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
                    state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapAirOutletNodeNum).HumRat);
 
     // first deal with condenser
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == AirCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
         CondAirSidePressure = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
         if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
             CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -4151,7 +4151,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
             CondInletHumRat = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).HumRat;
         }
         CondAirMassFlow = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirMassFlow;
-    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    } else if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         CondAirSidePressure = state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum).Press;
         if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
@@ -4272,7 +4272,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
 
     UpdateColdWeatherProtection(state, TESCoilNum);
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
         UpdateEvaporativeCondenserWaterUse(
             state, TESCoilNum, CondInletHumRat, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondAirInletNodeNum);
@@ -4610,7 +4610,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
 
     UpdateColdWeatherProtection(state, TESCoilNum);
 
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == EvapCooled) {
+    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserType == DataHeatBalance::RefrigCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
         UpdateEvaporativeCondenserWaterUse(
             state,

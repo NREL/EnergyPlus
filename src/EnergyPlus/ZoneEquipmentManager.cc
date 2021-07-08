@@ -5267,7 +5267,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, HumRatExt);
         CpAir = PsyCpAirFnW(HumRatExt);
         // Hybrid ventilation global control
-        if (state.dataHeatBal->Ventilation(j).HybridControlType == HybridControlTypeGlobal &&
+        if (state.dataHeatBal->Ventilation(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global &&
             state.dataHeatBal->Ventilation(j).HybridControlMasterNum > 0) {
             I = state.dataHeatBal->Ventilation(j).HybridControlMasterNum;
             NH = state.dataHeatBal->Ventilation(I).ZonePtr;
@@ -5360,9 +5360,10 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         if ((WindSpeedExt > state.dataHeatBal->Ventilation(I).MaxWindSpeed) && (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn)) continue;
 
         // Hybrid ventilation controls
-        if ((state.dataHeatBal->Ventilation(j).HybridControlType == HybridControlTypeClose) && (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn))
+        if ((state.dataHeatBal->Ventilation(j).HybridControlType == DataHeatBalance::HybridCtrlType::Close) &&
+            (!state.dataHeatBal->Ventilation(j).EMSSimpleVentOn))
             continue;
-        if (state.dataHeatBal->Ventilation(j).HybridControlType == HybridControlTypeGlobal &&
+        if (state.dataHeatBal->Ventilation(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global &&
             state.dataHeatBal->Ventilation(j).HybridControlMasterNum > 0) {
             if (j == I) state.dataHeatBal->Ventilation(j).HybridControlMasterStatus = true;
         }
@@ -5385,16 +5386,16 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (state.dataHeatBal->Ventilation(j).QuadratureSum) {
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->Ventilation(j).FanType); // ventilation type based calculation
-                    if (SELECT_CASE_var == ExhaustVentilation) {
+                    if (SELECT_CASE_var == DataHeatBalance::VentilationType::Exhaust) {
                         state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).ExhMassFlowRate +=
                             state.dataZoneEquip->VentMCP(j) / CpAir;
-                    } else if (SELECT_CASE_var == IntakeVentilation) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::VentilationType::Intake) {
                         state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).IntMassFlowRate +=
                             state.dataZoneEquip->VentMCP(j) / CpAir;
-                    } else if (SELECT_CASE_var == NaturalVentilation) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::VentilationType::Natural) {
                         state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).NatMassFlowRate +=
                             state.dataZoneEquip->VentMCP(j) / CpAir;
-                    } else if (SELECT_CASE_var == BalancedVentilation) {
+                    } else if (SELECT_CASE_var == DataHeatBalance::VentilationType::Balanced) {
                         state.dataHeatBal->ZoneAirBalance(state.dataHeatBal->Ventilation(j).OABalancePtr).BalMassFlowRate +=
                             state.dataZoneEquip->VentMCP(j) / CpAir;
                     }
@@ -5406,7 +5407,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (state.dataHeatBal->Ventilation(j).FanEfficiency > 0.0) {
                 state.dataHeatBal->Ventilation(j).FanPower =
                     VAMFL_temp * state.dataHeatBal->Ventilation(j).FanPressure / (state.dataHeatBal->Ventilation(j).FanEfficiency * AirDensity);
-                if (state.dataHeatBal->Ventilation(j).FanType == BalancedVentilation) state.dataHeatBal->Ventilation(j).FanPower *= 2.0;
+                if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced)
+                    state.dataHeatBal->Ventilation(j).FanPower *= 2.0;
                 // calc electric
                 if (state.dataAirflowNetwork->SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
                     // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(NZ)) &
@@ -5425,12 +5427,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 }
             }
             // Intake fans will add some heat to the air, raising the temperature for an intake fan...
-            if (state.dataHeatBal->Ventilation(j).FanType == IntakeVentilation || state.dataHeatBal->Ventilation(j).FanType == BalancedVentilation) {
+            if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Intake ||
+                state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced) {
                 if (VAMFL_temp == 0.0) {
                     OutletAirEnthalpy = EnthalpyExt;
                 } else {
                     if (state.dataHeatBal->Ventilation(j).FanPower > 0.0) {
-                        if (state.dataHeatBal->Ventilation(j).FanType == BalancedVentilation) {
+                        if (state.dataHeatBal->Ventilation(j).FanType == DataHeatBalance::VentilationType::Balanced) {
                             OutletAirEnthalpy =
                                 EnthalpyExt + state.dataHeatBal->Ventilation(j).FanPower / VAMFL_temp / 2.0; // Half fan power to calculate inlet T
                         } else {
@@ -5499,12 +5502,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         TZM = state.dataZoneEquip->ZMAT(m);
 
         // Hybrid ventilation controls
-        if (state.dataHeatBal->Mixing(j).HybridControlType == HybridControlTypeClose) continue;
+        if (state.dataHeatBal->Mixing(j).HybridControlType == DataHeatBalance::HybridCtrlType::Close) continue;
         // Check temperature limit
         MixingLimitFlag = false;
 
         // Hybrid ventilation global control
-        if (state.dataHeatBal->Mixing(j).HybridControlType == HybridControlTypeGlobal && state.dataHeatBal->Mixing(j).HybridControlMasterNum > 0) {
+        if (state.dataHeatBal->Mixing(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global &&
+            state.dataHeatBal->Mixing(j).HybridControlMasterNum > 0) {
             I = state.dataHeatBal->Mixing(j).HybridControlMasterNum;
             if (!state.dataHeatBal->Ventilation(I).HybridControlMasterStatus) continue;
         } else {
@@ -5603,8 +5607,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             }
         }
 
-        if (state.dataHeatBal->Mixing(j).HybridControlType != HybridControlTypeGlobal && MixingLimitFlag) continue;
-        if (state.dataHeatBal->Mixing(j).HybridControlType == HybridControlTypeGlobal) TD = 0.0;
+        if (state.dataHeatBal->Mixing(j).HybridControlType != DataHeatBalance::HybridCtrlType::Global && MixingLimitFlag) continue;
+        if (state.dataHeatBal->Mixing(j).HybridControlType == DataHeatBalance::HybridCtrlType::Global) TD = 0.0;
 
         //  If TD equals zero (default) set coefficients for full mixing otherwise test
         //    for mixing conditions if user input delta temp > 0, then from zone temp (TZM)
