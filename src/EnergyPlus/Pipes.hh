@@ -84,8 +84,8 @@ namespace Pipes {
 
         // Default Constructor
         LocalPipeData()
-            : TypeOf(0), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0),
-              CheckEquipName(true), EnvrnFlag(true)
+            : TypeOf(0), InletNodeNum(0), OutletNodeNum(0), LoopNum(0), LoopSide(0), BranchIndex(0), CompIndex(0), CheckEquipName(true),
+              EnvrnFlag(true)
         {
         }
 

@@ -296,27 +296,12 @@ void PlantProfileData::oneTimeInit(EnergyPlusData &state)
 {
     bool errFlag;
 
-    if (this->SetLoopIndexFlag) {
-        if (allocated(state.dataPlnt->PlantLoop)) {
-            errFlag = false;
-            ScanPlantLoopsForObject(state,
-                                    this->Name,
-                                    this->TypeNum,
-                                    this->WLoopNum,
-                                    this->WLoopSideNum,
-                                    this->WLoopBranchNum,
-                                    this->WLoopCompNum,
-                                    errFlag,
-                                    _,
-                                    _,
-                                    _,
-                                    _,
-                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
-            }
-
-            this->SetLoopIndexFlag = false;
+    if (allocated(state.dataPlnt->PlantLoop)) {
+        errFlag = false;
+        ScanPlantLoopsForObject(
+            state, this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
+        if (errFlag) {
+            ShowFatalError(state, "InitPlantProfile: Program terminated for previous conditions.");
         }
     }
 }
