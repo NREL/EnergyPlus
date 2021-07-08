@@ -1561,15 +1561,6 @@ void GetUserConvectionCoefficients(EnergyPlusData &state)
                             state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
                             PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
-                        } else {
-                            ++state.dataSurface->TotExtConvCoeff;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType =
-                                ConvectionConstants::ConvCoefOverrideType::SpecifiedModel;
-                            state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
-                            PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
-                            ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                         }
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
