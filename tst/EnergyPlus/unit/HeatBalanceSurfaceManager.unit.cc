@@ -3128,7 +3128,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     EXPECT_NEAR(1.666667, state->dataHeatBal->SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }
 
-TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_updateQdotConvInRepTest)
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_QdotConvInRepAdjRatioTest)
 {
     bool ErrorsFound(false);
 
@@ -3268,7 +3268,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_updateQdotConvInRepTest)
 
     state->dataLoopNodes->Node.allocate(4);
     state->dataHeatBal->SurfTempEffBulkAir.allocate(3);
-    state->dataHeatBalSurf->TempSurfInTmp.allocate(3);
+    state->dataHeatBalSurf->SurfTempInTmp.allocate(3);
 
     int surfNum1 = UtilityRoutines::FindItemInList("WALL", state->dataSurface->Surface);
     int surfNum2 = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
@@ -3283,9 +3283,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_updateQdotConvInRepTest)
     state->dataSurface->Surface(surfNum1).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum2).SolarEnclIndex = 1;
     state->dataSurface->Surface(surfNum3).SolarEnclIndex = 1;
-    state->dataHeatBalSurf->TempSurfInTmp(surfNum1) = 15.0;
-    state->dataHeatBalSurf->TempSurfInTmp(surfNum2) = 20.0;
-    state->dataHeatBalSurf->TempSurfInTmp(surfNum3) = 25.0;
+    state->dataHeatBalSurf->SurfTempInTmp(surfNum1) = 15.0;
+    state->dataHeatBalSurf->SurfTempInTmp(surfNum2) = 20.0;
+    state->dataHeatBalSurf->SurfTempInTmp(surfNum3) = 25.0;
     state->dataHeatBal->SurfTempEffBulkAir(surfNum1) = 10.0;
     state->dataHeatBal->SurfTempEffBulkAir(surfNum2) = 10.0;
     state->dataHeatBal->SurfTempEffBulkAir(surfNum3) = 10.0;
@@ -3299,10 +3299,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_updateQdotConvInRepTest)
     state->dataLoopNodes->Node(3).MassFlowRate = 0.1;
     state->dataLoopNodes->Node(4).MassFlowRate = 0.1;
 
-    state->dataHeatBal->HConvIn.allocate(3);
-    state->dataHeatBal->HConvIn(surfNum1) = 0.5;
-    state->dataHeatBal->HConvIn(surfNum2) = 0.5;
-    state->dataHeatBal->HConvIn(surfNum3) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt.allocate(3);
+    state->dataHeatBalSurf->SurfHConvInt(surfNum1) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(surfNum2) = 0.5;
+    state->dataHeatBalSurf->SurfHConvInt(surfNum3) = 0.5;
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
@@ -3333,10 +3333,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_updateQdotConvInRepTest)
     state->dataSurface->SurfWinSysSolTransmittance.allocate(3);
     state->dataSurface->SurfWinSysSolAbsorptance.allocate(3);
     state->dataSurface->SurfWinSysSolReflectance.allocate(3);
-    state->dataSurface->InsideGlassCondensationFlag.allocate(3);
+    state->dataSurface->SurfWinInsideGlassCondensationFlag.allocate(3);
     state->dataSurface->SurfWinGainFrameDividerToZoneRep.allocate(3);
-    state->dataSurface->InsideFrameCondensationFlag.allocate(3);
-    state->dataSurface->InsideDividerCondensationFlag.allocate(3);
+    state->dataSurface->SurfWinInsideFrameCondensationFlag.allocate(3);
+    state->dataSurface->SurfWinInsideDividerCondensationFlag.allocate(3);
 
     state->dataSurface->SurfTAirRef(surfNum1) = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
@@ -3363,8 +3363,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_updateQdotConvInRepTest)
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->EnclSolQSWRad = 0.0;
 
-    state->dataHeatBalSurf->TempSurfIn.allocate(3);
-    state->dataHeatBalSurf->TempSurfIn(surfNum2) = 297.0;
+    state->dataHeatBalSurf->SurfTempIn.allocate(3);
+    state->dataHeatBalSurf->SurfTempIn(surfNum1) = 297.0;
+    state->dataHeatBalSurf->SurfTempIn(surfNum2) = 297.0;
+    state->dataHeatBalSurf->SurfTempIn(surfNum3) = 297.0;
     state->dataHeatBalSurfMgr->RefAirTemp.allocate(3);
     state->dataHeatBalSurfMgr->RefAirTemp(surfNum2) = 296.0;
     state->dataHeatBalSurf->QdotConvInRep.allocate(3);
@@ -3377,16 +3379,103 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_updateQdotConvInRepTest)
     state->dataGlobal->TimeStepZoneSec = 50.0;
     state->dataHeatBal->CoeffAdjRatioIn.allocate(3);
     state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.0;
-    updateQdotConvInRep(*state, surfNum2);
+    state->dataHeatBalSurf->CoeffAdjRatioOut.allocate(3);
+    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.0;
+
+    state->dataHeatBalSurf->SurfIsAdiabatic.allocate(3);
+    state->dataHeatBalSurf->SurfIsAdiabatic(2) = 0;
+    state->dataHeatBalSurf->SurfIsSourceOrSink.allocate(3);
+    state->dataHeatBalSurf->SurfIsSourceOrSink(2) = 0;
+
+    state->dataHeatBalSurf->SurfCTFCross0.allocate(3);
+    state->dataHeatBalSurf->SurfCTFInside0.allocate(3);
+    state->dataHeatBalSurf->SurfCTFSourceIn0.allocate(3);
+    state->dataHeatBalSurf->SurfTempOutHist.allocate(3);
+    state->dataHeatBalSurf->TH.allocate(2, 2, 3);
+    state->dataHeatBalSurf->TH(1, 1, surfNum2) = 22.0;
+    state->dataHeatBalSurf->TH(2, 1, surfNum2) = 22.0;
+
+    state->dataSurface->SurfWinHeatGainRep.allocate(3);
+    state->dataSurface->SurfWinHeatGainRep.allocate(3);
+    state->dataSurface->SurfWinHeatLossRep.allocate(3);
+    state->dataSurface->SurfWinGainConvGlazToZoneRep.allocate(3);
+    state->dataSurface->SurfWinGainIRGlazToZoneRep.allocate(3);
+    state->dataSurface->SurfWinLossSWZoneToOutWinRep.allocate(3);
+    state->dataSurface->SurfWinGainFrameDividerToZoneRep.allocate(3);
+    state->dataSurface->SurfWinGainConvGlazShadGapToZoneRep.allocate(3);
+    state->dataSurface->SurfWinGainConvShadeToZoneRep.allocate(3);
+    state->dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep.allocate(3);
+    state->dataSurface->SurfWinGainIRShadeToZoneRep.allocate(3);
+    state->dataSurface->SurfWinFrameQRadOutAbs.allocate(3);
+    state->dataSurface->SurfWinFrameQRadInAbs.allocate(3);
+    state->dataSurface->SurfWinDividerQRadOutAbs.allocate(3);
+    state->dataSurface->SurfWinDividerQRadInAbs.allocate(3);
+    state->dataSurface->SurfWinHeatLossRep.allocate(3);
+    state->dataSurface->SurfWinGainConvGlazToZoneRep.allocate(3);
+    state->dataSurface->SurfWinGainIRGlazToZoneRep.allocate(3);
+    state->dataSurface->SurfWinLossSWZoneToOutWinRep.allocate(3);
+    state->dataSurface->SurfWinGainFrameDividerToZoneRep.allocate(3);
+    state->dataSurface->SurfWinGainConvGlazShadGapToZoneRep.allocate(3);
+    state->dataSurface->SurfWinGainConvShadeToZoneRep.allocate(3);
+    state->dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep.allocate(3);
+    state->dataSurface->SurfWinGainIRShadeToZoneRep.allocate(3);
+    state->dataSurface->SurfWinFrameQRadOutAbs.allocate(3);
+    state->dataSurface->SurfWinFrameQRadInAbs.allocate(3);
+    state->dataSurface->SurfWinDividerQRadOutAbs.allocate(3);
+    state->dataSurface->SurfWinDividerQRadInAbs.allocate(3);
+    state->dataHeatBalSurf->SurfCTFConstInPart.allocate(3);
+    state->dataHeatBalSurf->SurfOpaqQRadSWInAbs.allocate(3);
+    state->dataHeatBalSurf->SurfQAdditionalHeatSourceInside.allocate(3);
+    state->dataHeatBalFanSys->QCoolingPanelSurf.allocate(3);
+    state->dataHeatBalFanSys->QRadSurfAFNDuct.allocate(3);
+    state->dataHeatBalSurf->SurfTempDiv.allocate(3);
+    state->dataHeatBalSurf->SurfIsOperatingPool.allocate(3);
+    state->dataHeatBalFanSys->PoolHeatTransCoefs.allocate(3);
+    state->dataHeatBalSurf->SurfIsOperatingPool.allocate(3);
+    state->dataHeatBalSurf->SurfTempTerm.allocate(3);
+    state->dataHeatBalSurf->SurfNetLWRadToSurf.allocate(3);
+    state->dataHeatBalSurf->SurfQSourceSinkHist.allocate(3);
+    state->dataHeatBalFanSys->QPoolSurfNumerator.allocate(3);
+    state->dataHeatBalSurf->SurfHcExt.allocate(3);
+    state->dataHeatBalSurf->SurfHSkyExt.allocate(3);
+    state->dataHeatBalSurf->SurfHGrdExt.allocate(3);
+    state->dataHeatBalSurf->SurfHAirExt.allocate(3);
+    state->dataHeatBalSurf->SurfTempInRep.allocate(3);
+    state->dataHeatBalSurf->SurfTempOut.allocate(3);
+    state->dataSurface->SurfWinHeatGainRepEnergy.allocate(3);
+    state->dataSurface->SurfWinHeatTransferRepEnergy.allocate(3);
+
+    state->dataHeatBal->ZoneMRT.allocate(1);
+
+    state->dataHeatBalSurf->SurfTempTerm(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfQSourceSinkHist(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfCTFConstInPart(surfNum2) = 1.0;
+    state->dataHeatBalFanSys->QPoolSurfNumerator(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfTempOutHist(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfTempDiv(surfNum2) = 1.0;
+
+    CalcHeatBalanceInsideSurf2CTFOnly(*state, 1, state->dataGlobal->NumOfZones, state->dataSurface->AllIZSurfaceList);
 
     Real64 QdotConvInRepOld = state->dataHeatBalSurf->QdotConvInRep(surfNum2);
     Real64 QdotConvInRepPerAreaOld = state->dataHeatBalSurf->QdotConvInRepPerArea(surfNum2);
     Real64 QConvInReportOld = state->dataHeatBalSurf->QConvInReport(surfNum2);
+    Real64 SurfHConvIntOld = state->dataHeatBalSurf->SurfHConvInt(surfNum2);
+    Real64 SurfTempInOld = state->dataHeatBalSurf->SurfTempIn(surfNum2);
+    Real64 RefAirTempOld = state->dataHeatBalSurfMgr->RefAirTemp(surfNum2);
 
     state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.3;
-    updateQdotConvInRep(*state, surfNum2);
-    EXPECT_NEAR(QdotConvInRepOld * 1.3, state->dataHeatBalSurf->QdotConvInRep(surfNum2), 0.001);
-    EXPECT_NEAR(QdotConvInRepPerAreaOld * 1.3, state->dataHeatBalSurf->QdotConvInRepPerArea(surfNum2), 0.001);
-    EXPECT_NEAR(QConvInReportOld * 1.3, state->dataHeatBalSurf->QConvInReport(surfNum2), 0.001);
+    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.3;
+    CalcHeatBalanceInsideSurf2CTFOnly(*state, 1, state->dataGlobal->NumOfZones, state->dataSurface->AllIZSurfaceList);
+
+    Real64 ratio = 1.3 * state->dataHeatBalSurf->SurfHConvInt(surfNum2) / SurfHConvIntOld *
+                   (state->dataHeatBalSurf->SurfTempIn(surfNum2) - state->dataHeatBalSurfMgr->RefAirTemp(surfNum2)) / (SurfTempInOld - RefAirTempOld);
+
+    EXPECT_NEAR(ratio,
+                state->dataHeatBalSurf->QdotConvInRep(surfNum2) / QdotConvInRepOld,
+                0.001);
+    EXPECT_NEAR(ratio,
+                state->dataHeatBalSurf->QdotConvInRepPerArea(surfNum2) / QdotConvInRepPerAreaOld,
+                0.001);
+    EXPECT_NEAR(ratio, state->dataHeatBalSurf->QConvInReport(surfNum2) / QConvInReportOld, 0.001);
 }
 } // namespace EnergyPlus

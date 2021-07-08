@@ -7497,16 +7497,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 }
 
-void updateQdotConvInRep(EnergyPlusData &state,
-                         int const SurfNum)
-{
-    Real64 HConvIn = state.dataHeatBal->HConvIn(SurfNum) * state.dataHeatBal->CoeffAdjRatioIn(SurfNum);
-    Real64 const HConvInTemp_fac = -HConvIn * (state.dataHeatBalSurf->TempSurfIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
-    state.dataHeatBalSurf->QdotConvInRep(SurfNum) = state.dataSurface->Surface(SurfNum).Area * HConvInTemp_fac;
-    state.dataHeatBalSurf->QdotConvInRepPerArea(SurfNum) = HConvInTemp_fac;
-    state.dataHeatBalSurf->QConvInReport(SurfNum) = state.dataHeatBalSurf->QdotConvInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-}
-
 void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                                        const int FirstZone,             // First zone to simulate
                                        const int LastZone,              // Last zone to simulate

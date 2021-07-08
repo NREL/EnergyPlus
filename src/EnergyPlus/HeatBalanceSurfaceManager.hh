@@ -136,9 +136,6 @@ namespace HeatBalanceSurfaceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void updateQdotConvInRep(EnergyPlusData &state,
-                             int const SurfNum);
-
     void ReportSurfaceHeatBalance(EnergyPlusData &state);
 
     void ReportIntMovInsInsideSurfTemp(EnergyPlusData &state);
