@@ -838,6 +838,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
+    int const HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
@@ -883,6 +884,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
+
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -899,8 +905,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     state->dataSurface->Surface.allocate(1);
     state->dataSurface->Surface(1).Tilt = 90.0;
     state->dataSurface->Surface(1).Azimuth = 180.0;
-    int horiz = 1;
-    int vert = 2;
+    DataWindowEquivalentLayer::Orientation horiz = DataWindowEquivalentLayer::Orientation::Horizontal;
+    DataWindowEquivalentLayer::Orientation vert = DataWindowEquivalentLayer::Orientation::Vertical;
     Real64 ProfAng;
     Vector3<Real64> CosDirSun; // Solar direction cosines
 
@@ -2110,6 +2116,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_FALSE(foundErrors);                               // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
+    int const HoursInDay(24);
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
@@ -2160,6 +2167,10 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->WeightNow = 1.0;
     state->dataGlobal->WeightPreviousHour = 0.0;
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     CalcDayltgCoefficients(*state);
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
@@ -2852,7 +2863,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     state->dataSurfaceGeometry->SinZoneRelNorth(2) = std::sin(-state->dataHeatBal->Zone(2).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-
+    int const HoursInDay(24);
+    state->dataSurface->SurfSunCosHourly.allocate(HoursInDay);
+    for (int hour = 1; hour <= HoursInDay; hour++) {
+        state->dataSurface->SurfSunCosHourly(hour) = 0.0;
+    }
     SurfaceGeometry::GetSurfaceData(*state, foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
 

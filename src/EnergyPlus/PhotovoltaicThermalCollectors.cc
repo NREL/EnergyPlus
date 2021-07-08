@@ -347,7 +347,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).PlantOutletNodeNum =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -357,7 +357,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 BranchNodeConnections::TestCompSet(state,
@@ -379,7 +379,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Inlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
                 state.dataPhotovoltaicThermalCollector->PVT(Item).HVACOutletNodeNum =
                     NodeInputManager::GetOnlySingleNode(state,
@@ -389,7 +389,7 @@ namespace PhotovoltaicThermalCollectors {
                                                         state.dataIPShortCut->cAlphaArgs(1),
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType::Outlet,
-                                                        1,
+                                                        NodeInputManager::compFluidStream::Primary,
                                                         DataLoopNode::ObjectIsNotParent);
 
                 BranchNodeConnections::TestCompSet(state,
@@ -490,36 +490,10 @@ namespace PhotovoltaicThermalCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // init for PVT
 
-        static std::string const RoutineName("InitPVTcollectors");
+        static constexpr std::string_view RoutineName("InitPVTcollectors");
 
         // Do the one time initializations
-        if (this->MyOneTimeFlag) {
-            this->setupReportVars(state);
-            this->MyOneTimeFlag = false;
-        }
-
-        if (this->SetLoopIndexFlag) {
-            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
-                bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state,
-                                                        this->Name,
-                                                        this->TypeNum,
-                                                        this->WLoopNum,
-                                                        this->WLoopSideNum,
-                                                        this->WLoopBranchNum,
-                                                        this->WLoopCompNum,
-                                                        errFlag,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _,
-                                                        _);
-                if (errFlag) {
-                    ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
-                }
-                this->SetLoopIndexFlag = false;
-            }
-        }
+        this->oneTimeInit(state);
 
         // finish set up of PV, because PV get-input follows PVT's get input.
         if (!this->PVfound) {
@@ -920,7 +894,7 @@ namespace PhotovoltaicThermalCollectors {
         // METHODOLOGY EMPLOYED:
         // Current model is "simple" fixed efficiency and simple night sky balance for cooling
 
-        static std::string const RoutineName("CalcPVTcollectors");
+        static constexpr std::string_view RoutineName("CalcPVTcollectors");
 
         int InletNode(0);
 
@@ -1011,7 +985,7 @@ namespace PhotovoltaicThermalCollectors {
                 ConvectionCoefficients::InitExteriorConvectionCoeff(state,
                                                                     this->SurfNum,
                                                                     0.0,
-                                                                    DataHeatBalance::VerySmooth,
+                                                                    DataSurfaces::SurfaceRoughness::VerySmooth,
                                                                     this->Simple.SurfEmissivity,
                                                                     this->Simple.LastCollectorTemp,
                                                                     HcExt,
@@ -1034,8 +1008,8 @@ namespace PhotovoltaicThermalCollectors {
 
                 Real64 Tcollector =
                     (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
-                                                                      HrAir * state.dataSurface->Surface(this->SurfNum).OutDryBulbTemp +
-                                                                      HcExt * state.dataSurface->Surface(this->SurfNum).OutDryBulbTemp)) /
+                                                                      HrAir * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum) +
+                                                                      HcExt * state.dataSurface->SurfOutDryBulbTemp(this->SurfNum))) /
                     (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));
 
                 PotentialOutletTemp = 2.0 * Tcollector - Tinlet;
@@ -1118,6 +1092,37 @@ namespace PhotovoltaicThermalCollectors {
                 state.dataLoopNodes->Node(OutletNode).HumRat = state.dataLoopNodes->Node(InletNode).HumRat; // assumes dewpoint bound on cooling ....
                 state.dataLoopNodes->Node(OutletNode).Enthalpy =
                     Psychrometrics::PsyHFnTdbW(this->Report.ToutletWorkFluid, state.dataLoopNodes->Node(OutletNode).HumRat);
+            }
+        }
+    }
+    void PVTCollectorStruct::oneTimeInit(EnergyPlusData &state)
+    {
+
+        if (this->MyOneTimeFlag) {
+            this->setupReportVars(state);
+            this->MyOneTimeFlag = false;
+        }
+
+        if (this->SetLoopIndexFlag) {
+            if (allocated(state.dataPlnt->PlantLoop) && (this->PlantInletNodeNum > 0)) {
+                bool errFlag = false;
+                PlantUtilities::ScanPlantLoopsForObject(state,
+                                                        this->Name,
+                                                        this->TypeNum,
+                                                        this->WLoopNum,
+                                                        this->WLoopSideNum,
+                                                        this->WLoopBranchNum,
+                                                        this->WLoopCompNum,
+                                                        errFlag,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _,
+                                                        _);
+                if (errFlag) {
+                    ShowFatalError(state, "InitPVTcollectors: Program terminated for previous conditions.");
+                }
+                this->SetLoopIndexFlag = false;
             }
         }
     }

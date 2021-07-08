@@ -574,19 +574,17 @@ namespace FuelCellElectricGenerator {
 
         void FigureAirEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &Hair);
 
-        void FigureFuelHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
+        void FigureFuelHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp) const;
 
-        void FigureFuelEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &Hfuel);
+        void FigureFuelEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &Hfuel) const;
 
         void FigureProductGasesEnthalpy(EnergyPlusData &state, Real64 FluidTemp, Real64 &HProdGases);
-
-        void FigureProductGasHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
 
         void FigureAuxilHeatGasHeatCap(EnergyPlusData &state, Real64 FluidTemp, Real64 &Cp);
 
         void FigureACAncillaries(EnergyPlusData &state, Real64 &PacAncill);
 
-        void FigurePowerConditioningLosses(EnergyPlusData &state, Real64 Pdemand, Real64 &PpcuLosses);
+        void FigurePowerConditioningLosses(EnergyPlusData &state, Real64 Pdemand, Real64 &PpcuLosses) const;
 
         void FigureTransientConstraints(EnergyPlusData &state,
                                         Real64 &Pel,       // DC power control setting for power module
@@ -594,7 +592,7 @@ namespace FuelCellElectricGenerator {
                                         Real64 &PelDiff    // if constrained then this is the difference, positive
         );
 
-        Real64 FuelCellProductGasEnthResidual(EnergyPlusData &state, Real64 TprodGas, Array1D<Real64> const &Par);
+        Real64 FuelCellProductGasEnthResidual(EnergyPlusData &state, Real64 TprodGas, std::array<Real64, 2> const &Par);
 
         static void FigureGaseousWaterEnthalpy(Real64 FluidTemp, Real64 &HGasWater);
 
@@ -608,7 +606,7 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
-        void CalcUpdateHeatRecovery(EnergyPlusData &state, bool FirstHVACIteration);
+        void CalcUpdateHeatRecovery(EnergyPlusData &state, bool FirstHVACIteration) const;
 
         void ManageElectStorInteractions(EnergyPlusData &state,
                                          Real64 Pdemand,
@@ -624,6 +622,8 @@ namespace FuelCellElectricGenerator {
                                   bool FirstHVACIteration);
 
         void UpdateFuelCellGeneratorRecords(EnergyPlusData &state);
+
+        void oneTimeInit(EnergyPlusData &state) override;
     };
 
     void getFuelCellInput(EnergyPlusData &state);

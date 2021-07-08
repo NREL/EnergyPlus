@@ -234,7 +234,7 @@ namespace UnitarySystems {
         Real64 m_DesignCoolingCapacity;
         Real64 m_MaxCoolAirVolFlow;
         int m_CondenserNodeNum;
-        int m_CondenserType;
+        DataHeatBalance::RefrigCondenserType m_CondenserType;
         int m_CoolingCoilIndex;
         bool m_HeatPump;
         int m_ActualDXCoilIndexForHXAssisted;
@@ -530,7 +530,7 @@ namespace UnitarySystems {
 
         static Real64 genericDXCoilResidual(EnergyPlusData &state,
                                             Real64 const PartLoadRatio, // iteration routine for Coil:Cooling:DX
-                                            std::vector<Real64> const &Par);
+                                            std::array<Real64, 8> const &Par);
 
         static Real64 DOE2DXCoilHumRatResidual(EnergyPlusData &state,
                                                Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)

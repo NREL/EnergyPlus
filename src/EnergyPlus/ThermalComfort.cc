@@ -100,10 +100,7 @@ namespace ThermalComfort {
     // the people statements and perform the requested thermal comfort evaluations
 
     // Using/Aliasing
-    using DataHeatBalance::AngleFactor;
     using DataHeatBalance::PeopleData;
-    using DataHeatBalance::SurfaceWeighted;
-    using DataHeatBalance::ZoneAveraged;
     using Psychrometrics::PsyRhFnTdbWPb;
     using ScheduleManager::GetCurrentScheduleValue;
 
@@ -2041,7 +2038,7 @@ namespace ThermalComfort {
         }
 
         for (Item = 1; Item <= state.dataHeatBal->TotPeople; ++Item) {
-            if (state.dataHeatBal->People(Item).MRTCalcType != AngleFactor) continue;
+            if (state.dataHeatBal->People(Item).MRTCalcType != DataHeatBalance::CalcMRT::AngleFactor) continue;
             state.dataHeatBal->People(Item).AngleFactorListPtr =
                 UtilityRoutines::FindItemInList(state.dataHeatBal->People(Item).AngleFactorListName, state.dataThermalComforts->AngleFactorList);
             WhichAFList = state.dataHeatBal->People(Item).AngleFactorListPtr;
@@ -2260,14 +2257,14 @@ namespace ThermalComfort {
         {
             auto const SELECT_CASE_var(state.dataHeatBal->People(PeopleListNum).MRTCalcType);
 
-            if (SELECT_CASE_var == ZoneAveraged) {
-                state.dataThermalComforts->RadTemp = state.dataHeatBal->MRT(state.dataThermalComforts->ZoneNum);
-            } else if (SELECT_CASE_var == SurfaceWeighted) {
-                ZoneRadTemp = state.dataHeatBal->MRT(state.dataThermalComforts->ZoneNum);
+            if (SELECT_CASE_var == DataHeatBalance::CalcMRT::ZoneAveraged) {
+                state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
+            } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::SurfaceWeighted) {
+                ZoneRadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
                 SurfaceTemp = state.dataHeatBalSurf->TH(2, 1, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
                 state.dataThermalComforts->RadTemp =
                     CalcSurfaceWeightedMRT(state, state.dataThermalComforts->ZoneNum, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
-            } else if (SELECT_CASE_var == AngleFactor) {
+            } else if (SELECT_CASE_var == DataHeatBalance::CalcMRT::AngleFactor) {
                 state.dataThermalComforts->RadTemp = CalcAngleFactorMRT(state, state.dataHeatBal->People(PeopleListNum).AngleFactorListPtr);
             }
         }
@@ -2347,7 +2344,7 @@ namespace ThermalComfort {
                 } else {
                     CurAirTemp = state.dataHeatBalFanSys->ZTAVComf(iZone);
                 }
-                CurMeanRadiantTemp = state.dataHeatBal->MRT(iZone);
+                CurMeanRadiantTemp = state.dataHeatBal->ZoneMRT(iZone);
                 OperTemp = CurAirTemp * 0.5 + CurMeanRadiantTemp * 0.5;
                 HumidRatio = state.dataHeatBalFanSys->ZoneAirHumRatAvgComf(iZone);
                 // for debugging
@@ -2772,12 +2769,12 @@ namespace ThermalComfort {
         }
 
         if (initiate && weathersimulation) {
-            const bool statFileExists = FileSystem::fileExists(state.files.inStatFileName.fileName);
-            const bool epwFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
+            const bool statFileExists = FileSystem::fileExists(state.files.inStatFilePath.filePath);
+            const bool epwFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
 
             readStat = 0;
             if (statFileExists) {
-                auto statFile = state.files.inStatFileName.open(state, "CalcThermalComfortAdapctiveASH55");
+                auto statFile = state.files.inStatFilePath.open(state, "CalcThermalComfortAdapctiveASH55");
                 while (statFile.good()) {
                     auto lineIn = statFile.readLine();
                     if (has(lineIn.data, "Monthly Statistics for Dry Bulb temperatures")) {
@@ -2803,7 +2800,7 @@ namespace ThermalComfort {
                 }
                 state.dataThermalComforts->DailyAveOutTemp = 0.0;
 
-                auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptiveASH55");
+                auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptiveASH55");
                 for (i = 1; i <= 8; ++i) { // Headers
                     epwLine = epwFile.readLine().data;
                 }
@@ -3012,10 +3009,10 @@ namespace ThermalComfort {
         }
 
         if (initiate && weathersimulation) {
-            const bool epwFileExists = FileSystem::fileExists(state.files.inputWeatherFileName.fileName);
+            const bool epwFileExists = FileSystem::fileExists(state.files.inputWeatherFilePath.filePath);
             readStat = 0;
             if (epwFileExists) {
-                auto epwFile = state.files.inputWeatherFileName.open(state, "CalcThermalComfortAdaptiveCEN15251");
+                auto epwFile = state.files.inputWeatherFilePath.open(state, "CalcThermalComfortAdaptiveCEN15251");
                 for (i = 1; i <= 9; ++i) { // Headers
                     epwFile.readLine();
                 }

@@ -55,7 +55,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/bit.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -81,6 +80,25 @@ struct EnergyPlusData;
 #define EP_cache_PsyTsatFnPb
 #define EP_cache_PsyTsatFnHPb
 #endif
+
+// Adapted from: https://www.fluentcpp.com/2019/08/30/how-to-disable-a-warning-in-cpp/
+// clang-format off
+#if defined(_MSC_VER)
+#define DISABLE_WARNING_PUSH __pragma(warning(push))
+#define DISABLE_WARNING_POP __pragma(warning(pop))
+#define DISABLE_WARNING(warningNumber) __pragma(warning(disable : warningNumber))
+
+// purposfully doing nothing here - does MSVC not have a strict-aliasing warning?
+#define DISABLE_WARNING_STRICT_ALIASING
+#elif defined(__GNUC__) || defined(__clang__)
+#define DO_PRAGMA(X) _Pragma(#X)
+#define DISABLE_WARNING_PUSH DO_PRAGMA(GCC diagnostic push)
+#define DISABLE_WARNING_POP DO_PRAGMA(GCC diagnostic pop)
+#define DISABLE_WARNING(warningName) DO_PRAGMA(GCC diagnostic ignored #warningName)
+
+#define DISABLE_WARNING_STRICT_ALIASING DISABLE_WARNING(-Wstrict-aliasing)
+#endif
+// clang-format on
 
 namespace Psychrometrics {
 
@@ -187,6 +205,33 @@ namespace Psychrometrics {
         if (rhoair < 0.0) PsyRhoAirFnPbTdbW_error(state, pb, tdb, dw, rhoair, CalledFrom);
 #endif
         return rhoair;
+    }
+
+    constexpr Real64 PsyRhoAirFnPbTdbW(Real64 const pb,  // barometric pressure (Pascals)
+                                       Real64 const tdb, // dry bulb temperature (Celsius)
+                                       Real64 const dw   // humidity ratio (kgWater/kgDryAir)
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         G. S. Wright
+        //       DATE WRITTEN   June 2, 1994
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function provides density of air as a function of barometric
+        // pressure, dry bulb temperature, and humidity ratio.
+
+        // METHODOLOGY EMPLOYED:
+        // ideal gas law
+        //    universal gas const for air 287 J/(kg K)
+        //    air/water molecular mass ratio 28.9645/18.01534
+
+        // REFERENCES:
+        // Wylan & Sontag, Fundamentals of Classical Thermodynamics.
+        // ASHRAE handbook 1985 Fundamentals, Ch. 6, eqn. (6),(26)
+
+        return (pb / (287.0 * (tdb + DataGlobalConstants::KelvinConv) * (1.0 + 1.6077687 * std::max(dw, 1.0e-5))));
     }
 
     inline Real64 PsyRhoAirFnPbTdbW_fast([[maybe_unused]] EnergyPlusData &state,
@@ -644,22 +689,26 @@ namespace Psychrometrics {
 
         // FUNCTION PARAMETER DEFINITIONS:
         //  integer(i64), parameter :: Grid_Mask=NOT(ISHFT(1_i64, Grid_Shift)-1)
-        Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
-        assert(Grid_Shift == 64 - 12 - psatprecision_bits); // Force Grid_Shift updates when precision bits changes
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - psatprecision_bits;
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyPsatFnTemp_cache);
 #endif
 
-        Int64 const Tdb_tag(bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
-        //        Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
+        Int64 Tdb_tag(*reinterpret_cast<Int64 const *>(&T) >> Grid_Shift);
+        DISABLE_WARNING_POP
         Int64 const hash(Tdb_tag & psatcache_mask);
         auto &cPsat(state.dataPsychCache->cached_Psat(hash));
 
         if (cPsat.iTdb != Tdb_tag) {
             cPsat.iTdb = Tdb_tag;
-            Real64 Tdb_tag_r;
-            Tdb_tag_r = bit_transfer(bit_shift(Tdb_tag, Grid_Shift), Tdb_tag_r);
+            Tdb_tag <<= Grid_Shift;
+            DISABLE_WARNING_PUSH
+            DISABLE_WARNING_STRICT_ALIASING
+            Real64 Tdb_tag_r = *reinterpret_cast<Real64 const *>(&Tdb_tag);
+            DISABLE_WARNING_POP
             cPsat.Psat = PsyPsatFnTemp_raw(state, Tdb_tag_r, CalledFrom);
         }
 
@@ -690,7 +739,7 @@ namespace Psychrometrics {
 
         Real64 Tsat_result; // result=> Sat-Temp {C}
 
-        Int64 const Grid_Shift(64 - 12 - tsat_hbp_precision_bits);
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - tsat_hbp_precision_bits;
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -699,19 +748,16 @@ namespace Psychrometrics {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Int64 H_tag;
-        Int64 Pb_tag;
-        Int64 hash;
 
 #ifdef EP_psych_stats
         ++state.dataPsychCache->NumTimesCalled(iPsyTwbFnTdbWPb_cache);
 #endif
-
-        H_tag = bit_transfer(H, H_tag);
-        H_tag = bit_shift(H_tag, -Grid_Shift);
-        Pb_tag = bit_transfer(Pb, Pb_tag);
-        Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
-        hash = bit_and(bit_xor(H_tag, Pb_tag), Int64(tsat_hbp_cache_size - 1));
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
+        Int64 H_tag = *reinterpret_cast<Int64 const *>(&H) >> Grid_Shift;
+        Int64 Pb_tag = *reinterpret_cast<Int64 const *>(&Pb) >> Grid_Shift;
+        DISABLE_WARNING_POP
+        Int64 hash = (H_tag ^ Pb_tag) & Int64(tsat_hbp_cache_size - 1);
         auto &cached_Tsat_HPb = state.dataPsychCache->cached_Tsat_HPb;
         if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
             cached_Tsat_HPb(hash).iH = H_tag;
@@ -1108,9 +1154,11 @@ namespace Psychrometrics {
     )
     {
 
-        Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
-        assert(Grid_Shift == 64 - 12 - tsatprecision_bits); // Force Grid_Shift updates when precision bits changes
-        Int64 const Pb_tag(bit_shift(bit_transfer(Press, Grid_Shift), -Grid_Shift));
+        std::uint64_t constexpr Grid_Shift = 64 - 12 - tsatprecision_bits;
+        DISABLE_WARNING_PUSH
+        DISABLE_WARNING_STRICT_ALIASING
+        Int64 const Pb_tag(*reinterpret_cast<Int64 const *>(&Press) >> Grid_Shift);
+        DISABLE_WARNING_POP
 
         Int64 const hash(Pb_tag & tsatcache_mask);
         auto &cTsat(state.dataPsychCache->cached_Tsat(hash));
