@@ -119,7 +119,7 @@ namespace UtilityRoutines {
         // List directed Fortran input/output.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const ValidNumerics("0123456789.+-EeDd");
+        static constexpr std::string_view ValidNumerics("0123456789.+-EeDd");
 
         Real64 rProcessNumber = 0.0;
         //  Make sure the string has all what we think numerics should have
