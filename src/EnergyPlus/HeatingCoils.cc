@@ -57,6 +57,7 @@
 #include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -77,12 +78,12 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
-#include <EnergyPlus/ReportCoilSelection.hh>
+//#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus { // NOLINT(modernize-concat-nested-namespaces) // TODO: Take out this lint when we want to apply formatting for nested namespacing
 
 namespace HeatingCoils {
     // Module containing the HeatingCoil simulation routines other than the Water coils
@@ -97,14 +98,6 @@ namespace HeatingCoils {
     // To encapsulate the data and algorithms required to
     // manage the HeatingCoil System Component
 
-    // METHODOLOGY EMPLOYED:
-
-    // REFERENCES:
-
-    // OTHER NOTES:
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
@@ -138,12 +131,6 @@ namespace HeatingCoils {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages HeatingCoil component simulation.
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // in a unitary system
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum(0);       // The HeatingCoil that you are currently loading input into
@@ -255,9 +242,6 @@ namespace HeatingCoils {
             QCoilActual = QCoilActual2;
         }
     }
-
-    // Get Input Section of the Module
-    //******************************************************************************
 
     void GetHeatingCoilInput(EnergyPlusData &state)
     {
@@ -527,7 +511,7 @@ namespace HeatingCoils {
             HeatingCoil(CoilNum).HeatingCoilModel = "ElectricMultiStage";
             HeatingCoil(CoilNum).HCoilType_Num = Coil_HeatingElectric_MultiStage;
 
-            HeatingCoil(CoilNum).NumOfStages = Numbers(1);
+            HeatingCoil(CoilNum).NumOfStages = static_cast<int>(Numbers(1));
 
             HeatingCoil(CoilNum).MSEfficiency.allocate(HeatingCoil(CoilNum).NumOfStages);
             HeatingCoil(CoilNum).MSNominalCapacity.allocate(HeatingCoil(CoilNum).NumOfStages);
@@ -841,7 +825,7 @@ namespace HeatingCoils {
 
             HeatingCoil(CoilNum).ParasiticFuelCapacity = Numbers(1);
 
-            HeatingCoil(CoilNum).NumOfStages = Numbers(2);
+            HeatingCoil(CoilNum).NumOfStages = static_cast<int>(Numbers(2));
 
             HeatingCoil(CoilNum).MSEfficiency.allocate(HeatingCoil(CoilNum).NumOfStages);
             HeatingCoil(CoilNum).MSNominalCapacity.allocate(HeatingCoil(CoilNum).NumOfStages);
@@ -1251,12 +1235,39 @@ namespace HeatingCoils {
                         state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
                     }
                 }
+            } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX")) {
+                HeatingCoil(CoilNum).ReclaimHeatingSource = HeatObjTypes::COIL_COOLING_DX_NEW;
+                HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum = CoilCoolingDX::factory(state, Alphas(6));
+                if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum < 0) {
+                    ShowSevereError(
+                        state,
+                        format(
+                            "{}={}, could not find desuperheater coil {}={}",
+                            CurrentModuleObject, HeatingCoil(CoilNum).Name, Alphas(5), Alphas(6)
+                            )
+                        );
+                    state.dataHeatingCoils->InputErrorsFound = true;
+                }
+                DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataCoilCooingDX->coilCoolingDXs[HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum].reclaimHeat;
+                if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
+                    HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
+                    for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
+                        num = 0.0;
+                }
+                HeatReclaim.ReclaimEfficiencyTotal += HeatingCoil(CoilNum).Efficiency;
+                if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
+                    ShowSevereError(state,
+                                    cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + ", \"" + HeatingCoil(CoilNum).Name +
+                                    "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" +
+                                    HeatingCoil(CoilNum).ReclaimHeatingCoilName + "\" cannot be over 0.3");
+                }
+                state.dataHeatingCoils->ValidSourceType(CoilNum) = true;
             } else {
                 ShowSevereError(state,
                                 CurrentModuleObject + ", \"" + HeatingCoil(CoilNum).Name +
                                     "\" valid desuperheater heat source object type not found: " + Alphas(5));
                 ShowContinueError(state, "Valid desuperheater heat source objects are:");
-                ShowContinueError(state,
+                ShowContinueError(state,X
                                   "Refrigeration:CompressorRack, Coil:Cooling:DX:SingleSpeed, Refrigeration:Condenser:AirCooled, "
                                   "Refrigeration:Condenser:EvaporativeCooled, Refrigeration:Condenser:WaterCooled,Coil:Cooling:DX:TwoSpeed, and "
                                   "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
@@ -1345,12 +1356,6 @@ namespace HeatingCoils {
         lAlphaBlanks.deallocate();
         lNumericBlanks.deallocate();
     }
-
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
 
     void InitHeatingCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration, Real64 const QCoilRequired)
     {
@@ -1742,7 +1747,7 @@ namespace HeatingCoils {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) >
                                     state.dataSize->AutoVsHardSizingThreshold) {
-                                    ShowMessage(state, "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " + CompName);
+                                    ShowMessage(state, format("SizeHeatingCoil: Potential issue with equipment sizing for {}, {}", CompType, CompName));
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NominalCapacityUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NominalCapacityDes));
                                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1825,12 +1830,6 @@ namespace HeatingCoils {
         }
     }
 
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
     void CalcElectricHeatingCoil(EnergyPlusData &state,
                                  int const CoilNum, // index to heating coil
                                  Real64 &QCoilReq,
@@ -1848,25 +1847,9 @@ namespace HeatingCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // Simulates a simple Electric heating coil with an efficiency
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
         // Using/Aliasing
         auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
         using DataHVACGlobals::TempControlTol;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow; // [kg/sec]
@@ -2035,19 +2018,10 @@ namespace HeatingCoils {
         using Psychrometrics::PsyTsatFnHPb;
         using Psychrometrics::PsyWFnTdbH;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcMultiStageElectricHeatingCoil");
         static std::string const RoutineNameAverageLoad("CalcMultiStageElectricHeatingCoil:Averageload");
         static std::string const RoutineNameFullLoad("CalcMultiStageElectricHeatingCoil:fullload");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;          // dry air mass flow rate through coil [kg/s]
@@ -2235,25 +2209,9 @@ namespace HeatingCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // Simulates a simple Gas heating coil with a burner efficiency
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
         // Using/Aliasing
         using CurveManager::CurveValue;
         using DataHVACGlobals::TempControlTol;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow; // [kg/sec]
@@ -2469,19 +2427,10 @@ namespace HeatingCoils {
         using Psychrometrics::PsyTsatFnHPb;
         using Psychrometrics::PsyWFnTdbH;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcMultiStageGasHeatingCoil");
         static std::string const RoutineNameAverageLoad("CalcMultiStageGasHeatingCoil:Averageload");
         static std::string const RoutineNameFullLoad("CalcMultiStageGasHeatingCoil:fullload");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;          // dry air mass flow rate through coil [kg/s]
@@ -2741,23 +2690,9 @@ namespace HeatingCoils {
         // the electric or gas heating coil except that the NominalCapacity is variable
         // and based on the runtime fraction and heat rejection of the heat source object.
 
-        // REFERENCES:
-
         // Using/Aliasing
         using DataHVACGlobals::TempControlTol;
         using namespace DXCoils;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;     // air mass flow through the desuperheater heating coil [kg/sec]
@@ -2796,14 +2731,16 @@ namespace HeatingCoils {
         // Stovall 2011, add comparison to available temperature of heat reclaim source
         if (state.dataHeatingCoils->ValidSourceType(CoilNum)) {
             SourceID = HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum;
-            if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COMPRESSORRACK_REFRIGERATEDCASE) {
+            switch(HeatingCoil(CoilNum).ReclaimHeatingSource) {
+            case HeatObjTypes::COMPRESSORRACK_REFRIGERATEDCASE:
                 // Added last term to available energy equations to avoid double counting reclaimed energy
                 // because refrigeration systems are solved outside the hvac time step iterations
                 HeatingCoil(CoilNum).RTF = 1.0;
                 HeatingCoil(CoilNum).NominalCapacity =
                     state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).AvailCapacity * Effic -
                     state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
-            } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::CONDENSER_REFRIGERATION) {
+                break;
+            case HeatObjTypes::CONDENSER_REFRIGERATION:
                 AvailTemp = state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).AvailTemperature;
                 HeatingCoil(CoilNum).RTF = 1.0;
                 if (AvailTemp <= TempAirIn) {
@@ -2817,18 +2754,30 @@ namespace HeatingCoils {
                         state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).AvailCapacity * Effic -
                         state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
                 }
-            } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_COOLING ||
-                       HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_MULTISPEED ||
-                       HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_MULTIMODE) {
+                break;
+            case HeatObjTypes::COIL_DX_COOLING:
+            case HeatObjTypes::COIL_DX_MULTISPEED:
+            case HeatObjTypes::COIL_DX_MULTIMODE:
                 HeatingCoil(CoilNum).RTF = state.dataDXCoils->DXCoil(SourceID).CoolingCoilRuntimeFraction;
                 HeatingCoil(CoilNum).NominalCapacity = state.dataHeatBal->HeatReclaimDXCoil(SourceID).AvailCapacity * Effic -
                                                        state.dataHeatBal->HeatReclaimDXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
-            } else if (HeatingCoil(CoilNum).ReclaimHeatingSource == HeatObjTypes::COIL_DX_VARIABLE_COOLING) {
+                break;
+            case HeatObjTypes::COIL_DX_VARIABLE_COOLING:
                 // condenser heat rejection
                 HeatingCoil(CoilNum).RTF = state.dataVariableSpeedCoils->VarSpeedCoil(SourceID).RunFrac;
                 HeatingCoil(CoilNum).NominalCapacity = state.dataHeatBal->HeatReclaimVS_DXCoil(SourceID).AvailCapacity * Effic -
                                                        state.dataHeatBal->HeatReclaimVS_DXCoil(SourceID).WaterHeatingDesuperheaterReclaimedHeatTotal;
+                break;
+            case HeatObjTypes::COIL_COOLING_DX_NEW:
+                // get RTF and NominalCapacity from Coil:CoolingDX
+                HeatingCoil(CoilNum).RTF = 0.0;
+                HeatingCoil(CoilNum).NominalCapacity = 0.0;
+                break;
+            case HeatObjTypes::Unassigned:
+                ShowFatalError(state, "Developer error: Heating coil ReclaimHeatingSource was not assigned properly");
+                break;
             }
+
         } else {
             HeatingCoil(CoilNum).NominalCapacity = 0.0;
         }
@@ -2930,12 +2879,6 @@ namespace HeatingCoils {
         }
     }
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the HeatingCoil Module
-    // *****************************************************************************
-
     void UpdateHeatingCoil(EnergyPlusData &state, int const CoilNum)
     {
         // SUBROUTINE INFORMATION:
@@ -2949,22 +2892,6 @@ namespace HeatingCoils {
 
         // METHODOLOGY EMPLOYED:
         // Data is moved from the coil data structure to the coil outlet nodes.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;
@@ -2995,12 +2922,6 @@ namespace HeatingCoils {
             state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
         }
     }
-
-    //        End of Update subroutines for the HeatingCoil Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the HeatingCoil Module
-    // *****************************************************************************
 
     void ReportHeatingCoil(EnergyPlusData &state, int const CoilNum, bool const coilIsSuppHeater)
     {
@@ -3111,8 +3032,6 @@ namespace HeatingCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine provides a method for outside routines to check if
         // the heating coil is scheduled to be on.
-
-        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum;
@@ -3713,8 +3632,6 @@ namespace HeatingCoils {
 
         // PURPOSE OF THIS FUNCTION:
         // This function sets data to Heating Coil using the coil index and arguments passed
-
-        // Using/Aliasing
 
         if (state.dataHeatingCoils->GetCoilsInputFlag) {
             GetHeatingCoilInput(state);
