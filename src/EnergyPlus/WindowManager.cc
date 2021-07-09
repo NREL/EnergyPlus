@@ -5325,9 +5325,9 @@ namespace WindowManager {
             // Interaction with shade or blind, if one of these is present, is ignored. See below for
             // separate calculation of shade/blind temperature.
 
-            rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
+            rguess(1) = 1.0 / ((state.dataWindowManager->hcout + hrad) * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum));
             rguess(state.dataWindowManager->nglface + 1) =
-                1.0 / (state.dataWindowManager->hcin + hrad) * state.dataHeatBal->CoeffAdjRatioIn(SurfNum);
+                1.0 / ((state.dataWindowManager->hcin + hrad) * state.dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum));
 
             for (i = 2; i <= state.dataWindowManager->nglface; i += 2) {
                 rguess(i) = 1.0 / state.dataWindowManager->scon(i / 2);
@@ -7366,8 +7366,8 @@ namespace WindowManager {
         Real64 temdiff; // Inside/outside air temperature difference (K)
         Real64 ressum;  // Resistance sum (m2-K/W)
 
-        rguess(1) = 1.0 / (state.dataWindowManager->hcout + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
-        rguess(state.dataWindowManager->nglface + 1) = 1.0 / (hcinStartValue + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+        rguess(1) = 1.0 / ((state.dataWindowManager->hcout + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum));
+        rguess(state.dataWindowManager->nglface + 1) = 1.0 / ((hcinStartValue + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum));
 
         for (i = 2; i <= state.dataWindowManager->nglface; i += 2) {
             rguess(i) = 1.0 / state.dataWindowManager->scon(i / 2);
