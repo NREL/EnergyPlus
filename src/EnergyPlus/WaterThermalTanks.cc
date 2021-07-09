@@ -688,82 +688,72 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                                           ErrorsFound,
                                           state.dataIPShortCut->cCurrentModuleObject + " Name");
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Type = state.dataIPShortCut->cCurrentModuleObject;
+        auto &whDesupObj = state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum);
+
+        whDesupObj.Name = state.dataIPShortCut->cAlphaArgs(1);
+        whDesupObj.Type = state.dataIPShortCut->cCurrentModuleObject;
 
         //       convert availability schedule name to pointer
         if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr =
-                ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-            if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr == 0) {
+            whDesupObj.AvailSchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+            if (whDesupObj.AvailSchedPtr == 0) {
                 ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(2) + " = " + state.dataIPShortCut->cAlphaArgs(2));
                 ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
                 ErrorsFound = true;
             }
         } else {
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
+            whDesupObj.AvailSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
         }
 
-        //       convert schedule name to pointer
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule =
-            ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).SetPointTempSchedule == 0) {
+        // convert schedule name to pointer
+        whDesupObj.SetPointTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+        if (whDesupObj.SetPointTempSchedule == 0) {
             ShowSevereError(state, "Invalid, " + state.dataIPShortCut->cAlphaFieldNames(3) + " = " + state.dataIPShortCut->cAlphaArgs(3));
             ShowContinueError(state, "Entered in " + state.dataIPShortCut->cCurrentModuleObject + '=' + state.dataIPShortCut->cAlphaArgs(1));
             ErrorsFound = true;
         }
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff <= 0.0 ||
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).DeadBandTempDiff > 20.0) {
+        whDesupObj.DeadBandTempDiff = state.dataIPShortCut->rNumericArgs(1);
+        if (whDesupObj.DeadBandTempDiff <= 0.0 || whDesupObj.DeadBandTempDiff > 20.0) {
             ShowSevereError(state,
                             format("{} = {}: {} must be > 0 and <= 20. {} = {:.1T}",
                                    state.dataIPShortCut->cCurrentModuleObject,
-                                   state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                   whDesupObj.Name,
                                    state.dataIPShortCut->cNumericFieldNames(1),
                                    state.dataIPShortCut->cNumericFieldNames(1),
                                    state.dataIPShortCut->rNumericArgs(1)));
             ErrorsFound = true;
         }
 
-        // WaterHeaterDesuperheater(DesuperheaterNum)%HeatReclaimRecoveryEff       = state.dataIPShortCut->rNumericArgs(2)
         // Error limits on heat reclaim efficiency applied after source type identified
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp = state.dataIPShortCut->rNumericArgs(3);
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).RatedOutdoorAirTemp = state.dataIPShortCut->rNumericArgs(4);
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).MaxInletWaterTemp = state.dataIPShortCut->rNumericArgs(5);
+        whDesupObj.RatedInletWaterTemp = state.dataIPShortCut->rNumericArgs(3);
+        whDesupObj.RatedOutdoorAirTemp = state.dataIPShortCut->rNumericArgs(4);
+        whDesupObj.MaxInletWaterTemp = state.dataIPShortCut->rNumericArgs(5);
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp =
-                CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-            if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp == 0) {
+            whDesupObj.HEffFTemp = CurveManager::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(4));
+            if (whDesupObj.HEffFTemp == 0) {
                 ShowSevereError(state,
-                                state.dataIPShortCut->cCurrentModuleObject + " = " +
-                                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name + ":  " +
+                                state.dataIPShortCut->cCurrentModuleObject + " = " + whDesupObj.Name + ":  " +
                                     state.dataIPShortCut->cAlphaFieldNames(4) + " not found = " + state.dataIPShortCut->cAlphaArgs(4));
                 ErrorsFound = true;
             } else {
-                ErrorsFound |=
-                    CurveManager::CheckCurveDims(state,
-                                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp, // Curve index
-                                                 {2},                                                                          // Valid dimensions
-                                                 RoutineName,                                                                  // Routine name
-                                                 state.dataIPShortCut->cCurrentModuleObject,                                   // Object Type
-                                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name, // Object Name
-                                                 state.dataIPShortCut->cAlphaFieldNames(4));                                   // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            whDesupObj.HEffFTemp,                       // Curve index
+                                                            {2},                                        // Valid dimensions
+                                                            RoutineName,                                // Routine name
+                                                            state.dataIPShortCut->cCurrentModuleObject, // Object Type
+                                                            whDesupObj.Name,                            // Object Name
+                                                            state.dataIPShortCut->cAlphaFieldNames(4)); // Field Name
                 if (!ErrorsFound) {
-                    if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
+                    if (whDesupObj.HEffFTemp > 0) {
                         Real64 HEffFTemp = min(1.0,
                                                max(0.0,
                                                    CurveManager::CurveValue(
-                                                       state,
-                                                       state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,
-                                                       state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp,
-                                                       state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).RatedOutdoorAirTemp)));
+                                                       state, whDesupObj.HEffFTemp, whDesupObj.RatedInletWaterTemp, whDesupObj.RatedOutdoorAirTemp)));
                         if (std::abs(HEffFTemp - 1.0) > 0.05) {
-                            ShowWarningError(state,
-                                             state.dataIPShortCut->cCurrentModuleObject + ", \"" +
-                                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name + "\":");
+                            ShowWarningError(state, state.dataIPShortCut->cCurrentModuleObject + ", \"" + whDesupObj.Name + "\":");
                             ShowContinueError(state, "The " + state.dataIPShortCut->cAlphaFieldNames(4) + " should be normalized ");
                             ShowContinueError(state, format(" to 1.0 at the rating point. Curve output at the rating point = {:.3T}", HEffFTemp));
                             ShowContinueError(state, " The simulation continues using the user-specified curve.");
@@ -773,35 +763,33 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             }
         }
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).WaterInletNode =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(5),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Inlet,
-                                                NodeInputManager::compFluidStream::Primary,
-                                                DataLoopNode::ObjectIsParent);
+        whDesupObj.WaterInletNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                        state.dataIPShortCut->cAlphaArgs(5),
+                                                                        ErrorsFound,
+                                                                        state.dataIPShortCut->cCurrentModuleObject,
+                                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                                        DataLoopNode::NodeFluidType::Water,
+                                                                        DataLoopNode::NodeConnectionType::Inlet,
+                                                                        NodeInputManager::compFluidStream::Primary,
+                                                                        DataLoopNode::ObjectIsParent);
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).WaterOutletNode =
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataIPShortCut->cAlphaArgs(6),
-                                                ErrorsFound,
-                                                state.dataIPShortCut->cCurrentModuleObject,
-                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::NodeConnectionType::Outlet,
-                                                NodeInputManager::compFluidStream::Primary,
-                                                DataLoopNode::ObjectIsParent);
+        whDesupObj.WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                         state.dataIPShortCut->cAlphaArgs(6),
+                                                                         ErrorsFound,
+                                                                         state.dataIPShortCut->cCurrentModuleObject,
+                                                                         state.dataIPShortCut->cAlphaArgs(1),
+                                                                         DataLoopNode::NodeFluidType::Water,
+                                                                         DataLoopNode::NodeConnectionType::Outlet,
+                                                                         NodeInputManager::compFluidStream::Primary,
+                                                                         DataLoopNode::ObjectIsParent);
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).InletNodeName1 = state.dataIPShortCut->cAlphaArgs(5);
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).OutletNodeName1 = state.dataIPShortCut->cAlphaArgs(6);
+        whDesupObj.InletNodeName1 = state.dataIPShortCut->cAlphaArgs(5);
+        whDesupObj.OutletNodeName1 = state.dataIPShortCut->cAlphaArgs(6);
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankType = state.dataIPShortCut->cAlphaArgs(7);
+        whDesupObj.TankType = state.dataIPShortCut->cAlphaArgs(7);
 
-        if (!UtilityRoutines::SameString(state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankType, cMixedWHModuleObj) &&
-            !UtilityRoutines::SameString(state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankType, cStratifiedWHModuleObj)) {
+        if (!UtilityRoutines::SameString(whDesupObj.TankType, cMixedWHModuleObj) &&
+            !UtilityRoutines::SameString(whDesupObj.TankType, cStratifiedWHModuleObj)) {
 
             ShowSevereError(
                 state, state.dataIPShortCut->cCurrentModuleObject + " = " + state.dataWaterThermalTanks->HPWaterHeater(DesuperheaterNum).Name + ":");
@@ -809,51 +797,49 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankName = state.dataIPShortCut->cAlphaArgs(8);
+        whDesupObj.TankName = state.dataIPShortCut->cAlphaArgs(8);
 
-        //       Set up comp set for water side nodes (reverse inlet/outlet for water heater)
+        // Set up comp set for water side nodes (reverse inlet/outlet for water heater)
         BranchNodeConnections::SetUpCompSets(state,
-                                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Type,
-                                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
-                                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankType,
-                                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).TankName,
+                                             whDesupObj.Type,
+                                             whDesupObj.Name,
+                                             whDesupObj.TankType,
+                                             whDesupObj.TankName,
                                              state.dataIPShortCut->cAlphaArgs(6),
                                              state.dataIPShortCut->cAlphaArgs(5));
 
-        if ((UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Refrigeration:Condenser:AirCooled")) ||
-            (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Refrigeration:Condenser:EvaporativeCooled")) ||
-            (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Refrigeration:Condenser:WaterCooled"))) {
+        std::string const heatSourceObjType = state.dataIPShortCut->cAlphaArgs(9);
+
+        if ((UtilityRoutines::SameString(heatSourceObjType, "Refrigeration:Condenser:AirCooled")) ||
+            (UtilityRoutines::SameString(heatSourceObjType, "Refrigeration:Condenser:EvaporativeCooled")) ||
+            (UtilityRoutines::SameString(heatSourceObjType, "Refrigeration:Condenser:WaterCooled"))) {
             if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.8;
+                whDesupObj.HeatReclaimRecoveryEff = 0.8;
             } else {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff =
-                    state.dataIPShortCut->rNumericArgs(2);
-                if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
-                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.9) {
+                whDesupObj.HeatReclaimRecoveryEff = state.dataIPShortCut->rNumericArgs(2);
+                if (whDesupObj.HeatReclaimRecoveryEff <= 0.0 || whDesupObj.HeatReclaimRecoveryEff > 0.9) {
                     ShowSevereError(state,
                                     format("{} = {}: {} must be > 0.0 and <= 0.9, Efficiency = {:.3T}",
                                            state.dataIPShortCut->cCurrentModuleObject,
-                                           state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                           whDesupObj.Name,
                                            state.dataIPShortCut->cNumericFieldNames(2),
-                                           state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff));
+                                           whDesupObj.HeatReclaimRecoveryEff));
                     ErrorsFound = true;
                 }
             }    // Blank Num(2)
         } else { // max is 0.3 for all other sources
             if (state.dataIPShortCut->lNumericFieldBlanks(2)) {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff = 0.25;
+                whDesupObj.HeatReclaimRecoveryEff = 0.25;
             } else {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff =
-                    state.dataIPShortCut->rNumericArgs(2);
-                if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff <= 0.0 ||
-                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff > 0.3) {
+                whDesupObj.HeatReclaimRecoveryEff = state.dataIPShortCut->rNumericArgs(2);
+                if (whDesupObj.HeatReclaimRecoveryEff <= 0.0 || whDesupObj.HeatReclaimRecoveryEff > 0.3) {
                     ShowSevereError(state,
                                     format("{} = {}: {} must be > 0.0 and <= 0.3, {} = {:.3T}",
                                            state.dataIPShortCut->cCurrentModuleObject,
-                                           state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                           whDesupObj.Name,
                                            state.dataIPShortCut->cNumericFieldNames(2),
                                            state.dataIPShortCut->cNumericFieldNames(2),
-                                           state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff));
+                                           whDesupObj.HeatReclaimRecoveryEff));
                     ErrorsFound = true;
                 }
             } // Blank Num(2)
@@ -861,165 +847,147 @@ bool getDesuperHtrInput(EnergyPlusData &state)
 
         //       Find the Refrigeration equipment index associated with the desuperheater heating coil.
         bool errFlag = false;
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceType = state.dataIPShortCut->cAlphaArgs(9);
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName = state.dataIPShortCut->cAlphaArgs(10);
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Refrigeration:CompressorRack")) {
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource =
-                CoilObjEnum::CompressorRackRefrigeratedCase;
+        whDesupObj.HeatingSourceType = heatSourceObjType;
+        whDesupObj.HeatingSourceName = state.dataIPShortCut->cAlphaArgs(10);
+        if (UtilityRoutines::SameString(heatSourceObjType, "Refrigeration:CompressorRack")) {
+            whDesupObj.ReclaimHeatingSource = CoilObjEnum::CompressorRackRefrigeratedCase;
             for (int RackNum = 1; RackNum <= state.dataRefrigCase->NumRefrigeratedRacks; ++RackNum) {
                 if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimRefrigeratedRack(RackNum).Name, state.dataIPShortCut->cAlphaArgs(10)))
                     continue;
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = RackNum;
+                whDesupObj.ReclaimHeatingSourceIndexNum = RackNum;
                 if (allocated(state.dataHeatBal->HeatReclaimRefrigeratedRack)) {
-                    DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimRefrigeratedRack(
-                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                    DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
+                        state.dataHeatBal->HeatReclaimRefrigeratedRack(whDesupObj.ReclaimHeatingSourceIndexNum);
                     if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
                         HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(state.dataWaterThermalTanks->numWaterHeaterDesuperheater);
                         for (auto &num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)
                             num = 0.0;
                     }
-                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                    HeatReclaim.ReclaimEfficiencyTotal +=
-                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                    whDesupObj.ValidSourceType = true;
+                    HeatReclaim.ReclaimEfficiencyTotal += whDesupObj.HeatReclaimRecoveryEff;
                     if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                         ShowSevereError(state,
-                                        state.dataIPShortCut->cCurrentModuleObject + " = " +
-                                            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                        state.dataIPShortCut->cCurrentModuleObject + " = " + whDesupObj.Name +
                                             ": "
                                             " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName +
-                                            "\" cannot be over 0.3");
+                                            whDesupObj.HeatingSourceName + "\" cannot be over 0.3");
                         ErrorsFound = true;
                     }
                 }
                 break;
             }
-        } else if ((UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Refrigeration:Condenser:AirCooled")) ||
-                   (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Refrigeration:Condenser:EvaporativeCooled")) ||
-                   (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Refrigeration:Condenser:WaterCooled"))) {
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::CondenserRefrigeration;
+        } else if ((UtilityRoutines::SameString(heatSourceObjType, "Refrigeration:Condenser:AirCooled")) ||
+                   (UtilityRoutines::SameString(heatSourceObjType, "Refrigeration:Condenser:EvaporativeCooled")) ||
+                   (UtilityRoutines::SameString(heatSourceObjType, "Refrigeration:Condenser:WaterCooled"))) {
+            whDesupObj.ReclaimHeatingSource = CoilObjEnum::CondenserRefrigeration;
             for (int CondNum = 1; CondNum <= state.dataRefrigCase->NumRefrigCondensers; ++CondNum) {
                 if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name, state.dataIPShortCut->cAlphaArgs(10)))
                     continue;
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum = CondNum;
+                whDesupObj.ReclaimHeatingSourceIndexNum = CondNum;
                 if (allocated(state.dataHeatBal->HeatReclaimRefrigCondenser)) {
-                    DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimRefrigCondenser(
-                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                    DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
+                        state.dataHeatBal->HeatReclaimRefrigCondenser(whDesupObj.ReclaimHeatingSourceIndexNum);
                     if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
                         HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(state.dataWaterThermalTanks->numWaterHeaterDesuperheater);
                         for (auto &num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)
                             num = 0.0;
                     }
-                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                    HeatReclaim.ReclaimEfficiencyTotal +=
-                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                    whDesupObj.ValidSourceType = true;
+                    HeatReclaim.ReclaimEfficiencyTotal += whDesupObj.HeatReclaimRecoveryEff;
                     if (HeatReclaim.ReclaimEfficiencyTotal > 0.9) {
                         ShowSevereError(state,
-                                        state.dataIPShortCut->cCurrentModuleObject + " = " +
-                                            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                        state.dataIPShortCut->cCurrentModuleObject + " = " + whDesupObj.Name +
                                             ": "
                                             " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName +
-                                            "\" cannot be over 0.9");
+                                            whDesupObj.HeatingSourceName + "\" cannot be over 0.9");
                         ErrorsFound = true;
                     }
                 }
                 break;
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Coil:Cooling:DX:SingleSpeed") ||
-                   UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Coil:Cooling:DX:TwoSpeed") ||
-                   UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Coil:Cooling:DX:MultiSpeed") ||
-                   UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+        } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX:SingleSpeed") ||
+                   UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX:TwoSpeed") ||
+                   UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX:MultiSpeed") ||
+                   UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Coil:Cooling:DX:SingleSpeed")) {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::DXCooling;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::DXMultiMode;
+            if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX:SingleSpeed")) {
+                whDesupObj.ReclaimHeatingSource = CoilObjEnum::DXCooling;
+            } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                whDesupObj.ReclaimHeatingSource = CoilObjEnum::DXMultiMode;
             } else {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::DXMultiSpeed;
+                whDesupObj.ReclaimHeatingSource = CoilObjEnum::DXMultiSpeed;
             }
             DXCoils::GetDXCoilIndex(state,
-                                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,
-                                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum,
+                                    whDesupObj.HeatingSourceName,
+                                    whDesupObj.ReclaimHeatingSourceIndexNum,
                                     errFlag,
                                     state.dataIPShortCut->cCurrentModuleObject,
                                     ObjexxFCL::Optional_bool_const());
             if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
-                DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimDXCoil(
-                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimDXCoil(whDesupObj.ReclaimHeatingSourceIndexNum);
                 if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
                     HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(state.dataWaterThermalTanks->numWaterHeaterDesuperheater);
                     for (auto &num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)
                         num = 0.0;
                 }
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                HeatReclaim.ReclaimEfficiencyTotal += state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                whDesupObj.ValidSourceType = true;
+                HeatReclaim.ReclaimEfficiencyTotal += whDesupObj.HeatReclaimRecoveryEff;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                     ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " +
-                                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                    state.dataIPShortCut->cCurrentModuleObject + " = " + whDesupObj.Name +
                                         ": "
                                         " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName +
-                                        "\" cannot be over 0.3");
+                                        whDesupObj.HeatingSourceName + "\" cannot be over 0.3");
                     ErrorsFound = true;
                 }
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Coil:Cooling:DX:VariableSpeed")) {
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::DXVariableCooling;
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum =
-                VariableSpeedCoils::GetCoilIndexVariableSpeed(
-                    state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), errFlag);
+        } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX:VariableSpeed")) {
+            whDesupObj.ReclaimHeatingSource = CoilObjEnum::DXVariableCooling;
+            whDesupObj.ReclaimHeatingSourceIndexNum =
+                VariableSpeedCoils::GetCoilIndexVariableSpeed(state, heatSourceObjType, state.dataIPShortCut->cAlphaArgs(10), errFlag);
             if (allocated(state.dataHeatBal->HeatReclaimVS_DXCoil)) {
-                DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimVS_DXCoil(
-                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimVS_DXCoil(whDesupObj.ReclaimHeatingSourceIndexNum);
                 if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
                     HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(state.dataWaterThermalTanks->numWaterHeaterDesuperheater);
                     for (auto &num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)
                         num = 0.0;
                 }
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                HeatReclaim.ReclaimEfficiencyTotal += state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                whDesupObj.ValidSourceType = true;
+                HeatReclaim.ReclaimEfficiencyTotal += whDesupObj.HeatReclaimRecoveryEff;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                     ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " +
-                                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                    state.dataIPShortCut->cCurrentModuleObject + " = " + whDesupObj.Name +
                                         ": "
                                         " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName +
-                                        "\" cannot be over 0.3");
+                                        whDesupObj.HeatingSourceName + "\" cannot be over 0.3");
                     ErrorsFound = true;
                 }
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::AirWaterHeatPumpEQ;
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum =
-                WaterToAirHeatPumpSimple::GetCoilIndex(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), errFlag);
+        } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
+            whDesupObj.ReclaimHeatingSource = CoilObjEnum::AirWaterHeatPumpEQ;
+            whDesupObj.ReclaimHeatingSourceIndexNum =
+                WaterToAirHeatPumpSimple::GetCoilIndex(state, heatSourceObjType, state.dataIPShortCut->cAlphaArgs(10), errFlag);
             if (allocated(state.dataHeatBal->HeatReclaimSimple_WAHPCoil)) {
-                DataHeatBalance::HeatReclaimDataBase &HeatReclaim = state.dataHeatBal->HeatReclaimSimple_WAHPCoil(
-                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
+                DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
+                    state.dataHeatBal->HeatReclaimSimple_WAHPCoil(whDesupObj.ReclaimHeatingSourceIndexNum);
                 if (!allocated(HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)) {
                     HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat.allocate(state.dataWaterThermalTanks->numWaterHeaterDesuperheater);
                     for (auto &num : HeatReclaim.WaterHeatingDesuperheaterReclaimedHeat)
                         num = 0.0;
                 }
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ValidSourceType = true;
-                HeatReclaim.ReclaimEfficiencyTotal += state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatReclaimRecoveryEff;
+                whDesupObj.ValidSourceType = true;
+                HeatReclaim.ReclaimEfficiencyTotal += whDesupObj.HeatReclaimRecoveryEff;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                     ShowSevereError(state,
-                                    state.dataIPShortCut->cCurrentModuleObject + " = " +
-                                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name +
+                                    state.dataIPShortCut->cCurrentModuleObject + " = " + whDesupObj.Name +
                                         ": "
                                         " sum of heat reclaim recovery efficiencies from the same source coil: \"" +
-                                        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName +
-                                        "\" cannot be over 0.3");
+                                        whDesupObj.HeatingSourceName + "\" cannot be over 0.3");
                     ErrorsFound = true;
                 }
             }
         } else {
-            ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + " = " +
-                                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name + ':');
+            ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + whDesupObj.Name + ':');
             ShowContinueError(state, " desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, ");
             ShowContinueError(state,
                               " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, "
@@ -1027,100 +995,93 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                               "Coil:Cooling:WaterToAirHeatPump:EquationFit, Refrigeration:CompressorRack,");
             ShowContinueError(state, " Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, ");
             ShowContinueError(state, " or Refrigeration:Condenser:WaterCooled.");
-            ShowContinueError(state,
-                              " Invalid desuperheater heat source object: " + state.dataIPShortCut->cAlphaArgs(9) + " \"" +
-                                  state.dataIPShortCut->cAlphaArgs(10) + "\"");
+            ShowContinueError(
+                state, " Invalid desuperheater heat source object: " + heatSourceObjType + " \"" + state.dataIPShortCut->cAlphaArgs(10) + "\"");
             ErrorsFound = true;
         }
         if (errFlag) {
-            ShowContinueError(state,
-                              "...occurs in " + state.dataIPShortCut->cCurrentModuleObject + '=' +
-                                  state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name);
+            ShowContinueError(state, "...occurs in " + state.dataIPShortCut->cCurrentModuleObject + '=' + whDesupObj.Name);
             ErrorsFound = true;
         }
 
-        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum == 0) {
+        if (whDesupObj.ReclaimHeatingSourceIndexNum == 0) {
             ShowSevereError(state,
-                            state.dataIPShortCut->cCurrentModuleObject + ", \"" +
-                                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name +
-                                "\" desuperheater heat source object not found: " + state.dataIPShortCut->cAlphaArgs(9) + " \"" +
-                                state.dataIPShortCut->cAlphaArgs(10) + "\"");
+                            state.dataIPShortCut->cCurrentModuleObject + ", \"" + whDesupObj.Name +
+                                "\" desuperheater heat source object not found: " + heatSourceObjType + " \"" + state.dataIPShortCut->cAlphaArgs(10) +
+                                "\"");
             ErrorsFound = true;
         }
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate = state.dataIPShortCut->rNumericArgs(6);
-        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate <= 0.0) {
+        whDesupObj.OperatingWaterFlowRate = state.dataIPShortCut->rNumericArgs(6);
+        if (whDesupObj.OperatingWaterFlowRate <= 0.0) {
             ShowSevereError(state,
                             format("{} = {}: {} must be greater than 0. {} = {:.6T}",
                                    state.dataIPShortCut->cCurrentModuleObject,
-                                   state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                   whDesupObj.Name,
                                    state.dataIPShortCut->cNumericFieldNames(6),
                                    state.dataIPShortCut->cNumericFieldNames(6),
                                    state.dataIPShortCut->rNumericArgs(6)));
             ErrorsFound = true;
         }
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower = state.dataIPShortCut->rNumericArgs(7);
-        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower < 0.0) {
+        whDesupObj.PumpElecPower = state.dataIPShortCut->rNumericArgs(7);
+        if (whDesupObj.PumpElecPower < 0.0) {
             ShowSevereError(state,
                             format("{} = {}: {} must be >= 0. {} = {:.2T}",
                                    state.dataIPShortCut->cCurrentModuleObject,
-                                   state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                   whDesupObj.Name,
                                    state.dataIPShortCut->cNumericFieldNames(7),
                                    state.dataIPShortCut->cNumericFieldNames(7),
                                    state.dataIPShortCut->rNumericArgs(7)));
             ErrorsFound = true;
         }
 
-        if ((state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower /
-             state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate) > 7.9264e6) {
+        if ((whDesupObj.PumpElecPower / whDesupObj.OperatingWaterFlowRate) > 7.9264e6) {
             ShowWarningError(state,
                              format("{} = {}: {} to {} ratio > 7.9264E6. {} to {} = {:.3T}",
                                     state.dataIPShortCut->cCurrentModuleObject,
-                                    state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                    whDesupObj.Name,
                                     state.dataIPShortCut->cNumericFieldNames(7),
                                     state.dataIPShortCut->cNumericFieldNames(6),
                                     state.dataIPShortCut->cNumericFieldNames(7),
                                     state.dataIPShortCut->cNumericFieldNames(6),
-                                    (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).PumpElecPower /
-                                     state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).OperatingWaterFlowRate)));
+                                    (whDesupObj.PumpElecPower / whDesupObj.OperatingWaterFlowRate)));
             ShowContinueError(state,
                               " Suggest reducing " + state.dataIPShortCut->cNumericFieldNames(7) + " or increasing " +
                                   state.dataIPShortCut->cNumericFieldNames(6) + '.');
             ShowContinueError(state, " The simulation will continue using the user defined values.");
         }
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater = state.dataIPShortCut->rNumericArgs(8);
-        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater < 0.0 ||
-            state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).PumpFracToWater > 1.0) {
+        whDesupObj.PumpFracToWater = state.dataIPShortCut->rNumericArgs(8);
+        if (whDesupObj.PumpFracToWater < 0.0 || whDesupObj.PumpFracToWater > 1.0) {
             ShowSevereError(state,
                             format("{} = {}: {} must be >= 0 or <= 1. {} = {:.3T}",
                                    state.dataIPShortCut->cCurrentModuleObject,
-                                   state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                   whDesupObj.Name,
                                    state.dataIPShortCut->cNumericFieldNames(8),
                                    state.dataIPShortCut->cNumericFieldNames(8),
                                    state.dataIPShortCut->rNumericArgs(8)));
             ErrorsFound = true;
         }
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaLoad = state.dataIPShortCut->rNumericArgs(9);
-        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).OnCycParaLoad < 0.0) {
+        whDesupObj.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(9);
+        if (whDesupObj.OnCycParaLoad < 0.0) {
             ShowSevereError(state,
                             format("{} = {}: {} must be >= 0. {} = {:.2T}",
                                    state.dataIPShortCut->cCurrentModuleObject,
-                                   state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                   whDesupObj.Name,
                                    state.dataIPShortCut->cNumericFieldNames(9),
                                    state.dataIPShortCut->cNumericFieldNames(9),
                                    state.dataIPShortCut->rNumericArgs(9)));
             ErrorsFound = true;
         }
 
-        state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaLoad = state.dataIPShortCut->rNumericArgs(10);
-        if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).OffCycParaLoad < 0.0) {
+        whDesupObj.OffCycParaLoad = state.dataIPShortCut->rNumericArgs(10);
+        if (whDesupObj.OffCycParaLoad < 0.0) {
             ShowSevereError(state,
                             format("{} = {}: {} must be >= 0. {} = {:.2T}",
                                    state.dataIPShortCut->cCurrentModuleObject,
-                                   state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name,
+                                   whDesupObj.Name,
                                    state.dataIPShortCut->cNumericFieldNames(10),
                                    state.dataIPShortCut->cNumericFieldNames(10),
                                    state.dataIPShortCut->rNumericArgs(10)));
