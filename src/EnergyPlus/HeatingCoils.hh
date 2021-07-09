@@ -76,7 +76,7 @@ namespace HeatingCoils {
         COIL_DX_MULTIMODE,
         CONDENSER_REFRIGERATION,
         COIL_DX_VARIABLE_COOLING,
-        //COIL_COOLING_DX // Coil:Cooling:DX main one-for-all coil
+        COIL_COOLING_DX_NEW // Coil:Cooling:DX main one-for-all coil
     };
 
     struct HeatingCoilEquipConditions
