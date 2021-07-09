@@ -1378,11 +1378,11 @@ namespace Psychrometrics {
         state.dataPsychrometrics->Press_Save = Press;
         // int n_sample = 217; //sample bin size =512 Pa; continous sample size =217
         // int n_sample = 52; // sample bin size = 512 Pa; discontinous sample size = 52
-        int n_sample = 413; // sample bin size =256 Pa; continous sample size =413
+        //int n_sample = 413; // sample bin size =256 Pa; continous sample size =413
         // int n_sample = 81; // sample bin size = 256 Pa; discontinous sample size = 81
         // int n_sample = 826; // sample bin size = 128 Pa; continous sample size = 826
         // int n_sample = 160;  // sample bin size = 128 Pa; discontinous sample size = 160
-        // int n_sample = 1651; // sample bin size = 64 Pa; continous sample size = 1651
+         int n_sample = 1651; // sample bin size = 64 Pa; continous sample size = 1651
         // int n_sample = 317; // sample bin size = 64 Pa; discontinous sample size = 317
         // linear interpolation
         tSat = linearint(state, n_sample, Press); // linear interpolation for y
