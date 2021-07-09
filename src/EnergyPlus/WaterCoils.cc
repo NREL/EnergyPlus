@@ -2364,6 +2364,11 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
             }
 
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // Coil:Cooling:Water:DetailedGeometry
+                TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
+                state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
+            }
+
             bool errorsFound = false;
             CoolingAirFlowSizer sizingCoolingAirFlow;
             CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
@@ -2559,7 +2564,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate <= 0.0) {
                 state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = 0.0;
-                ShowWarningError(state, "The design air flow rate is zero for Coil:Cooling:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
+                ShowWarningError(state, "The design air flow rate is zero for " + CompType + " " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                 ShowContinueError(state, "The autosize value for max air volume flow rate is zero");
             }
 
