@@ -114,7 +114,9 @@
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                     !- Run Simulation for Weather File Run Periods
+    ,                        !- Do HVAC Sizing Simulation for Sizing Periods
+    ;                        !- Maximum Number of HVAC Sizing Simulation Passes
 
   RunPeriod,
     Run Period 1,            !- Name
@@ -130,7 +132,6 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-
 
   RunPeriod,
     Run Period 2,            !- Name
@@ -286,6 +287,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -360,6 +362,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -376,6 +379,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -392,6 +396,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -408,6 +413,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -424,6 +430,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -436,8 +443,8 @@
     15.24000,15.24000,4.572;  !- X,Y,Z ==> Vertex 4 {m}
 
   People,
-    ZONE ONE People,            !- Name
-    ZONE ONE,                   !- Zone or ZoneList Name
+    ZONE ONE People,         !- Name
+    ZONE ONE,                !- Zone or ZoneList Name
     BLDG_OCC_SCH,            !- Number of People Schedule Name
     Area/Person,             !- Number of People Calculation Method
     ,                        !- Number of People
@@ -646,42 +653,43 @@
     7.5,                     !- Y-Coordinate of Reference Point {m}
     0.7;                     !- Z-Coordinate of Reference Point {m}
 
-  Output:Variable,*,Site Outdoor Air Barometric Pressure,hourly; !- Zone Average [Pa]
+  Output:Variable,*,Site Outdoor Air Barometric Pressure,hourly;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
-  Output:Variable,*,Site Outdoor Air Humidity Ratio,hourly; !- Zone Average [kgWater/kgDryAir]
+  Output:Variable,*,Site Outdoor Air Humidity Ratio,hourly;
 
-  Output:Variable,*,Site Outdoor Air Relative Humidity,hourly; !- Zone Average [%]
+  Output:Variable,*,Site Outdoor Air Relative Humidity,hourly;
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
-  Output:Variable,*,Zone Mean Air Humidity Ratio,hourly; !- Zone Average [kgWater/kgDryAir]
+  Output:Variable,*,Zone Mean Air Humidity Ratio,hourly;
 
-  Output:Variable,*,Zone Air Relative Humidity,hourly; !- Zone Average [%]
+  Output:Variable,*,Zone Air Relative Humidity,hourly;
 
-  Output:Variable,*,Zone Heat Index,hourly; !- Zone Average [C]
+  Output:Variable,*,Zone Heat Index,hourly;
 
-  Output:Variable,*,Zone Humidity Index,hourly; !- Zone Average []
+  Output:Variable,*,Zone Humidity Index,hourly;
 
-  Output:Variable,*,Zone Thermal Comfort Fanger Model PMV,hourly; !- Zone Average []
+  Output:Variable,*,Zone Thermal Comfort Fanger Model PMV,hourly;
 
-  Output:Variable,*,Zone Thermal Comfort Fanger Model PPD,hourly; !- Zone Average [%]
+  Output:Variable,*,Zone Thermal Comfort Fanger Model PPD,hourly;
 
-  Output:Variable,*,Zone Thermal Comfort Pierce Model Standard Effective Temperature,hourly; !- Zone Average [C]
+  Output:Variable,*,Zone Thermal Comfort Pierce Model Standard Effective Temperature,hourly;
 
-  Output:Variable,*,Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect,hourly; !- Zone Average [C]
+  Output:Variable,*,Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect,hourly;
 
-  Output:Variable,*,Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PMV,hourly; !- Zone Average []
+  Output:Variable,*,Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PMV,hourly;
 
-  Output:Variable,*,Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PPD,hourly; !- Zone Average []
+  Output:Variable,*,Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PPD,hourly;
 
-  Output:Variable,*,Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD,hourly; !- Zone Average []
+  Output:Variable,*,Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD,hourly;
 
   Output:VariableDictionary,IDF;
 
   OutputControl:Table:Style,
-    HTML;                     !- Column Separator
+    HTML;                    !- Column Separator
 
   Output:Table:SummaryReports,
-    AllSummary;  !- Report 1 Name
+    AllSummary;              !- Report 1 Name
+

@@ -310,6 +310,7 @@
     Wall,                    !- Surface Type
     WallExtInsFin1,          !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -326,6 +327,7 @@
     Wall,                    !- Surface Type
     WallExtInsFin1,          !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -342,6 +344,7 @@
     Wall,                    !- Surface Type
     WallExtInsFin1,          !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -358,6 +361,7 @@
     Wall,                    !- Surface Type
     WallExtInsFin1,          !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -374,6 +378,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -390,6 +395,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -490,19 +496,32 @@
     Verbose;                 !- EMS Runtime Language Debug Output Level
 
   Output:Variable,*,CondFD Phase Change Node Temperature 1,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Temperature 2,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Temperature 3,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Temperature 4,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Temperature 5,hourly;
 
   Output:Variable,*,CondFD Phase Change Node Conductivity 1,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Conductivity 2,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Conductivity 3,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Conductivity 4,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Conductivity 5,hourly;
 
   Output:Variable,*,CondFD Phase Change Node Specific Heat 1,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Specific Heat 2,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Specific Heat 3,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Specific Heat 4,hourly;
+
   Output:Variable,*,CondFD Phase Change Node Specific Heat 5,hourly;
+

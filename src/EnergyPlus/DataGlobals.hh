@@ -104,6 +104,7 @@ struct DataGlobal : BaseGlobalStruct
     int NumOfDayInEnvrn = 0;                          // Number of days in the simulation for a particular environment
     int NumOfTimeStepInHour = 0;                      // Number of time steps in each hour of the simulation
     int NumOfZones = 0;                               // Total number of Zones for simulation
+    int NumOfSpaces = 0;                              // Total number of Spaces for simulation
     int TimeStep = 0;                                 // Counter for time steps (fractional hours)
     Real64 TimeStepZone = 0.0;                        // Zone time step in fractional hours
     bool WarmupFlag = false;                          // True during the warmup portion of a simulation
@@ -208,6 +209,7 @@ struct DataGlobal : BaseGlobalStruct
         this->NumOfDayInEnvrn = 0;
         this->NumOfTimeStepInHour = 0;
         this->NumOfZones = 0;
+        this->NumOfSpaces = 0;
         this->TimeStep = 0;
         this->TimeStepZone = 0.0;
         this->WarmupFlag = false;

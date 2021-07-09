@@ -431,7 +431,7 @@
   ConstructionProperty:InternalHeatSource,
     SLAB SOURCE,             !- Name
     SLAB FLOOR,              !- Construction Name
-    4,                       !- Source Present After Layer Number
+    4,                       !- Thermal Source Present After Layer Number
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
@@ -440,7 +440,7 @@
   ConstructionProperty:InternalHeatSource,
     EXTERIOR SOURCE,         !- Name
     EXTERIOR,                !- Construction Name
-    2,                       !- Source Present After Layer Number
+    2,                       !- Thermal Source Present After Layer Number
     2,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
@@ -449,7 +449,7 @@
   ConstructionProperty:InternalHeatSource,
     ROOF SOURCE,             !- Name
     ROOF31,                  !- Construction Name
-    3,                       !- Source Present After Layer Number
+    3,                       !- Thermal Source Present After Layer Number
     3,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
@@ -539,6 +539,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -555,6 +556,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -571,6 +573,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -602,6 +605,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -618,6 +622,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -649,6 +654,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -665,6 +671,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -681,6 +688,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -697,6 +705,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -728,6 +737,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -744,6 +754,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -775,6 +786,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -791,6 +803,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -807,6 +820,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -823,6 +837,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -839,6 +854,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -855,6 +871,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -871,6 +888,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1771,43 +1789,43 @@
     ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
-    Zone 1 Radiant Floor, !- Name
-    Zone 1 Radiant Floor Design, !- Design_Object_Name
-    RadiantSysAvailSched, !- Availability_Schedule_Name
-    Zone 1, !- Zone_Name
-    Zone 1 Radiant Surfaces, !- Surface_Name_or_Radiant_Surface_Group_Name
-    400.0, !- Hydronic_Tubing_Length
-    Autosize, !- Heating_Design_Capacity
-    0.0002, !- Maximum_Hot_Water_Flow
-    West Zone Radiant Water Inlet Node, !- Heating_Water_Inlet_Node_Name
-    West Zone Radiant Water Outlet Node, !- Heating_Water_Outlet_Node_Name
-    Autosize, !- Cooling_Design_Capacity
-    0.0025, !- Maximum_Cold_Water_Flow
-    Zone 1 Cooling Water Inlet Node, !- Cooling_Water_Inlet_Node_Name
-    Zone 1 Cooling Water Outlet Node, !- Cooling_Water_Outlet_Node_Name
-    , !- Number_of_Circuits
-    ; !- Circuit_Length
+    Zone 1 Radiant Floor,    !- Name
+    Zone 1 Radiant Floor Design,  !- Design Object
+    RadiantSysAvailSched,    !- Availability Schedule Name
+    Zone 1,                  !- Zone Name
+    Zone 1 Radiant Surfaces, !- Surface Name or Radiant Surface Group Name
+    400.0,                   !- Hydronic Tubing Length {m}
+    Autosize,                !- Heating Design Capacity {W}
+    0.0002,                  !- Maximum Hot Water Flow {m3/s}
+    West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
+    West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
+    Autosize,                !- Cooling Design Capacity {W}
+    0.0025,                  !- Maximum Cold Water Flow {m3/s}
+    Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
+    Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
+    ,                        !- Number of Circuits
+    ;                        !- Circuit Length {m}
 
   ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
-    Zone 1 Radiant Floor Design, !- Design_Object_Name
-    ConvectionOnly, !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
-    0.012, !- Hydronic_Tubing_Inside_Diameter
-    0.016, !- Hydronic_Tubing_Outside_Diameter
-    0.35, !- Hydronic_Tubing_Conductivity
-    MeanAirTemperature, !- Temperature_Control_Type
-    HalfFlowPower, !- Setpoint_Control_Type
-    HeatingDesignCapacity, !- Heating_Design_Capacity_Method
-    , !- Heating_Design_Capacity_Per_Floor_Area
-    , !- Fraction_of_Autosized_Heating_Design_Capacity
-    2.0, !- Heating_Control_Throttling_Range
-    Radiant Heating Setpoints, !- Heating_Control_Temperature_Schedule_Name
-    CoolingDesignCapacity, !- Cooling_Design_Capacity_Method
-    , !- Cooling_Design_Capacity_Per_Floor_Area
-    , !- Fraction_of_Autosized_Cooling_Design_Capacity
-    2.0, !- Cooling_Control_Throttling_Range
-    Radiant Cooling Setpoints, !- Cooling_Control_Temperature_Schedule_Name
-    , !- Condensation_Control_Type
-    ; !- Condensation_Control_Dewpoint_Offset
+    Zone 1 Radiant Floor Design,  !- Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
+    0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
+    MeanAirTemperature,      !- Temperature Control Type
+    HalfFlowPower,           !- Setpoint Control Type
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    2.0,                     !- Heating Control Throttling Range {deltaC}
+    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    2.0,                     !- Cooling Control Throttling Range {deltaC}
+    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
+    ,                        !- Condensation Control Type
+    ;                        !- Condensation Control Dewpoint Offset {C}
 
   ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,
     Zone 1 Radiant Surfaces, !- Name

@@ -755,6 +755,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -786,6 +787,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -802,6 +804,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -818,6 +821,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -834,6 +838,7 @@
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -850,6 +855,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -866,6 +872,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -882,6 +889,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -898,6 +906,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -914,6 +923,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -930,6 +940,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -946,6 +957,7 @@
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -962,6 +974,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -978,6 +991,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -994,6 +1008,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1010,6 +1025,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1026,6 +1042,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall003,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1042,6 +1059,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1058,6 +1076,7 @@
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1074,6 +1093,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2349,118 +2369,118 @@
      ! need to find PLR that satisifies load
 
   EnergyManagementSystem:Program,
-    WinAC_OnFanCycCoil_Sim_Model,
-    IF Qdot_Request < 0.0,
-    Set QdotReq = Qdot_Request,
-    ELSE,
-    Set QdotReq = 0.0,
-    ENDIF,
-    IF COOLINGCOILAVAILSCHED == 0.0,
-    Set QdotReq = 0.0,
-    ENDIF,
-    IF QdotReq == 0.0,
-    Set PrimAir_MdotIn = 0.0,
-    Set PrimAir_MdotOut = 0.0,
-    Set PrimAir_Tout = PrimAir_Tinlet,
-    Set PrimAir_Wout = PrimAir_Winlet,
-    Set tot_cool_Power = 0.0,
-    Set ElectPower = 0.0,
-    Set ElectEnergy = 0.0,
-    Set OA_MdotIn = 0.0,
-    RETURN,
-    ENDIF,
-    Set Recirc_Mdot = AirSupMdotDesign - AirOAMdotDesign,
-    Set Recirc_H  = @HFnTdbW PrimAir_Tinlet PrimAir_Winlet,
-    Set OA_H  = @HFnTdbW OA_Tdb OA_W,
-    Set Mix_H = ((Recirc_Mdot * Recirc_H) + (AirOAMdotDesign * OA_H)) / AirSupMdotDesign,
-    Set Mix_W = ((Recirc_Mdot * PrimAir_Winlet) + (AirOAMdotDesign * OA_W)) / AirSupMdotDesign,
-    Set Mix_Tdb = @TdbFnHW Mix_H Mix_W,
-    Set Mix_rho = @RhoAirFnPbTdbW OA_Press Mix_Tdb Mix_W,
-    Set FanPower = (AirSupMdotDesign * FanDeltaP) / (FanEff * Mix_rho),
-    Set FanPowerToAir = FanPower,
-    Set FanDeltaH = FanPowerToAir/AirSupMdotDesign,
-    Set FanOut_H = Mix_H + FanDeltaH,
-    Set FanOut_W = Mix_W,
-    Set FanOut_Tdb = @TdbFnHW FanOut_H FanOut_W,
-    Set FanOut_Twb = @TwbFnTdbWPb FanOut_Tdb FanOut_W OA_Press,
-    Set RatedCBF = 0.12666,
-    Set LogRatedCBF = @Ln RatedCBF,
-    Set A0 = (0.0 -1.0) * LogRatedCBF * AirSupMdotDesign,
-    Set ADiff = (0.0 - 1.0) * (A0 / AirSupMdotDesign),
-    Set CBF = @Exp ADiff,
-    Set dummy = 0.0,
-    Set TotCapTempModFac = @CurveValue WindACCoolCapFT FanOut_Twb OA_Tdb dummy dummy dummy,
-    Set TotCapFlowModFac = @CurveValue WindACCoolCapFFF 1.0 dummy dummy dummy dummy,
-    Set TotCap = RatedCap * TotCapTempModFac * TotCapFlowModFac,
-    Set HDelta = TotCap / AirSupMdotDesign,
-    Set H_ADP = FanOut_H - (HDelta / ( 1.0 - CBF)),
-    Set T_ADP = @TsatFnHPb H_ADP OA_Press,
-    Set W_ADP = @WfnTdbH T_ADP H_ADP,
-    Set H_Tin_W_ADP = @HFnTdbW FanOut_Tdb W_ADP,
+    WinAC_OnFanCycCoil_Sim_Model,  !- Name
+    IF Qdot_Request < 0.0,   !- Program Line 1
+    Set QdotReq = Qdot_Request,  !- Program Line 2
+    ELSE,                    !- <none>
+    Set QdotReq = 0.0,       !- <none>
+    ENDIF,                   !- <none>
+    IF COOLINGCOILAVAILSCHED == 0.0,  !- <none>
+    Set QdotReq = 0.0,       !- <none>
+    ENDIF,                   !- <none>
+    IF QdotReq == 0.0,       !- <none>
+    Set PrimAir_MdotIn = 0.0,!- <none>
+    Set PrimAir_MdotOut = 0.0,  !- <none>
+    Set PrimAir_Tout = PrimAir_Tinlet,  !- <none>
+    Set PrimAir_Wout = PrimAir_Winlet,  !- <none>
+    Set tot_cool_Power = 0.0,!- <none>
+    Set ElectPower = 0.0,    !- <none>
+    Set ElectEnergy = 0.0,   !- <none>
+    Set OA_MdotIn = 0.0,     !- <none>
+    RETURN,                  !- <none>
+    ENDIF,                   !- <none>
+    Set Recirc_Mdot = AirSupMdotDesign - AirOAMdotDesign,  !- <none>
+    Set Recirc_H  = @HFnTdbW PrimAir_Tinlet PrimAir_Winlet,  !- <none>
+    Set OA_H  = @HFnTdbW OA_Tdb OA_W,  !- <none>
+    Set Mix_H = ((Recirc_Mdot * Recirc_H) + (AirOAMdotDesign * OA_H)) / AirSupMdotDesign,  !- <none>
+    Set Mix_W = ((Recirc_Mdot * PrimAir_Winlet) + (AirOAMdotDesign * OA_W)) / AirSupMdotDesign,  !- <none>
+    Set Mix_Tdb = @TdbFnHW Mix_H Mix_W,  !- <none>
+    Set Mix_rho = @RhoAirFnPbTdbW OA_Press Mix_Tdb Mix_W,  !- <none>
+    Set FanPower = (AirSupMdotDesign * FanDeltaP) / (FanEff * Mix_rho),  !- <none>
+    Set FanPowerToAir = FanPower,  !- <none>
+    Set FanDeltaH = FanPowerToAir/AirSupMdotDesign,  !- <none>
+    Set FanOut_H = Mix_H + FanDeltaH,  !- <none>
+    Set FanOut_W = Mix_W,    !- <none>
+    Set FanOut_Tdb = @TdbFnHW FanOut_H FanOut_W,  !- <none>
+    Set FanOut_Twb = @TwbFnTdbWPb FanOut_Tdb FanOut_W OA_Press,  !- <none>
+    Set RatedCBF = 0.12666,  !- <none>
+    Set LogRatedCBF = @Ln RatedCBF,  !- <none>
+    Set A0 = (0.0 -1.0) * LogRatedCBF * AirSupMdotDesign,  !- <none>
+    Set ADiff = (0.0 - 1.0) * (A0 / AirSupMdotDesign),  !- <none>
+    Set CBF = @Exp ADiff,    !- <none>
+    Set dummy = 0.0,         !- <none>
+    Set TotCapTempModFac = @CurveValue WindACCoolCapFT FanOut_Twb OA_Tdb dummy dummy dummy,  !- <none>
+    Set TotCapFlowModFac = @CurveValue WindACCoolCapFFF 1.0 dummy dummy dummy dummy,  !- <none>
+    Set TotCap = RatedCap * TotCapTempModFac * TotCapFlowModFac,  !- <none>
+    Set HDelta = TotCap / AirSupMdotDesign,  !- <none>
+    Set H_ADP = FanOut_H - (HDelta / ( 1.0 - CBF)),  !- <none>
+    Set T_ADP = @TsatFnHPb H_ADP OA_Press,  !- <none>
+    Set W_ADP = @WfnTdbH T_ADP H_ADP,  !- <none>
+    Set H_Tin_W_ADP = @HFnTdbW FanOut_Tdb W_ADP,  !- <none>
     IF ((FanOut_H - H_ADP) <> 0.0),  !- <none>
-    Set SHR = (H_Tin_W_ADP - H_ADP)/(FanOut_H - H_ADP ),
-    Set SHR = @Min SHR 1.0,
-    ELSE,
-    Set SHR = 1.0,
-    ENDIF,
-    Set PLR = 1.0,
-    Set FullLoadOutAirEnth = FanOut_H - (TotCap/AirSupMdotDesign),
-    Set hTinwout = FanOut_H - ((1.0 - SHR) * HDelta),
-    IF (SHR < 1.0),
-    Set FullLoadOutAirHumRat = @WFnTdbH FanOut_Tdb hTinwout,
-    ELSE,
-    Set FullLoadOutAirHumRat = FanOut_W,
-    ENDIF,
-    Set FullLoadOutAirTemp = @TdbFnHW FullLoadOutAirEnth  FullLoadOutAirHumRat,
-    Set DesiredZone_H = @HFnTdbW ZoneCoolTstat PrimAir_Winlet,
-    Set FullTotCapSens = AirSupMdotDesign * (DesiredZone_H - FullLoadOutAirEnth),
-    Set ABS_FullTotCapSens = @ABS FullTotCapSens,
-    Set ABS_QdotReq = @ABS QdotReq,
-    IF ABS_QdotReq < ABS_FullTotCapSens,
-    Set PLR = (ABS_QdotReq - FanPowerToAir)/ (ABS_FullTotCapSens - FanPowerToAir),
-    Set ErrorTol = 0.0005,
-    Set Iter = 0,
-    Set MaxIter = 30,
-    Set Relax = 0.8,
-    Set ABS_Error = 0.002,
-    WHILE (ABS_Error > ErrorTol) && (Iter < MaxIter),
-    Set OutAir_H = (PLR*FullLoadOutAirEnth) +  ((1.0-PLR)* FanOut_H),
-    Set OutAir_W = (PLR*FullLoadOutAirHumRat) + ((1.0-PLR)*FanOut_W),
-    Set OutletAirTemp = @TdbFnHW OutAir_H OutAir_W,
-    Set TotCapTest = AirSupMdotDesign * (DesiredZone_H - OutAir_H),
-    Set Error = (ABS_QdotReq - TotCapTest)/ABS_QdotReq,
-    Set ABS_Error = @ABS Error,
-    IF (ABS_Error > ErrorTol),
-    Set DelPLR = (ABS_QdotReq - TotCapTest) / ABS_FullTotCapSens,
-    Set PLR = PLR + Relax * DelPLR,
-    Set PLR = @min PLR 1.0,
-    ENDIF,
-    Set Iter = Iter + 1,
-    If (Iter == 16),
-    Set Relax = 0.5,
-    ENDIF,
-    ENDWHILE,
-    ELSE,
-    Set PLR = 1.0,
-    Set OutAir_H = FullLoadOutAirEnth,
-    Set OutAir_W = FullLoadOutAirHumRat,
-    Set OutletAirTemp = FullLoadOutAirTemp,
-    ENDIF,
-    Set PLF = @CurveValue WindACPLFFPLR PLR dummy dummy dummy dummy,
-    Set CoilRTF = PLR / PLF,
-    Set CoilRTF = @Min CoilRTF 1.0,
-    Set EIRTempModFac = @CurveValue WindACEIRFT FanOut_Twb OA_Tdb dummy dummy dummy,
-    Set EIRFlowModFac = @CurveValue WindACEIRFFF 1.0 dummy dummy dummy dummy,
-    Set EIR = RatedEIR * EIRTempModFac * EIRFlowModFac,
-    Set DXElecPower = TotCap * CoilRTF * EIR,
-    Set ElectPower = DXElecPower + FanPower,
-    Set ElectEnergy = ElectPower * SystemTimeStep * 3600,
-    Set tot_cool_Power = ABS_FullTotCapSens * PLR,
-    Set PrimAir_MdotOut = AirSupMdotDesign,
-    Set PrimAir_MdotIn  = AirSupMdotDesign,
-    Set PrimAir_Tout  = OutletAirTemp,
-    SEt PrimAir_Wout = OutAir_W,
-    Set OA_MdotIn = AirOAMdotDesign;
+    Set SHR = (H_Tin_W_ADP - H_ADP)/(FanOut_H - H_ADP ),  !- <none>
+    Set SHR = @Min SHR 1.0,  !- <none>
+    ELSE,                    !- <none>
+    Set SHR = 1.0,           !- <none>
+    ENDIF,                   !- <none>
+    Set PLR = 1.0,           !- <none>
+    Set FullLoadOutAirEnth = FanOut_H - (TotCap/AirSupMdotDesign),  !- <none>
+    Set hTinwout = FanOut_H - ((1.0 - SHR) * HDelta),  !- <none>
+    IF (SHR < 1.0),          !- <none>
+    Set FullLoadOutAirHumRat = @WFnTdbH FanOut_Tdb hTinwout,  !- <none>
+    ELSE,                    !- <none>
+    Set FullLoadOutAirHumRat = FanOut_W,  !- <none>
+    ENDIF,                   !- <none>
+    Set FullLoadOutAirTemp = @TdbFnHW FullLoadOutAirEnth  FullLoadOutAirHumRat,  !- <none>
+    Set DesiredZone_H = @HFnTdbW ZoneCoolTstat PrimAir_Winlet,  !- <none>
+    Set FullTotCapSens = AirSupMdotDesign * (DesiredZone_H - FullLoadOutAirEnth),  !- <none>
+    Set ABS_FullTotCapSens = @ABS FullTotCapSens,  !- <none>
+    Set ABS_QdotReq = @ABS QdotReq,  !- <none>
+    IF ABS_QdotReq < ABS_FullTotCapSens,  !- <none>
+    Set PLR = (ABS_QdotReq - FanPowerToAir)/ (ABS_FullTotCapSens - FanPowerToAir),  !- <none>
+    Set ErrorTol = 0.0005,   !- <none>
+    Set Iter = 0,            !- <none>
+    Set MaxIter = 30,        !- <none>
+    Set Relax = 0.8,         !- <none>
+    Set ABS_Error = 0.002,   !- <none>
+    WHILE (ABS_Error > ErrorTol) && (Iter < MaxIter),  !- <none>
+    Set OutAir_H = (PLR*FullLoadOutAirEnth) +  ((1.0-PLR)* FanOut_H),  !- <none>
+    Set OutAir_W = (PLR*FullLoadOutAirHumRat) + ((1.0-PLR)*FanOut_W),  !- <none>
+    Set OutletAirTemp = @TdbFnHW OutAir_H OutAir_W,  !- <none>
+    Set TotCapTest = AirSupMdotDesign * (DesiredZone_H - OutAir_H),  !- <none>
+    Set Error = (ABS_QdotReq - TotCapTest)/ABS_QdotReq,  !- <none>
+    Set ABS_Error = @ABS Error,  !- <none>
+    IF (ABS_Error > ErrorTol),  !- <none>
+    Set DelPLR = (ABS_QdotReq - TotCapTest) / ABS_FullTotCapSens,  !- <none>
+    Set PLR = PLR + Relax * DelPLR,  !- <none>
+    Set PLR = @min PLR 1.0,  !- <none>
+    ENDIF,                   !- <none>
+    Set Iter = Iter + 1,     !- <none>
+    If (Iter == 16),         !- <none>
+    Set Relax = 0.5,         !- <none>
+    ENDIF,                   !- <none>
+    ENDWHILE,                !- <none>
+    ELSE,                    !- <none>
+    Set PLR = 1.0,           !- <none>
+    Set OutAir_H = FullLoadOutAirEnth,  !- <none>
+    Set OutAir_W = FullLoadOutAirHumRat,  !- <none>
+    Set OutletAirTemp = FullLoadOutAirTemp,  !- <none>
+    ENDIF,                   !- <none>
+    Set PLF = @CurveValue WindACPLFFPLR PLR dummy dummy dummy dummy,  !- <none>
+    Set CoilRTF = PLR / PLF, !- <none>
+    Set CoilRTF = @Min CoilRTF 1.0,  !- <none>
+    Set EIRTempModFac = @CurveValue WindACEIRFT FanOut_Twb OA_Tdb dummy dummy dummy,  !- <none>
+    Set EIRFlowModFac = @CurveValue WindACEIRFFF 1.0 dummy dummy dummy dummy,  !- <none>
+    Set EIR = RatedEIR * EIRTempModFac * EIRFlowModFac,  !- <none>
+    Set DXElecPower = TotCap * CoilRTF * EIR,  !- <none>
+    Set ElectPower = DXElecPower + FanPower,  !- <none>
+    Set ElectEnergy = ElectPower * SystemTimeStep * 3600,  !- <none>
+    Set tot_cool_Power = ABS_FullTotCapSens * PLR,  !- <none>
+    Set PrimAir_MdotOut = AirSupMdotDesign,  !- <none>
+    Set PrimAir_MdotIn  = AirSupMdotDesign,  !- <none>
+    Set PrimAir_Tout  = OutletAirTemp,  !- <none>
+    SEt PrimAir_Wout = OutAir_W,  !- <none>
+    Set OA_MdotIn = AirOAMdotDesign;  !- <none>
 
   EnergyManagementSystem:GlobalVariable,
     PrimAir_Tinlet,          !- Erl Variable 1 Name

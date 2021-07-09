@@ -290,6 +290,7 @@
     WALL,                    !- Surface Type
     TESTSURFACE,             !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -306,6 +307,7 @@
     WALL,                    !- Surface Type
     TESTSURFACE,             !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE WEST,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -322,6 +324,7 @@
     WALL,                    !- Surface Type
     TESTSURFACE,             !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE NORTH,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -338,6 +341,7 @@
     WALL,                    !- Surface Type
     TESTSURFACE,             !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE EAST,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -354,6 +358,7 @@
     CEILING,                 !- Surface Type
     TESTSURFACE,             !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE CEILING,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -370,6 +375,7 @@
     FLOOR,                   !- Surface Type
     TESTSURFACE,             !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZONE SURFACE FLOOR,      !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure

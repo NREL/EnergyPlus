@@ -267,6 +267,7 @@
     Wall,                    !- Surface Type
     CfactorUGWall1,          !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -283,6 +284,7 @@
     Wall,                    !- Surface Type
     CfactorUGWall2,          !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -299,6 +301,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -315,6 +318,7 @@
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -331,6 +335,7 @@
     Floor,                   !- Surface Type
     slabconst,               !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     GroundFCfactorMethod,    !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -347,6 +352,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE ONE,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

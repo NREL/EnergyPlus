@@ -4900,29 +4900,11 @@ namespace HeatBalanceManager {
         // METHODOLOGY EMPLOYED:
         // The GetObjectItem routines are employed to retrieve the data.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace SurfaceGeometry;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         GetZoneData(state, ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(state, ErrorsFound);
+        GetSpaceData(state, ErrorsFound);
+
+        SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     }
 
     void GetZoneData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
@@ -5468,6 +5450,105 @@ namespace HeatBalanceManager {
                             state.dataHeatBal->Zone(ZoneLoop).Name);
     }
 
+    void GetSpaceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
+    {
+        constexpr const char *RoutineName("GetSpaceData: ");
+        std::string cCurrentModuleObject = "Space";
+        auto &ip = state.dataInputProcessing->inputProcessor;
+        auto const instances = ip->epJSON.find(cCurrentModuleObject);
+        if (instances != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+            auto &instancesValue = instances.value();
+            int numSpaces = instancesValue.size();
+            int spaceNum = 0;
+            // Allow for one additional Space per zone if some surfaces do not have a Space assigned in input
+            state.dataHeatBal->Space.allocate(numSpaces + state.dataGlobal->NumOfZones);
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                ++spaceNum;
+                auto const &objectFields = instance.value();
+                auto &thisSpace = state.dataHeatBal->Space(spaceNum);
+                thisSpace.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+                std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
+                int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+                if (zoneNum > 0) {
+                    thisSpace.ZoneNum = zoneNum;
+                    state.dataHeatBal->Zone(zoneNum).Spaces.emplace_back(spaceNum);
+                } else {
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpace.Name);
+                    ShowContinueError(state, "Zone Name =" + zoneName + "not found.");
+                    ErrorsFound = true;
+                }
+                thisSpace.SpaceType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_type");
+                auto extensibles = objectFields.find("tags");
+                auto const &extensionSchemaProps = objectSchemaProps["tags"]["items"]["properties"];
+                if (extensibles != objectFields.end()) {
+                    auto extensiblesArray = extensibles.value();
+                    for (auto extensibleInstance : extensiblesArray) {
+                        thisSpace.Tags.emplace_back(ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "tag"));
+                    }
+                }
+            }
+            state.dataGlobal->NumOfSpaces = spaceNum;
+        } else {
+            // If no Spaces are defined, the allow for one Space per zone
+            state.dataHeatBal->Space.allocate(state.dataGlobal->NumOfZones);
+        }
+
+        cCurrentModuleObject = "SpaceList";
+        auto const instances2 = ip->epJSON.find(cCurrentModuleObject);
+        if (instances2 != ip->epJSON.end()) {
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, cCurrentModuleObject);
+            auto &instancesValue = instances2.value();
+            int numSpaceLists = instancesValue.size();
+            int spaceListNum = 0;
+            state.dataHeatBal->SpaceList.allocate(numSpaceLists);
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                ++spaceListNum;
+                auto const &objectFields = instance.value();
+                auto &thisSpaceList = state.dataHeatBal->SpaceList(spaceListNum);
+                thisSpaceList.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+
+                if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->Zone) > 0) {
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  is a duplicate of a zone name.");
+                    ErrorsFound = true;
+                }
+                if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->Space) > 0) {
+                    ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  is a duplicate of a space name.");
+                    ErrorsFound = true;
+                }
+
+                // List of spaces
+                auto extensibles = objectFields.find("spaces");
+                auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
+                if (extensibles != objectFields.end()) {
+                    auto extensiblesArray = extensibles.value();
+                    for (auto extensibleInstance : extensiblesArray) {
+                        std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
+                        int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->Space);
+                        if (thisSpaceNum > 0) {
+                            thisSpaceList.Spaces.emplace_back(thisSpaceNum);
+                        } else {
+                            ShowSevereError(state, RoutineName + cCurrentModuleObject + "=" + thisSpaceList.Name);
+                            ShowContinueError(state, "Space Name =" + thisSpaceName + "not found.");
+                            ErrorsFound = true;
+                        }
+                        thisSpaceList.MaxSpaceNameLength = max(thisSpaceList.MaxSpaceNameLength, len(thisSpaceName));
+                        // Check for duplicate spaces
+                        for (int loop = 1; loop <= int(thisSpaceList.Spaces.size()) - 1; ++loop) {
+                            if (thisSpaceNum == thisSpaceList.Spaces(loop)) {
+                                ShowSevereError(state,
+                                                RoutineName + cCurrentModuleObject + "=\"" + thisSpaceList.Name + "\":  Space Name " + thisSpaceName +
+                                                    " appears more than once in list.");
+                                ErrorsFound = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
 

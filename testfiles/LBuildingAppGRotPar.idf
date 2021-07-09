@@ -530,6 +530,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-17,  !- Construction Name
     Main_Zone_a_b_g_l,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -668,6 +669,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-17,  !- Construction Name
     Main_Zone_b_c_h_g,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -731,6 +733,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-17,  !- Construction Name
     Main_Zone_c_d_i_h,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -854,6 +857,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-17,  !- Construction Name
     Main_Zone_d_e_j_i,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -917,6 +921,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-17,  !- Construction Name
     Main_Zone_e_f_k_j,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -995,6 +1000,7 @@
     Wall,                    !- Surface Type
     FaceBrkIns4LWConcBlkGyp_R-17,  !- Construction Name
     Main_Zone_l_k_f_a,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1041,6 +1047,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_b_c_h_g,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_g_h_mirror, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1057,6 +1064,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_g_h,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1073,6 +1081,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_c_d_i_h,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_h_i_mirror, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1089,6 +1098,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_h_i,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1105,6 +1115,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_d_e_j_i,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_i_j_mirror, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1121,6 +1132,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_i_j,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1137,6 +1149,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_e_f_k_j,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_j_k_mirror, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1153,6 +1166,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_j_k,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1169,6 +1183,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_l_k_f_a,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_k_l_mirror, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1185,6 +1200,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_k_l,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1201,6 +1217,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_a_b_g_l,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_l_g_mirror, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1217,6 +1234,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_l_g,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1233,6 +1251,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_l_i_mirror, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1249,6 +1268,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Main_IntWall_l_i,        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1269,6 +1289,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_a_b_g_l,       !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Main_Zone_l_k_f_a,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1285,6 +1306,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_b_c_h_g,       !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Main_Zone_a_b_g_l,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1301,6 +1323,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_c_d_i_h,       !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Main_Zone_b_c_h_g,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1317,6 +1340,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_d_e_j_i,       !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Main_Zone_c_d_i_h,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1333,6 +1357,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_e_f_k_j,       !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Main_Zone_d_e_j_i,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1349,6 +1374,7 @@
     Wall,                    !- Surface Type
     IntWallConstruction,     !- Construction Name
     Main_Zone_l_k_f_a,       !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     Main_Zone_e_f_k_j,       !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1367,6 +1393,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-21,  !- Construction Name
     Main_Zone_a_b_g_l,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1386,6 +1413,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-21,  !- Construction Name
     Main_Zone_b_c_h_g,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1405,6 +1433,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-21,  !- Construction Name
     Main_Zone_c_d_i_h,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1424,6 +1453,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-21,  !- Construction Name
     Main_Zone_d_e_j_i,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1443,6 +1473,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-21,  !- Construction Name
     Main_Zone_e_f_k_j,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1462,6 +1493,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-21,  !- Construction Name
     Main_Zone_l_k_f_a,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1481,6 +1513,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-21,  !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1500,6 +1533,7 @@
     Roof,                    !- Surface Type
     SlagFeltIns6LWConcGapAcoTile_R-21,  !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1518,6 +1552,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     Main_Zone_a_b_g_l,       !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1536,6 +1571,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     Main_Zone_b_c_h_g,       !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1554,6 +1590,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     Main_Zone_c_d_i_h,       !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1572,6 +1609,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     Main_Zone_d_e_j_i,       !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1590,6 +1628,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     Main_Zone_e_f_k_j,       !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1608,6 +1647,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     Main_Zone_l_k_f_a,       !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1626,6 +1666,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1644,6 +1685,7 @@
     Floor,                   !- Surface Type
     BotFloorConstruction,    !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1713,7 +1755,8 @@
     Main_Zone_a_b_g_l_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_a_b_g_l,       !- Zone or ZoneList Name
-    90.7638663194365;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    90.7638663194365;        !- Extended Field
 
                              !- Name
 
@@ -1721,7 +1764,8 @@
     Main_Zone_a_b_g_l_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_a_b_g_l,       !- Zone or ZoneList Name
-    90.7638663194365;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    90.7638663194365;        !- Extended Field
 
   Zone,
     Main_Zone_b_c_h_g,       !- Name
@@ -1781,7 +1825,8 @@
     Main_Zone_b_c_h_g_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_b_c_h_g,       !- Zone or ZoneList Name
-    21.908520224611;         !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    21.908520224611;         !- Extended Field
 
                              !- Name
 
@@ -1789,7 +1834,8 @@
     Main_Zone_b_c_h_g_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_b_c_h_g,       !- Zone or ZoneList Name
-    21.908520224611;         !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    21.908520224611;         !- Extended Field
 
   Zone,
     Main_Zone_c_d_i_h,       !- Name
@@ -1849,7 +1895,8 @@
     Main_Zone_c_d_i_h_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_c_d_i_h,       !- Zone or ZoneList Name
-    68.8553478084919;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    68.8553478084919;        !- Extended Field
 
                              !- Name
 
@@ -1857,7 +1904,8 @@
     Main_Zone_c_d_i_h_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_c_d_i_h,       !- Zone or ZoneList Name
-    68.8553478084919;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    68.8553478084919;        !- Extended Field
 
   Zone,
     Main_Zone_d_e_j_i,       !- Name
@@ -1917,7 +1965,8 @@
     Main_Zone_d_e_j_i_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_d_e_j_i,       !- Zone or ZoneList Name
-    31.2978850559206;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    31.2978850559206;        !- Extended Field
 
                              !- Name
 
@@ -1925,7 +1974,8 @@
     Main_Zone_d_e_j_i_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_d_e_j_i,       !- Zone or ZoneList Name
-    31.2978850559206;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    31.2978850559206;        !- Extended Field
 
   Zone,
     Main_Zone_e_f_k_j,       !- Name
@@ -1985,7 +2035,8 @@
     Main_Zone_e_f_k_j_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_e_f_k_j,       !- Zone or ZoneList Name
-    21.908520224611;         !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    21.908520224611;         !- Extended Field
 
                              !- Name
 
@@ -1993,7 +2044,8 @@
     Main_Zone_e_f_k_j_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_e_f_k_j,       !- Zone or ZoneList Name
-    21.908520224611;         !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    21.908520224611;         !- Extended Field
 
   Zone,
     Main_Zone_l_k_f_a,       !- Name
@@ -2053,7 +2105,8 @@
     Main_Zone_l_k_f_a_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_l_k_f_a,       !- Zone or ZoneList Name
-    53.206406994198;         !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    53.206406994198;         !- Extended Field
 
                              !- Name
 
@@ -2061,7 +2114,8 @@
     Main_Zone_l_k_f_a_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_l_k_f_a,       !- Zone or ZoneList Name
-    53.206406994198;         !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    53.206406994198;         !- Extended Field
 
   Zone,
     Main_Zone_g_h_i_l,       !- Name
@@ -2121,7 +2175,8 @@
     Main_Zone_g_h_i_l_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone or ZoneList Name
-    100.153236291745;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    100.153236291745;        !- Extended Field
 
                              !- Name
 
@@ -2129,7 +2184,8 @@
     Main_Zone_g_h_i_l_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_g_h_i_l,       !- Zone or ZoneList Name
-    100.153236291745;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    100.153236291745;        !- Extended Field
 
   Zone,
     Main_Zone_i_j_k_l,       !- Name
@@ -2189,7 +2245,8 @@
     Main_Zone_i_j_k_l_Furniture1,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone or ZoneList Name
-    50.0766181458726;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    50.0766181458726;        !- Extended Field
 
                              !- Name
 
@@ -2197,7 +2254,8 @@
     Main_Zone_i_j_k_l_Furniture2,  !- Name
     FurnitureConstruction,   !- Construction Name
     Main_Zone_i_j_k_l,       !- Zone or ZoneList Name
-    50.0766181458726;        !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    50.0766181458726;        !- Extended Field
 
   Schedule:Compact,
     People_office_Sch,       !- Name

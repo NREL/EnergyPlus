@@ -764,6 +764,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-wall,  !- Construction Name
     ZN1_S_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -780,6 +781,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN1_S_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN2_E_Space_1:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -796,6 +798,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN1_S_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN5_Core_Space_1:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -812,6 +815,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN1_S_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN4_W_Space_1:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -828,6 +832,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-slab,  !- Construction Name
     ZN1_S_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -844,6 +849,7 @@
     ceiling,                 !- Surface Type
     Int-floor-underside,     !- Construction Name
     ZN1_S_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN6_S_Space_2:floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -860,6 +866,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN2_E_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN1_S_Space_1:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -876,6 +883,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-wall,  !- Construction Name
     ZN2_E_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -892,6 +900,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN2_E_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN3_N_Space_1:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -908,6 +917,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN2_E_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN5_Core_Space_1:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -924,6 +934,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-slab,  !- Construction Name
     ZN2_E_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -940,6 +951,7 @@
     ceiling,                 !- Surface Type
     Int-floor-underside,     !- Construction Name
     ZN2_E_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN7_E_Space_2:floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -956,6 +968,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN3_N_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN5_Core_Space_1:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -972,6 +985,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN3_N_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN2_E_Space_1:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -988,6 +1002,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-wall,  !- Construction Name
     ZN3_N_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1004,6 +1019,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN3_N_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN4_W_Space_1:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1020,6 +1036,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-slab,  !- Construction Name
     ZN3_N_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1036,6 +1053,7 @@
     ceiling,                 !- Surface Type
     Int-floor-underside,     !- Construction Name
     ZN3_N_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN8_N_Space_2:floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1052,6 +1070,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN4_W_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN1_S_Space_1:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1068,6 +1087,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN4_W_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN5_Core_Space_1:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1084,6 +1104,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN4_W_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN3_N_Space_1:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1100,6 +1121,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-wall,  !- Construction Name
     ZN4_W_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1116,6 +1138,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-slab,  !- Construction Name
     ZN4_W_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1132,6 +1155,7 @@
     ceiling,                 !- Surface Type
     Int-floor-underside,     !- Construction Name
     ZN4_W_Space_1,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN9_W_Space_2:floor,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1148,6 +1172,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN5_Core_Space_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN1_S_Space_1:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1164,6 +1189,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN5_Core_Space_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN2_E_Space_1:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1180,6 +1206,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN5_Core_Space_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN3_N_Space_1:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1196,6 +1223,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN5_Core_Space_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN4_W_Space_1:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1212,6 +1240,7 @@
     floor,                   !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-slab,  !- Construction Name
     ZN5_Core_Space_1,        !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1228,6 +1257,7 @@
     ceiling,                 !- Surface Type
     Int-floor-underside,     !- Construction Name
     ZN5_Core_Space_1,        !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Core_Space_2:floor, !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1244,6 +1274,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-wall,  !- Construction Name
     ZN6_S_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1260,6 +1291,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN6_S_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN7_E_Space_2:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1276,6 +1308,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN6_S_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Core_Space_2:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1292,6 +1325,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN6_S_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN9_W_Space_2:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1308,6 +1342,7 @@
     floor,                   !- Surface Type
     Int-floor-topside,       !- Construction Name
     ZN6_S_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN1_S_Space_1:Ceiling,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1324,6 +1359,7 @@
     roof,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Roof,  !- Construction Name
     ZN6_S_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1340,6 +1376,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN7_E_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN6_S_Space_2:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1356,6 +1393,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-wall,  !- Construction Name
     ZN7_E_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1372,6 +1410,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN7_E_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN8_N_Space_2:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1388,6 +1427,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN7_E_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Core_Space_2:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1404,6 +1444,7 @@
     floor,                   !- Surface Type
     Int-floor-topside,       !- Construction Name
     ZN7_E_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN2_E_Space_1:Ceiling,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1420,6 +1461,7 @@
     roof,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Roof,  !- Construction Name
     ZN7_E_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1436,6 +1478,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN8_N_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Core_Space_2:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1452,6 +1495,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN8_N_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN7_E_Space_2:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1468,6 +1512,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-wall,  !- Construction Name
     ZN8_N_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1484,6 +1529,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN8_N_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN9_W_Space_2:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1500,6 +1546,7 @@
     floor,                   !- Surface Type
     Int-floor-topside,       !- Construction Name
     ZN8_N_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN3_N_Space_1:Ceiling,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1516,6 +1563,7 @@
     roof,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Roof,  !- Construction Name
     ZN8_N_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1532,6 +1580,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN9_W_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN6_S_Space_2:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1548,6 +1597,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN9_W_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN10_Core_Space_2:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1564,6 +1614,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN9_W_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN8_N_Space_2:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1580,6 +1631,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Ext-wall,  !- Construction Name
     ZN9_W_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1596,6 +1648,7 @@
     floor,                   !- Surface Type
     Int-floor-topside,       !- Construction Name
     ZN9_W_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN4_W_Space_1:Ceiling,   !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1612,6 +1665,7 @@
     roof,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Roof,  !- Construction Name
     ZN9_W_Space_2,           !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1628,6 +1682,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN10_Core_Space_2,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN6_S_Space_2:IntWall:North,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1644,6 +1699,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN10_Core_Space_2,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN7_E_Space_2:IntWall:West,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1660,6 +1716,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN10_Core_Space_2,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN8_N_Space_2:IntWall:South,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1676,6 +1733,7 @@
     wall,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Int-Wall,  !- Construction Name
     ZN10_Core_Space_2,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN9_W_Space_2:IntWall:East,  !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1692,6 +1750,7 @@
     floor,                   !- Surface Type
     Int-floor-topside,       !- Construction Name
     ZN10_Core_Space_2,       !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     ZN5_Core_Space_1:Ceiling,!- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1708,6 +1767,7 @@
     roof,                    !- Surface Type
     ASHRAE 90.1-2004_Sec 5.5-2_Roof,  !- Construction Name
     ZN10_Core_Space_2,       !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1843,61 +1903,71 @@
     ZN1_S_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN1_S_Space_1,           !- Zone or ZoneList Name
-    186.730;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    186.730;                 !- Extended Field
 
   InternalMass,
     ZN2_E_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN2_E_Space_1,           !- Zone or ZoneList Name
-    186.730;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    186.730;                 !- Extended Field
 
   InternalMass,
     ZN3_N_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN3_N_Space_1,           !- Zone or ZoneList Name
-    186.730;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    186.730;                 !- Extended Field
 
   InternalMass,
     ZN4_W_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN4_W_Space_1,           !- Zone or ZoneList Name
-    186.730;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    186.730;                 !- Extended Field
 
   InternalMass,
     ZN5_Core_Space_1,        !- Name
     InteriorFurnishings,     !- Construction Name
     ZN5_Core_Space_1,        !- Zone or ZoneList Name
-    503.079;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    503.079;                 !- Extended Field
 
   InternalMass,
     ZN6_S_Space_2,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN6_S_Space_2,           !- Zone or ZoneList Name
-    186.730;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    186.730;                 !- Extended Field
 
   InternalMass,
     ZN7_E_Space_2,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN7_E_Space_2,           !- Zone or ZoneList Name
-    186.730;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    186.730;                 !- Extended Field
 
   InternalMass,
     ZN8_N_Space_2,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN8_N_Space_2,           !- Zone or ZoneList Name
-    186.730;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    186.730;                 !- Extended Field
 
   InternalMass,
     ZN9_W_Space_2,           !- Name
     InteriorFurnishings,     !- Construction Name
     ZN9_W_Space_2,           !- Zone or ZoneList Name
-    186.730;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    186.730;                 !- Extended Field
 
   InternalMass,
     ZN10_Core_Space_2,       !- Name
     InteriorFurnishings,     !- Construction Name
     ZN10_Core_Space_2,       !- Zone or ZoneList Name
-    503.079;                 !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    503.079;                 !- Extended Field
 
   ScheduleTypeLimits,
     Any Number;              !- Name

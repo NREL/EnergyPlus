@@ -380,6 +380,7 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
         "    Wall,                    !- Surface Type",
         "    PARTITION,               !- Construction Name",
         "    living_unit1,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",

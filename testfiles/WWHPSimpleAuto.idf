@@ -821,6 +821,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -852,6 +853,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -868,6 +870,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -884,6 +887,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -900,6 +904,7 @@
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -916,6 +921,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     West Zone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -932,6 +938,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -948,6 +955,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -964,6 +972,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -980,6 +989,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -996,6 +1006,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1012,6 +1023,7 @@
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1028,6 +1040,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     EAST ZONE,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1044,6 +1057,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1060,6 +1074,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1076,6 +1091,7 @@
     Wall,                    !- Surface Type
     EXTWALL80,               !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1092,6 +1108,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall003,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1108,6 +1125,7 @@
     Wall,                    !- Surface Type
     PARTITION06,             !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall005,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1124,6 +1142,7 @@
     Floor,                   !- Surface Type
     FLOOR SLAB 8 IN,         !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1140,6 +1159,7 @@
     Roof,                    !- Surface Type
     ROOF34,                  !- Construction Name
     NORTH ZONE,              !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1482,12 +1502,12 @@
     GshpHeating;             !- Companion Heating Heat Pump Name
 
   Curve:QuadLinear,
-    CoolCapCurve,            !- Curve Name
-    -1.52030596,             !- CoefficientC1
-    3.46625667,              !- CoefficientC2
-    -1.32267797,             !- CoefficientC3
-    0.09395678,              !- CoefficientC4
-    0.038975504,             !- CoefficientC5
+    CoolCapCurve,            !- Name
+    -1.52030596,             !- Coefficient1 Constant
+    3.46625667,              !- Coefficient2 w
+    -1.32267797,             !- Coefficient3 x
+    0.09395678,              !- Coefficient4 y
+    0.038975504,             !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -1500,12 +1520,12 @@
     38;                      !- Maximum Curve Output
 
   Curve:QuadLinear,
-    CoolPowCurve,            !- Curve Name
-    -8.59564386,             !- CoefficientC1
-    0.96265085,              !- CoefficientC2
-    8.69489229,              !- CoefficientC3
-    0.02501669,              !- CoefficientC4
-    -0.20132665,             !- CoefficientC5
+    CoolPowCurve,            !- Name
+    -8.59564386,             !- Coefficient1 Constant
+    0.96265085,              !- Coefficient2 w
+    8.69489229,              !- Coefficient3 x
+    0.02501669,              !- Coefficient4 y
+    -0.20132665,             !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -1814,12 +1834,12 @@
     GshpCLG;                 !- Companion Cooling Heat Pump Name
 
   Curve:QuadLinear,
-    HeatCapCurve,            !- Curve Name
-    -3.33491153,             !- CoefficientC1
-    -0.51451946,             !- CoefficientC2
-    4.51592706,              !- CoefficientC3
-    0.01797107,              !- CoefficientC4
-    0.155797661,             !- CoefficientC5
+    HeatCapCurve,            !- Name
+    -3.33491153,             !- Coefficient1 Constant
+    -0.51451946,             !- Coefficient2 w
+    4.51592706,              !- Coefficient3 x
+    0.01797107,              !- Coefficient4 y
+    0.155797661,             !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x
@@ -1832,12 +1852,12 @@
     38;                      !- Maximum Curve Output
 
   Curve:QuadLinear,
-    HeatPowCurve,            !- Curve Name
-    -8.93121751,             !- CoefficientC1
-    8.57035762,              !- CoefficientC2
-    1.29660976,              !- CoefficientC3
-    -0.21629222,             !- CoefficientC4
-    0.033862378,             !- CoefficientC5
+    HeatPowCurve,            !- Name
+    -8.93121751,             !- Coefficient1 Constant
+    8.57035762,              !- Coefficient2 w
+    1.29660976,              !- Coefficient3 x
+    -0.21629222,             !- Coefficient4 y
+    0.033862378,             !- Coefficient5 z
     -100,                    !- Minimum Value of w
     100,                     !- Maximum Value of w
     -100,                    !- Minimum Value of x

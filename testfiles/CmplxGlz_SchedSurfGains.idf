@@ -487,6 +487,7 @@
     WALL,                    !- Surface Type
     Room Wall - South,       !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -503,6 +504,7 @@
     FLOOR,                   !- Surface Type
     Room Floor,              !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -519,6 +521,7 @@
     WALL,                    !- Surface Type
     Room Wall - East West,   !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Room102 West Wall,       !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -535,6 +538,7 @@
     WALL,                    !- Surface Type
     Room Wall - North,       !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Room102 North Wall,      !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -551,6 +555,7 @@
     WALL,                    !- Surface Type
     Room Wall - East West,   !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Room102 East Wall,       !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -567,6 +572,7 @@
     CEILING,                 !- Surface Type
     Room Ceiling,            !- Construction Name
     Room 102,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Room102 Ceiling,         !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

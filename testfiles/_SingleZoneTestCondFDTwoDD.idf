@@ -2332,6 +2332,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     SouthZone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SouthZone:South Wall,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2350,6 +2351,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     SouthZone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SouthZone:East Wall,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2368,6 +2370,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     SouthZone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SouthZone:North Wall,    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2386,6 +2389,7 @@
     Wall,                    !- Surface Type
     Light Exterior Wall,     !- Construction Name
     SouthZone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SouthZone:West Wall,     !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2404,6 +2408,7 @@
     Roof,                    !- Surface Type
     Light Roof/Ceiling,      !- Construction Name
     SouthZone,               !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     SouthZone:Roof,          !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2422,6 +2427,7 @@
     Floor,                   !- Surface Type
     Light Floor,             !- Construction Name
     SouthZone,               !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SouthZone:Floor,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure

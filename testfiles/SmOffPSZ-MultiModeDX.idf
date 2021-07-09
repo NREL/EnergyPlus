@@ -484,6 +484,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -500,6 +501,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -516,6 +518,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -534,6 +537,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -550,6 +554,7 @@
     Wall,                    !- Surface Type
     INTWALL-1,               !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     ZSF1,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -566,6 +571,7 @@
     Wall,                    !- Surface Type
     INTWALL-1,               !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Zone,                    !- Outside Boundary Condition
     ZSF2,                    !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -582,6 +588,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -600,6 +607,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -619,6 +627,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -635,6 +644,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -651,6 +661,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -669,6 +680,7 @@
     ROOF,                    !- Surface Type
     ROOFR,                   !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -689,6 +701,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -708,6 +721,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -726,6 +740,7 @@
     WALL,                    !- Surface Type
     WALLR,                   !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -745,6 +760,7 @@
     ROOF,                    !- Surface Type
     ROOFR,                   !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -761,6 +777,7 @@
     CEILING,                 !- Surface Type
     reverseFLOORR,           !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     FSFLOOR-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -777,6 +794,7 @@
     CEILING,                 !- Surface Type
     reverseFLOORR,           !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     FNFLOOR-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -793,6 +811,7 @@
     FLOOR,                   !- Surface Type
     FLOORR,                  !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     BSCEING-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -809,6 +828,7 @@
     FLOOR,                   !- Surface Type
     FLOORR,                  !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     BNCEING-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -827,6 +847,7 @@
     CEILING,                 !- Surface Type
     reverseFLOORR,           !- Construction Name
     ZSF1,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SSFLOOR-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -846,6 +867,7 @@
     CEILING,                 !- Surface Type
     reverseFLOORR,           !- Construction Name
     ZNF1,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SNFLOOR-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -864,6 +886,7 @@
     FLOOR,                   !- Surface Type
     FLOORR,                  !- Construction Name
     ZSF2,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     FSCEING-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -883,6 +906,7 @@
     FLOOR,                   !- Surface Type
     FLOORR,                  !- Construction Name
     ZNF2,                    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     FNCEING-1,               !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -901,6 +925,7 @@
     FLOOR,                   !- Surface Type
     SLABL,                   !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -917,6 +942,7 @@
     WALL,                    !- Surface Type
     UNDRWALL,                !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -933,6 +959,7 @@
     WALL,                    !- Surface Type
     UNDRWALL,                !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -949,6 +976,7 @@
     WALL,                    !- Surface Type
     UNDRWALL,                !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -965,6 +993,7 @@
     WALL,                    !- Surface Type
     UNDRWALL,                !- Construction Name
     BASE-1,                  !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1160,25 +1189,29 @@
     ZSF1-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZSF1,                    !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   InternalMass,
     ZNF1-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZNF1,                    !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   InternalMass,
     ZSF2-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZSF2,                    !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   InternalMass,
     ZNF2-MASS,               !- Name
     FURNITURE,               !- Construction Name
     ZNF2,                    !- Zone or ZoneList Name
-    77;                      !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    77;                      !- Extended Field
 
   ScheduleTypeLimits,
     AnyNumber;               !- Name

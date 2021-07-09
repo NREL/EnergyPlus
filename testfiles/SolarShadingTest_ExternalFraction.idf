@@ -2527,6 +2527,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1 @ 200 601 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2568,6 +2569,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1 @ 200 601 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2599,6 +2601,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1 @ 200 601 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2615,6 +2618,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1 @ 200 601 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2631,6 +2635,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 1 @ 200 601 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2662,6 +2667,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 1 @ 200 601 0 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2678,6 +2684,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     ZONE 1 @ 200 601 0 T,    !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2694,6 +2701,7 @@
     Roof,                    !- Surface Type
     CEILING,                 !- Construction Name
     ZONE 1 @ 200 601 0 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn005:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2710,6 +2718,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 2 @ 200 200 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2751,6 +2760,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 2 @ 200 200 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2767,6 +2777,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 2 @ 200 200 0 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Wall008,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2783,6 +2794,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 2 @ 200 200 0 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Wall006,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2799,6 +2811,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     ZONE 2 @ 200 200 0 T,    !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2815,6 +2828,7 @@
     Roof,                    !- Surface Type
     CEILING,                 !- Construction Name
     ZONE 2 @ 200 200 0 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn006:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -2831,6 +2845,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2872,6 +2887,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2903,6 +2919,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2919,6 +2936,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2935,6 +2953,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2951,6 +2970,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2967,6 +2987,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -2998,6 +3019,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Wall003,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3014,6 +3036,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3030,6 +3053,7 @@
     Roof,                    !- Surface Type
     CEILING,                 !- Construction Name
     ZONE 3 @ 200 610 0 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn007:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3046,6 +3070,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 4 @ 200 600 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3087,6 +3112,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 4 @ 200 600 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3118,6 +3144,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 4 @ 200 600 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3134,6 +3161,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 4 @ 200 600 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3150,6 +3178,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 4 @ 200 600 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3166,6 +3195,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 4 @ 200 600 0 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3197,6 +3227,7 @@
     Floor,                   !- Surface Type
     SLAB FLOOR,              !- Construction Name
     ZONE 4 @ 200 600 0 T,    !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3213,6 +3244,7 @@
     Roof,                    !- Surface Type
     CEILING,                 !- Construction Name
     ZONE 4 @ 200 600 0 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn009:Flr001,            !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3229,6 +3261,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 5 @ 200 601 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3270,6 +3303,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 5 @ 200 601 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3301,6 +3335,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 5 @ 200 601 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3317,6 +3352,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 5 @ 200 601 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3333,6 +3369,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 5 @ 200 601 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3364,6 +3401,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 5 @ 200 601 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn006:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3380,6 +3418,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     ZONE 5 @ 200 601 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn001:Roof001,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3396,6 +3435,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE 5 @ 200 601 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3412,6 +3452,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 6 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3453,6 +3494,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 6 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3469,6 +3511,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 6 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn007:Wall008,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3485,6 +3528,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 6 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn005:Wall006,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3501,6 +3545,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     ZONE 6 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn002:Roof001,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3517,6 +3562,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE 6 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3533,6 +3579,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3574,6 +3621,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3605,6 +3653,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3621,6 +3670,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3637,6 +3687,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3653,6 +3704,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3684,6 +3736,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn008:Wall004,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3700,6 +3753,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn006:Wall003,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3716,6 +3770,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn003:Roof001,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3732,6 +3787,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE 7 @ 200 610 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3748,6 +3804,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 8 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3789,6 +3846,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 8 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3805,6 +3863,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 8 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn009:Wall006,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3821,6 +3880,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 8 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn007:Wall007,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -3837,6 +3897,7 @@
     Floor,                   !- Surface Type
     FLOOR32,                 !- Construction Name
     ZONE 8 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3853,6 +3914,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE 8 @ 200 200 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3869,6 +3931,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 9 @ 200 600 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3910,6 +3973,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 9 @ 200 600 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3941,6 +4005,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 9 @ 200 600 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3957,6 +4022,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 9 @ 200 600 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3973,6 +4039,7 @@
     Wall,                    !- Surface Type
     EXTERIOR,                !- Construction Name
     ZONE 9 @ 200 600 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -4004,6 +4071,7 @@
     Wall,                    !- Surface Type
     INTERIOR,                !- Construction Name
     ZONE 9 @ 200 600 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn008:Wall003,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4020,6 +4088,7 @@
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
     ZONE 9 @ 200 600 1 T,    !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     Zn004:Roof001,           !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -4036,6 +4105,7 @@
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
     ZONE 9 @ 200 600 1 T,    !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

@@ -374,6 +374,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
         "    Wall,                    !- Surface Type",
         "    EXTWALL80,               !- Construction Name",
         "    West Zone,               !- Zone Name",
+        "    ,                        !- Space Name",
         "    Outdoors,                !- Outside Boundary Condition",
         "    ,                        !- Outside Boundary Condition Object",
         "    SunExposed,              !- Sun Exposure",

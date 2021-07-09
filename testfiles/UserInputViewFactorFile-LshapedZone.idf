@@ -803,6 +803,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:South Wall, !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -821,6 +822,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:East Wall,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -839,6 +841,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:North Wall-1,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -857,6 +860,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:West Wall-1,!- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -875,6 +879,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:NorthWall-2,!- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -893,6 +898,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:WestWall-2, !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -911,6 +917,7 @@
     Roof,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:Roof-1,     !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -929,6 +936,7 @@
     Roof,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:Roof-2,     !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -947,6 +955,7 @@
     Floor,                   !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:Floor-1,    !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -965,6 +974,7 @@
     Floor,                   !- Surface Type
     SpandrelSheet,           !- Construction Name
     Lshaped zone,            !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     Lshaped zone:Floor-2,    !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -983,6 +993,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:South Wall,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1001,6 +1012,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:East Wall,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1019,6 +1031,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:North Wall-1,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1037,6 +1050,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:West Wall-1,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1055,6 +1069,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:NorthWall-2,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1073,6 +1088,7 @@
     Wall,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:WestWall-2,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1091,6 +1107,7 @@
     Roof,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:Roof-1,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1109,6 +1126,7 @@
     Roof,                    !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:Roof-2,  !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1127,6 +1145,7 @@
     Floor,                   !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:Floor-1, !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1145,6 +1164,7 @@
     Floor,                   !- Surface Type
     SpandrelSheet,           !- Construction Name
     LshapedZoneBase,         !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     LshapedZoneBase:Floor-2, !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure

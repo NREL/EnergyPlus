@@ -509,6 +509,7 @@
     Zn001:Wall001,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -575,6 +576,7 @@
     Zn001:Wall002,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     20,                      !- Starting X Coordinate {m}
@@ -587,6 +589,7 @@
     Zn001:Wall003,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -609,6 +612,7 @@
     Zn001:Wall004,           !- Name
     INTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     20,                      !- Starting X Coordinate {m}
@@ -621,6 +625,7 @@
     Zn001:Flr001,            !- Name
     FLOOR,                   !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -633,6 +638,7 @@
     Zn001:Roof001,           !- Name
     CEILING34,               !- Construction Name
     ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -645,6 +651,7 @@
     Zn002:Wall001,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 2,                  !- Zone Name
+    ,                        !- Space Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -688,6 +695,7 @@
     Zn002:Wall002,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 2,                  !- Zone Name
+    ,                        !- Space Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     20,                      !- Starting X Coordinate {m}
@@ -700,6 +708,7 @@
     Zn002:Wall003,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 2,                  !- Zone Name
+    ,                        !- Space Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     20,                      !- Starting X Coordinate {m}
@@ -712,6 +721,7 @@
     Zn002:Wall004,           !- Name
     INTERIOR,                !- Construction Name
     ZONE 2,                  !- Zone Name
+    ,                        !- Space Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -724,6 +734,7 @@
     Zn002:Flr001,            !- Name
     FLOOR,                   !- Construction Name
     ZONE 2,                  !- Zone Name
+    ,                        !- Space Name
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -736,6 +747,7 @@
     Zn002:Roof001,           !- Name
     CEILING34,               !- Construction Name
     ZONE 2,                  !- Zone Name
+    ,                        !- Space Name
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -748,6 +760,7 @@
     Zn003:Wall001,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 3,                  !- Zone Name
+    ,                        !- Space Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -771,6 +784,7 @@
     Zn003:Wall002,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 3,                  !- Zone Name
+    ,                        !- Space Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     20,                      !- Starting X Coordinate {m}
@@ -783,6 +797,7 @@
     Zn003:Wall003,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 3,                  !- Zone Name
+    ,                        !- Space Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -795,6 +810,7 @@
     Zn003:Wall004,           !- Name
     INTERIOR,                !- Construction Name
     ZONE 3,                  !- Zone Name
+    ,                        !- Space Name
     ZONE 4,                  !- Outside Boundary Condition Object
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
@@ -841,6 +857,7 @@
     Zn003:Flr001,            !- Name
     FLOOR34,                 !- Construction Name
     ZONE 3,                  !- Zone Name
+    ,                        !- Space Name
     Zn001:Roof001,           !- Outside Boundary Condition Object
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
@@ -854,6 +871,7 @@
     Zn003:Roof001,           !- Name
     ROOF31,                  !- Construction Name
     ZONE 3,                  !- Zone Name
+    ,                        !- Space Name
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -866,6 +884,7 @@
     Zn004:Wall001,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 4,                  !- Zone Name
+    ,                        !- Space Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}
@@ -889,6 +908,7 @@
     Zn004:Wall002,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 4,                  !- Zone Name
+    ,                        !- Space Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     20,                      !- Starting X Coordinate {m}
@@ -901,6 +921,7 @@
     Zn004:Wall003,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 4,                  !- Zone Name
+    ,                        !- Space Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
     20,                      !- Starting X Coordinate {m}
@@ -913,6 +934,7 @@
     Zn004:Flr001,            !- Name
     FLOOR34,                 !- Construction Name
     ZONE 4,                  !- Zone Name
+    ,                        !- Space Name
     Zn002:Roof001,           !- Outside Boundary Condition Object
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
@@ -926,6 +948,7 @@
     Zn004:Roof001,           !- Name
     ROOF31,                  !- Construction Name
     ZONE 4,                  !- Zone Name
+    ,                        !- Space Name
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
     0,                       !- Starting X Coordinate {m}

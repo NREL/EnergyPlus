@@ -704,6 +704,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -720,6 +721,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -736,6 +738,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -752,6 +755,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -768,6 +772,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -784,6 +789,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     LGstore1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore1_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -800,6 +806,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -816,6 +823,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -832,6 +840,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -848,6 +857,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore4_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -864,6 +874,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -880,6 +891,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     LGstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore5_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -896,6 +908,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -912,6 +925,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -928,6 +942,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -944,6 +959,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LGstore1_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -960,6 +976,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -976,6 +993,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore1,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore2_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -992,6 +1010,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1008,6 +1027,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1024,6 +1044,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1040,6 +1061,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore1_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1056,6 +1078,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1072,6 +1095,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore2,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore3_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1088,6 +1112,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1104,6 +1129,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1120,6 +1146,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1136,6 +1163,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore2_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1152,6 +1180,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1168,6 +1197,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore3,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore4_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1184,6 +1214,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1200,6 +1231,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1216,6 +1248,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1232,6 +1265,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore3_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1248,6 +1282,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1264,6 +1299,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore4,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LGstore2_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1280,6 +1316,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1296,6 +1333,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1312,6 +1350,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1328,6 +1367,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     LGstore2_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1344,6 +1384,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1360,6 +1401,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore5,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore6_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1376,6 +1418,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1392,6 +1435,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1408,6 +1452,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1424,6 +1469,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore5_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1440,6 +1486,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1456,6 +1503,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore6,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore7_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1472,6 +1520,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1488,6 +1537,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1504,6 +1554,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1520,6 +1571,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore6_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1536,6 +1588,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1552,6 +1605,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore7,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore8_Wall_2,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1568,6 +1622,7 @@
     Floor,                   !- Surface Type
     ext-slab,                !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Ground,                  !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1584,6 +1639,7 @@
     Roof,                    !- Surface Type
     IEAD Non-res Roof,       !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1600,6 +1656,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1616,6 +1673,7 @@
     Wall,                    !- Surface Type
     int-walls,               !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Surface,                 !- Outside Boundary Condition
     SMstore7_Wall_4,         !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -1632,6 +1690,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -1648,6 +1707,7 @@
     Wall,                    !- Surface Type
     Steel Frame Non-res Ext Wall,  !- Construction Name
     SMstore8,                !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -3052,61 +3112,71 @@
     LGstore1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     LGstore1,                !- Zone or ZoneList Name
-    696.7728;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    696.7728;                !- Extended Field
 
   InternalMass,
     LGstore2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     LGstore2,                !- Zone or ZoneList Name
-    696.7728;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    696.7728;                !- Extended Field
 
   InternalMass,
     SMstore1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore1,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   InternalMass,
     SMstore2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore2,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   InternalMass,
     SMstore3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore3,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   InternalMass,
     SMstore4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore4,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   InternalMass,
     SMstore5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore5,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   InternalMass,
     SMstore6 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore6,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   InternalMass,
     SMstore7 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore7,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
   InternalMass,
     SMstore8 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
     SMstore8,                !- Zone or ZoneList Name
-    348.3864;                !- Surface Area {m2}
+    ,                        !- Surface Area {m2}
+    348.3864;                !- Extended Field
 
 ! ***INTERNAL GAINS SCHEDULES***
 

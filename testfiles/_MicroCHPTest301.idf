@@ -255,6 +255,7 @@
     WALL,                    !- Surface Type
     EXTWALL:GARAGE,          !- Construction Name
     GARAGE ZONE,             !- Zone Name
+    ,                        !- Space Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
