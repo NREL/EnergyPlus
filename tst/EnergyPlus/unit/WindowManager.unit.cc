@@ -577,10 +577,10 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataSurface->SurfTAirRef(surfNum2) = DataSurfaces::ZoneSupplyAirTemp;
     state->dataSurface->SurfTAirRef(surfNum3) = DataSurfaces::AdjacentAirTemp;
 
-    state->dataHeatBalSurf->CoeffAdjRatioOut.allocate(3);
-    state->dataHeatBal->CoeffAdjRatioIn.allocate(3);
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.0;
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0;
 
     state->dataHeatBalSurf->QdotConvOutRep.allocate(3);
     state->dataHeatBalSurf->QdotConvOutRepPerArea.allocate(3);
@@ -2779,10 +2779,10 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
 
     // initialize simple glazing adjustment ratio
-    state->dataHeatBalSurf->CoeffAdjRatioOut.allocate(3);
-    state->dataHeatBal->CoeffAdjRatioIn.allocate(3);
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.0024;
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.0024;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0024;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0024;
 
     state->dataHeatBalFanSys->MAT.allocate(1);
     state->dataHeatBalFanSys->MAT(1) = 25.0;
@@ -3090,8 +3090,8 @@ TEST_F(EnergyPlusFixture, WindowManager_updateQdotConvRadOutRepTest) {
     state->dataWindowManager->hcout = 4.0;
     state->dataWindowManager->tout = 295.0;
     state->dataGlobal->TimeStepZoneSec = 50.0;
-    state->dataHeatBalSurf->CoeffAdjRatioOut.allocate(3);
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
     updateQdotConvOutRep(*state, surfNum2, Tsout);
     Real64 rad_out_per_area = 2.0;
     Real64 rad_out_air_per_area = 1.5;
@@ -3106,7 +3106,7 @@ TEST_F(EnergyPlusFixture, WindowManager_updateQdotConvRadOutRepTest) {
     Real64 QAirExtReportOld = state->dataHeatBalSurf->QAirExtReport(surfNum2);
     Real64 QHeatEmiReportOld = state->dataHeatBalSurf->QHeatEmiReport(surfNum2);
 
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.3;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.3;
     updateQdotConvOutRep(*state, surfNum2, Tsout);
     updateQdotRadOutRepHeatEmi(*state, surfNum2, Tsout, rad_out_per_area, rad_out_air_per_area);
     EXPECT_NEAR(QdotConvOutRepOld * 1.3, state->dataHeatBalSurf->QdotConvOutRep(surfNum2), 0.001);
@@ -3363,17 +3363,17 @@ TEST_F(EnergyPlusFixture, WindowManager_QrepWithAdjRatio)
     Real64 oldValueHeatEmiRep;
 
     // Calculate temperature based on supply flow rate
-    state->dataHeatBalSurf->CoeffAdjRatioOut.allocate(3);
-    state->dataHeatBal->CoeffAdjRatioIn.allocate(3);
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.0;
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0;
     Real64 HextConvCoeff = state->dataHeatBalSurf->SurfHConvInt(surfNum2);
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, HextConvCoeff, inSurfTemp, outSurfTemp);
     oldValueConvOutRep = state->dataHeatBalSurf->QdotConvOutRep(surfNum2);
     oldValueConvOutRepPerArea = state->dataHeatBalSurf->QdotConvOutRepPerArea(surfNum2);
     oldValueHeatEmiRep = state->dataHeatBalSurf->QHeatEmiReport(surfNum2);
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.5;
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.5;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.5;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.5;
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, HextConvCoeff, inSurfTemp, outSurfTemp);
     // fixme: figure out the before-vs-after difference
     // ASSERT_NEAR(oldValueConvOutRep * 1.5, state->dataHeatBalSurf->QdotConvOutRep(surfNum2), 0.1);
@@ -3862,10 +3862,10 @@ TEST_F(EnergyPlusFixture, WindowManger_AdjRatioWindowTempNominalTest)
     state->dataWindowManager->nglface = 2 * state->dataWindowManager->ngllayer;
 
     // initialize simple glazing adjustment ratio
-    state->dataHeatBal->CoeffAdjRatioIn.allocate(3);
-    state->dataHeatBalSurf->CoeffAdjRatioOut.allocate(3);
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.0;
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0;
 
     state->dataWindowManager->emis(1) = 0.84;
     state->dataWindowManager->emis(2) = 0.84;
@@ -4173,10 +4173,10 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
     state->dataWindowManager->nglface = 2 * state->dataWindowManager->ngllayer;
 
     // initialize simple glazing adjustment ratio
-    state->dataHeatBal->CoeffAdjRatioIn.allocate(3);
-    state->dataHeatBalSurf->CoeffAdjRatioOut.allocate(3);
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.0;
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0;
 
     state->dataWindowManager->thetasPrev = 0.0;
     state->dataWindowManager->fvec = 0.0;
@@ -4255,8 +4255,8 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
     AfaceNoAdj = Aface;
     BfaceNoAdj = Bface;
 
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.5;
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.5;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.5;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.5;
 
     WindowManager::GetHeatBalanceEqCoefMatrix(*state,
                                               surfNum2,
@@ -4285,11 +4285,11 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
     EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));
     EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
     EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / state->dataWindowManager->hcout,
-                state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) - 1.0, 0.001);
+                state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) - 1.0, 0.001);
     EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin,
-                state->dataHeatBal->CoeffAdjRatioIn(surfNum2) - 1.0, 0.01);
-    EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout), state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) - 1.0, 0.001);
-    EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin), state->dataHeatBal->CoeffAdjRatioIn(surfNum2) - 1.0, 0.001);
+                state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) - 1.0, 0.01);
+    EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout), state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) - 1.0, 0.001);
+    EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin), state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) - 1.0, 0.001);
 
     DataSurfaces::WinShadingType const ShadeFlagOn = DataSurfaces::WinShadingType::ExtShade;
 
@@ -4312,8 +4312,8 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
         }
     } // End of check if shade or blind is on
 
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.0;
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0;
 
     WindowManager::GetHeatBalanceEqCoefMatrix(*state,
                                               surfNum2,
@@ -4342,8 +4342,8 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
     AfaceNoAdj = Aface;
     BfaceNoAdj = Bface;
 
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.5;
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.5;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.5;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.5;
 
     WindowManager::GetHeatBalanceEqCoefMatrix(*state,
                                               surfNum2,
@@ -4377,13 +4377,13 @@ TEST_F(EnergyPlusFixture, WindowManager_AdjRatioWindowTemperatureTest)
     EXPECT_EQ(AfaceNoAdj(3, 4), state->dataWindowManager->Aface(3, 4));
     EXPECT_EQ(AfaceNoAdj(4, 4), state->dataWindowManager->Aface(4, 4));
     EXPECT_NEAR((state->dataWindowManager->Aface(3, 3) - AfaceNoAdj(3, 3)) / state->dataWindowManager->hcout,
-                state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) - 1.0, 0.001);
+                state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) - 1.0, 0.001);
     EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin,
-                state->dataHeatBal->CoeffAdjRatioIn(surfNum2) - 1.0, 0.01);
+                state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) - 1.0, 0.01);
     EXPECT_EQ(state->dataWindowManager->Bface(1), BfaceNoAdj(1));
     EXPECT_EQ(state->dataWindowManager->Bface(4), BfaceNoAdj(4));
-    EXPECT_NEAR((state->dataWindowManager->Bface(3) - BfaceNoAdj(3)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout), state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) - 1.0, 0.001);
-    EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin), state->dataHeatBal->CoeffAdjRatioIn(surfNum2) - 1.0, 0.001);
+    EXPECT_NEAR((state->dataWindowManager->Bface(3) - BfaceNoAdj(3)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout), state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) - 1.0, 0.001);
+    EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin), state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) - 1.0, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)

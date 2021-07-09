@@ -2211,9 +2211,9 @@ namespace WindowManager {
                                     Real64 const Tsout) {
         auto &surface(state.dataSurface->Surface(SurfNum));
         state.dataHeatBalSurf->QdotConvOutRep(SurfNum) =
-        -surface.Area * state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
+        -surface.Area * state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
         state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum) =
-            -state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
+            -state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
         state.dataHeatBalSurf->QConvOutReport(SurfNum) = state.dataHeatBalSurf->QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
     }
 
@@ -2224,13 +2224,13 @@ namespace WindowManager {
                              Real64 const rad_out_air_per_area)
     {
         auto const &surface = state.dataSurface->Surface(SurfNum);
-        state.dataHeatBalSurf->QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
-        state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = rad_out_per_area * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
+        state.dataHeatBalSurf->QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
+        state.dataHeatBalSurf->QdotRadOutRepPerArea(SurfNum) = rad_out_per_area * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
         state.dataHeatBalSurf->QRadOutReport(SurfNum) = state.dataHeatBalSurf->QdotRadOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
         // Radiation emission to air rate
-        state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
+        state.dataHeatBalSurf->QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
         state.dataHeatBalSurf->QHeatEmiReport(SurfNum) = surface.Area * state.dataWindowManager->hcout *
-                                                             state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) *
+                                                             state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) *
                                                              (Tsout - state.dataWindowManager->tout) +
                                                          state.dataHeatBalSurf->QAirExtReport(SurfNum);
     }
@@ -3355,24 +3355,24 @@ namespace WindowManager {
 
         if (nglasslayer == 1) {
             Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                       state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * state.dataWindowManager->tout +
+                       state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) * state.dataWindowManager->tout +
                        state.dataWindowManager->AbsRadGlassFace(1);
             Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
-                       state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatioIn(SurfNum) * state.dataWindowManager->tin +
+                       state.dataWindowManager->hcin * state.dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) * state.dataWindowManager->tin +
                        state.dataWindowManager->AbsRadGlassFace(2);
 
             Aface(1, 1) =
-                hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
+                hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
             Aface(2, 1) = -state.dataWindowManager->scon(1);
             Aface(1, 2) = -state.dataWindowManager->scon(1);
-            Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatioIn(SurfNum);
+            Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum);
 
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
                            state.dataWindowManager->AbsRadGlassFace(2);
                 Bface(3) = state.dataWindowManager->Rmir * TauShIR * RhoGlIR2 * EpsShIR1 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(1);
                 Bface(4) = state.dataWindowManager->Rmir * EpsShIR2 +
-                           state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatioIn(SurfNum) * state.dataWindowManager->tin +
+                           state.dataWindowManager->hcin * state.dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum) * state.dataWindowManager->tin +
                            AbsRadShadeFace(2);
 
                 Aface(2, 2) = hr(2) * (1 - RhoShIR1) / ShGlReflFacIR + state.dataWindowManager->scon(1) + hcv;
@@ -3381,20 +3381,20 @@ namespace WindowManager {
                 Aface(3, 3) = hr(3) * (1 - RhoGlIR2 * (EpsShIR1 + RhoShIR1)) / ShGlReflFacIR + sconsh + hcv;
                 Aface(4, 3) = -sconsh;
                 Aface(3, 4) = -sconsh;
-                Aface(4, 4) = hr(4) + sconsh + state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatioIn(SurfNum);
+                Aface(4, 4) = hr(4) + sconsh + state.dataWindowManager->hcin * state.dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum);
             }
 
             if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                 Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
                            state.dataWindowManager->AbsRadGlassFace(1);
                 Bface(3) = state.dataWindowManager->Outir * EpsShIR1 +
-                           state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum) * state.dataWindowManager->tout +
+                           state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) * state.dataWindowManager->tout +
                            AbsRadShadeFace(1);
                 Bface(4) = state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
 
                 Aface(1, 1) = hr(1) * (1 - RhoShIR2) / ShGlReflFacIR + state.dataWindowManager->scon(1) + hcv;
                 Aface(4, 1) = -state.dataWindowManager->emis(1) * hr(4) / ShGlReflFacIR;
-                Aface(3, 3) = hr(3) + sconsh + state.dataWindowManager->hcout * state.dataHeatBalSurf->CoeffAdjRatioOut(SurfNum);
+                Aface(3, 3) = hr(3) + sconsh + state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
                 Aface(4, 3) = -sconsh;
                 Aface(1, 4) = -hr(1) * EpsShIR2 / ShGlReflFacIR;
                 Aface(3, 4) = -sconsh;

@@ -111,7 +111,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfTempInsOld;      // SurfTempIn from previous iteration for convergence check
     Array1D<Real64> SurfTempInTmp;       // Inside Surface Temperature Of Each Heat Transfer Surface
     Array1D<Real64> SurfHcExt;           // Outside Convection Coefficient
-    Array1D<Real64> CoeffAdjRatioOut;    // Outside Convective and Radiative Coefficient Adjustment Ratio
+    Array1D<Real64> SurfWinCoeffAdjRatioOut; // Outside Convective and Radiative Coefficient Adjustment Ratio.
+                                             // Only applicable for exterior window surfaces
     Array1D<Real64> SurfHAirExt;         // Outside Convection Coefficient to Air
     Array1D<Real64> SurfHSkyExt;         // Outside Convection Coefficient to Sky
     Array1D<Real64> SurfHGrdExt;         // Outside Convection Coefficient to Ground
@@ -261,7 +262,7 @@ struct HeatBalSurfData : BaseGlobalStruct
         this->SurfTempInsOld.deallocate();
         this->SurfTempInTmp.deallocate();
         this->SurfHcExt.deallocate();
-        this->CoeffAdjRatioOut.deallocate();
+        this->SurfWinCoeffAdjRatioOut.deallocate();
         this->SurfHAirExt.deallocate();
         this->SurfHSkyExt.deallocate();
         this->SurfHGrdExt.deallocate();

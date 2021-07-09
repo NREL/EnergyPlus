@@ -3151,7 +3151,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_QdotConvInRepAdjRatioTest)
                           "Construction,",
                           "  WindowConstruction,      !- Name",
                           "  WindowMaterial;          !- Outside Layer",
-                          "WindowProperty:FrameAndDivider,",
                           "  WindowFrame,             !- Name",
                           "  0.05,                    !- Frame Width {m}",
                           "  0.00,                    !- Frame Outside Projection {m}",
@@ -3377,10 +3376,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_QdotConvInRepAdjRatioTest)
     state->dataWindowManager->hcout = 4.0;
     state->dataWindowManager->tout = 295.0;
     state->dataGlobal->TimeStepZoneSec = 50.0;
-    state->dataHeatBal->CoeffAdjRatioIn.allocate(3);
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.0;
-    state->dataHeatBalSurf->CoeffAdjRatioOut.allocate(3);
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.0;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn.allocate(3);
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.0;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut.allocate(3);
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.0;
 
     state->dataHeatBalSurf->SurfIsAdiabatic.allocate(3);
     state->dataHeatBalSurf->SurfIsAdiabatic(2) = 0;
@@ -3463,8 +3462,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_QdotConvInRepAdjRatioTest)
     Real64 SurfTempInOld = state->dataHeatBalSurf->SurfTempIn(surfNum2);
     Real64 RefAirTempOld = state->dataHeatBalSurfMgr->RefAirTemp(surfNum2);
 
-    state->dataHeatBal->CoeffAdjRatioIn(surfNum2) = 1.3;
-    state->dataHeatBalSurf->CoeffAdjRatioOut(surfNum2) = 1.3;
+    state->dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum2) = 1.3;
+    state->dataHeatBalSurf->SurfWinCoeffAdjRatioOut(surfNum2) = 1.3;
     CalcHeatBalanceInsideSurf2CTFOnly(*state, 1, state->dataGlobal->NumOfZones, state->dataSurface->AllIZSurfaceList);
 
     Real64 ratio = 1.3 * state->dataHeatBalSurf->SurfHConvInt(surfNum2) / SurfHConvIntOld *
