@@ -14315,8 +14315,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
         "  AirLoopHVAC:OutdoorAirSystem,",
         "    Sys 1 Furnace DX Cool OA System,  !- Name",
         "    Sys 1 Furnace DX Cool OA System Controllers,  !- Controller List Name",
-        "    Sys 1 Furnace DX Cool OA System Equipment,  !- Outdoor Air Equipment List Name",
-        "    Sys 1 Furnace DX Cool Availability Managers;  !- Availability Manager List Name",
+        "    Sys 1 Furnace DX Cool OA System Equipment;  !- Outdoor Air Equipment List Name",
 
         "  AirLoopHVAC:ControllerList,",
         "    Sys 1 Furnace DX Cool OA System Controllers,  !- Name",

@@ -835,7 +835,6 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     int AlphaNum;
     std::string ComponentListName;
     std::string ControllerListName;
-    std::string AvailManagerListName;
     int NumInList;
     int InListNum;
     int ListNum;
@@ -963,7 +962,6 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         state.dataAirLoop->OutsideAirSys(OASysNum).ControllerListName = AlphArray(2);
         ComponentListName = AlphArray(3);
         state.dataAirLoop->OutsideAirSys(OASysNum).ComponentListName = AlphArray(3);
-        AvailManagerListName = AlphArray(4);
 
         TestCompSet(state, CurrentModuleObject, AlphArray(1), "UNDEFINED", "UNDEFINED", "Air Nodes");
 
@@ -1044,16 +1042,6 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         }
         state.dataAirLoop->OutsideAirSys(OASysNum).ControllerListNum = ListNum;
         state.dataAirLoop->OutsideAirSys(OASysNum).NumSimpleControllers = NumSimpControllers;
-
-        if (!lAlphaBlanks(4)) {
-            ListNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(
-                state, CurrentModuleObjects(static_cast<int>(CMO::SysAvailMgrList)), AvailManagerListName);
-            if (ListNum <= 0) {
-                ShowSevereError(
-                    state, CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\" not found.");
-                ErrorsFound = true;
-            }
-        }
     }
 
     for (OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
