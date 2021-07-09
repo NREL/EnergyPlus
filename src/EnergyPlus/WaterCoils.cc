@@ -2364,6 +2364,12 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
             }
 
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == iCoilModel::CoolingDetailed) { // Coil:Cooling:Water:DetailedGeometry
+                TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
+                if (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate == 0.0)
+                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
+            }
+
             bool errorsFound = false;
             CoolingAirFlowSizer sizingCoolingAirFlow;
             CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
