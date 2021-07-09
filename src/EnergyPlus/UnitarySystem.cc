@@ -12590,7 +12590,7 @@ namespace UnitarySystems {
                                 Par[5] = double(FanOpMode);
                                 Par[6] = double(this->m_DehumidificationMode);
                                 Par[7] = this->LoadSHR;
-								General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
+                                General::SolveRoot(state, HumRatAcc, MaxIte, SolFla, PartLoadFrac, this->HXAssistedCoolCoilHRResidual, 0.0, 1.0, Par);
                                 if (SolFla == -1) {
 
                                     //                   RegulaFalsi may not find latent PLR when the latent degradation model is used.
@@ -15252,8 +15252,17 @@ namespace UnitarySystems {
         if (thisSys.CoolCoilFluidInletNode > 0) {
             state.dataLoopNodes->Node(thisSys.CoolCoilFluidInletNode).MassFlowRate = thisSys.MaxCoolCoilFluidFlow * PartLoadRatio;
         }
-        HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(
-            state, CoilIndex, FirstHVACIteration, state.dataUnitarySystems->On, PartLoadRatio, HXUnitOn, FanOpMode, _, _, DehumidificationMode_par, LoadSHR_par);
+        HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
+                                                             CoilIndex,
+                                                             FirstHVACIteration,
+                                                             state.dataUnitarySystems->On,
+                                                             PartLoadRatio,
+                                                             HXUnitOn,
+                                                             FanOpMode,
+                                                             _,
+                                                             _,
+                                                             DehumidificationMode_par,
+                                                             LoadSHR_par);
         Real64 OutletAirTemp = state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(CoilIndex);
         Residuum = Par[2] - OutletAirTemp;
         return Residuum;
@@ -15293,7 +15302,7 @@ namespace UnitarySystems {
         int FanOpMode = int(Par[5]);
         int DehumidificationMode_par = int(Par[6]);
         Real64 LoadSHR_par = Par[7];
-        
+
         HVACHXAssistedCoolingCoil::CalcHXAssistedCoolingCoil(state,
                                                              CoilIndex,
                                                              FirstHVACIteration,
