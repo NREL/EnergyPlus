@@ -105,13 +105,13 @@ namespace HVACHXAssistedCoolingCoil {
                                   int const CompOp,                      // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,            // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
-                                  int const FanOpMode,                // Allows the parent object to control fan operation
-                                  Optional_bool_const HXUnitEnable,   // flag to enable heat exchanger heat recovery
-                                  Optional<Real64 const> OnOffAFR,    // Ratio of compressor ON air mass flow rate to AVERAGE over time step
-                                  Optional_bool_const EconomizerFlag, // OA sys or air loop economizer status
-                                  Optional<Real64> QTotOut,            // the total cooling output of unit
-                                  Optional_int_const DehumidificationMode,   // Optional dehumbidication mode
-                                  Optional<Real64 const> LoadSHR             // Optional CoilSHR pass over
+                                  int const FanOpMode,                     // Allows the parent object to control fan operation
+                                  Optional_bool_const HXUnitEnable,        // flag to enable heat exchanger heat recovery
+                                  Optional<Real64 const> OnOffAFR,         // Ratio of compressor ON air mass flow rate to AVERAGE over time step
+                                  Optional_bool_const EconomizerFlag,      // OA sys or air loop economizer status
+                                  Optional<Real64> QTotOut,                // the total cooling output of unit
+                                  Optional_int_const DehumidificationMode, // Optional dehumbidication mode
+                                  Optional<Real64 const> LoadSHR           // Optional CoilSHR pass over
     )
     {
 
