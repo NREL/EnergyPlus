@@ -168,7 +168,8 @@ namespace WindowManager {
                                           int const nglasslayer,   // Number of glass layers
                                           Array2D<Real64> &Aface,  // Coefficient in equation Aface*thetas = Bface
                                           Array1D<Real64> &Bface,  // Coefficient in equation Aface*thetas = Bface
-                                          Array1D<Real64> hr       // Radiative conductance (W/m2-K)
+                                          Array1D<Real64> hr,      // Radiative conductance (W/m2-K)
+                                          Array1A<Real64> hgap // Gap gas conductive conductance (W/m2-K)
     );
 
     //****************************************************************************

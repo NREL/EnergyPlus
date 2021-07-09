@@ -3887,17 +3887,18 @@ TEST_F(EnergyPlusFixture, WindowManger_AdjRatioWindowTempNominalTest)
     Array2D<Real64> AfaceNoAdj;
     Array1D<Real64> BfaceNoAdj;
     Array1D<Real64> hr = state->dataWindowManager->hr;
+    Array1A<Real64> hgap = state->dataWindowManager->hgap;
 
     int ConstrNum = state->dataSurface->Surface(surfNum2).Construction;
 
     state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.0;
-    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, ConstrNum, 1, Aface, Bface, hr);
+    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, ConstrNum, 1, Aface, Bface, hr, hgap);
 
     AfaceNoAdj = Aface;
     BfaceNoAdj = Bface;
 
     state->dataHeatBal->CoeffAdjRatio(ConstrNum) = 1.5;
-    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, ConstrNum, 1, Aface, Bface, hr);
+    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, ConstrNum, 1, Aface, Bface, hr, hgap);
 
     EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));
     EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));

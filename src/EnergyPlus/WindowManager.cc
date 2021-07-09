@@ -3160,10 +3160,9 @@ namespace WindowManager {
                                           int const nglasslayer,
                                           Array2D<Real64> &Aface,
                                           Array1D<Real64> &Bface,
-                                          Array1D<Real64> hr)
+                                          Array1D<Real64> hr,
+                                          Array1A<Real64> hgap)
     {
-        auto &hgap = state.dataWindowManager->hgap;
-
         Real64 gr;  // Grashof number of gas in a gap
         Real64 con; // Gap gas conductivity
         Real64 pr;  // Gap gas Prandtl number
@@ -7313,7 +7312,7 @@ namespace WindowManager {
             ++iter;
 
             auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-            GetHeatBalanceEqCoefMatrixSimple(state, ConstrNum, SELECT_CASE_var, Aface, Bface, hr);
+            GetHeatBalanceEqCoefMatrixSimple(state, ConstrNum, SELECT_CASE_var, Aface, Bface, hr, hgap);
 
             LUdecomposition(state, Aface, state.dataWindowManager->nglface, indx, d); // Note that these routines change Aface;
             LUsolution(Aface, state.dataWindowManager->nglface, indx, Bface);         // face temperatures are returned in Bface
