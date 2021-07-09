@@ -4542,30 +4542,30 @@ namespace UnitarySystems {
                         errorsFound = true;
                     }
 
-					if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
+                    if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX")) {
 
-						errFlag = false;
-						int childCCIndex_temp = CoilCoolingDX::factory(state, ChildCoolingCoilName);
-						if (childCCIndex_temp < 0) {
-							ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
-							errFlag = true;
-							errorsFound = true;
-						}
+                        errFlag = false;
+                        int childCCIndex_temp = CoilCoolingDX::factory(state, ChildCoolingCoilName);
+                        if (childCCIndex_temp < 0) {
+                            ShowContinueError(state, "Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                            errFlag = true;
+                            errorsFound = true;
+                        }
 
-						auto& newCoil_temp = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_temp];
-						this->m_CoolingCoilAvailSchPtr = newCoil_temp.availScheduleIndex;
+                        auto &newCoil_temp = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex_temp];
+                        this->m_CoolingCoilAvailSchPtr = newCoil_temp.availScheduleIndex;
 
-						// thisSys.m_DesignCoolingCapacity = newCoil_temp.performance.normalMode.ratedGrossTotalCap;
-						// Get Coil:Cooling:DX coil air flow rate. Later fields will overwrite this IF input field is present
-						this->m_MaxCoolAirVolFlow = newCoil_temp.performance.normalMode.ratedEvapAirFlowRate;
-						// if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
-						if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                        // thisSys.m_DesignCoolingCapacity = newCoil_temp.performance.normalMode.ratedGrossTotalCap;
+                        // Get Coil:Cooling:DX coil air flow rate. Later fields will overwrite this IF input field is present
+                        this->m_MaxCoolAirVolFlow = newCoil_temp.performance.normalMode.ratedEvapAirFlowRate;
+                        // if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                        if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
 
-						// Get Outdoor condenser node from heat exchanger assisted DX coil object
-						errFlag = false;
-						this->m_CondenserNodeNum = newCoil_temp.condInletNodeIndex;
+                        // Get Outdoor condenser node from heat exchanger assisted DX coil object
+                        errFlag = false;
+                        this->m_CondenserNodeNum = newCoil_temp.condInletNodeIndex;
 
-					} else if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX:SINGLESPEED")) {
+                    } else if (UtilityRoutines::SameString(ChildCoolingCoilType, "COIL:COOLING:DX:SINGLESPEED")) {
 
                         errFlag = false;
                         this->m_CoolingCoilAvailSchPtr = DXCoils::GetDXCoilAvailSchPtr(state, ChildCoolingCoilType, ChildCoolingCoilName, errFlag);

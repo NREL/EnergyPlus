@@ -362,14 +362,14 @@ namespace HVACHXAssistedCoolingCoil {
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType = AlphArray(4);
             state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName = AlphArray(5);
 
-            if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                            "Coil:Cooling:DX")) {
+            if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, "Coil:Cooling:DX")) {
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num = CoilDX_Cooling;
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
 
                 CoolingCoilErrFlag = false;
-                int coolingCoilIndex_temp = CoilCoolingDX::factory(state, state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
+                int coolingCoilIndex_temp =
+                    CoilCoolingDX::factory(state, state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex = coolingCoilIndex_temp;
                 if (coolingCoilIndex_temp < 0) {
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + AlphArray(5));
@@ -389,7 +389,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                            "Coil:Cooling:DX:SingleSpeed")) {
+                                                   "Coil:Cooling:DX:SingleSpeed")) {
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num = CoilDX_CoolingSingleSpeed;
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
@@ -468,11 +468,11 @@ namespace HVACHXAssistedCoolingCoil {
                     state, "...Occurs in " + CurrentModuleObject + "=\"" + state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
             }
 
-            if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                            "Coil:Cooling:DX")) {
+            if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, "Coil:Cooling:DX")) {
                 CoolingCoilErrFlag = false;
                 CoolingCoilInletNodeNum =
-                    state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].evapInletNodeIndex;
+                    state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex]
+                        .evapInletNodeIndex;
                 if (CoolingCoilErrFlag) { // this flag is not changed
                     ShowContinueError(state,
                                       "...Occurs in " + CurrentModuleObject + "=\"" +
@@ -498,7 +498,7 @@ namespace HVACHXAssistedCoolingCoil {
 
                 CoolingCoilErrFlag = false;
                 CoolingCoilOutletNodeNum =
-                        state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex]
+                    state.dataCoilCooingDX->coilCoolingDXs[state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex]
                         .evapOutletNodeIndex;
                 if (CoolingCoilErrFlag) { // this error flag is not changed
                     ShowContinueError(state,
@@ -524,7 +524,7 @@ namespace HVACHXAssistedCoolingCoil {
                 }
 
             } else if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                            "Coil:Cooling:DX:SingleSpeed")) {
+                                                   "Coil:Cooling:DX:SingleSpeed")) {
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
                 CoolingCoilInletNodeNum = GetDXCoilInletNode(state,
@@ -995,8 +995,7 @@ namespace HVACHXAssistedCoolingCoil {
         state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).MassFlowRate =
             state.dataLoopNodes->Node(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum).MassFlowRate;
 
-        if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling)
-        {
+        if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
             //
         } else if (state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
             state.dataDXCoils->DXCoilFullLoadOutAirTemp(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
@@ -1011,16 +1010,16 @@ namespace HVACHXAssistedCoolingCoil {
     //******************************************************************************
 
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
-                                   int const HXAssistedCoilNum,         // Index number for HXAssistedCoolingCoil
-                                   bool const FirstHVACIteration,       // FirstHVACIteration flag
-                                   int const CompOp,                    // compressor operation; 1=on, 0=off
-                                   Real64 const PartLoadRatio,          // Cooling coil part load ratio
-                                   bool const HXUnitOn,                 // Flag to enable heat exchanger
-                                   int const FanOpMode,                 // Allows parent object to control fan operation
-                                   Optional<Real64 const> OnOffAirFlow, // Ratio of compressor ON air mass flow to AVERAGE over time step
-                                   Optional_bool_const EconomizerFlag,  // OA (or airloop) econommizer status
+                                   int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
+                                   bool const FirstHVACIteration,           // FirstHVACIteration flag
+                                   int const CompOp,                        // compressor operation; 1=on, 0=off
+                                   Real64 const PartLoadRatio,              // Cooling coil part load ratio
+                                   bool const HXUnitOn,                     // Flag to enable heat exchanger
+                                   int const FanOpMode,                     // Allows parent object to control fan operation
+                                   Optional<Real64 const> OnOffAirFlow,     // Ratio of compressor ON air mass flow to AVERAGE over time step
+                                   Optional_bool_const EconomizerFlag,      // OA (or airloop) econommizer status
                                    Optional_int_const DehumidificationMode, // Optional dehumbidication mode
-                                   Optional<Real64 const> LoadSHR       // Optional coil SHR pass over
+                                   Optional<Real64 const> LoadSHR           // Optional coil SHR pass over
     )
     {
 
@@ -1107,9 +1106,9 @@ namespace HVACHXAssistedCoolingCoil {
                     OperationMode = DataHVACGlobals::coilEnhancedMode;
                 }
 
-                Real64 CoolingSpeedNum =
-                    state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].performance.normalMode.speeds.size(); // used the same for the original variable speed coil
-                Real64 CoolingSpeedRatio = 1.0; // used same setting as the original variable speed coil
+                Real64 CoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
+                                             .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
+                Real64 CoolingSpeedRatio = 1.0;                                     // used same setting as the original variable speed coil
                 bool singleMode = true;
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].getNumModes() > 1) {
                     singleMode = false;
