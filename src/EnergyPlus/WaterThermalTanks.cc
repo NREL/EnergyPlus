@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -986,6 +987,34 @@ bool getDesuperHtrInput(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
             }
+        } else if (UtilityRoutines::SameString(heatSourceObjType, "Coil:Cooling:DX")) {
+            whDesupObj.ReclaimHeatingSource = CoilObjEnum::CoilCoolingDX;
+            whDesupObj.ReclaimHeatingSourceIndexNum = CoilCoolingDX::factory(state, state.dataIPShortCut->cAlphaArgs(10));
+            if (whDesupObj.ReclaimHeatingSourceIndexNum < 0) {
+                ShowSevereError(state,
+                                format("{}={}, could not find desuperheater coil {}={}",
+                                       state.dataIPShortCut->cCurrentModuleObject,
+                                       whDesupObj.Name,
+                                       state.dataIPShortCut->cAlphaArgs(9),
+                                       state.dataIPShortCut->cAlphaArgs(10)));
+                ErrorsFound = true;
+            } else {
+                DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
+                    state.dataCoilCooingDX->coilCoolingDXs[whDesupObj.ReclaimHeatingSourceIndexNum].reclaimHeat;
+                if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
+                    HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataWaterThermalTanks->numWaterHeaterDesuperheater);
+                    for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
+                        num = 0.0;
+                }
+                HeatReclaim.ReclaimEfficiencyTotal += whDesupObj.HeatReclaimRecoveryEff;
+                if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
+                    ShowSevereError(state,
+                                    state.dataIPShortCut->cCurrentModuleObject + ", \"" + whDesupObj.Name +
+                                        "\" sum of heat reclaim recovery efficiencies from the same source coil: \"" + whDesupObj.HeatingSourceName +
+                                        "\" cannot be over 0.3");
+                    ErrorsFound = true;
+                }
+            }
         } else {
             ShowSevereError(state, state.dataIPShortCut->cCurrentModuleObject + " = " + whDesupObj.Name + ':');
             ShowContinueError(state, " desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, ");
@@ -1004,7 +1033,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (whDesupObj.ReclaimHeatingSourceIndexNum == 0) {
+        if (whDesupObj.ReclaimHeatingSourceIndexNum == 0 && whDesupObj.ReclaimHeatingSource != CoilObjEnum::CoilCoolingDX) {
             ShowSevereError(state,
                             state.dataIPShortCut->cCurrentModuleObject + ", \"" + whDesupObj.Name +
                                 "\" desuperheater heat source object not found: " + heatSourceObjType + " \"" + state.dataIPShortCut->cAlphaArgs(10) +
@@ -1095,6 +1124,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
     }
 
     return ErrorsFound;
+
 } // namespace WaterThermalTanks
 
 bool getHPWaterHeaterInput(EnergyPlusData &state)

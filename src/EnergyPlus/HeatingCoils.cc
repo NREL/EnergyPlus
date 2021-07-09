@@ -1267,7 +1267,7 @@ namespace HeatingCoils {
                                 CurrentModuleObject + ", \"" + HeatingCoil(CoilNum).Name +
                                     "\" valid desuperheater heat source object type not found: " + Alphas(5));
                 ShowContinueError(state, "Valid desuperheater heat source objects are:");
-                ShowContinueError(state,X
+                ShowContinueError(state,
                                   "Refrigeration:CompressorRack, Coil:Cooling:DX:SingleSpeed, Refrigeration:Condenser:AirCooled, "
                                   "Refrigeration:Condenser:EvaporativeCooled, Refrigeration:Condenser:WaterCooled,Coil:Cooling:DX:TwoSpeed, and "
                                   "Coil:Cooling:DX:TwoStageWithHumidityControlMode");
