@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
 
     state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
     state->dataLoopNodes->Node(1).HumRat = 0.008;
@@ -372,7 +372,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
 
     state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
     state->dataLoopNodes->Node(1).HumRat = 0.008;
@@ -559,7 +559,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
     state->dataLoopNodes->Node(1).HumRat = 0.008;
@@ -767,7 +767,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     state->dataAirflowNetwork->SimulateAirflowNetwork = 0;
 
-    state->dataHeatBal->ZoneAirSolutionAlgo = UseEulerMethod;
+    state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.01; // Zone inlet node 1
     state->dataLoopNodes->Node(1).HumRat = 0.008;

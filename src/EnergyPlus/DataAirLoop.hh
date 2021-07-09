@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
 
@@ -235,7 +236,7 @@ namespace DataAirLoop {
         int OAControllerIndex;        // OA controller index in OAController
         Array1D_string ComponentName;
         Array1D_string ComponentType;
-        Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
+        Array1D<SimAirServingZones::CompType> ComponentType_Num; // Parameterized (see above) Component Types this
         // module can address
         Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
         std::vector<HVACSystemData *> compPointer;
