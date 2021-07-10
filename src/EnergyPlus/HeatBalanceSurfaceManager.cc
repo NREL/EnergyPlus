@@ -7386,8 +7386,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
         // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
         HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum);
-        auto const HConvInTemp_fac(-HConvIn *
-                                   (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
+        auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
         state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
         state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
         state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -8119,8 +8118,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
             // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
             HConvIn = state.dataHeatBalSurf->SurfHConvInt(surfNum) * state.dataHeatBal->SurfWinCoeffAdjRatioIn(surfNum);
-            auto const HConvInTemp_fac(-HConvIn *
-                                       (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
+            auto const HConvInTemp_fac(-HConvIn * (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)));
             state.dataHeatBalSurf->QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;
             state.dataHeatBalSurf->QdotConvInRepPerArea(surfNum) = HConvInTemp_fac;
             state.dataHeatBalSurf->QConvInReport(surfNum) = state.dataHeatBalSurf->QdotConvInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;

@@ -2206,22 +2206,19 @@ namespace WindowManager {
     // state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum)
     // state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum)
     // state.dataHeatBalSurf->QConvOutReport(SurfNum)
-    void updateQdotConvOutRep(EnergyPlusData &state,
-                                    int const SurfNum,
-                                    Real64 const Tsout) {
+    void updateQdotConvOutRep(EnergyPlusData &state, int const SurfNum, Real64 const Tsout)
+    {
         auto &surface(state.dataSurface->Surface(SurfNum));
-        state.dataHeatBalSurf->QdotConvOutRep(SurfNum) =
-        -surface.Area * state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
+        state.dataHeatBalSurf->QdotConvOutRep(SurfNum) = -surface.Area * state.dataWindowManager->hcout *
+                                                         state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) *
+                                                         (Tsout - state.dataWindowManager->tout);
         state.dataHeatBalSurf->QdotConvOutRepPerArea(SurfNum) =
             -state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum) * (Tsout - state.dataWindowManager->tout);
         state.dataHeatBalSurf->QConvOutReport(SurfNum) = state.dataHeatBalSurf->QdotConvOutRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
     }
 
-    void updateQdotRadOutRepHeatEmi(EnergyPlusData &state,
-                             int const SurfNum,
-                             Real64 const Tsout,
-                             Real64 const rad_out_per_area,
-                             Real64 const rad_out_air_per_area)
+    void updateQdotRadOutRepHeatEmi(
+        EnergyPlusData &state, int const SurfNum, Real64 const Tsout, Real64 const rad_out_per_area, Real64 const rad_out_air_per_area)
     {
         auto const &surface = state.dataSurface->Surface(SurfNum);
         state.dataHeatBalSurf->QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
@@ -2984,7 +2981,6 @@ namespace WindowManager {
 
         state.dataHeatBalSurf->SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
         updateQdotRadOutRepHeatEmi(state, SurfNum, Tsout, rad_out_per_area, rad_out_air_per_area);
-
     }
 
     //****************************************************************************
@@ -3330,27 +3326,27 @@ namespace WindowManager {
         auto &hgap = state.dataWindowManager->hgap;
         auto &RhoIR = state.dataWindowManager->RhoIR;
 
-        Real64 gr;   // Grashof number of gas in a gap
-        Real64 con;  // Gap gas conductivity
-        Real64 pr;   // Gap gas Prandtl number
-        Real64 nu;   // Gap gas Nusselt number
+        Real64 gr;  // Grashof number of gas in a gap
+        Real64 con; // Gap gas conductivity
+        Real64 pr;  // Gap gas Prandtl number
+        Real64 nu;  // Gap gas Nusselt number
 
-        Real64 FacRhoIR25;            // Intermediate variable
-        Real64 FacRhoIR63;            // Intermediate variable
-        Real64 RhoIRfp;               // Intermediate variable
-        Real64 RhoIRbp;               // Intermediate variable
-        Real64 FacRhoIR2fp;           // Intermediate variable
-        Real64 FacRhoIR3bp;           // Intermediate variable
-        Real64 FacRhoIR2fpRhoIR63;    // Intermediate variable
-        Real64 FacRhoIR3bpRhoIR25;    // Intermediate variable
-        Real64 FacRhoIR47;            // Intermediate variable
-        Real64 FacRhoIR85;            // Intermediate variable
-        Real64 FacRhoIR4fp;           // Intermediate variable
-        Real64 FacRhoIR5bp;           // Intermediate variable
-        Real64 FacRhoIR4fpRhoIR85;    // Intermediate variable
-        Real64 FacRhoIR5bpRhoIR47;    // Intermediate variable
+        Real64 FacRhoIR25;         // Intermediate variable
+        Real64 FacRhoIR63;         // Intermediate variable
+        Real64 RhoIRfp;            // Intermediate variable
+        Real64 RhoIRbp;            // Intermediate variable
+        Real64 FacRhoIR2fp;        // Intermediate variable
+        Real64 FacRhoIR3bp;        // Intermediate variable
+        Real64 FacRhoIR2fpRhoIR63; // Intermediate variable
+        Real64 FacRhoIR3bpRhoIR25; // Intermediate variable
+        Real64 FacRhoIR47;         // Intermediate variable
+        Real64 FacRhoIR85;         // Intermediate variable
+        Real64 FacRhoIR4fp;        // Intermediate variable
+        Real64 FacRhoIR5bp;        // Intermediate variable
+        Real64 FacRhoIR4fpRhoIR85; // Intermediate variable
+        Real64 FacRhoIR5bpRhoIR47; // Intermediate variable
 
-        int i;       // Counter
+        int i; // Counter
 
         if (nglasslayer == 1) {
             Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
@@ -3364,7 +3360,8 @@ namespace WindowManager {
                 hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataHeatBalSurf->SurfWinCoeffAdjRatioOut(SurfNum);
             Aface(2, 1) = -state.dataWindowManager->scon(1);
             Aface(1, 2) = -state.dataWindowManager->scon(1);
-            Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum);
+            Aface(2, 2) =
+                hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBal->SurfWinCoeffAdjRatioIn(SurfNum);
 
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) * TauShIR / ShGlReflFacIR + hcv * TGapNew +
@@ -3864,8 +3861,8 @@ namespace WindowManager {
         Real64 RhoShIR1; // Long-wave reflectance of shade/blind surface facing glass; 1=interior shade/blind,
         Real64 RhoShIR2;
         //  2=exterior shade/blind
-        Real64 TauShIR;           // Long-wave transmittance of isolated shade/blind
-        Real64 sconsh;            // shade/blind conductance (W/m2-K)
+        Real64 TauShIR; // Long-wave transmittance of isolated shade/blind
+        Real64 sconsh;  // shade/blind conductance (W/m2-K)
 
         WinShadingType ShadeFlag; // Shading flag
         //  radiation from lights and zone equipment absorbed by faces of shade/blind (W/m2)
@@ -7318,11 +7315,11 @@ namespace WindowManager {
             LUsolution(Aface, state.dataWindowManager->nglface, indx, Bface);         // face temperatures are returned in Bface
 
             errtemp = 0.0;
-                for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
+            for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
                 errtemp += std::abs(state.dataWindowManager->thetas(i) - Bface(i)) / state.dataWindowManager->nglface;
-                }
+            }
 
-                for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
+            for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
                 state.dataWindowManager->thetas(i) = 0.5 * (state.dataWindowManager->thetas(i) + Bface(i));
             }
         }
