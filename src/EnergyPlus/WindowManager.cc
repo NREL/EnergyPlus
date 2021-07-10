@@ -7168,8 +7168,8 @@ namespace WindowManager {
         // only compute adjustment ratio when there is valid user input U
         if ((WinterSummerFlag == 1)) {
             if (inputU > 0) {
-                state.dataHeatBjl->CoeffAdjRatio(ConstrNum) = inputU / NominalConductance;
-                NominalConductance = NominalConductance * state.dataHeatBjl->CoeffAdjRatio(ConstrNum);
+                state.dataHeatBal->CoeffAdjRatio(ConstrNum) = inputU / NominalConductance;
+                NominalConductance = NominalConductance * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
             }
         }
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
@@ -7250,11 +7250,13 @@ namespace WindowManager {
         Real64 TiltDeg;         // glazing tilt in degrees
         Real64 sineTilt;        // sine of glazing tilt
         Real64 Nuint;           // Nusselt number for interior surface convection
+        Real64 CoeffAdjRatio;   // Convective and radiative adjustment ratio for exterior window surfaces
 
         iter = 0;
 
         // Initialize face temperatures
-        StartingWinTempsForNominalCond(state, ConstrNum);
+        CoeffAdjRatio = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+        StartingWinTempsForNominalCond(state, CoeffAdjRatio);
 
         // Calculate radiative conductance
         errtemp = errtemptol * 2.0;
@@ -7333,7 +7335,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void StartingWinTempsForNominalCond(EnergyPlusData &state, int const ConstrNum)
+    void StartingWinTempsForNominalCond(EnergyPlusData &state, Real64 const CoeffAdjRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7362,8 +7364,8 @@ namespace WindowManager {
         Real64 temdiff; // Inside/outside air temperature difference (K)
         Real64 ressum;  // Resistance sum (m2-K/W)
 
-        rguess(1) = 1.0 / ((state.dataWindowManager->hcout + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum));
-        rguess(state.dataWindowManager->nglface + 1) = 1.0 / ((hcinStartValue + hrad) * state.dataHeatBal->CoeffAdjRatio(ConstrNum));
+        rguess(1) = 1.0 / ((state.dataWindowManager->hcout + hrad) * CoeffAdjRatio);
+        rguess(state.dataWindowManager->nglface + 1) = 1.0 / ((hcinStartValue + hrad) * CoeffAdjRatio);
 
         for (i = 2; i <= state.dataWindowManager->nglface; i += 2) {
             rguess(i) = 1.0 / state.dataWindowManager->scon(i / 2);

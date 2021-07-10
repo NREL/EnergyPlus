@@ -397,8 +397,8 @@ namespace WindowManager {
     //****************************************************************************
 
     void StartingWinTempsForNominalCond(EnergyPlusData &state,
-                                        int const ConstrNum    // Construction number of window
-                                        );
+                                        Real64 CoeffAdjRatio // Convective and radiative adjustment ratio for exterior window surfaces
+    );
 
     //****************************************************************************
 
