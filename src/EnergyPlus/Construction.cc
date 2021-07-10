@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/BITF.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataConversions.hh>
@@ -1903,7 +1904,7 @@ void ConstructionProps::reportTransferFunction(EnergyPlusData &state, int const 
         int Layer = this->LayerPoint(I);
         {
             auto const SELECT_CASE_var(state.dataMaterial->Material(Layer).Group);
-            if (SELECT_CASE_var == DataHeatBalance::Air) {
+            if (SELECT_CASE_var == DataHeatBalance::MaterialGroup::Air) {
                 static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
                 print(state.files.eio, Format_702, state.dataMaterial->Material(Layer).Name, state.dataMaterial->Material(Layer).Resistance);
             } else {
@@ -1963,8 +1964,10 @@ bool ConstructionProps::isGlazingConstruction(EnergyPlusData &state) const
     // Commonly used routine in several places in EnergyPlus which examines if current
     // construction is glazing construction
     auto const MaterialGroup = state.dataMaterial->Material(LayerPoint(1)).Group;
-    return MaterialGroup == DataHeatBalance::WindowGlass || MaterialGroup == DataHeatBalance::Shade || MaterialGroup == DataHeatBalance::Screen ||
-           MaterialGroup == DataHeatBalance::WindowBlind || MaterialGroup == DataHeatBalance::WindowSimpleGlazing;
+    return BITF_TEST_ANY(BITF(MaterialGroup),
+                         BITF(DataHeatBalance::MaterialGroup::WindowGlass) | BITF(DataHeatBalance::MaterialGroup::Shade) |
+                             BITF(DataHeatBalance::MaterialGroup::Screen) | BITF(DataHeatBalance::MaterialGroup::WindowBlind) |
+                             BITF(DataHeatBalance::MaterialGroup::WindowSimpleGlazing));
 }
 
 Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue)
