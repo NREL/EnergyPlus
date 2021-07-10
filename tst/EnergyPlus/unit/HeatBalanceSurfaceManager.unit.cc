@@ -1903,8 +1903,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0; // Grd temp
 
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
-        state->dataHeatBalSurf->SurfOutTempHistCurr(SurfNum) = 20;       // Surf temp
-        state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22; // Air temp
+        state->dataHeatBalSurf->SurfOutTempHistCurr(SurfNum) = 20; // Surf temp
+        state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22;      // Air temp
         state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = -6;
         state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;
     }

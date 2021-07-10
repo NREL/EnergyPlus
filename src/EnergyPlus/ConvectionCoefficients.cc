@@ -262,7 +262,6 @@ void InitInteriorConvectionCoeffs(EnergyPlusData &state,
                     continue; // skip surfaces that are not associated with this zone
                 }
             }
-            if (SurfNum == 20) std::string test = state.dataSurface->Surface(SurfNum).Name;
 
             int algoNum;
             bool standardAlgo;

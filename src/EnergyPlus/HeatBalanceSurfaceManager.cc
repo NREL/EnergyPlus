@@ -707,9 +707,9 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     TSC = 0.0;
                     TUC = 0.0;
                 }
-//                auto l11(state.dataHeatBalSurf->TH.index(1, 2, SurfNum));
-//                auto l12(state.dataHeatBalSurf->TH.index(2, 2, SurfNum));
-//                auto const s3(state.dataHeatBalSurf->TH.size3());
+                //                auto l11(state.dataHeatBalSurf->TH.index(1, 2, SurfNum));
+                //                auto l12(state.dataHeatBalSurf->TH.index(2, 2, SurfNum));
+                //                auto const s3(state.dataHeatBalSurf->TH.size3());
                 for (int Term = 1; Term <= construct.NumCTFTerms; ++Term) {
                     // [ l11 ] == ( 1, Term + 1, SurfNum ), [ l12 ] == ( 1, Term + 1, SurfNum )
 
@@ -725,9 +725,11 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
                     Real64 const TH11(state.dataHeatBalSurf->TH(SurfNum, 1, Term + 1));
                     Real64 const TH12(state.dataHeatBalSurf->TH(SurfNum, 2, Term + 1));
 
-                    QIC += ctf_cross * TH11 - construct.CTFInside(Term) * TH12 + construct.CTFFlux(Term) * state.dataHeatBalSurf->QH(SurfNum, 2, Term + 1);
+                    QIC += ctf_cross * TH11 - construct.CTFInside(Term) * TH12 +
+                           construct.CTFFlux(Term) * state.dataHeatBalSurf->QH(SurfNum, 2, Term + 1);
 
-                    QOC += construct.CTFOutside(Term) * TH11 - ctf_cross * TH12 + construct.CTFFlux(Term) * state.dataHeatBalSurf->QH(SurfNum, 1, Term + 1);
+                    QOC += construct.CTFOutside(Term) * TH11 - ctf_cross * TH12 +
+                           construct.CTFFlux(Term) * state.dataHeatBalSurf->QH(SurfNum, 1, Term + 1);
 
                     if (construct.SourceSinkPresent) {
                         Real64 const QsrcHist1(state.dataHeatBalSurf->QsrcHist(SurfNum, Term + 1));
@@ -4948,13 +4950,6 @@ void UpdateThermalHistories(EnergyPlusData &state)
                     state.dataHeatBalSurf->TH(SurfNum, 1, 1) * construct.CTFTUserOut(0) +
                     state.dataHeatBalSurf->SurfTempIn(SurfNum) * construct.CTFTUserIn(0) +
                     state.dataHeatBalSurf->QsrcHist(SurfNum, 1) * construct.CTFTUserSource(0) + state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum);
-//                if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 21 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 3) {
-//                    std::cout << state.dataEnvrn->Month << ", " << state.dataEnvrn->DayOfMonth << ", " << state.dataGlobal->HourOfDay <<
-//                              ", " << state.dataGlobal->TimeStep << ", surfnum " << state.dataSurface->Surface(SurfNum).Name << std::endl;
-//                    std::cout << state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum) << std::endl;
-//                    int test = 1;
-//                }
-
             }
 
             if (surface.ExtBoundCond > 0) continue; // Don't need to evaluate outside for partitions
@@ -5170,12 +5165,6 @@ void UpdateThermalHistories(EnergyPlusData &state)
                         (state.dataHeatBalSurf->TuserHistM[l2] - state.dataHeatBalSurfMgr->Tuser1(SurfNum)) * sum_steps;
                 }
             }
-        }
-        int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
-        int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-        for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-            state.dataHeatBalSurf->TH(SurfNum, 1, 1) = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum);
-            state.dataHeatBalSurf->TH(SurfNum, 2, 1) = state.dataHeatBalSurf->SurfInTempHistCurr(SurfNum);
         }
     } // ...end of loop over all (heat transfer) surfaces
 }
@@ -6492,7 +6481,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
             state.dataHeatBalSurf->QHeatEmiReport(SurfNum) =
                 state.dataHeatBalSurf->QAirExtReport(SurfNum) - state.dataHeatBalSurf->QdotConvOutRep(SurfNum);
 
-//            state.dataHeatBalSurf->TH(SurfNum, 1, 1) = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum);
+            //            state.dataHeatBalSurf->TH(SurfNum, 1, 1) = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum);
         }
     } // ...end of DO loop over all surface (actually heat transfer surfaces)
 }
@@ -7330,15 +7319,16 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
         // balance.  This block is intended to "lock" the opposite side (outside)
         // temperatures to the correct value, namely the value calculated by the
         // inside surface heat balance for the other side.
-//        assert(state.dataHeatBalSurf->TH.index(1, 1, 1) == 0u); // Assumed for linear indexing below
-//        auto const l211(state.dataHeatBalSurf->TH.index(2, 1, 1) - 1);
+        //        assert(state.dataHeatBalSurf->TH.index(1, 1, 1) == 0u); // Assumed for linear indexing below
+        //        auto const l211(state.dataHeatBalSurf->TH.index(2, 1, 1) - 1);
         for (int SurfNum : IZSurfs) {
             int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
             // Set the outside surface temperature to the inside surface temperature of the interzone pair.
             // By going through all of the surfaces, this should pick up the other side as well as affect the next iteration.
             // [ SurfNum - 1 ] == ( 1, 1, SurfNum )
             // [ l211 + surfExtBoundCond ] == ( 2, 1, surfExtBoundCond )
-            state.dataHeatBalSurf->SurfTempOut(SurfNum) = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum) = state.dataHeatBalSurf->SurfInTempHistCurr(surfExtBoundCond);
+            state.dataHeatBalSurf->SurfTempOut(SurfNum) = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum) =
+                state.dataHeatBalSurf->SurfInTempHistCurr(surfExtBoundCond);
         }
 
         ++state.dataHeatBal->InsideSurfIterations;
@@ -7463,10 +7453,10 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
             }
         }
     }
-//    for (int surfNum : HTSurfs) {
-//        state.dataHeatBalSurf->TH(surfNum, 1, 1) = state.dataHeatBalSurf->SurfOutTempHistCurr(surfNum);
-//        state.dataHeatBalSurf->TH(surfNum, 2, 1) = state.dataHeatBalSurf->SurfInTempHistCurr(surfNum);
-//    }
+    //    for (int surfNum : HTSurfs) {
+    //        state.dataHeatBalSurf->TH(surfNum, 1, 1) = state.dataHeatBalSurf->SurfOutTempHistCurr(surfNum);
+    //        state.dataHeatBalSurf->TH(surfNum, 2, 1) = state.dataHeatBalSurf->SurfInTempHistCurr(surfNum);
+    //    }
 
     // Update SumHmXXXX for non-window EMPD or HAMT surfaces
     if (state.dataHeatBal->AnyEMPD || state.dataHeatBal->AnyHAMT) {
@@ -8087,15 +8077,16 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
         // balance.  This block is intended to "lock" the opposite side (outside)
         // temperatures to the correct value, namely the value calculated by the
         // inside surface heat balance for the other side.
-//        assert(state.dataHeatBalSurf->TH.index(1, 1, 1) == 0u); // Assumed for linear indexing below
-//        auto const l211(state.dataHeatBalSurf->TH.index(2, 1, 1) - 1);
+        //        assert(state.dataHeatBalSurf->TH.index(1, 1, 1) == 0u); // Assumed for linear indexing below
+        //        auto const l211(state.dataHeatBalSurf->TH.index(2, 1, 1) - 1);
         for (int SurfNum : IZSurfs) {
             int const surfExtBoundCond(Surface(SurfNum).ExtBoundCond);
             // Set the outside surface temperature to the inside surface temperature of the interzone pair.
             // By going through all of the surfaces, this should pick up the other side as well as affect the next iteration.
             // [ SurfNum - 1 ] == ( 1, 1, SurfNum )
             // [ l211 + surfExtBoundCond ] == ( 2, 1, surfExtBoundCond )
-            state.dataHeatBalSurf->SurfTempOut(SurfNum) = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum) = state.dataHeatBalSurf->SurfInTempHistCurr(surfExtBoundCond);
+            state.dataHeatBalSurf->SurfTempOut(SurfNum) = state.dataHeatBalSurf->SurfOutTempHistCurr(SurfNum) =
+                state.dataHeatBalSurf->SurfInTempHistCurr(surfExtBoundCond);
             state.dataHeatBalSurf->SurfTempOutHist(SurfNum) = state.dataHeatBalSurf->SurfTempOut(SurfNum);
         }
 
@@ -8204,14 +8195,14 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
     }
 
     if (state.dataSurface->AnyMovableInsulation) ReportIntMovInsInsideSurfTemp(state);
-//    for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-//        int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
-//        int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
-//        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-//            state.dataHeatBalSurf->TH(surfNum, 1, 1) = state.dataHeatBalSurf->SurfOutTempHistCurr(surfNum);
-//            state.dataHeatBalSurf->TH(surfNum, 2, 1) = state.dataHeatBalSurf->SurfInTempHistCurr(surfNum);
-//        }
-//    }
+    //    for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
+    //        int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+    //        int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
+    //        for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
+    //            state.dataHeatBalSurf->TH(surfNum, 1, 1) = state.dataHeatBalSurf->SurfOutTempHistCurr(surfNum);
+    //            state.dataHeatBalSurf->TH(surfNum, 2, 1) = state.dataHeatBalSurf->SurfInTempHistCurr(surfNum);
+    //        }
+    //    }
     CalculateZoneMRT(state, ZoneToResimulate); // Update here so that the proper value of MRT is available to radiant systems
 }
 
