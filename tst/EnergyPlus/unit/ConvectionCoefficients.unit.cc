@@ -479,7 +479,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     // Surface temps are 20C
     for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
-        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
+        state->dataHeatBalSurf->SurfInTempHistCurr(surf) = 20.0;
     }
 
     // Case 1 - Zone air warmer than surfaces
@@ -612,7 +612,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
     for (int surf = 1; surf <= state->dataSurface->TotSurfaces; ++surf) {
-        state->dataHeatBalSurf->TH(2, 1, surf) = 20.0;
+        state->dataHeatBalSurf->SurfInTempHistCurr(surf) = 20.0;
     }
 
     state->dataHeatBalFanSys->MAT.allocate(1);
@@ -629,7 +629,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->Surface(SurfNum).CosTilt = -1;
 
     HcExpectedValue =
-        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+        CalcASHRAETARPNatural(state->dataHeatBalSurf->SurfInTempHistCurr(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
@@ -641,7 +641,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->Surface(SurfNum).CosTilt = 1;
 
     HcExpectedValue =
-        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+        CalcASHRAETARPNatural(state->dataHeatBalSurf->SurfInTempHistCurr(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);
@@ -653,7 +653,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->Surface(SurfNum).CosTilt = 0;
 
     HcExpectedValue =
-        CalcASHRAETARPNatural(state->dataHeatBalSurf->TH(2, 1, 1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
+        CalcASHRAETARPNatural(state->dataHeatBalSurf->SurfInTempHistCurr(1), state->dataHeatBalFanSys->MAT(1), -state->dataSurface->Surface(SurfNum).CosTilt);
 
     EvaluateIntHcModels(*state, SurfNum, ConvModelEquationNum, Hc);
     EXPECT_EQ(state->dataSurface->SurfTAirRef(SurfNum), DataSurfaces::ZoneMeanAirTemp);

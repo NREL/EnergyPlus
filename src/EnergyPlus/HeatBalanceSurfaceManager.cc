@@ -4948,6 +4948,13 @@ void UpdateThermalHistories(EnergyPlusData &state)
                     state.dataHeatBalSurf->TH(SurfNum, 1, 1) * construct.CTFTUserOut(0) +
                     state.dataHeatBalSurf->SurfTempIn(SurfNum) * construct.CTFTUserIn(0) +
                     state.dataHeatBalSurf->QsrcHist(SurfNum, 1) * construct.CTFTUserSource(0) + state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum);
+//                if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 21 && state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 3) {
+//                    std::cout << state.dataEnvrn->Month << ", " << state.dataEnvrn->DayOfMonth << ", " << state.dataGlobal->HourOfDay <<
+//                              ", " << state.dataGlobal->TimeStep << ", surfnum " << state.dataSurface->Surface(SurfNum).Name << std::endl;
+//                    std::cout << state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum) << std::endl;
+//                    int test = 1;
+//                }
+
             }
 
             if (surface.ExtBoundCond > 0) continue; // Don't need to evaluate outside for partitions
@@ -5037,13 +5044,14 @@ void UpdateThermalHistories(EnergyPlusData &state)
                         }
                     }
                     if (construct.SourceSinkPresent) {
-                        //                        auto m(state.dataHeatBalSurf->TsrcHistM.index(SurfNum, numCTFTerms));
-                        //                        auto m1(m + 1);
-                        for (int HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum) { // Tuned Linear indexing
-                            state.dataHeatBalSurf->TsrcHist(SurfNum, HistTermNum) = state.dataHeatBalSurf->TsrcHistM(SurfNum, HistTermNum) =
-                                state.dataHeatBalSurf->TsrcHistM(SurfNum, HistTermNum - 1);
-                            state.dataHeatBalSurf->QsrcHist(SurfNum, HistTermNum) = state.dataHeatBalSurf->QsrcHistM(SurfNum, HistTermNum) =
-                                state.dataHeatBalSurf->QsrcHistM(SurfNum, HistTermNum - 1);
+                        auto m(state.dataHeatBalSurf->TsrcHistM.index(SurfNum, numCTFTerms));
+                        auto m1(m + 1);
+                        for (int HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing
+                            // TsrcHist( SurfNum, HistTerm ) = TsrcHistM( SurfNum, HHistTerm ) = TsrcHistM( SurfNum, HistTermNum - 1 );
+                            // QsrcHist( SurfNum, HistTerm ) = QsrcHistM( SurfNum, HHistTerm ) = QsrcHistM( SurfNum, HistTermNum - 1 );
+                            state.dataHeatBalSurf->TsrcHist[m1] = state.dataHeatBalSurf->TsrcHistM[m1] = state.dataHeatBalSurf->TsrcHistM[m];
+                            state.dataHeatBalSurf->QsrcHist[m1] = state.dataHeatBalSurf->QsrcHistM[m1] = state.dataHeatBalSurf->QsrcHistM[m];
+                            state.dataHeatBalSurf->TuserHist[m1] = state.dataHeatBalSurf->TuserHistM[m1] = state.dataHeatBalSurf->TuserHistM[m];
                         }
                     }
                 }
