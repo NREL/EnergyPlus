@@ -324,6 +324,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataSurface->Surface(1).Construction = 1;
     state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
 
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
