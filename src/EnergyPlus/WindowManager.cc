@@ -7168,9 +7168,8 @@ namespace WindowManager {
         // only compute adjustment ratio when there is valid user input U
         if ((WinterSummerFlag == 1)) {
             if (inputU > 0) {
-                state.dataHeatBal->CoeffAdjRatio(ConstrNum) = inputU / NominalConductance;
-                NominalConductance =
-                    1.0 / (rOut * 1 / state.dataHeatBal->CoeffAdjRatio(ConstrNum) + Rbare + rIn * 1 / state.dataHeatBal->CoeffAdjRatio(ConstrNum));
+                state.dataHeatBjl->CoeffAdjRatio(ConstrNum) = inputU / NominalConductance;
+                NominalConductance = NominalConductance * state.dataHeatBjl->CoeffAdjRatio(ConstrNum);
             }
         }
         // EPTeam - again -- believe that is enforced in input //Autodesk But this routine is not self-protecting: Add as an assert
