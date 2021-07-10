@@ -172,15 +172,15 @@ namespace UnitarySystems {
           m_SensibleLoadMet(0.0), m_LatentLoadMet(0.0), m_MyStagedFlag(false), m_SensibleLoadPredicted(0.0), m_MoistureLoadPredicted(0.0),
           m_FaultyCoilSATFlag(false), m_FaultyCoilSATIndex(0), m_FaultyCoilSATOffset(0.0), m_TESOpMode(0), m_initLoadBasedControlAirLoopPass(false),
           m_airLoopPassCounter(0), m_airLoopReturnCounter(0), m_FanCompNotSetYet(true), m_CoolCompNotSetYet(true), m_HeatCompNotSetYet(true),
-          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_IsDXCoil(true), m_SmallLoadTolerance(5.0), UnitarySystemType_Num(0),
-          MaxIterIndex(0), RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0),
-          HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0),
-          MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
-          MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0),
-          CoolCoilLoopNum(0), CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0),
-          HeatCoilLoopSide(0), HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0),
-          HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0),
-          m_CompPointerMSHP(nullptr), LoadSHR(0.0), CoilSHR(0.0)
+          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_IsDXCoil(true), m_SmallLoadTolerance(5.0), UnitarySystemType_Num(0), MaxIterIndex(0),
+          RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0),
+          ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0),
+          DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0),
+          MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0),
+          CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0),
+          HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0),
+          HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr),
+          LoadSHR(0.0), CoilSHR(0.0)
     {
     }
 
@@ -11678,11 +11678,13 @@ namespace UnitarySystems {
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
 
                         CycRatio = 1.0;
-                        for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
-                            SpeedRatio = double(SpeedNum) - 1.0;
+                        for (SpeedRatio = 0; SpeedRatio < this->m_NumOfSpeedCooling; ++SpeedRatio) {
                             DXCoils::SimDXCoilMultiSpeed(state, CompName, SpeedRatio, CycRatio, this->m_CoolingCoilIndex);
                             OutletTemp = state.dataDXCoils->DXCoilOutletTemp(this->m_CoolingCoilIndex);
-                            if (SpeedNum == 2) FullLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
+                            if (SpeedRatio == 1) {
+                                FullLoadHumRatOut = state.dataDXCoils->DXCoilOutletHumRat(this->m_CoolingCoilIndex);
+                                break;
+                            }
                             if (OutletTemp < DesOutTemp && SensibleLoad) break; // this isn't going to work IF dehumidIFying
                         }
 
@@ -11872,6 +11874,9 @@ namespace UnitarySystems {
                     } else {
                     }
 
+                    ReqOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
+                                (Psychrometrics::PsyHFnTdbW(DesOutTemp, state.dataLoopNodes->Node(OutletNode).HumRat) -
+                                 Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat));
                     FullOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                  Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(state.dataLoopNodes->Node(OutletNode).Temp,
                                                                             state.dataLoopNodes->Node(OutletNode).HumRat,
