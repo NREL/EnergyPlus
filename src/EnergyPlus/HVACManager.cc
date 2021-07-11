@@ -724,8 +724,13 @@ void SimHVAC(EnergyPlusData &state)
                             OutputProcessor::eTimeStepType::HVAC,
                             OutputProcessor::eVariableType::Sum,
                             "SimHVAC");
-        SetupOutputVariable(
-            state, "Air System Solver Iteration Count", OutputProcessor::Unit::None, state.dataHVACMgr->RepIterAir, OutputProcessor::eTimeStepType::HVAC, OutputProcessor::eVariableType::Sum, "SimHVAC");
+        SetupOutputVariable(state,
+                            "Air System Solver Iteration Count",
+                            OutputProcessor::Unit::None,
+                            state.dataHVACMgr->RepIterAir,
+                            OutputProcessor::eTimeStepType::HVAC,
+                            OutputProcessor::eVariableType::Sum,
+                            "SimHVAC");
         SetupOutputVariable(state,
                             "Air System Relief Air Total Heat Loss Energy",
                             OutputProcessor::Unit::J,

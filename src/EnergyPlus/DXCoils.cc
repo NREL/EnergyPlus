@@ -5468,8 +5468,13 @@ void GetDXCoils(EnergyPlusData &state)
         if (Coil.DXCoilType_Num == CoilDX_CoolingSingleSpeed || Coil.DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
             // Setup Report Variables for Cooling Equipment
             // CurrentModuleObject='Coil:Cooling:DX:SingleSpeed/Coil:Cooling:DX:TwoStageWithHumidityControlMode'
-            SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
@@ -5482,16 +5487,41 @@ void GetDXCoils(EnergyPlusData &state)
                                 "COOLINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.SensCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.SensCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.LatCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.LatCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.ElecCoolingPower,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -5504,8 +5534,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 "COOLING",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.CoolingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             if (Coil.IsSecondaryDXCoilInZone) {
                 SetupOutputVariable(state,
                                     "Secondary Coil Heat Rejection Rate",
@@ -5549,8 +5584,13 @@ void GetDXCoils(EnergyPlusData &state)
             //  END IF
 
             if (Coil.ReportEvapCondVars) {
-                SetupOutputVariable(
-                    state, "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, Coil.CondInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+                SetupOutputVariable(state,
+                                    "Cooling Coil Condenser Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    Coil.CondInletTemp,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
+                                    Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Water Volume",
                                     OutputProcessor::Unit::m3,
@@ -5641,8 +5681,13 @@ void GetDXCoils(EnergyPlusData &state)
         else if (Coil.DXCoilType_Num == CoilDX_HeatingEmpirical) {
             // Setup Report Variables for Heating Equipment
             // CurrentModuleObject='Coil:Heating:DX:SingleSpeed'
-            SetupOutputVariable(
-                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalHeatingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
@@ -5655,8 +5700,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.ElecHeatingPower,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -5669,8 +5719,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 "HEATING",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Heating Coil Defrost Electricity Rate", OutputProcessor::Unit::W, Coil.DefrostPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Defrost Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.DefrostPower,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Defrost Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -5702,8 +5757,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 "HEATING",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.HeatingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             if (Coil.IsSecondaryDXCoilInZone) {
                 SetupOutputVariable(state,
                                     "Secondary Coil Total Heat Removal Rate",
@@ -5726,8 +5786,13 @@ void GetDXCoils(EnergyPlusData &state)
                                     OutputProcessor::eTimeStepType::System,
                                     OutputProcessor::eVariableType::Average,
                                     Coil.Name);
-                SetupOutputVariable(
-                    state, "Secondary Coil Sensible Heat Ratio", OutputProcessor::Unit::None, Coil.SecCoilSHR, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+                SetupOutputVariable(state,
+                                    "Secondary Coil Sensible Heat Ratio",
+                                    OutputProcessor::Unit::None,
+                                    Coil.SecCoilSHR,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
+                                    Coil.Name);
                 SetupOutputVariable(state,
                                     "Secondary Coil Compressor Part Load Ratio",
                                     OutputProcessor::Unit::None,
@@ -5741,8 +5806,13 @@ void GetDXCoils(EnergyPlusData &state)
         else if (Coil.DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
             // Setup Report Variables for Cooling Equipment
             // CurrentModuleObject='Coil:Cooling:DX:TwoSpeed'
-            SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
@@ -5755,16 +5825,41 @@ void GetDXCoils(EnergyPlusData &state)
                                 "COOLINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.SensCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.SensCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.LatCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.LatCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.ElecCoolingPower,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -5777,8 +5872,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 "COOLING",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.CoolingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             if (Coil.IsSecondaryDXCoilInZone) {
                 SetupOutputVariable(state,
                                     "Secondary Coil Heat Rejection Rate",
@@ -5790,8 +5890,13 @@ void GetDXCoils(EnergyPlusData &state)
             }
 
             if (Coil.ReportEvapCondVars) {
-                SetupOutputVariable(
-                    state, "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, Coil.CondInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+                SetupOutputVariable(state,
+                                    "Cooling Coil Condenser Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    Coil.CondInletTemp,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
+                                    Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Water Volume",
                                     OutputProcessor::Unit::m3,
@@ -5864,8 +5969,13 @@ void GetDXCoils(EnergyPlusData &state)
             // Setup Report Variables for Cooling Equipment
             // CurrentModuleObject='Coil:WaterHeating:AirToWaterHeatPump:Pumped'
             // or 'Coil:WaterHeating:AirToWaterHeatPump:Wrapped'
-            SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
 
             if (Coil.IsDXCoilInZone) {
                 SetupOutputVariable(state,
@@ -5881,20 +5991,50 @@ void GetDXCoils(EnergyPlusData &state)
                                     _,
                                     "System");
             } else {
-                SetupOutputVariable(
-                    state, "Cooling Coil Total Cooling Energy", OutputProcessor::Unit::J, Coil.TotalCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
+                SetupOutputVariable(state,
+                                    "Cooling Coil Total Cooling Energy",
+                                    OutputProcessor::Unit::J,
+                                    Coil.TotalCoolingEnergy,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Sum,
+                                    Coil.Name);
             }
 
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.SensCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.SensCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.LatCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.LatCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.CoolingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
 
             if (Coil.ReportCoolingCoilCrankcasePower) {
                 SetupOutputVariable(state,
@@ -5958,8 +6098,13 @@ void GetDXCoils(EnergyPlusData &state)
         else if (Coil.DXCoilType_Num == CoilDX_MultiSpeedCooling) {
             // Setup Report Variables for Cooling Equipment:
             // CurrentModuleObject='Coil:Cooling:DX:MultiSpeed'
-            SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
@@ -5972,16 +6117,41 @@ void GetDXCoils(EnergyPlusData &state)
                                 "COOLINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.SensCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.SensCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.LatCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.LatCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.ElecCoolingPower,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -5996,8 +6166,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System");
 
             if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
-                SetupOutputVariable(
-                    state, "Cooling Coil " + Coil.FuelType + " Rate", OutputProcessor::Unit::W, Coil.FuelUsed, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+                SetupOutputVariable(state,
+                                    "Cooling Coil " + Coil.FuelType + " Rate",
+                                    OutputProcessor::Unit::W,
+                                    Coil.FuelUsed,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
+                                    Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil " + Coil.FuelType + " Energy",
                                     OutputProcessor::Unit::J,
@@ -6012,12 +6187,22 @@ void GetDXCoils(EnergyPlusData &state)
                                     "System");
             }
 
-            SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.CoolingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
 
             if (Coil.ReportEvapCondVars) {
-                SetupOutputVariable(
-                    state, "Cooling Coil Condenser Inlet Temperature", OutputProcessor::Unit::C, Coil.CondInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+                SetupOutputVariable(state,
+                                    "Cooling Coil Condenser Inlet Temperature",
+                                    OutputProcessor::Unit::C,
+                                    Coil.CondInletTemp,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
+                                    Coil.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Evaporative Condenser Water Volume",
                                     OutputProcessor::Unit::m3,
@@ -6098,8 +6283,13 @@ void GetDXCoils(EnergyPlusData &state)
         else if (Coil.DXCoilType_Num == CoilDX_MultiSpeedHeating) {
             // Setup Report Variables for Heating Equipment:
             // CurrentModuleObject='Coil:Heating:DX:MultiSpeed'
-            SetupOutputVariable(
-                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalHeatingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
@@ -6112,8 +6302,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.ElecHeatingPower,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -6128,8 +6323,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 "System");
 
             if (Coil.FuelTypeNum != DataGlobalConstants::ResourceType::Electricity) {
-                SetupOutputVariable(
-                    state, "Heating Coil " + Coil.FuelType + " Rate", OutputProcessor::Unit::W, Coil.FuelUsed, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+                SetupOutputVariable(state,
+                                    "Heating Coil " + Coil.FuelType + " Rate",
+                                    OutputProcessor::Unit::W,
+                                    Coil.FuelUsed,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
+                                    Coil.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil " + Coil.FuelType + " Energy",
                                     OutputProcessor::Unit::J,
@@ -6166,8 +6366,13 @@ void GetDXCoils(EnergyPlusData &state)
                                     _,
                                     "System");
             } else {
-                SetupOutputVariable(
-                    state, "Heating Coil Defrost Electricity Rate", OutputProcessor::Unit::W, Coil.DefrostPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+                SetupOutputVariable(state,
+                                    "Heating Coil Defrost Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    Coil.DefrostPower,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
+                                    Coil.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Defrost Electricity Energy",
                                     OutputProcessor::Unit::J,
@@ -6201,8 +6406,13 @@ void GetDXCoils(EnergyPlusData &state)
                                 "HEATING",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.HeatingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
 
             if (Coil.IsSecondaryDXCoilInZone) {
                 SetupOutputVariable(state,
@@ -6226,8 +6436,13 @@ void GetDXCoils(EnergyPlusData &state)
                                     OutputProcessor::eTimeStepType::System,
                                     OutputProcessor::eVariableType::Average,
                                     Coil.Name);
-                SetupOutputVariable(
-                    state, "Secondary Coil Sensible Heat Ratio", OutputProcessor::Unit::None, Coil.SecCoilSHR, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+                SetupOutputVariable(state,
+                                    "Secondary Coil Sensible Heat Ratio",
+                                    OutputProcessor::Unit::None,
+                                    Coil.SecCoilSHR,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
+                                    Coil.Name);
             }
         }
 
@@ -6235,8 +6450,13 @@ void GetDXCoils(EnergyPlusData &state)
         else if (Coil.DXCoilType_Num == CoilVRF_Cooling) {
             // Setup Report Variables for Cooling Equipment:
             // CurrentModuleObject='Coil:Cooling:DX:VariableRefrigerantFlow
-            SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
@@ -6249,16 +6469,41 @@ void GetDXCoils(EnergyPlusData &state)
                                 "COOLINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.SensCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.SensCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.LatCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.LatCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.CoolingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             if (Coil.CondensateCollectMode == iCondensate::ToTank) {
                 SetupOutputVariable(state,
                                     "Cooling Coil Condensate Volume Flow Rate",
@@ -6286,8 +6531,13 @@ void GetDXCoils(EnergyPlusData &state)
         else if (Coil.DXCoilType_Num == CoilVRF_Heating) {
             // Setup Report Variables for Heating Equipment:
             // CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow
-            SetupOutputVariable(
-                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalHeatingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
@@ -6300,16 +6550,26 @@ void GetDXCoils(EnergyPlusData &state)
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.HeatingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
         }
 
         // VRF cooling coil for FluidTCtrl, report variables
         else if (Coil.DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling) {
             // Setup Report Variables for Cooling Equipment:
             // CurrentModuleObject='Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl
-            SetupOutputVariable(
-                state, "Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, Coil.TotalCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Total Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
@@ -6322,21 +6582,56 @@ void GetDXCoils(EnergyPlusData &state)
                                 "COOLINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, Coil.SensCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, Coil.SensCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.SensCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Sensible Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.SensCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.LatCoolingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Latent Cooling Energy",
+                                OutputProcessor::Unit::J,
+                                Coil.LatCoolingEnergy,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.CoolingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             // Followings for VRF_FluidTCtrl Only
-            SetupOutputVariable(
-                state, "Cooling Coil VRF Evaporating Temperature", OutputProcessor::Unit::C, Coil.EvaporatingTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Cooling Coil VRF Super Heating Degrees", OutputProcessor::Unit::C, Coil.ActualSH, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil VRF Evaporating Temperature",
+                                OutputProcessor::Unit::C,
+                                Coil.EvaporatingTemp,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Cooling Coil VRF Super Heating Degrees",
+                                OutputProcessor::Unit::C,
+                                Coil.ActualSH,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
 
             if (Coil.CondensateCollectMode == iCondensate::ToTank) {
                 SetupOutputVariable(state,
@@ -6365,8 +6660,13 @@ void GetDXCoils(EnergyPlusData &state)
         else if (Coil.DXCoilType_Num == CoilVRF_FluidTCtrl_Heating) {
             // Setup Report Variables for Heating Equipment:
             // CurrentModuleObject='Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl
-            SetupOutputVariable(
-                state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, Coil.TotalHeatingEnergyRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Rate",
+                                OutputProcessor::Unit::W,
+                                Coil.TotalHeatingEnergyRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 OutputProcessor::Unit::J,
@@ -6379,13 +6679,28 @@ void GetDXCoils(EnergyPlusData &state)
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.HeatingCoilRuntimeFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                Coil.HeatingCoilRuntimeFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
             // Followings for VRF_FluidTCtrl Only
-            SetupOutputVariable(
-                state, "Heating Coil VRF Condensing Temperature", OutputProcessor::Unit::C, Coil.CondensingTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
-            SetupOutputVariable(
-                state, "Heating Coil VRF Subcooling Degrees", OutputProcessor::Unit::C, Coil.ActualSC, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil VRF Condensing Temperature",
+                                OutputProcessor::Unit::C,
+                                Coil.CondensingTemp,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil VRF Subcooling Degrees",
+                                OutputProcessor::Unit::C,
+                                Coil.ActualSC,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Coil.Name);
         }
     }
 

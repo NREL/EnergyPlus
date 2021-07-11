@@ -742,7 +742,13 @@ namespace HeatingCoils {
                                 "HEATINGCOILS",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Heating Rate", OutputProcessor::Unit::W, coil.HeatingCoilRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Heating Rate",
+                                OutputProcessor::Unit::W,
+                                coil.HeatingCoilRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil " + FuelType + " Energy",
                                 OutputProcessor::Unit::J,
@@ -755,8 +761,13 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(
-                state, "Heating Coil " + FuelType + " Rate", OutputProcessor::Unit::W, coil.FuelUseRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil " + FuelType + " Rate",
+                                OutputProcessor::Unit::W,
+                                coil.FuelUseRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
@@ -769,8 +780,20 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable(state, "Heating Coil Electricity Rate", OutputProcessor::Unit::W, coil.ElecUseRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, coil.Name);
-            SetupOutputVariable(state, "Heating Coil Runtime Fraction", OutputProcessor::Unit::None, coil.RTF, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Electricity Rate",
+                                OutputProcessor::Unit::W,
+                                coil.ElecUseRate,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                coil.Name);
+            SetupOutputVariable(state,
+                                "Heating Coil Runtime Fraction",
+                                OutputProcessor::Unit::None,
+                                coil.RTF,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                coil.Name);
             SetupOutputVariable(state,
                                 "Heating Coil Ancillary " + FuelType + " Rate",
                                 OutputProcessor::Unit::W,

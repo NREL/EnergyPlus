@@ -540,8 +540,13 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
 {
     std::string const ChillerName = this->Name;
 
-    SetupOutputVariable(
-        state, "Chiller Heater Evaporator Cooling Rate", OutputProcessor::Unit::W, this->CoolingLoad, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Evaporator Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->CoolingLoad,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Evaporator Cooling Energy",
                         OutputProcessor::Unit::J,
@@ -555,7 +560,13 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(state, "Chiller Heater Heating Rate", OutputProcessor::Unit::W, this->HeatingLoad, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatingLoad,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Heating Energy",
                         OutputProcessor::Unit::J,
@@ -569,8 +580,13 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Chiller Heater Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->TowerLoad, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Condenser Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->TowerLoad,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Condenser Heat Transfer Energy",
                         OutputProcessor::Unit::J,
@@ -584,15 +600,37 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Chiller Heater Cooling Source Heat COP", OutputProcessor::Unit::W_W, this->ThermalEnergyCOP, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Cooling Source Heat COP",
+                        OutputProcessor::Unit::W_W,
+                        this->ThermalEnergyCOP,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
 
-    SetupOutputVariable(state, "Chiller Heater Electricity Rate", OutputProcessor::Unit::W, this->ElectricPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->ElectricPower,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
     // Do not include this on meters, this would duplicate the cool electric and heat electric
-    SetupOutputVariable(state, "Chiller Heater Electricity Energy", OutputProcessor::Unit::J, this->ElectricEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        this->ElectricEnergy,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Sum,
+                        ChillerName);
 
-    SetupOutputVariable(
-        state, "Chiller Heater Cooling Electricity Rate", OutputProcessor::Unit::W, this->CoolElectricPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Cooling Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->CoolElectricPower,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Cooling Electricity Energy",
                         OutputProcessor::Unit::J,
@@ -606,8 +644,13 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Electricity Rate", OutputProcessor::Unit::W, this->HeatElectricPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Electricity Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatElectricPower,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Heating Electricity Energy",
                         OutputProcessor::Unit::J,
@@ -621,46 +664,126 @@ void ExhaustAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(
-        state, "Chiller Heater Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->ChillReturnTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->ChillSupplyTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->ChillWaterFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Evaporator Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->ChillReturnTemp,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Evaporator Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->ChillSupplyTemp,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Evaporator Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->ChillWaterFlowRate,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
 
     if (this->isWaterCooled) {
-        SetupOutputVariable(
-            state, "Chiller Heater Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondReturnTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
-        SetupOutputVariable(
-            state, "Chiller Heater Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondSupplyTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
-        SetupOutputVariable(
-            state, "Chiller Heater Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondWaterFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+        SetupOutputVariable(state,
+                            "Chiller Heater Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondReturnTemp,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            ChillerName);
+        SetupOutputVariable(state,
+                            "Chiller Heater Condenser Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondSupplyTemp,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            ChillerName);
+        SetupOutputVariable(state,
+                            "Chiller Heater Condenser Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->CondWaterFlowRate,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            ChillerName);
     } else {
-        SetupOutputVariable(
-            state, "Chiller Heater Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondReturnTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+        SetupOutputVariable(state,
+                            "Chiller Heater Condenser Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->CondReturnTemp,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            ChillerName);
     }
 
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Inlet Temperature", OutputProcessor::Unit::C, this->HotWaterReturnTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Outlet Temperature", OutputProcessor::Unit::C, this->HotWaterSupplyTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HotWaterFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->HotWaterReturnTemp,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Outlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->HotWaterSupplyTemp,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->HotWaterFlowRate,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
 
-    SetupOutputVariable(
-        state, "Chiller Heater Cooling Part Load Ratio", OutputProcessor::Unit::None, this->CoolPartLoadRatio, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Maximum Cooling Rate", OutputProcessor::Unit::W, this->CoolingCapacity, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Heating Part Load Ratio", OutputProcessor::Unit::None, this->HeatPartLoadRatio, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
-    SetupOutputVariable(
-        state, "Chiller Heater Maximum Heating Rate", OutputProcessor::Unit::W, this->HeatingCapacity, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Cooling Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->CoolPartLoadRatio,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Maximum Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->CoolingCapacity,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Heating Part Load Ratio",
+                        OutputProcessor::Unit::None,
+                        this->HeatPartLoadRatio,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Maximum Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatingCapacity,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
 
-    SetupOutputVariable(
-        state, "Chiller Heater Runtime Fraction", OutputProcessor::Unit::None, this->FractionOfPeriodRunning, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Runtime Fraction",
+                        OutputProcessor::Unit::None,
+                        this->FractionOfPeriodRunning,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
 
-    SetupOutputVariable(
-        state, "Chiller Heater Source Exhaust Inlet Temperature", OutputProcessor::Unit::C, this->ExhaustInTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, ChillerName);
+    SetupOutputVariable(state,
+                        "Chiller Heater Source Exhaust Inlet Temperature",
+                        OutputProcessor::Unit::C,
+                        this->ExhaustInTemp,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        ChillerName);
     SetupOutputVariable(state,
                         "Chiller Heater Source Exhaust Inlet Mass Flow Rate",
                         OutputProcessor::Unit::kg_s,

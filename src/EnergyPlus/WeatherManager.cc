@@ -423,9 +423,27 @@ namespace WeatherManager {
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 "Environment");
-            SetupOutputVariable(state, "Site Wind Speed", OutputProcessor::Unit::m_s, state.dataEnvrn->WindSpeed, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
-            SetupOutputVariable(state, "Site Wind Direction", OutputProcessor::Unit::deg, state.dataEnvrn->WindDir, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
-            SetupOutputVariable(state, "Site Sky Temperature", OutputProcessor::Unit::C, state.dataEnvrn->SkyTemp, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
+            SetupOutputVariable(state,
+                                "Site Wind Speed",
+                                OutputProcessor::Unit::m_s,
+                                state.dataEnvrn->WindSpeed,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Wind Direction",
+                                OutputProcessor::Unit::deg,
+                                state.dataEnvrn->WindDir,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Sky Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEnvrn->SkyTemp,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Horizontal Infrared Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
@@ -447,8 +465,13 @@ namespace WeatherManager {
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Precipitation Depth", OutputProcessor::Unit::m, state.dataEnvrn->LiquidPrecipitation, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Environment");
+            SetupOutputVariable(state,
+                                "Site Precipitation Depth",
+                                OutputProcessor::Unit::m,
+                                state.dataEnvrn->LiquidPrecipitation,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Sum,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Ground Reflected Solar Radiation Rate per Area",
                                 OutputProcessor::Unit::W_m2,
@@ -456,8 +479,13 @@ namespace WeatherManager {
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Ground Temperature", OutputProcessor::Unit::C, state.dataEnvrn->GroundTemp, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
+            SetupOutputVariable(state,
+                                "Site Ground Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEnvrn->GroundTemp,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Surface Ground Temperature",
                                 OutputProcessor::Unit::C,
@@ -465,8 +493,13 @@ namespace WeatherManager {
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Deep Ground Temperature", OutputProcessor::Unit::C, state.dataEnvrn->GroundTemp_Deep, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
+            SetupOutputVariable(state,
+                                "Site Deep Ground Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEnvrn->GroundTemp_Deep,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Simple Factor Model Ground Temperature",
                                 OutputProcessor::Unit::C,
@@ -474,14 +507,34 @@ namespace WeatherManager {
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Total Sky Cover", OutputProcessor::Unit::None, state.dataEnvrn->TotalCloudCover, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
-            SetupOutputVariable(
-                state, "Site Opaque Sky Cover", OutputProcessor::Unit::None, state.dataEnvrn->OpaqueCloudCover, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
-            SetupOutputVariable(
-                state, "Site Outdoor Air Enthalpy", OutputProcessor::Unit::J_kg, state.dataEnvrn->OutEnthalpy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
-            SetupOutputVariable(
-                state, "Site Outdoor Air Density", OutputProcessor::Unit::kg_m3, state.dataEnvrn->OutAirDensity, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
+            SetupOutputVariable(state,
+                                "Site Total Sky Cover",
+                                OutputProcessor::Unit::None,
+                                state.dataEnvrn->TotalCloudCover,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Opaque Sky Cover",
+                                OutputProcessor::Unit::None,
+                                state.dataEnvrn->OpaqueCloudCover,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Outdoor Air Enthalpy",
+                                OutputProcessor::Unit::J_kg,
+                                state.dataEnvrn->OutEnthalpy,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Outdoor Air Density",
+                                OutputProcessor::Unit::kg_m3,
+                                state.dataEnvrn->OutAirDensity,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Solar Azimuth Angle",
                                 OutputProcessor::Unit::deg,
@@ -496,10 +549,20 @@ namespace WeatherManager {
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Solar Hour Angle", OutputProcessor::Unit::deg, state.dataWeatherManager->HrAngle, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
-            SetupOutputVariable(
-                state, "Site Rain Status", OutputProcessor::Unit::None, state.dataWeatherManager->RptIsRain, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
+            SetupOutputVariable(state,
+                                "Site Solar Hour Angle",
+                                OutputProcessor::Unit::deg,
+                                state.dataWeatherManager->HrAngle,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Rain Status",
+                                OutputProcessor::Unit::None,
+                                state.dataWeatherManager->RptIsRain,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Site Snow on Ground Status",
                                 OutputProcessor::Unit::None,
@@ -563,10 +626,20 @@ namespace WeatherManager {
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Site Day Type Index", OutputProcessor::Unit::None, state.dataWeatherManager->RptDayType, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
-            SetupOutputVariable(
-                state, "Site Mains Water Temperature", OutputProcessor::Unit::C, state.dataEnvrn->WaterMainsTemp, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
+            SetupOutputVariable(state,
+                                "Site Day Type Index",
+                                OutputProcessor::Unit::None,
+                                state.dataWeatherManager->RptDayType,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Site Mains Water Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEnvrn->WaterMainsTemp,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state,

@@ -3144,17 +3144,53 @@ namespace OutputProcessor {
         Real64 ilgrLiving;
         Real64 ilgrAttic;
 
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrGarage, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Garage");
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Living");
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrAttic, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Attic");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::J,
+                            ilgrGarage,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Garage");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::J,
+                            ilgrLiving,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Living");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::J,
+                            ilgrAttic,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Attic");
 
         Real64 isgrGarage;
         Real64 isgrLiving;
         Real64 isgrAttic;
 
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrGarage, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Garage");
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Living");
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Attic");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Sensible Gain Rate",
+                            OutputProcessor::Unit::J,
+                            isgrGarage,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Garage");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Sensible Gain Rate",
+                            OutputProcessor::Unit::J,
+                            isgrLiving,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Living");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Sensible Gain Rate",
+                            OutputProcessor::Unit::J,
+                            isgrAttic,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Attic");
 
         state->dataGlobal->DoWeathSim = true;
         state->dataGlobal->TimeStepZone = 0.25;
@@ -3201,17 +3237,53 @@ namespace OutputProcessor {
         Real64 ilgrLiving1;
         Real64 ilgrLiving2;
 
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrGarage, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Garage");
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving1, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Living1");
-        SetupOutputVariable(*state, "Zone Total Internal Latent Gain Rate", OutputProcessor::Unit::J, ilgrLiving2, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Living2");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::J,
+                            ilgrGarage,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Garage");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::J,
+                            ilgrLiving1,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Living1");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Latent Gain Rate",
+                            OutputProcessor::Unit::J,
+                            ilgrLiving2,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Living2");
 
         Real64 isgrGarage;
         Real64 isgrLiving;
         Real64 isgrAttic;
 
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrGarage, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Garage");
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrLiving, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Living1");
-        SetupOutputVariable(*state, "Zone Total Internal Sensible Gain Rate", OutputProcessor::Unit::J, isgrAttic, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Living2");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Sensible Gain Rate",
+                            OutputProcessor::Unit::J,
+                            isgrGarage,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Garage");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Sensible Gain Rate",
+                            OutputProcessor::Unit::J,
+                            isgrLiving,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Living1");
+        SetupOutputVariable(*state,
+                            "Zone Total Internal Sensible Gain Rate",
+                            OutputProcessor::Unit::J,
+                            isgrAttic,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "Living2");
 
         state->dataGlobal->DoWeathSim = true;
         state->dataGlobal->TimeStepZone = 0.25;
@@ -3542,9 +3614,27 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         Real64 fuel_used = 999;
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler2");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler3");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler1");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler2");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3574,9 +3664,27 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         Real64 fuel_used = 999;
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler2");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler3");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler1");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler2");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3604,9 +3712,27 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         Real64 fuel_used = 999;
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler2");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler3");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler1");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler2");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3636,10 +3762,20 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         Real64 vol_flow = 999;
-        SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Zn003:Wall001");
-        SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Zn003:Wall002");
+        SetupOutputVariable(*state,
+                            "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            vol_flow,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Zn003:Wall001");
+        SetupOutputVariable(*state,
+                            "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            vol_flow,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Zn003:Wall002");
         SetupOutputVariable(*state,
                             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
@@ -3647,8 +3783,13 @@ namespace OutputProcessor {
                             OutputProcessor::eTimeStepType::System,
                             OutputProcessor::eVariableType::Average,
                             "Zn003:Wall002:Win001");
-        SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Zn003:Wall003");
+        SetupOutputVariable(*state,
+                            "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            vol_flow,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Zn003:Wall003");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3693,10 +3834,20 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
         Real64 vol_flow = 999;
-        SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "ZN003:WALL001");
-        SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "ZN003:WALL002");
+        SetupOutputVariable(*state,
+                            "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            vol_flow,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "ZN003:WALL001");
+        SetupOutputVariable(*state,
+                            "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            vol_flow,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "ZN003:WALL002");
         SetupOutputVariable(*state,
                             "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
@@ -3704,8 +3855,13 @@ namespace OutputProcessor {
                             OutputProcessor::eTimeStepType::System,
                             OutputProcessor::eVariableType::Average,
                             "ZN003:WALL002:WIN001");
-        SetupOutputVariable(
-            *state, "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "ZN003:WALL003");
+        SetupOutputVariable(*state,
+                            "AFN Linkage Node 1 to Node 2 Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            vol_flow,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "ZN003:WALL003");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
@@ -3911,16 +4067,41 @@ namespace OutputProcessor {
                             1,
                             1);
         Real64 zone_infil_total_loss = 0;
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE1-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE2-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE3-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE4-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE5-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE1-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE2-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE3-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE4-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE5-1");
 
         bool errors_found = false;
 
@@ -4148,16 +4329,41 @@ namespace OutputProcessor {
                             1,
                             1);
         Real64 zone_infil_total_loss = 999;
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE1-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE2-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE3-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE4-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE5-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE1-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE2-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE3-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE4-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE5-1");
 
         UpdateMeterReporting(*state);
 
@@ -4411,20 +4617,57 @@ namespace OutputProcessor {
                             1,
                             1);
         Real64 zone_infil_total_loss = 999;
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE1-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE2-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE3-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE4-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE5-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE1-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE2-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE3-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE4-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE5-1");
         Real64 fuel_used = 999;
         Real64 boiler_load = 999;
-        SetupOutputVariable(*state, "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler1");
+        SetupOutputVariable(*state,
+                            "Boiler Heating Rate",
+                            OutputProcessor::Unit::W,
+                            boiler_load,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler1");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler1");
 
         UpdateMeterReporting(*state);
 
@@ -4687,20 +4930,57 @@ namespace OutputProcessor {
                             1,
                             1);
         Real64 zone_infil_total_loss = 999;
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE1-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE2-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE3-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE4-1");
-        SetupOutputVariable(
-            *state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, "SPACE5-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE1-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE2-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE3-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE4-1");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            zone_infil_total_loss,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            "SPACE5-1");
         Real64 fuel_used = 999;
         Real64 boiler_load = 999;
-        SetupOutputVariable(*state, "Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler1");
-        SetupOutputVariable(*state, "Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, "Boiler1");
+        SetupOutputVariable(*state,
+                            "Boiler Heating Rate",
+                            OutputProcessor::Unit::W,
+                            boiler_load,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler1");
+        SetupOutputVariable(*state,
+                            "Boiler NaturalGas Rate",
+                            OutputProcessor::Unit::W,
+                            fuel_used,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            "Boiler1");
 
         UpdateMeterReporting(*state);
 
@@ -5235,18 +5515,83 @@ namespace OutputProcessor {
         state->dataAirSystemsData->PrimaryAirSystems(1).Name = "Air Loop 1";
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig(state->dataGlobal->NumOfZones).IsControlled = true;
-        SetupOutputVariable(
-            *state, "Surface Average Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "Surface Window Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "Zone Windows Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "Surface Window Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "Zone Ventilation Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "Zone Ventilation Total Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "Zone Infiltration Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "Zone Electric Equipment Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "Zone Lights Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
-        SetupOutputVariable(*state, "People Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "*");
+        SetupOutputVariable(*state,
+                            "Surface Average Face Conduction Heat Transfer Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "Surface Window Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "Zone Windows Total Heat Gain Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "Surface Window Heat Gain Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "Zone Ventilation Total Heat Gain Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "Zone Ventilation Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Gain Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "Zone Infiltration Total Heat Loss Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "Zone Electric Equipment Total Heating Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "Zone Lights Total Heating Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
+        SetupOutputVariable(*state,
+                            "People Total Heating Energy",
+                            OutputProcessor::Unit::J,
+                            transferredenergy,
+                            OutputProcessor::eTimeStepType::Zone,
+                            OutputProcessor::eVariableType::Sum,
+                            "*");
         SystemReports::AllocateAndSetUpVentReports(*state);
         SystemReports::AllocateAndSetUpVentReports(*state);
         GetCustomMeterInput(*state, errors_found);

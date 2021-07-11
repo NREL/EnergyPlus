@@ -297,10 +297,20 @@ namespace EcoRoofManager {
 
             // DJS NOVEMBER 2010 - Make calls to SetupOutput Variable to allow for reporting of ecoroof variables
 
-            SetupOutputVariable(
-                state, "Green Roof Soil Temperature", OutputProcessor::Unit::C, state.dataEcoRoofMgr->Tg, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
-            SetupOutputVariable(
-                state, "Green Roof Vegetation Temperature", OutputProcessor::Unit::C, state.dataEcoRoofMgr->Tf, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Soil Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEcoRoofMgr->Tg,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Vegetation Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataEcoRoofMgr->Tf,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Soil Root Moisture Ratio",
                                 OutputProcessor::Unit::None,
@@ -372,8 +382,13 @@ namespace EcoRoofManager {
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Sum,
                                 "Environment");
-            SetupOutputVariable(
-                state, "Green Roof Cumulative Runoff Depth", OutputProcessor::Unit::m, state.dataEcoRoofMgr->CumRunoff, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Cumulative Runoff Depth",
+                                OutputProcessor::Unit::m,
+                                state.dataEcoRoofMgr->CumRunoff,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Sum,
+                                "Environment");
             SetupOutputVariable(state,
                                 "Green Roof Cumulative Evapotranspiration Depth",
                                 OutputProcessor::Unit::m,

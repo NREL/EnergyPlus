@@ -897,8 +897,13 @@ namespace EvaporativeFluidCoolers {
         if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
 
             // Added for fluid bypass
-            SetupOutputVariable(
-                state, "Cooling Tower Bypass Fraction", OutputProcessor::Unit::None, this->BypassFraction, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Bypass Fraction",
+                                OutputProcessor::Unit::None,
+                                this->BypassFraction,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                this->Name);
         }
 
         // setup common water reporting for all types of evaporative fluid coolers.
@@ -912,7 +917,13 @@ namespace EvaporativeFluidCoolers {
                                 OutputProcessor::eVariableType::Average,
                                 this->Name);
 
-            SetupOutputVariable(state, "Cooling Tower Make Up Water Volume", OutputProcessor::Unit::m3, this->MakeUpVol, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->Name);
+            SetupOutputVariable(state,
+                                "Cooling Tower Make Up Water Volume",
+                                OutputProcessor::Unit::m3,
+                                this->MakeUpVol,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
+                                this->Name);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Storage Tank Water Volume Flow Rate",
@@ -1005,18 +1016,45 @@ namespace EvaporativeFluidCoolers {
                                 "Plant");
         }
 
-        SetupOutputVariable(
-            state, "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->fluidCoolerInletWaterTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->fluidCoolerInletWaterTemp,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->fluidCoolerOutletWaterTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Outlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->fluidCoolerOutletWaterTemp,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->WaterMassFlowRate,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
 
-        SetupOutputVariable(state, "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Heat Transfer Rate",
+                            OutputProcessor::Unit::W,
+                            this->Qactual,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
 
-        SetupOutputVariable(state, "Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Fan Electricity Rate",
+                            OutputProcessor::Unit::W,
+                            this->FanPower,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Cooling Tower Fan Electricity Energy",
@@ -1039,18 +1077,45 @@ namespace EvaporativeFluidCoolers {
                             OutputProcessor::eVariableType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Cooling Tower Water Evaporation Volume", OutputProcessor::Unit::m3, this->EvaporationVol, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Evaporation Volume",
+                            OutputProcessor::Unit::m3,
+                            this->EvaporationVol,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Cooling Tower Water Drift Volume Flow Rate", OutputProcessor::Unit::m3_s, this->DriftVdot, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Drift Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->DriftVdot,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
 
-        SetupOutputVariable(state, "Cooling Tower Water Drift Volume", OutputProcessor::Unit::m3, this->DriftVol, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Drift Volume",
+                            OutputProcessor::Unit::m3,
+                            this->DriftVol,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            this->Name);
 
-        SetupOutputVariable(
-            state, "Cooling Tower Water Blowdown Volume Flow Rate", OutputProcessor::Unit::m3_s, this->BlowdownVdot, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Blowdown Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->BlowdownVdot,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
 
-        SetupOutputVariable(state, "Cooling Tower Water Blowdown Volume", OutputProcessor::Unit::m3, this->BlowdownVol, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Water Blowdown Volume",
+                            OutputProcessor::Unit::m3,
+                            this->BlowdownVol,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
+                            this->Name);
     }
 
     void EvapFluidCoolerSpecs::getSizingFactor(Real64 &_SizFac)

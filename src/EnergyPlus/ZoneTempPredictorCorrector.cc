@@ -2984,8 +2984,13 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 OutputProcessor::eTimeStepType::System,
                                 OutputProcessor::eVariableType::Average,
                                 Zone(Loop).Name);
-            SetupOutputVariable(
-                state, "Zone Air Temperature", OutputProcessor::Unit::C, state.dataHeatBalFanSys->ZT(Loop), OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Zone(Loop).Name);
+            SetupOutputVariable(state,
+                                "Zone Air Temperature",
+                                OutputProcessor::Unit::C,
+                                state.dataHeatBalFanSys->ZT(Loop),
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Air Temperature",
                                 OutputProcessor::Unit::C,
@@ -3102,8 +3107,13 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 OutputProcessor::eVariableType::Average,
                                 Zone(Loop).Name);
 
-            SetupOutputVariable(
-                state, "Zone Thermostat Control Type", OutputProcessor::Unit::None, TempControlType(Loop), OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, Zone(Loop).Name);
+            SetupOutputVariable(state,
+                                "Zone Thermostat Control Type",
+                                OutputProcessor::Unit::None,
+                                TempControlType(Loop),
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                Zone(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Heating Setpoint Temperature",
                                 OutputProcessor::Unit::C,

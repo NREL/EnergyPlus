@@ -631,8 +631,13 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
 
 void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(
-        state, "Indoor Pool Makeup Water Rate", OutputProcessor::Unit::m3_s, this->MakeUpWaterVolFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Makeup Water Rate",
+                        OutputProcessor::Unit::m3_s,
+                        this->MakeUpWaterVolFlowRate,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Indoor Pool Makeup Water Volume",
                         OutputProcessor::Unit::m3,
@@ -645,18 +650,55 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         "Heating",
                         _,
                         "System");
-    SetupOutputVariable(
-        state, "Indoor Pool Makeup Water Temperature", OutputProcessor::Unit::C, this->CurMakeupWaterTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(state, "Indoor Pool Water Temperature", OutputProcessor::Unit::C, this->PoolWaterTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Inlet Water Temperature", OutputProcessor::Unit::C, this->WaterInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Inlet Water Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Miscellaneous Equipment Power", OutputProcessor::Unit::W, this->MiscEquipPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Miscellaneous Equipment Energy", OutputProcessor::Unit::J, this->MiscEquipEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->Name);
-    SetupOutputVariable(state, "Indoor Pool Water Heating Rate", OutputProcessor::Unit::W, this->HeatPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Makeup Water Temperature",
+                        OutputProcessor::Unit::C,
+                        this->CurMakeupWaterTemp,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Water Temperature",
+                        OutputProcessor::Unit::C,
+                        this->PoolWaterTemp,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Inlet Water Temperature",
+                        OutputProcessor::Unit::C,
+                        this->WaterInletTemp,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Inlet Water Mass Flow Rate",
+                        OutputProcessor::Unit::kg_s,
+                        this->WaterMassFlowRate,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Miscellaneous Equipment Power",
+                        OutputProcessor::Unit::W,
+                        this->MiscEquipPower,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Miscellaneous Equipment Energy",
+                        OutputProcessor::Unit::J,
+                        this->MiscEquipEnergy,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Sum,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Water Heating Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatPower,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
     SetupOutputVariable(state,
                         "Indoor Pool Water Heating Energy",
                         OutputProcessor::Unit::J,
@@ -669,17 +711,48 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         "HEATINGCOILS",
                         _,
                         "System");
-    SetupOutputVariable(
-        state, "Indoor Pool Radiant to Convection by Cover", OutputProcessor::Unit::W, this->RadConvertToConvect, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(state, "Indoor Pool People Heat Gain", OutputProcessor::Unit::W, this->PeopleHeatGain, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Current Activity Factor", OutputProcessor::Unit::None, this->CurActivityFactor, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Current Cover Factor", OutputProcessor::Unit::None, this->CurCoverSchedVal, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Evaporative Heat Loss Rate", OutputProcessor::Unit::W, this->EvapHeatLossRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Evaporative Heat Loss Energy", OutputProcessor::Unit::J, this->EvapEnergyLoss, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Radiant to Convection by Cover",
+                        OutputProcessor::Unit::W,
+                        this->RadConvertToConvect,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool People Heat Gain",
+                        OutputProcessor::Unit::W,
+                        this->PeopleHeatGain,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Current Activity Factor",
+                        OutputProcessor::Unit::None,
+                        this->CurActivityFactor,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Current Cover Factor",
+                        OutputProcessor::Unit::None,
+                        this->CurCoverSchedVal,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Evaporative Heat Loss Rate",
+                        OutputProcessor::Unit::W,
+                        this->EvapHeatLossRate,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Evaporative Heat Loss Energy",
+                        OutputProcessor::Unit::J,
+                        this->EvapEnergyLoss,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Sum,
+                        this->Name);
     SetupOutputVariable(state,
                         "Indoor Pool Saturation Pressure at Pool Temperature",
                         OutputProcessor::Unit::Pa,
@@ -694,14 +767,34 @@ void SwimmingPoolData::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::eTimeStepType::System,
                         OutputProcessor::eVariableType::Average,
                         this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Current Cover Evaporation Factor", OutputProcessor::Unit::None, this->CurCoverEvapFac, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Current Cover Convective Factor", OutputProcessor::Unit::None, this->CurCoverConvFac, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Current Cover SW Radiation Factor", OutputProcessor::Unit::None, this->CurCoverSWRadFac, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
-    SetupOutputVariable(
-        state, "Indoor Pool Current Cover LW Radiation Factor", OutputProcessor::Unit::None, this->CurCoverLWRadFac, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Current Cover Evaporation Factor",
+                        OutputProcessor::Unit::None,
+                        this->CurCoverEvapFac,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Current Cover Convective Factor",
+                        OutputProcessor::Unit::None,
+                        this->CurCoverConvFac,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Current Cover SW Radiation Factor",
+                        OutputProcessor::Unit::None,
+                        this->CurCoverSWRadFac,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
+    SetupOutputVariable(state,
+                        "Indoor Pool Current Cover LW Radiation Factor",
+                        OutputProcessor::Unit::None,
+                        this->CurCoverLWRadFac,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
 }
 
 void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)

@@ -428,8 +428,13 @@ namespace PhotovoltaicThermalCollectors {
 
     void PVTCollectorStruct::setupReportVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(
-            state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->Report.ThermPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator Produced Thermal Rate",
+                            OutputProcessor::Unit::W,
+                            this->Report.ThermPower,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
             SetupOutputVariable(state,
@@ -459,12 +464,22 @@ namespace PhotovoltaicThermalCollectors {
                                 _,
                                 "System");
 
-            SetupOutputVariable(
-                state, "Generator PVT Fluid Bypass Status", OutputProcessor::Unit::None, this->Report.BypassStatus, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+            SetupOutputVariable(state,
+                                "Generator PVT Fluid Bypass Status",
+                                OutputProcessor::Unit::None,
+                                this->Report.BypassStatus,
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
+                                this->Name);
         }
 
-        SetupOutputVariable(
-            state, "Generator PVT Fluid Inlet Temperature", OutputProcessor::Unit::C, this->Report.TinletWorkFluid, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator PVT Fluid Inlet Temperature",
+                            OutputProcessor::Unit::C,
+                            this->Report.TinletWorkFluid,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Outlet Temperature",
@@ -474,8 +489,13 @@ namespace PhotovoltaicThermalCollectors {
                             OutputProcessor::eVariableType::Average,
                             this->Name);
 
-        SetupOutputVariable(
-            state, "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.MdotWorkFluid, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+        SetupOutputVariable(state,
+                            "Generator PVT Fluid Mass Flow Rate",
+                            OutputProcessor::Unit::kg_s,
+                            this->Report.MdotWorkFluid,
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
+                            this->Name);
     }
 
     void PVTCollectorStruct::initialize(EnergyPlusData &state, bool const FirstHVACIteration)

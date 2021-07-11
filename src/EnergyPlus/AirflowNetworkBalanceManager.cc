@@ -5494,8 +5494,13 @@ void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
                                     OutputProcessor::eTimeStepType::System,
                                     OutputProcessor::eVariableType::Average,
                                     Zone(i).Name);
-                SetupOutputVariable(
-                    state, "AFN Zone Mixing Mass Flow Rate", OutputProcessor::Unit::kg_s, exchangeData(i).SumMMHr, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, Zone(i).Name);
+                SetupOutputVariable(state,
+                                    "AFN Zone Mixing Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    exchangeData(i).SumMMHr,
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
+                                    Zone(i).Name);
                 SetupOutputVariable(state,
                                     "AFN Zone Outdoor Air CO2 Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,

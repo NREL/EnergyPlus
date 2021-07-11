@@ -119,9 +119,27 @@ TEST_F(EnergyPlusFixture, OutputReportData_getVariableKeys)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Lite1");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Lite2");
-    SetupOutputVariable(*state, "Exterior Lights Electric Power", OutputProcessor::Unit::W, extLitPow, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, "Lite3");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Average,
+                        "Lite1");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Average,
+                        "Lite2");
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electric Power",
+                        OutputProcessor::Unit::W,
+                        extLitPow,
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Average,
+                        "Lite3");
 
     int keyCount = 0;
     OutputProcessor::VariableType typeVar = OutputProcessor::VariableType::NotFound;

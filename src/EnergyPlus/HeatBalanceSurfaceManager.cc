@@ -1739,7 +1739,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Heat Transfer Coefficient",
                                 OutputProcessor::Unit::W_m2K,
-            state.dataHeatBalSurf->SurfHcExt(loop),
+                                state.dataHeatBalSurf->SurfHcExt(loop),
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 Surface(loop).Name);
@@ -1767,21 +1767,21 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient",
                                 OutputProcessor::Unit::W_m2K,
-            state.dataHeatBalSurf->SurfHAirExt(loop),
+                                state.dataHeatBalSurf->SurfHAirExt(loop),
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient",
                                 OutputProcessor::Unit::W_m2K,
-            state.dataHeatBalSurf->SurfHSkyExt(loop),
+                                state.dataHeatBalSurf->SurfHSkyExt(loop),
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient",
                                 OutputProcessor::Unit::W_m2K,
-            state.dataHeatBalSurf->SurfHGrdExt(loop),
+                                state.dataHeatBalSurf->SurfHGrdExt(loop),
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 Surface(loop).Name);
@@ -1867,7 +1867,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Surface Outside Face Conduction Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-            state.dataHeatBalSurf->SurfOpaqOutFaceCond(loop),
+                                    state.dataHeatBalSurf->SurfOpaqOutFaceCond(loop),
                                     OutputProcessor::eTimeStepType::Zone,
                                     OutputProcessor::eVariableType::Average,
                                     Surface(loop).Name);
@@ -1888,14 +1888,14 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Surface Outside Face Conduction Heat Transfer Rate per Area",
                                     OutputProcessor::Unit::W_m2,
-                state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(loop),
+                                    state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(loop),
                                     OutputProcessor::eTimeStepType::Zone,
                                     OutputProcessor::eVariableType::Average,
                                     Surface(loop).Name);
                 SetupOutputVariable(state,
                                     "Surface Outside Face Conduction Heat Transfer Energy",
                                     OutputProcessor::Unit::J,
-                state.dataHeatBalSurf->SurfOpaqOutFaceCondEnergy(loop),
+                                    state.dataHeatBalSurf->SurfOpaqOutFaceCondEnergy(loop),
                                     OutputProcessor::eTimeStepType::Zone,
                                     OutputProcessor::eVariableType::Sum,
                                     Surface(loop).Name);
@@ -1903,7 +1903,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Surface Average Face Conduction Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
-                state.dataHeatBalSurf->SurfOpaqAvgFaceCond(loop),
+                                    state.dataHeatBalSurf->SurfOpaqAvgFaceCond(loop),
                                     OutputProcessor::eTimeStepType::Zone,
                                     OutputProcessor::eVariableType::Average,
                                     Surface(loop).Name);
@@ -1924,14 +1924,14 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Surface Average Face Conduction Heat Transfer Rate per Area",
                                     OutputProcessor::Unit::W_m2,
-                state.dataHeatBalSurf->SurfOpaqAvgFaceCondFlux(loop),
+                                    state.dataHeatBalSurf->SurfOpaqAvgFaceCondFlux(loop),
                                     OutputProcessor::eTimeStepType::Zone,
                                     OutputProcessor::eVariableType::Average,
                                     Surface(loop).Name);
                 SetupOutputVariable(state,
                                     "Surface Average Face Conduction Heat Transfer Energy",
                                     OutputProcessor::Unit::J,
-                state.dataHeatBalSurf->SurfOpaqAvgFaceCondEnergy(loop),
+                                    state.dataHeatBalSurf->SurfOpaqAvgFaceCondEnergy(loop),
                                     OutputProcessor::eTimeStepType::Zone,
                                     OutputProcessor::eVariableType::Sum,
                                     Surface(loop).Name);
@@ -1939,7 +1939,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Surface Heat Storage Rate",
                                     OutputProcessor::Unit::W,
-                state.dataHeatBalSurf->SurfOpaqStorageCond(loop),
+                                    state.dataHeatBalSurf->SurfOpaqStorageCond(loop),
                                     OutputProcessor::eTimeStepType::Zone,
                                     OutputProcessor::eVariableType::Average,
                                     Surface(loop).Name);
@@ -1960,14 +1960,14 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Surface Heat Storage Rate per Area",
                                     OutputProcessor::Unit::W_m2,
-                state.dataHeatBalSurf->SurfOpaqStorageCondFlux(loop),
+                                    state.dataHeatBalSurf->SurfOpaqStorageCondFlux(loop),
                                     OutputProcessor::eTimeStepType::Zone,
                                     OutputProcessor::eVariableType::Average,
                                     Surface(loop).Name);
                 SetupOutputVariable(state,
                                     "Surface Heat Storage Energy",
                                     OutputProcessor::Unit::J,
-                state.dataHeatBalSurf->SurfOpaqStorageCondEnergy(loop),
+                                    state.dataHeatBalSurf->SurfOpaqStorageCondEnergy(loop),
                                     OutputProcessor::eTimeStepType::Zone,
                                     OutputProcessor::eVariableType::Sum,
                                     Surface(loop).Name);
@@ -1988,14 +1988,14 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Surface Internal Source Location Temperature",
                                 OutputProcessor::Unit::C,
-        state.dataHeatBalSurf->SurfTempSource(loop),
+                                state.dataHeatBalSurf->SurfTempSource(loop),
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 Surface(loop).Name);
             SetupOutputVariable(state,
                                 "Surface Internal User Specified Location Temperature",
                                 OutputProcessor::Unit::C,
-            state.dataHeatBalSurf->SurfTempUserLoc(loop),
+                                state.dataHeatBalSurf->SurfTempUserLoc(loop),
                                 OutputProcessor::eTimeStepType::Zone,
                                 OutputProcessor::eVariableType::Average,
                                 Surface(loop).Name);
@@ -2087,8 +2087,13 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
         //     ENDIF
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
-            SetupOutputVariable(
-                state, "Surface Construction Index", OutputProcessor::Unit::None, Surface(loop).Construction, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, Surface(loop).Name);
+            SetupOutputVariable(state,
+                                "Surface Construction Index",
+                                OutputProcessor::Unit::None,
+                                Surface(loop).Construction,
+                                OutputProcessor::eTimeStepType::Zone,
+                                OutputProcessor::eVariableType::Average,
+                                Surface(loop).Name);
         }
     }
 

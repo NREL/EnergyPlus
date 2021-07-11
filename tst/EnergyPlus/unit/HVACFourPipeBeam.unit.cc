@@ -1726,7 +1726,8 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     OutputReportPredefined::SetPredefinedTables(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::eTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
     createFacilityElectricPowerServiceObject(*state);
@@ -3299,7 +3300,8 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     OutputReportPredefined::SetPredefinedTables(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
-    OutputProcessor::SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(
+        *state, OutputProcessor::eTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
     createFacilityElectricPowerServiceObject(*state);

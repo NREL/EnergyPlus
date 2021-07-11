@@ -530,8 +530,13 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
 
 void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(
-        state, "Fluid Heat Exchanger Heat Transfer Rate", OutputProcessor::Unit::W, this->HeatTransferRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Fluid Heat Exchanger Heat Transfer Rate",
+                        OutputProcessor::Unit::W,
+                        this->HeatTransferRate,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Heat Transfer Energy",
@@ -594,11 +599,21 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::eVariableType::Average,
                         this->Name);
 
-    SetupOutputVariable(
-        state, "Fluid Heat Exchanger Operation Status", OutputProcessor::Unit::None, this->OperationStatus, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Fluid Heat Exchanger Operation Status",
+                        OutputProcessor::Unit::None,
+                        this->OperationStatus,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
 
-    SetupOutputVariable(
-        state, "Fluid Heat Exchanger Effectiveness", OutputProcessor::Unit::None, this->Effectiveness, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state,
+                        "Fluid Heat Exchanger Effectiveness",
+                        OutputProcessor::Unit::None,
+                        this->Effectiveness,
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Average,
+                        this->Name);
 }
 
 void HeatExchangerStruct::initialize(EnergyPlusData &state)
