@@ -734,10 +734,10 @@ namespace ThermalChimney {
 
             for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).Width == majorW) {
-                    if (state.dataHeatBalSurf->TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
-                        TemporaryWallSurfTemp = state.dataHeatBalSurf->TempSurfIn(SurfNum);
-                        ConvTransCoeffWallFluid = state.dataHeatBal->HConvIn(SurfNum);
-                        SurfTempAbsorberWall = state.dataHeatBalSurf->TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                    if (state.dataHeatBalSurf->SurfTempIn(SurfNum) > TemporaryWallSurfTemp) {
+                        TemporaryWallSurfTemp = state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                        ConvTransCoeffWallFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
+                        SurfTempAbsorberWall = state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv;
                     }
                 }
             }
@@ -746,8 +746,8 @@ namespace ThermalChimney {
                 if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
                     if (state.dataSurface->Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = state.dataSurface->Surface(SurfNum).Width;
-                        ConvTransCoeffGlassFluid = state.dataHeatBal->HConvIn(SurfNum);
-                        SurfTempGlassCover = state.dataHeatBalSurf->TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
+                        ConvTransCoeffGlassFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
+                        SurfTempGlassCover = state.dataHeatBalSurf->SurfTempIn(SurfNum) + DataGlobalConstants::KelvinConv;
                     }
                 }
             }

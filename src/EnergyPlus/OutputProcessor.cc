@@ -5971,7 +5971,7 @@ namespace EnergyPlus {
     void UpdateDataandReport(EnergyPlusData &state,
                              OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
     {
-
+heat
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   December 1998

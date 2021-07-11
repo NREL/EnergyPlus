@@ -1093,17 +1093,17 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
         bool WaterCoilOnAirLoop = true;
         for (tempCoilNum = 1; tempCoilNum <= state.dataWaterCoils->NumWaterCoils; ++tempCoilNum) {
             if (state.dataWaterCoils->WaterCoil(tempCoilNum).ControllerIndex > 0) {
-                int CoilTypeNum(0);
+                SimAirServingZones::CompType CoilTypeNum(SimAirServingZones::CompType::Unassigned);
                 std::string CompType;
                 std::string CompName = state.dataWaterCoils->WaterCoil(tempCoilNum).Name;
                 if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterCooling) {
-                    CoilTypeNum = SimAirServingZones::WaterCoil_Cooling;
+                    CoilTypeNum = SimAirServingZones::CompType::WaterCoil_Cooling;
                     CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater);
                 } else if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterDetailedFlatCooling) {
-                    CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
+                    CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
                     CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
                 } else if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::TypeOf_CoilWaterSimpleHeating) {
-                    CoilTypeNum = SimAirServingZones::WaterCoil_SimpleHeat;
+                    CoilTypeNum = SimAirServingZones::CompType::WaterCoil_SimpleHeat;
                     CompType = cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
                 }
                 WaterCoilOnAirLoop = true;

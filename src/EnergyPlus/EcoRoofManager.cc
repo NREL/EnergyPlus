@@ -64,6 +64,7 @@
 #include <EnergyPlus/EcoRoofManager.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -146,9 +147,9 @@ namespace EcoRoofManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EcoLoop; // an integer loop variable for the simultaneous solution iteration
 
-        Real64 AbsThermSurf; // Thermal absoptance of the exterior surface
-        int RoughSurf;       // Roughness index of the exterior (ecoroof) surface.
-        Real64 HMovInsul;    // "Convection" coefficient of movable insulation
+        Real64 AbsThermSurf;                      // Thermal absoptance of the exterior surface
+        DataSurfaces::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
+        Real64 HMovInsul;                         // "Convection" coefficient of movable insulation
         //  REAL(r64)    :: HSky                ! "Convection" coefficient from sky to surface
         //  REAL(r64)    :: HAir                ! "Convection" coefficient from air to surface (radiation)
         //  INTEGER :: OPtr
@@ -237,13 +238,13 @@ namespace EcoRoofManager {
                                         RoughSurf,
                                         AbsThermSurf,
                                         state.dataHeatBalSurf->TH(1, 1, SurfNum),
-                                        state.dataHeatBalSurf->HcExtSurf(SurfNum),
-                                        state.dataHeatBalSurf->HSkyExtSurf(SurfNum),
-                                        state.dataHeatBalSurf->HGrdExtSurf(SurfNum),
-                                        state.dataHeatBalSurf->HAirExtSurf(SurfNum));
+                                        state.dataHeatBalSurf->SurfHcExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
+                                        state.dataHeatBalSurf->SurfHAirExt(SurfNum));
         }
 
-        RS = state.dataEnvrn->BeamSolarRad + state.dataHeatBal->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
+        RS = state.dataEnvrn->BeamSolarRad + state.dataSolarShading->SurfAnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
         Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
                1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
@@ -475,16 +476,16 @@ namespace EcoRoofManager {
             if (state.dataConstruction->Construct(ConstrNum).CTFCross(0) > 0.01) {
                 state.dataEcoRoofMgr->QuickConductionSurf = true;
                 F1temp = state.dataConstruction->Construct(ConstrNum).CTFCross(0) /
-                         (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBal->HConvIn(SurfNum));
-                Qsoilpart1 = -state.dataHeatBalSurf->CTFConstOutPart(SurfNum) +
-                             F1temp * (state.dataHeatBalSurf->CTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
+                         (state.dataConstruction->Construct(ConstrNum).CTFInside(0) + state.dataHeatBalSurf->SurfHConvInt(SurfNum));
+                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
+                             F1temp * (state.dataHeatBalSurf->SurfCTFConstInPart(SurfNum) + state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) +
                                        state.dataHeatBal->SurfQRadThermInAbs(SurfNum) +
                                        state.dataConstruction->Construct(ConstrNum).CTFSourceIn(0) * state.dataHeatBalSurf->QsrcHist(SurfNum, 1) +
-                                       state.dataHeatBal->HConvIn(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
+                                       state.dataHeatBalSurf->SurfHConvInt(SurfNum) * state.dataHeatBalFanSys->MAT(ZoneNum) +
                                        state.dataHeatBalSurf->SurfNetLWRadToSurf(SurfNum));
             } else {
-                Qsoilpart1 = -state.dataHeatBalSurf->CTFConstOutPart(SurfNum) +
-                             state.dataConstruction->Construct(ConstrNum).CTFCross(0) * state.dataHeatBalSurf->TempSurfIn(SurfNum);
+                Qsoilpart1 = -state.dataHeatBalSurf->SurfCTFConstOutPart(SurfNum) +
+                             state.dataConstruction->Construct(ConstrNum).CTFCross(0) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
                 F1temp = 0.0;
             }
 
@@ -616,19 +617,19 @@ namespace EcoRoofManager {
                 Gammah = std::pow(1.0 - 5.0 * Rib, -0.5);
             }
 
-            if (RoughSurf == VerySmooth) { //  6= very smooth, 5=smooth, 4= med. sm. ,3= med. rough. , 2= rough, 1= Very rough
+            if (RoughSurf == DataSurfaces::SurfaceRoughness::VerySmooth) {
                 state.dataEcoRoofMgr->Zog = 0.0008;
-            } else if (RoughSurf == Smooth) {
+            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::Smooth) {
                 state.dataEcoRoofMgr->Zog = 0.0010;
-            } else if (RoughSurf == MediumSmooth) {
+            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::MediumSmooth) {
                 state.dataEcoRoofMgr->Zog = 0.0015;
-            } else if (RoughSurf == MediumRough) {
+            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::MediumRough) {
                 state.dataEcoRoofMgr->Zog = 0.0020;
-            } else if (RoughSurf == Rough) {
+            } else if (RoughSurf == DataSurfaces::SurfaceRoughness::Rough) {
                 state.dataEcoRoofMgr->Zog = 0.0030;
             } else { // VeryRough
                 state.dataEcoRoofMgr->Zog = 0.005;
-            }
+            } // TODO: fix this after creating FindEnumeratedValueIndex()
 
             Chng = pow_2(Kv / std::log(state.dataEcoRoofMgr->Za / state.dataEcoRoofMgr->Zog)) / rch; // bulk transfer coefficient near ground
             Chg = Gammah * ((1.0 - sigmaf) * Chng + sigmaf * Cfhn);

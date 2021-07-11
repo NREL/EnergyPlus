@@ -784,7 +784,13 @@ namespace WindTurbine {
                             if (lnPtr != 1) {
                                 if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
-                                        readItem(lineIn.data.substr(0, lnPtr), MonthWS(mon));
+                                        bool error = false;
+                                        MonthWS(mon) = UtilityRoutines::ProcessNumber(lineIn.data.substr(0, lnPtr), error);
+
+                                        if (error) {
+                                            // probably should throw some error here
+                                        }
+
                                         lineIn.data.erase(0, lnPtr + 1);
                                     }
                                 } else { // blank field

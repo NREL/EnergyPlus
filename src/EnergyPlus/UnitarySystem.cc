@@ -138,11 +138,12 @@ namespace UnitarySystems {
           m_HeatingCoilAvailSchPtr(0), m_DesignHeatingCapacity(0.0), m_MaxHeatAirVolFlow(0.0), m_NumOfSpeedHeating(0), m_MultiSpeedHeatingCoil(false),
 
           m_VarSpeedHeatingCoil(false), m_SystemHeatControlNodeNum(0), m_CoolCoilExists(false), m_CoolingCoilType_Num(0), m_NumOfSpeedCooling(0),
-          m_CoolingCoilAvailSchPtr(0), m_DesignCoolingCapacity(0.0), m_MaxCoolAirVolFlow(0.0), m_CondenserNodeNum(0), m_CondenserType(0),
-          m_CoolingCoilIndex(0), m_HeatPump(false), m_ActualDXCoilIndexForHXAssisted(0), m_DiscreteSpeedCoolingCoil(false),
-          m_ContSpeedCoolingCoil(false), m_SystemCoolControlNodeNum(0), m_WaterCyclingMode(0), m_ISHundredPercentDOASDXCoil(false),
-          m_RunOnSensibleLoad(false), m_RunOnLatentLoad(false), m_RunOnLatentOnlyWithSensible(false), m_DehumidificationMode(0),
-          m_SuppHeatCoilType_Num(0), m_SuppCoilExists(false), m_DesignSuppHeatingCapacity(0.0), m_SuppCoilAirInletNode(0), m_SuppCoilAirOutletNode(0),
+          m_CoolingCoilAvailSchPtr(0), m_DesignCoolingCapacity(0.0), m_MaxCoolAirVolFlow(0.0), m_CondenserNodeNum(0),
+          m_CondenserType(DataHeatBalance::RefrigCondenserType::Unassigned), m_CoolingCoilIndex(0), m_HeatPump(false),
+          m_ActualDXCoilIndexForHXAssisted(0), m_DiscreteSpeedCoolingCoil(false), m_ContSpeedCoolingCoil(false), m_SystemCoolControlNodeNum(0),
+          m_WaterCyclingMode(0), m_ISHundredPercentDOASDXCoil(false), m_RunOnSensibleLoad(false), m_RunOnLatentLoad(false),
+          m_RunOnLatentOnlyWithSensible(false), m_DehumidificationMode(0), m_SuppHeatCoilType_Num(0), m_SuppCoilExists(false),
+          m_DesignSuppHeatingCapacity(0.0), m_SuppCoilAirInletNode(0), m_SuppCoilAirOutletNode(0),
 
           m_SuppCoilFluidInletNode(0), m_MaxSuppCoilFluidFlow(0.0), m_SuppHeatCoilIndex(0), m_SuppHeatControlNodeNum(0), m_SupHeaterLoad(0.0),
           m_CoolingSAFMethod(0), m_HeatingSAFMethod(0), m_NoCoolHeatSAFMethod(0), m_MaxNoCoolHeatAirVolFlow(0.0),
@@ -2968,7 +2969,7 @@ namespace UnitarySystems {
             this->UnitarySystemType_Num = DataZoneEquipment::ZoneUnitarySys_Num;
             this->m_OKToPrintSizing = true;
         } else {
-            this->UnitarySystemType_Num = SimAirServingZones::UnitarySystemModel;
+            this->UnitarySystemType_Num = static_cast<int>(SimAirServingZones::CompType::UnitarySystemModel);
         }
 
         this->m_IterationMode.resize(3);
@@ -13078,7 +13079,7 @@ namespace UnitarySystems {
 
         if (this->m_CondenserNodeNum != 0) {
             OutdoorDryBulb = state.dataLoopNodes->Node(this->m_CondenserNodeNum).Temp;
-            if (this->m_CondenserType == DataHVACGlobals::WaterCooled) {
+            if (this->m_CondenserType == DataHeatBalance::RefrigCondenserType::Water) {
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
