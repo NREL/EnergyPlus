@@ -3476,8 +3476,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite1",
                         _,
                         "Electricity",
@@ -3487,8 +3487,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite2",
                         _,
                         "Electricity",
@@ -3498,8 +3498,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite3",
                         _,
                         "Electricity",
@@ -3544,8 +3544,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite1",
                         _,
                         "Electricity",
@@ -3555,8 +3555,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite2",
                         _,
                         "Electricity",
@@ -3566,8 +3566,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite3",
                         _,
                         "Electricity",
@@ -6450,8 +6450,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite1",
                         _,
                         "Electricity",
@@ -6461,8 +6461,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite2",
                         _,
                         "Electricity",
@@ -6472,8 +6472,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite3",
                         _,
                         "Electricity",
@@ -7244,14 +7244,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     std::vector<std::string> ZoneNames({"Zone1", "Zone2"});
 
     for (int i = 0; i < 2; ++i) {
-        SetupOutputVariable(*state, "Zone Mean Air Temperature", OutputProcessor::Unit::C, zoneTemp, "Zone", "Average", ZoneNames[i]);
+        SetupOutputVariable(*state, "Zone Mean Air Temperature", OutputProcessor::Unit::C, zoneTemp, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, ZoneNames[i]);
 
-        SetupOutputVariable(*state, "Zone Heating Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
+        SetupOutputVariable(*state, "Zone Heating Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, ZoneNames[i]);
         SetupOutputVariable(
-            *state, "Zone Heating Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
-        SetupOutputVariable(*state, "Zone Cooling Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
+            *state, "Zone Heating Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, ZoneNames[i]);
+        SetupOutputVariable(*state, "Zone Cooling Setpoint Not Met Time", OutputProcessor::Unit::hr, timeNotMet, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, ZoneNames[i]);
         SetupOutputVariable(
-            *state, "Zone Cooling Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, "Zone", "Sum", ZoneNames[i]);
+            *state, "Zone Cooling Setpoint Not Met While Occupied Time", OutputProcessor::Unit::hr, timeNotMet, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, ZoneNames[i]);
     }
 
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
@@ -7875,8 +7875,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite1",
                         _,
                         "Electricity",
@@ -7886,8 +7886,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite2",
                         _,
                         "Electricity",
@@ -7897,19 +7897,19 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite3",
                         _,
                         "Electricity",
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(
-        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, "Zone", "Sum", "Lite4", _, "Coal", "Heating", "General");
+        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Lite4", _, "Coal", "Heating", "General");
     SetupOutputVariable(
-        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, "Zone", "Sum", "Lite5", _, "Gasoline", "Heating", "General");
+        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Lite5", _, "Gasoline", "Heating", "General");
     SetupOutputVariable(
-        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, "Zone", "Sum", "Lite6", _, "Propane", "Heating", "General");
+        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Lite6", _, "Propane", "Heating", "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
@@ -8423,8 +8423,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite1",
                         _,
                         "Electricity",
@@ -8434,8 +8434,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
                         "Exterior Lights Electricity Rate",
                         OutputProcessor::Unit::W,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite2",
                         _,
                         "Electricity",
@@ -9428,8 +9428,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite1",
                         _,
                         "Electricity",
@@ -9439,8 +9439,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite2",
                         _,
                         "Electricity",
@@ -9450,19 +9450,19 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                         "Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
-                        "Zone",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::Zone,
+                        OutputProcessor::eVariableType::Sum,
                         "Lite3",
                         _,
                         "Electricity",
                         "Exterior Lights",
                         "General");
     SetupOutputVariable(
-        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, "Zone", "Sum", "Lite4", _, "Coal", "Heating", "General");
+        *state, "Heating Coal Energy", OutputProcessor::Unit::J, CoalHeating, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Lite4", _, "Coal", "Heating", "General");
     SetupOutputVariable(
-        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, "Zone", "Sum", "Lite5", _, "Gasoline", "Heating", "General");
+        *state, "Heating Gasoline Energy", OutputProcessor::Unit::J, GasolineHeating, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Lite5", _, "Gasoline", "Heating", "General");
     SetupOutputVariable(
-        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, "Zone", "Sum", "Lite6", _, "Propane", "Heating", "General");
+        *state, "Heating Propane Energy", OutputProcessor::Unit::J, PropaneHeating, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, "Lite6", _, "Propane", "Heating", "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;

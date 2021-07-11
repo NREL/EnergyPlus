@@ -179,13 +179,13 @@ public:
         for (auto &val : this->realVariablePlaceholders) {
             if (val.meterType) {
                 SetupOutputVariable(
-                    *state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Sum", val.varKey, _, "ELECTRICITY", "HEATING", _, "System");
+                    *state, val.varName, OutputProcessor::Unit::kg_s, val.value, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Sum, val.varKey, _, "ELECTRICITY", "HEATING", _, "System");
             } else {
-                SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+                SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, val.varKey);
             }
         }
         for (auto &val : this->intVariablePlaceholders) {
-            SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+            SetupOutputVariable(*state, val.varName, OutputProcessor::Unit::kg_s, val.value, OutputProcessor::eTimeStepType::Zone, OutputProcessor::eVariableType::Average, val.varKey);
         }
     }
 
