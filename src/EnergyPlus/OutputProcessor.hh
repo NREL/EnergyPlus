@@ -77,38 +77,38 @@ namespace OutputProcessor {
     enum class eTimeStepType : int {
         Zone = 0, HeatBalance = 1, HVAC = 2, System = 3, Plant = 4
     };
-    std::array<std::string_view, 5> constexpr sTimeStepType = {"Zone", "HeatBalance", "HVAC", "System", "Plant"};
-    inline eTimeStepType getTimeStepTypeEnum(std::string const & s) {
-        if (s == "Zone") {
-            return eTimeStepType::Zone;
-        } else if (s == "HeatBalance") {
-            return eTimeStepType::HeatBalance;
-        } else if (s == "HVAC") {
-            return eTimeStepType::HVAC;
-        } else if (s == "System") {
-            return eTimeStepType::System;
-        } else if (s == "Plant") {
-            return eTimeStepType::Plant;
-        }
-        std::cout << "BAD TIME STEP TYPE ENUM LOOKUP" + s << std::endl;
-        assert(false);
-        return eTimeStepType::Plant; // just to hush up the compiler
-    }
+//    std::array<std::string_view, 5> constexpr sTimeStepType = {"Zone", "HeatBalance", "HVAC", "System", "Plant"};
+//    inline eTimeStepType getTimeStepTypeEnum(std::string const & s) {
+//        if (s == "Zone") {
+//            return eTimeStepType::Zone;
+//        } else if (s == "HeatBalance") {
+//            return eTimeStepType::HeatBalance;
+//        } else if (s == "HVAC") {
+//            return eTimeStepType::HVAC;
+//        } else if (s == "System") {
+//            return eTimeStepType::System;
+//        } else if (s == "Plant") {
+//            return eTimeStepType::Plant;
+//        }
+//        std::cout << "BAD TIME STEP TYPE ENUM LOOKUP" + s << std::endl;
+//        assert(false);
+//        return eTimeStepType::Plant; // just to hush up the compiler
+//    }
 
     enum class eVariableType : int {
         Average = 0, Sum = 1
     };
-    std::array<std::string_view, 2> constexpr sVariableType = {"Average", "Sum"};
-    inline eVariableType getVariableTypeEnum(std::string const & s) {
-        if (s == "Average") {
-            return eVariableType::Average;
-        } else if (s == "Sum") {
-            return eVariableType::Sum;
-        }
-        std::cout << "BAD VARIABLE TYPE ENUM LOOKUP" + s << std::endl;
-        assert(false);
-        return eVariableType::Average; // just to hush the compiler
-    }
+//    std::array<std::string_view, 2> constexpr sVariableType = {"Average", "Sum"};
+//    inline eVariableType getVariableTypeEnum(std::string const & s) {
+//        if (s == "Average") {
+//            return eVariableType::Average;
+//        } else if (s == "Sum") {
+//            return eVariableType::Sum;
+//        }
+//        std::cout << "BAD VARIABLE TYPE ENUM LOOKUP" + s << std::endl;
+//        assert(false);
+//        return eVariableType::Average; // just to hush the compiler
+//    }
 
     enum class iReportVDD
     {
@@ -985,55 +985,6 @@ void SetupOutputVariable(EnergyPlusData &state, std::string const &VariableName,
                          Optional_int_const ZoneListMult = _,       // Zone List Multiplier, defaults to 1
                          Optional_int_const indexGroupKey = _       // Group identifier for SQL output
 );
-
-
-    void SetupOutputVariable(EnergyPlusData &state,
-                             std::string const &VariableName,           // String Name of variable (with units)
-                             OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
-                             Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-                             std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                             std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
-                             std::string const &KeyedValue,             // Associated Key for this variable
-                             Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
-                             Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
-                             Optional_string_const EndUseKey = _,       // Meter End Use Key (Lights, Heating, Cooling, etc)
-                             Optional_string_const EndUseSubKey = _,    // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                             Optional_string_const GroupKey = _,        // Meter Super Group Key (Building, System, Plant)
-                             Optional_string_const ZoneKey = _,         // Meter Zone Key (zone name)
-                             Optional_int_const ZoneMult = _,           // Zone Multiplier, defaults to 1
-                             Optional_int_const ZoneListMult = _,       // Zone List Multiplier, defaults to 1
-                             Optional_int_const indexGroupKey = _,      // Group identifier for SQL output
-                             Optional_string_const customUnitName = _   // the custom name for the units from EMS definition of units
-    );
-
-    void SetupOutputVariable(EnergyPlusData &state,
-                             std::string const &VariableName,           // String Name of variable
-                             OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
-                             int &ActualVariable,                       // Actual Variable, used to set up pointer
-                             std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-                             std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
-                             std::string const &KeyedValue,             // Associated Key for this variable
-                             Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
-                             Optional_int_const indexGroupKey = _       // Group identifier for SQL output
-    );
-
-    //void SetupOutputVariable(std::string const &VariableName,           // String Name of variable
-    //                         OutputProcessor::Unit const &VariableUnit, // Actual units corresponding to the actual variable
-    //                         Real64 &ActualVariable,                    // Actual Variable, used to set up pointer
-    //                         std::string const &TimeStepTypeKey,        // Zone, HeatBalance=1, HVAC, System, Plant=2
-    //                         std::string const &VariableTypeKey,        // State, Average=1, NonState, Sum=2
-    //                         int const KeyedValue,                      // Associated Key for this variable
-    //                         Optional_string_const ReportFreq = _,      // Internal use -- causes reporting at this freqency
-    //                         Optional_string_const ResourceTypeKey = _, // Meter Resource Type (Electricity, Gas, etc)
-    //                         Optional_string_const EndUseKey = _,       // Meter End Use Key (Lights, Heating, Cooling, etc)
-    //                         Optional_string_const EndUseSubKey = _,    // Meter End Use Sub Key (General Lights, Task Lights, etc)
-    //                         Optional_string_const GroupKey = _,        // Meter Super Group Key (Building, System, Plant)
-    //                         Optional_string_const ZoneKey = _,         // Meter Zone Key (zone name)
-    //                         Optional_int_const ZoneMult = _,           // Zone Multiplier, defaults to 1
-    //                         Optional_int_const ZoneListMult = _,       // Zone List Multiplier, defaults to 1
-    //                         Optional_int_const indexGroupKey = _       // Group identifier for SQL output
-    //);
-
 
 void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
 
