@@ -439,13 +439,13 @@ namespace BoilerSteam {
 
     void BoilerSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        SetupOutputVariable(state, "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Boiler Heating Rate", OutputProcessor::Unit::W, this->BoilerLoad, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
         SetupOutputVariable(state,
                             "Boiler Heating Energy",
                             OutputProcessor::Unit::J,
                             this->BoilerEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             this->Name,
                             _,
                             "ENERGYTRANSFER",
@@ -456,28 +456,28 @@ namespace BoilerSteam {
                             "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
                             OutputProcessor::Unit::W,
                             this->FuelUsed,
-                            "System",
-                            "Average",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelConsumed,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             this->Name,
                             _,
                             this->BoilerFuelTypeForOutputVariable,
                             "Heating",
                             this->EndUseSubcategory,
                             "Plant");
-        SetupOutputVariable(state, "Boiler Steam Efficiency", OutputProcessor::Unit::None, this->BoilerEff, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Boiler Steam Efficiency", OutputProcessor::Unit::None, this->BoilerEff, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
         SetupOutputVariable(
-            state, "Boiler Steam Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, "System", "Average", this->Name);
+            state, "Boiler Steam Inlet Temperature", OutputProcessor::Unit::C, this->BoilerInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
         SetupOutputVariable(
-            state, "Boiler Steam Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, "System", "Average", this->Name);
+            state, "Boiler Steam Outlet Temperature", OutputProcessor::Unit::C, this->BoilerOutletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
         SetupOutputVariable(
-            state, "Boiler Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, "System", "Average", this->Name);
+            state, "Boiler Steam Mass Flow Rate", OutputProcessor::Unit::kg_s, this->BoilerMassFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
     }
 
     void BoilerSpecs::autosize(EnergyPlusData &state)

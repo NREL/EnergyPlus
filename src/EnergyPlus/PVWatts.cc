@@ -172,22 +172,22 @@ namespace PVWatts {
     void PVWattsGenerator::setupOutputVariables(EnergyPlusData &state)
     {
         // Set up output variables
-        SetupOutputVariable(state, "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, m_outputDCPower, "System", "Average", m_name);
+        SetupOutputVariable(state, "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, m_outputDCPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, m_name);
         SetupOutputVariable(state,
                             "Generator Produced DC Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_outputDCEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             m_name,
                             _,
                             "ElectricityProduced",
                             "Photovoltaics",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, "System", "Average", m_name);
-        SetupOutputVariable(state, "Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, "System", "Average", m_name);
-        SetupOutputVariable(state, "Shaded Percent", OutputProcessor::Unit::Perc, m_shadedPercent, "System", "Average", m_name);
+        SetupOutputVariable(state, "Generator PV Cell Temperature", OutputProcessor::Unit::C, m_cellTemperature, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, m_name);
+        SetupOutputVariable(state, "Plane of Array Irradiance", OutputProcessor::Unit::W_m2, m_planeOfArrayIrradiance, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, m_name);
+        SetupOutputVariable(state, "Shaded Percent", OutputProcessor::Unit::Perc, m_shadedPercent, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, m_name);
     }
 
     PVWattsGenerator PVWattsGenerator::createFromIdfObj(EnergyPlusData &state, int objNum)

@@ -511,29 +511,29 @@ namespace ZoneAirLoopEquipmentManager {
                                     "Zone Air Terminal Sensible Heating Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).HeatGain,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Sum,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Cooling Energy",
                                     OutputProcessor::Unit::J,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).CoolGain,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Sum,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Heating Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).HeatRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Cooling Rate",
                                     OutputProcessor::Unit::W,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).CoolRate,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
             }
         }

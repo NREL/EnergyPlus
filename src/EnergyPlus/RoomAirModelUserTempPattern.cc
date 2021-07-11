@@ -420,8 +420,8 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
                             "Room Air Zone Vertical Temperature Gradient",
                             OutputProcessor::Unit::K_m,
                             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Gradient,
-                            "HVAC",
-                            "State",
+                            OutputProcessor::eTimeStepType::HVAC,
+                            OutputProcessor::eVariableType::Average,
                             state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).ZoneName);
 
         state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum) = false;

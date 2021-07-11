@@ -361,13 +361,13 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
 
         // setup output variables
         SetupOutputVariable(
-            state, "Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, this->loadSideHeatTransfer, "System", "Average", this->name);
+            state, "Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, this->loadSideHeatTransfer, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
                             this->loadSideEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             this->name,
                             _,
                             "ENERGYTRANSFER",
@@ -378,27 +378,27 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                             "Heat Pump Source Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
                             this->sourceSideHeatTransfer,
-                            "System",
-                            "Average",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
                             this->name);
         SetupOutputVariable(
-            state, "Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, this->sourceSideEnergy, "System", "Sum", this->name);
+            state, "Heat Pump Source Side Heat Transfer Energy", OutputProcessor::Unit::J, this->sourceSideEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->name);
         SetupOutputVariable(
-            state, "Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C, this->loadSideInletTemp, "System", "Average", this->name);
+            state, "Heat Pump Load Side Inlet Temperature", OutputProcessor::Unit::C, this->loadSideInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->name);
         SetupOutputVariable(
-            state, "Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C, this->loadSideOutletTemp, "System", "Average", this->name);
+            state, "Heat Pump Load Side Outlet Temperature", OutputProcessor::Unit::C, this->loadSideOutletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->name);
         SetupOutputVariable(
-            state, "Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, this->sourceSideInletTemp, "System", "Average", this->name);
+            state, "Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, this->sourceSideInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->name);
         SetupOutputVariable(
-            state, "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
-        SetupOutputVariable(state, "Heat Pump Electricity Rate", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
+            state, "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->name);
+        SetupOutputVariable(state, "Heat Pump Electricity Rate", OutputProcessor::Unit::W, this->powerUsage, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->name);
         if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
             SetupOutputVariable(state,
                                 "Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->powerEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 this->name,
                                 _,
                                 "Electricity",
@@ -410,8 +410,8 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                                 "Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->powerEnergy,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 this->name,
                                 _,
                                 "Electricity",
@@ -420,13 +420,13 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
                                 "Plant");
         }
         SetupOutputVariable(
-            state, "Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->loadSideMassFlowRate, "System", "Average", this->name);
+            state, "Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->loadSideMassFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->sourceSideMassFlowRate,
-                            "System",
-                            "Average",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Average,
                             this->name);
 
         // find this component on the plant

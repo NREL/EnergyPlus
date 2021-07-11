@@ -422,17 +422,17 @@ void GetFluidCoolerInput(EnergyPlusData &state)
 void FluidCoolerspecs::setupOutputVars(EnergyPlusData &state)
 {
 
-    SetupOutputVariable(state, "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-    SetupOutputVariable(state, "Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+    SetupOutputVariable(state, "Cooling Tower Inlet Temperature", OutputProcessor::Unit::C, this->InletWaterTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state, "Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state, "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state, "Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+    SetupOutputVariable(state, "Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
     SetupOutputVariable(state,
                         "Cooling Tower Fan Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->FanEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Sum,
                         this->Name,
                         _,
                         "Electricity",

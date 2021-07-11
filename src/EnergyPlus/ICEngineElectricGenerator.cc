@@ -308,14 +308,14 @@ namespace ICEngineElectricGenerator {
     void ICEngineGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     {
         SetupOutputVariable(
-            state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+            state, "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ElecEnergyGenerated,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             this->Name,
                             _,
                             "ElectricityProduced",
@@ -324,14 +324,14 @@ namespace ICEngineElectricGenerator {
                             "Plant");
 
         SetupOutputVariable(
-            state, "Generator " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
+            state, "Generator " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
         SetupOutputVariable(state,
                             "Generator " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             this->Name,
                             _,
                             this->FuelType,
@@ -341,34 +341,34 @@ namespace ICEngineElectricGenerator {
 
         //    general fuel use report to match other generators.
         SetupOutputVariable(
-            state, "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, "System", "Average", this->Name);
+            state, "Generator Fuel HHV Basis Rate", OutputProcessor::Unit::W, this->FuelEnergyUseRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
-        SetupOutputVariable(state, "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergy, "System", "Sum", this->Name);
-
-        SetupOutputVariable(
-            state, "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, "System", "Average", this->Name);
+        SetupOutputVariable(state, "Generator Fuel HHV Basis Energy", OutputProcessor::Unit::J, this->FuelEnergy, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->Name);
 
         SetupOutputVariable(
-            state, "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, "System", "Average", this->Name);
+            state, "Generator " + this->FuelType + " Mass Flow Rate", OutputProcessor::Unit::kg_s, this->FuelMdot, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
+
+        SetupOutputVariable(
+            state, "Generator Exhaust Air Temperature", OutputProcessor::Unit::C, this->ExhaustStackTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
         if (this->HeatRecActive) {
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 this->HeatRecMdotActual,
-                                "System",
-                                "Average",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
                                 this->Name);
 
             SetupOutputVariable(
-                state, "Generator Jacket Heat Recovery Rate", OutputProcessor::Unit::W, this->QJacketRecovered, "System", "Average", this->Name);
+                state, "Generator Jacket Heat Recovery Rate", OutputProcessor::Unit::W, this->QJacketRecovered, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Jacket Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->JacketEnergyRec,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 this->Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -377,14 +377,14 @@ namespace ICEngineElectricGenerator {
                                 "Plant");
 
             SetupOutputVariable(
-                state, "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, this->QLubeOilRecovered, "System", "Average", this->Name);
+                state, "Generator Lube Heat Recovery Rate", OutputProcessor::Unit::W, this->QLubeOilRecovered, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Lube Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->LubeOilEnergyRec,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 this->Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -393,14 +393,14 @@ namespace ICEngineElectricGenerator {
                                 "Plant");
 
             SetupOutputVariable(
-                state, "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, this->QExhaustRecovered, "System", "Average", this->Name);
+                state, "Generator Exhaust Heat Recovery Rate", OutputProcessor::Unit::W, this->QExhaustRecovered, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Exhaust Heat Recovery Energy",
                                 OutputProcessor::Unit::J,
                                 this->ExhaustEnergyRec,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 this->Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -409,25 +409,25 @@ namespace ICEngineElectricGenerator {
                                 "Plant");
 
             SetupOutputVariable(
-                state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QTotalHeatRecovered, "System", "Average", this->Name);
+                state, "Generator Produced Thermal Rate", OutputProcessor::Unit::W, this->QTotalHeatRecovered, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
             SetupOutputVariable(
-                state, "Generator Produced Thermal Energy", OutputProcessor::Unit::J, this->TotalHeatEnergyRec, "System", "Sum", this->Name);
+                state, "Generator Produced Thermal Energy", OutputProcessor::Unit::J, this->TotalHeatEnergyRec, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 this->HeatRecInletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Generator Heat Recovery Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 this->HeatRecOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
                                 this->Name);
         }
     }

@@ -313,13 +313,13 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
 
     if (numLoadCenters_ > 0) {
         SetupOutputVariable(
-            state, "Facility Total Purchased Electricity Rate", OutputProcessor::Unit::W, electPurchRate_, "System", "Average", name_);
+            state, "Facility Total Purchased Electricity Rate", OutputProcessor::Unit::W, electPurchRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
         SetupOutputVariable(state,
                             "Facility Total Purchased Electricity Energy",
                             OutputProcessor::Unit::J,
                             electricityPurch_,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             name_,
                             _,
                             "ElectricityPurchased",
@@ -328,13 +328,13 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             "Plant");
 
         SetupOutputVariable(
-            state, "Facility Total Surplus Electricity Rate", OutputProcessor::Unit::W, electSurplusRate_, "System", "Average", name_);
+            state, "Facility Total Surplus Electricity Rate", OutputProcessor::Unit::W, electSurplusRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
         SetupOutputVariable(state,
                             "Facility Total Surplus Electricity Energy",
                             OutputProcessor::Unit::J,
                             electricitySurplus_,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             name_,
                             _,
                             "ElectricitySurplusSold",
@@ -343,13 +343,13 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             "Plant");
 
         SetupOutputVariable(
-            state, "Facility Net Purchased Electricity Rate", OutputProcessor::Unit::W, electricityNetRate_, "System", "Average", name_);
+            state, "Facility Net Purchased Electricity Rate", OutputProcessor::Unit::W, electricityNetRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
         SetupOutputVariable(state,
                             "Facility Net Purchased Electricity Energy",
                             OutputProcessor::Unit::J,
                             electricityNet_,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             name_,
                             _,
                             "ElectricityNet",
@@ -358,14 +358,14 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             "Plant");
 
         SetupOutputVariable(
-            state, "Facility Total Building Electricity Demand Rate", OutputProcessor::Unit::W, totalBldgElecDemand_, "System", "Average", name_);
+            state, "Facility Total Building Electricity Demand Rate", OutputProcessor::Unit::W, totalBldgElecDemand_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
         SetupOutputVariable(
-            state, "Facility Total HVAC Electricity Demand Rate", OutputProcessor::Unit::W, totalHVACElecDemand_, "System", "Average", name_);
+            state, "Facility Total HVAC Electricity Demand Rate", OutputProcessor::Unit::W, totalHVACElecDemand_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
         SetupOutputVariable(
-            state, "Facility Total Electricity Demand Rate", OutputProcessor::Unit::W, totalElectricDemand_, "System", "Average", name_);
+            state, "Facility Total Electricity Demand Rate", OutputProcessor::Unit::W, totalElectricDemand_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
 
-        SetupOutputVariable(state, "Facility Total Produced Electricity Rate", OutputProcessor::Unit::W, electProdRate_, "System", "Average", name_);
-        SetupOutputVariable(state, "Facility Total Produced Electricity Energy", OutputProcessor::Unit::J, electricityProd_, "System", "Sum", name_);
+        SetupOutputVariable(state, "Facility Total Produced Electricity Rate", OutputProcessor::Unit::W, electProdRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Facility Total Produced Electricity Energy", OutputProcessor::Unit::J, electricityProd_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
 
         reportPVandWindCapacity(state);
 
@@ -1061,15 +1061,15 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
     // Setup general output variables for reporting in the electric load center
     SetupOutputVariable(
-        state, "Electric Load Center Produced Electricity Rate", OutputProcessor::Unit::W, genElectProdRate, "System", "Average", name_);
-    SetupOutputVariable(state, "Electric Load Center Produced Electricity Energy", OutputProcessor::Unit::J, genElectricProd, "System", "Sum", name_);
+        state, "Electric Load Center Produced Electricity Rate", OutputProcessor::Unit::W, genElectProdRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+    SetupOutputVariable(state, "Electric Load Center Produced Electricity Energy", OutputProcessor::Unit::J, genElectricProd, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
     SetupOutputVariable(
-        state, "Electric Load Center Supplied Electricity Rate", OutputProcessor::Unit::W, subpanelFeedInRate, "System", "Average", name_);
-    SetupOutputVariable(state, "Electric Load Center Drawn Electricity Rate", OutputProcessor::Unit::W, subpanelDrawRate, "System", "Average", name_);
-    SetupOutputVariable(state, "Electric Load Center Produced Thermal Rate", OutputProcessor::Unit::W, thermalProdRate, "System", "Average", name_);
-    SetupOutputVariable(state, "Electric Load Center Produced Thermal Energy", OutputProcessor::Unit::J, thermalProd, "System", "Sum", name_);
+        state, "Electric Load Center Supplied Electricity Rate", OutputProcessor::Unit::W, subpanelFeedInRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+    SetupOutputVariable(state, "Electric Load Center Drawn Electricity Rate", OutputProcessor::Unit::W, subpanelDrawRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+    SetupOutputVariable(state, "Electric Load Center Produced Thermal Rate", OutputProcessor::Unit::W, thermalProdRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+    SetupOutputVariable(state, "Electric Load Center Produced Thermal Energy", OutputProcessor::Unit::J, thermalProd, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
     SetupOutputVariable(
-        state, "Electric Load Center Requested Electricity Rate", OutputProcessor::Unit::W, totalPowerRequest_, "System", "Average", name_);
+        state, "Electric Load Center Requested Electricity Rate", OutputProcessor::Unit::W, totalPowerRequest_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
 
     if (state.dataGlobal->AnyEnergyManagementSystemInModel && storagePresent_) {
         SetupEMSActuator(state, "Electrical Storage", name_, "Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_);
@@ -2160,7 +2160,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     maxPowerOut = ratedElecPowerOutput, nominalThermElectRatio = thermalToElectRatio;
 
     SetupOutputVariable(
-        state, "Generator Requested Electricity Rate", OutputProcessor::Unit::W, powerRequestThisTimestep, "System", "Average", objectName);
+        state, "Generator Requested Electricity Rate", OutputProcessor::Unit::W, powerRequestThisTimestep, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, objectName);
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable(state, "Generator Nominal Maximum Power", objectName, "[W]", maxPowerOut);
         SetupEMSInternalVariable(state, "Generator Nominal Thermal To Electric Ratio", objectName, "[ratio]", nominalThermElectRatio);
@@ -2480,34 +2480,34 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
 
         } // end switch modelType
 
-        SetupOutputVariable(state, "Inverter DC to AC Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_);
-        SetupOutputVariable(state, "Inverter DC Input Electricity Rate", OutputProcessor::Unit::W, dCPowerIn_, "System", "Average", name_);
-        SetupOutputVariable(state, "Inverter DC Input Electricity Energy", OutputProcessor::Unit::J, dCEnergyIn_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Inverter AC Output Electricity Rate", OutputProcessor::Unit::W, aCPowerOut_, "System", "Average", name_);
-        SetupOutputVariable(state, "Inverter AC Output Electricity Energy", OutputProcessor::Unit::J, aCEnergyOut_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Inverter Conversion Loss Power", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_);
-        SetupOutputVariable(state, "Inverter Conversion Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, "System", "Sum", name_);
+        SetupOutputVariable(state, "Inverter DC to AC Efficiency", OutputProcessor::Unit::None, efficiency_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Inverter DC Input Electricity Rate", OutputProcessor::Unit::W, dCPowerIn_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Inverter DC Input Electricity Energy", OutputProcessor::Unit::J, dCEnergyIn_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Inverter AC Output Electricity Rate", OutputProcessor::Unit::W, aCPowerOut_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Inverter AC Output Electricity Energy", OutputProcessor::Unit::J, aCEnergyOut_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Inverter Conversion Loss Power", OutputProcessor::Unit::W, conversionLossPower_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Inverter Conversion Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
         SetupOutputVariable(state,
                             "Inverter Conversion Loss Decrement Energy",
                             OutputProcessor::Unit::J,
                             conversionLossEnergyDecrement_,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             name_,
                             _,
                             "ElectricityProduced",
                             "POWERCONVERSION",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Inverter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
-        SetupOutputVariable(state, "Inverter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Inverter Ancillary AC Electricity Rate", OutputProcessor::Unit::W, ancillACuseRate_, "System", "Average", name_);
+        SetupOutputVariable(state, "Inverter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Inverter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Inverter Ancillary AC Electricity Rate", OutputProcessor::Unit::W, ancillACuseRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
         SetupOutputVariable(state,
                             "Inverter Ancillary AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             ancillACuseEnergy_,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             name_,
                             _,
                             "Electricity",
@@ -2878,34 +2878,34 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
         }
         zoneRadFract_ = state.dataIPShortCut->rNumericArgs(4);
 
-        SetupOutputVariable(state, "Converter AC to DC Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_);
-        SetupOutputVariable(state, "Converter AC Input Electricity Rate", OutputProcessor::Unit::W, aCPowerIn_, "System", "Average", name_);
-        SetupOutputVariable(state, "Converter AC Input Electricity Energy", OutputProcessor::Unit::J, aCEnergyIn_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Converter DC Output Electricity Rate", OutputProcessor::Unit::W, dCPowerOut_, "System", "Average", name_);
-        SetupOutputVariable(state, "Converter DC Output Electricity Energy", OutputProcessor::Unit::J, dCEnergyOut_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Converter Electricity Loss Rate", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_);
-        SetupOutputVariable(state, "Converter Electricity Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, "System", "Sum", name_);
+        SetupOutputVariable(state, "Converter AC to DC Efficiency", OutputProcessor::Unit::None, efficiency_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Converter AC Input Electricity Rate", OutputProcessor::Unit::W, aCPowerIn_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Converter AC Input Electricity Energy", OutputProcessor::Unit::J, aCEnergyIn_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Converter DC Output Electricity Rate", OutputProcessor::Unit::W, dCPowerOut_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Converter DC Output Electricity Energy", OutputProcessor::Unit::J, dCEnergyOut_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Converter Electricity Loss Rate", OutputProcessor::Unit::W, conversionLossPower_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Converter Electricity Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
         SetupOutputVariable(state,
                             "Converter Electricity Loss Decrement Energy",
                             OutputProcessor::Unit::J,
                             conversionLossEnergyDecrement_,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             name_,
                             _,
                             "ElectricityProduced",
                             "POWERCONVERSION",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Converter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
-        SetupOutputVariable(state, "Converter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Converter Ancillary AC Electricity Rate", OutputProcessor::Unit::W, ancillACuseRate_, "System", "Average", name_);
+        SetupOutputVariable(state, "Converter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Converter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Converter Ancillary AC Electricity Rate", OutputProcessor::Unit::W, ancillACuseRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
         SetupOutputVariable(state,
                             "Converter Ancillary AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             ancillACuseEnergy_,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             name_,
                             _,
                             "Electricity",
@@ -3137,8 +3137,8 @@ ElectricStorage::ElectricStorage( // main constructor
                                 "Electric Storage Simple Charge State",
                                 OutputProcessor::Unit::J,
                                 electEnergyinStorage_,
-                                "System",
-                                "Average",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
                                 name_); // issue #4921
             break;
         }
@@ -3371,53 +3371,53 @@ ElectricStorage::ElectricStorage( // main constructor
 
         if (storageModelMode_ == StorageModelType::kiBaMBattery or storageModelMode_ == StorageModelType::liIonNmcBattery) {
             SetupOutputVariable(
-                state, "Electric Storage Operating Mode Index", OutputProcessor::Unit::None, storageMode_, "System", "Average", name_);
+                state, "Electric Storage Operating Mode Index", OutputProcessor::Unit::None, storageMode_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
             SetupOutputVariable(state,
                                 "Electric Storage Battery Charge State",
                                 OutputProcessor::Unit::Ah,
                                 absoluteSOC_,
-                                "System",
-                                "Average",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
                                 name_); // issue #4921
-            SetupOutputVariable(state, "Electric Storage Charge Fraction", OutputProcessor::Unit::None, fractionSOC_, "System", "Average", name_);
-            SetupOutputVariable(state, "Electric Storage Total Current", OutputProcessor::Unit::A, batteryCurrent_, "System", "Average", name_);
-            SetupOutputVariable(state, "Electric Storage Total Voltage", OutputProcessor::Unit::V, batteryVoltage_, "System", "Average", name_);
+            SetupOutputVariable(state, "Electric Storage Charge Fraction", OutputProcessor::Unit::None, fractionSOC_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+            SetupOutputVariable(state, "Electric Storage Total Current", OutputProcessor::Unit::A, batteryCurrent_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+            SetupOutputVariable(state, "Electric Storage Total Voltage", OutputProcessor::Unit::V, batteryVoltage_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
 
             if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
                 SetupOutputVariable(
-                    state, "Electric Storage Degradation Fraction", OutputProcessor::Unit::None, batteryDamage_, "System", "Average", name_);
+                    state, "Electric Storage Degradation Fraction", OutputProcessor::Unit::None, batteryDamage_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
             }
         }
 
-        SetupOutputVariable(state, "Electric Storage Charge Power", OutputProcessor::Unit::W, storedPower_, "System", "Average", name_);
-        SetupOutputVariable(state, "Electric Storage Charge Energy", OutputProcessor::Unit::J, storedEnergy_, "System", "Sum", name_);
+        SetupOutputVariable(state, "Electric Storage Charge Power", OutputProcessor::Unit::W, storedPower_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Electric Storage Charge Energy", OutputProcessor::Unit::J, storedEnergy_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
         SetupOutputVariable(state,
                             "Electric Storage Production Decrement Energy",
                             OutputProcessor::Unit::J,
                             decrementedEnergyStored_,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             name_,
                             _,
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Electric Storage Discharge Power", OutputProcessor::Unit::W, drawnPower_, "System", "Average", name_);
+        SetupOutputVariable(state, "Electric Storage Discharge Power", OutputProcessor::Unit::W, drawnPower_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
         SetupOutputVariable(state,
                             "Electric Storage Discharge Energy",
                             OutputProcessor::Unit::J,
                             drawnEnergy_,
-                            "System",
-                            "Sum",
+                            OutputProcessor::eTimeStepType::System,
+                            OutputProcessor::eVariableType::Sum,
                             name_,
                             _,
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
                             _,
                             "Plant");
-        SetupOutputVariable(state, "Electric Storage Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
-        SetupOutputVariable(state, "Electric Storage Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
+        SetupOutputVariable(state, "Electric Storage Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Electric Storage Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
             if (storageModelMode_ == StorageModelType::simpleBucketStorage) {
                 SetupEMSInternalVariable(state, "Electrical Storage Simple Maximum Capacity", name_, "[J]", maxEnergyCapacity_);
@@ -3427,7 +3427,7 @@ ElectricStorage::ElectricStorage( // main constructor
         }
         if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
             SetupOutputVariable(
-                state, "Electric Storage Battery Temperature", OutputProcessor::Unit::C, batteryTemperature_, "System", "Average", name_);
+                state, "Electric Storage Battery Temperature", OutputProcessor::Unit::C, batteryTemperature_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
         }
 
         if (zoneNum_ > 0) {
@@ -4461,24 +4461,24 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                 }
             }
         }
-        SetupOutputVariable(state, "Transformer Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_);
-        SetupOutputVariable(state, "Transformer Input Electricity Rate", OutputProcessor::Unit::W, powerIn_, "System", "Average", name_);
-        SetupOutputVariable(state, "Transformer Input Electricity Energy", OutputProcessor::Unit::J, energyIn_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Transformer Output Electricity Rate", OutputProcessor::Unit::W, powerOut_, "System", "Average", name_);
-        SetupOutputVariable(state, "Transformer Output Electricity Energy", OutputProcessor::Unit::J, energyOut_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Transformer No Load Loss Rate", OutputProcessor::Unit::W, noLoadLossRate_, "System", "Average", name_);
-        SetupOutputVariable(state, "Transformer No Load Loss Energy", OutputProcessor::Unit::J, noLoadLossEnergy_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Transformer Load Loss Rate", OutputProcessor::Unit::W, loadLossRate_, "System", "Average", name_);
-        SetupOutputVariable(state, "Transformer Load Loss Energy", OutputProcessor::Unit::J, loadLossEnergy_, "System", "Sum", name_);
-        SetupOutputVariable(state, "Transformer Thermal Loss Rate", OutputProcessor::Unit::W, thermalLossRate_, "System", "Average", name_);
-        SetupOutputVariable(state, "Transformer Thermal Loss Energy", OutputProcessor::Unit::J, thermalLossEnergy_, "System", "Sum", name_);
+        SetupOutputVariable(state, "Transformer Efficiency", OutputProcessor::Unit::None, efficiency_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Transformer Input Electricity Rate", OutputProcessor::Unit::W, powerIn_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Transformer Input Electricity Energy", OutputProcessor::Unit::J, energyIn_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Transformer Output Electricity Rate", OutputProcessor::Unit::W, powerOut_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Transformer Output Electricity Energy", OutputProcessor::Unit::J, energyOut_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Transformer No Load Loss Rate", OutputProcessor::Unit::W, noLoadLossRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Transformer No Load Loss Energy", OutputProcessor::Unit::J, noLoadLossEnergy_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Transformer Load Loss Rate", OutputProcessor::Unit::W, loadLossRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Transformer Load Loss Energy", OutputProcessor::Unit::J, loadLossEnergy_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
+        SetupOutputVariable(state, "Transformer Thermal Loss Rate", OutputProcessor::Unit::W, thermalLossRate_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, name_);
+        SetupOutputVariable(state, "Transformer Thermal Loss Energy", OutputProcessor::Unit::J, thermalLossEnergy_, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, name_);
         if (usageMode_ == TransformerUse::powerInFromGrid) { // power losses metered as an end use exterior equipment
             SetupOutputVariable(state,
                                 "Transformer Distribution Electricity Loss Energy",
                                 OutputProcessor::Unit::J,
                                 elecUseMeteredUtilityLosses_,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 name_,
                                 _,
                                 "Electricity",
@@ -4491,8 +4491,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 "Transformer Cogeneration Electricity Loss Energy",
                                 OutputProcessor::Unit::J,
                                 powerConversionMeteredLosses_,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 name_,
                                 _,
                                 "ElectricityProduced",
@@ -4505,8 +4505,8 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 "Transformer Conversion Electricity Loss Energy",
                                 OutputProcessor::Unit::J,
                                 powerConversionMeteredLosses_,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 name_,
                                 _,
                                 "ElectricityProduced",

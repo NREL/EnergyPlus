@@ -436,8 +436,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Scheduled Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->SchedSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -481,8 +481,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Scheduled On Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->SchedOnSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -526,8 +526,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Scheduled Off Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->SchedOffSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -751,8 +751,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Night Cycle Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -914,8 +914,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Optimum Start Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).Name);
 
                 // add
@@ -923,8 +923,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Optimum Start Time Before Occupancy",
                                     OutputProcessor::Unit::hr,
                                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).NumHoursBeforeOccupancy,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->OptStartSysAvailMgrData(SysAvailNum).Name,
                                     "Daily");
             }
@@ -1008,8 +1008,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Differential Thermostat Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -1063,8 +1063,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager High Temperature Turn Off Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -1119,8 +1119,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager High Temperature Turn On Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -1186,8 +1186,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Low Temperature Turn Off Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -1242,8 +1242,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Low Temperature Turn On Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -1312,8 +1312,8 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Night Ventilation Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).AvailStatus,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).Name);
 
             } // SysAvailNum
@@ -4500,30 +4500,30 @@ namespace SystemAvailabilityManager {
                                     "Availability Manager Hybrid Ventilation Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName);
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Mode",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlMode,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).AirLoopName);
             } else {
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Status",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlZoneName);
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Mode",
                                     OutputProcessor::Unit::None,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlMode,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlZoneName);
             }
 
@@ -4532,8 +4532,8 @@ namespace SystemAvailabilityManager {
                                     "Hybrid Ventilation Control HVAC System Operation Elapsed Time",
                                     OutputProcessor::Unit::min,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeOperDuration,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
 
@@ -4542,8 +4542,8 @@ namespace SystemAvailabilityManager {
                                     "Hybrid Ventilation Control Natural Ventilation Elapsed Time",
                                     OutputProcessor::Unit::min,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).TimeVentDuration,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
 
@@ -4557,22 +4557,22 @@ namespace SystemAvailabilityManager {
                                     "Hybrid Ventilation Operative Temperature",
                                     OutputProcessor::Unit::C,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name);
                 SetupOutputVariable(state,
                                     "Hybrid Ventilation Lower Limit Operative Temperature",
                                     OutputProcessor::Unit::C,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).minAdaTem,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name);
                 SetupOutputVariable(state,
                                     "Hybrid Ventilation Upper Limit Operative Temperature",
                                     OutputProcessor::Unit::C,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).maxAdaTem,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
 
@@ -4583,8 +4583,8 @@ namespace SystemAvailabilityManager {
                                     "Hybrid Ventilation CO2 Concentration",
                                     OutputProcessor::Unit::ppm,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).CO2,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name);
             }
         }

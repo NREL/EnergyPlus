@@ -686,15 +686,15 @@ namespace HVACDXSystem {
                                     "Coil System Cycling Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CycRatio,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                 SetupOutputVariable(state,
                                     "Coil System Compressor Speed Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedRatio,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
             } else if (UtilityRoutines::SameString(state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CoolingCoilType,
                                                    "Coil:Cooling:DX:VariableSpeed")) {
@@ -702,38 +702,38 @@ namespace HVACDXSystem {
                                     "Coil System Cycling Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).CycRatio,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                 SetupOutputVariable(state,
                                     "Coil System Compressor Speed Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedRatio,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
                 SetupOutputVariable(state,
                                     "Coil System Compressor Speed Number",
                                     OutputProcessor::Unit::None,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).SpeedNum,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
             } else {
                 SetupOutputVariable(state,
                                     "Coil System Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).PartLoadFrac,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
             }
             SetupOutputVariable(state,
                                 "Coil System Frost Control Status",
                                 OutputProcessor::Unit::None,
                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).FrostControlStatus,
-                                "System",
-                                "Average",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
                                 state.dataHVACDXSys->DXCoolingSystem(DXSystemNum).Name);
         }
 

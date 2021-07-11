@@ -761,18 +761,18 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
 
 void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
 {
-    SetupOutputVariable(state, "Chiller Part Load Ratio", OutputProcessor::Unit::None, this->ChillerPartLoadRatio, "System", "Average", this->Name);
+    SetupOutputVariable(state, "Chiller Part Load Ratio", OutputProcessor::Unit::None, this->ChillerPartLoadRatio, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
-    SetupOutputVariable(state, "Chiller Cycling Ratio", OutputProcessor::Unit::None, this->ChillerCyclingRatio, "System", "Average", this->Name);
+    SetupOutputVariable(state, "Chiller Cycling Ratio", OutputProcessor::Unit::None, this->ChillerCyclingRatio, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
-    SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+    SetupOutputVariable(state, "Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->Energy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Sum,
                         this->Name,
                         _,
                         "ELECTRICITY",
@@ -780,14 +780,14 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         this->EndUseSubcategory,
                         "Plant");
 
-    SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
+    SetupOutputVariable(state, "Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Evaporator Cooling Energy",
                         OutputProcessor::Unit::J,
                         this->EvapEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Sum,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
@@ -796,28 +796,28 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         "Plant");
 
     SetupOutputVariable(
-        state, "Chiller False Load Heat Transfer Rate", OutputProcessor::Unit::W, this->ChillerFalseLoadRate, "System", "Average", this->Name);
+        state, "Chiller False Load Heat Transfer Rate", OutputProcessor::Unit::W, this->ChillerFalseLoadRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     SetupOutputVariable(
-        state, "Chiller False Load Heat Transfer Energy", OutputProcessor::Unit::J, this->ChillerFalseLoad, "System", "Sum", this->Name);
+        state, "Chiller False Load Heat Transfer Energy", OutputProcessor::Unit::J, this->ChillerFalseLoad, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Sum, this->Name);
 
     SetupOutputVariable(
-        state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, "System", "Average", this->Name);
+        state, "Chiller Evaporator Inlet Temperature", OutputProcessor::Unit::C, this->EvapInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     SetupOutputVariable(
-        state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, "System", "Average", this->Name);
+        state, "Chiller Evaporator Outlet Temperature", OutputProcessor::Unit::C, this->EvapOutletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     SetupOutputVariable(
-        state, "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, "System", "Average", this->Name);
+        state, "Chiller Evaporator Mass Flow Rate", OutputProcessor::Unit::kg_s, this->EvapMassFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
-    SetupOutputVariable(state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, "System", "Average", this->Name);
+    SetupOutputVariable(state, "Chiller Condenser Heat Transfer Rate", OutputProcessor::Unit::W, this->QCondenser, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     SetupOutputVariable(state,
                         "Chiller Condenser Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->CondEnergy,
-                        "System",
-                        "Sum",
+                        OutputProcessor::eTimeStepType::System,
+                        OutputProcessor::eVariableType::Sum,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
@@ -825,39 +825,39 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                         _,
                         "Plant");
 
-    SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, "System", "Average", this->Name);
+    SetupOutputVariable(state, "Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     SetupOutputVariable(
-        state, "Chiller Capacity Temperature Modifier Multiplier", OutputProcessor::Unit::None, this->ChillerCapFT, "System", "Average", this->Name);
+        state, "Chiller Capacity Temperature Modifier Multiplier", OutputProcessor::Unit::None, this->ChillerCapFT, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     SetupOutputVariable(
-        state, "Chiller EIR Temperature Modifier Multiplier", OutputProcessor::Unit::None, this->ChillerEIRFT, "System", "Average", this->Name);
+        state, "Chiller EIR Temperature Modifier Multiplier", OutputProcessor::Unit::None, this->ChillerEIRFT, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     SetupOutputVariable(
-        state, "Chiller EIR Part Load Modifier Multiplier", OutputProcessor::Unit::None, this->ChillerEIRFPLR, "System", "Average", this->Name);
+        state, "Chiller EIR Part Load Modifier Multiplier", OutputProcessor::Unit::None, this->ChillerEIRFPLR, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
     // Condenser mass flow and outlet temp are valid for water cooled
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         SetupOutputVariable(
-            state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
+            state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
         SetupOutputVariable(
-            state, "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, "System", "Average", this->Name);
+            state, "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
         SetupOutputVariable(
-            state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, "System", "Average", this->Name);
+            state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
         // If heat recovery is active then setup report variables
         if (this->HeatRecActive) {
             SetupOutputVariable(
-                state, "Chiller Total Recovered Heat Rate", OutputProcessor::Unit::W, this->QHeatRecovered, "System", "Average", this->Name);
+                state, "Chiller Total Recovered Heat Rate", OutputProcessor::Unit::W, this->QHeatRecovered, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
             SetupOutputVariable(state,
                                 "Chiller Total Recovered Heat Energy",
                                 OutputProcessor::Unit::J,
                                 this->EnergyHeatRecovery,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 this->Name,
                                 _,
                                 "ENERGYTRANSFER",
@@ -866,42 +866,42 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 "Plant");
 
             SetupOutputVariable(
-                state, "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, "System", "Average", this->Name);
+                state, "Chiller Heat Recovery Inlet Temperature", OutputProcessor::Unit::C, this->HeatRecInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
             SetupOutputVariable(state,
                                 "Chiller Heat Recovery Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 this->HeatRecOutletTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
                                 this->Name);
 
             SetupOutputVariable(
-                state, "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMassFlow, "System", "Average", this->Name);
+                state, "Chiller Heat Recovery Mass Flow Rate", OutputProcessor::Unit::kg_s, this->HeatRecMassFlow, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
             SetupOutputVariable(state,
                                 "Chiller Effective Heat Rejection Temperature",
                                 OutputProcessor::Unit::C,
                                 this->ChillerCondAvgTemp,
-                                "System",
-                                "Average",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Average,
                                 this->Name);
         }
 
     } else {
         SetupOutputVariable(
-            state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
+            state, "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
         if (this->CondenserFanPowerRatio > 0) {
             SetupOutputVariable(
-                state, "Chiller Condenser Fan Electricity Rate", OutputProcessor::Unit::W, this->CondenserFanPower, "System", "Average", this->Name);
+                state, "Chiller Condenser Fan Electricity Rate", OutputProcessor::Unit::W, this->CondenserFanPower, OutputProcessor::eTimeStepType::System, OutputProcessor::eVariableType::Average, this->Name);
 
             SetupOutputVariable(state,
                                 "Chiller Condenser Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->CondenserFanEnergyConsumption,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 this->Name,
                                 _,
                                 "ELECTRICITY",
@@ -914,8 +914,8 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 "Chiller Evaporative Condenser Water Volume",
                                 OutputProcessor::Unit::m3,
                                 this->EvapWaterConsump,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 this->Name,
                                 _,
                                 "Water",
@@ -927,8 +927,8 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                 "Chiller Evaporative Condenser Mains Supply Water Volume",
                                 OutputProcessor::Unit::m3,
                                 this->EvapWaterConsump,
-                                "System",
-                                "Sum",
+                                OutputProcessor::eTimeStepType::System,
+                                OutputProcessor::eVariableType::Sum,
                                 this->Name,
                                 _,
                                 "MainsWater",
@@ -941,16 +941,16 @@ void ElectricEIRChillerSpecs::setupOutputVars(EnergyPlusData &state)
                                     "Chiller Basin Heater Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     this->BasinHeaterPower,
-                                    "System",
-                                    "Average",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Average,
                                     this->Name);
 
                 SetupOutputVariable(state,
                                     "Chiller Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
-                                    "System",
-                                    "Sum",
+                                    OutputProcessor::eTimeStepType::System,
+                                    OutputProcessor::eVariableType::Sum,
                                     this->Name,
                                     _,
                                     "Electricity",
