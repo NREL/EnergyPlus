@@ -5368,7 +5368,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
             if (j == I) state.dataHeatBal->Ventilation(j).HybridControlMasterStatus = true;
         }
 
-        if (state.dataHeatBal->Ventilation(j).ModelType == VentilationDesignFlowRate) {
+        if (state.dataHeatBal->Ventilation(j).ModelType == DataHeatBalance::Ventilation::DesignFlowRate) {
             // CR6845 if calculated < 0, don't propagate.
             VVF = state.dataHeatBal->Ventilation(j).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Ventilation(j).SchedPtr);
 
@@ -5451,7 +5451,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 state.dataHeatBalFanSys->MCPTV(NZ) += state.dataZoneEquip->VentMCP(j) * state.dataHeatBal->Ventilation(j).AirTemp;
         }
 
-        if (state.dataHeatBal->Ventilation(j).ModelType == VentilationWindAndStack) {
+        if (state.dataHeatBal->Ventilation(j).ModelType == DataHeatBalance::Ventilation::WindAndStack) {
             if (state.dataHeatBal->Ventilation(j).OpenEff != DataGlobalConstants::AutoCalculate) {
                 Cw = state.dataHeatBal->Ventilation(j).OpenEff;
             } else {

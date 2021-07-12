@@ -1413,7 +1413,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     }
                 }
 
-                state.dataHeatBal->Ventilation(Loop).ModelType = VentilationDesignFlowRate;
+                state.dataHeatBal->Ventilation(Loop).ModelType = DataHeatBalance::Ventilation::DesignFlowRate;
                 state.dataHeatBal->Ventilation(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataHeatBal->Ventilation(Loop).SchedPtr == 0) {
                     if (Item1 == 1) {
@@ -2077,7 +2077,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataHeatBal->Ventilation(VentiCount).Name = cAlphaArgs(1);
-        state.dataHeatBal->Ventilation(VentiCount).ModelType = VentilationWindAndStack;
+        state.dataHeatBal->Ventilation(VentiCount).ModelType = DataHeatBalance::Ventilation::WindAndStack;
 
         state.dataHeatBal->Ventilation(VentiCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr == 0) {

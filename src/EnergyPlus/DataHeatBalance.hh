@@ -216,8 +216,12 @@ namespace DataHeatBalance {
     };
 
     // Parameters for type of ventilation model
-    constexpr int VentilationDesignFlowRate(1);
-    constexpr int VentilationWindAndStack(2);
+    enum class Ventilation
+    {
+        Unassigned = -1,
+        DesignFlowRate,
+        WindAndStack
+    };
 
     // Parameters for type of zone air balance model
     constexpr int AirBalanceNone(0);
@@ -940,7 +944,7 @@ namespace DataHeatBalance {
         std::string Name;
         int ZonePtr;
         int SchedPtr;
-        int ModelType; // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
+        Ventilation ModelType; // which model is used for ventilation: DesignFlowRate and WindandStackOpenArea
         Real64 DesignLevel;
         bool EMSSimpleVentOn;        // EMS actuating ventilation flow rate if .TRUE.
         Real64 EMSimpleVentFlowRate; // Value EMS is directing to use for override
@@ -983,7 +987,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         VentilationData()
-            : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), EMSSimpleVentOn(false), EMSimpleVentFlowRate(0.0),
+            : ZonePtr(0), SchedPtr(0), ModelType(Ventilation::Unassigned), DesignLevel(0.0), EMSSimpleVentOn(false), EMSimpleVentFlowRate(0.0),
               MinIndoorTemperature(-100.0), DelTemperature(0.0), FanType(VentilationType::Natural), FanPressure(0.0), FanEfficiency(0.0),
               FanPower(0.0), AirTemp(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0), VelocitySQTermCoef(0.0),
               MaxIndoorTemperature(100.0), MinOutdoorTemperature(-100.0), MaxOutdoorTemperature(100.0), MaxWindSpeed(40.0), MinIndoorTempSchedPtr(0),
