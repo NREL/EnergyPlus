@@ -17320,7 +17320,6 @@ TEST_F(EnergyPlusFixture, UnitarySystem_DetailedWaterCoolingCoil_SizingTest)
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
     int unitarySysIndex(0);
-    bool FirstHVACIteration = true;
     UnitarySystems::UnitarySys::factory(*state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[0];
     auto &thisSys = unitSys[unitarySysIndex];
