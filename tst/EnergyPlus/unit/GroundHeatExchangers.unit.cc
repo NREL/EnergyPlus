@@ -792,6 +792,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Response_Factors_
         "    KATemps,            !- Undisturbed Ground Temperature Model Name",
         "    2.423,              !- Ground Thermal Conductivity {W/m-K}",
         "    2.343E+06,          !- Ground Thermal Heat Capacity {J/m3-K}",
+        "    UHFcalc,            !- g-function Calculation Model name",
         "    GHE-1 g-functions;  !- Response Factors Object Name",
     });
 
