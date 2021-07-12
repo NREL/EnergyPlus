@@ -83,23 +83,6 @@ namespace OutputProcessor {
         Plant = 4
     };
     std::array<std::string_view, 5> constexpr sTimeStepType = {"Zone", "HeatBalance", "HVAC", "System", "Plant"};
-    inline eTimeStepType getTimeStepTypeEnum(std::string const &s)
-    {
-        if (s == "Zone") {
-            return eTimeStepType::Zone;
-        } else if (s == "HeatBalance") {
-            return eTimeStepType::HeatBalance;
-        } else if (s == "HVAC") {
-            return eTimeStepType::HVAC;
-        } else if (s == "System") {
-            return eTimeStepType::System;
-        } else if (s == "Plant") {
-            return eTimeStepType::Plant;
-        }
-        std::cout << "BAD TIME STEP TYPE ENUM LOOKUP" + s << std::endl;
-        assert(false);
-        return eTimeStepType::Plant; // just to hush up the compiler
-    }
 
     enum class eVariableType : int
     {
@@ -107,17 +90,6 @@ namespace OutputProcessor {
         Sum = 1
     };
     std::array<std::string_view, 2> constexpr sVariableType = {"Average", "Sum"};
-    inline eVariableType getVariableTypeEnum(std::string const &s)
-    {
-        if (s == "Average") {
-            return eVariableType::Average;
-        } else if (s == "Sum") {
-            return eVariableType::Sum;
-        }
-        std::cout << "BAD VARIABLE TYPE ENUM LOOKUP" + s << std::endl;
-        assert(false);
-        return eVariableType::Average; // just to hush the compiler
-    }
 
     enum class iReportVDD
     {
