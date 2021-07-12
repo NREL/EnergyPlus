@@ -844,7 +844,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     if (errFlag) ErrorsFound = true;
                 }
 
-                state.dataHeatBal->Infiltration(Loop).ModelType = InfiltrationDesignFlowRate;
+                state.dataHeatBal->Infiltration(Loop).ModelType = DataHeatBalance::Infiltration::DesignFlowRate;
                 state.dataHeatBal->Infiltration(Loop).SchedPtr = GetScheduleIndex(state, cAlphaArgs(3));
                 if (state.dataHeatBal->Infiltration(Loop).SchedPtr == 0) {
                     if (Item1 == 1) {
@@ -1064,7 +1064,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
         state.dataHeatBal->Infiltration(InfiltCount).Name = cAlphaArgs(1);
-        state.dataHeatBal->Infiltration(InfiltCount).ModelType = InfiltrationShermanGrimsrud;
+        state.dataHeatBal->Infiltration(InfiltCount).ModelType = DataHeatBalance::Infiltration::ShermanGrimsrud;
         state.dataHeatBal->Infiltration(InfiltCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr == 0) {
             ShowSevereError(state,
@@ -1132,7 +1132,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHeatBalAirMgr->UniqueInfiltrationNames, cAlphaArgs(1), cCurrentModuleObject, cAlphaFieldNames(1), ErrorsFound);
         state.dataHeatBal->Infiltration(InfiltCount).Name = cAlphaArgs(1);
-        state.dataHeatBal->Infiltration(InfiltCount).ModelType = InfiltrationAIM2;
+        state.dataHeatBal->Infiltration(InfiltCount).ModelType = DataHeatBalance::Infiltration::AIM2;
         state.dataHeatBal->Infiltration(InfiltCount).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataHeatBal->Infiltration(InfiltCount).ZonePtr == 0) {
             ShowSevereError(state,

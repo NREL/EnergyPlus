@@ -5987,7 +5987,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
         {
             auto const SELECT_CASE_var(state.dataHeatBal->Infiltration(j).ModelType);
 
-            if (SELECT_CASE_var == InfiltrationDesignFlowRate) {
+            if (SELECT_CASE_var == DataHeatBalance::Infiltration::DesignFlowRate) {
 
                 IVF = state.dataHeatBal->Infiltration(j).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Infiltration(j).SchedPtr);
                 // CR6845 if calculated < 0.0, don't propagate
@@ -6015,7 +6015,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                     }
                 }
                 state.dataHeatBal->Infiltration(j).MassFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity;
-            } else if (SELECT_CASE_var == InfiltrationShermanGrimsrud) {
+            } else if (SELECT_CASE_var == DataHeatBalance::Infiltration::ShermanGrimsrud) {
                 // Sherman Grimsrud model as formulated in ASHRAE HoF
                 WindSpeedExt = state.dataEnvrn->WindSpeed; // formulated to use wind at Meterological Station rather than local
                 IVF = GetCurrentScheduleValue(state, state.dataHeatBal->Infiltration(j).SchedPtr) * state.dataHeatBal->Infiltration(j).LeakageArea /
@@ -6041,7 +6041,7 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                     }
                 }
                 state.dataHeatBal->Infiltration(j).MassFlowRate = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity;
-            } else if (SELECT_CASE_var == InfiltrationAIM2) {
+            } else if (SELECT_CASE_var == DataHeatBalance::Infiltration::AIM2) {
                 // Walker Wilson model as formulated in ASHRAE HoF
                 IVF = GetCurrentScheduleValue(state, state.dataHeatBal->Infiltration(j).SchedPtr) *
                       std::sqrt(

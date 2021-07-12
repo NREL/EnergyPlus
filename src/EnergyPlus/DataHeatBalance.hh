@@ -60,6 +60,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
@@ -206,9 +207,13 @@ namespace DataHeatBalance {
     };
 
     // Parameters for type of infiltration model
-    constexpr int InfiltrationDesignFlowRate(1);
-    constexpr int InfiltrationShermanGrimsrud(2);
-    constexpr int InfiltrationAIM2(3);
+    enum class Infiltration
+    {
+        Unassigned = -1,
+        DesignFlowRate,
+        ShermanGrimsrud,
+        AIM2
+    };
 
     // Parameters for type of ventilation model
     constexpr int VentilationDesignFlowRate(1);
@@ -893,9 +898,9 @@ namespace DataHeatBalance {
     {
         // Members
         std::string Name;
-        int ZonePtr;   // Which zone infiltration is in
-        int SchedPtr;  // Schedule for infiltration
-        int ModelType; // which model is used for infiltration
+        int ZonePtr;            // Which zone infiltration is in
+        int SchedPtr;           // Schedule for infiltration
+        Infiltration ModelType; // which model is used for infiltration
         // Design Flow Rate model terms
         Real64 DesignLevel;
         Real64 ConstantTermCoef;
@@ -921,10 +926,10 @@ namespace DataHeatBalance {
 
         // Default Constructor
         InfiltrationData()
-            : ZonePtr(0), SchedPtr(0), ModelType(0), DesignLevel(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0), VelocityTermCoef(0.0),
-              VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0), BasicWindCoefficient(0.0), FlowCoefficient(0.0),
-              AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0), ShelterFactor(0.0), EMSOverrideOn(false),
-              EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0)
+            : ZonePtr(0), SchedPtr(0), ModelType(Infiltration::Unassigned), DesignLevel(0.0), ConstantTermCoef(0.0), TemperatureTermCoef(0.0),
+              VelocityTermCoef(0.0), VelocitySQTermCoef(0.0), LeakageArea(0.0), BasicStackCoefficient(0.0), BasicWindCoefficient(0.0),
+              FlowCoefficient(0.0), AIM2StackCoefficient(0.0), AIM2WindCoefficient(0.0), PressureExponent(0.0), ShelterFactor(0.0),
+              EMSOverrideOn(false), EMSAirFlowRateValue(0.0), QuadratureSum(false), OABalancePtr(0), VolumeFlowRate(0.0), MassFlowRate(0.0)
         {
         }
     };
