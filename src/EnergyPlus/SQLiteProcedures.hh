@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
@@ -79,8 +80,8 @@ protected:
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream, std::shared_ptr<sqlite3> const &db);
     SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream,
                      bool writeOutputToSQLite,
-                     std::string const &dbName,
-                     std::string const &errorFileName);
+                     fs::path const &dbName,
+                     fs::path const &errorFilePath);
 
     int sqliteExecuteCommand(const std::string &commandBuffer);
     int sqlitePrepareStatement(sqlite3_stmt *&stmt, const std::string &stmtBuffer);
@@ -136,8 +137,8 @@ public:
     // Open the DB and prepare for writing data
     // Create all of the tables on construction
     SQLite(std::shared_ptr<std::ostream> errorStream,
-           std::string const &dbName,
-           std::string const &errorFileName,
+           fs::path const &dbName,
+           fs::path const &errorFilePath,
            bool writeOutputToSQLite = false,
            bool writeTabularDataToSQLite = false);
 
@@ -576,8 +577,8 @@ private:
     private:
         int const number;
         std::string const &name;
-        int const &group;
-        int const &roughness;
+        DataHeatBalance::MaterialGroup const &group;
+        DataSurfaces::SurfaceRoughness const &roughness;
         double const &conductivity;
         double const &density;
         double const &isoMoistCap;
@@ -628,7 +629,7 @@ private:
         double const &outsideAbsorpSolar;
         double const &insideAbsorpThermal;
         double const &outsideAbsorpThermal;
-        int const &outsideRoughness;
+        DataSurfaces::SurfaceRoughness const &outsideRoughness;
         bool const &typeIsWindow;
         double const &uValue;
 
@@ -722,7 +723,7 @@ private:
         bool const &fanger;
         bool const &pierce;
         bool const &ksu;
-        int const &mrtCalcType;
+        DataHeatBalance::CalcMRT const &mrtCalcType;
         int const &surfacePtr;
         std::string const &angleFactorListName;
         int const &angleFactorListPtr;

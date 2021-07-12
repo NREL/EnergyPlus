@@ -1328,6 +1328,11 @@ namespace OutputReportPredefined {
             state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry =
                 format("{:#12.{}F}", tableEntryReal, sigDigitCount);
         } else {
+            // Formatting in scientific notation, zero sigDigits makes zero sense.
+            // **for something greater than 1E+08**, one sigDigits is very unhelpful (you're having an accuracy of 0.5E+07 at best)
+            if (sigDigitCount < 2) {
+                sigDigitCount = 2;
+            }
             state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry =
                 format("{:12.{}Z}", tableEntryReal, sigDigitCount);
         }

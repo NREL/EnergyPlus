@@ -63,13 +63,12 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingDevices.hh>
@@ -822,7 +821,7 @@ namespace InternalHeatGains {
                         if (state.dataInternalHeatGains->UsingThermalComfort) {
 
                             // Set the default value of MRTCalcType as 'ZoneAveraged'
-                            state.dataHeatBal->People(Loop).MRTCalcType = ZoneAveraged;
+                            state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
 
                             bool ModelWithAdditionalInputs = state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce ||
                                                              state.dataHeatBal->People(Loop).KSU ||
@@ -834,10 +833,10 @@ namespace InternalHeatGains {
                                 auto const mrtType(AlphaName(7));
 
                                 if (mrtType == "ZONEAVERAGED") {
-                                    state.dataHeatBal->People(Loop).MRTCalcType = ZoneAveraged;
+                                    state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
 
                                 } else if (mrtType == "SURFACEWEIGHTED") {
-                                    state.dataHeatBal->People(Loop).MRTCalcType = SurfaceWeighted;
+                                    state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::SurfaceWeighted;
                                     state.dataHeatBal->People(Loop).SurfacePtr =
                                         UtilityRoutines::FindItemInList(AlphaName(8), state.dataSurface->Surface);
                                     if (state.dataHeatBal->People(Loop).SurfacePtr == 0 && ModelWithAdditionalInputs) {
@@ -864,7 +863,7 @@ namespace InternalHeatGains {
                                     }
 
                                 } else if (mrtType == "ANGLEFACTOR") {
-                                    state.dataHeatBal->People(Loop).MRTCalcType = AngleFactor;
+                                    state.dataHeatBal->People(Loop).MRTCalcType = DataHeatBalance::CalcMRT::AngleFactor;
                                     state.dataHeatBal->People(Loop).AngleFactorListName = AlphaName(8);
 
                                 } else if (mrtType == "") { // Blank input field--just ignore this
@@ -4607,7 +4606,7 @@ namespace InternalHeatGains {
                                                                                            AlphaName(1),
                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                            DataLoopNode::NodeConnectionType::Sensor,
-                                                                                           1,
+                                                                                           NodeInputManager::compFluidStream::Primary,
                                                                                            ObjectIsNotParent);
                 }
 
@@ -5691,11 +5690,11 @@ namespace InternalHeatGains {
                 state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                 print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
 
-                if (state.dataHeatBal->People(Loop).MRTCalcType == ZoneAveraged) {
+                if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::ZoneAveraged) {
                     print(state.files.eio, "Zone Averaged,");
-                } else if (state.dataHeatBal->People(Loop).MRTCalcType == SurfaceWeighted) {
+                } else if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::SurfaceWeighted) {
                     print(state.files.eio, "Surface Weighted,");
-                } else if (state.dataHeatBal->People(Loop).MRTCalcType == AngleFactor) {
+                } else if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::AngleFactor) {
                     print(state.files.eio, "Angle Factor,");
                 } else {
                     print(state.files.eio, "N/A,");
@@ -6469,11 +6468,11 @@ namespace InternalHeatGains {
         // QL is per radiant enclosure (one or more zones if grouped by air boundaries)
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
             auto &thisEnclosure(state.dataViewFactor->ZoneRadiantInfo(enclosureNum));
-            state.dataHeatBal->QL(enclosureNum) = 0.0;
+            state.dataHeatBal->EnclRadQThermalRad(enclosureNum) = 0.0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 Real64 zoneQL;
                 SumAllInternalRadiationGains(state, zoneNum, zoneQL);
-                state.dataHeatBal->QL(enclosureNum) += zoneQL;
+                state.dataHeatBal->EnclRadQThermalRad(enclosureNum) += zoneQL;
             }
         }
 
@@ -6490,25 +6489,28 @@ namespace InternalHeatGains {
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 int const radEnclosureNum = state.dataHeatBal->Zone(zoneNum).RadiantEnclosureNum;
                 if (!state.dataGlobal->doLoadComponentPulseNow) {
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) =
-                        state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
+                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum) *
+                                                                     state.dataHeatBal->EnclRadThermAbsMult(radEnclosureNum) *
+                                                                     state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                 } else {
-                    state.dataInternalHeatGains->curQL = state.dataHeatBal->QL(radEnclosureNum);
+                    state.dataInternalHeatGains->curQL = state.dataHeatBal->EnclRadQThermalRad(radEnclosureNum);
                     // for the loads component report during the special sizing run increase the radiant portion
                     // a small amount to create a "pulse" of heat that is used for the delayed loads
                     state.dataInternalHeatGains->adjQL =
                         state.dataInternalHeatGains->curQL + state.dataViewFactor->ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                     // ITABSF is the Inside Thermal Absorptance
-                    // TMULT is a multiplier for each zone
+                    // EnclRadThermAbsMult is a multiplier for each zone
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) =
-                        state.dataInternalHeatGains->adjQL * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
+                    state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataInternalHeatGains->adjQL *
+                                                                     state.dataHeatBal->EnclRadThermAbsMult(radEnclosureNum) *
+                                                                     state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum);
                     // store the magnitude and time of the pulse
                     state.dataOutRptTab->radiantPulseTimestep(state.dataSize->CurOverallSimDay, zoneNum) =
                         (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                     state.dataOutRptTab->radiantPulseReceived(state.dataSize->CurOverallSimDay, SurfNum) =
-                        (state.dataInternalHeatGains->adjQL - state.dataInternalHeatGains->curQL) * state.dataHeatBal->TMULT(radEnclosureNum) *
-                        state.dataHeatBal->ITABSF(SurfNum) * state.dataSurface->Surface(SurfNum).Area;
+                        (state.dataInternalHeatGains->adjQL - state.dataInternalHeatGains->curQL) *
+                        state.dataHeatBal->EnclRadThermAbsMult(radEnclosureNum) * state.dataHeatBalSurf->SurfAbsThermalInt(SurfNum) *
+                        state.dataSurface->Surface(SurfNum).Area;
                 }
             }
         }
@@ -8038,12 +8040,10 @@ namespace InternalHeatGains {
         }
     }
 
-    void GetInternalGainDeviceIndex(EnergyPlusData &state,
-                                    int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                    int const IntGainTypeOfNum,     // zone internal gain type number
-                                    std::string const &IntGainName, // Internal gain name
-                                    int &DeviceIndex,               // Device index
-                                    bool &ErrorFound)
+    int GetInternalGainDeviceIndex(EnergyPlusData &state,
+                                   int const ZoneNum,                   // zone index pointer for which zone to sum gains for
+                                   int const IntGainTypeOfNum,          // zone internal gain type number
+                                   std::string_view const &IntGainName) // Internal gain name
     {
 
         // SUBROUTINE INFORMATION:
@@ -8054,31 +8054,25 @@ namespace InternalHeatGains {
 
         // PURPOSE OF THIS SUBROUTINE:
         // utility to retrieve index pointer to a specific internal gain
+        // the subroutine returns the index of matched internal gain device or -1 if no match found.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool Found;
         int DeviceNum;
-
-        Found = false;
-
+        int DeviceIndex;
         if (state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices == 0) {
             DeviceIndex = -1;
-            ErrorFound = true;
-            return;
+            return DeviceIndex;
         }
-
         for (DeviceNum = 1; DeviceNum <= state.dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices; ++DeviceNum) {
-            if (UtilityRoutines::SameString(state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectName, IntGainName)) {
-                if (state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum != IntGainTypeOfNum) {
-                    ErrorFound = true;
-                } else {
-                    ErrorFound = false;
-                }
-                Found = true;
+            if ((UtilityRoutines::SameString(state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompObjectName, IntGainName.data())) &&
+                (state.dataHeatBal->ZoneIntGain(ZoneNum).Device(DeviceNum).CompTypeOfNum == IntGainTypeOfNum)) {
                 DeviceIndex = DeviceNum;
                 break;
+            } else {
+                DeviceIndex = -1;
             }
         }
+        return DeviceIndex;
     }
 
     void SumInternalConvectionGainsByIndices(

@@ -86,16 +86,24 @@ namespace OutputProcessor {
     constexpr int IMinSetValue(999999);
     constexpr int IMaxSetValue(-999999);
 
-    constexpr int VarType_NotFound(0); // ref: GetVariableKeyCountandType, 0 = not found
-    constexpr int VarType_Integer(1);  // ref: GetVariableKeyCountandType, 1 = integer
-    constexpr int VarType_Real(2);     // ref: GetVariableKeyCountandType, 2 = real
-    constexpr int VarType_Meter(3);    // ref: GetVariableKeyCountandType, 3 = meter
-    constexpr int VarType_Schedule(4); // ref: GetVariableKeyCountandType, 4 = schedule
+    enum class VariableType
+    {
+        Unassigned = -1,
+        NotFound, // ref: GetVariableKeyCountandType, 0 = not found
+        Integer,  // ref: GetVariableKeyCountandType, 1 = integer
+        Real,     // ref: GetVariableKeyCountandType, 2 = real
+        Meter,    // ref: GetVariableKeyCountandType, 3 = meter
+        Schedule  // ref: GetVariableKeyCountandType, 4 = schedule
+    };
 
-    constexpr int MeterType_Normal(0);     // Type value for normal meters
-    constexpr int MeterType_Custom(1);     // Type value for custom meters
-    constexpr int MeterType_CustomDec(2);  // Type value for custom meters that decrement another meter
-    constexpr int MeterType_CustomDiff(3); // Type value for custom meters that difference another meter
+    enum class MtrType
+    {
+        Unassigned = -1,
+        Normal,    // Type value for normal meters
+        Custom,    // Type value for custom meters
+        CustomDec, // Type value for custom meters that decrement another meter
+        CustomDiff // Type value for custom meters that difference another meter
+    };
 
     constexpr int N_WriteTimeStampFormatData(100);
 
@@ -152,17 +160,19 @@ namespace OutputProcessor {
     constexpr int IVarAllocInc(10);
 
     //  For IP Units (tabular reports) certain resources will be put in sub-tables
-    // INTEGER, PARAMETER :: RT_IPUnits_Consumption=0
-    constexpr int RT_IPUnits_Electricity(1);
-    constexpr int RT_IPUnits_Gas(2);
-    constexpr int RT_IPUnits_Cooling(3);
-    constexpr int RT_IPUnits_Water(4);
-    constexpr int RT_IPUnits_OtherKG(5);
-    constexpr int RT_IPUnits_OtherM3(6);
-    constexpr int RT_IPUnits_OtherL(7);
-    constexpr int RT_IPUnits_OtherJ(0);
+    enum class RT_IPUnits
+    {
+        Unassigned = -1,
+        OtherJ,
+        Electricity,
+        Gas,
+        Cooling,
+        Water,
+        OtherKG,
+        OtherM3,
+        OtherL
+    };
 
-    // Types
     enum class Unit
     {
         kg_s,
@@ -327,7 +337,7 @@ namespace OutputProcessor {
         // Members
         TimeStepType timeStepType;     // Type whether Zone or HVAC
         StoreType storeType;           // Variable Type (Summed/Non-Static or Average/Static)
-        int VariableType;              // Integer, Real.
+        VariableType variableType;     // Integer, Real.
         int Next;                      // Next variable of same name (different units)
         bool ReportedOnDDFile;         // true after written to .rdd/.mdd file
         std::string VarNameOnly;       // Name of Variable
@@ -336,7 +346,7 @@ namespace OutputProcessor {
 
         // Default Constructor
         VariableTypeForDDOutput()
-            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), VariableType(VarType_NotFound), Next(0),
+            : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), variableType(VariableType::NotFound), Next(0),
               ReportedOnDDFile(false), units(OutputProcessor::Unit::None)
         {
         }
@@ -418,15 +428,15 @@ namespace OutputProcessor {
     struct MeterType
     {
         // Members
-        std::string Name;            // Name of the meter
-        std::string ResourceType;    // Resource Type of the meter
-        std::string EndUse;          // End Use of the meter
-        std::string EndUseSub;       // End Use subcategory of the meter
-        std::string Group;           // Group of the meter
-        OutputProcessor::Unit Units; // Units for the Meter
-        int RT_forIPUnits;           // Resource type number for IP Units (tabular) reporting
-        int TypeOfMeter;             // type of meter
-        int SourceMeter;             // for custom decrement meters, this is the meter number for the subtraction
+        std::string Name;                          // Name of the meter
+        std::string ResourceType;                  // Resource Type of the meter
+        std::string EndUse;                        // End Use of the meter
+        std::string EndUseSub;                     // End Use subcategory of the meter
+        std::string Group;                         // Group of the meter
+        OutputProcessor::Unit Units;               // Units for the Meter
+        OutputProcessor::RT_IPUnits RT_forIPUnits; // Resource type number for IP Units (tabular) reporting
+        MtrType TypeOfMeter;                       // type of meter
+        int SourceMeter;                           // for custom decrement meters, this is the meter number for the subtraction
 
         Real64 TSValue;          // TimeStep Value
         Real64 CurTSValue;       // Current TimeStep Value (internal access)
@@ -518,17 +528,18 @@ namespace OutputProcessor {
 
         // Default Constructor
         MeterType()
-            : Units(OutputProcessor::Unit::None), RT_forIPUnits(0), TypeOfMeter(MeterType_Normal), SourceMeter(0), TSValue(0.0), CurTSValue(0.0),
-              RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false), HRMaxVal(-99999.0), HRMaxValDate(0),
-              HRMinVal(99999.0), HRMinValDate(0), HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false), DYMaxVal(-99999.0), DYMaxValDate(0),
-              DYMinVal(99999.0), DYMinValDate(0), DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false), MNMaxVal(-99999.0), MNMaxValDate(0),
-              MNMinVal(99999.0), MNMinValDate(0), MNRptNum(0), YRValue(0.0), RptYR(false), RptYRFO(false), YRMaxVal(-99999.0), YRMaxValDate(0),
-              YRMinVal(99999.0), YRMinValDate(0), YRRptNum(0), SMValue(0.0), RptSM(false), RptSMFO(false), SMMaxVal(-99999.0), SMMaxValDate(0),
-              SMMinVal(99999.0), SMMinValDate(0), SMRptNum(0), LastSMValue(0.0), LastSMMaxVal(-99999.0), LastSMMaxValDate(0), LastSMMinVal(99999.0),
-              LastSMMinValDate(0), FinYrSMValue(0.0), FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0), FinYrSMMinVal(99999.0), FinYrSMMinValDate(0),
-              RptAccTS(false), RptAccTSFO(false), RptAccHR(false), RptAccHRFO(false), RptAccDY(false), RptAccDYFO(false), RptAccMN(false),
-              RptAccMNFO(false), RptAccYR(false), RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false), TSAccRptNum(0), HRAccRptNum(0),
-              DYAccRptNum(0), MNAccRptNum(0), YRAccRptNum(0), SMAccRptNum(0), InstMeterCacheStart(0), InstMeterCacheEnd(0)
+            : Units(OutputProcessor::Unit::None), RT_forIPUnits(OutputProcessor::RT_IPUnits::Unassigned), TypeOfMeter(MtrType::Normal),
+              SourceMeter(0), TSValue(0.0), CurTSValue(0.0), RptTS(false), RptTSFO(false), TSRptNum(0), HRValue(0.0), RptHR(false), RptHRFO(false),
+              HRMaxVal(-99999.0), HRMaxValDate(0), HRMinVal(99999.0), HRMinValDate(0), HRRptNum(0), DYValue(0.0), RptDY(false), RptDYFO(false),
+              DYMaxVal(-99999.0), DYMaxValDate(0), DYMinVal(99999.0), DYMinValDate(0), DYRptNum(0), MNValue(0.0), RptMN(false), RptMNFO(false),
+              MNMaxVal(-99999.0), MNMaxValDate(0), MNMinVal(99999.0), MNMinValDate(0), MNRptNum(0), YRValue(0.0), RptYR(false), RptYRFO(false),
+              YRMaxVal(-99999.0), YRMaxValDate(0), YRMinVal(99999.0), YRMinValDate(0), YRRptNum(0), SMValue(0.0), RptSM(false), RptSMFO(false),
+              SMMaxVal(-99999.0), SMMaxValDate(0), SMMinVal(99999.0), SMMinValDate(0), SMRptNum(0), LastSMValue(0.0), LastSMMaxVal(-99999.0),
+              LastSMMaxValDate(0), LastSMMinVal(99999.0), LastSMMinValDate(0), FinYrSMValue(0.0), FinYrSMMaxVal(-99999.0), FinYrSMMaxValDate(0),
+              FinYrSMMinVal(99999.0), FinYrSMMinValDate(0), RptAccTS(false), RptAccTSFO(false), RptAccHR(false), RptAccHRFO(false), RptAccDY(false),
+              RptAccDYFO(false), RptAccMN(false), RptAccMNFO(false), RptAccYR(false), RptAccYRFO(false), RptAccSM(false), RptAccSMFO(false),
+              TSAccRptNum(0), HRAccRptNum(0), DYAccRptNum(0), MNAccRptNum(0), YRAccRptNum(0), SMAccRptNum(0), InstMeterCacheStart(0),
+              InstMeterCacheEnd(0)
         {
         }
     };
@@ -662,10 +673,10 @@ namespace OutputProcessor {
     );
 
     void DetermineMeterIPUnits(EnergyPlusData &state,
-                               int &CodeForIPUnits,                   // Output Code for IP Units
-                               std::string const &ResourceType,       // Resource Type
-                               OutputProcessor::Unit const &MtrUnits, // Meter units
-                               bool &ErrorsFound                      // true if errors found during subroutine
+                               OutputProcessor::RT_IPUnits &CodeForIPUnits, // Output Code for IP Units
+                               std::string const &ResourceType,             // Resource Type
+                               OutputProcessor::Unit const &MtrUnits,       // Meter units
+                               bool &ErrorsFound                            // true if errors found during subroutine
     );
 
     void UpdateMeterValues(EnergyPlusData &state,
@@ -859,10 +870,10 @@ namespace OutputProcessor {
     std::string DetermineIndexGroupFromMeterGroup(MeterType const &meter); // the meter
 
     void SetInternalVariableValue(EnergyPlusData &state,
-                                  int const varType,       // 1=integer, 2=real, 3=meter
-                                  int const keyVarIndex,   // Array index
-                                  Real64 const SetRealVal, // real value to set, if type is real or meter
-                                  int const SetIntVal      // integer value to set if type is integer
+                                  OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
+                                  int const keyVarIndex,                       // Array index
+                                  Real64 const SetRealVal,                     // real value to set, if type is real or meter
+                                  int const SetIntVal                          // integer value to set if type is integer
     );
 
     std::string unitEnumToStringBrackets(Unit const &unitIn);
@@ -968,13 +979,13 @@ Real64 GetInstantMeterValue(EnergyPlusData &state,
 void IncrementInstMeterCache(EnergyPlusData &state);
 
 Real64 GetInternalVariableValue(EnergyPlusData &state,
-                                int const varType,    // 1=integer, 2=real, 3=meter
-                                int const keyVarIndex // Array index
+                                OutputProcessor::VariableType const varType, // 1=integer, 2=real, 3=meter
+                                int const keyVarIndex                        // Array index
 );
 
 Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
-                                                 int const varType,    // 1=integer, 2=REAL(r64), 3=meter
-                                                 int const keyVarIndex // Array index
+                                                 OutputProcessor::VariableType const varType, // 1=integer, 2=REAL(r64), 3=meter
+                                                 int const keyVarIndex                        // Array index
 );
 
 int GetNumMeteredVariables(EnergyPlusData &state,
@@ -986,7 +997,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D_int &VarTypes,                                           // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable
@@ -1000,7 +1011,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          std::string const &ComponentType,                                // Given Component Type
                          std::string const &ComponentName,                                // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                         // Variable Numbers
-                         Array1D_int &VarTypes,                                           // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::VariableType> &VarTypes,                // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,           // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,                     // units from enum for each variable
                          std::map<int, DataGlobalConstants::ResourceType> &ResourceTypes, // ResourceTypes for each variable
@@ -1011,9 +1022,9 @@ void GetMeteredVariables(EnergyPlusData &state,
 );
 
 void GetVariableKeyCountandType(EnergyPlusData &state,
-                                std::string const &varName,                 // Standard variable name
-                                int &numKeys,                               // Number of keys found
-                                int &varType,                               // 0=not found, 1=integer, 2=real, 3=meter
+                                std::string const &varName, // Standard variable name
+                                int &numKeys,               // Number of keys found
+                                OutputProcessor::VariableType &varType,
                                 OutputProcessor::StoreType &varAvgSum,      // Variable  is Averaged=1 or Summed=2
                                 OutputProcessor::TimeStepType &varStepType, // Variable time step is Zone=1 or HVAC=2
                                 OutputProcessor::Unit &varUnits             // Units enumeration
@@ -1021,9 +1032,9 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
 
 void GetVariableKeys(EnergyPlusData &state,
                      std::string const &varName, // Standard variable name
-                     int const varType,          // 1=integer, 2=real, 3=meter
-                     Array1D_string &keyNames,   // Specific key name
-                     Array1D_int &keyVarIndexes  // Array index for
+                     OutputProcessor::VariableType const varType,
+                     Array1D_string &keyNames,  // Specific key name
+                     Array1D_int &keyVarIndexes // Array index for
 );
 
 bool ReportingThisVariable(EnergyPlusData &state, std::string const &RepVarName);
@@ -1036,7 +1047,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
                              std::string const &VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,
                              OutputProcessor::StoreType const StateType,
-                             int const VariableType,
+                             OutputProcessor::VariableType const VariableType,
                              OutputProcessor::Unit const unitsForVar,
                              Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );
