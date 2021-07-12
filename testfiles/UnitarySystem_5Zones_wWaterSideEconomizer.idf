@@ -1,8 +1,8 @@
-! 5Zone_Unitary_HXAssistedCoil.idf
+! 5Zone_Unitary_wWaterSideEconomizer.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !                          file derived from 5ZoneAutoDXVAV.idf
 !
-! Highlights:              Water Side Economizer HX assists a packaged VAV system with setpoint-based Unitary system using 
+! Highlights:              Water Side Economizer HX assists a packaged VAV system with setpoint-based Unitary system using
 !                          single speed air-to-air DX cooling coil AC and a supplemental heating coil for humidity control.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -164,7 +164,7 @@
     1,                       !- Upper Limit Value
     Discrete,                !- Numeric Type
     availability;            !- Unit Type
-	
+
   ScheduleTypeLimits,
     AnyNumber;              !- Name
 
@@ -213,7 +213,7 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-	
+
   RunPeriod,
     September 1 to 3,        !- Name
     9,                       !- Begin Month
@@ -1950,7 +1950,7 @@
     Until: 7:00,18.0,        !- Field 23
     Until: 18:00,21.1,       !- Field 25
     Until: 24:00,18.0;       !- Field 27
-	
+
   Schedule:Compact,
     PlenumHtg-SetP-Sch,      !- Name
     Temperature,             !- Schedule Type Limits Name
@@ -1990,7 +1990,7 @@
     Until: 7:00,26.0,        !- Field 23
     Until: 18:00,23.9,       !- Field 25
     Until: 24:00,26.0;       !- Field 27
-	
+
   Schedule:Compact,
     PlenumClg-SetP-Sch,      !- Name
     Temperature,             !- Schedule Type Limits Name
@@ -2046,11 +2046,11 @@
 
   NodeList,
     SupplyAir Temp Nodes,    !- Name
-!	FreeClgCoil OutletNode,  !- Node 1 Name
+!   FreeClgCoil OutletNode,  !- Node 1 Name
     DX Clg Coil Inlet Node,  !- Node 2 Name
     Heating Coil Inlet Node, !- Node 3 Name
     Rht Coil Air Inlet Node, !- Node 4 Name
-	VAV Sys 1 Outlet Node;   !- Node 5 Name
+    VAV Sys 1 Outlet Node;   !- Node 5 Name
 
 
   SetpointManager:MixedAir,
@@ -2060,7 +2060,7 @@
     FreeClgCoil OutletNode,  !- Fan Inlet Node Name
     DX Clg Coil Inlet Node,  !- Fan Outlet Node Name
     FreeClgCoil OutletNode;  !- Setpoint Node or NodeList Name
-	
+
   SetpointManager:OutdoorAirReset,
     Seasonal SAT Reset,      !- Name
     Temperature,             !- Control Variable
@@ -2069,7 +2069,7 @@
     12.8,                    !- Setpoint at Outdoor High Temperature {C}
     28.0,                    !- Outdoor High Temperature {C}
     SupplyAir Temp Nodes;    !- Setpoint Node or NodeList Name
-	
+
   Schedule:Compact,
     Min OARequirements Sched,!- Name
     Any Number,              !- Schedule Type Limits Name
@@ -2078,12 +2078,12 @@
     Until: 24:00,1.0,        !- Field 3
     For: AllOtherDays,       !- Field 5
     Until: 24:00,0.25;       !- Field 6
-	
-  Schedule:Constant,Always On Discrete,OnOff,1;	
-	
-  !Schedule:Constant,Always Off Discrete,OnOff,0;	
+
+  Schedule:Constant,Always On Discrete,OnOff,1;
+
+  !Schedule:Constant,Always Off Discrete,OnOff,0;
   !Schedule:Constant,SupplyAir HumRate Schd,AnyNumber,0.006;
- 
+
 
   Curve:Biquadratic,
     VarSpeedCoolCapFT,       !- Name
@@ -2694,13 +2694,13 @@
     FreeClgCoil OutletNode,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow;               !- Heat Exchanger Configuration
-	
+
   AirLoopHVAC:UnitarySystem,
     DXAC Gas Furnace,        !- Name
     Setpoint,                !- Control Type
     ,                        !- Controlling Zone or Thermostat Location
     !CoolReheat,             !- Dehumidification Control Type
-	None,                    !- Dehumidification Control Type
+    None,                    !- Dehumidification Control Type
     ReheatCoilAvailSched,    !- Availability Schedule Name
     FreeClgCoil OutletNode,  !- Air Inlet Node Name
     VAV Sys 1 Outlet Node,   !- Air Outlet Node Name
@@ -2750,9 +2750,9 @@
 
   NodeList,
     HumRat SetPoint Nodes,   !- Name
-	FreeClgCoil OutletNode,  !- Node 1 Name
+    FreeClgCoil OutletNode,  !- Node 1 Name
     Heating Coil Inlet Node, !- Node 2 Name
-	VAV Sys 1 Outlet Node;   !- Node 3 Name
+    VAV Sys 1 Outlet Node;   !- Node 3 Name
 
 
   SetpointManager:MultiZone:Humidity:Maximum,
@@ -2779,19 +2779,19 @@
     SPACE3-1,                !- Zone Name
     HumidifyingHumSetSch,    !- Humidifying Relative Humidity Setpoint Schedule Name
     DehumidifyingHumSetSch;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
-	
+
   ZoneControl:Humidistat,
     Space4-1 Humidistat,     !- Name
     SPACE4-1,                !- Zone Name
     HumidifyingHumSetSch,    !- Humidifying Relative Humidity Setpoint Schedule Name
     DehumidifyingHumSetSch;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
-	
+
   ZoneControl:Humidistat,
     Space5-1 Humidistat,     !- Name
     SPACE5-1,                !- Zone Name
     HumidifyingHumSetSch,    !- Humidifying Relative Humidity Setpoint Schedule Name
     DehumidifyingHumSetSch;  !- Dehumidifying Relative Humidity Setpoint Schedule Name
-	
+
   Schedule:Compact,
     HumidifyingHumSetSch,    !- Name
     Humidity,                !- Schedule Type Limits Name
@@ -2810,8 +2810,8 @@
     Humidity,                !- Name
     0,                       !- Lower Limit Value
     100,                     !- Upper Limit Value
-    CONTINUOUS;              !- Numeric Type	
-	
+    CONTINUOUS;              !- Numeric Type
+
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
     OA Sys 1 Controllers,    !- Controller List Name
@@ -2874,7 +2874,7 @@
     AirCooled,               !- Condenser Type
     ,                        !- Nominal Evaporative Condenser Pump Power {W}
     1,                       !- Nominal Speed Number
-	DX Clg Coil Speed 1 Per; !- Speed 3 Name
+    DX Clg Coil Speed 1 Per; !- Speed 3 Name
 
   Coil:Cooling:DX:CurveFit:Speed,
     DX Clg Coil Speed 1 Per, !- Name
@@ -2990,7 +2990,7 @@
     ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
     ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
     0.7;                     !- Fan Total Efficiency
-	
+
   Controller:OutdoorAir,
     OA Controller,           !- Name
     Relief Air Outlet Node,  !- Relief Air Outlet Node Name
@@ -2999,7 +2999,7 @@
     Outside Air Inlet Node,  !- Actuator Node Name
     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-	!NoEconomizer,            !- Economizer Control Type
+    !NoEconomizer,            !- Economizer Control Type
     FixedDryBulb,            !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
     19.,                     !- Economizer Maximum Limit Dry-Bulb Temperature {C}
@@ -3011,8 +3011,8 @@
     FixedMinimum,            !- Minimum Limit Type
     Min OA Sched;            !- Minimum Outdoor Air Schedule Name
 
-	
-	
+
+
 ! Condenser Loop used with Water-Side Economizer
 
   PlantLoop,
@@ -3182,7 +3182,7 @@
   BranchList,
     CondenserPlantLoop Demand Branches,  !- Name
     CondenserPlantLoop Demand Inlet Branch,  !- Branch 1 Name
-	CondenserPlantLoop Demand Branch 2,  !- Branch 3 Name
+    CondenserPlantLoop Demand Branch 2,  !- Branch 3 Name
     CondenserPlantLoop Demand Bypass Branch,  !- Branch 3 Name
     CondenserPlantLoop Demand Outlet Branch;  !- Branch 4 Name
 
@@ -3196,13 +3196,13 @@
   Connector:Splitter,
     CondenserPlantLoop Demand Splitter,  !- Name
     CondenserPlantLoop Demand Inlet Branch,  !- Inlet Branch Name
-    CondenserPlantLoop Demand Branch 2,  !- Outlet Branch 2 Name	
+    CondenserPlantLoop Demand Branch 2,  !- Outlet Branch 2 Name
     CondenserPlantLoop Demand Bypass Branch;  !- Outlet Branch 2 Name
 
   Connector:Mixer,
     CondenserPlantLoop Demand Mixer,  !- Name
     CondenserPlantLoop Demand Outlet Branch,  !- Outlet Branch Name
-    CondenserPlantLoop Demand Branch 2,  !- Inlet Branch 2 Name	
+    CondenserPlantLoop Demand Branch 2,  !- Inlet Branch 2 Name
     CondenserPlantLoop Demand Bypass Branch;  !- Inlet Branch 2 Name
 
   Branch,
@@ -3272,8 +3272,8 @@
   RunPeriodControl:DaylightSavingTime,
     1st Sunday in April,     !- Start Date
     Last Sunday in October;  !- End Date
-	
-	
+
+
   SetpointManager:OutdoorAirReset,
     CoolingTowerSetPoint,    !- Name
     Temperature,             !- Control Variable
@@ -3281,21 +3281,21 @@
     5.0,                     !- Outdoor Low Temperature {C}
     25.0,                    !- Setpoint at Outdoor High Temperature {C}
     30.0,                    !- Outdoor High Temperature {C}
-    Node 17;                 !- Setpoint Node or NodeList Name	
-	
+    Node 17;                 !- Setpoint Node or NodeList Name
+
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
   !Output:Variable,*,Zone Mean Air Humidity Ratio,hourly;
 
   !Output:Variable,*,Zone Air Relative Humidity,hourly;
-  
+
   Output:Variable,SPACE1-1,Zone Air Temperature,hourly;
   Output:Variable,SPACE2-1,Zone Air Temperature,hourly;
   Output:Variable,SPACE3-1,Zone Air Temperature,hourly;
   Output:Variable,SPACE4-1,Zone Air Temperature,hourly;
   Output:Variable,SPACE5-1,Zone Air Temperature,hourly;
-   
+
   Output:Variable,SPACE1-1 In Node,System Node Temperature,hourly;
 
   Output:Variable,SPACE2-1 In Node,System Node Temperature,hourly;
@@ -3303,11 +3303,11 @@
   Output:Variable,SPACE3-1 In Node,System Node Temperature,hourly;
 
   Output:Variable,SPACE4-1 In Node,System Node Temperature,hourly;
-  
+
   Output:Variable,SPACE5-1 In Node,System Node Temperature,hourly;
-  
+
   Output:Variable,SPACE1-1 In Node,System Node Mass Flow Rate,hourly;
-   
+
   Output:Variable,SPACE2-1 In Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE3-1 In Node,System Node Mass Flow Rate,hourly;
@@ -3315,7 +3315,7 @@
   Output:Variable,SPACE4-1 In Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,SPACE5-1 In Node,System Node Mass Flow Rate,hourly;
-  
+
   Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly;
 
   Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,hourly;
@@ -3361,13 +3361,13 @@
   Output:Variable,Mixed Air Node,System Node Temperature,hourly;
 
   Output:Variable,FreeClgCoil OutletNode,System Node Temperature,hourly;
-  
+
   Output:Variable,Node 13,System Node Temperature,hourly;
 
   Output:Variable,Node 15,System Node Temperature,hourly;
 
   Output:Variable,Node 13,System Node Mass Flow Rate,hourly;
-  
+
   Output:Variable,Node 15,System Node Mass Flow Rate,hourly;
 
   Output:Variable,*,Air System Outdoor Air Flow Fraction,hourly;
@@ -3417,15 +3417,15 @@
   Output:Variable,VAV Sys 1 Outlet Node,System Node Current Density Volume Flow Rate,hourly;
 
   Output:Variable,*,Coil System Water Part Load Ratio,hourly;
-  
+
   Output:Variable,*,Coil System Water Total Cooling Rate,hourly;
 
   Output:Variable,*,Coil System Water Sensible Cooling Rate,hourly;
-  
+
   Output:Variable,*,Coil System Water Latent Cooling Rate,hourly;
 
   Output:Variable,*,Coil System Water Control Status,hourly;
-  
+
   Output:VariableDictionary,IDF;
 
   Output:Surfaces:Drawing,dxf;
