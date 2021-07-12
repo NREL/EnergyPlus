@@ -133,14 +133,15 @@ namespace WindowManager {
     // Window Thermal Calculation Subroutines
     //***********************************************************************************
     void updateQdotRadOutRepHeatEmi(EnergyPlusData &state,
-                                    int const SurfNum,
-                                    Real64 const Tsout,
-                                    Real64 const rad_out_per_area,
-                                    Real64 const rad_out_air_per_area);
+                                    int const SurfNum,                // Surface number
+                                    Real64 const Tsout,               // temporary for result of outside surface temp in Kelvin
+                                    Real64 const rad_out_per_area,    // Total radiation emission rate per area
+                                    Real64 const rad_out_air_per_area // Radiation emission to air rate per area
+    );
 
     void updateQdotConvOutRep(EnergyPlusData &state,
-                             int const SurfNum,     // Surface number
-                             Real64 const Tsout     // temporary for result of outside surface temp in Kelvin
+                              int const SurfNum, // Surface number
+                              Real64 const Tsout // temporary for result of outside surface temp in Kelvin
     );
 
     void CalcWindowHeatBalance(EnergyPlusData &state,
@@ -164,12 +165,12 @@ namespace WindowManager {
     //****************************************************************************
 
     void GetHeatBalanceEqCoefMatrixSimple(EnergyPlusData &state,
-                                          int const ConstrNum,     // Construction number
-                                          int const nglasslayer,   // Number of glass layers
-                                          Array2D<Real64> &Aface,  // Coefficient in equation Aface*thetas = Bface
-                                          Array1D<Real64> &Bface,  // Coefficient in equation Aface*thetas = Bface
-                                          Array1D<Real64> hr,      // Radiative conductance (W/m2-K)
-                                          Array1A<Real64> hgap // Gap gas conductive conductance (W/m2-K)
+                                          int const ConstrNum,    // Construction number
+                                          int const nglasslayer,  // Number of glass layers
+                                          Array2D<Real64> &Aface, // Coefficient in equation Aface*thetas = Bface
+                                          Array1D<Real64> &Bface, // Coefficient in equation Aface*thetas = Bface
+                                          Array1D<Real64> hr,     // Radiative conductance (W/m2-K)
+                                          Array1A<Real64> hgap    // Gap gas conductive conductance (W/m2-K)
     );
 
     //****************************************************************************
@@ -194,9 +195,9 @@ namespace WindowManager {
                                     Array1A<Real64> hcvBG,      // Convection coefficient from gap glass or shade to gap gas (W/m2-K)
                                     Array1A<Real64> TGapNewBG,
                                     Array1A<Real64> AbsRadShadeFace,
-                                    Array2D<Real64> &Aface,     // Coefficient in equation Aface*thetas = Bface
-                                    Array1D<Real64> &Bface,     // Coefficient in equation Aface*thetas = Bface
-                                    Array1D<Real64> hr);        // Radiative conductance (W/m2-K)
+                                    Array2D<Real64> &Aface, // Coefficient in equation Aface*thetas = Bface
+                                    Array1D<Real64> &Bface, // Coefficient in equation Aface*thetas = Bface
+                                    Array1D<Real64> hr);    // Radiative conductance (W/m2-K)
 
     //****************************************************************************
 
