@@ -3044,7 +3044,21 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         IsAutoSize = true;
     }
     if (this->ZoneMinAirFracMethod == MinFlowFraction::Constant) {
-        if (state.dataSize->ZoneSizingRunDone) {
+        int AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+        int SysSizNum = UtilityRoutines::FindItemInList(
+            state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
+
+        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+            if (this->MaxAirVolFlowRate > 0.0) {
+                MinAirFlowFracDes = 1.5 *
+                                    max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
+                                        state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone) /
+                                    this->MaxAirVolFlowRate;
+            } else {
+                MinAirFlowFracDes = 0.0;
+            }
+        } else if (state.dataSize->ZoneSizingRunDone) {
             if (state.dataSize->CurTermUnitSizingNum > 0) {
                 // use the combined defaults or other user inputs stored in DesCoolVolFlowMin
                 if (this->MaxAirVolFlowRate > 0.0) {
@@ -3073,6 +3087,9 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                          this->SysName,
                                          "Design Size Constant Minimum Air Flow Fraction",
                                          MinAirFlowFracDes * this->ZoneTurndownMinAirFrac);
+            if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) {
+                state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VpzMinByZoneSPSized = true;
+            }
             this->ZoneMinAirFracDes = MinAirFlowFracDes;
         } else {
             // report out hard (user set) value and issue warning if appropriate
@@ -3113,7 +3130,19 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
         IsAutoSize = true;
     }
     if (this->ZoneMinAirFracMethod == MinFlowFraction::Fixed) {
-        if (state.dataSize->ZoneSizingRunDone) {
+        int AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
+        int SysSizNum = UtilityRoutines::FindItemInList(
+            state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+        if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
+
+        if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_SP) { // 62.1 simplified procedure
+            if (this->MaxAirVolFlowRate > 0.0) {
+                FixedMinAirDes = 1.5 * max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozClgByZone,
+                                           state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).VozHtgByZone);
+            } else {
+                MinAirFlowFracDes = 0.0;
+            }
+        } else if (state.dataSize->ZoneSizingRunDone) {
             if (state.dataSize->CurTermUnitSizingNum > 0) {
                 // use the combined defaults or other user inputs stored in DesCoolVolFlowMin
                 if (this->MaxAirVolFlowRate > 0.0) {
@@ -4222,7 +4251,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
 void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
                                            Real64 &SAMassFlow,   // outside air based on optional user input
                                            Real64 &AirLoopOAFrac // outside air based on optional user input
-) const
+                                           ) const
 {
 
     // FUNCTION INFORMATION:

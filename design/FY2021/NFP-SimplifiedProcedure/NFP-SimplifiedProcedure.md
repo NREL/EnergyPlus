@@ -8,7 +8,7 @@ The latest version of ASHRAE Standard 62.1 introduces a new approach to calculat
 
 ![ASHRAE 62.1 Simplified Procedure](code_language.png)
 
-The Simplified Procedure (SP) is required by ASHRAE Standard 90.1 to calculate the zone air flow rate in dead band when zones with thermostatic DDC controls are served by terminal boxes that re-heat and/or re-cool the air delivered to the zone (see section 6.5.2.1, exception 2.a.(1)).
+The Simplified Procedure (SP) is referenced by ASHRAE Standard 90.1 to limit the zone air flow rate in dead band when zones with thermostatic DDC controls are served by terminal boxes that re-heat and/or re-cool the air delivered to the zone (see section 6.5.2.1, exception 2.a.(1)).
 
 EnergyPlus is currently able to calculate the design OA intake of multi-zone systems based on the VRP but not based on the SP. EnergyPlus currently handles both multi- and single-zone VRP calculations for single- and dual-duct systems.
 
@@ -21,12 +21,12 @@ Cap the OA flow rate calculated by the `Controller:MechanicalVentilation` object
 
 ## Approach
 ### System OA Intake
-In order for the design system OA to be calculated following the SP, a new `System Outdoor Air Method` will be added to the `Sizing:System` object (proposed name: `SimplifiedProcedure`).
+In order for the design system OA to be calculated following the SP, a new `System Outdoor Air Method` will be added to the `Sizing:System` object.
 
 ### Zone Minimum (Primary) Air Flow
 As shown in the previous section, minimum terminal primary air flow can (be required to) be calculated using the SP. We propose to add one of the two following items:
-1. Add a new `Cooling Design Air Flow Method` to the `Sizing:Zone` object (proposed name: `SimplifiedProcedure`)
-2. Add a new `Zone Minimum Air Flow Input Method` for all applicable `AirTerminal:*` objects (proposed name: `SimplifiedProcedure`)
+1. Add a new `Cooling Design Air Flow Method` to the `Sizing:Zone` object
+2. Add a new `Zone Minimum Air Flow Input Method` for all applicable `AirTerminal:*` objects
 
 ### Occupant diversity
 The occupant diversity, `D`, is currently calculated by EnergyPlus using user-input design levels and schedules. While this might be convenient for users, extra care should be put into developing schedules so `D`, as calculated by EnergyPlus, match a potentially expected value. Additionally, performance might be somewhat impacted by the current implementation of that routine (see [issue 6487](https://github.com/NREL/EnergyPlus/issues/6487)). We propose to make `D` a user-input in the `Sizing:System` object. If not specified by the user the current routine would be used.
@@ -57,7 +57,9 @@ The system ventilation optimization control requirement in ASHRAE Standard 90.1 
 ## E-mail and  Conference Call Conclusions
 During the initial presentation, the team suggested not to consider option 1 listed above as a way to determine a terminal's primary air flow rate using the SP.
 
-Additional discussion regarding the proposal of making `D` a user input is needed. Note: an example showcasing why letting EnergyPlus calculate `D` has been added to the Approach section. 
+Additional discussion regarding the proposal of making `D` a user input is needed. Note: an example showcasing why letting EnergyPlus calculate `D` has been added to the Approach section.
+
+Following a review of the NFP, it was decided that the `VentilationRateProcedure` field value would be replaced by `Standard62.1VentilationRateProcedure` and the Simplified Procedure would be referred to as `Standard62.1SimplifiedProcedure` thus requiring a transition rule. Changes were made to this NFP to reflect this.
 
 ## Testing/Validation/Data Sources
 Unit tests covering the calculation of the SP as well as the ventilation optimization control "cap" will be added. An example file (see below) will be developed and its output checked against "manual" calculations.
@@ -66,16 +68,30 @@ Unit tests covering the calculation of the SP as well as the ventilation optimiz
 The only changes to the Input/Output Reference document will be in the description of the System Outdoor Air Method field of the `Sizing:System` object and the new Occupant Diversity, also in the `Sizing:System` object. Changes and additions are respectively strikethrough and underlined in the text below.
 
 ### System Outdoor Air Method
->The method used to calculate the system minimum outdoor air flow. The <ins>three</ins> choices are ZoneSum<ins>, VentilationRateProcedure (VRP), and SimplifiedProcedure (SP)</ins>. ZoneSum sums the outdoor air flows across all zones served by the system. VRP uses the multi-zone equations defined in <ins>ASHRAE Standard</ins> 62.1 <ins>~~-2007~~</ins> to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. VRP may also adjust autosized air terminal maximum and minimum supply flow rates if needed to ensure adequate outdoor air flow rate to each zone. <ins>SP is similar to VRP and was introduced in ASHRAE Standard 62.1-2019. The main difference with VRP is that is uses a simplified approach to calculate the system's ventilation efficiency which is in turn used to calculate the system outdoor air flow. Additionally, when set to be autosized, the minimum (primary) air flow (or fraction) for these air terminals will be calculated following SP: \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} (_Constant Minimum Air Flow Fraction_ or _Fixed Minimum Air Flow Fraction_), 
-\hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat} (_Constant Minimum Air Flow Fraction_ or _Fixed Minimum Air Flow Fraction_), \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat} (_Minimum Primary Air Flow Fraction_), 
- \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}(_Minimum Primary Air Flow Fraction_).</ins>
+>The method used to calculate the system minimum outdoor air flow. The <ins>three</ins> choices are ZoneSum<ins>, Standard62.1VentilationRateProcedure (VRP), and Standard62.1SimplifiedProcedure (SP)</ins>. ZoneSum sums the outdoor air flows across all zones served by the system. VRP uses the multi-zone equations defined in <ins>ASHRAE Standard</ins> 62.1 <ins>~~-2007~~</ins> to calculate the system outdoor air flow. VRP considers zone air distribution effectiveness and zone diversification of outdoor air fractions. VRP may also adjust autosized air terminal maximum and minimum supply flow rates if needed to ensure adequate outdoor air flow rate to each zone. <ins>SP is similar to VRP and was introduced in ASHRAE Standard 62.1-2019. The main difference with VRP is that it uses a simplified approach to calculate the system's ventilation efficiency which is in turn used to calculate the system outdoor air flow. Additionally, when set to autosize, the minimum (primary) air flow (or air flow fraction) for these air terminals will be calculated following SP: \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat} (\emph{Constant Minimum Air Flow Fraction} or \emph{Fixed Minimum Air Flow Fraction}), 
+\hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat} (\emph{Constant Minimum Air Flow Fraction} or \emph{Fixed Minimum Air Flow Fraction}), \hyperref[airterminalsingleductseriespiureheat]{AirTerminal:SingleDuct:SeriesPIU:Reheat} (\emph{Minimum Primary Air Flow Fraction}), 
+ \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}(\emph{Minimum Primary Air Flow Fraction})</ins>
 
  ### Occupant Diversity
  Part of the language is taken from the Engineering manual.
 
  ><ins>\paragraph{Field: Occupant Diversity}\label{occupant-diversity}</ins>
  >
- ><ins>The occupant diversity ratio (D) as defined in ASHRAE Standard 62.1. The ratio is the expected peak population to the design zone population for all zones attached to the air system. If left blank or set to autosize, EnergyPlus will calculate it by using the people design level and schedules.</ins>
+ ><ins>The Occupant Diversity ratio (D) as defined in ASHRAE Standard 62.1. The ratio is the expected peak population to the design zone population for all zones attached to the air system. If left blank or set to autosize, EnergyPlus will calculate it by using the people design level and schedules.</ins>
+
+### AirTerminal:SingleDuct:*PIU:Reheat
+The following paragraph will be added at the end of the section describing the Minimum Primary Air Flow Fraction:
+
+><ins>The autosize flow fraction is calculated according to the ASHRAE Standard 62.1 Simplified procedure if the Sizing:System's \emph{System Outdoor Air Method} associated with this terminal is set to Standard62.1SimplifiedProcedure.</ins>
+
+### AirTerminal:SingleDuct:VAV:Reheat and NoReheat
+The following paragraph will be added at the end of the section describing the Constant Minimum Air Flow Fraction:
+
+><ins>The autosize flow fraction is calculated according to the ASHRAE Standard 62.1 Simplified procedure if the Sizing:System's \emph{System Outdoor Air Method} associated with this terminal is set to Standard62.1SimplifiedProcedure.</ins>
+
+The following paragraph will be added at the end of the section describing the Fixed Minimum Air Flow Rate:
+
+><ins>The autosize flow rate is calculated according to the ASHRAE Standard 62.1 Simplified procedure if the Sizing:System's \emph{System Outdoor Air Method} associated with this terminal is set to Standard62.1SimplifiedProcedure.</ins>
 
 ## Input Description
 ### System OA Intake and Occupant Diversity
@@ -86,22 +102,22 @@ Sizing:System,
   A8, \field System Outdoor Air Method
       \type choice
       \key ZoneSum
-      \key VentilationRateProcedure
-      \key SimplifiedProcedure
+      \key Standard62.1VentilationRateProcedure
+      \key Standard62.1SimplifiedProcedure
       \default ZoneSum
 ```
 
 Based on the team's final decision, a new field could potentially be added to the `Sizing:System` object to represent the system's occupant diversity (`D`), as follows:
 ```
 Sizing:System,
-  N27, \field Occupant Diversity
+  N27; \field Occupant Diversity
       \type real
       \maximum 1.0
       \minimum> 0.0
       \default autosize
       \note The Occupant Diversity is used to determine a multi-zone system's outdoor air intake when the System Outdoor Air Method is 
-      \note VentilationRateProcedure or the SimplifiedProcedure. If set to be autosized, it will be calculated using the information in
-      \note the People objects assigned to each zone attached to this system/airloop.
+      \note Standard62.1VentilationRateProcedure or the Standard62.1SimplifiedProcedure. If set to be autosized, it will be calculated
+      \note using the information in the People objects assigned to each zone attached to this system/airloop.
 ```
 For single-zone system, `D` should be equal to 1.0. A warning will be added to let users know when a value less than one has been specified for a single-zone system.
 
@@ -142,7 +158,7 @@ The zone minimum air flow of the `AirTerminal:DualDuct:VAV`, `AirTerminal:Single
 - `AirTerminal:SingleDuct:SeriesPIU:Reheat`
 - `AirTerminal:SingleDuct:ParallelPIU:Reheat`
 
-Instead of adding a new `Zone Minimum Air Flow Input Method` for all terminal listed above, their zone minimum (primary) air flow will be calculated following the SP if the `Sizing:System`'s `System Outdoor Air Method` is set to `SimplifiedProcedure`. A note in the `Constant Minimum Air Flow Fraction`, `Fixed Minimum Air Flow Rate`, and `Minimum Primary Air Flow Fraction` will be added to specify that, see below.
+Instead of adding a new `Zone Minimum Air Flow Input Method` for all terminal listed above, their zone minimum (primary) air flow will be calculated following the SP if the `Sizing:System`'s `System Outdoor Air Method` is set to `Standard62.1SimplifiedProcedure`. A note in the `Constant Minimum Air Flow Fraction`, `Fixed Minimum Air Flow Rate`, and `Minimum Primary Air Flow Fraction` will be added to specify that, see below.
 
 ```
   N2 , \field Constant Minimum Air Flow Fraction
@@ -159,7 +175,7 @@ Instead of adding a new `Zone Minimum Air Flow Input Method` for all terminal li
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
        \note To calculate the constant minimum air flow fraction based on the ASHRAE 62.1 Simplified Procedure,
        \note set this field to autosize and this object's air loop's Sizing:System's System Outdoor Air Method
-       \note field to SimplifiedProcedure.
+       \note field to Standard62.1SimplifiedProcedure.
   N3 , \field Fixed Minimum Air Flow Rate
        \type real
        \units m3/s
@@ -175,7 +191,7 @@ Instead of adding a new `Zone Minimum Air Flow Input Method` for all terminal li
        \note 0.000762 m3/s-m2 (0.15 cfm/ft2) is used.
        \note To calculate the fixed minimum air flow rate based on the ASHRAE 62.1 Simplified Procedure,
        \note set this field to autosize and this object's air loop's Sizing:System's System Outdoor Air Method
-       \note field to SimplifiedProcedure.
+       \note field to Standard62.1SimplifiedProcedure.
 ```
 
 ```
@@ -185,13 +201,14 @@ Instead of adding a new `Zone Minimum Air Flow Input Method` for all terminal li
        \minimum 0.0
        \maximum 1.0
        \autosizable
-       \note To calculate the minimum primary air flow fraction based on the ASHRAE 62.1 Simplified Procedure,
-       \note set this field to autosize and this object's air loop's Sizing:System's System Outdoor Air Method
-       \note field to SimplifiedProcedure.
+       \note When set to autosize, the calculated air flow is determined based on the System Outdoor Air Method used in the air loop's Sizing:System object.
 ```
 
 ## Outputs Description
-The existing output summary report will be used. The proposal does not include any new outputs.
+The existing Standard 62.1 Summary report will be used. Several modification will be made:
+- A column under the _System Ventilation Requirements_ tables will be added to specify the origin of the Occupant Diversity for each air loop. Is it user-specified or calculated from schedules?
+- A column under the _System Ventilation Requirements_ tables will be added to specify the method of calculation of the System Ventilation Efficiency. Reported values would be nothing if ZoneSum is used, "Standard 62.1 Ventilation Rate Procedure", or "Standard 62.1 Simplified Procedure".
+- A column under the _Zone Ventilation Calculations_ tables will be added to specify if Vpz_min was calculated following the Standard 62.1 Simplified Procedure. The title of the column would be "Is Vpz-min calculated using the Standard 62.1 Simplified Procedure?" and reported values would either nothing or Yes.
 
 ## Engineering Reference
 ### Simplified Procedure
@@ -200,22 +217,25 @@ A new sub section will be added under the Demand Control Ventilation section of 
 >
 >\subsubsection{System Ventilation Efficiency}\label{sp-calculation-of-system-ventilation-efficiency}
 >
->The Simplified Procedure (SP) introduced in ASHRAE Standard 62.1-2019 provides an alternative way to determine the ventilation efficiency of a system(\({E_v}\)). The efficiency is calculated using equation \ref{eqn:ev-high-d} when the occupant diversity, \({D}\), is less than 0.6 and equation \ref{eqp:ev-low-d} otherwise. \({E_v}\) is then used in the same manner as in the VRP to determine the system design outdoor air intake.
+>The Simplified Procedure (SP) introduced in ASHRAE Standard 62.1-2019 provides an alternative way to determine the ventilation efficiency of a system(\({E_v}\)). The efficiency is calculated using equation \ref{eqn:ev-high-d} when the occupant diversity, \({D}\), is less than 0.6 and equation \ref{eqn:ev-low-d} otherwise. \({E_v}\) is then used in the same manner as in the VRP to determine the system design outdoor air intake.
 >
 >\begin{equation}\label(eqn:ev-high-d)
->{E_v} = 0.88 {D} + 0.22
+>{E_{v}} = 0.88 {D} + 0.22
 >\end{equation}
 >
 >\begin{equation}\label(eqn:ev-low-d)
->{E_v} = 0.75
+>{E_{v}} = 0.75
 >\end{equation}
 >
 >\subsubsection{Zone Minimum Air Flow}\label{sp-zone-minimum-air-flow}
->When set to be autosized, the minimum (primary) air flow (or fraction) for these terminals will be calculated using equation \ref{eqn:sp-zone-minimum-air-flow}: _AirTerminal:SingleDuct:VAV:NoReheat_ (Constant Minimum Air Flow Fraction or Fixed Minimum Air Flow Fraction), _AirTerminal:SingleDuct:VAV:Reheat_ (Constant Minimum Air Flow Fraction or Fixed Minimum Air Flow Fraction), _AirTerminal:SingleDuct:SeriesPIU:Reheat_, _AirTerminal:SingleDuct:ParallelPIU:Reheat_.
+>When set to be autosized, the minimum (primary) air flow (or fraction) for these terminals will be calculated using equation \ref{eqn:sp-zone-minimum-air-flow}: \emph{AirTerminal:SingleDuct:VAV:NoReheat} (Constant Minimum Air Flow Fraction or Fixed Minimum Air Flow Fraction), \emph{AirTerminal:SingleDuct:VAV:Reheat} (Constant Minimum Air Flow Fraction or Fixed Minimum Air Flow Fraction), \emph{AirTerminal:SingleDuct:SeriesPIU:Reheat}, \emph{AirTerminal:SingleDuct:ParallelPIU:Reheat}.
 >
 >\begin{equation}\label(eqn:sp-zone-minimum-air-flow)
->{V_{pz}_{min}} = 1.5 * {V_{oz}}
+>{V_{{pz}_{min}}} = 1.5 * {V_{oz}}
 >\end{equation}
+
+### Other
+* A mention of the Simplified Procedure will be added to the "System Design Outdoor Air Flow Rate" subsection of the Engineering Manual.
 
 ### Ventilation Optimization
 The following equation in the in the sub-sub-section "Calculation of system minimum OA flow" will changed from...
@@ -226,13 +246,13 @@ The following equation in the in the sub-sub-section "Calculation of system mini
 
 ... to:
 > \begin{equation}
-> {V_{ot}} = min(V_{ot}_{design}, {V_{ou}}/{E_v})
+> {V_{ot}} = min(V_{{ot}_{design}}, {V_{ou}}/{E_v})
 > \end{equation}
 
 ## Example Files and Transition Changes
 Two example files using the SP will be developed to showcase of to correctly set up a model to use the SP using both standard and PIU air terminals. 
 
-No transition changes are expected at this point.
+Review of the original NFP prompted a request to change the existing `VentilationRateProcedure` field value to `Standard62.1SimplifiedProcedure`. This change requires a transition rule.
 
 # References
 * ASHRAE. 2019. ANSI/ASHRAE/IES 90.1-2019, Energy Standard for Buildings Except Low-Rise
@@ -243,7 +263,7 @@ Residential Buildings. ASHRAE, Atlanta, GA
 # Design Document
 ## System OA Intake and Occupant Diversity
 ### Occupant Diversity
-In `SizeSysOutdoorAir` the call to the `DetermineSystemPopulationDiversity` function will be wrapped in a `if` statement which will check if the new occupant diversity field in the `Sizing:System` object is set to `autosize` or not. If set to `autosize`, the existing method will be used, if not, the value specified by the user will be retrieved through `state.dataSize->SysSizInput`.
+In the `DetermineSystemPopulationDiversity` the calculation of the Occupant Diversity, D, will be bypassed if the new occupant diversity field in the `Sizing:System` object is set to `autosize`. If the user-specified value of D is less than one and the system serves a single-zone, a warning will be issued mentioning that the actual occupant diversity used by EnergyPlus is 1.0.
 ### System OA Intake
 A new OA method will be added to `DataSizing.hh`, `SOAM_SP`.
 
@@ -253,6 +273,8 @@ The design system OA intake, ventilation efficiency, along with the intermediate
 In the `SingleDuctAirTerminal::SizeSys` function (where terminal air flow sizing calculations for single duct terminals are done), code will be added to retrieve the system OA method associated with each terminal (through `state.dataSize->SysSizInput`). Code will be added in that same function to determine the zone minimum airflow if the selected system OA method is the new OA method (`DataSizing::SOAM_SP`). `FixedMinAirDes` (when `ZoneMinAirFracMethod == MinFlowFraction::Fixed`) will be calculated by retrieving the values for `VozClgByZone` and `VozHtgByZone` and multiplying the larger of the two by 1.5. `MinAirFlowFracDes` (when `ZoneMinAirFracMethod == MinFlowFraction::Constant`) will be calculated similarly (and divided by `MaxAirVolFlowRate`).
 ### PIUs
 The same approach as previously described will be used in `SizePIU`. `MinPriAirFlowFracDes` will be determined by multiplying the larger of the two `VozClgByZone` and `VozHtgByZone` air flows by 1.5.
+## Reporting
+New variables will be created to store data used to populate the new columns described in the Output Description section of the NFP.
 
 ## Ventilation Optimization
 The ventilation optimization calculations are done in the `VentilationMechanicalProps::CalcMechVentController` function in `MixedAir.cc`. The system OA flow for the VRP is calculated as follows: `SysOA = SysOAuc / SysEv;`. As mentioned in ASHRAE Standard 90.1 and Guideline 36, the calculated OA flow should be equal or smaller to the design OA flow. The design OA flow will be retrieved from `state.dataSize->FinalSysSizing` and the system OA flow will be set to the minimum of the design air flow rate and the recalculated air flow.
