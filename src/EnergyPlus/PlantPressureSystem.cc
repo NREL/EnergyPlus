@@ -198,8 +198,8 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
                                         "Plant Branch Pressure Difference",
                                         OutputProcessor::Unit::Pa,
                                         branch.PressureDrop,
-                                        OutputProcessor::eTimeStepType::Plant,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         branch.Name);
                 }
             }
@@ -212,8 +212,8 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
                                         "Plant Demand Side Loop Pressure Difference",
                                         OutputProcessor::Unit::Pa,
                                         loop_side.PressureDrop,
-                                        OutputProcessor::eTimeStepType::Plant,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         loop.Name);
 
                 } else if (LoopSideNum == SupplySide) {
@@ -222,8 +222,8 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
                                         "Plant Supply Side Loop Pressure Difference",
                                         OutputProcessor::Unit::Pa,
                                         loop_side.PressureDrop,
-                                        OutputProcessor::eTimeStepType::Plant,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         loop.Name);
                 }
             }
@@ -239,8 +239,8 @@ void InitPressureDrop(EnergyPlusData &state, int const LoopNum, bool const First
                                 "Plant Loop Pressure Difference",
                                 OutputProcessor::Unit::Pa,
                                 loop.PressureDrop,
-                                OutputProcessor::eTimeStepType::Plant,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 loop.Name);
 
             // Check for illegal configurations on this plant loop

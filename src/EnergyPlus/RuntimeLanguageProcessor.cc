@@ -2623,8 +2623,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     int VariableNum(0); // temporary
     int RuntimeReportVarNum;
     bool Found;
-    OutputProcessor::eTimeStepType FreqString;    // temporary
-    OutputProcessor::eVariableType VarTypeString; // temporary
+    OutputProcessor::TimeStepType FreqString;    // temporary
+    OutputProcessor::StoreType VarTypeString; // temporary
     std::string ResourceTypeString;
     std::string GroupTypeString;
     std::string EndUseTypeString;
@@ -3270,9 +3270,9 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     auto const SELECT_CASE_var(cAlphaArgs(3));
 
                     if (SELECT_CASE_var == "AVERAGED") {
-                        VarTypeString = OutputProcessor::eVariableType::Average;
+                        VarTypeString = OutputProcessor::StoreType::Averaged;
                     } else if (SELECT_CASE_var == "SUMMED") {
-                        VarTypeString = OutputProcessor::eVariableType::Sum;
+                        VarTypeString = OutputProcessor::StoreType::Summed;
                     } else {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3));
@@ -3285,9 +3285,9 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     auto const SELECT_CASE_var(cAlphaArgs(4));
 
                     if (SELECT_CASE_var == "ZONETIMESTEP") {
-                        FreqString = OutputProcessor::eTimeStepType::Zone;
+                        FreqString = OutputProcessor::TimeStepType::TimeStepZone;
                     } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
-                        FreqString = OutputProcessor::eTimeStepType::System;
+                        FreqString = OutputProcessor::TimeStepType::TimeStepSystem;
                     } else {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));
@@ -3446,15 +3446,15 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
                 }
 
-                VarTypeString = OutputProcessor::eVariableType::Sum; // all metered vars are sum type
+                VarTypeString = OutputProcessor::StoreType::Summed; // all metered vars are sum type
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(3));
 
                     if (SELECT_CASE_var == "ZONETIMESTEP") {
-                        FreqString = OutputProcessor::eTimeStepType::Zone;
+                        FreqString = OutputProcessor::TimeStepType::TimeStepZone;
                     } else if (SELECT_CASE_var == "SYSTEMTIMESTEP") {
-                        FreqString = OutputProcessor::eTimeStepType::System;
+                        FreqString = OutputProcessor::TimeStepType::TimeStepSystem;
                     } else {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid field.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(4) + '=' + cAlphaArgs(4));

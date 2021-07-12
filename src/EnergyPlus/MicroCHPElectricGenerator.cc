@@ -405,56 +405,56 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         "Generator Off Mode Time",
                         OutputProcessor::Unit::s,
                         this->A42Model.OffModeTime,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Standby Mode Time",
                         OutputProcessor::Unit::s,
                         this->A42Model.StandyByModeTime,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Warm Up Mode Time",
                         OutputProcessor::Unit::s,
                         this->A42Model.WarmUpModeTime,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Normal Operating Mode Time",
                         OutputProcessor::Unit::s,
                         this->A42Model.NormalModeTime,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Cool Down Mode Time",
                         OutputProcessor::Unit::s,
                         this->A42Model.CoolDownModeTime,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Produced AC Electricity Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.ACPowerGen,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Produced AC Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->A42Model.ACEnergyGen,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name,
                         _,
                         "ElectricityProduced",
@@ -466,16 +466,16 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         "Generator Produced Thermal Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.QdotHR,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Produced Thermal Energy",
                         OutputProcessor::Unit::J,
                         this->A42Model.TotalHeatEnergyRec,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
@@ -487,88 +487,88 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         "Generator Electric Efficiency",
                         OutputProcessor::Unit::None,
                         this->A42Model.ElecEff,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Thermal Efficiency",
                         OutputProcessor::Unit::None,
                         this->A42Model.ThermEff,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Gross Input Heat Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.Qgross,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Steady State Engine Heat Generation Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.Qgenss,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Engine Heat Exchange Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.QdotHX,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Air Mass Flow Rate",
                         OutputProcessor::Unit::kg_s,
                         this->A42Model.MdotAir,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Fuel Molar Flow Rate",
                         OutputProcessor::Unit::kmol_s,
                         this->A42Model.NdotFuel,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Fuel Mass Flow Rate",
                         OutputProcessor::Unit::kg_s,
                         this->A42Model.MdotFuel,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Engine Temperature",
                         OutputProcessor::Unit::C,
                         this->A42Model.Teng,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Coolant Inlet Temperature",
                         OutputProcessor::Unit::C,
                         this->A42Model.HeatRecInletTemp,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Coolant Outlet Temperature",
                         OutputProcessor::Unit::C,
                         this->A42Model.HeatRecOutletTemp,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     // this next one needs to be reconciled with non-gas fuel constituents.
@@ -577,8 +577,8 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         "Generator Fuel HHV Basis Energy",
                         OutputProcessor::Unit::J,
                         this->A42Model.FuelEnergyHHV,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name,
                         _,
                         "NaturalGas",
@@ -590,80 +590,80 @@ void MicroCHPDataStruct::setupOutputVars(EnergyPlusData &state)
                         "Generator Fuel HHV Basis Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.FuelEnergyUseRateHHV,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Fuel LHV Basis Energy",
                         OutputProcessor::Unit::J,
                         this->A42Model.FuelEnergyLHV,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Fuel LHV Basis Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.FuelEnergyUseRateLHV,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Fuel Compressor Electricity Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.FuelCompressPower,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Fuel Compressor Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->A42Model.FuelCompressEnergy,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Fuel Compressor Skin Heat Loss Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.FuelCompressSkinLoss,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Zone Sensible Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.SkinLossPower,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Zone Sensible Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->A42Model.SkinLossEnergy,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Zone Convection Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.SkinLossConvect,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Generator Zone Radiation Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->A42Model.SkinLossRadiat,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     if (this->ZoneID > 0) {

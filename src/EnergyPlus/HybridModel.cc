@@ -443,15 +443,15 @@ namespace HybridModel {
                                             "Zone Infiltration Hybrid Model Air Change Rate",
                                             OutputProcessor::Unit::ach,
                                             state.dataHeatBal->Zone(ZonePtr).InfilOAAirChangeRateHM,
-                                            OutputProcessor::eTimeStepType::Zone,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepZone,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                         SetupOutputVariable(state,
                                             "Zone Infiltration Hybrid Model Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             state.dataHeatBal->Zone(ZonePtr).MCPIHM,
-                                            OutputProcessor::eTimeStepType::Zone,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepZone,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
                     if (state.dataHybridModel->HybridModelZone(ZonePtr).PeopleCountCalc_T ||
@@ -461,8 +461,8 @@ namespace HybridModel {
                                             "Zone Hybrid Model People Count",
                                             OutputProcessor::Unit::None,
                                             state.dataHeatBal->Zone(ZonePtr).NumOccHM,
-                                            OutputProcessor::eTimeStepType::Zone,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepZone,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
 

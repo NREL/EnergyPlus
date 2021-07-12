@@ -109,8 +109,8 @@ protected:
         state->dataWeatherManager->Environment(4).DesignDayNum = 2;
         state->dataWeatherManager->Environment(4).SeedEnvrnNum = 2;
 
-        OutputProcessor::SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, state->dataGlobal->TimeStepZone);
-        OutputProcessor::SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+        OutputProcessor::SetupTimePointers(*state, OutputProcessor::TimeStepType::TimeStepZone, state->dataGlobal->TimeStepZone);
+        OutputProcessor::SetupTimePointers(*state, OutputProcessor::TimeStepType::TimeStepSystem, state->dataHVACGlobal->TimeStepSys);
 
         state->dataSize->PlantSizData.allocate(1);
 

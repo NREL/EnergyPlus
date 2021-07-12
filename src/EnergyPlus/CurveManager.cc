@@ -2432,8 +2432,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput1,
-                                        OutputProcessor::eTimeStepType::HVAC,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 2:
@@ -2441,8 +2441,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput2,
-                                        OutputProcessor::eTimeStepType::HVAC,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 3:
@@ -2450,8 +2450,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput3,
-                                        OutputProcessor::eTimeStepType::HVAC,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 4:
@@ -2459,8 +2459,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput4,
-                                        OutputProcessor::eTimeStepType::HVAC,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 5:
@@ -2468,8 +2468,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput5,
-                                        OutputProcessor::eTimeStepType::HVAC,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 case 6:
@@ -2477,8 +2477,8 @@ namespace CurveManager {
                                         "Performance Curve Input Variable " + numStr + " Value",
                                         OutputProcessor::Unit::None,
                                         state.dataCurveManager->PerfCurve(CurveIndex).CurveInput6,
-                                        OutputProcessor::eTimeStepType::HVAC,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataCurveManager->PerfCurve(CurveIndex).Name);
                     break;
                 default:
@@ -2491,8 +2491,8 @@ namespace CurveManager {
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataCurveManager->PerfCurve(CurveIndex).CurveOutput,
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataCurveManager->PerfCurve(CurveIndex).Name);
         }
 
@@ -2501,29 +2501,29 @@ namespace CurveManager {
                                 "Performance Curve Input Variable 1 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput1,
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 2 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput2,
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 3 Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveInput3,
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
                                 OutputProcessor::Unit::None,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).CurveOutput,
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataBranchAirLoopPlant->PressureCurve(CurveIndex).Name);
         }
 

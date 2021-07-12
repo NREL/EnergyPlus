@@ -661,45 +661,45 @@ namespace UnitHeater {
                                 "Zone Unit Heater Heating Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatEnergy,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             // Note that the unit heater fan electric is NOT metered because this value is already metered through the fan component
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecEnergy,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Availability Status",
                                 OutputProcessor::Unit::None,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num == FanType_SimpleOnOff) {
                 SetupOutputVariable(state,
                                     "Zone Unit Heater Fan Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanPartLoadRatio,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
             }
         }

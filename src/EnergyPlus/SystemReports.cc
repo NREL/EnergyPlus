@@ -1868,16 +1868,16 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Air System Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysTotHTNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysTotCLNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             // SYSTEM ENERGY USE REPORT
@@ -1885,56 +1885,56 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Air System Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysTotH2OHOT(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Steam Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysTotSteam(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Chilled Water Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysTotH2OCOLD(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysTotElec(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System NaturalGas Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysTotNaturalGas(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Propane Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysTotPropane(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Water Volume",
                                 OutputProcessor::Unit::m3,
                                 state.dataSysRpts->SysDomesticH2O(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             // SYSTEM COMPONENT LOAD REPORT
@@ -1942,96 +1942,96 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Air System Fan Air Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysFANCompHTNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Cooling Coil Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysCCCompCLNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHCCompHTNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Heat Exchanger Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHeatExHTNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Heat Exchanger Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHeatExCLNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Solar Collector Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysSolarCollectHeating(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Solar Collector Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysSolarCollectCooling(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System User Defined Air Terminal Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysUserDefinedTerminalHeating(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System User Defined Air Terminal Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysUserDefinedTerminalCooling(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHumidHTNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Evaporative Cooler Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysEvapCLNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Desiccant Dehumidifier Total Cooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->DesDehumidCLNG(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             // SYSTEM COMPONENT ENERGY REPORT
@@ -2039,168 +2039,168 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Air System Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysFANCompElec(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Hot Water Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHCCompH2OHOT(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Cooling Coil Chilled Water Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysCCCompH2OCOLD(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System DX Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHCCompElec(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System DX Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysCCCompElec(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHCCompElecRes(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil NaturalGas Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHCCompNaturalGas(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Propane Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHCCompPropane(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Steam Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHCCompSteam(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHumidElec(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier NaturalGas Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHumidNaturalGas(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier Propane Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysHumidPropane(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Evaporative Cooler Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->SysEvapElec(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Desiccant Dehumidifier Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->DesDehumidElec(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Mechanical Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataSysRpts->SysMechVentFlow(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Natural Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataSysRpts->SysNatVentFlow(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Target Voz Ventilation Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 state.dataSysRpts->SysTargetVentilationFlowVoz(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation Below Target Voz Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataSysRpts->SysTimeBelowVozDyn(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation At Target Voz Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataSysRpts->SysTimeAtVozDyn(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation Above Target Voz Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataSysRpts->SysTimeAboveVozDyn(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation When Unoccupied Time",
                                 OutputProcessor::Unit::hr,
                                 state.dataSysRpts->SysTimeVentUnocc(SysIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
         }
     }
@@ -2213,64 +2213,64 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Zone Mechanical Ventilation No Load Heat Removal Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->MaxNoLoadCoolingByVent(ZoneIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Cooling Load Increase Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->MaxCoolingLoadAddedByVent(ZoneIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->MaxOverheatingByVent(ZoneIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Cooling Load Decrease Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->MaxCoolingLoadMetByVent(ZoneIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
             // Heating Loads
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation No Load Heat Addition Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->MaxNoLoadHeatingByVent(ZoneIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Heating Load Increase Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->MaxHeatingLoadAddedByVent(ZoneIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->MaxOvercoolingByVent(ZoneIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Heating Load Decrease Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataSysRpts->MaxHeatingLoadMetByVent(ZoneIndex),
-                                OutputProcessor::eTimeStepType::HVAC,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
         }
 
@@ -2278,96 +2278,96 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                             "Zone Mechanical Ventilation Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             state.dataSysRpts->ZoneOAMassFlow(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Mass",
                             OutputProcessor::Unit::kg,
                             state.dataSysRpts->ZoneOAMass(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Sum,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Standard Density Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataSysRpts->ZoneOAVolFlowStdRho(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Standard Density Volume",
                             OutputProcessor::Unit::m3,
                             state.dataSysRpts->ZoneOAVolStdRho(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Sum,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Current Density Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataSysRpts->ZoneOAVolFlowCrntRho(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Current Density Volume",
                             OutputProcessor::Unit::m3,
                             state.dataSysRpts->ZoneOAVolCrntRho(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Sum,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Air Changes per Hour",
                             OutputProcessor::Unit::ach,
                             state.dataSysRpts->ZoneMechACH(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Target Voz Ventilation Flow Rate",
                             OutputProcessor::Unit::m3_s,
                             state.dataSysRpts->ZoneTargetVentilationFlowVoz(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation Below Target Voz Time",
                             OutputProcessor::Unit::hr,
                             state.dataSysRpts->ZoneTimeBelowVozDyn(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Sum,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation At Target Voz Time",
                             OutputProcessor::Unit::hr,
                             state.dataSysRpts->ZoneTimeAtVozDyn(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Sum,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation Above Target Voz Time",
                             OutputProcessor::Unit::hr,
                             state.dataSysRpts->ZoneTimeAboveVozDyn(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Sum,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation When Unoccupied Time",
                             OutputProcessor::Unit::hr,
                             state.dataSysRpts->ZoneTimeVentUnocc(ZoneIndex),
-                            OutputProcessor::eTimeStepType::HVAC,
-                            OutputProcessor::eVariableType::Sum,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
     }
 
@@ -2376,32 +2376,32 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                         "Facility Any Zone Ventilation Below Target Voz Time",
                         OutputProcessor::Unit::hr,
                         state.dataSysRpts->AnyZoneTimeBelowVozDyn,
-                        OutputProcessor::eTimeStepType::HVAC,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         "Facility");
 
     SetupOutputVariable(state,
                         "Facility All Zones Ventilation At Target Voz Time",
                         OutputProcessor::Unit::hr,
                         state.dataSysRpts->AllZonesTimeAtVozDyn,
-                        OutputProcessor::eTimeStepType::HVAC,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         "Facility");
 
     SetupOutputVariable(state,
                         "Facility Any Zone Ventilation Above Target Voz Time",
                         OutputProcessor::Unit::hr,
                         state.dataSysRpts->AnyZoneTimeAboveVozDyn,
-                        OutputProcessor::eTimeStepType::HVAC,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         "Facility");
 
     SetupOutputVariable(state,
                         "Facility Any Zone Ventilation When Unoccupied Time",
                         OutputProcessor::Unit::hr,
                         state.dataSysRpts->AnyZoneTimeVentUnocc,
-                        OutputProcessor::eTimeStepType::HVAC,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         "Facility");
 }
 

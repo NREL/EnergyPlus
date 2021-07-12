@@ -146,8 +146,8 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
     {
         EnergyPlusFixture::SetUp();
         Real64 timeStep = 1.0;
-        OutputProcessor::SetupTimePointers(*state, OutputProcessor::eTimeStepType::Zone, timeStep);
-        OutputProcessor::SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, timeStep);
+        OutputProcessor::SetupTimePointers(*state, OutputProcessor::TimeStepType::TimeStepZone, timeStep);
+        OutputProcessor::SetupTimePointers(*state, OutputProcessor::TimeStepType::TimeStepSystem, timeStep);
         *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
         *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
         state->dataPluginManager->pluginManager = std::make_unique<EnergyPlus::PluginManagement::PluginManager>(*state);
@@ -182,8 +182,8 @@ public:
                                     val.varName,
                                     OutputProcessor::Unit::kg_s,
                                     val.value,
-                                    OutputProcessor::eTimeStepType::Zone,
-                                    OutputProcessor::eVariableType::Sum,
+                                    OutputProcessor::TimeStepType::TimeStepZone,
+                                    OutputProcessor::StoreType::Summed,
                                     val.varKey,
                                     _,
                                     "ELECTRICITY",
@@ -195,8 +195,8 @@ public:
                                     val.varName,
                                     OutputProcessor::Unit::kg_s,
                                     val.value,
-                                    OutputProcessor::eTimeStepType::Zone,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepZone,
+                                    OutputProcessor::StoreType::Averaged,
                                     val.varKey);
             }
         }
@@ -205,8 +205,8 @@ public:
                                 val.varName,
                                 OutputProcessor::Unit::kg_s,
                                 val.value,
-                                OutputProcessor::eTimeStepType::Zone,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::StoreType::Averaged,
                                 val.varKey);
         }
     }

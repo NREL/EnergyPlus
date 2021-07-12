@@ -3165,103 +3165,103 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                                     "Air System Outdoor Air Economizer Status",
                                     OutputProcessor::Unit::None,
                                     loopOAController.EconomizerStatus,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Heat Recovery Bypass Status",
                                     OutputProcessor::Unit::None,
                                     loopOAController.HeatRecoveryBypassStatus,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status",
                                     OutputProcessor::Unit::None,
                                     loopOAController.HRHeatingCoilActive,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature",
                                     OutputProcessor::Unit::C,
                                     loopOAController.MixedAirTempAtMinOAFlow,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air High Humidity Control Status",
                                     OutputProcessor::Unit::None,
                                     loopOAController.HighHumCtrlStatus,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Limiting Factor",
                                     OutputProcessor::Unit::None,
                                     loopOAController.OALimitingFactor,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Flow Fraction",
                                     OutputProcessor::Unit::None,
                                     loopOAController.OAFractionRpt,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Minimum Flow Fraction",
                                     OutputProcessor::Unit::None,
                                     loopOAController.MinOAFracLimit,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Outdoor Air Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     loopOAController.OAMassFlow,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Mixed Air Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     loopOAController.MixMassFlow,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Relief Air Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     loopOAController.RelTotalLossRate,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Relief Air Sensible Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     loopOAController.RelSensiLossRate,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 SetupOutputVariable(state,
                                     "Air System Relief Air Latent Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     loopOAController.RelLatentLossRate,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     airloopName);
 
                 if (loopOAController.MixedAirSPMNum > 0) {
@@ -3269,8 +3269,8 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                                         "Air System Outdoor Air Maximum Flow Fraction",
                                         OutputProcessor::Unit::None,
                                         loopOAController.MaxOAFracBySetPoint,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         airloopName);
                 }
 
@@ -3294,8 +3294,8 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                                         "Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         loopOAController.MechVentOAMassFlowRequest,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         airloopName);
                     if (!state.dataMixedAir->VentilationMechanical(VentMechObjectNum).DCVFlag) {
                         state.dataAirLoop->AirLoopControlInfo(thisAirLoop).AirLoopDCVFlag = false;

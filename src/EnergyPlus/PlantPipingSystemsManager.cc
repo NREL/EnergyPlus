@@ -1944,23 +1944,23 @@ namespace PlantPipingSystemsManager {
                                     "Pipe Segment Inlet Temperature",
                                     OutputProcessor::Unit::C,
                                     thisSegment.InletTemperature,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisSegment.Name);
                 SetupOutputVariable(state,
                                     "Pipe Segment Outlet Temperature",
                                     OutputProcessor::Unit::C,
                                     thisSegment.OutletTemperature,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisSegment.Name);
 
                 SetupOutputVariable(state,
                                     "Pipe Segment Fluid Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     thisSegment.FluidHeatLoss,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisSegment.Name);
             }
         }
@@ -1973,31 +1973,31 @@ namespace PlantPipingSystemsManager {
                                     "Pipe Circuit Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     thisCircuit.CurCircuitFlowRate,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisCircuit.Name);
 
                 SetupOutputVariable(state,
                                     "Pipe Circuit Inlet Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCircuit.InletTemperature,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisCircuit.Name);
                 SetupOutputVariable(state,
                                     "Pipe Circuit Outlet Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCircuit.OutletTemperature,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisCircuit.Name);
 
                 SetupOutputVariable(state,
                                     "Pipe Circuit Fluid Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     thisCircuit.FluidHeatLoss,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisCircuit.Name);
 
             } else { // it is a horizontal trench
@@ -2006,31 +2006,31 @@ namespace PlantPipingSystemsManager {
                                     "Ground Heat Exchanger Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     thisCircuit.CurCircuitFlowRate,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisCircuit.Name);
 
                 SetupOutputVariable(state,
                                     "Ground Heat Exchanger Inlet Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCircuit.InletTemperature,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisCircuit.Name);
                 SetupOutputVariable(state,
                                     "Ground Heat Exchanger Outlet Temperature",
                                     OutputProcessor::Unit::C,
                                     thisCircuit.OutletTemperature,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisCircuit.Name);
 
                 SetupOutputVariable(state,
                                     "Ground Heat Exchanger Fluid Heat Transfer Rate",
                                     OutputProcessor::Unit::W,
                                     thisCircuit.FluidHeatLoss,
-                                    OutputProcessor::eTimeStepType::Plant,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     thisCircuit.Name);
             }
         }
@@ -2051,15 +2051,15 @@ namespace PlantPipingSystemsManager {
                                 "GroundDomain Slab Zone Coupled Surface Heat Flux",
                                 OutputProcessor::Unit::W_m2,
                                 this->HeatFlux,
-                                OutputProcessor::eTimeStepType::Zone,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::StoreType::Averaged,
                                 this->Name);
             SetupOutputVariable(state,
                                 "GroundDomain Slab Zone Coupled Surface Temperature",
                                 OutputProcessor::Unit::C,
                                 this->ZoneCoupledSurfaceTemp,
-                                OutputProcessor::eTimeStepType::Zone,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::StoreType::Averaged,
                                 this->Name);
         } else if (this->HasZoneCoupledBasement) {
             // Zone-coupled basement wall outputs
@@ -2067,30 +2067,30 @@ namespace PlantPipingSystemsManager {
                                 "GroundDomain Basement Wall Interface Heat Flux",
                                 OutputProcessor::Unit::W_m2,
                                 this->WallHeatFlux,
-                                OutputProcessor::eTimeStepType::Zone,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::StoreType::Averaged,
                                 this->Name);
             SetupOutputVariable(state,
                                 "GroundDomain Basement Wall Interface Temperature",
                                 OutputProcessor::Unit::C,
                                 this->BasementWallTemp,
-                                OutputProcessor::eTimeStepType::Zone,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::StoreType::Averaged,
                                 this->Name);
             // Zone-coupled basement floor outputs
             SetupOutputVariable(state,
                                 "GroundDomain Basement Floor Interface Heat Flux",
                                 OutputProcessor::Unit::W_m2,
                                 this->FloorHeatFlux,
-                                OutputProcessor::eTimeStepType::Zone,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::StoreType::Averaged,
                                 this->Name);
             SetupOutputVariable(state,
                                 "GroundDomain Basement Floor Interface Temperature",
                                 OutputProcessor::Unit::C,
                                 this->BasementFloorTemp,
-                                OutputProcessor::eTimeStepType::Zone,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepZone,
+                                OutputProcessor::StoreType::Averaged,
                                 this->Name);
         }
     }

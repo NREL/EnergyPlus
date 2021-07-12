@@ -418,8 +418,8 @@ namespace HVACDXHeatPumpSystem {
                                 "Coil System Part Load Ratio",
                                 OutputProcessor::Unit::None,
                                 DXHeatPumpSystem(DXHeatSysNum).PartLoadFrac,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 DXHeatPumpSystem(DXHeatSysNum).Name);
         }
 

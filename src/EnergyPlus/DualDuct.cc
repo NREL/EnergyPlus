@@ -397,15 +397,15 @@ namespace DualDuct {
                                     "Zone Air Terminal Cold Supply Duct Damper Position",
                                     OutputProcessor::Unit::None,
                                     state.dataDualDuct->dd_airterminal(DDNum).ColdAirDamperPosition,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataDualDuct->dd_airterminal(DDNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Hot Supply Duct Damper Position",
                                     OutputProcessor::Unit::None,
                                     state.dataDualDuct->dd_airterminal(DDNum).HotAirDamperPosition,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataDualDuct->dd_airterminal(DDNum).Name);
 
             } // end Number of Damper Loop
@@ -574,22 +574,22 @@ namespace DualDuct {
                                     "Zone Air Terminal Cold Supply Duct Damper Position",
                                     OutputProcessor::Unit::None,
                                     state.dataDualDuct->dd_airterminal(DDNum).ColdAirDamperPosition,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataDualDuct->dd_airterminal(DDNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Hot Supply Duct Damper Position",
                                     OutputProcessor::Unit::None,
                                     state.dataDualDuct->dd_airterminal(DDNum).HotAirDamperPosition,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataDualDuct->dd_airterminal(DDNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Outdoor Air Volume Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     state.dataDualDuct->dd_airterminal(DDNum).OutdoorAirFlowRate,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataDualDuct->dd_airterminal(DDNum).Name);
             } // end Number of Damper Loop
         }
@@ -833,22 +833,22 @@ namespace DualDuct {
                                     "Zone Air Terminal Outdoor Air Duct Damper Position",
                                     OutputProcessor::Unit::None,
                                     state.dataDualDuct->dd_airterminal(DDNum).OADamperPosition,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataDualDuct->dd_airterminal(DDNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Recirculated Air Duct Damper Position",
                                     OutputProcessor::Unit::None,
                                     state.dataDualDuct->dd_airterminal(DDNum).RecircAirDamperPosition,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataDualDuct->dd_airterminal(DDNum).Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Outdoor Air Fraction",
                                     OutputProcessor::Unit::None,
                                     state.dataDualDuct->dd_airterminal(DDNum).OAFraction,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataDualDuct->dd_airterminal(DDNum).Name);
 
             } // end Number of Damper Loop

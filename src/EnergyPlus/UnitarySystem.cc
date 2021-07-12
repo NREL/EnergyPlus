@@ -7064,65 +7064,65 @@ namespace UnitarySystems {
                                         "Unitary System Part Load Ratio",
                                         OutputProcessor::Unit::None,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_PartLoadFrac,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     SetupOutputVariable(state,
                                         "Unitary System Total Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_TotCoolEnergyRate,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     SetupOutputVariable(state,
                                         "Unitary System Sensible Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_SensCoolEnergyRate,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     SetupOutputVariable(state,
                                         "Unitary System Latent Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_LatCoolEnergyRate,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     SetupOutputVariable(state,
                                         "Unitary System Total Heating Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_TotHeatEnergyRate,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     SetupOutputVariable(state,
                                         "Unitary System Sensible Heating Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_SensHeatEnergyRate,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     SetupOutputVariable(state,
                                         "Unitary System Latent Heating Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_LatHeatEnergyRate,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     SetupOutputVariable(state,
                                         "Unitary System Ancillary Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_TotalAuxElecPower,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolCoilExists) {
                         SetupOutputVariable(state,
                                             "Unitary System Cooling Ancillary Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_CoolingAuxElecConsumption,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Sum,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Summed,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
                                             _,
                                             "Electricity",
@@ -7136,8 +7136,8 @@ namespace UnitarySystems {
                                             "Unitary System Heating Ancillary Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_HeatingAuxElecConsumption,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Sum,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Summed,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name,
                                             _,
                                             "Electricity",
@@ -7150,15 +7150,15 @@ namespace UnitarySystems {
                                         "Unitary System Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_ElecPower,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     SetupOutputVariable(state,
                                         "Unitary System Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_ElecPowerConsumption,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Sum,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Summed,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
 
                     // report predicted load as determined by Unitary System for load control only
@@ -7167,15 +7167,15 @@ namespace UnitarySystems {
                                             "Unitary System Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                             OutputProcessor::Unit::W,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_SensibleLoadPredicted,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                         SetupOutputVariable(state,
                                             "Unitary System Predicted Moisture Load to Setpoint Heat Transfer Rate",
                                             OutputProcessor::Unit::W,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_MoistureLoadPredicted,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
 
@@ -7184,8 +7184,8 @@ namespace UnitarySystems {
                                         "Unitary System Dehumidification Induced Heating Demand Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_DehumidInducedHeatingDemandRate,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
                     //        END IF
 
@@ -7194,8 +7194,8 @@ namespace UnitarySystems {
                                             "Unitary System Fan Part Load Ratio",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].FanPartLoadRatio,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
 
@@ -7203,16 +7203,16 @@ namespace UnitarySystems {
                                         "Unitary System Compressor Part Load Ratio",
                                         OutputProcessor::Unit::None,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_CompPartLoadRatio,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
 
                     SetupOutputVariable(state,
                                         "Unitary System Frost Control Status",
                                         OutputProcessor::Unit::None,
                                         state.dataUnitarySystems->unitarySys[sysNum].m_FrostControlStatus,
-                                        OutputProcessor::eTimeStepType::System,
-                                        OutputProcessor::eVariableType::Average,
+                                        OutputProcessor::TimeStepType::TimeStepSystem,
+                                        OutputProcessor::StoreType::Averaged,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
 
                     {
@@ -7225,36 +7225,36 @@ namespace UnitarySystems {
                                                     "Unitary System Heat Recovery Rate",
                                                     OutputProcessor::Unit::W,
                                                     state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryRate,
-                                                    OutputProcessor::eTimeStepType::System,
-                                                    OutputProcessor::eVariableType::Average,
+                                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                                    OutputProcessor::StoreType::Averaged,
                                                     state.dataUnitarySystems->unitarySys[sysNum].Name);
                                 SetupOutputVariable(state,
                                                     "Unitary System Heat Recovery Inlet Temperature",
                                                     OutputProcessor::Unit::C,
                                                     state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryInletTemp,
-                                                    OutputProcessor::eTimeStepType::System,
-                                                    OutputProcessor::eVariableType::Average,
+                                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                                    OutputProcessor::StoreType::Averaged,
                                                     state.dataUnitarySystems->unitarySys[sysNum].Name);
                                 SetupOutputVariable(state,
                                                     "Unitary System Heat Recovery Outlet Temperature",
                                                     OutputProcessor::Unit::C,
                                                     state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryOutletTemp,
-                                                    OutputProcessor::eTimeStepType::System,
-                                                    OutputProcessor::eVariableType::Average,
+                                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                                    OutputProcessor::StoreType::Averaged,
                                                     state.dataUnitarySystems->unitarySys[sysNum].Name);
                                 SetupOutputVariable(state,
                                                     "Unitary System Heat Recovery Fluid Mass Flow Rate",
                                                     OutputProcessor::Unit::kg_s,
                                                     state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryMassFlowRate,
-                                                    OutputProcessor::eTimeStepType::System,
-                                                    OutputProcessor::eVariableType::Average,
+                                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                                    OutputProcessor::StoreType::Averaged,
                                                     state.dataUnitarySystems->unitarySys[sysNum].Name);
                                 SetupOutputVariable(state,
                                                     "Unitary System Heat Recovery Energy",
                                                     OutputProcessor::Unit::J,
                                                     state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecoveryEnergy,
-                                                    OutputProcessor::eTimeStepType::System,
-                                                    OutputProcessor::eVariableType::Sum,
+                                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                                    OutputProcessor::StoreType::Summed,
                                                     state.dataUnitarySystems->unitarySys[sysNum].Name);
                             }
                         } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
@@ -7266,15 +7266,15 @@ namespace UnitarySystems {
                                                 "Unitary System Requested Sensible Cooling Rate",
                                                 OutputProcessor::Unit::W,
                                                 state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilSensDemand,
-                                                OutputProcessor::eTimeStepType::System,
-                                                OutputProcessor::eVariableType::Average,
+                                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                                OutputProcessor::StoreType::Averaged,
                                                 state.dataUnitarySystems->unitarySys[sysNum].Name);
                             SetupOutputVariable(state,
                                                 "Unitary System Requested Latent Cooling Rate",
                                                 OutputProcessor::Unit::W,
                                                 state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilLatentDemand,
-                                                OutputProcessor::eTimeStepType::System,
-                                                OutputProcessor::eVariableType::Average,
+                                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                                OutputProcessor::StoreType::Averaged,
                                                 state.dataUnitarySystems->unitarySys[sysNum].Name);
                         } else {
                         }
@@ -7285,15 +7285,15 @@ namespace UnitarySystems {
                                             "Unitary System Zone Load Sensible Heat Ratio",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].LoadSHR,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                         SetupOutputVariable(state,
                                             "Unitary System Cooling Coil Load Sensible Heat Ratio",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].CoilSHR,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
 
@@ -7307,8 +7307,8 @@ namespace UnitarySystems {
                                                 "Unitary System Requested Heating Rate",
                                                 OutputProcessor::Unit::W,
                                                 state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilSensDemand,
-                                                OutputProcessor::eTimeStepType::System,
-                                                OutputProcessor::eVariableType::Average,
+                                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                                OutputProcessor::StoreType::Averaged,
                                                 state.dataUnitarySystems->unitarySys[sysNum].Name);
                         }
                     }
@@ -7323,22 +7323,22 @@ namespace UnitarySystems {
                                             "Unitary System DX Coil Cycling Ratio",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                         SetupOutputVariable(state,
                                             "Unitary System DX Coil Speed Ratio",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                         SetupOutputVariable(state,
                                             "Unitary System DX Coil Speed Level",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_SpeedNum,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
 
@@ -7351,22 +7351,22 @@ namespace UnitarySystems {
                                             "Unitary System Water Coil Cycling Ratio",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_CycRatio,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                         SetupOutputVariable(state,
                                             "Unitary System Water Coil Speed Ratio",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_SpeedRatio,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                         SetupOutputVariable(state,
                                             "Unitary System Water Coil Speed Level",
                                             OutputProcessor::Unit::None,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_SpeedNum,
-                                            OutputProcessor::eTimeStepType::System,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepSystem,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                     }
 

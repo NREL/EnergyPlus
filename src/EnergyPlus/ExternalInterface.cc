@@ -2486,7 +2486,7 @@ void GetReportVariableKey(
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     OutputProcessor::VariableType varType(OutputProcessor::VariableType::NotFound);         // 0=not found, 1=integer, 2=real, 3=meter
     int numKeys(0);                                                                         // Number of keys found
-    OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);             // Variable  is Averaged=1 or Summed=2
+    OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);            // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::TimeStepZone); // Variable time step is Zone=1 or HVAC=2
     OutputProcessor::Unit varUnits(OutputProcessor::Unit::None);                            // Units sting, may be blank
     Array1D_int keyIndexes;                                                                 // Array index for

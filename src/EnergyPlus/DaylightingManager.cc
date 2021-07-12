@@ -4367,15 +4367,15 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                                             format("Daylighting Window Reference Point {} Illuminance", refPtNum),
                                             OutputProcessor::Unit::lux,
                                             state.dataSurface->SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
-                                            OutputProcessor::eTimeStepType::Zone,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepZone,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataSurface->Surface(SurfLoop).Name);
                         SetupOutputVariable(state,
                                             format("Daylighting Window Reference Point {} View Luminance", refPtNum),
                                             OutputProcessor::Unit::cd_m2,
                                             state.dataSurface->SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
-                                            OutputProcessor::eTimeStepType::Zone,
-                                            OutputProcessor::eVariableType::Average,
+                                            OutputProcessor::TimeStepType::TimeStepZone,
+                                            OutputProcessor::StoreType::Averaged,
                                             state.dataSurface->Surface(SurfLoop).Name);
                     }
                 }
@@ -4400,15 +4400,15 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
                                                     "Daylighting Window Reference Point Illuminance",
                                                     OutputProcessor::Unit::lux,
                                                     state.dataSurface->SurfaceWindow(enclSurfNum).IllumFromWinAtRefPtRep(refPtCount),
-                                                    OutputProcessor::eTimeStepType::Zone,
-                                                    OutputProcessor::eVariableType::Average,
+                                                    OutputProcessor::TimeStepType::TimeStepZone,
+                                                    OutputProcessor::StoreType::Averaged,
                                                     varKey);
                                 SetupOutputVariable(state,
                                                     "Daylighting Window Reference Point View Luminance",
                                                     OutputProcessor::Unit::cd_m2,
                                                     state.dataSurface->SurfaceWindow(enclSurfNum).LumWinFromRefPtRep(refPtCount),
-                                                    OutputProcessor::eTimeStepType::Zone,
-                                                    OutputProcessor::eVariableType::Average,
+                                                    OutputProcessor::TimeStepType::TimeStepZone,
+                                                    OutputProcessor::StoreType::Averaged,
                                                     varKey);
                             }
                         }
@@ -5148,29 +5148,29 @@ void GetDaylightingControls(EnergyPlusData &state,
                                     format("Daylighting Reference Point {} Illuminance", refPtNum),
                                     OutputProcessor::Unit::lux,
                                     zone_daylight.DaylIllumAtRefPt(refPtNum),
-                                    OutputProcessor::eTimeStepType::Zone,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepZone,
+                                    OutputProcessor::StoreType::Averaged,
                                     zone_daylight.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Daylight Illuminance Setpoint Exceeded Time", refPtNum),
                                     OutputProcessor::Unit::hr,
                                     zone_daylight.TimeExceedingDaylightIlluminanceSPAtRefPt(refPtNum),
-                                    OutputProcessor::eTimeStepType::Zone,
-                                    OutputProcessor::eVariableType::Sum,
+                                    OutputProcessor::TimeStepType::TimeStepZone,
+                                    OutputProcessor::StoreType::Summed,
                                     zone_daylight.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Glare Index", refPtNum),
                                     OutputProcessor::Unit::None,
                                     zone_daylight.GlareIndexAtRefPt(refPtNum),
-                                    OutputProcessor::eTimeStepType::Zone,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepZone,
+                                    OutputProcessor::StoreType::Averaged,
                                     zone_daylight.Name);
                 SetupOutputVariable(state,
                                     format("Daylighting Reference Point {} Glare Index Setpoint Exceeded Time", refPtNum),
                                     OutputProcessor::Unit::hr,
                                     zone_daylight.TimeExceedingGlareIndexSPAtRefPt(refPtNum),
-                                    OutputProcessor::eTimeStepType::Zone,
-                                    OutputProcessor::eVariableType::Sum,
+                                    OutputProcessor::TimeStepType::TimeStepZone,
+                                    OutputProcessor::StoreType::Summed,
                                     zone_daylight.Name);
             }
         }
@@ -5208,8 +5208,8 @@ void GetDaylightingControls(EnergyPlusData &state,
                             "Daylighting Lighting Power Multiplier",
                             OutputProcessor::Unit::None,
                             zone_daylight.ZonePowerReductionFactor,
-                            OutputProcessor::eTimeStepType::Zone,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepZone,
+                            OutputProcessor::StoreType::Averaged,
                             zone_daylight.Name);
     }
 }

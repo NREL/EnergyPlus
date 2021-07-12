@@ -274,8 +274,8 @@ namespace MundtSimMgr {
                                                     "Room Air Node Air Temperature",
                                                     OutputProcessor::Unit::C,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Temp,
-                                                    OutputProcessor::eTimeStepType::HVAC,
-                                                    OutputProcessor::eVariableType::Average,
+                                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                                    OutputProcessor::StoreType::Averaged,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName);
 
                                 AirNodeBeginNum = AirNodeNum + 1;

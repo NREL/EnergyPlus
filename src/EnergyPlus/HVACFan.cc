@@ -610,29 +610,29 @@ namespace HVACFan {
                             "Fan Electricity Rate",
                             OutputProcessor::Unit::W,
                             m_fanPower,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             name);
         SetupOutputVariable(state,
                             "Fan Rise in Air Temperature",
                             OutputProcessor::Unit::deltaC,
                             m_deltaTemp,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             name);
         SetupOutputVariable(state,
                             "Fan Heat Gain to Air",
                             OutputProcessor::Unit::W,
                             m_powerLossToAir,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             name);
         SetupOutputVariable(state,
                             "Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_fanEnergy,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Sum,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             name,
                             _,
                             "Electricity",
@@ -643,16 +643,16 @@ namespace HVACFan {
                             "Fan Air Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             m_outletAirMassFlowRate,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             name);
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1) {
             SetupOutputVariable(state,
                                 "Fan Runtime Fraction",
                                 OutputProcessor::Unit::None,
                                 m_fanRunTimeFractionAtSpeed[0],
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 name);
         } else if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) {
             for (auto speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
@@ -660,8 +660,8 @@ namespace HVACFan {
                                     "Fan Runtime Fraction Speed " + fmt::to_string(speedLoop + 1),
                                     OutputProcessor::Unit::None,
                                     m_fanRunTimeFractionAtSpeed[speedLoop],
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     name);
             }
         }

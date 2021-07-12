@@ -673,15 +673,15 @@ namespace Photovoltaics {
                                 "Generator Produced DC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataPhotovoltaic->PVarray(PVnum).Report.DCPower,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name);
             SetupOutputVariable(state,
                                 "Generator Produced DC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 state.dataPhotovoltaic->PVarray(PVnum).Report.DCEnergy,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name,
                                 _,
                                 "ElectricityProduced",
@@ -692,8 +692,8 @@ namespace Photovoltaics {
                                 "Generator PV Array Efficiency",
                                 OutputProcessor::Unit::None,
                                 state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayEfficiency,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 state.dataPhotovoltaic->PVarray(PVnum).Name);
 
             // CurrentModuleObject='Equiv1Diode or Sandia Photovoltaics'
@@ -703,22 +703,22 @@ namespace Photovoltaics {
                                     "Generator PV Cell Temperature",
                                     OutputProcessor::Unit::C,
                                     state.dataPhotovoltaic->PVarray(PVnum).Report.CellTemp,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPhotovoltaic->PVarray(PVnum).Name);
                 SetupOutputVariable(state,
                                     "Generator PV Short Circuit Current",
                                     OutputProcessor::Unit::A,
                                     state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayIsc,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPhotovoltaic->PVarray(PVnum).Name);
                 SetupOutputVariable(state,
                                     "Generator PV Open Circuit Voltage",
                                     OutputProcessor::Unit::V,
                                     state.dataPhotovoltaic->PVarray(PVnum).Report.ArrayVoc,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPhotovoltaic->PVarray(PVnum).Name);
             }
 

@@ -432,8 +432,8 @@ namespace PhotovoltaicThermalCollectors {
                             "Generator Produced Thermal Rate",
                             OutputProcessor::Unit::W,
                             this->Report.ThermPower,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             this->Name);
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
@@ -441,8 +441,8 @@ namespace PhotovoltaicThermalCollectors {
                                 "Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.ThermEnergy,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarWater",
@@ -455,8 +455,8 @@ namespace PhotovoltaicThermalCollectors {
                                 "Generator Produced Thermal Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.ThermEnergy,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 this->Name,
                                 _,
                                 "SolarAir",
@@ -468,8 +468,8 @@ namespace PhotovoltaicThermalCollectors {
                                 "Generator PVT Fluid Bypass Status",
                                 OutputProcessor::Unit::None,
                                 this->Report.BypassStatus,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 this->Name);
         }
 
@@ -477,24 +477,24 @@ namespace PhotovoltaicThermalCollectors {
                             "Generator PVT Fluid Inlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.TinletWorkFluid,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Outlet Temperature",
                             OutputProcessor::Unit::C,
                             this->Report.ToutletWorkFluid,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->Report.MdotWorkFluid,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             this->Name);
     }
 

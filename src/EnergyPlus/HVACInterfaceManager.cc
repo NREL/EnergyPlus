@@ -1257,22 +1257,22 @@ void SetupCommonPipes(EnergyPlusData &state)
                                     "Plant Common Pipe Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).Flow,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Temperature",
                                     OutputProcessor::Unit::C,
                                     PlantCommonPipe(CurLoopNum).Temp,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Flow Direction Status",
                                     OutputProcessor::Unit::None,
                                     PlantCommonPipe(CurLoopNum).FlowDir,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
                 if (first_supply_component_typenum == TypeOf_PumpVariableSpeed) {
@@ -1289,29 +1289,29 @@ void SetupCommonPipes(EnergyPlusData &state)
                                     "Plant Common Pipe Primary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).PriCPLegFlow,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Secondary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).SecCPLegFlow,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Primary to Secondary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).PriToSecFlow,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
                 SetupOutputVariable(state,
                                     "Plant Common Pipe Secondary to Primary Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     PlantCommonPipe(CurLoopNum).SecToPriFlow,
-                                    OutputProcessor::eTimeStepType::System,
-                                    OutputProcessor::eVariableType::Average,
+                                    OutputProcessor::TimeStepType::TimeStepSystem,
+                                    OutputProcessor::StoreType::Averaged,
                                     state.dataPlnt->PlantLoop(CurLoopNum).Name);
 
                 // check type of pump on supply side inlet

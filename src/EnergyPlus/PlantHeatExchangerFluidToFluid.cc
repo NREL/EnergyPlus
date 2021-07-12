@@ -534,16 +534,16 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         "Fluid Heat Exchanger Heat Transfer Rate",
                         OutputProcessor::Unit::W,
                         this->HeatTransferRate,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Heat Transfer Energy",
                         OutputProcessor::Unit::J,
                         this->HeatTransferEnergy,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Sum,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Summed,
                         this->Name,
                         _,
                         "ENERGYTRANSFER",
@@ -555,64 +555,64 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         "Fluid Heat Exchanger Loop Supply Side Mass Flow Rate",
                         OutputProcessor::Unit::kg_s,
                         this->SupplySideLoop.InletMassFlowRate,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Supply Side Inlet Temperature",
                         OutputProcessor::Unit::C,
                         this->SupplySideLoop.InletTemp,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Supply Side Outlet Temperature",
                         OutputProcessor::Unit::C,
                         this->SupplySideLoop.OutletTemp,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Demand Side Mass Flow Rate",
                         OutputProcessor::Unit::kg_s,
                         this->DemandSideLoop.InletMassFlowRate,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Demand Side Inlet Temperature",
                         OutputProcessor::Unit::C,
                         this->DemandSideLoop.InletTemp,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Demand Side Outlet Temperature",
                         OutputProcessor::Unit::C,
                         this->DemandSideLoop.OutletTemp,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Operation Status",
                         OutputProcessor::Unit::None,
                         this->OperationStatus,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Effectiveness",
                         OutputProcessor::Unit::None,
                         this->Effectiveness,
-                        OutputProcessor::eTimeStepType::System,
-                        OutputProcessor::eVariableType::Average,
+                        OutputProcessor::TimeStepType::TimeStepSystem,
+                        OutputProcessor::StoreType::Averaged,
                         this->Name);
 }
 

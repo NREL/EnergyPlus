@@ -122,8 +122,8 @@ protected:
         // OutputProcessor::TimeValue.allocate(2);
         // set up time related
         SetupTimePointers(
-            *state, OutputProcessor::eTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-        SetupTimePointers(*state, OutputProcessor::eTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+            *state, OutputProcessor::TimeStepType::TimeStepZone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(*state, OutputProcessor::TimeStepType::TimeStepSystem, state->dataHVACGlobal->TimeStepSys);
 
         state->dataGlobal->NumOfTimeStepInHour = 4;
         state->dataWeatherManager->TimeStepFraction = 1.0 / double(state->dataGlobal->NumOfTimeStepInHour);

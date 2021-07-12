@@ -3138,15 +3138,15 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                             "Setpoint Manager Warmest Temperature Critical Zone Number",
                             OutputProcessor::Unit::None,
                             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).CritZoneNum,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Name);
         SetupOutputVariable(state,
                             "Setpoint Manager Warmest Temperature Turndown Flow Fraction",
                             OutputProcessor::Unit::None,
                             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Turndown,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Name);
     }
 

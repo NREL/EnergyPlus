@@ -361,8 +361,8 @@ namespace BaseboardElectric {
                                 "Baseboard Total Heating Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.Energy,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 thisBaseboard.EquipName,
                                 _,
                                 "ENERGYTRANSFER",
@@ -374,16 +374,16 @@ namespace BaseboardElectric {
                                 "Baseboard Total Heating Rate",
                                 OutputProcessor::Unit::W,
                                 thisBaseboard.Power,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 thisBaseboard.EquipName);
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.ElecUseLoad,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Sum,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Summed,
                                 thisBaseboard.EquipName,
                                 _,
                                 "Electricity",
@@ -395,8 +395,8 @@ namespace BaseboardElectric {
                                 "Baseboard Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 thisBaseboard.ElecUseRate,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 thisBaseboard.EquipName);
         }
     }

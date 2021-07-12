@@ -963,29 +963,29 @@ void GetFanInput(EnergyPlusData &state)
                             "Fan Electricity Rate",
                             OutputProcessor::Unit::W,
                             Fan(FanNum).FanPower,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             Fan(FanNum).FanName);
         SetupOutputVariable(state,
                             "Fan Rise in Air Temperature",
                             OutputProcessor::Unit::deltaC,
                             Fan(FanNum).DeltaTemp,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             Fan(FanNum).FanName);
         SetupOutputVariable(state,
                             "Fan Heat Gain to Air",
                             OutputProcessor::Unit::W,
                             Fan(FanNum).PowerLossToAir,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             Fan(FanNum).FanName);
         SetupOutputVariable(state,
                             "Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             Fan(FanNum).FanEnergy,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Sum,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Summed,
                             Fan(FanNum).FanName,
                             _,
                             "Electricity",
@@ -996,23 +996,23 @@ void GetFanInput(EnergyPlusData &state)
                             "Fan Air Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             Fan(FanNum).OutletAirMassFlowRate,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             Fan(FanNum).FanName);
         if ((Fan(FanNum).FanType_Num == FanType_ZoneExhaust) && (Fan(FanNum).BalancedFractSchedNum > 0)) {
             SetupOutputVariable(state,
                                 "Fan Unbalanced Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 Fan(FanNum).UnbalancedOutletMassFlowRate,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 Fan(FanNum).FanName);
             SetupOutputVariable(state,
                                 "Fan Balanced Air Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 Fan(FanNum).BalancedOutletMassFlowRate,
-                                OutputProcessor::eTimeStepType::System,
-                                OutputProcessor::eVariableType::Average,
+                                OutputProcessor::TimeStepType::TimeStepSystem,
+                                OutputProcessor::StoreType::Averaged,
                                 Fan(FanNum).FanName);
         }
 
@@ -1054,8 +1054,8 @@ void GetFanInput(EnergyPlusData &state)
                             "Fan Runtime Fraction",
                             OutputProcessor::Unit::None,
                             Fan(FanNum).FanRuntimeFraction,
-                            OutputProcessor::eTimeStepType::System,
-                            OutputProcessor::eVariableType::Average,
+                            OutputProcessor::TimeStepType::TimeStepSystem,
+                            OutputProcessor::StoreType::Averaged,
                             Fan(FanNum).FanName);
     }
 
