@@ -4190,7 +4190,7 @@ namespace OutputProcessor {
         case ReportingFrequency::Monthly: //  3
             print_meter(state, 9);
             break;
-        case ReportingFrequency::Yearly: //  5
+        case ReportingFrequency::Yearly:     //  5
         case ReportingFrequency::Simulation: //  4
             print_meter(state, 11);
             break;

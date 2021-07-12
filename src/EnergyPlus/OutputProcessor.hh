@@ -53,11 +53,12 @@
 #include <map>
 #include <unordered_map>
 
-// ObjexxFCL Headers
+// Third Party Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
+//#include <GSL/span.h>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -84,7 +85,13 @@ namespace OutputProcessor {
         Plant = 4,
         Num
     };
-    //inline int getEnumerationValue(std::string_view s, gsl::span<std::string_view>, sList)
+    // TODO: Move this general purpose routine to UtilityRoutines or something
+    //    inline unsigned int getEnumerationIndex(std::string_view s, gsl::span<std::string_view> sList) {
+    //        for (unsigned int i; i < sList.size(); ++i) {
+    //            if (sList[i] == s) return i;
+    //        }
+    //        return -1;
+    //    }
     std::array<std::string_view, static_cast<int>(eTimeStepType::Num)> constexpr sTimeStepType = {"Zone", "HeatBalance", "HVAC", "System", "Plant"};
 
     enum class eVariableType : int
@@ -276,194 +283,194 @@ namespace OutputProcessor {
     struct TimeSteps
     {
         Real64 *TimeStep = nullptr; // fortran POINTER Pointer to the Actual Time Step Variable (Zone or HVAC)
-        Real64 CurMinute = 0.0; // Current minute (decoded from real Time Step Value)
+        Real64 CurMinute = 0.0;     // Current minute (decoded from real Time Step Value)
     };
 
     struct RealVariables
     {
-        Real64 *Which = nullptr;       // The POINTER to the actual variable holding the value
-        Real64 Value = 0.0;        // Current Value of the variable (to resolution of Zone Time Step)
-        Real64 TSValue = 0.0;      // Value of this variable at the Zone Time Step
-        Real64 EITSValue = 0.0;    // Value of this variable at the Zone Time Step for external interface
-        Real64 StoreValue = 0.0;   // At end of Zone Time Step, value is placed here for later reporting
-        Real64 NumStored = 0.0;    // Number of hours stored // TODO: Why is this a float?
+        Real64 *Which = nullptr;                   // The POINTER to the actual variable holding the value
+        Real64 Value = 0.0;                        // Current Value of the variable (to resolution of Zone Time Step)
+        Real64 TSValue = 0.0;                      // Value of this variable at the Zone Time Step
+        Real64 EITSValue = 0.0;                    // Value of this variable at the Zone Time Step for external interface
+        Real64 StoreValue = 0.0;                   // At end of Zone Time Step, value is placed here for later reporting
+        Real64 NumStored = 0.0;                    // Number of hours stored // TODO: Why is this a float?
         StoreType storeType = StoreType::Averaged; // Variable Type (Summed/Non-Static or Average/Static)
-        bool Stored = false;         // True when value is stored
-        bool Report = false;         // User has requested reporting of this variable in the IDF
-        bool tsStored = false;       // if stored for this zone timestep
-        bool thisTSStored = false;   // if stored for this zone timestep
+        bool Stored = false;                       // True when value is stored
+        bool Report = false;                       // User has requested reporting of this variable in the IDF
+        bool tsStored = false;                     // if stored for this zone timestep
+        bool thisTSStored = false;                 // if stored for this zone timestep
         int thisTSCount = 0;
         ReportingFrequency frequency = ReportingFrequency::Hourly; // How often to report this variable
-        Real64 MaxValue = -9999.0;              // Maximum reporting (only for Averaged variables, and those greater than Time Step)
-        int maxValueDate = 0;             // Date stamp of maximum
-        Real64 MinValue = 9999.0;              // Minimum reporting (only for Averaged variables, and those greater than Time Step)
-        int minValueDate = 0;             // Date stamp of minimum
-        int ReportID = 0;                 // Report variable ID number
-        std::string ReportIDChr;      // Report variable ID number (character -- for printing)
-        int SchedPtr = 0;                 // If scheduled, this points to the schedule
-        int MeterArrayPtr = 0;            // If metered, this points to an array of applicable meters
-        int ZoneMult = 1;                 // If metered, Zone Multiplier is applied
-        int ZoneListMult = 1;             // If metered, Zone List Multiplier is applied
+        Real64 MaxValue = -9999.0; // Maximum reporting (only for Averaged variables, and those greater than Time Step)
+        int maxValueDate = 0;      // Date stamp of maximum
+        Real64 MinValue = 9999.0;  // Minimum reporting (only for Averaged variables, and those greater than Time Step)
+        int minValueDate = 0;      // Date stamp of minimum
+        int ReportID = 0;          // Report variable ID number
+        std::string ReportIDChr;   // Report variable ID number (character -- for printing)
+        int SchedPtr = 0;          // If scheduled, this points to the schedule
+        int MeterArrayPtr = 0;     // If metered, this points to an array of applicable meters
+        int ZoneMult = 1;          // If metered, Zone Multiplier is applied
+        int ZoneListMult = 1;      // If metered, Zone List Multiplier is applied
     };
 
     struct IntegerVariables
     {
-        int *Which = nullptr;          // The POINTER to the actual variable holding the value
-        Real64 Value = 0.0;        // Current Value of the variable (to resolution of Zone Time Step)
-        Real64 TSValue = 0.0;      // Value of this variable at the Zone Time Step
-        Real64 EITSValue = 0.0;    // Value of this variable at the Zone Time Step for external interface
-        Real64 StoreValue = 0.0;   // At end of Zone Time Step, value is placed here for later reporting
-        Real64 NumStored = 0.0;    // Number of hours stored // TODO: Why is this a float?
+        int *Which = nullptr;                      // The POINTER to the actual variable holding the value
+        Real64 Value = 0.0;                        // Current Value of the variable (to resolution of Zone Time Step)
+        Real64 TSValue = 0.0;                      // Value of this variable at the Zone Time Step
+        Real64 EITSValue = 0.0;                    // Value of this variable at the Zone Time Step for external interface
+        Real64 StoreValue = 0.0;                   // At end of Zone Time Step, value is placed here for later reporting
+        Real64 NumStored = 0.0;                    // Number of hours stored // TODO: Why is this a float?
         StoreType storeType = StoreType::Averaged; // Variable Type (Summed/Non-Static or Average/Static)
-        bool Stored = false;         // True when value is stored
-        bool Report = false;         // User has requested reporting of this variable in the IDF
-        bool tsStored = false;       // if stored for this zone timestep
-        bool thisTSStored = false;   // if stored for this zone timestep
+        bool Stored = false;                       // True when value is stored
+        bool Report = false;                       // User has requested reporting of this variable in the IDF
+        bool tsStored = false;                     // if stored for this zone timestep
+        bool thisTSStored = false;                 // if stored for this zone timestep
         int thisTSCount = 0;
         ReportingFrequency frequency = ReportingFrequency::Hourly; // How often to report this variable
-        int MaxValue = -9999;                 // Maximum reporting (only for Averaged variables, and those greater than Time Step)
-        int maxValueDate = 0;             // Date stamp of maximum
-        int MinValue = 9999;                 // Minimum reporting (only for Averaged variables, and those greater than Time Step)
-        int minValueDate = 0;             // Date stamp of minimum
-        int ReportID = 0;                 // Report variable ID number
-        std::string ReportIDChr;      // Report variable ID number (character -- for printing)
-        int SchedPtr = 0;                 // If scheduled, this points to the schedule
+        int MaxValue = -9999;    // Maximum reporting (only for Averaged variables, and those greater than Time Step)
+        int maxValueDate = 0;    // Date stamp of maximum
+        int MinValue = 9999;     // Minimum reporting (only for Averaged variables, and those greater than Time Step)
+        int minValueDate = 0;    // Date stamp of minimum
+        int ReportID = 0;        // Report variable ID number
+        std::string ReportIDChr; // Report variable ID number (character -- for printing)
+        int SchedPtr = 0;        // If scheduled, this points to the schedule
     };
 
     struct VariableTypeForDDOutput
     {
-        TimeStepType timeStepType = TimeStepType::TimeStepZone;     // Type whether Zone or HVAC
-        StoreType storeType = StoreType::Averaged;           // Variable Type (Summed/Non-Static or Average/Static)
-        VariableType variableType = VariableType::NotFound;     // Integer, Real.
-        int Next = 0;                      // Next variable of same name (different units)
-        bool ReportedOnDDFile = false;         // true after written to .rdd/.mdd file
-        std::string VarNameOnly;       // Name of Variable
-        OutputProcessor::Unit units = OutputProcessor::Unit::None;   // Units for Variable
-        std::string unitNameCustomEMS; // name of units when customEMS is used for EMS variables that are unusual
+        TimeStepType timeStepType = TimeStepType::TimeStepZone;    // Type whether Zone or HVAC
+        StoreType storeType = StoreType::Averaged;                 // Variable Type (Summed/Non-Static or Average/Static)
+        VariableType variableType = VariableType::NotFound;        // Integer, Real.
+        int Next = 0;                                              // Next variable of same name (different units)
+        bool ReportedOnDDFile = false;                             // true after written to .rdd/.mdd file
+        std::string VarNameOnly;                                   // Name of Variable
+        OutputProcessor::Unit units = OutputProcessor::Unit::None; // Units for Variable
+        std::string unitNameCustomEMS;                             // name of units when customEMS is used for EMS variables that are unusual
     };
 
     struct RealVariableType
     {
-        TimeStepType timeStepType = TimeStepType::TimeStepZone;     // Type whether Zone or HVAC
-        StoreType storeType = StoreType::Averaged;           // Variable Type (Summed/Non-Static or Average/Static)
-        int ReportID = 0;                  // Report variable ID number
-        std::string VarName;           // Name of Variable key:variable
-        std::string VarNameUC;         // Name of Variable (Uppercase)
-        std::string VarNameOnly;       // Name of Variable
-        std::string VarNameOnlyUC;     // Name of Variable with out key in uppercase
-        std::string KeyNameOnlyUC;     // Name of key only witht out variable in uppercase
-        OutputProcessor::Unit units = OutputProcessor::Unit::None;   // Units for Variable
-        std::string unitNameCustomEMS; // name of units when customEMS is used for EMS variables that are unusual
-        RealVariables VarPtr;          // Pointer used to real Variables structure
+        TimeStepType timeStepType = TimeStepType::TimeStepZone;    // Type whether Zone or HVAC
+        StoreType storeType = StoreType::Averaged;                 // Variable Type (Summed/Non-Static or Average/Static)
+        int ReportID = 0;                                          // Report variable ID number
+        std::string VarName;                                       // Name of Variable key:variable
+        std::string VarNameUC;                                     // Name of Variable (Uppercase)
+        std::string VarNameOnly;                                   // Name of Variable
+        std::string VarNameOnlyUC;                                 // Name of Variable with out key in uppercase
+        std::string KeyNameOnlyUC;                                 // Name of key only witht out variable in uppercase
+        OutputProcessor::Unit units = OutputProcessor::Unit::None; // Units for Variable
+        std::string unitNameCustomEMS;                             // name of units when customEMS is used for EMS variables that are unusual
+        RealVariables VarPtr;                                      // Pointer used to real Variables structure
     };
 
     struct IntegerVariableType
     {
-        TimeStepType timeStepType = TimeStepType::TimeStepZone;   // Type whether Zone or HVAC
-        StoreType storeType = StoreType::Averaged;         // Variable Type (Summed/Non-Static or Average/Static)
-        int ReportID = 0;                // Report variable ID number
-        std::string VarName;         // Name of Variable
-        std::string VarNameUC;       // Name of Variable
-        std::string VarNameOnly;     // Name of Variable
-        std::string VarNameOnlyUC;   // Name of Variable with out key in uppercase
-        std::string KeyNameOnlyUC;   // Name of key only witht out variable in uppercase
+        TimeStepType timeStepType = TimeStepType::TimeStepZone;    // Type whether Zone or HVAC
+        StoreType storeType = StoreType::Averaged;                 // Variable Type (Summed/Non-Static or Average/Static)
+        int ReportID = 0;                                          // Report variable ID number
+        std::string VarName;                                       // Name of Variable
+        std::string VarNameUC;                                     // Name of Variable
+        std::string VarNameOnly;                                   // Name of Variable
+        std::string VarNameOnlyUC;                                 // Name of Variable with out key in uppercase
+        std::string KeyNameOnlyUC;                                 // Name of key only witht out variable in uppercase
         OutputProcessor::Unit units = OutputProcessor::Unit::None; // Units for Variable
-        IntegerVariables VarPtr;     // Pointer used to integer Variables structure
+        IntegerVariables VarPtr;                                   // Pointer used to integer Variables structure
     };
 
     struct ReqReportVariables // Structure for requested Report Variables
     {
-        std::string Key;              // Could be blank or "*"
-        std::string VarName;          // Name of Variable
+        std::string Key;                                           // Could be blank or "*"
+        std::string VarName;                                       // Name of Variable
         ReportingFrequency frequency = ReportingFrequency::Hourly; // Reporting Frequency
-        int SchedPtr = 0;                 // Index of the Schedule
-        std::string SchedName;        // Schedule Name
-        bool Used = false;                    // True when this combination (key, varname, frequency) has been set
+        int SchedPtr = 0;                                          // Index of the Schedule
+        std::string SchedName;                                     // Schedule Name
+        bool Used = false;                                         // True when this combination (key, varname, frequency) has been set
     };
 
     struct MeterArrayType
     {
-        int NumOnMeters = 0;            // Number of OnMeter Entries for variable
-        int RepVariable = 0;            // Backwards pointer to real Variable
-        Array1D_int OnMeters = Array1D_int(6, 0);       // Forward pointer to Meter Numbers
-        int NumOnCustomMeters = 0;      // Number of OnCustomMeter Entries for variable
-        Array1D_int OnCustomMeters; // Forward pointer to Custom Meter Numbers
+        int NumOnMeters = 0;                      // Number of OnMeter Entries for variable
+        int RepVariable = 0;                      // Backwards pointer to real Variable
+        Array1D_int OnMeters = Array1D_int(6, 0); // Forward pointer to Meter Numbers
+        int NumOnCustomMeters = 0;                // Number of OnCustomMeter Entries for variable
+        Array1D_int OnCustomMeters;               // Forward pointer to Custom Meter Numbers
     };
 
     struct MeterType
     {
-        std::string Name;                          // Name of the meter
-        std::string ResourceType;                  // Resource Type of the meter
-        std::string EndUse;                        // End Use of the meter
-        std::string EndUseSub;                     // End Use subcategory of the meter
-        std::string Group;                         // Group of the meter
-        OutputProcessor::Unit Units = OutputProcessor::Unit::None;               // Units for the Meter
+        std::string Name;                                                                    // Name of the meter
+        std::string ResourceType;                                                            // Resource Type of the meter
+        std::string EndUse;                                                                  // End Use of the meter
+        std::string EndUseSub;                                                               // End Use subcategory of the meter
+        std::string Group;                                                                   // Group of the meter
+        OutputProcessor::Unit Units = OutputProcessor::Unit::None;                           // Units for the Meter
         OutputProcessor::RT_IPUnits RT_forIPUnits = OutputProcessor::RT_IPUnits::Unassigned; // Resource type number for IP Units (tabular) reporting
-        MtrType TypeOfMeter = MtrType::Normal;                       // type of meter
-        int SourceMeter = 0;                           // for custom decrement meters, this is the meter number for the subtraction
+        MtrType TypeOfMeter = MtrType::Normal;                                               // type of meter
+        int SourceMeter = 0; // for custom decrement meters, this is the meter number for the subtraction
 
-        Real64 TSValue = 0.0;          // TimeStep Value
-        Real64 CurTSValue = 0.0;       // Current TimeStep Value (internal access)
-        bool RptTS = false;              // Report at End of TimeStep (Zone)
-        bool RptTSFO = false;            // Report at End of TimeStep (Zone) -- meter file only
-        int TSRptNum = 0;            // Report Number for TS Values
+        Real64 TSValue = 0.0;    // TimeStep Value
+        Real64 CurTSValue = 0.0; // Current TimeStep Value (internal access)
+        bool RptTS = false;      // Report at End of TimeStep (Zone)
+        bool RptTSFO = false;    // Report at End of TimeStep (Zone) -- meter file only
+        int TSRptNum = 0;        // Report Number for TS Values
         std::string TSRptNumChr; // Report Number for TS Values (character -- for printing)
 
-        Real64 HRValue = 0.0;          // Hourly Value
-        bool RptHR = false;              // Report at End of Hour
-        bool RptHRFO = false;            // Report at End of Hour -- meter file only
-        Real64 HRMaxVal = -99999.0;         // Maximum Value (Hour)
-        int HRMaxValDate = 0;        // Date stamp of maximum
-        Real64 HRMinVal = 99999.0;         // Minimum Value (Hour)
-        int HRMinValDate = 0;        // Date stamp of minimum
-        int HRRptNum = 0;            // Report Number for HR Values
-        std::string HRRptNumChr; // Report Number for HR Values (character -- for printing)
+        Real64 HRValue = 0.0;       // Hourly Value
+        bool RptHR = false;         // Report at End of Hour
+        bool RptHRFO = false;       // Report at End of Hour -- meter file only
+        Real64 HRMaxVal = -99999.0; // Maximum Value (Hour)
+        int HRMaxValDate = 0;       // Date stamp of maximum
+        Real64 HRMinVal = 99999.0;  // Minimum Value (Hour)
+        int HRMinValDate = 0;       // Date stamp of minimum
+        int HRRptNum = 0;           // Report Number for HR Values
+        std::string HRRptNumChr;    // Report Number for HR Values (character -- for printing)
 
-        Real64 DYValue = 0.0;          // Daily Value
-        bool RptDY = false;              // Report at End of Day
-        bool RptDYFO = false;            // Report at End of Day -- meter file only
-        Real64 DYMaxVal = -99999.0;         // Maximum Value (Day)
-        int DYMaxValDate = 0;        // Date stamp of maximum
-        Real64 DYMinVal = 99999.0;         // Minimum Value (Day)
-        int DYMinValDate = 0;        // Date stamp of minimum
-        int DYRptNum = 0;            // Report Number for DY Values
-        std::string DYRptNumChr; // Report Number for DY Values (character -- for printing)
+        Real64 DYValue = 0.0;       // Daily Value
+        bool RptDY = false;         // Report at End of Day
+        bool RptDYFO = false;       // Report at End of Day -- meter file only
+        Real64 DYMaxVal = -99999.0; // Maximum Value (Day)
+        int DYMaxValDate = 0;       // Date stamp of maximum
+        Real64 DYMinVal = 99999.0;  // Minimum Value (Day)
+        int DYMinValDate = 0;       // Date stamp of minimum
+        int DYRptNum = 0;           // Report Number for DY Values
+        std::string DYRptNumChr;    // Report Number for DY Values (character -- for printing)
 
-        Real64 MNValue = 0.0;          // Monthly Value
-        bool RptMN = false;              // Report at End of Month
-        bool RptMNFO = false;            // Report at End of Month -- meter file only
-        Real64 MNMaxVal = -99999.0;         // Maximum Value (Month)
-        int MNMaxValDate = 0;        // Date stamp of maximum
-        Real64 MNMinVal = 99999.0;         // Minimum Value (Month)
-        int MNMinValDate = 0;        // Date stamp of minimum
-        int MNRptNum = 0;            // Report Number for MN Values
-        std::string MNRptNumChr; // Report Number for MN Values (character -- for printing)
+        Real64 MNValue = 0.0;       // Monthly Value
+        bool RptMN = false;         // Report at End of Month
+        bool RptMNFO = false;       // Report at End of Month -- meter file only
+        Real64 MNMaxVal = -99999.0; // Maximum Value (Month)
+        int MNMaxValDate = 0;       // Date stamp of maximum
+        Real64 MNMinVal = 99999.0;  // Minimum Value (Month)
+        int MNMinValDate = 0;       // Date stamp of minimum
+        int MNRptNum = 0;           // Report Number for MN Values
+        std::string MNRptNumChr;    // Report Number for MN Values (character -- for printing)
 
-        Real64 YRValue = 0.0;          // Yearly Value
-        bool RptYR = false;              // Report at End of Year
-        bool RptYRFO = false;            // Report at End of Year
-        Real64 YRMaxVal = -99999.0;         // Maximum Value (Yearly)
-        int YRMaxValDate = 0;        // Date stamp of maximum
-        Real64 YRMinVal = 99999.0;         // Minimum Value (Yearly)
-        int YRMinValDate = 0;        // Date stamp of minimum
-        int YRRptNum = 0;            // Report Number for YR Values
-        std::string YRRptNumChr; // Report Number for YR Values (character -- for printing)
+        Real64 YRValue = 0.0;       // Yearly Value
+        bool RptYR = false;         // Report at End of Year
+        bool RptYRFO = false;       // Report at End of Year
+        Real64 YRMaxVal = -99999.0; // Maximum Value (Yearly)
+        int YRMaxValDate = 0;       // Date stamp of maximum
+        Real64 YRMinVal = 99999.0;  // Minimum Value (Yearly)
+        int YRMinValDate = 0;       // Date stamp of minimum
+        int YRRptNum = 0;           // Report Number for YR Values
+        std::string YRRptNumChr;    // Report Number for YR Values (character -- for printing)
 
-        Real64 SMValue = 0.0;          // Simulation Value
-        bool RptSM = false;              // Report at End of Environment/Simulation
-        bool RptSMFO = false;            // Report at End of Environment/Simulation -- meter file only
-        Real64 SMMaxVal = -99999.0;         // Maximum Value (Sim)
-        int SMMaxValDate = 0;        // Date stamp of maximum
-        Real64 SMMinVal = 99999.0;         // Minimum Value (Sim)
-        int SMMinValDate = 0;        // Date stamp of minimum
-        int SMRptNum = 0;            // Report Number for SM Values
-        std::string SMRptNumChr; // Report Number for SM Values (character -- for printing)
+        Real64 SMValue = 0.0;       // Simulation Value
+        bool RptSM = false;         // Report at End of Environment/Simulation
+        bool RptSMFO = false;       // Report at End of Environment/Simulation -- meter file only
+        Real64 SMMaxVal = -99999.0; // Maximum Value (Sim)
+        int SMMaxValDate = 0;       // Date stamp of maximum
+        Real64 SMMinVal = 99999.0;  // Minimum Value (Sim)
+        int SMMinValDate = 0;       // Date stamp of minimum
+        int SMRptNum = 0;           // Report Number for SM Values
+        std::string SMRptNumChr;    // Report Number for SM Values (character -- for printing)
 
-        Real64 FinYrSMValue = 0.0;     // Final Year Simulation Value
-        Real64 FinYrSMMaxVal = -99999.0;    // Maximum Value (Sim)
-        int FinYrSMMaxValDate = 0;   // Date stamp of maximum
-        Real64 FinYrSMMinVal = 99999.0;    // Minimum Value (Sim)
-        int FinYrSMMinValDate = 0;   // Date stamp of minimum
+        Real64 FinYrSMValue = 0.0;       // Final Year Simulation Value
+        Real64 FinYrSMMaxVal = -99999.0; // Maximum Value (Sim)
+        int FinYrSMMaxValDate = 0;       // Date stamp of maximum
+        Real64 FinYrSMMinVal = 99999.0;  // Minimum Value (Sim)
+        int FinYrSMMinValDate = 0;       // Date stamp of minimum
         bool RptAccTS = false;           // Report Cumulative Meter at Time Step
         bool RptAccTSFO = false;         // Report Cumulative Meter at Time Step -- meter file only
         bool RptAccHR = false;           // Report Cumulative Meter at Hour
@@ -476,14 +483,14 @@ namespace OutputProcessor {
         bool RptAccYRFO = false;         // Report Cumulative Meter at Year -- meter file only
         bool RptAccSM = false;           // Report Cumulative Meter at Run Period
         bool RptAccSMFO = false;         // Report Cumulative Meter at Run Period -- meter file only
-        int TSAccRptNum = 0;         // Report Number for Acc Values
-        int HRAccRptNum = 0;         // Report Number for Acc Values
-        int DYAccRptNum = 0;         // Report Number for Acc Values
-        int MNAccRptNum = 0;         // Report Number for Acc Values
-        int YRAccRptNum = 0;         // Report Number for Acc Values
-        int SMAccRptNum = 0;         // Report Number for Acc Values
-        int InstMeterCacheStart = 0; // index of the beginning of the instant meter cache
-        int InstMeterCacheEnd = 0;   // index of the end of the instant meter cache
+        int TSAccRptNum = 0;             // Report Number for Acc Values
+        int HRAccRptNum = 0;             // Report Number for Acc Values
+        int DYAccRptNum = 0;             // Report Number for Acc Values
+        int MNAccRptNum = 0;             // Report Number for Acc Values
+        int YRAccRptNum = 0;             // Report Number for Acc Values
+        int SMAccRptNum = 0;             // Report Number for Acc Values
+        int InstMeterCacheStart = 0;     // index of the beginning of the instant meter cache
+        int InstMeterCacheEnd = 0;       // index of the end of the instant meter cache
     };
 
     struct EndUseCategoryType
