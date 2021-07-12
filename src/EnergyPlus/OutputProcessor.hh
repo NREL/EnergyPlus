@@ -76,6 +76,7 @@ namespace OutputProcessor {
 
     enum class eTimeStepType : int
     {
+        Invalid = -1,
         Zone = 0,
         HeatBalance = 1,
         HVAC = 2,
@@ -83,10 +84,12 @@ namespace OutputProcessor {
         Plant = 4,
         Num
     };
+    //inline int getEnumerationValue(std::string_view s, gsl::span<std::string_view>, sList)
     std::array<std::string_view, static_cast<int>(eTimeStepType::Num)> constexpr sTimeStepType = {"Zone", "HeatBalance", "HVAC", "System", "Plant"};
 
     enum class eVariableType : int
     {
+        Invalid = -1,
         Average = 0,
         Sum = 1,
         Num
@@ -456,11 +459,6 @@ namespace OutputProcessor {
         int SMRptNum = 0;            // Report Number for SM Values
         std::string SMRptNumChr; // Report Number for SM Values (character -- for printing)
 
-        Real64 LastSMValue = 0.0;      // Simulation Value
-        Real64 LastSMMaxVal = -99999.0;     // Maximum Value (Sim)
-        int LastSMMaxValDate = 0;    // Date stamp of maximum
-        Real64 LastSMMinVal = 99999.0;     // Minimum Value (Sim)
-        int LastSMMinValDate = 0;    // Date stamp of minimum
         Real64 FinYrSMValue = 0.0;     // Final Year Simulation Value
         Real64 FinYrSMMaxVal = -99999.0;    // Maximum Value (Sim)
         int FinYrSMMaxValDate = 0;   // Date stamp of maximum

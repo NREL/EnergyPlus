@@ -653,7 +653,7 @@ namespace OutputProcessor {
         op->GetOutputInputFlag = false;
 
         // First check environment variable to see of possible override for minimum reporting frequency
-        if (state.dataSysVars->MinReportFrequency != "") {
+        if (!state.dataSysVars->MinReportFrequency.empty()) {
             // Formats
             static constexpr auto Format_800("! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n");
             static constexpr auto Format_801(" Minimum Reporting Frequency, {},{}\n");
@@ -777,8 +777,6 @@ namespace OutputProcessor {
             StrOut = format(MonthFormat, strip(String), Day, Hour, Minute);
             break;
         case ReportingFrequency::Yearly:
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
-            break;
         case ReportingFrequency::Simulation:
             StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, Minute);
             break;
@@ -3289,11 +3287,12 @@ namespace OutputProcessor {
 
         PrintTimeStamp = true;
         for (Loop = 1; Loop <= op->NumEnergyMeters; ++Loop) {
-            op->EnergyMeters(Loop).LastSMValue = op->EnergyMeters(Loop).SMValue;
-            op->EnergyMeters(Loop).LastSMMinVal = op->EnergyMeters(Loop).SMMinVal;
-            op->EnergyMeters(Loop).LastSMMinValDate = op->EnergyMeters(Loop).SMMinValDate;
-            op->EnergyMeters(Loop).LastSMMaxVal = op->EnergyMeters(Loop).SMMaxVal;
-            op->EnergyMeters(Loop).LastSMMaxValDate = op->EnergyMeters(Loop).SMMaxValDate;
+            // these were assigned but never accessed
+            //            op->EnergyMeters(Loop).LastSMValue = op->EnergyMeters(Loop).SMValue;
+            //            op->EnergyMeters(Loop).LastSMMinVal = op->EnergyMeters(Loop).SMMinVal;
+            //            op->EnergyMeters(Loop).LastSMMinValDate = op->EnergyMeters(Loop).SMMinValDate;
+            //            op->EnergyMeters(Loop).LastSMMaxVal = op->EnergyMeters(Loop).SMMaxVal;
+            //            op->EnergyMeters(Loop).LastSMMaxValDate = op->EnergyMeters(Loop).SMMaxValDate;
             if (!op->EnergyMeters(Loop).RptSM && !op->EnergyMeters(Loop).RptAccSM) continue;
             if (PrintTimeStamp) {
                 WriteTimeStampFormatData(state,
@@ -3662,7 +3661,7 @@ namespace OutputProcessor {
 
             const std::string mtrUnitString = unitEnumToStringBrackets(op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).units);
 
-            std::string Multipliers = "";
+            std::string Multipliers;
             const auto ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
             const auto ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
@@ -4192,8 +4191,6 @@ namespace OutputProcessor {
             print_meter(state, 9);
             break;
         case ReportingFrequency::Yearly: //  5
-            print_meter(state, 11);
-            break;
         case ReportingFrequency::Simulation: //  4
             print_meter(state, 11);
             break;
@@ -5117,7 +5114,7 @@ namespace OutputProcessor {
             return OutputProcessor::Unit::J;
         } else if (unitUpper == "DELTAC") {
             return OutputProcessor::Unit::deltaC;
-        } else if (unitUpper == "") {
+        } else if (unitUpper.empty()) {
             return OutputProcessor::Unit::None;
         } else if (unitUpper == "W") {
             return OutputProcessor::Unit::W;
@@ -5369,7 +5366,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         auto &thisRvar = op->RVariableTypes(CV);
         thisRvar.timeStepType = TimeStepType;
         thisRvar.storeType = VariableType;
-        thisRvar.VarName = KeyedValue + ':' + VarName;
+        thisRvar.VarName = format("{}:{}", KeyedValue, VarName);
         thisRvar.VarNameOnly = VarName;
         thisRvar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisRvar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisRvar.VarName);
@@ -5410,13 +5407,13 @@ void SetupOutputVariable(EnergyPlusData &state,
             if (OnMeter) {
                 if (VariableType == StoreType::Averaged) {
                     ShowSevereError(state, "Meters can only be \"Summed\" variables");
-                    ShowContinueError(state, "..reference variable=" + KeyedValue + ':' + VariableName);
+                    ShowContinueError(state, format("..reference variable={}:{}", KeyedValue, VariableName));
                 } else {
                     Unit mtrUnits = op->RVariableTypes(CV).units;
                     bool ErrorsFound = false;
                     AttachMeters(state, mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
-                        ShowContinueError(state, "Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
+                        ShowContinueError(state, format("Invalid Meter spec for variable={}:{}", KeyedValue, VariableName));
                         op->ErrorsLogged = true;
                     }
                 }
@@ -5558,7 +5555,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         auto &thisIVar = op->IVariableTypes(CV);
         thisIVar.timeStepType = TimeStepType;
         thisIVar.storeType = VariableType;
-        thisIVar.VarName = KeyedValue + ':' + VarName;
+        thisIVar.VarName = format("{}:{}", KeyedValue, VarName);
         thisIVar.VarNameOnly = VarName;
         thisIVar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
@@ -6433,7 +6430,7 @@ void GenOutputVariablesAuditReport(EnergyPlusData &state)
         if (op->ReqRepVars(Loop).Key.empty()) op->ReqRepVars(Loop).Key = "*";
         if (has(op->ReqRepVars(Loop).VarName, "OPAQUE SURFACE INSIDE FACE CONDUCTION") && !state.dataGlobal->DisplayAdvancedReportVariables &&
             !state.dataOutputProcessor->OpaqSurfWarned) {
-            ShowWarningError(state, "Variables containing \"Opaque Surface Inside Face Conduction\" are now \"advanced\" variables.");
+            ShowWarningError(state, R"(Variables containing "Opaque Surface Inside Face Conduction" are now "advanced" variables.)");
             ShowContinueError(state, "You must enter the \"Output:Diagnostics,DisplayAdvancedReportVariables;\" statement to view.");
             ShowContinueError(state, "First, though, read cautionary statements in the \"InputOutputReference\" document.");
             state.dataOutputProcessor->OpaqSurfWarned = true;
@@ -7448,9 +7445,7 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
     auto &op(state.dataOutputProcessor);
 
     // Select based on variable type:  integer, real, or meter
-    if (varType == VariableType::NotFound) { // Variable not a found variable
-        resultVal = 0.0;
-    } else if (varType == VariableType::Integer) {
+    if (varType == VariableType::Integer) {
         if (keyVarIndex > op->NumOfIVariable) {
             ShowFatalError(state, "GetInternalVariableValue: Integer variable passed index beyond range of array.");
             ShowContinueError(state, format("Index = {} Number of integer variables = {}", keyVarIndex, op->NumOfIVariable));
@@ -7477,6 +7472,7 @@ Real64 GetInternalVariableValue(EnergyPlusData &state,
     } else if (varType == VariableType::Schedule) {
         resultVal = GetCurrentScheduleValue(state, keyVarIndex);
     } else {
+        // VariableType::NotFound or other...
         resultVal = 0.0;
     }
 
@@ -7532,9 +7528,7 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
     auto &op(state.dataOutputProcessor);
 
     // Select based on variable type:  integer, REAL(r64), or meter
-    if (varType == VariableType::NotFound) { // Variable not a found variable
-        resultVal = 0.0;
-    } else if (varType == VariableType::Integer) {
+    if (varType == VariableType::Integer) {
         if (keyVarIndex > op->NumOfIVariable) {
             ShowFatalError(state, "GetInternalVariableValueExternalInterface: passed index beyond range of array.");
         }
@@ -7559,6 +7553,7 @@ Real64 GetInternalVariableValueExternalInterface(EnergyPlusData &state,
     } else if (varType == VariableType::Schedule) {
         resultVal = GetCurrentScheduleValue(state, keyVarIndex);
     } else {
+        // VariableType::NotFound or other
         resultVal = 0.0;
     }
 
@@ -7679,7 +7674,7 @@ void GetMeteredVariables(EnergyPlusData &state,
 
         } else {
             ShowWarningError(state,
-                             "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
+                             format("Referenced variable or meter used in the wrong context \"{}\" of type \"{}\"", ComponentName, ComponentType));
         }
     }
 
@@ -7763,7 +7758,7 @@ void GetMeteredVariables(EnergyPlusData &state,
 
         } else {
             ShowWarningError(state,
-                             "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
+                             format("Referenced variable or meter used in the wrong context \"{}\" of type \"{}\"", ComponentName, ComponentType));
         }
     }
 }
