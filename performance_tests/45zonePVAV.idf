@@ -19761,8 +19761,7 @@
   AirLoopHVAC:OutdoorAirSystem,
     PACKAGED VAV WITH REHEAT_OA,  !- Name
     PACKAGED VAV WITH REHEAT_OA_Controllers,  !- Controller List Name
-    PACKAGED VAV WITH REHEAT_OA_Equipment,  !- Outdoor Air Equipment List Name
-    PACKAGED VAV WITH REHEAT Availability Manager List;  !- Availability Manager List Name
+    PACKAGED VAV WITH REHEAT_OA_Equipment;  !- Outdoor Air Equipment List Name
 
   OutdoorAir:NodeList,
     PACKAGED VAV WITH REHEAT_OANode List;  !- Node or NodeList Name 1

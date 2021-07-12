@@ -2405,7 +2405,7 @@
   Branch,
     VAV SYS 1 Main Branch,   !- Name
     ,                        !- Pressure Drop Curve Name
-    w,  !- Component 1 Object Type
+    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
     VAV SYS 1 OA System,     !- Component 1 Name
     VAV SYS 1 Air Loop Inlet,!- Component 1 Inlet Node Name
     VAV SYS 1 Mixed Air Outlet,  !- Component 1 Outlet Node Name
