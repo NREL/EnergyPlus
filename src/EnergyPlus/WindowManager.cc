@@ -3152,12 +3152,13 @@ namespace WindowManager {
     //****************************************************************************
 
     void GetHeatBalanceEqCoefMatrixSimple(EnergyPlusData &state,
-                                          int const ConstrNum,
-                                          int const nglasslayer,
-                                          Array2D<Real64> &Aface,
-                                          Array1D<Real64> &Bface,
-                                          Array1D<Real64> hr,
-                                          Array1A<Real64> hgap)
+                                          Real64 adjRatio,        // Convective and radiative coefficient adjustment ratio
+                                          int const nglasslayer,  // Number of glass layers
+                                          Array2D<Real64> &Aface, // Coefficient in equation Aface*thetas = Bface
+                                          Array1D<Real64> &Bface, // Coefficient in equation Aface*thetas = Bface
+                                          Array1D<Real64> hr,     // Radiative conductance (W/m2-K)
+                                          Array1A<Real64> hgap    // Gap gas conductive conductance (W/m2-K)
+    )
     {
         Real64 gr;  // Grashof number of gas in a gap
         Real64 con; // Gap gas conductivity
@@ -3166,16 +3167,14 @@ namespace WindowManager {
 
         if (nglasslayer == 1) {
             Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) +
-                       state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatio(ConstrNum) * state.dataWindowManager->tout +
-                       state.dataWindowManager->AbsRadGlassFace(1);
+                       state.dataWindowManager->hcout * adjRatio * state.dataWindowManager->tout + state.dataWindowManager->AbsRadGlassFace(1);
             Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) +
-                       state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatio(ConstrNum) * state.dataWindowManager->tin +
-                       state.dataWindowManager->AbsRadGlassFace(2);
+                       state.dataWindowManager->hcin * adjRatio * state.dataWindowManager->tin + state.dataWindowManager->AbsRadGlassFace(2);
 
-            Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+            Aface(1, 1) = hr(1) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcout * adjRatio;
             Aface(2, 1) = -state.dataWindowManager->scon(1);
             Aface(1, 2) = -state.dataWindowManager->scon(1);
-            Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+            Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin * adjRatio;
 
         } else if (nglasslayer == 2) {
             WindowGasConductance(state, state.dataWindowManager->thetas(2), state.dataWindowManager->thetas(3), 1, con, pr, gr);
@@ -7310,7 +7309,8 @@ namespace WindowManager {
             ++iter;
 
             auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
-            GetHeatBalanceEqCoefMatrixSimple(state, ConstrNum, SELECT_CASE_var, Aface, Bface, hr, hgap);
+            Real64 adjRatio = state.dataHeatBal->CoeffAdjRatio(ConstrNum);
+            GetHeatBalanceEqCoefMatrixSimple(state, adjRatio, SELECT_CASE_var, Aface, Bface, hr, hgap);
 
             LUdecomposition(state, Aface, state.dataWindowManager->nglface, indx, d); // Note that these routines change Aface;
             LUsolution(Aface, state.dataWindowManager->nglface, indx, Bface);         // face temperatures are returned in Bface

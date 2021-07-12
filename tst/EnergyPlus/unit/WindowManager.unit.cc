@@ -3148,36 +3148,31 @@ TEST_F(EnergyPlusFixture, WindowManger_AdjRatioWindowTempNominalTest)
     Array1D<Real64> hr = state->dataWindowManager->hr;
     Array1A<Real64> hgap = state->dataWindowManager->hgap;
 
-    int ConstrNum = 1;
-
     // compute heat balance equation coefficient with default adjustment ratio
     Real64 adjRatioDefault = 1.0;
-    state->dataHeatBal->CoeffAdjRatio.allocate(1);
-    state->dataHeatBal->CoeffAdjRatio(ConstrNum) = adjRatioDefault;
-    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, ConstrNum, 1, Aface, Bface, hr, hgap);
+    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioDefault, 1, Aface, Bface, hr, hgap);
 
     AfaceNoAdj = Aface;
     BfaceNoAdj = Bface;
 
     // compute heat balance equation coefficient with non-default adjustment ratio, 1.5
     Real64 adjRatioNonDefault = 1.5;
-    state->dataHeatBal->CoeffAdjRatio(ConstrNum) = adjRatioNonDefault;
-    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, ConstrNum, 1, Aface, Bface, hr, hgap);
+    WindowManager::GetHeatBalanceEqCoefMatrixSimple(*state, adjRatioNonDefault, 1, Aface, Bface, hr, hgap);
 
     // compare the adjustment ratio before and after adjustment
     EXPECT_EQ(AfaceNoAdj(2, 1), state->dataWindowManager->Aface(2, 1));
     EXPECT_EQ(AfaceNoAdj(1, 2), state->dataWindowManager->Aface(1, 2));
     EXPECT_NEAR((state->dataWindowManager->Aface(1, 1) - AfaceNoAdj(1, 1)) / state->dataWindowManager->hcout,
-                state->dataHeatBal->CoeffAdjRatio(ConstrNum) - 1.0,
+                adjRatioNonDefault - 1.0,
                 0.001);
     EXPECT_NEAR((state->dataWindowManager->Aface(2, 2) - AfaceNoAdj(2, 2)) / state->dataWindowManager->hcin,
-                state->dataHeatBal->CoeffAdjRatio(ConstrNum) - 1.0,
+                adjRatioNonDefault - 1.0,
                 0.01);
     EXPECT_NEAR((state->dataWindowManager->Bface(1) - BfaceNoAdj(1)) / (state->dataWindowManager->hcout * state->dataWindowManager->tout),
-                state->dataHeatBal->CoeffAdjRatio(ConstrNum) - 1.0,
+                adjRatioNonDefault - 1.0,
                 0.001);
     EXPECT_NEAR((state->dataWindowManager->Bface(2) - BfaceNoAdj(2)) / (state->dataWindowManager->hcin * state->dataWindowManager->tin),
-                state->dataHeatBal->CoeffAdjRatio(ConstrNum) - 1.0,
+                adjRatioNonDefault - 1.0,
                 0.001);
     // fixme: integrate in the tests for other branches if there's already some in existing test cases for WindowTempsForNominalCond
 }
