@@ -790,93 +790,6 @@ namespace OutputProcessor {
         String = StrOut;
     }
 
-    void ProduceMinMaxStringWStartMinute(EnergyPlusData &state,
-                                         std::string &String,                // Current value
-                                         int const DateValue,                // Date of min/max
-                                         ReportingFrequency const ReportFreq // Reporting Frequency
-    )
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   January 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine produces the appropriate min/max string depending
-        // on the reporting frequency.  Used in Meter reporting.
-
-        // METHODOLOGY EMPLOYED:
-        // Prior to calling this routine, the basic value string will be
-        // produced, but DecodeMonDayHrMin will not have been called.  Uses the MinutesPerTimeStep
-        // value to set the StartMinute.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::DecodeMonDayHrMin;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto HrFormat("{},{:02}:{:02}");
-        static constexpr auto DayFormat("{},{:2},{:02}:{:02}");
-        static constexpr auto MonthFormat("{},{:2},{:2},{:02}:{:02}");
-        static constexpr auto EnvrnFormat("{},{:2},{:2},{:2},{:02}:{:02}");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Mon;
-        int Day;
-        int Hour;
-        int Minute;
-        int StartMinute;
-        std::string StrOut;
-
-        DecodeMonDayHrMin(DateValue, Mon, Day, Hour, Minute);
-
-        switch (ReportFreq) {
-        case ReportingFrequency::Hourly: // Hourly -- used in meters
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(HrFormat, strip(String), StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Daily: // Daily
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(DayFormat, strip(String), Hour, StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Monthly: // Monthly
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(MonthFormat, strip(String), Day, Hour, StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Yearly: // Yearly
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
-            break;
-
-        case ReportingFrequency::Simulation: // Environment
-            StartMinute = Minute - state.dataGlobal->MinutesPerTimeStep + 1;
-            StrOut = format(EnvrnFormat, strip(String), Mon, Day, Hour, StartMinute, Minute);
-            break;
-
-        default: // Each, TimeStep, Hourly dont have this
-            StrOut = std::string();
-            break;
-        }
-
-        String = StrOut;
-    }
-
     TimeStepType ValidateTimeStepType(EnergyPlusData &state,
                                       eTimeStepType const &TimeStepTypeKey, // Index type (Zone, HVAC) for variables
                                       std::string const &CalledFrom         // Routine called from (for error messages)
@@ -937,29 +850,8 @@ namespace OutputProcessor {
         // METHODOLOGY EMPLOYED:
         // Look it up in a list of valid index types.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         std::string StandardTimeStepTypeKey;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (timeStepType == TimeStepType::TimeStepZone) {
             StandardTimeStepTypeKey = "Zone";
@@ -1027,30 +919,6 @@ namespace OutputProcessor {
         // METHODOLOGY EMPLOYED:
         // From variable type value, produce proper string.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
         switch (VariableType) {
         case StoreType::Averaged:
             return "Average";
@@ -1083,27 +951,6 @@ namespace OutputProcessor {
         // METHODOLOGY EMPLOYED:
         // Allocate the static set.  Use "AddMeter" with appropriate arguments that will
         // allow expansion later.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         state.files.mtd.ensure_open(state, "InitializeMeters", state.files.outputControl.mtd);
     }
@@ -1748,7 +1595,7 @@ namespace OutputProcessor {
 
         // Basic ResourceType for Meters
         {
-            auto const meterType(UserInputResourceType);
+            auto const &meterType(UserInputResourceType);
 
             if (meterType == "ELECTRICITY") {
                 OutResourceType = "Electricity";
@@ -3770,8 +3617,7 @@ namespace OutputProcessor {
             assert(false);
         }
 
-        const std::string StringOut = format(DateFmt, Day, monthName, Hour, Minute);
-        return StringOut;
+        return format(DateFmt, Day, monthName, Hour, Minute);
     }
 
     void ReportMeterDetails(EnergyPlusData &state)
@@ -3843,13 +3689,13 @@ namespace OutputProcessor {
 
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             print(state.files.mtd, "\n For Meter={}{}", op->EnergyMeters(Meter).Name, unitEnumToStringBrackets(op->EnergyMeters(Meter).Units));
-            if (op->EnergyMeters(Meter).ResourceType != "") {
+            if (!op->EnergyMeters(Meter).ResourceType.empty()) {
                 print(state.files.mtd, ", ResourceType={}", op->EnergyMeters(Meter).ResourceType);
             }
-            if (op->EnergyMeters(Meter).EndUse != "") {
+            if (!op->EnergyMeters(Meter).EndUse.empty()) {
                 print(state.files.mtd, ", EndUse={}", op->EnergyMeters(Meter).EndUse);
             }
-            if (op->EnergyMeters(Meter).Group != "") {
+            if (!op->EnergyMeters(Meter).Group.empty()) {
                 print(state.files.mtd, ", Group={}", op->EnergyMeters(Meter).Group);
             }
             print(state.files.mtd, ", contents are:\n");
@@ -3862,7 +3708,7 @@ namespace OutputProcessor {
                         for (int VarMeter1 = 1; VarMeter1 <= op->VarMeterArrays(VarMeter).NumOnMeters; ++VarMeter1) {
                             if (op->VarMeterArrays(VarMeter).OnMeters(VarMeter1) != Meter) continue;
 
-                            std::string Multipliers = "";
+                            std::string Multipliers;
                             const auto ZoneMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
                             const auto ZoneListMult = op->RVariableTypes(op->VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
@@ -4721,38 +4567,6 @@ namespace OutputProcessor {
         // easier maintenance and writing of data to the SQL database.
 
         i32toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
-
-        if (state.dataSQLiteProcedures->sqlite) {
-            state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
-        }
-
-        if (state.files.eso.good()) {
-            print(state.files.eso, "{},{}\n", creportID, state.dataOutputProcessor->s_WriteNumericData);
-        }
-    }
-
-    void WriteNumericData(EnergyPlusData &state,
-                          int const reportID,           // The variable's reporting ID
-                          std::string const &creportID, // variable ID in characters
-                          int64_t const repValue        // The variable's value
-    )
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Mark Adams
-        //       DATE WRITTEN   May 2016
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE:
-        // This subroutine writes real data to the output files and
-        // SQL database.
-        // This is a refactor of WriteIntegerData.
-        //
-        // Much of the code here was an included in earlier versions
-        // of the UpdateDataandReport subroutine. The code was moved to facilitate
-        // easier maintenance and writing of data to the SQL database.
-
-        i64toa(repValue, state.dataOutputProcessor->s_WriteNumericData);
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->createSQLiteReportDataRecord(reportID, repValue);
