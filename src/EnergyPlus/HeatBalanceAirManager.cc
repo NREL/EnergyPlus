@@ -575,11 +575,11 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         {
             auto const SELECT_CASE_var(cAlphaArgs(3)); // Aie balance method type character input-->convert to integer
             if (SELECT_CASE_var == "QUADRATURE") {
-                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalanceQuadrature;
+                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::Quadrature;
             } else if (SELECT_CASE_var == "NONE") {
-                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalanceNone;
+                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
             } else {
-                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalanceNone;
+                state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
                 ShowWarningError(state,
                                  RoutineName + cAlphaFieldNames(3) + " = " + cAlphaArgs(3) + " not valid choice for " + cCurrentModuleObject + '=' +
                                      cAlphaArgs(1));
@@ -621,8 +621,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
         // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
         ControlFlag = GetHybridVentilationControlStatus(state, state.dataHeatBal->ZoneAirBalance(Loop).ZonePtr);
-        if (ControlFlag && state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalanceQuadrature) {
-            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalanceNone;
+        if (ControlFlag && state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
+            state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod = AirBalance::None;
             ShowWarningError(state,
                              cCurrentModuleObject + " = " + state.dataHeatBal->ZoneAirBalance(Loop).Name + ": This Zone (" + cAlphaArgs(2) +
                                  ") is controlled by AvailabilityManager:HybridVentilation with Simple Airflow Control Type option.");
@@ -630,7 +630,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                               "Air balance method type QUADRATURE and Simple Airflow Control Type cannot co-exist. The NONE method is assigned");
         }
 
-        if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalanceQuadrature) {
+        if (state.dataHeatBal->ZoneAirBalance(Loop).BalanceMethod == AirBalance::Quadrature) {
             SetupOutputVariable(state,
                                 "Zone Combined Outdoor Air Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
@@ -865,7 +865,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
                     for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                         if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                                 state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
                                 state.dataHeatBal->Infiltration(Loop).OABalancePtr = i;
                                 break;
@@ -1077,7 +1077,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
             for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                 if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                         state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
                         state.dataHeatBal->Infiltration(Loop).OABalancePtr = i;
                         break;
@@ -1145,7 +1145,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         if (state.dataHeatBal->Infiltration(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
             for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                 if (state.dataHeatBal->Infiltration(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                         state.dataHeatBal->Infiltration(Loop).QuadratureSum = true;
                         state.dataHeatBal->Infiltration(Loop).OABalancePtr = i;
                         break;
@@ -1404,7 +1404,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (state.dataHeatBal->Ventilation(Loop).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
                     for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                         if (state.dataHeatBal->Ventilation(Loop).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                            if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                                 state.dataHeatBal->Ventilation(Loop).QuadratureSum = true;
                                 state.dataHeatBal->Ventilation(Loop).OABalancePtr = i;
                                 break;
@@ -2091,7 +2091,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr > 0 && state.dataHeatBal->TotZoneAirBalance > 0) {
             for (i = 1; i <= state.dataHeatBal->TotZoneAirBalance; ++i) {
                 if (state.dataHeatBal->Ventilation(VentiCount).ZonePtr == state.dataHeatBal->ZoneAirBalance(i).ZonePtr) {
-                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalanceQuadrature) {
+                    if (state.dataHeatBal->ZoneAirBalance(i).BalanceMethod == AirBalance::Quadrature) {
                         state.dataHeatBal->Ventilation(VentiCount).QuadratureSum = true;
                         state.dataHeatBal->Ventilation(VentiCount).OABalancePtr = i;
                         break;

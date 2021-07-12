@@ -224,8 +224,11 @@ namespace DataHeatBalance {
     };
 
     // Parameters for type of zone air balance model
-    constexpr int AirBalanceNone(0);
-    constexpr int AirBalanceQuadrature(1);
+    enum class AirBalance
+    {
+        None,
+        Quadrature
+    };
 
     // Parameter for source zone air flow mass balance infiltration treatment
     constexpr int NoInfiltrationFlow(0);
@@ -1005,7 +1008,7 @@ namespace DataHeatBalance {
         std::string Name;           // Object name
         std::string ZoneName;       // Zone name
         int ZonePtr;                // Zone number
-        int BalanceMethod;          // Air Balance Method: None=0, Quadrature = 1
+        AirBalance BalanceMethod;   // Air Balance Method
         Real64 InducedAirRate;      // Induced Outdoor Air Due to Duct Leakage Unbalance [m3/s]
         int InducedAirSchedPtr;     // Induced Outdoor Air Fraction Schedule
         Real64 BalMassFlowRate;     // balanced mass flow rate
@@ -1021,7 +1024,7 @@ namespace DataHeatBalance {
 
         // Default Constructor
         ZoneAirBalanceData()
-            : ZonePtr(0), BalanceMethod(0), InducedAirRate(0.0), InducedAirSchedPtr(0), BalMassFlowRate(0.0), InfMassFlowRate(0.0),
+            : ZonePtr(0), BalanceMethod(AirBalance::None), InducedAirRate(0.0), InducedAirSchedPtr(0), BalMassFlowRate(0.0), InfMassFlowRate(0.0),
               NatMassFlowRate(0.0), ExhMassFlowRate(0.0), IntMassFlowRate(0.0), ERVMassFlowRate(0.0), OneTimeFlag(false), NumOfERVs(0)
         {
         }
