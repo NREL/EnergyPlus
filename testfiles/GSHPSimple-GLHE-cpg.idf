@@ -1884,6 +1884,7 @@
     Vertical Ground Heat Exchanger Ground Temps,  !- Undisturbed Ground Temperature Model Name
     0.692626E+00,            !- Ground Thermal Conductivity {W/m-K}
     0.234700E+07,            !- Ground Thermal Heat Capacity {J/m3-K}
+    UBHWTcalc,                !- g-Function Calculation Model Name
     Vertical Ground Heat Exchanger g-functions;  !- GHE:Vertical:ResponseFactors Object Name
 
   GroundHeatExchanger:Vertical:Properties,
