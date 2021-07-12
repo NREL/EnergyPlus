@@ -786,8 +786,6 @@ namespace PlantChillers {
 
         static std::string const RoutineName("InitElectricChiller");
 
-        this->oneTimeInit(state);
-
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
@@ -2027,7 +2025,6 @@ namespace PlantChillers {
     void ElectricChillerSpecs::oneTimeInit(EnergyPlusData &state)
     {
 
-        if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables(state);
@@ -2149,8 +2146,6 @@ namespace PlantChillers {
                     }
                 }
             }
-            this->MyFlag = false;
-        }
     }
 
     EngineDrivenChillerSpecs *EngineDrivenChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
@@ -2856,8 +2851,6 @@ namespace PlantChillers {
         // SUBROUTINE PARAMETER DEFINITIONS:
 
         static std::string const RoutineName("InitEngineDrivenChiller");
-
-        this->oneTimeInit(state);
 
         // Initialize critical Demand Side Variables
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -4086,7 +4079,6 @@ namespace PlantChillers {
     void EngineDrivenChillerSpecs::oneTimeInit(EnergyPlusData &state)
     {
 
-        if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables(state);
@@ -4200,9 +4192,6 @@ namespace PlantChillers {
                         state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
-
-            this->MyFlag = false;
-        }
     }
 
     GTChillerSpecs *GTChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
@@ -4839,8 +4828,6 @@ namespace PlantChillers {
         // SUBROUTINE PARAMETER DEFINITIONS:
 
         static std::string const RoutineName("InitGTChiller");
-
-        this->oneTimeInit(state);
 
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
@@ -6065,7 +6052,6 @@ namespace PlantChillers {
     void GTChillerSpecs::oneTimeInit(EnergyPlusData &state)
     {
         // Init more variables
-        if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables(state);
@@ -6180,8 +6166,6 @@ namespace PlantChillers {
                         state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
-            this->MyFlag = false;
-        }
     }
 
     ConstCOPChillerSpecs *ConstCOPChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
@@ -6647,8 +6631,6 @@ namespace PlantChillers {
         static std::string const RoutineName("InitConstCOPChiller");
 
         Real64 const TempDesCondIn(25.0); // Design condenser inlet temp. C
-
-        this->oneTimeInit(state);
 
         // Initialize critical Demand Side Variables at the beginning of each environment
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
@@ -7552,7 +7534,6 @@ namespace PlantChillers {
     void ConstCOPChillerSpecs::oneTimeInit(EnergyPlusData &state)
     {
         // Init more variables
-        if (this->MyFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             this->setupOutputVariables(state);
@@ -7644,8 +7625,6 @@ namespace PlantChillers {
                         state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWLoopNum).TempSetPointNodeNum).TempSetPointHi;
                 }
             }
-            this->MyFlag = false;
-        }
     }
 
 } // namespace PlantChillers
