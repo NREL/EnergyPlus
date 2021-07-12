@@ -142,7 +142,7 @@ namespace DataSizing {
     // System Outdoor Air Method
     constexpr int SOAM_ZoneSum(1); // Sum the outdoor air flow rates of all zones
     constexpr int SOAM_VRP(2);     // Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
-    constexpr int SOAM_SP(9); // Use the ASHRAE Standard 62.1 Simplified Procedure to calculate the system level outdoor air flow rates
+    constexpr int SOAM_SP(9);      // Use the ASHRAE Standard 62.1 Simplified Procedure to calculate the system level outdoor air flow rates
     //  considering the zone air distribution effectiveness and the system ventilation efficiency
     constexpr int SOAM_IAQP(3); // Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
     // based on the CO2 setpoint
@@ -425,16 +425,16 @@ namespace DataSizing {
         Real64 SupplyAirAdjustFactor;      // supply air adjustment factor for next time step if OA is capped
         Real64 ZpzClgByZone;               // OA Std 62.1 required fraction in cooling mode ? should this be ZdzClgByZone
         Real64 ZpzHtgByZone;               // OA Std 62.1 required fraction in heating mode ? should this be ZdzHtgByZone
-        Real64 VozClgByZone;    // value of required cooling vent to zone, used in 62.1 tabular report, already includes people diversity term
-        Real64 VozHtgByZone;    // value of required heating vent to zone, used in 62.1 tabular report, already includes people diversity term
-        Real64 DOASHeatLoad;    // current heating load from DOAS supply air [W]
-        Real64 DOASCoolLoad;    // current cooling load from DOAS supply air [W]
-        Real64 DOASHeatAdd;     // current heat addition rate from DOAS supply air [W]
-        Real64 DOASLatAdd;      // current latent heat addition rate from DOAS supply air [W]
-        Real64 DOASSupMassFlow; // current mass flow rate of DOAS supply air [kg/s]
-        Real64 DOASSupTemp;     // current DOAS supply air temperature [C]
-        Real64 DOASSupHumRat;   // current DOAS supply air humidity ratio [kgWater/kgDryAir]
-        Real64 DOASTotCoolLoad; // current total cooling load imposed by DOAS supply air [W]
+        Real64 VozClgByZone;      // value of required cooling vent to zone, used in 62.1 tabular report, already includes people diversity term
+        Real64 VozHtgByZone;      // value of required heating vent to zone, used in 62.1 tabular report, already includes people diversity term
+        Real64 DOASHeatLoad;      // current heating load from DOAS supply air [W]
+        Real64 DOASCoolLoad;      // current cooling load from DOAS supply air [W]
+        Real64 DOASHeatAdd;       // current heat addition rate from DOAS supply air [W]
+        Real64 DOASLatAdd;        // current latent heat addition rate from DOAS supply air [W]
+        Real64 DOASSupMassFlow;   // current mass flow rate of DOAS supply air [kg/s]
+        Real64 DOASSupTemp;       // current DOAS supply air temperature [C]
+        Real64 DOASSupHumRat;     // current DOAS supply air humidity ratio [kgWater/kgDryAir]
+        Real64 DOASTotCoolLoad;   // current total cooling load imposed by DOAS supply air [W]
         bool VpzMinByZoneSPSized; // is Vpz_min sized using the 62.1 Standard Simplified Procedure
         Array1D<Real64> DOASHeatLoadSeq;    // daily sequence of zone DOAS heating load (zone time step) [W]
         Array1D<Real64> DOASCoolLoadSeq;    // daily sequence of zone DOAS cooling load (zone time step) [W]
@@ -678,7 +678,7 @@ namespace DataSizing {
         Real64 FlowPerHeatingCapacity;            // ratio of heating supply air flow rate to heating capacity of an airloop
         int CoolingPeakLoadType;                  // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCoolingLoad
         int CoolCapControl;                       // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
-        Real64 OccupantDiversity;                 // occupant diversity  
+        Real64 OccupantDiversity;                 // occupant diversity
 
         // Default Constructor
         SystemSizingInputData()

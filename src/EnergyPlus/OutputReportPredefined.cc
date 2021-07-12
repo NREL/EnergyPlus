@@ -1002,7 +1002,8 @@ namespace OutputReportPredefined {
             // s->pdchS62zcdVsec =        newPreDefColumn(state, s->pdstS62znCoolDes,'Secondary Fan Airflow - Vsec [m3/s]')
             s->pdchS62zcdVdz = newPreDefColumn(state, s->pdstS62znCoolDes, "Zone Discharge Airflow - Vdz [m3/s]");
             s->pdchS62zcdVpzmin = newPreDefColumn(state, s->pdstS62znCoolDes, "Minimum Zone Primary Airflow - Vpz-min [m3/s]");
-            s->pdchS62zcdVpzminSPSize = newPreDefColumn(state, s->pdstS62znCoolDes, "Is Vpz-min calculated using the Standard 62.1 Simplified Procedure?");
+            s->pdchS62zcdVpzminSPSize =
+                newPreDefColumn(state, s->pdstS62znCoolDes, "Is Vpz-min calculated using the Standard 62.1 Simplified Procedure?");
             s->pdchS62zcdVozclg = newPreDefColumn(state, s->pdstS62znCoolDes, "Zone Outdoor Airflow Cooling - Voz-clg [m3/s]");
             s->pdchS62zcdZpz = newPreDefColumn(state, s->pdstS62znCoolDes, "Primary Outdoor Air Fraction - Zpz");
             s->pdchS62zcdEp = newPreDefColumn(state, s->pdstS62znCoolDes, "Primary Air Fraction - Ep");
@@ -1031,7 +1032,8 @@ namespace OutputReportPredefined {
             // s->pdchS62zhdVsec =        newPreDefColumn(state, s->pdstS62znHeatDes,'Secondary Fan Airflow - Vsec [m3/s]')
             s->pdchS62zhdVdz = newPreDefColumn(state, s->pdstS62znHeatDes, "Zone Discharge Airflow - Vdz [m3/s]");
             s->pdchS62zhdVpzmin = newPreDefColumn(state, s->pdstS62znHeatDes, "Minimum Zone Primary Airflow - Vpz-min [m3/s]");
-            s->pdchS62zhdVpzminSPSize = newPreDefColumn(state, s->pdstS62znHeatDes, "Is Vpz-min calculated using the Standard 62.1 Simplified Procedure?");
+            s->pdchS62zhdVpzminSPSize =
+                newPreDefColumn(state, s->pdstS62znHeatDes, "Is Vpz-min calculated using the Standard 62.1 Simplified Procedure?");
             s->pdchS62zhdVozhtg = newPreDefColumn(state, s->pdstS62znHeatDes, "Zone Outdoor Airflow Heating - Voz-htg [m3/s]");
             s->pdchS62zhdZpz = newPreDefColumn(state, s->pdstS62znHeatDes, "Primary Outdoor Air Fraction - Zpz");
             s->pdchS62zhdEp = newPreDefColumn(state, s->pdstS62znHeatDes, "Primary Air Fraction - Ep");
