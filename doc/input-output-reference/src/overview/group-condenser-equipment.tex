@@ -3026,7 +3026,7 @@ This numeric field contains the thermal heat capacity of the ground in J/m\(^{3}
 
 The unique name of the \hyperref[groundheatexchangerresponsefactors]{GroundHeatExchanger:ResponseFactors} object used to define the third-party response factors. If present, the GHE:Vertical:Array and GHE:Vertical:Single objects defined will be ignored.
 
-\paragraph{Field: GHE:CalculationModel name}
+\paragraph{Field: GHE:CalculationModelName}
 
 There are two options for this input; UHFcalc or UBHWTcalc. The default is
 UHFcalc, where a g-function is computed with the uniform heat extraction rate
@@ -3057,6 +3057,7 @@ The following is are example inputs corresponding to the input variations allowe
     2.5,                !- Ground Thermal Conductivity {W/m-K}
     2.5E+06,            !- Ground Thermal Heat Capacity {J/m3-K}
     ,                   !- Response Factors Object Name
+    UBHWTcalc,          !- g-Function Calculation Model Name
     GHE-Array;
 
   GroundHeatExchanger:Vertical:Properties,
@@ -3093,6 +3094,7 @@ The second example uses the \hyperref[groundheatexchangerverticalsingle]{GroundH
     2.5,                !- Ground Thermal Conductivity {W/m-K}
     2.5E+06,            !- Ground Thermal Heat Capacity {J/m3-K}
     ,                   !- Response Factors Object Name
+    UBHWTcalc,          !- g-Function Calculation Model Name
     ,                   !- GHE Array Object Name
     GHE-1,              !- GHE Borehole Definition 1
     GHE-2,              !- GHE Borehole Definition 2
@@ -3149,6 +3151,7 @@ The final example uses the ResponseFactors object to provide third-party g-funct
     KATemps,            !- Undisturbed Ground Temperature Model Name
     2.5,                !- Ground Thermal Conductivity {W/m-K}
     2.5E+06,            !- Ground Thermal Heat Capacity {J/m3-K}
+    UBHWTcalc,          !- g-Function Calculation Model Name
     GHE-1 g-functions;  !- Response Factors Object Name
 
   GroundHeatExchanger:Vertical:Properties,
