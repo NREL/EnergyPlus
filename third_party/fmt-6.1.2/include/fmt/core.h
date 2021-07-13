@@ -300,7 +300,7 @@ template <typename Char> class basic_string_view {
     the size with ``std::char_traits<Char>::length``.
     \endrst
    */
-  basic_string_view(const Char* s)
+  FMT_CONSTEXPR basic_string_view(const Char* s)
       : data_(s), size_(std::char_traits<Char>::length(s)) {}
 
   /** Constructs a string reference from a ``std::basic_string`` object. */
