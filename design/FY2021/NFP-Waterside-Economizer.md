@@ -169,7 +169,7 @@ CoilSystem:Cooling:Water,
        \required-field
        \key Coil:Cooling:Water
        \key Coil:Cooling:Water:DetailedGeometry
-       \key CoilSystem:Cooling:Water:HeatExchangerAssisted ??
+       \key CoilSystem:Cooling:Water:HeatExchangerAssisted
    A6, \field Cooling Coil Name
        \required-field
        \type object-list
@@ -177,17 +177,21 @@ CoilSystem:Cooling:Water,
    A7, \field Dehumidification Control Type
        \type choice
        \key None
-       \key HeatExchangerControl
+       \key Multimode
        \key CoolReheat
        \default None
        \note None = meet sensible load only
-       \note HeatExchangerControl = activate water coil and meet sensible load.
+       \note Multimode = activate water coil and meet sensible load.	   
        \note If no sensible load exists, and Run on Latent Load = Yes, and a latent
        \note load exists, the coil will operate to meet the latent load.
        \note If the latent load cannot be met the heat exchanger will be activated.
        \note IF Run on Latent Load = No, the heat exchanger will always be active.
-       \note CoolReheat = cool beyond the dry-bulb setpoint as required
-       \note to meet the humidity setpoint.
+       \note This control mode either switches the coil mode or allows the heat exchanger to 
+       \note be turned on and off based on the zone dehumidification requirements. Valid 
+       \note only with cooling coil type CoilSystem:Cooling:Water:HeatExchangerAssisted.   
+       \note CoolReheat = cool beyond the dry-bulb setpoint as required to meet the 
+       \note humidity setpoint. Valid with all cooling coil types. When a heat exchanger 
+       \note assisted cooling coil is used, the heat exchanger is locked on at all times.	   
        \note For all dehumidification controls, the max
        \note humidity setpoint on the Sensor Node is used.
        \note SetpointManager:SingleZone:Humidity:Maximum,
