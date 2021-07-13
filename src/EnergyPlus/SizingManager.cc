@@ -64,6 +64,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
@@ -460,6 +461,8 @@ void ManageSizing(EnergyPlusData &state)
 
         ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
         ManageAirLoops(state, true, SimAir, SimZoneEquip);
+        // check sizing of zone OA flow rates compared to zone exhaust fans
+        SizingManager::checkZoneOutdoorAirFlowDesignBalanceForExhaustFan(state);
         SizingManager::UpdateTermUnitFinalZoneSizing(state); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
         SimAirServingZones::SizeSysOutdoorAir(state);        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
         ResetEnvironmentCounter(state);
@@ -5361,4 +5364,91 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         }
     }
 }
+void checkZoneOutdoorAirFlowDesignBalanceForExhaustFan(EnergyPlusData &state)
+{
+    // Begin input and sizing check on the air balancing related to zone exhaust fan flows
+
+    static std::string const RoutineName("checkZoneOutdoorAirFlowDesignBalanceForExhaustFan");
+    // Step 1.  Run thru zones attached to an airloop and check if the zone minimum outdoor air flow is at least as large as the zone exhaust fan
+    // flows that are expected to be balanced by a central air system during operation.
+
+    if (state.dataHVACGlobal->NumPrimaryAirSys > 0 && state.dataSize->CalcFinalZoneSizing.allocated() && state.dataSize->FinalSysSizing.allocated() &&
+        state.dataAirLoop->AirToZoneNodeInfo.allocated()) {
+
+        // loop over air loops and fill zone sizing data for design exhaust fan flows
+        for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
+
+            for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
+                int coolCtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(zoneNum);
+                int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+
+                Real64 locZoneExhaustFanFlowRate(0.0);
+
+                // find zone exhaust node numbers
+                for (int nodeNum = 1; nodeNum <= state.dataZoneEquip->ZoneEquipConfig(coolCtrlZoneNum).NumExhaustNodes; ++nodeNum) {
+                    int trialExhaustNode = state.dataZoneEquip->ZoneEquipConfig(coolCtrlZoneNum).ExhaustNode(nodeNum);
+                    locZoneExhaustFanFlowRate += Fans::ZoneExhaustFanBalancedAirFlow(state, trialExhaustNode);
+                }
+                // fill zone sizing structure with exhaust fan flows
+                state.dataSize->FinalZoneSizing(coolCtrlZoneNum).ZoneExhaustFanFlow = locZoneExhaustFanFlowRate;
+                state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneExhaustFanFlow = locZoneExhaustFanFlowRate;
+
+                // don't go quietly if making an adjustment, throw warning about taking max here
+                if (locZoneExhaustFanFlowRate > state.dataSize->FinalZoneSizing(coolCtrlZoneNum).MinOA) {
+
+                    ShowWarningError(state,
+                                     RoutineName + " Zone Exhaust Fan is starved by minimum ventilation requirements.  Ventilation should "
+                                                   "be increased to match that required to balance the exhaust fans in the zone. ");
+                    ShowContinueError(state, "Zone name =" + state.dataHeatBal->Zone(coolCtrlZoneNum).Name);
+                    ShowContinueError(state, format("Zone exhaust fan flow for air system design = {:.6R} [m3/s] ", locZoneExhaustFanFlowRate));
+                    ShowContinueError(state,
+                                      format("Minimum ventilation requirement for zone = {:.6R} [m3/s] = ",
+                                             state.dataSize->FinalZoneSizing(coolCtrlZoneNum).MinOA));
+                    ShowContinueError(state,
+                                      "Input for outdoor air requirements should be increased to larger flow needed for exhaust fan(s).  Check "
+                                      "DesignSpecification:OutdoorAir and Fan:ZoneExhaust for this zone.  Simulation continues.");
+                }
+            }
+
+            // Do it all again for heated zones.
+            for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
+                int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                int MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
+                                                                      state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                      state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                if (MatchingCooledZoneNum == 0) { // did not already procss zone as a cooled zone
+                    int heatCtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(zoneNum);
+
+                    Real64 locZoneExhaustFanFlowRate(0.0);
+
+                    // find zone exhaust node numbers
+                    for (int nodeNum = 1; nodeNum <= state.dataZoneEquip->ZoneEquipConfig(heatCtrlZoneNum).NumExhaustNodes; ++nodeNum) {
+                        int trialExhaustNode = state.dataZoneEquip->ZoneEquipConfig(heatCtrlZoneNum).ExhaustNode(nodeNum);
+                        locZoneExhaustFanFlowRate += Fans::ZoneExhaustFanBalancedAirFlow(state, trialExhaustNode);
+                    }
+                    // fill zone sizing structure with exhaust fan flows
+                    state.dataSize->FinalZoneSizing(heatCtrlZoneNum).ZoneExhaustFanFlow = locZoneExhaustFanFlowRate;
+                    state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneExhaustFanFlow = locZoneExhaustFanFlowRate;
+
+                    // don't go quietly if making an adjustment, throw warning about taking max here
+                    if (locZoneExhaustFanFlowRate > state.dataSize->FinalZoneSizing(heatCtrlZoneNum).MinOA) {
+
+                        ShowWarningError(state,
+                                         RoutineName + " Zone Exhaust Fan is starved by minimum ventilation requirements.  Ventilation should "
+                                                       "be increased to match that required to balance the exhaust fans in the zone. ");
+                        ShowContinueError(state, "Zone name =" + state.dataHeatBal->Zone(heatCtrlZoneNum).Name);
+                        ShowContinueError(state,
+                                          format("Zone exhaust fan flow for air system design = {:.6R} [m3/s] =  ", locZoneExhaustFanFlowRate));
+                        ShowContinueError(state,
+                                          format("Minimum ventilation requirement for zone = {:.6R} [m3/s]",
+                                                 state.dataSize->FinalZoneSizing(heatCtrlZoneNum).MinOA));
+                        ShowContinueError(state,
+                                          "Input for outdoor air requirements should be increased to larger flow needed for exhaust fan(s).  Check "
+                                          "DesignSpecification:OutdoorAir and Fan:ZoneExhaust for this zone.  Simulation continues.");
+                    }
+                }
+            }
+        }
+    }
+} // End warning for zone exhaust fan
 } // namespace EnergyPlus::SizingManager

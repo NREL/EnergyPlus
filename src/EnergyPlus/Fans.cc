@@ -3100,4 +3100,29 @@ void SetFanAirLoopNumber(EnergyPlusData &state, int const FanIndex, int const Ai
     state.dataFans->Fan(FanIndex).AirLoopNum = AirLoopNum;
 }
 
+Real64 ZoneExhaustFanBalancedAirFlow(EnergyPlusData &state, int const trailInletNode) // TRANE
+{
+    // pass in state and trial fan inlet node num, and return a design flow rate for a zone exhaust fan that has this inlet node
+
+    // Obtains and Allocates fan related parameters from input file, zone exhaust fans must be hard sized.
+    if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
+        GetFanInput(state);
+        state.dataFans->GetFanInputFlag = false;
+    }
+
+    Real64 exhaustFanOAFlowForDesign(0.0);
+
+    // loop thru fans to find zone exhaust fans on this zone
+    for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
+        if (state.dataFans->Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
+            if (state.dataFans->Fan(FanNum).InletNodeNum == trailInletNode) { // found it
+                // Scale maximum flow rate by the schedule for how flows are balanced in some other way (simple infiltration, mixing)
+                Real64 minSchedValue = GetScheduleMinValue(state, state.dataFans->Fan(FanNum).BalancedFractSchedNum);
+                exhaustFanOAFlowForDesign = (1.0 - minSchedValue) * state.dataFans->Fan(FanNum).MaxAirFlowRate;
+                break;
+            }
+        }
+    }
+    return exhaustFanOAFlowForDesign;
+}
 } // namespace EnergyPlus::Fans

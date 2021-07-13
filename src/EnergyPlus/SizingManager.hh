@@ -157,6 +157,8 @@ namespace SizingManager {
 
     void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state);
 
+    void checkZoneOutdoorAirFlowDesignBalanceForExhaustFan(EnergyPlusData &state);
+
 } // namespace SizingManager
 
 struct SizingManagerData : BaseGlobalStruct
