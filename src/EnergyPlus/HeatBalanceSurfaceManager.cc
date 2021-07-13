@@ -163,14 +163,6 @@ using namespace FenestrationCommon;
 using namespace SingleLayerOptics;
 using namespace MultiLayerOptics;
 
-// Data
-// MODULE PARAMETER DEFINITIONS:
-static std::string const BlankString;
-
-namespace {
-
-} // namespace
-
 // These are now external subroutines
 // PUBLIC  CalcHeatBalanceOutsideSurf  ! The heat balance routines are now public because the
 // PUBLIC  CalcHeatBalanceInsideSurf   ! radiant systems need access to them in order to simulate
@@ -5797,7 +5789,6 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
     constexpr const char *HBSurfManRainHAMT("HBSurfMan:Rain:HAMT");
     constexpr const char *HBSurfManDrySurfCondFD("HBSurfMan:DrySurf:CondFD");
     constexpr const char *Outside("Outside");
-    static std::string const BlankString;
 
     bool MovInsulErrorFlag = false; // Movable Insulation error flag
 
@@ -6615,7 +6606,6 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     constexpr const char *wsurf("Wsurf");
     constexpr const char *HBSurfManInsideSurf("HB,SurfMan:InsideSurf");
     constexpr const char *Inside("Inside");
-    static std::string const BlankString;
 
     Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
     Real64 SurfTempInSat;  // Local temporary surface dew point temperature
@@ -8662,9 +8652,6 @@ void CalcExteriorVentedCavity(EnergyPlusData &state, int const SurfNum) // index
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyWFnTdbTwbPb;
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const BlankString;
 
     // local working variables
     Real64 AspRat; // Aspect Ratio of gap
