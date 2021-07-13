@@ -95,8 +95,8 @@ public:
     // default constructor
     AnnualFieldSet()
         : m_variMeter(""), m_colHead(""), m_aggregate(sumOrAvg), m_varUnits(OutputProcessor::Unit::None),
-          m_typeOfVar(OutputProcessor::VariableType::NotFound), m_keyCount(0), m_varAvgSum(OutputProcessor::StoreType::Averaged),
-          m_bottomBinValue(0), m_topBinValue(0)
+          m_typeOfVar(OutputProcessor::VariableType::NotFound), m_keyCount(0), m_varAvgSum(OutputProcessor::StoreType::Averaged), m_bottomBinValue(0),
+          m_topBinValue(0)
     {
     }
 
