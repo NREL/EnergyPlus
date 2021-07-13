@@ -4776,7 +4776,7 @@ void CalcZoneInfiltrationFlows(EnergyPlusData &state,
     Real64 ZoneInfiltrationMassFlowRate = 0.0;
 
     // Set zone infiltration flow rate
-    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow) {
+    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No) {
         if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr > 0) {
             if (state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone ||
                 (state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType == DataHeatBalance::AllZones)) {
@@ -4784,7 +4784,7 @@ void CalcZoneInfiltrationFlows(EnergyPlusData &state,
                                                state.dataHeatBal->MassConservation(ZoneNum).MixingMassFlowRate +
                                                state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate -
                                                state.dataZoneEquip->ZoneEquipConfig(ZoneNum).TotInletAirMassFlowRate;
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AdjustInfiltrationFlow) {
+                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                     if (std::abs(ZoneInfiltrationMassFlowRate) > ConvergenceTolerance) {
                         state.dataHeatBalFanSys->ZoneInfiltrationFlag(ZoneNum) = true;
                         state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
@@ -4797,7 +4797,7 @@ void CalcZoneInfiltrationFlows(EnergyPlusData &state,
                         state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
                         state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = 0.0;
                     }
-                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AddInfiltrationFlow) {
+                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
                     if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
                         state.dataHeatBalFanSys->ZoneInfiltrationFlag(ZoneNum) = true;
                         state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
@@ -4807,16 +4807,16 @@ void CalcZoneInfiltrationFlows(EnergyPlusData &state,
                     } else {
                         state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
                     }
-                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) {
+                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::No) {
                     state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
                 }
             } else {
-                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AdjustInfiltrationFlow) {
+                if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                     state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate =
                         state.dataHeatBal->Infiltration(state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
-                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::AddInfiltrationFlow) {
+                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
                     state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
-                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) {
+                } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::No) {
                     state.dataHeatBal->MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
                 }
             }
@@ -6001,13 +6001,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                 state.dataHeatBal->Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
                 if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         // if ( Infiltration(j).MassFlowRate > 0.0 ) {
                         state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).MassFlowRate / AirDensity;
                         MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
                         //}
                     }
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
                         state.dataHeatBal->Infiltration(j).VolumeFlowRate =
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate +
                             state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
@@ -6027,13 +6027,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                 state.dataHeatBal->Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
                 if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         if (state.dataHeatBal->Infiltration(j).MassFlowRate > 0.0) {
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).MassFlowRate / AirDensity;
                             MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
                         }
                     }
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
                         state.dataHeatBal->Infiltration(j).VolumeFlowRate =
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate +
                             state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
@@ -6055,13 +6055,13 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (MCpI_temp < 0.0) MCpI_temp = 0.0;
                 state.dataHeatBal->Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
                 if (AdjustZoneInfiltrationFlowFlag && state.dataHeatBalFanSys->ZoneInfiltrationFlag(NZ)) {
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         if (state.dataHeatBal->Infiltration(j).MassFlowRate > 0.0) {
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate = state.dataHeatBal->Infiltration(j).MassFlowRate / AirDensity;
                             MCpI_temp = state.dataHeatBal->Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
                         }
                     }
-                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+                    if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add) {
                         state.dataHeatBal->Infiltration(j).VolumeFlowRate =
                             state.dataHeatBal->Infiltration(j).VolumeFlowRate +
                             state.dataHeatBal->MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;

@@ -4182,7 +4182,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if ((state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing &&
                  state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone) &&
-                (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow)) {
+                (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No)) {
                 if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr == 0) {
                     ShowSevereError(state, RoutineName + ": Infiltration object is not defined for zone = " + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(state, "Zone air mass flow balance requires infiltration object for source zones of mixing objects");
@@ -4230,7 +4230,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                                     "Average",
                                     state.dataHeatBal->Zone(ZoneNum).Name);
             }
-            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow) {
+            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No) {
                 if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType == AllZones ||
                     (state.dataHeatBal->MassConservation(ZoneNum).NumSourceZonesMixingObject > 0)) {
                     if (state.dataHeatBal->MassConservation(ZoneNum).InfiltrationPtr > 0) {

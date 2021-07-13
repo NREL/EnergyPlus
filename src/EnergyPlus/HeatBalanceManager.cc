@@ -1227,22 +1227,22 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(AlphaName(2));
                     if (SELECT_CASE_var == "ADDINFILTRATIONFLOW") {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
                             state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Adjust;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
                         if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
                             state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NONE") {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::No;
                         AlphaName(2) = "None";
                     } else {
-                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+                        state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
                         ShowWarningError(state,
@@ -1251,11 +1251,11 @@ namespace HeatBalanceManager {
                     }
                 }
             } else {
-                state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
+                state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                 state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
                 AlphaName(2) = "AddInfiltrationFlow";
             }
-            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == NoInfiltrationFlow) {
+            if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::No) {
                 AlphaName(3) = "N/A";
             } else {
                 if (NumAlpha > 2) {
@@ -1284,7 +1284,7 @@ namespace HeatBalanceManager {
         } else {
             state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
-        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow)
+        if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::InfiltrationFlow::No)
             state.dataHeatBal->ZoneAirMassFlow.AdjustZoneInfiltrationFlow = true;
 
         constexpr const char *Format_732(
