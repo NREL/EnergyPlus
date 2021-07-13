@@ -1010,7 +1010,7 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("UpdateChillerComponentCondenserSide");
+    static constexpr std::string_view RoutineName("UpdateChillerComponentCondenserSide");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool DidAnythingChange(false); // set to true if conditions changed
@@ -1097,7 +1097,7 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
     using FluidProperties::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("UpdateComponentHeatRecoverySide");
+    static constexpr std::string_view RoutineName("UpdateComponentHeatRecoverySide");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool DidAnythingChange(false); // set to true if conditions changed
@@ -1635,7 +1635,7 @@ void LogPlantConvergencePoints(EnergyPlusData &state, bool const FirstHVACIterat
 }
 
 void ScanPlantLoopsForObject(EnergyPlusData &state,
-                             std::string const &CompName,
+                             std::string_view CompName,
                              int const CompType,
                              int &LoopNum,
                              int &LoopSideNum,
@@ -1736,12 +1736,12 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
         if (CompType >= 1 && CompType <= DataPlant::NumSimPlantEquipTypes) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
+                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + std::string{CompName} +
                                     "\" was not found on any plant loops.");
                 AuditBranches(state, true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
             } else {
                 ShowSevereError(state,
-                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
+                                "Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + std::string{CompName} +
                                     "\" was not found on plant loop=\"" + state.dataPlnt->PlantLoop(SingleLoopSearch).Name + "\".");
             }
             if (present(InletNodeNumber)) {
@@ -1768,10 +1768,10 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
 }
 
 void ScanPlantLoopsForNodeNum(EnergyPlusData &state,
-                              std::string_view const &CallerName, // really used for error messages
-                              int const NodeNum,                  // index in Node structure of node to be scanned
-                              int &LoopNum,                       // return value for plant loop
-                              int &LoopSideNum,                   // return value for plant loop side
+                              std::string_view const CallerName, // really used for error messages
+                              int const NodeNum,                 // index in Node structure of node to be scanned
+                              int &LoopNum,                      // return value for plant loop
+                              int &LoopSideNum,                  // return value for plant loop side
                               int &BranchNum,
                               Optional_int CompNum)
 {
@@ -1946,7 +1946,7 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
 
 int MyPlantSizingIndex(EnergyPlusData &state,
                        std::string const &CompType,           // component description
-                       std::string const &CompName,           // user name of component
+                       std::string_view CompName,             // user name of component
                        int const NodeNumIn,                   // component water inlet node
                        [[maybe_unused]] int const NodeNumOut, // component water outlet node
                        bool &ErrorsFound,                     // set to true if there's an error, unchanged otherwise
@@ -2006,13 +2006,13 @@ int MyPlantSizingIndex(EnergyPlusData &state,
             if (PrintErrorFlag) {
                 ShowSevereError(state,
                                 "MyPlantSizingIndex: Could not find " + state.dataPlnt->PlantLoop(MyPltLoopNum).Name + " in Sizing:Plant objects.");
-                ShowContinueError(state, "...reference Component Type=\"" + CompType + "\", Name=\"" + CompName + "\".");
+                ShowContinueError(state, "...reference Component Type=\"" + CompType + "\", Name=\"" + std::string{CompName} + "\".");
             }
             ErrorsFound = true;
         }
     } else {
         if (PrintErrorFlag) {
-            ShowWarningError(state, "MyPlantSizingIndex: Could not find " + CompType + " with name " + CompName + " on any plant loop");
+            ShowWarningError(state, "MyPlantSizingIndex: Could not find " + CompType + " with name " + std::string{CompName} + " on any plant loop");
         }
         ErrorsFound = true;
     }
