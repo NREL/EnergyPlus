@@ -143,6 +143,72 @@ int constexpr HcExt_ISO15099Windows{323};
 int constexpr HcExt_AlamdariHammondStableHorizontal{324};
 int constexpr HcExt_AlamdariHammondUnstableHorizontal{325};
 
+// Parameters for classification of outside face of surfaces
+constexpr int OutConvClass_WindwardVertWall{101};
+constexpr int OutConvClass_LeewardVertWall{102};
+constexpr int OutConvClass_RoofStable{103};
+constexpr int OutConvClass_RoofUnstable{104};
+
+// Parameters for fenestration relative location in zone
+enum class InConvWinLoc
+{
+    Invalid = -1,
+    NotSet = 0,
+    LowerPartOfExteriorWall = 1, // this is a window in the lower part of wall
+    UpperPartOfExteriorWall = 2, // this is a window in the upper part of wall
+    WindowAboveThis = 3,         // this is a wall with window above it
+    WindowBelowThis = 4,         // this is a wall with window below it
+    LargePartOfExteriorWall = 5, // this is a big window taking up most of wall
+};
+
+// Parameters for adaptive convection algorithm's classification of inside face of surfaces
+constexpr int InConvClass_Invalid{-1};
+constexpr int InConvClass_A1_VertWalls{1};           // flow regime A1, vertical walls
+constexpr int InConvClass_A1_StableHoriz{2};         // flow regime A1
+constexpr int InConvClass_A1_UnstableHoriz{3};       // flow regime A1
+constexpr int InConvClass_A1_HeatedFloor{4};         // flow regime A1
+constexpr int InConvClass_A1_ChilledCeil{5};         // flow regime A1
+constexpr int InConvClass_A1_StableTilted{6};        // flow regime A1
+constexpr int InConvClass_A1_UnstableTilted{7};      // flow regime A1
+constexpr int InConvClass_A1_Windows{8};             // flow regime A1
+constexpr int InConvClass_A2_VertWallsNonHeated{9};  // flow regime A2
+constexpr int InConvClass_A2_HeatedVerticalWall{10}; // flow regime A2
+constexpr int InConvClass_A2_StableHoriz{11};        // flow regime A2
+constexpr int InConvClass_A2_UnstableHoriz{12};      // flow regime A2
+constexpr int InConvClass_A2_StableTilted{13};       // flow regime A2
+constexpr int InConvClass_A2_UnstableTilted{14};     // flow regime A2
+constexpr int InConvClass_A2_Windows{15};            // flow regime A2
+constexpr int InConvClass_A3_VertWalls{16};          // flow regime A3
+constexpr int InConvClass_A3_StableHoriz{17};        // flow regime A3
+constexpr int InConvClass_A3_UnstableHoriz{18};      // flow regime A3
+constexpr int InConvClass_A3_StableTilted{19};       // flow regime A3
+constexpr int InConvClass_A3_UnstableTilted{20};     // flow regime A3
+constexpr int InConvClass_A3_Windows{21};            // flow regime A3
+constexpr int InConvClass_B_VertWalls{22};           // flow regime B
+constexpr int InConvClass_B_VertWallsNearHeat{23};   // flow regime B
+constexpr int InConvClass_B_StableHoriz{24};         // flow regime B
+constexpr int InConvClass_B_UnstableHoriz{25};       // flow regime B
+constexpr int InConvClass_B_StableTilted{26};        // flow regime B
+constexpr int InConvClass_B_UnstableTilted{27};      // flow regime B
+constexpr int InConvClass_B_Windows{28};             // flow regime B
+constexpr int InConvClass_C_Walls{29};               // flow regime C
+constexpr int InConvClass_C_Ceiling{30};             // flow regime C
+constexpr int InConvClass_C_Floor{31};               // flow regime C
+constexpr int InConvClass_C_Windows{32};             // flow regime C
+constexpr int InConvClass_D_Walls{33};               // flow regime D
+constexpr int InConvClass_D_StableHoriz{34};         // flow regime D
+constexpr int InConvClass_D_UnstableHoriz{35};       // flow regime D
+constexpr int InConvClass_D_StableTilted{36};        // flow regime D
+constexpr int InConvClass_D_UnstableTilted{37};      // flow regime D
+constexpr int InConvClass_D_Windows{38};             // flow regime D
+constexpr int InConvClass_E_AssistFlowWalls{39};     // flow regime E
+constexpr int InConvClass_E_OpposFlowWalls{40};      // flow regime E
+constexpr int InConvClass_E_StableFloor{41};         // flow regime E
+constexpr int InConvClass_E_UnstableFloor{42};       // flow regime E
+constexpr int InConvClass_E_StableCeiling{43};       // flow regime E
+constexpr int InConvClass_E_UnstableCeiling{44};     // flow regime E
+constexpr int InConvClass_E_Windows{45};             // flow regime E
+
 // Parameters to indicate user specified convection coefficients (for surface)
 enum class ConvCoefOverrideType
 {
