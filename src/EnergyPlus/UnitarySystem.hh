@@ -814,7 +814,7 @@ namespace UnitarySystems {
         getUnitarySystemInputData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
         static void getCoilWaterSystemInputData(
-            EnergyPlusData &state, std::string const &CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
+            EnergyPlusData &state, std::string_view CoilSysName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
         static HVACSystemData *
         factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
