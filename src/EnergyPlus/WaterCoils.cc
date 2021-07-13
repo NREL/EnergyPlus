@@ -140,7 +140,7 @@ using Psychrometrics::PsyWFnTdpPb;
 using namespace ScheduleManager;
 
 void SimulateWaterCoilComponents(EnergyPlusData &state,
-                                 std::string const &CompName,
+                                 std::string_view CompName,
                                  bool const FirstHVACIteration,
                                  int &CompIndex,
                                  Optional<Real64> QActual,
@@ -174,7 +174,7 @@ void SimulateWaterCoilComponents(EnergyPlusData &state,
     if (CompIndex == 0) {
         CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
         if (CoilNum == 0) {
-            ShowFatalError(state, "SimulateWaterCoilComponents: Coil not found=" + CompName);
+            ShowFatalError(state, "SimulateWaterCoilComponents: Coil not found=" + std::string{CompName});
         }
         CompIndex = CoilNum;
     } else {
@@ -262,7 +262,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
     using namespace FaultsManager;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("GetWaterCoilInput: "); // include trailing blank space
+    static constexpr std::string_view RoutineName("GetWaterCoilInput: "); // include trailing blank space
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CoilNum; // The WaterCoil that you are currently loading input into
@@ -968,7 +968,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
     }
 
     if (ErrorsFound) {
-        ShowFatalError(state, RoutineName + "Errors found in getting input.");
+        ShowFatalError(state, std::string{RoutineName} + "Errors found in getting input.");
     }
 
     AlphArray.deallocate();
@@ -1014,7 +1014,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
     constexpr Real64 SmallNo(1.e-9); // SmallNo number in place of zero
     constexpr int itmax(10);
     constexpr int MaxIte(500); // Maximum number of iterations
-    static std::string const RoutineName("InitWaterCoil");
+    static constexpr std::string_view RoutineName("InitWaterCoil");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int tempCoilNum;                   // loop variable
@@ -2299,8 +2299,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
     using PlantUtilities::RegisterPlantCompDesignFlow;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const InitWaterCoil("InitWaterCoil");
-    static std::string const RoutineName("SizeWaterCoil");
+    static constexpr std::string_view RoutineName("SizeWaterCoil");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 rho;
@@ -2981,7 +2980,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             sizerHWCoilUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             state.dataWaterCoils->WaterCoil(CoilNum).UACoil = sizerHWCoilUA.size(state, TempSize, ErrorsFound);
             if (DesCoilWaterInTempSaved < DesCoilHWInletTempMin) {
-                ShowWarningError(state, "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
+                ShowWarningError(state, "Autosizing of heating coil UA for Coil:Heating:Water \"" + std::string{CompName} + "\"");
                 ShowContinueError(state,
                                   format(" Plant design loop exit temperature = {:.2T} C",
                                          state.dataSize->PlantSizData(state.dataSize->DataPltSizHeatNum).ExitTemp));
@@ -3082,7 +3081,7 @@ void CalcSimpleHeatingCoil(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CalcSimpleHeatingCoil");
+    static constexpr std::string_view RoutineName("CalcSimpleHeatingCoil");
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -3262,7 +3261,7 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static Real64 const exp_47(std::exp(-0.41718));
     static Real64 const exp_35(std::exp(-0.3574));
-    static std::string const RoutineName("CalcDetailFlatFinCoolingCoil");
+    static constexpr std::string_view RoutineName("CalcDetailFlatFinCoolingCoil");
 
     constexpr Real64 AirViscosity(1.846e-5); // Dynamic Viscosity of Air in kg/(m.s)
     constexpr Real64 ConvK(1.0e-3);          // Unit conversion factor
@@ -4185,7 +4184,7 @@ void CoilCompletelyDry(EnergyPlusData &state,
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CoilCompletelyDry");
+    static constexpr std::string_view RoutineName("CoilCompletelyDry");
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -4294,7 +4293,7 @@ void CoilCompletelyWet(EnergyPlusData &state,
     // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CoilCompletelyWet");
+    static constexpr std::string_view RoutineName("CoilCompletelyWet");
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -5115,7 +5114,7 @@ void ReportWaterCoil(EnergyPlusData &state, int const CoilNum)
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("ReportWaterCoil");
+    static constexpr std::string_view RoutineName("ReportWaterCoil");
 
     // INTERFACE BLOCK SPECIFICATIONS
     // na
@@ -5982,7 +5981,7 @@ Label10:;
 
 void CheckWaterCoilSchedule(EnergyPlusData &state,
                             [[maybe_unused]] std::string const &CompType, // unused1208
-                            std::string const &CompName,
+                            std::string_view CompName,
                             Real64 &Value,
                             int &CompIndex)
 {
@@ -6011,7 +6010,7 @@ void CheckWaterCoilSchedule(EnergyPlusData &state,
     if (CompIndex == 0) {
         CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
         if (CoilNum == 0) {
-            ShowFatalError(state, "CheckWaterCoilSchedule: Coil not found=" + CompName);
+            ShowFatalError(state, "CheckWaterCoilSchedule: Coil not found=" + std::string{CompName});
         }
         CompIndex = CoilNum;
         Value = GetCurrentScheduleValue(state, state.dataWaterCoils->WaterCoil(CoilNum).SchedPtr); // not scheduled?
@@ -6443,7 +6442,7 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
     using SetPointManager::NodeHasSPMCtrlVarType;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("CheckForSensorAndSetpointNode: ");
+    static constexpr std::string_view RoutineName("CheckForSensorAndSetpointNode: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int WhichCoil;             // water coil index
@@ -6485,7 +6484,8 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                     if (EMSSetPointErrorFlag) {
                         if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
-                            ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                            ShowWarningError(
+                                state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                             ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
                             ShowContinueError(state,
                                               " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -6497,7 +6497,8 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                     if (EMSSetPointErrorFlag) {
                         if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
-                            ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                            ShowWarningError(
+                                state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                             ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
                             ShowContinueError(state,
                                               " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -6509,7 +6510,8 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                     if (EMSSetPointErrorFlag) {
                         if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::Temp)) {
-                            ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                            ShowWarningError(
+                                state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                             ShowContinueError(state, " ..Temperature setpoint not found on coil air outlet node.");
                             ShowContinueError(state,
                                               " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -6521,7 +6523,8 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                     if (EMSSetPointErrorFlag) {
                         if (!NodeHasSPMCtrlVarType(state, SensorNodeNum, iCtrlVarType::MaxHumRat)) {
-                            ShowWarningError(state, RoutineName + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
+                            ShowWarningError(
+                                state, std::string{RoutineName} + WaterCoilType + "=\"" + state.dataWaterCoils->WaterCoil(WhichCoil).Name + "\". ");
                             ShowContinueError(state, " ..Humidity ratio setpoint not found on coil air outlet node.");
                             ShowContinueError(state,
                                               " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -7054,7 +7057,7 @@ void EstimateCoilInletWaterTemp(EnergyPlusData &state,
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("EstimateCoilInletWaterTemp");
+    static constexpr std::string_view RoutineName("EstimateCoilInletWaterTemp");
     constexpr Real64 EffectivenessMaxAssumed(0.80);
 
     // INTERFACE BLOCK SPECIFICATIONS

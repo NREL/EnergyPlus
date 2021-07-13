@@ -266,7 +266,7 @@ namespace WaterCoils {
     // Functions
 
     void SimulateWaterCoilComponents(EnergyPlusData &state,
-                                     std::string const &CompName,
+                                     std::string_view CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64> QActual = _,
@@ -429,7 +429,7 @@ namespace WaterCoils {
 
     void CheckWaterCoilSchedule(EnergyPlusData &state,
                                 std::string const &CompType, // unused1208
-                                std::string const &CompName,
+                                std::string_view CompName,
                                 Real64 &Value,
                                 int &CompIndex);
 

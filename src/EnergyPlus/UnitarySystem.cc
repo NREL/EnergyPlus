@@ -103,8 +103,8 @@
 namespace EnergyPlus {
 namespace UnitarySystems {
 
-    static std::string const fluidNameSteam("STEAM");
-    static std::string const blankString("");
+    static constexpr std::string_view fluidNameSteam("STEAM");
+    static constexpr std::string_view blankString("");
 
     UnitarySysInputSpec::UnitarySysInputSpec()
         : dx_heating_coil_sizing_ratio(1.0), minimum_supply_air_temperature(2.0), cooling_supply_air_flow_rate(-999.0),
@@ -186,7 +186,7 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::simulate(EnergyPlusData &state,
-                              std::string const &Name,
+                              std::string_view Name,
                               bool const FirstHVACIteration,
                               int const &AirLoopNum,
                               int &CompIndex,
@@ -213,7 +213,7 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::simulateSys(EnergyPlusData &state,
-                                 std::string const &Name,
+                                 std::string_view Name,
                                  bool const FirstHVACIteration,
                                  int const &AirLoopNum,
                                  int &CompIndex,
@@ -391,7 +391,7 @@ namespace UnitarySystems {
 
                 std::string loc_m_SingleModeOp("No");
                 if (fields.find("single_mode_operation") != fields.end()) { // not required field
-                    loc_m_SingleModeOp = UtilityRoutines::MakeUPPERCase(fields.at("single_mode_operation"));
+                    loc_m_SingleModeOp = UtilityRoutines::MakeUPPERCase(AsString(fields.at("single_mode_operation")));
                 }
                 // set single mode flag
                 if (UtilityRoutines::SameString(loc_m_SingleModeOp, "Yes")) {
@@ -467,8 +467,8 @@ namespace UnitarySystems {
     }
 
     int getDesignSpecMSHPIndex(
-        EnergyPlusData &state,        // lookup vector index for design spec object name in object array EnergyPlus::UnitarySystems::designSpecMSHP
-        std::string const &objectName // IDF name in input
+        EnergyPlusData &state,      // lookup vector index for design spec object name in object array EnergyPlus::UnitarySystems::designSpecMSHP
+        std::string_view objectName // IDF name in input
     )
     {
         int index = -1;
@@ -479,13 +479,14 @@ namespace UnitarySystems {
                 return index;
             }
         }
-        ShowSevereError(state, "getDesignSpecMSHPIndex: did not find UnitarySystemPerformance:Multispeed name =" + objectName + ". Check inputs");
+        ShowSevereError(
+            state, "getDesignSpecMSHPIndex: did not find UnitarySystemPerformance:Multispeed name =" + std::string{objectName} + ". Check inputs");
         return index;
     }
 
     int getUnitarySystemIndex(
-        EnergyPlusData &state,        // lookup vector index for UnitarySystem object name in object array EnergyPlus::UnitarySystems::unitarySys
-        std::string const &objectName // IDF name in input
+        EnergyPlusData &state,      // lookup vector index for UnitarySystem object name in object array EnergyPlus::UnitarySystems::unitarySys
+        std::string_view objectName // IDF name in input
     )
     {
         int index = -1;
@@ -504,7 +505,7 @@ namespace UnitarySystems {
     void UnitarySys::initUnitarySystems(
         EnergyPlusData &state, int const &AirLoopNum, bool const &FirstHVACIteration, int const ZoneOAUnitNum, Real64 const OAUCoilOutTemp)
     {
-        static std::string const routineName("InitUnitarySystems");
+        static constexpr std::string_view routineName("InitUnitarySystems");
         bool errorsFound = false; // error flag for mining functions
 
         if (state.dataUnitarySystems->myOneTimeFlag) {
@@ -1420,7 +1421,7 @@ namespace UnitarySystems {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const RunOnSensible(1); // identifier for temperature (sensible load) control
         int const RunOnLatent(2);   // identifier for humidity (latent load) control
-        static std::string const routineName("FrostControlSetPointLimit");
+        static constexpr std::string_view routineName("FrostControlSetPointLimit");
 
         Real64 AirMassFlow = state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).MassFlowRate;
         if (ControlMode == RunOnSensible && AirMassFlow > DataHVACGlobals::SmallAirVolFlow &&
@@ -1441,7 +1442,7 @@ namespace UnitarySystems {
         }
     }
 
-    void UnitarySys::getUnitarySystemInput(EnergyPlusData &state, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
+    void UnitarySys::getUnitarySystemInput(EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
     {
 
         bool errorsFound(false);
@@ -1475,7 +1476,7 @@ namespace UnitarySystems {
         // heating and cooling capacities are close but not identical.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeUnitarySystem");
+        static constexpr std::string_view RoutineName("SizeUnitarySystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Iter;                  // iteration count
@@ -1672,7 +1673,7 @@ namespace UnitarySystems {
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
             } else {
                 // should never happen
-                ShowSevereError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Illegal entry for Cooling Supply Air Flow Rate Method.");
             }
 
@@ -1803,7 +1804,7 @@ namespace UnitarySystems {
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
                 // should never happen
-                ShowSevereError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowSevereError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Illegal entry for Heating Supply Air Flow Rate Method.");
             }
 
@@ -1965,7 +1966,7 @@ namespace UnitarySystems {
             this->m_DesignFanVolFlowRate = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
             if (this->m_ActualFanVolFlowRate > 0.0) this->m_DesignFanVolFlowRate = this->m_ActualFanVolFlowRate;
             if (this->m_DesignFanVolFlowRate <= 0.0) {
-                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowFatalError(state, "Unable to determine fan air flow rate.");
             }
         }
@@ -2171,7 +2172,7 @@ namespace UnitarySystems {
                                                       0.0,
                                                       0.0); // conduct the sizing operation in the VS WSHP
             if (this->m_NumOfSpeedCooling != state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                 ShowFatalError(state,
                                "Cooling coil = " + state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).VarSpeedCoilType + ": " +
@@ -2222,7 +2223,7 @@ namespace UnitarySystems {
             auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
             // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
             if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
-                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                 ShowFatalError(state, "Cooling coil = Coil:Cooling:DX: " + newCoil.name);
             }
@@ -2383,7 +2384,7 @@ namespace UnitarySystems {
                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage) {
                             if (state.dataUnitarySystems->designSpecMSHP[MSHPIndex].heatingVolFlowRatio[Iter - 1] < 1.0 &&
                                 this->m_ControlType == ControlType::Setpoint) {
-                                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                                 ShowContinueError(state, "Design specification object = " + state.dataUnitarySystems->designSpecMSHP[MSHPIndex].name);
                                 ShowContinueError(state,
                                                   "When control type = SetPointBased the outlet air temperature must change with coil capacity, if "
@@ -2455,7 +2456,7 @@ namespace UnitarySystems {
                                                       0.0); // conduct the sizing operation in the VS WSHP
 
             if (this->m_NumOfSpeedHeating != state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).NumOfSpeeds) {
-                ShowWarningError(state, RoutineName + ": " + CompType + " = " + CompName);
+                ShowWarningError(state, std::string{RoutineName} + ": " + CompType + " = " + std::string{CompName});
                 ShowContinueError(state, "Number of heating speeds does not match coil object.");
                 ShowFatalError(state,
                                "Heating coil = " + state.dataVariableSpeedCoils->VarSpeedCoil(this->m_HeatingCoilIndex).VarSpeedCoilType + ": " +
@@ -2927,7 +2928,7 @@ namespace UnitarySystems {
                                       int const ZoneOAUnitNum)
     {
 
-        static std::string const unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
+        static constexpr std::string_view unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
         std::string cCurrentModuleObject = input_data.system_type;
         std::string thisObjectName = input_data.name;
@@ -6756,7 +6757,7 @@ namespace UnitarySystems {
             if (this->m_NumOfSpeedCooling == 0) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                 ShowContinueError(state,
-                                  "... Cooling coil object type requires valid " + unitarySysHeatPumpPerformanceObjectType +
+                                  "... Cooling coil object type requires valid " + std::string{unitarySysHeatPumpPerformanceObjectType} +
                                       " for cooling to be specified with number of speeds > 0");
                 errorsFound = true;
             }
@@ -6768,7 +6769,7 @@ namespace UnitarySystems {
             if (this->m_NumOfSpeedHeating == 0) {
                 ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                 ShowContinueError(state,
-                                  "... Heating coil object type requires valid " + unitarySysHeatPumpPerformanceObjectType +
+                                  "... Heating coil object type requires valid " + std::string{unitarySysHeatPumpPerformanceObjectType} +
                                       " for heating to be specified with number of speeds > 0");
                 errorsFound = true;
             }
@@ -7011,11 +7012,8 @@ namespace UnitarySystems {
     }
 
     void UnitarySys::getUnitarySystemInputData(
-        EnergyPlusData &state, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
+        EnergyPlusData &state, std::string_view objectName, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound)
     {
-
-        static std::string const getUnitarySystemInput("getUnitarySystemInputData");
-
         std::string cCurrentModuleObject = "AirLoopHVAC:UnitarySystem";
         int numUnitarySystems = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         int numCoilSystemsWater =
@@ -7056,52 +7054,52 @@ namespace UnitarySystems {
                 input_spec.control_type = fields.at("control_type");
                 if (fields.find("controlling_zone_or_thermostat_location") != fields.end()) { // not required field
                     input_spec.controlling_zone_or_thermostat_location =
-                        UtilityRoutines::MakeUPPERCase(fields.at("controlling_zone_or_thermostat_location"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("controlling_zone_or_thermostat_location")));
                 }
                 if (fields.find("dehumidification_control_type") != fields.end()) { // not required field, has default
-                    input_spec.dehumidification_control_type = UtilityRoutines::MakeUPPERCase(fields.at("dehumidification_control_type"));
+                    input_spec.dehumidification_control_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("dehumidification_control_type")));
                 } else {
                     input_spec.dehumidification_control_type = "NONE"; // default value
                 }
                 if (fields.find("availability_schedule_name") != fields.end()) { // not required field
-                    input_spec.availability_schedule_name = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
+                    input_spec.availability_schedule_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("availability_schedule_name")));
                 }
-                input_spec.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_inlet_node_name"));   // required
-                input_spec.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("air_outlet_node_name")); // required
-                if (fields.find("supply_fan_object_type") != fields.end()) {                                         // not required field
-                    input_spec.supply_fan_object_type = UtilityRoutines::MakeUPPERCase(fields.at("supply_fan_object_type"));
+                input_spec.air_inlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_inlet_node_name")));   // required
+                input_spec.air_outlet_node_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("air_outlet_node_name"))); // required
+                if (fields.find("supply_fan_object_type") != fields.end()) {                                                   // not required field
+                    input_spec.supply_fan_object_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("supply_fan_object_type")));
                 }
 
                 std::string loc_m_FanName;
                 if (fields.find("supply_fan_name") != fields.end()) { // not required field
-                    input_spec.supply_fan_name = UtilityRoutines::MakeUPPERCase(fields.at("supply_fan_name"));
+                    input_spec.supply_fan_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("supply_fan_name")));
                 }
                 if (fields.find("fan_placement") != fields.end()) { // not required field
-                    input_spec.fan_placement = UtilityRoutines::MakeUPPERCase(fields.at("fan_placement"));
+                    input_spec.fan_placement = UtilityRoutines::MakeUPPERCase(AsString(fields.at("fan_placement")));
                 }
                 if (fields.find("supply_air_fan_operating_mode_schedule_name") != fields.end()) { // not required field
                     input_spec.supply_air_fan_operating_mode_schedule_name =
-                        UtilityRoutines::MakeUPPERCase(fields.at("supply_air_fan_operating_mode_schedule_name"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("supply_air_fan_operating_mode_schedule_name")));
                 }
                 if (fields.find("heating_coil_object_type") != fields.end()) { // not required field
-                    input_spec.heating_coil_object_type = UtilityRoutines::MakeUPPERCase(fields.at("heating_coil_object_type"));
+                    input_spec.heating_coil_object_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("heating_coil_object_type")));
                     thisSys.m_HeatCoilExists = true;
                 }
                 if (fields.find("heating_coil_name") != fields.end()) { // not required field
-                    input_spec.heating_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("heating_coil_name"));
+                    input_spec.heating_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("heating_coil_name")));
                 }
                 if (fields.find("dx_heating_coil_sizing_ratio") != fields.end()) { // not required field, has default
                     input_spec.dx_heating_coil_sizing_ratio = fields.at("dx_heating_coil_sizing_ratio");
                 }
                 if (fields.find("cooling_coil_object_type") != fields.end()) { // not required field
-                    input_spec.cooling_coil_object_type = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));
+                    input_spec.cooling_coil_object_type = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_object_type")));
                     thisSys.m_CoolCoilExists = true;
                 }
                 if (fields.find("cooling_coil_name") != fields.end()) { // not required field
-                    input_spec.cooling_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_name"));
+                    input_spec.cooling_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_coil_name")));
                 }
                 if (fields.find("use_doas_dx_cooling_coil") != fields.end()) { // not required field, has default
-                    input_spec.use_doas_dx_cooling_coil = UtilityRoutines::MakeUPPERCase(fields.at("use_doas_dx_cooling_coil"));
+                    input_spec.use_doas_dx_cooling_coil = UtilityRoutines::MakeUPPERCase(AsString(fields.at("use_doas_dx_cooling_coil")));
                 } else {
                     input_spec.use_doas_dx_cooling_coil = "No";
                 }
@@ -7114,19 +7112,20 @@ namespace UnitarySystems {
                     }
                 }
                 if (fields.find("latent_load_control") != fields.end()) { // not required field, has default
-                    input_spec.latent_load_control = UtilityRoutines::MakeUPPERCase(fields.at("latent_load_control"));
+                    input_spec.latent_load_control = UtilityRoutines::MakeUPPERCase(AsString(fields.at("latent_load_control")));
                 } else {
                     input_spec.latent_load_control = "SensibleOnlyLoadControl";
                 }
                 if (fields.find("supplemental_heating_coil_object_type") != fields.end()) { // not required field
                     input_spec.supplemental_heating_coil_object_type =
-                        UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_object_type"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("supplemental_heating_coil_object_type")));
                 }
                 if (fields.find("supplemental_heating_coil_name") != fields.end()) { // not required field
-                    input_spec.supplemental_heating_coil_name = UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_name"));
+                    input_spec.supplemental_heating_coil_name = UtilityRoutines::MakeUPPERCase(AsString(fields.at("supplemental_heating_coil_name")));
                 }
                 if (fields.find("cooling_supply_air_flow_rate_method") != fields.end()) { // not required field
-                    input_spec.cooling_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(fields.at("cooling_supply_air_flow_rate_method"));
+                    input_spec.cooling_supply_air_flow_rate_method =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("cooling_supply_air_flow_rate_method")));
                 }
                 if (fields.find("cooling_supply_air_flow_rate") != fields.end()) { // not required field, autosizable
                     auto tempFieldVal = fields.at("cooling_supply_air_flow_rate");
@@ -7147,7 +7146,8 @@ namespace UnitarySystems {
                     input_spec.cooling_supply_air_flow_rate_per_unit_of_capacity = fields.at("cooling_supply_air_flow_rate_per_unit_of_capacity");
                 }
                 if (fields.find("heating_supply_air_flow_rate_method") != fields.end()) { // not required field
-                    input_spec.heating_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(fields.at("heating_supply_air_flow_rate_method"));
+                    input_spec.heating_supply_air_flow_rate_method =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("heating_supply_air_flow_rate_method")));
                 }
                 if (fields.find("heating_supply_air_flow_rate") != fields.end()) { // not required field
                     auto tempFieldVal = fields.at("heating_supply_air_flow_rate");
@@ -7168,7 +7168,8 @@ namespace UnitarySystems {
                     input_spec.heating_supply_air_flow_rate_per_unit_of_capacity = fields.at("heating_supply_air_flow_rate_per_unit_of_capacity");
                 }
                 if (fields.find("no_load_supply_air_flow_rate_method") != fields.end()) { // not required field
-                    input_spec.no_load_supply_air_flow_rate_method = UtilityRoutines::MakeUPPERCase(fields.at("no_load_supply_air_flow_rate_method"));
+                    input_spec.no_load_supply_air_flow_rate_method =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("no_load_supply_air_flow_rate_method")));
                 }
                 if (fields.find("no_load_supply_air_flow_rate") != fields.end()) { // not required field
                     auto tempFieldVal = fields.at("no_load_supply_air_flow_rate");
@@ -7212,7 +7213,7 @@ namespace UnitarySystems {
                 }
                 if (fields.find("outdoor_dry_bulb_temperature_sensor_node_name") != fields.end()) { // not required field
                     input_spec.outdoor_dry_bulb_temperature_sensor_node_name =
-                        UtilityRoutines::MakeUPPERCase(fields.at("outdoor_dry_bulb_temperature_sensor_node_name"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("outdoor_dry_bulb_temperature_sensor_node_name")));
                 }
                 if (fields.find("maximum_cycling_rate") != fields.end()) { // not required field, has default
                     input_spec.maximum_cycling_rate = fields.at("maximum_cycling_rate");
@@ -7239,19 +7240,20 @@ namespace UnitarySystems {
                     input_spec.maximum_temperature_for_heat_recovery = fields.at("maximum_temperature_for_heat_recovery");
                 }
                 if (fields.find("heat_recovery_water_inlet_node_name") != fields.end()) { // not required field
-                    input_spec.heat_recovery_water_inlet_node_name = UtilityRoutines::MakeUPPERCase(fields.at("heat_recovery_water_inlet_node_name"));
+                    input_spec.heat_recovery_water_inlet_node_name =
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("heat_recovery_water_inlet_node_name")));
                 }
                 if (fields.find("heat_recovery_water_outlet_node_name") != fields.end()) { // not required field
                     input_spec.heat_recovery_water_outlet_node_name =
-                        UtilityRoutines::MakeUPPERCase(fields.at("heat_recovery_water_outlet_node_name"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("heat_recovery_water_outlet_node_name")));
                 }
                 if (fields.find("design_specification_multispeed_object_type") != fields.end()) { // not required field
                     input_spec.design_specification_multispeed_object_type =
-                        UtilityRoutines::MakeUPPERCase(fields.at("design_specification_multispeed_object_type"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("design_specification_multispeed_object_type")));
                 }
                 if (fields.find("design_specification_multispeed_object_name") != fields.end()) { // not required field
                     input_spec.design_specification_multispeed_object_name =
-                        UtilityRoutines::MakeUPPERCase(fields.at("design_specification_multispeed_object_name"));
+                        UtilityRoutines::MakeUPPERCase(AsString(fields.at("design_specification_multispeed_object_name")));
                 }
 
                 thisSys.processInputSpec(state, input_spec, sysNum, errorsFound, ZoneEquipment, ZoneOAUnitNum);
@@ -9400,7 +9402,7 @@ namespace UnitarySystems {
         // Initialize mass flow rates and speed ratios. Calculate loads and adjust if necessary when using constant fan.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const routineName("InitUnitarySystems");
+        static constexpr std::string_view routineName("InitUnitarySystems");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // static Array1D_bool MyEnvrnFlag; // environment flag
@@ -14573,7 +14575,7 @@ namespace UnitarySystems {
         //  Calculate the heat recovered from UnitarySystem
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const routineName("UnitarySystemHeatRecovery");
+        static constexpr std::string_view routineName("UnitarySystemHeatRecovery");
 
         Real64 ReportingConstant = state.dataHVACGlobal->TimeStepSys * DataGlobalConstants::SecInHour;
 
@@ -16543,7 +16545,7 @@ namespace UnitarySystems {
         this->setAverageAirFlow(state, PartLoadRatio, OnOffAirFlowRatio);
     }
 
-    void UnitarySys::checkUnitarySysCoilInOASysExists(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum)
+    void UnitarySys::checkUnitarySysCoilInOASysExists(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -16558,7 +16560,7 @@ namespace UnitarySystems {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CheckUnitarySysCoilInOASysExists: "); // include trailing blank space
+        static constexpr std::string_view RoutineName("CheckUnitarySysCoilInOASysExists: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         if (state.dataUnitarySystems->getInputOnceFlag) {
@@ -16585,18 +16587,18 @@ namespace UnitarySystems {
                 }
             }
             if (!UnitarySysFound) {
-                ShowSevereError(state, RoutineName + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
+                ShowSevereError(state, std::string{RoutineName} + "System not found = UnitarySystem \"" + std::string{UnitarySysName} + "\"");
             }
         } else {
-            ShowSevereError(state, RoutineName + "System not found = UnitarySystem \"" + UnitarySysName + "\"");
+            ShowSevereError(state, std::string{RoutineName} + "System not found = UnitarySystem \"" + std::string{UnitarySysName} + "\"");
         }
     }
 
     void UnitarySys::getUnitarySysHeatCoolCoil(EnergyPlusData &state,
-                                               std::string const &UnitarySysName, // Name of Unitary System object
-                                               bool &CoolingCoil,                 // Cooling coil exists
-                                               bool &HeatingCoil,                 // Heating coil exists
-                                               int const ZoneOAUnitNum            // index to zone OA unit
+                                               std::string_view UnitarySysName, // Name of Unitary System object
+                                               bool &CoolingCoil,               // Cooling coil exists
+                                               bool &HeatingCoil,               // Heating coil exists
+                                               int const ZoneOAUnitNum          // index to zone OA unit
     )
     {
 
@@ -16628,7 +16630,7 @@ namespace UnitarySystems {
         }
     }
 
-    int UnitarySys::getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
+    int UnitarySys::getAirInNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
     {
         if (state.dataUnitarySystems->getInputOnceFlag) {
             getUnitarySystemInput(state, UnitarySysName, false, ZoneOAUnitNum);
@@ -16645,7 +16647,7 @@ namespace UnitarySystems {
         return airNode;
     }
 
-    int UnitarySys::getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
+    int UnitarySys::getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
     {
         if (state.dataUnitarySystems->getInputOnceFlag) {
             getUnitarySystemInput(state, UnitarySysName, false, ZoneOAUnitNum);
@@ -16737,7 +16739,7 @@ namespace UnitarySystems {
         }
     }
 
-    bool searchTotalComponents(EnergyPlusData &state, std::string objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex)
+    bool searchTotalComponents(EnergyPlusData &state, std::string_view objectNameToFind, int &compIndex, int &branchIndex, int &airLoopIndex)
     {
         for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
             for (int BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {

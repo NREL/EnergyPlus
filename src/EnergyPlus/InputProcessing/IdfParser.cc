@@ -680,7 +680,7 @@ IdfParser::Token IdfParser::next_token(std::string const &idf, size_t &index)
     case ';':
         return Token::SEMICOLON;
     default:
-        static std::string const numeric(".-+0123456789");
+        static constexpr std::string_view numeric(".-+0123456789");
         if (numeric.find_first_of(c) != std::string::npos) {
             return Token::NUMBER;
         }
@@ -692,7 +692,7 @@ IdfParser::Token IdfParser::next_token(std::string const &idf, size_t &index)
 
 std::string &IdfParser::rtrim(std::string &s)
 {
-    static std::string const whitespace(" \t\0", 3);
+    static constexpr std::string_view whitespace(" \t\0", 3);
     if (s.empty()) return s;
     auto const index = s.find_last_not_of(whitespace);
     if (index == std::string::npos) {
