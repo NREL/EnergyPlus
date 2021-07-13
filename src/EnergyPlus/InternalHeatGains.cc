@@ -1699,19 +1699,17 @@ namespace InternalHeatGains {
                         } else {
                             bool exhaustNodeError = false;
                             state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum = GetOnlySingleNode(state,
-                                                                                             AlphaName(8),
-                                                                                             exhaustNodeError ,
-                                                                                             CurrentModuleObject,
-                                                                                             state.dataHeatBal->Lights(Loop).Name,
-                                                                                             DataLoopNode::NodeFluidType::Air,
-                                                                                             DataLoopNode::NodeConnectionType::ZoneExhaust,
-                                                                                             NodeInputManager::compFluidStream::Primary,
-                                                                                             ObjectIsNotParent);
+                                                                                                   AlphaName(8),
+                                                                                                   exhaustNodeError,
+                                                                                                   CurrentModuleObject,
+                                                                                                   state.dataHeatBal->Lights(Loop).Name,
+                                                                                                   DataLoopNode::NodeFluidType::Air,
+                                                                                                   DataLoopNode::NodeConnectionType::ZoneExhaust,
+                                                                                                   NodeInputManager::compFluidStream::Primary,
+                                                                                                   ObjectIsNotParent);
                             if (!exhaustNodeError) { // GetOnlySingleNode will throw error messages if the is a NodeList Name and for other issues
                                 exhaustNodeError = DataZoneEquipment::VerifyLightsExhaustNodeForZone(
-                                    state,
-                                    state.dataHeatBal->Lights(Loop).ZonePtr,
-                                    state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum);
+                                    state, state.dataHeatBal->Lights(Loop).ZonePtr, state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum);
                             }
                             if (exhaustNodeError) {
                                 ShowWarningError(state,
@@ -1721,14 +1719,14 @@ namespace InternalHeatGains {
                             } else {
                                 if (state.dataHeatBal->Lights(Loop).ZoneReturnNum > 0) {
                                     state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->Zone(state.dataHeatBal->Lights(Loop).ZonePtr).ZoneEqNum)
-                                    .ReturnNodeExhaustNodeNum(state.dataHeatBal->Lights(Loop).ZoneReturnNum) =
-                                    state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum;
+                                        .ReturnNodeExhaustNodeNum(state.dataHeatBal->Lights(Loop).ZoneReturnNum) =
+                                        state.dataHeatBal->Lights(Loop).ZoneExhaustNodeNum;
                                 } else {
                                     ShowWarningError(state,
-                                                 RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
-                                                     state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8) + " is not used" );
-                                    ShowContinueError(state, "No matching Zone Return Air Node found. The Exhaust Node requires Return Node to work together");
-
+                                                     RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " +
+                                                         state.dataIPShortCut->cAlphaFieldNames(8) + " =" + AlphaName(8) + " is not used");
+                                    ShowContinueError(
+                                        state, "No matching Zone Return Air Node found. The Exhaust Node requires Return Node to work together");
                                 }
                             }
                         }

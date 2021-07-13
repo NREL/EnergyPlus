@@ -1345,7 +1345,6 @@ bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, in
         }
     }
 
-
     return exhaustNodeError;
 }
 
