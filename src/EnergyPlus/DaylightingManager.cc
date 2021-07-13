@@ -1252,7 +1252,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const ZoneNum)
 
     //  In the following four variables, I=1 for clear sky, 2 for overcast.
     int IHR;       // Hour of day counter
-    int numRefPts;       // Number of daylighting reference points in a zone
+    int numRefPts; // Number of daylighting reference points in a zone
     int IL;        // Reference point counter
     Real64 AZVIEW; // Azimuth of view vector in absolute coord system for
     //  glare calculation (radians)

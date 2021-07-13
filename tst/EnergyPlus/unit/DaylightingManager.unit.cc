@@ -2893,15 +2893,14 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     int MapNum = 1;
     state->dataDaylightingManager->ReportIllumMap_firstTime = false;
     state->dataDaylightingData->TotIllumMaps = 1;
-    
+
     state->dataDaylightingManager->FirstTimeMaps.dimension(state->dataDaylightingData->TotIllumMaps, true);
     state->dataDaylightingManager->EnvrnPrint.dimension(state->dataDaylightingData->TotIllumMaps, false);
     state->dataGlobal->NumOfZones = 1;
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints = 3;
     state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
-    state->dataDaylightingManager->RefPts.allocate(state->dataGlobal->NumOfZones,
-                                                   state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
+    state->dataDaylightingManager->RefPts.allocate(state->dataGlobal->NumOfZones, state->dataDaylightingData->ZoneDaylight(1).TotalDaylRefPoints);
     state->dataDaylightingManager->SavedMnDy.allocate(state->dataDaylightingData->TotIllumMaps);
     state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->IllumMap(MapNum).Zone = 1;
@@ -2920,7 +2919,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataDaylightingData->ZoneDaylight(1).DaylRefPtAbsCoord(3, 3) = 9.01;
     state->dataDaylightingData->IllumMap(MapNum).Name = "ThisOne";
     state->dataDaylightingData->IllumMap(MapNum).Z = 23.23;
-    
+
     std::string ExpectedResult0;
     std::string ExpectedResult1;
     std::string ExpectedResult2;
@@ -2931,10 +2930,9 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     ExpectedResult3 = "RefPt3=(7.89:8.90:9.01)";
 
     DaylightingManager::ReportIllumMap(*state, MapNum);
-    
+
     EXPECT_EQ(ExpectedResult0, state->dataDaylightingData->IllumMap(1).Name);
     EXPECT_EQ(ExpectedResult1, state->dataDaylightingManager->RefPts(1, 1));
     EXPECT_EQ(ExpectedResult2, state->dataDaylightingManager->RefPts(1, 2));
     EXPECT_EQ(ExpectedResult3, state->dataDaylightingManager->RefPts(1, 3));
-
 }
