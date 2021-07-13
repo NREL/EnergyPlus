@@ -97,7 +97,7 @@ namespace MixerComponent {
 
     // Functions
 
-    void SimAirMixer(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
+    void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompIndex);
 
     // Get Input Section of the Module
     //******************************************************************************

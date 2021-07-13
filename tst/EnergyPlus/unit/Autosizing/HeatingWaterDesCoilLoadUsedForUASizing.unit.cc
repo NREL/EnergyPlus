@@ -59,7 +59,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilLoadUsedForUASizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     state->dataEnvrn->StdRhoAir = 1.2;
-    static std::string const routineName("HeatingWaterDesCoilLoadUsedForUASizingGauntlet");
+    static constexpr std::string_view routineName("HeatingWaterDesCoilLoadUsedForUASizingGauntlet");
 
     state->dataSize->ZoneEqSizing.allocate(1);
 
